@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { Card } from '@/components/ui/Card'
 import { PackageBadge } from '@/components/ui/PackageBadge'
