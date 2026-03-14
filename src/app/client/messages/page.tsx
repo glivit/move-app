@@ -1,0 +1,343 @@
+'use client'
+
+import { useEffect, useState, useRef, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { MessageCircle } from 'lucide-react'
+import { createClient } from '@/lib/supabase'
+import { ChatBubble } from '@/components/client/ChatBubble'
+import { ChatInput } from '@/components/client/ChatInput'
+
+interface Message {
+  id: string
+  sender_id: string
+  receiver_id: string
+  content: string
+  message_type: string
+  file_url: string | null
+  read_at: string | null
+  created_at: string
+}
+
+interface GroupedMessages {
+  [key: string]: Message[]
+}
+
+function getDateLabel(date: Date): string {
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const messageDate = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate()
+  )
+
+  if (messageDate.getTime() === today.getTime()) {
+    return 'Vandaag'
+  }
+
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+  if (messageDate.getTime() === yesterday.getTime()) {
+    return 'Gisteren'
+  }
+
+  return date.toLocaleDateString('nl-BE', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
+function groupMessagesByDate(messages: Message[]): GroupedMessages {
+  const groups: GroupedMessages = {}
+
+  messages.forEach((msg) => {
+    const date = new Date(msg.created_at)
+    const dateKey = getDateLabel(date)
+
+    if (!groups[dateKey]) {
+      groups[dateKey] = []
+    }
+    groups[dateKey].push(msg)
+  })
+
+  return groups
+}
+
+export default function ClientMessagesPage() {
+  const router = useRouter()
+  const [messages, setMessages] = useState<Message[]>([])
+  const [loading, setLoading] = useState(true)
+  const [sending, setSending] = useState(false)
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
+  const [coachId, setCoachId] = useState<string | null>(null)
+  const [coachName, setCoachName] = useState('')
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [])
+
+  // Initialize page and load data
+  useEffect(() => {
+    async function initPage() {
+      try {
+        const supabase = createClient()
+
+        // Get current user
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser()
+
+        if (authError || !user) {
+          router.push('/auth/login')
+          return
+        }
+
+        setCurrentUserId(user.id)
+
+        // Find coach
+        const { data: coaches, error: coachError } = await supabase
+          .from('profiles')
+          .select('id, full_name')
+          .eq('role', 'coach')
+          .limit(1)
+
+        if (coachError || !coaches || coaches.length === 0) {
+          console.error('Coach not found')
+          setLoading(false)
+          return
+        }
+
+        const coach = coaches[0]
+        setCoachId(coach.id)
+        setCoachName(coach.full_name || 'Coach')
+
+        // Load messages
+        const { data: messageData, error: messageError } = await supabase
+          .from('messages')
+          .select('*')
+          .or(
+            `and(sender_id.eq.${user.id},receiver_id.eq.${coach.id}),and(sender_id.eq.${coach.id},receiver_id.eq.${user.id})`
+          )
+          .order('created_at', { ascending: true })
+
+        if (!messageError && messageData) {
+          setMessages(messageData as Message[])
+        }
+
+        // Mark messages as read
+        if (messageData && messageData.length > 0) {
+          const unreadIds = messageData
+            .filter((m) => m.sender_id === coach.id && !m.read_at)
+            .map((m) => m.id)
+
+          if (unreadIds.length > 0) {
+            await supabase
+              .from('messages')
+              .update({ read_at: new Date().toISOString() })
+              .in('id', unreadIds)
+          }
+        }
+
+        setLoading(false)
+
+        // Subscribe to real-time messages
+        const channel = supabase
+          .channel(`conversation:${[user.id, coach.id].sort().join('-')}`)
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'messages',
+            },
+            (payload) => {
+              const msg = payload.new as Message
+              const isRelevant =
+                (msg.sender_id === user.id && msg.receiver_id === coach.id) ||
+                (msg.sender_id === coach.id && msg.receiver_id === user.id)
+              if (isRelevant) {
+                setMessages((prev) => {
+                  if (prev.some((m) => m.id === msg.id)) return prev
+                  return [...prev, msg]
+                })
+              }
+            }
+          )
+          .subscribe()
+
+        return () => {
+          supabase.removeChannel(channel)
+        }
+      } catch (error) {
+        console.error('Error initializing page:', error)
+        setLoading(false)
+      }
+    }
+
+    initPage()
+  }, [router])
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages, scrollToBottom])
+
+  const handleSendMessage = async (content: string) => {
+    if (!currentUserId || !coachId || !content.trim()) return
+
+    setSending(true)
+
+    try {
+      const supabase = createClient()
+
+      // Optimistic update
+      const optimisticMsg: Message = {
+        id: `temp-${Date.now()}`,
+        sender_id: currentUserId,
+        receiver_id: coachId,
+        content,
+        message_type: 'text',
+        file_url: null,
+        read_at: null,
+        created_at: new Date().toISOString(),
+      }
+
+      setMessages((prev) => [...prev, optimisticMsg])
+      scrollToBottom()
+
+      const { data, error } = await supabase
+        .from('messages')
+        .insert({
+          sender_id: currentUserId,
+          receiver_id: coachId,
+          content,
+          message_type: 'text',
+        })
+        .select()
+        .single()
+
+      if (error) {
+        setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id))
+        console.error('Error sending message:', error)
+        return
+      }
+
+      // Replace optimistic with real message
+      setMessages((prev) =>
+        prev.map((m) => (m.id === optimisticMsg.id ? (data as Message) : m))
+      )
+    } catch (error) {
+      console.error('Error sending message:', error)
+    } finally {
+      setSending(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-col h-[calc(100vh-80px)] bg-client-bg">
+        <div className="px-4 py-4 border-b border-client-border">
+          <div className="animate-pulse space-y-2">
+            <div className="h-5 bg-client-surface-muted rounded w-32" />
+            <div className="h-3 bg-client-surface-muted rounded w-24" />
+          </div>
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-pulse space-y-3">
+            <div className="h-3 bg-client-surface-muted rounded w-48 mx-auto" />
+            <div className="h-3 bg-client-surface-muted rounded w-64 mx-auto" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!currentUserId || !coachId) {
+    return (
+      <div className="flex flex-col h-[calc(100vh-80px)] bg-client-bg items-center justify-center">
+        <MessageCircle size={48} className="text-client-text-muted mb-4" />
+        <p className="text-client-text-muted">
+          {!currentUserId ? 'Niet aangemeld' : 'Coach niet beschikbaar'}
+        </p>
+      </div>
+    )
+  }
+
+  const groupedMessages = groupMessagesByDate(messages)
+  const dateKeys = Object.keys(groupedMessages)
+
+  return (
+    <div className="flex flex-col h-[calc(100vh-80px)] bg-client-bg -mx-4 -mt-4">
+      {/* Header */}
+      <div className="px-4 py-4 border-b border-client-border">
+        <h1 className="text-lg font-semibold text-text-primary">{coachName}</h1>
+        <p className="text-xs text-client-text-muted mt-0.5">Je coach</p>
+      </div>
+
+      {/* Messages */}
+      <div
+        ref={containerRef}
+        className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
+      >
+        {messages.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center space-y-3">
+              <MessageCircle
+                size={48}
+                className="text-client-text-muted mx-auto"
+                strokeWidth={1.5}
+              />
+              <p className="text-text-primary font-medium">
+                Start een gesprek met je coach
+              </p>
+              <p className="text-xs text-client-text-muted">
+                Je coach zal je snel beantwoorden
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {dateKeys.map((dateKey) => (
+              <div key={dateKey} className="space-y-3">
+                {/* Date separator */}
+                <div className="flex items-center gap-3 py-2">
+                  <div className="flex-1 h-px bg-client-border" />
+                  <span className="text-xs text-client-text-muted font-medium px-2">
+                    {dateKey}
+                  </span>
+                  <div className="flex-1 h-px bg-client-border" />
+                </div>
+
+                {/* Messages for this date */}
+                {groupedMessages[dateKey].map((msg) => (
+                  <ChatBubble
+                    key={msg.id}
+                    message={{
+                      id: msg.id,
+                      content: msg.content,
+                      type: msg.message_type,
+                      image_url: msg.file_url || undefined,
+                      created_at: msg.created_at,
+                      sender_id: msg.sender_id,
+                    }}
+                    isCoach={msg.sender_id === coachId}
+                  />
+                ))}
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </>
+        )}
+      </div>
+
+      {/* Input - positioned above mobile nav or at bottom on desktop */}
+      <div className="sticky bottom-0 left-0 right-0 bg-white">
+        <ChatInput onSend={handleSendMessage} loading={sending} />
+      </div>
+    </div>
+  )
+}

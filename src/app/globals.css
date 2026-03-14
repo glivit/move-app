@@ -1,0 +1,281 @@
+@import "tailwindcss";
+@import "../styles/variables.css";
+
+@theme {
+  /* ━━━ Premium Design System ━━━ Aesop-inspired warmth & restraint */
+
+  /* Surfaces — warm cream tones */
+  --color-bg: #F9F8F5;
+  --color-bg-dark: #1A1A18;
+  --color-surface: #FFFFFF;
+  --color-surface-muted: #F4F3F0;
+
+  /* Accent — refined gold with tonal range */
+  --color-accent: #8B6914;
+  --color-accent-dark: #6F5612;
+  --color-accent-hover: #A07B1A;
+  --color-accent-light: rgba(139, 105, 20, 0.07);
+  --color-accent-subtle: rgba(139, 105, 20, 0.11);
+  --color-accent-surface: #F8F5ED;
+
+  /* Typography — warm neutrals for depth */
+  --color-text-primary: #1A1A18;
+  --color-text-secondary: #6E6E73;
+  --color-text-muted: #AEAEB2;
+
+  /* Borders — warm, architectural */
+  --color-border: #ECEAE5;
+  --color-border-subtle: #F2F0EC;
+
+  /* Status — muted sophistication */
+  --color-success: #2D9D4E;
+  --color-warning: #E68A00;
+  --color-error: #D93025;
+
+  /* Client surfaces */
+  --color-client-bg: #F9F8F5;
+  --color-client-surface: #FFFFFF;
+  --color-client-surface-muted: #F4F3F0;
+  --color-client-border: #ECEAE5;
+  --color-client-border-strong: #E0DDD7;
+  --color-client-text-secondary: #6E6E73;
+  --color-client-text-muted: #AEAEB2;
+
+  /* Data visualization — refined palette */
+  --color-data-orange: #E68A00;
+  --color-data-red: #D93025;
+  --color-data-purple: #9B59B6;
+  --color-data-green: #2D9D4E;
+  --color-data-blue: #3478F6;
+  --color-data-pink: #E84393;
+  --color-data-yellow: #F0B429;
+
+  /* Fonts */
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+
+  /* Spacing */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.125rem;
+  --radius-2xl: 1.375rem;
+
+  /* Shadows — barely-there elegance */
+  --shadow-card: 0 1px 4px rgba(26, 26, 24, 0.03);
+  --shadow-elevated: 0 8px 24px rgba(26, 26, 24, 0.07);
+  --shadow-clean: 0 1px 4px rgba(26, 26, 24, 0.03);
+  --shadow-clean-hover: 0 4px 16px rgba(26, 26, 24, 0.06);
+}
+
+/* ━━━ Base Styles ━━━ */
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.011em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Client-specific body override */
+.client-app {
+  background-color: #F9F8F5;
+}
+
+.client-app h1,
+.client-app h2,
+.client-app h3 {
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: -0.011em;
+}
+
+.client-app h1.display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* ━━━ Premium transitions ━━━ */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+a, button {
+  transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ━━━ Premium card hover effect ━━━ */
+.premium-card {
+  transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.premium-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(26, 26, 24, 0.06);
+}
+
+/* ━━━ Shimmer animation for skeleton loaders ━━━ */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-client-surface-muted) 0%,
+    #ECEAE5 50%,
+    var(--color-client-surface-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* ━━━ Scrollbar — minimal, premium ━━━ */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* ━━━ Focus ring ━━━ */
+*:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Safe area for mobile bottom nav */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ━━━ Premium Animations ━━━ Calm, purposeful movement */
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes gentle-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes confetti-fall {
+  0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+}
+@keyframes bounce-in {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Animation classes — calmer timing for premium feel */
+.animate-slide-in-right { animation: slide-in-right 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-slide-in-left { animation: slide-in-left 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-slide-up { animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-fade-in { animation: fade-in 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+.animate-scale-in { animation: scale-in 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-bounce-in { animation: bounce-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.animate-gentle-rise { animation: gentle-rise 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-pulse-subtle { animation: pulse-subtle 2s ease-in-out infinite; }
+
+/* Staggered entrance animations for card grids */
+.stagger-1 { animation-delay: 0ms; }
+.stagger-2 { animation-delay: 60ms; }
+.stagger-3 { animation-delay: 120ms; }
+.stagger-4 { animation-delay: 180ms; }
+.stagger-5 { animation-delay: 240ms; }
+.stagger-6 { animation-delay: 300ms; }
+
+/* Confetti particle */
+.confetti-particle {
+  position: fixed;
+  top: -10px;
+  z-index: 9999;
+  pointer-events: none;
+  animation: confetti-fall 3s ease-in forwards;
+}
+
+/* ━━━ Premium input styling ━━━ */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+textarea,
+select {
+  transition: border-color 280ms cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(139, 105, 20, 0.08);
+}
+
+/* ━━━ Dark mode ━━━ */
+.dark {
+  --color-bg: #0F0F0E;
+  --color-surface: #1A1A18;
+  --color-surface-muted: #222220;
+  --color-text-primary: #F5F5F3;
+  --color-text-secondary: #9A9A9E;
+  --color-text-muted: #555555;
+  --color-border: #2A2A28;
+  --color-client-bg: #0F0F0E;
+  --color-client-surface: #1A1A18;
+  --color-client-surface-muted: #222220;
+  --color-client-border: #2A2A28;
+  --color-client-border-strong: #3A3A38;
+  --color-client-text-secondary: #9A9A9E;
+  --color-client-text-muted: #555555;
+  --color-accent-light: rgba(139, 105, 20, 0.15);
+  --color-accent-subtle: rgba(139, 105, 20, 0.20);
+  --color-accent-surface: #1E1C16;
+}
+.dark body, .dark {
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+}

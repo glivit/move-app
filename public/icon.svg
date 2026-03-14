@@ -1,0 +1,19 @@
+<svg viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="192" height="192" fill="#F5F0EA" rx="45"/>
+
+  <!-- Accent circle -->
+  <circle cx="96" cy="96" r="75" fill="#C8A96E" opacity="0.1"/>
+
+  <!-- MŌVE mark - stylized upward movement -->
+  <g transform="translate(96, 96)">
+    <!-- Left stroke -->
+    <path d="M -20 20 L -10 0 L 0 -20" stroke="#C8A96E" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Right stroke -->
+    <path d="M 20 20 L 10 0 L 0 -20" stroke="#8B6914" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Center accent -->
+    <circle cx="0" cy="-20" r="4" fill="#C8A96E"/>
+  </g>
+</svg>

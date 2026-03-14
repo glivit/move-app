@@ -1,0 +1,101 @@
+:root {
+  /* ━━━ Premium Color Palette ━━━ Warm cream tones, architectural restraint */
+
+  /* Surfaces — warm cream instead of cold gray */
+  --color-bg: #F9F8F5;
+  --color-bg-dark: #1A1A18;
+  --color-surface: #FFFFFF;
+  --color-surface-muted: #F4F3F0;
+
+  /* Accent — refined gold */
+  --color-accent: #8B6914;
+  --color-accent-dark: #6F5612;
+  --color-accent-hover: #A07B1A;
+
+  /* Typography — warm neutrals */
+  --color-text-primary: #1A1A18;
+  --color-text-secondary: #6E6E73;
+  --color-text-muted: #AEAEB2;
+
+  /* Borders — warm, barely visible */
+  --color-border: #ECEAE5;
+
+  /* Status — muted, sophisticated */
+  --color-success: #2D9D4E;
+  --color-warning: #E68A00;
+  --color-error: #D93025;
+
+  /* Client surfaces */
+  --color-client-bg: #F9F8F5;
+  --color-client-surface: #FFFFFF;
+  --color-client-surface-muted: #F4F3F0;
+  --color-client-border: #ECEAE5;
+  --color-client-border-strong: #E0DDD7;
+  --color-client-text-secondary: #6E6E73;
+  --color-client-text-muted: #AEAEB2;
+  --color-accent-light: rgba(139, 105, 20, 0.07);
+  --color-accent-subtle: rgba(139, 105, 20, 0.11);
+  --color-accent-surface: #F8F5ED;
+
+  /* Data visualization — refined, less saturated */
+  --color-data-orange: #E68A00;
+  --color-data-red: #D93025;
+  --color-data-purple: #9B59B6;
+  --color-data-green: #2D9D4E;
+  --color-data-blue: #3478F6;
+  --color-data-pink: #E84393;
+  --color-data-yellow: #F0B429;
+
+  /* Typography */
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+
+  /* Font Sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1.0625rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-hero: 3.5rem;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.125rem;
+  --radius-2xl: 1.375rem;
+  --radius-full: 9999px;
+
+  /* Shadows — extremely subtle, architectural */
+  --shadow-sm: 0 1px 2px rgba(26, 26, 24, 0.03);
+  --shadow-md: 0 2px 12px rgba(26, 26, 24, 0.05);
+  --shadow-lg: 0 8px 24px rgba(26, 26, 24, 0.07);
+  --shadow-clean: 0 1px 4px rgba(26, 26, 24, 0.03);
+  --shadow-clean-hover: 0 4px 16px rgba(26, 26, 24, 0.06);
+
+  /* Transitions — calm, premium */
+  --ease-premium: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 450ms cubic-bezier(0.4, 0, 0.2, 1);
+}

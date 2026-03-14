@@ -1,0 +1,219 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase'
+import Link from 'next/link'
+import { Video, Calendar, Clock, ArrowRight, Phone } from 'lucide-react'
+
+interface VideoSession {
+  id: string
+  scheduled_at: string
+  duration_minutes: number
+  status: string
+  daily_room_url: string | null
+  notes: string | null
+}
+
+export default function ClientVideoPage() {
+  const [sessions, setSessions] = useState<VideoSession[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadSessions()
+  }, [])
+
+  async function loadSessions() {
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { data } = await supabase
+        .from('video_sessions')
+        .select('id, scheduled_at, duration_minutes, status, daily_room_url, notes')
+        .eq('client_id', user.id)
+        .order('scheduled_at', { ascending: false })
+
+      setSessions(data || [])
+    } catch (err) {
+      console.error('Error loading video sessions:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const now = new Date()
+  const upcoming = sessions.filter(
+    (s) => new Date(s.scheduled_at) >= now && s.status !== 'completed' && s.status !== 'cancelled'
+  )
+  const past = sessions.filter(
+    (s) => new Date(s.scheduled_at) < now || s.status === 'completed'
+  )
+
+  function formatDate(dateStr: string) {
+    const d = new Date(dateStr)
+    const today = new Date()
+    const tomorrow = new Date()
+    tomorrow.setDate(today.getDate() + 1)
+
+    if (d.toDateString() === today.toDateString()) return 'Vandaag'
+    if (d.toDateString() === tomorrow.toDateString()) return 'Morgen'
+    return d.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })
+  }
+
+  function formatTime(dateStr: string) {
+    return new Date(dateStr).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })
+  }
+
+  function isJoinable(session: VideoSession) {
+    const start = new Date(session.scheduled_at)
+    const end = new Date(start.getTime() + session.duration_minutes * 60000)
+    const joinWindow = new Date(start.getTime() - 5 * 60000) // 5 min before
+    return now >= joinWindow && now <= end && session.daily_room_url
+  }
+
+  function statusLabel(status: string) {
+    switch (status) {
+      case 'scheduled': return { text: 'Gepland', color: '#007AFF', bg: '#007AFF' }
+      case 'in_progress': return { text: 'Bezig', color: '#34C759', bg: '#34C759' }
+      case 'completed': return { text: 'Afgerond', color: '#8E8E93', bg: '#8E8E93' }
+      case 'cancelled': return { text: 'Geannuleerd', color: '#FF3B30', bg: '#FF3B30' }
+      default: return { text: status, color: '#8E8E93', bg: '#8E8E93' }
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#FAFAFA]">
+        <div className="max-w-lg mx-auto px-5 py-8">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#8B6914] border-t-transparent" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-[#FAFAFA]">
+      <div className="max-w-lg mx-auto px-5 py-8 pb-28">
+        {/* Header */}
+        <h1 className="text-[28px] font-[family-name:var(--font-display)] text-[#1A1A18] mb-1">
+          Video Calls
+        </h1>
+        <p className="text-[13px] text-[#8E8E93] mb-8">
+          Je geplande sessies met je coach
+        </p>
+
+        {/* Upcoming Sessions */}
+        {upcoming.length > 0 && (
+          <div className="mb-8">
+            <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-3">
+              Aankomend
+            </p>
+            <div className="space-y-3">
+              {upcoming.map((session) => {
+                const joinable = isJoinable(session)
+                const st = statusLabel(session.status)
+
+                return (
+                  <div
+                    key={session.id}
+                    className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]"
+                  >
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-xl bg-[#007AFF]/10 flex items-center justify-center">
+                          <Video strokeWidth={1.5} className="w-5 h-5 text-[#007AFF]" />
+                        </div>
+                        <div>
+                          <p className="text-[15px] font-semibold text-[#1A1A18]">
+                            {formatDate(session.scheduled_at)}
+                          </p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <Clock strokeWidth={1.5} className="w-3.5 h-3.5 text-[#C7C7CC]" />
+                            <span className="text-[13px] text-[#8E8E93]">
+                              {formatTime(session.scheduled_at)} · {session.duration_minutes} min
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <span
+                        className="text-[11px] font-medium px-2.5 py-1 rounded-full"
+                        style={{ backgroundColor: `${st.bg}10`, color: st.color }}
+                      >
+                        {st.text}
+                      </span>
+                    </div>
+
+                    {joinable ? (
+                      <Link
+                        href={`/client/video/${session.id}`}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#34C759] text-white text-[14px] font-semibold hover:bg-[#2DB84E] transition-colors"
+                      >
+                        <Phone strokeWidth={1.5} className="w-4 h-4" />
+                        Nu deelnemen
+                      </Link>
+                    ) : (
+                      <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#F5F5F3] text-[13px] text-[#8E8E93]">
+                        <Calendar strokeWidth={1.5} className="w-4 h-4" />
+                        Je kunt 5 minuten voor de start deelnemen
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Past Sessions */}
+        {past.length > 0 && (
+          <div>
+            <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-3">
+              Eerdere sessies
+            </p>
+            <div className="space-y-2">
+              {past.map((session) => (
+                <div
+                  key={session.id}
+                  className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] flex items-center gap-3"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-[#F5F5F3] flex items-center justify-center">
+                    <Video strokeWidth={1.5} className="w-4 h-4 text-[#C7C7CC]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[14px] font-medium text-[#1A1A18]">
+                      {formatDate(session.scheduled_at)}
+                    </p>
+                    <p className="text-[12px] text-[#C7C7CC]">
+                      {formatTime(session.scheduled_at)} · {session.duration_minutes} min
+                    </p>
+                  </div>
+                  <span className="text-[11px] text-[#C7C7CC]">
+                    {statusLabel(session.status).text}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {sessions.length === 0 && (
+          <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+            <div className="w-16 h-16 rounded-full bg-[#007AFF]/10 flex items-center justify-center mx-auto mb-4">
+              <Video strokeWidth={1.5} className="w-8 h-8 text-[#007AFF]" />
+            </div>
+            <h2 className="text-[17px] font-semibold text-[#1A1A18] mb-2">
+              Geen video calls gepland
+            </h2>
+            <p className="text-[13px] text-[#8E8E93] max-w-xs mx-auto">
+              Je coach plant video sessies in wanneer nodig. Je ziet ze hier verschijnen.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
