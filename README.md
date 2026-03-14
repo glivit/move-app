@@ -8,7 +8,7 @@ MŌVE is a comprehensive coaching platform designed to help fitness coaches and 
 
 ### Key Features
 
-- Coach dashboard with client management
+- Coach dashboard with client management.
 - Real-time video coaching sessions via Daily.co
 - Client check-in system with metrics tracking
 - Personalized meal plan generation
