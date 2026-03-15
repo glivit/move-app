@@ -5,8 +5,13 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // Let these routes pass through without any auth check
-  const publicPaths = ['/', '/auth/callback', '/auth/confirm', '/offline', '/onboarding']
-  if (publicPaths.includes(pathname)) {
+  // All /auth/* routes must be public (callback, set-password, reset-password, verify, etc.)
+  if (
+    pathname === '/' ||
+    pathname === '/offline' ||
+    pathname === '/onboarding' ||
+    pathname.startsWith('/auth/')
+  ) {
     return NextResponse.next()
   }
 
