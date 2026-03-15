@@ -23,8 +23,8 @@ import {
 const mainNavItems = [
   { href: '/client', label: 'Home', icon: Home },
   { href: '/client/journey', label: 'Mijn Reis', icon: LineChart },
-  { href: '/client/program', label: 'Training', icon: Dumbbell },
-  { href: '/client/meal-plan', label: 'Voeding', icon: UtensilsCrossed },
+  { href: '/client/workout', label: 'Training', icon: Dumbbell },
+  { href: '/client/nutrition', label: 'Voeding', icon: UtensilsCrossed },
   { href: '/client/messages', label: 'Berichten', icon: MessageCircle },
   { href: '/client/community', label: 'Community', icon: UsersRound },
   { href: '/client/progress', label: 'Voortgang', icon: TrendingUp },

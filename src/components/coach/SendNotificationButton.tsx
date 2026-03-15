@@ -9,9 +9,9 @@ interface Props {
 }
 
 const quickMessages = [
-  { label: 'Training herinnering', title: 'Tijd om te trainen!', message: 'Hey {name}, vergeet je training vandaag niet! Ga ervoor 💪', url: '/client/program' },
+  { label: 'Training herinnering', title: 'Tijd om te trainen!', message: 'Hey {name}, vergeet je training vandaag niet! Ga ervoor 💪', url: '/client/workout' },
   { label: 'Check-in herinnering', title: 'Wekelijkse check-in', message: 'Hey {name}, het is weer tijd voor je wekelijkse check-in. Hoe gaat het?', url: '/client/check-in' },
-  { label: 'Nieuw programma', title: 'Nieuw programma klaar!', message: 'Hey {name}, je nieuwe trainingsprogramma staat klaar. Bekijk het nu!', url: '/client/program' },
+  { label: 'Nieuw programma', title: 'Nieuw programma klaar!', message: 'Hey {name}, je nieuwe trainingsprogramma staat klaar. Bekijk het nu!', url: '/client/workout' },
   { label: 'Motivatie', title: 'Keep going! 🔥', message: 'Hey {name}, je doet het geweldig. Blijf zo doorgaan!', url: '/client' },
 ]
 

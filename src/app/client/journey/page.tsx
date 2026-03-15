@@ -147,7 +147,7 @@ export default function JourneyPage() {
     {
       title: 'Training',
       subtitle: 'Bekijk je trainingsschema',
-      href: '/client/program',
+      href: '/client/workout',
       icon: Dumbbell,
       bgColor: 'rgba(0, 122, 255, 0.1)',
       accentColor: '#007AFF',
@@ -155,7 +155,7 @@ export default function JourneyPage() {
     {
       title: 'Voeding',
       subtitle: 'Bekijk je voedingsplan',
-      href: '/client/meal-plan',
+      href: '/client/nutrition',
       icon: UtensilsCrossed,
       bgColor: 'rgba(52, 199, 89, 0.1)',
       accentColor: '#34C759',
