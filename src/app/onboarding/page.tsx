@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { createClient } from '@/lib/supabase'
-import { ChevronLeft, Check, Zap, Heart, Apple, Moon, Ruler, Trophy } from 'lucide-react'
+import { PhotoUploadStep } from '@/components/client/PhotoUploadStep'
+import { TapeMeasurementsStep } from '@/components/client/TapeMeasurementsStep'
+import { ChevronLeft, Check, Zap, Heart, Apple, Moon, Ruler, Trophy, Camera } from 'lucide-react'
 
 const steps = [
   { id: 'welcome', title: 'Welkom bij MŌVE', description: 'Laten we je eerst wat beter leren kennen' },
@@ -14,8 +16,12 @@ const steps = [
   { id: 'nutrition', title: 'Voeding', description: 'Wat zijn je voedingsvoorkeuren?' },
   { id: 'lifestyle', title: 'Levensstijl', description: 'Slaap, stress en motivatie' },
   { id: 'measurements', title: 'Startmetingen', description: 'Basis gegevens voor je profiel' },
+  { id: 'photos', title: "Startfoto's", description: "Leg je startpunt vast met foto's" },
+  { id: 'tape', title: 'Omtrekmaten', description: 'Meet je lichaamsmaten op' },
   { id: 'complete', title: 'Klaar!', description: 'Je profiel is aangemaakt' },
 ]
+
+const TOTAL_STEPS = steps.length // 10
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -39,6 +45,17 @@ export default function OnboardingPage() {
     weight_kg: '',
     height_cm: '',
     age: '',
+  })
+
+  const [photos, setPhotos] = useState<{
+    front: File | null; back: File | null; left: File | null; right: File | null
+  }>({ front: null, back: null, left: null, right: null })
+
+  const [tapeMeasurements, setTapeMeasurements] = useState<Record<string, string>>({
+    chest_cm: '', waist_cm: '', hips_cm: '',
+    left_arm_cm: '', right_arm_cm: '',
+    left_thigh_cm: '', right_thigh_cm: '',
+    left_calf_cm: '', right_calf_cm: '',
   })
 
   const days = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']
@@ -67,6 +84,26 @@ export default function OnboardingPage() {
         return
       }
 
+      const parseNum = (v: string) => v ? parseFloat(v.replace(',', '.')) : null
+
+      // Upload photos to storage
+      const photoUrls: Record<string, string | null> = { front: null, back: null, left: null, right: null }
+      for (const [position, file] of Object.entries(photos)) {
+        if (file) {
+          const fileName = `${user.id}/onboarding_${position}.jpg`
+          const { error: uploadError } = await supabase.storage
+            .from('checkin-photos')
+            .upload(fileName, file, { upsert: true })
+          if (!uploadError) {
+            const { data: urlData } = supabase.storage
+              .from('checkin-photos')
+              .getPublicUrl(fileName)
+            photoUrls[position] = urlData.publicUrl
+          }
+        }
+      }
+
+      // Save intake form with all data including measurements and photos
       const { error: insertError } = await supabase.from('intake_forms').insert({
         client_id: user.id,
         primary_goal: data.primary_goal,
@@ -80,9 +117,24 @@ export default function OnboardingPage() {
         sleep_hours_avg: data.sleep_hours_avg ? parseFloat(data.sleep_hours_avg) : null,
         stress_level: data.stress_level,
         motivation_statement: data.motivation_statement,
-        weight_kg: data.weight_kg ? parseFloat(data.weight_kg) : null,
-        height_cm: data.height_cm ? parseFloat(data.height_cm) : null,
+        weight_kg: parseNum(data.weight_kg),
+        height_cm: parseNum(data.height_cm),
         age: data.age ? parseInt(data.age) : null,
+        // Photos
+        photo_front_url: photoUrls.front,
+        photo_back_url: photoUrls.back,
+        photo_left_url: photoUrls.left,
+        photo_right_url: photoUrls.right,
+        // Tape measurements
+        chest_cm: parseNum(tapeMeasurements.chest_cm),
+        waist_cm: parseNum(tapeMeasurements.waist_cm),
+        hips_cm: parseNum(tapeMeasurements.hips_cm),
+        left_arm_cm: parseNum(tapeMeasurements.left_arm_cm),
+        right_arm_cm: parseNum(tapeMeasurements.right_arm_cm),
+        left_thigh_cm: parseNum(tapeMeasurements.left_thigh_cm),
+        right_thigh_cm: parseNum(tapeMeasurements.right_thigh_cm),
+        left_calf_cm: parseNum(tapeMeasurements.left_calf_cm),
+        right_calf_cm: parseNum(tapeMeasurements.right_calf_cm),
         completed: true,
       })
 
@@ -92,11 +144,21 @@ export default function OnboardingPage() {
         return
       }
 
+      // Also create initial health_metrics entry for weight tracking
+      if (data.weight_kg) {
+        await supabase.from('health_metrics').insert({
+          client_id: user.id,
+          metric_type: 'weight',
+          value: parseNum(data.weight_kg),
+          measured_at: new Date().toISOString(),
+        }).then(() => {}) // ignore errors
+      }
+
       // Mark intake as completed on profile
       await supabase.from('profiles').update({ intake_completed: true }).eq('id', user.id)
 
       // Move to success screen
-      handleStepChange(7)
+      handleStepChange(TOTAL_STEPS - 1)
     } catch (err) {
       setError('Er is een onverwachte fout opgetreden')
       setSubmitting(false)
@@ -121,7 +183,8 @@ export default function OnboardingPage() {
     }))
   }
 
-  const progressPercent = ((step) / (steps.length - 1)) * 100
+  const progressPercent = ((step) / (TOTAL_STEPS - 1)) * 100
+  const lastFormStep = TOTAL_STEPS - 2 // step 8 = tape measurements (last before complete)
 
   return (
     <div className="client-app min-h-screen bg-client-bg flex flex-col">
@@ -165,7 +228,7 @@ export default function OnboardingPage() {
               </div>
 
               <div className="pt-4">
-                <p className="text-xs text-client-text-muted text-center mb-6">Stap 1 van 8 — Ongeveer 5 minuten</p>
+                <p className="text-xs text-client-text-muted text-center mb-6">Stap 1 van {TOTAL_STEPS} — Ongeveer 8 minuten</p>
                 <Button onClick={() => handleStepChange(1)} fullWidth size="lg" className="bg-[#1A1A18] text-white hover:bg-[#333330]">
                   Laten we beginnen
                 </Button>
@@ -177,7 +240,7 @@ export default function OnboardingPage() {
           {step === 1 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div>
-                <p className="text-xs text-client-text-secondary uppercase tracking-wide">Stap 2 van 8</p>
+                <p className="text-xs text-client-text-secondary uppercase tracking-wide">Stap 2 van {TOTAL_STEPS}</p>
                 <h2 className="text-2xl font-body font-semibold text-black mt-2">Wat is je belangrijkste doel?</h2>
                 <p className="text-sm text-client-text-secondary mt-1">Dit helpt ons jouw plan te personaliseren</p>
               </div>
@@ -223,7 +286,7 @@ export default function OnboardingPage() {
           {step === 2 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div>
-                <p className="text-xs text-client-text-secondary uppercase tracking-wide">Stap 3 van 8</p>
+                <p className="text-xs text-client-text-secondary uppercase tracking-wide">Stap 3 van {TOTAL_STEPS}</p>
                 <h2 className="text-2xl font-body font-semibold text-black mt-2">Sportervaring</h2>
                 <p className="text-sm text-client-text-secondary mt-1">Vertel over je trainingsachtergrond</p>
               </div>
@@ -291,7 +354,7 @@ export default function OnboardingPage() {
           {step === 3 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div>
-                <p className="text-xs text-client-text-secondary uppercase tracking-wide">Stap 4 van 8</p>
+                <p className="text-xs text-client-text-secondary uppercase tracking-wide">Stap 4 van {TOTAL_STEPS}</p>
                 <h2 className="text-2xl font-body font-semibold text-black mt-2">Gezondheid</h2>
                 <p className="text-sm text-client-text-secondary mt-1">Blessures en fysieke beperkingen</p>
               </div>
@@ -319,7 +382,7 @@ export default function OnboardingPage() {
           {step === 4 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div>
-                <p className="text-xs text-client-text-secondary uppercase tracking-wide">Stap 5 van 8</p>
+                <p className="text-xs text-client-text-secondary uppercase tracking-wide">Stap 5 van {TOTAL_STEPS}</p>
                 <h2 className="text-2xl font-body font-semibold text-black mt-2">Voeding</h2>
                 <p className="text-sm text-client-text-secondary mt-1">Je voedings- en dieetvoorkeuren</p>
               </div>
@@ -360,7 +423,7 @@ export default function OnboardingPage() {
           {step === 5 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div>
-                <p className="text-xs text-client-text-secondary uppercase tracking-wide">Stap 6 van 8</p>
+                <p className="text-xs text-client-text-secondary uppercase tracking-wide">Stap 6 van {TOTAL_STEPS}</p>
                 <h2 className="text-2xl font-body font-semibold text-black mt-2">Levensstijl</h2>
                 <p className="text-sm text-client-text-secondary mt-1">Slaap, stress en motivatie</p>
               </div>
@@ -422,11 +485,11 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Step 6: Measurements */}
+          {/* Step 6: Measurements (weight/height/age) */}
           {step === 6 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div>
-                <p className="text-xs text-client-text-secondary uppercase tracking-wide">Stap 7 van 8</p>
+                <p className="text-xs text-client-text-secondary uppercase tracking-wide">Stap 7 van {TOTAL_STEPS}</p>
                 <h2 className="text-2xl font-body font-semibold text-black mt-2">Startmetingen</h2>
                 <p className="text-sm text-client-text-secondary mt-1">Basis gegevens voor je profiel</p>
               </div>
@@ -484,8 +547,65 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Step 7: Complete */}
+          {/* Step 7: Photos */}
           {step === 7 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div>
+                <p className="text-xs text-client-text-secondary uppercase tracking-wide">Stap 8 van {TOTAL_STEPS}</p>
+                <h2 className="text-2xl font-body font-semibold text-black mt-2">Startfoto's</h2>
+                <p className="text-sm text-client-text-secondary mt-1">
+                  Leg je startpunt vast. Zo kunnen we je voortgang visueel bijhouden.
+                </p>
+              </div>
+
+              {error && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-2xl">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              )}
+
+              <div className="bg-white rounded-2xl p-5 border border-client-border/50">
+                <PhotoUploadStep photos={photos} onChange={setPhotos} />
+              </div>
+
+              <p className="text-xs text-client-text-muted">
+                Tip: neem de foto's 's ochtends, nuchter, in dezelfde kleding en op dezelfde locatie als bij toekomstige check-ins.
+              </p>
+            </div>
+          )}
+
+          {/* Step 8: Tape Measurements */}
+          {step === 8 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div>
+                <p className="text-xs text-client-text-secondary uppercase tracking-wide">Stap 9 van {TOTAL_STEPS}</p>
+                <h2 className="text-2xl font-body font-semibold text-black mt-2">Omtrekmaten</h2>
+                <p className="text-sm text-client-text-secondary mt-1">
+                  Meet je lichaamsmaten op met een meetlint. Dit is optioneel maar helpt enorm bij het tracken van je voortgang.
+                </p>
+              </div>
+
+              {error && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-2xl">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              )}
+
+              <div className="bg-white rounded-2xl p-5 border border-client-border/50">
+                <TapeMeasurementsStep
+                  measurements={tapeMeasurements}
+                  onChange={setTapeMeasurements}
+                />
+              </div>
+
+              <p className="text-xs text-client-text-muted">
+                Meet elk lichaamsdeel ontspannen en op het breedste punt. Gebruik een flexibel meetlint.
+              </p>
+            </div>
+          )}
+
+          {/* Step 9: Complete */}
+          {step === (TOTAL_STEPS - 1) && (
             <div className="space-y-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="space-y-3">
                 <div className="h-20 w-20 bg-gradient-to-br from-accent/20 to-accent-dark/20 rounded-3xl flex items-center justify-center mx-auto">
@@ -525,7 +645,7 @@ export default function OnboardingPage() {
       {/* Footer Navigation */}
       <div className="border-t border-client-border bg-client-surface px-6 py-4 sm:py-5 safe-area-bottom">
         <div className="max-w-md mx-auto flex gap-3">
-          {step > 0 && step < 7 && (
+          {step > 0 && step < (TOTAL_STEPS - 1) && (
             <button
               onClick={() => handleStepChange(step - 1)}
               className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-client-text-secondary hover:text-black hover:bg-client-surface-muted rounded-2xl transition-all"
@@ -535,10 +655,10 @@ export default function OnboardingPage() {
             </button>
           )}
 
-          {step < 6 && (
+          {step < lastFormStep && (
             <Button
               onClick={() => {
-                if (step === 0 || (step === 1 && data.primary_goal) || (step > 1 && step < 6)) {
+                if (step === 0 || (step === 1 && data.primary_goal) || (step > 1 && step < lastFormStep)) {
                   handleStepChange(step + 1)
                 }
               }}
@@ -549,7 +669,7 @@ export default function OnboardingPage() {
             </Button>
           )}
 
-          {step === 6 && (
+          {step === lastFormStep && (
             <Button
               onClick={handleSubmit}
               loading={submitting}

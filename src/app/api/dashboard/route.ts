@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
         .limit(20),
 
       // Intake form (for onboarding progress)
-      supabase.from('intake_forms').select('id, completed, primary_goal, training_experience, dietary_preferences, weight_kg')
+      supabase.from('intake_forms').select('id, completed, primary_goal, training_experience, dietary_preferences, weight_kg, photo_front_url, chest_cm')
         .eq('client_id', user.id).single(),
 
       // Last check-in (for monthly check-in reminder)
@@ -202,15 +202,16 @@ export async function GET(request: NextRequest) {
     const onboardingComplete = !!profile?.intake_completed
 
     // Calculate onboarding step progress (matches /onboarding page steps)
-    // Steps: 0=welcome, 1=goals, 2=training, 3=health, 4=nutrition, 5=lifestyle, 6=measurements, 7=done
+    // Steps: 0=welcome, 1=goals, 2=training, 3=health, 4=nutrition, 5=lifestyle, 6=measurements, 7=photos, 8=tape, 9=done
     let onboardingStep = 0
     if (intakeForm) {
       if (intakeForm.primary_goal) onboardingStep = 2
       if (intakeForm.training_experience) onboardingStep = 3
-      // More fields = further along
       if (intakeForm.dietary_preferences) onboardingStep = 5
       if (intakeForm.weight_kg) onboardingStep = 7
-      if (intakeForm.completed) onboardingStep = 8
+      if ((intakeForm as any).photo_front_url) onboardingStep = 8
+      if ((intakeForm as any).chest_cm) onboardingStep = 9
+      if (intakeForm.completed) onboardingStep = 10
     }
 
     // ── Check-in due (improved logic) ────────────────────
@@ -257,7 +258,7 @@ export async function GET(request: NextRequest) {
       onboarding: {
         complete: onboardingComplete,
         currentStep: onboardingStep,
-        totalSteps: 8,
+        totalSteps: 10,
       },
 
       training: {

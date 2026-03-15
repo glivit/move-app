@@ -427,6 +427,22 @@ export interface Database {
           sleep_hours_avg: number | null
           stress_level: number | null
           motivation_statement: string | null
+          weight_kg: number | null
+          height_cm: number | null
+          age: number | null
+          photo_front_url: string | null
+          photo_back_url: string | null
+          photo_left_url: string | null
+          photo_right_url: string | null
+          chest_cm: number | null
+          waist_cm: number | null
+          hips_cm: number | null
+          left_arm_cm: number | null
+          right_arm_cm: number | null
+          left_thigh_cm: number | null
+          right_thigh_cm: number | null
+          left_calf_cm: number | null
+          right_calf_cm: number | null
           completed: boolean
           created_at: string
         }
@@ -444,6 +460,22 @@ export interface Database {
           sleep_hours_avg?: number | null
           stress_level?: number | null
           motivation_statement?: string | null
+          weight_kg?: number | null
+          height_cm?: number | null
+          age?: number | null
+          photo_front_url?: string | null
+          photo_back_url?: string | null
+          photo_left_url?: string | null
+          photo_right_url?: string | null
+          chest_cm?: number | null
+          waist_cm?: number | null
+          hips_cm?: number | null
+          left_arm_cm?: number | null
+          right_arm_cm?: number | null
+          left_thigh_cm?: number | null
+          right_thigh_cm?: number | null
+          left_calf_cm?: number | null
+          right_calf_cm?: number | null
           completed?: boolean
           created_at?: string
         }
@@ -461,6 +493,22 @@ export interface Database {
           sleep_hours_avg?: number | null
           stress_level?: number | null
           motivation_statement?: string | null
+          weight_kg?: number | null
+          height_cm?: number | null
+          age?: number | null
+          photo_front_url?: string | null
+          photo_back_url?: string | null
+          photo_left_url?: string | null
+          photo_right_url?: string | null
+          chest_cm?: number | null
+          waist_cm?: number | null
+          hips_cm?: number | null
+          left_arm_cm?: number | null
+          right_arm_cm?: number | null
+          left_thigh_cm?: number | null
+          right_thigh_cm?: number | null
+          left_calf_cm?: number | null
+          right_calf_cm?: number | null
           completed?: boolean
           created_at?: string
         }
