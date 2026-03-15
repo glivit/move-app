@@ -5,7 +5,8 @@ import Link from 'next/link'
 import {
   Dumbbell, CheckCircle, ChevronRight, Apple, Video,
   MessageSquare, Calendar, ArrowUpRight, ShieldCheck,
-  Flame, TrendingDown, TrendingUp, Activity
+  Flame, TrendingDown, TrendingUp, Activity,
+  ClipboardList, AlertCircle
 } from 'lucide-react'
 import { NotificationCenter } from '@/components/client/NotificationCenter'
 
@@ -16,6 +17,11 @@ interface DashboardData {
     firstName: string
     startDate: string | null
   } | null
+  onboarding: {
+    complete: boolean
+    currentStep: number
+    totalSteps: number
+  }
   training: {
     today: {
       id: string
@@ -53,7 +59,7 @@ interface DashboardData {
     pendingPrompt: { id: string; question: string } | null
     unreadMessages: number
     nextVideoCall: { id: string; scheduled_at: string } | null
-    checkInDue: number | null
+    checkInDue: { daysUntil: number; overdue: boolean } | null
   }
   momentum: {
     streakDays: number
@@ -176,9 +182,10 @@ export default function ClientDashboard() {
     )
   }
 
-  const { training, nutrition, actions, momentum } = data
+  const { training, nutrition, actions, momentum, onboarding } = data
   const firstName = data.profile?.firstName || ''
   const hasActions = actions.accountabilityPending || actions.pendingPrompt || actions.checkInDue !== null
+  const showOnboarding = onboarding && !onboarding.complete
 
   // ─── Render ───────────────────────────────────────────────
 
@@ -224,6 +231,57 @@ export default function ClientDashboard() {
             </Link>
           )}
         </div>
+      )}
+
+      {/* ═══ ONBOARDING — Intake formulier ═══════════════════ */}
+      {showOnboarding && (
+        <Link
+          href="/onboarding"
+          className="block rounded-2xl border-2 overflow-hidden animate-slide-up"
+          style={{
+            borderColor: '#D14343',
+            background: 'linear-gradient(135deg, rgba(209,67,67,0.06) 0%, rgba(209,67,67,0.01) 100%)',
+            animationDelay: '60ms',
+            animationFillMode: 'both',
+          }}
+        >
+          <div className="p-5">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-[#D14343] flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(209,67,67,0.3)]">
+                <ClipboardList strokeWidth={1.5} className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[16px] font-semibold text-[#1A1917] tracking-[-0.01em]">
+                  Maak je profiel compleet
+                </p>
+                <p className="text-[13px] text-[#D14343] mt-0.5">
+                  Vul je intake formulier in zodat je coach je programma kan opstellen
+                </p>
+              </div>
+              <ArrowUpRight strokeWidth={1.5} className="w-5 h-5 text-[#D14343] shrink-0" />
+            </div>
+
+            {/* Progress bar */}
+            <div className="mt-4">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#BAB8B3]">
+                  Voortgang
+                </span>
+                <span className="text-[12px] font-semibold text-[#D14343]">
+                  {onboarding.currentStep}/{onboarding.totalSteps}
+                </span>
+              </div>
+              <div className="w-full h-2 bg-[#F0EDE8] rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500 ease-out bg-[#D14343]"
+                  style={{
+                    width: `${(onboarding.currentStep / onboarding.totalSteps) * 100}%`,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </Link>
       )}
 
       {/* ═══ BLOK 1 — TRAINING VAN VANDAAG ═══════════════════ */}
@@ -387,78 +445,82 @@ export default function ClientDashboard() {
         </div>
       )}
 
-      {/* ═══ BLOK 3 — VANDAAG VAN JOU VERWACHT ═══════════════ */}
+      {/* ═══ BLOK 3 — ACTIE VEREIST (rood tot afgerond) ═══════ */}
       {hasActions && (
         <div className="space-y-3 animate-slide-up" style={{ animationDelay: '200ms', animationFillMode: 'both' }}>
-          {/* Coach prompt */}
+          {/* Coach prompt — ROOD */}
           {actions.pendingPrompt && (
             <Link
               href="/client/prompts"
-              className="block rounded-2xl p-5 border transition-all duration-200 hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
+              className="block rounded-2xl p-5 border-2 transition-all duration-200 hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
               style={{
-                background: 'linear-gradient(135deg, rgba(196,125,21,0.06) 0%, rgba(196,125,21,0.01) 100%)',
-                borderColor: 'rgba(196,125,21,0.15)',
+                background: 'linear-gradient(135deg, rgba(209,67,67,0.06) 0%, rgba(209,67,67,0.01) 100%)',
+                borderColor: 'rgba(209,67,67,0.35)',
               }}
             >
               <div className="flex items-center gap-4">
-                <div className="w-11 h-11 rounded-2xl bg-[#C47D15] flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(196,125,21,0.25)]">
+                <div className="w-11 h-11 rounded-2xl bg-[#D14343] flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(209,67,67,0.25)]">
                   <MessageSquare strokeWidth={1.5} className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-semibold text-[#1A1917] tracking-[-0.01em]">Glenn heeft een vraag</p>
+                  <p className="text-[15px] font-semibold text-[#1A1917] tracking-[-0.01em]">Wekelijkse reflectie</p>
                   {actions.pendingPrompt.question && (
-                    <p className="text-[13px] text-[#C47D15] mt-0.5 truncate">&ldquo;{actions.pendingPrompt.question}&rdquo;</p>
+                    <p className="text-[13px] text-[#D14343] mt-0.5 truncate">&ldquo;{actions.pendingPrompt.question}&rdquo;</p>
                   )}
                 </div>
-                <ArrowUpRight strokeWidth={1.5} className="w-5 h-5 text-[#C47D15] shrink-0" />
+                <ArrowUpRight strokeWidth={1.5} className="w-5 h-5 text-[#D14343] shrink-0" />
               </div>
             </Link>
           )}
 
-          {/* Accountability check */}
+          {/* Accountability check — ROOD */}
           {actions.accountabilityPending && (
             <Link
               href="/client/accountability"
-              className="block rounded-2xl p-5 border transition-all duration-200 hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
+              className="block rounded-2xl p-5 border-2 transition-all duration-200 hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
               style={{
-                background: 'linear-gradient(135deg, rgba(155,123,46,0.06) 0%, rgba(155,123,46,0.01) 100%)',
-                borderColor: 'rgba(155,123,46,0.15)',
+                background: 'linear-gradient(135deg, rgba(209,67,67,0.06) 0%, rgba(209,67,67,0.01) 100%)',
+                borderColor: 'rgba(209,67,67,0.35)',
               }}
             >
               <div className="flex items-center gap-4">
-                <div className="w-11 h-11 rounded-2xl bg-[#9B7B2E] flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(155,123,46,0.25)]">
+                <div className="w-11 h-11 rounded-2xl bg-[#D14343] flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(209,67,67,0.25)]">
                   <ShieldCheck strokeWidth={1.5} className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1">
                   <p className="text-[15px] font-semibold text-[#1A1917] tracking-[-0.01em]">Dagelijkse check</p>
-                  <p className="text-[13px] text-[#9B7B2E] mt-0.5">Laat even weten hoe je dag was</p>
+                  <p className="text-[13px] text-[#D14343] mt-0.5">Laat even weten hoe je dag was</p>
                 </div>
-                <ArrowUpRight strokeWidth={1.5} className="w-5 h-5 text-[#9B7B2E] shrink-0" />
+                <ArrowUpRight strokeWidth={1.5} className="w-5 h-5 text-[#D14343] shrink-0" />
               </div>
             </Link>
           )}
 
-          {/* Monthly check-in */}
+          {/* Monthly check-in — ROOD */}
           {actions.checkInDue !== null && (
             <Link
               href="/client/check-in"
-              className="block rounded-2xl p-5 border transition-all duration-200 hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
+              className="block rounded-2xl p-5 border-2 transition-all duration-200 hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
               style={{
-                background: 'linear-gradient(135deg, rgba(61,139,92,0.06) 0%, rgba(61,139,92,0.01) 100%)',
-                borderColor: 'rgba(61,139,92,0.15)',
+                background: 'linear-gradient(135deg, rgba(209,67,67,0.06) 0%, rgba(209,67,67,0.01) 100%)',
+                borderColor: 'rgba(209,67,67,0.35)',
               }}
             >
               <div className="flex items-center gap-4">
-                <div className="w-11 h-11 rounded-2xl bg-[#3D8B5C] flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(61,139,92,0.25)]">
+                <div className="w-11 h-11 rounded-2xl bg-[#D14343] flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(209,67,67,0.25)]">
                   <Calendar strokeWidth={1.5} className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1">
                   <p className="text-[15px] font-semibold text-[#1A1917] tracking-[-0.01em]">Maandelijkse meting</p>
-                  <p className="text-[13px] text-[#3D8B5C] mt-0.5">
-                    {actions.checkInDue === 0 ? 'Vandaag is het zover!' : `Nog ${actions.checkInDue} ${actions.checkInDue === 1 ? 'dag' : 'dagen'}`}
+                  <p className="text-[13px] text-[#D14343] mt-0.5">
+                    {actions.checkInDue.overdue
+                      ? 'Nu invullen!'
+                      : actions.checkInDue.daysUntil === 0
+                        ? 'Vandaag is het zover!'
+                        : `Nog ${actions.checkInDue.daysUntil} ${actions.checkInDue.daysUntil === 1 ? 'dag' : 'dagen'}`}
                   </p>
                 </div>
-                <ArrowUpRight strokeWidth={1.5} className="w-5 h-5 text-[#3D8B5C] shrink-0" />
+                <ArrowUpRight strokeWidth={1.5} className="w-5 h-5 text-[#D14343] shrink-0" />
               </div>
             </Link>
           )}

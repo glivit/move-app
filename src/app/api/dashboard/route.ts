@@ -29,9 +29,11 @@ export async function GET(request: NextRequest) {
       accountabilityRes,
       promptsRes,
       broadcastsRes,
+      intakeRes,
+      lastCheckinRes,
     ] = await Promise.all([
-      // Profile
-      supabase.from('profiles').select('id, full_name, role, package, start_date')
+      // Profile (include intake_completed for onboarding)
+      supabase.from('profiles').select('id, full_name, role, package, start_date, intake_completed')
         .eq('id', user.id).single(),
 
       // Active program with template days
@@ -85,6 +87,17 @@ export async function GET(request: NextRequest) {
         .select('id, title, content, created_at, target_clients, read_by')
         .order('created_at', { ascending: false })
         .limit(20),
+
+      // Intake form (for onboarding progress)
+      supabase.from('intake_forms').select('id, completed, primary_goal, training_experience, dietary_preferences, weight_kg')
+        .eq('client_id', user.id).single(),
+
+      // Last check-in (for monthly check-in reminder)
+      supabase.from('checkins').select('id, date')
+        .eq('client_id', user.id)
+        .order('date', { ascending: false })
+        .limit(1)
+        .single(),
     ])
 
     // ── Compute derived data ──────────────────────────────
@@ -184,6 +197,55 @@ export async function GET(request: NextRequest) {
       return targets.includes(user.id) && !readBy.includes(user.id)
     }).length
 
+    // ── Onboarding progress ────────────────────────────────
+    const intakeForm = intakeRes.data
+    const onboardingComplete = !!profile?.intake_completed
+
+    // Calculate onboarding step progress (matches /onboarding page steps)
+    // Steps: 0=welcome, 1=goals, 2=training, 3=health, 4=nutrition, 5=lifestyle, 6=measurements, 7=done
+    let onboardingStep = 0
+    if (intakeForm) {
+      if (intakeForm.primary_goal) onboardingStep = 2
+      if (intakeForm.training_experience) onboardingStep = 3
+      // More fields = further along
+      if (intakeForm.dietary_preferences) onboardingStep = 5
+      if (intakeForm.weight_kg) onboardingStep = 7
+      if (intakeForm.completed) onboardingStep = 8
+    }
+
+    // ── Check-in due (improved logic) ────────────────────
+    const lastCheckin = lastCheckinRes.data
+    const checkInDueInfo = (() => {
+      if (!profile?.start_date) return null
+
+      const startDate = new Date(profile.start_date)
+      const nowDate = new Date()
+
+      // If the client just started (less than 25 days ago), no check-in needed yet
+      const daysSinceStart = Math.floor((nowDate.getTime() - startDate.getTime()) / 86400000)
+      if (daysSinceStart < 25) return null
+
+      if (lastCheckin) {
+        // Days since last check-in
+        const lastCheckinDate = new Date(lastCheckin.date)
+        const daysSinceLast = Math.floor((nowDate.getTime() - lastCheckinDate.getTime()) / 86400000)
+
+        // Check-in is due when it's been ~30 days since the last one
+        // Show reminder from 5 days before due, and stay visible until done
+        const daysUntilDue = 30 - daysSinceLast
+        if (daysUntilDue <= 5) {
+          return {
+            daysUntil: Math.max(0, daysUntilDue),
+            overdue: daysUntilDue < 0,
+          }
+        }
+        return null
+      } else {
+        // Never done a check-in — due now (if > 25 days active)
+        return { daysUntil: 0, overdue: true }
+      }
+    })()
+
     // ── Response ──────────────────────────────────────────
 
     return NextResponse.json({
@@ -191,6 +253,12 @@ export async function GET(request: NextRequest) {
         firstName: profile.full_name?.split(' ')[0] || '',
         startDate: profile.start_date,
       } : null,
+
+      onboarding: {
+        complete: onboardingComplete,
+        currentStep: onboardingStep,
+        totalSteps: 8,
+      },
 
       training: {
         today: todayTemplateDay ? {
@@ -234,12 +302,7 @@ export async function GET(request: NextRequest) {
           if (Date.now() > endTime) return null
           return { id: vc.id, scheduled_at: vc.scheduled_at }
         })(),
-        checkInDue: (() => {
-          if (!profile?.start_date) return null
-          const daysElapsed = Math.floor((Date.now() - new Date(profile.start_date).getTime()) / 86400000)
-          const daysUntil = 30 - (daysElapsed % 30)
-          return daysUntil <= 5 ? daysUntil : null
-        })(),
+        checkInDue: checkInDueInfo,
       },
 
       momentum: {
