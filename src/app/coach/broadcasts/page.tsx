@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { formatDistanceToNow, format } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { Send, Trash2, Users, Clock } from 'lucide-react';
+import { sendPushToClient } from '@/lib/push-notifications';
 
 interface Client {
   id: string;
@@ -130,6 +131,11 @@ export default function BroadcastsPage() {
         console.error('Fout bij aanmaken van berichten:', messagesError);
         return;
       }
+
+      // Send push notification to each client (fire & forget)
+      selectedClientIds.forEach((clientId) => {
+        sendPushToClient(clientId, title || 'MŌVE', message.substring(0, 100), '/client/messages')
+      });
 
       // Add to broadcasts list
       setBroadcasts([

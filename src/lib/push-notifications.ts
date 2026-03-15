@@ -1,123 +1,100 @@
 /**
- * Push notification utilities for MŌVE coaching app
+ * Push notification client utilities for MŌVE coaching app
  * Handles permission requests, service worker registration, and push subscriptions
+ * Subscriptions are stored in Supabase via /api/push
  */
 
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
+const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || ''
+
+/**
+ * Check if push notifications are supported on this device/browser
+ */
+export function isPushSupported(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    'serviceWorker' in navigator &&
+    'PushManager' in window &&
+    'Notification' in window
+  )
+}
 
 /**
  * Request notification permission from the user
  */
 export async function requestNotificationPermission(): Promise<NotificationPermission> {
-  if (!('Notification' in window)) {
-    console.log('Deze browser ondersteunt meldingen niet');
-    return 'denied';
-  }
-
-  if (Notification.permission === 'granted') {
-    return 'granted';
-  }
-
-  if (Notification.permission === 'denied') {
-    return 'denied';
-  }
-
-  return await Notification.requestPermission();
+  if (!('Notification' in window)) return 'denied'
+  if (Notification.permission !== 'default') return Notification.permission
+  return await Notification.requestPermission()
 }
 
 /**
  * Register the service worker for push notifications
  */
 export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
-  if (!('serviceWorker' in navigator)) {
-    console.log('Service Workers worden niet ondersteund');
-    return null;
-  }
+  if (!('serviceWorker' in navigator)) return null
 
   try {
-    const registration = await navigator.serviceWorker.register('/sw.js', {
-      scope: '/',
-    });
-    console.log('Service Worker geregistreerd:', registration);
-    return registration;
+    const registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' })
+    return registration
   } catch (error) {
-    console.error('Service Worker registratie mislukt:', error);
-    return null;
+    console.error('[Push] Service Worker registratie mislukt:', error)
+    return null
   }
 }
 
 /**
- * Subscribe to push notifications
- * Requires service worker to be registered and permission to be granted
+ * Full push setup: request permission → register SW → subscribe → save to Supabase
+ * Call this once after the client logs in
  */
-export async function subscribeToPushNotifications(): Promise<PushSubscription | null> {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    console.log('Push notificaties worden niet ondersteund');
-    return null;
+export async function setupPushNotifications(): Promise<boolean> {
+  if (!isPushSupported() || !VAPID_PUBLIC_KEY) {
+    console.log('[Push] Niet ondersteund of VAPID key ontbreekt')
+    return false
   }
 
   try {
-    // Get the service worker registration
-    const registration = await navigator.serviceWorker.ready;
-
-    // Check if already subscribed
-    const existingSubscription = await registration.pushManager.getSubscription();
-    if (existingSubscription) {
-      console.log('Reeds geabonneerd op push notificaties');
-      return existingSubscription;
+    // 1. Request permission
+    const permission = await requestNotificationPermission()
+    if (permission !== 'granted') {
+      console.log('[Push] Toestemming geweigerd')
+      return false
     }
 
-    // Subscribe to push notifications
-    const subscription = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as BufferSource,
-    });
+    // 2. Register service worker
+    const registration = await registerServiceWorker()
+    if (!registration) return false
 
-    console.log('Geabonneerd op push notificaties');
+    // Wait for SW to be ready
+    await navigator.serviceWorker.ready
 
-    // Save subscription to localStorage as placeholder
-    await savePushSubscriptionLocally(subscription);
+    // 3. Check existing subscription
+    let subscription = await registration.pushManager.getSubscription()
 
-    return subscription;
+    // 4. Subscribe if not yet subscribed
+    if (!subscription) {
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as BufferSource,
+      })
+    }
+
+    // 5. Save to Supabase via API
+    const res = await fetch('/api/push', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscription: subscription.toJSON() }),
+    })
+
+    if (!res.ok) {
+      console.error('[Push] Opslaan mislukt:', await res.text())
+      return false
+    }
+
+    console.log('[Push] Notificaties actief')
+    return true
   } catch (error) {
-    console.error('Abonnering op push notificaties mislukt:', error);
-    return null;
-  }
-}
-
-/**
- * Save push subscription to localStorage (placeholder for Supabase push_subscriptions table)
- * In production, this should save to the push_subscriptions table in Supabase
- */
-export async function savePushSubscriptionLocally(
-  subscription: PushSubscription
-): Promise<void> {
-  try {
-    const subscriptionJson = JSON.stringify(subscription);
-    localStorage.setItem('move_push_subscription', subscriptionJson);
-    console.log('Push abonnement lokaal opgeslagen');
-  } catch (error) {
-    console.error('Fout bij opslaan van push abonnement:', error);
-  }
-}
-
-/**
- * Save push subscription to Supabase (future implementation)
- * Currently a placeholder that uses localStorage
- */
-export async function savePushSubscriptionToSupabase(
-  userId: string,
-  subscription: PushSubscription
-): Promise<void> {
-  try {
-    // TODO: Implement Supabase storage
-    // For now, store in localStorage with userId key
-    const key = `move_push_subscription_${userId}`;
-    const subscriptionJson = JSON.stringify(subscription);
-    localStorage.setItem(key, subscriptionJson);
-    console.log('Push abonnement voor gebruiker opgeslagen');
-  } catch (error) {
-    console.error('Fout bij opslaan van push abonnement:', error);
+    console.error('[Push] Setup mislukt:', error)
+    return false
   }
 }
 
@@ -126,52 +103,59 @@ export async function savePushSubscriptionToSupabase(
  */
 export async function unsubscribeFromPushNotifications(): Promise<void> {
   try {
-    if ('serviceWorker' in navigator) {
-      const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.getSubscription();
+    if (!('serviceWorker' in navigator)) return
 
-      if (subscription) {
-        await subscription.unsubscribe();
-        localStorage.removeItem('move_push_subscription');
-        console.log('Afgemeldt van push notificaties');
-      }
+    const registration = await navigator.serviceWorker.ready
+    const subscription = await registration.pushManager.getSubscription()
+
+    if (subscription) {
+      const endpoint = subscription.endpoint
+      await subscription.unsubscribe()
+
+      // Remove from Supabase
+      await fetch('/api/push', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endpoint }),
+      })
     }
   } catch (error) {
-    console.error('Fout bij afmelden van push notificaties:', error);
+    console.error('[Push] Afmelden mislukt:', error)
   }
 }
 
 /**
- * Get current push subscription
+ * Helper: send push notification to specific client(s)
+ * Called from coach-side code after sending broadcast/message/prompt
  */
-export async function getPushSubscription(): Promise<PushSubscription | null> {
+export async function sendPushToClient(
+  clientId: string,
+  title: string,
+  message: string,
+  url: string = '/client'
+): Promise<boolean> {
   try {
-    if ('serviceWorker' in navigator) {
-      const registration = await navigator.serviceWorker.ready;
-      return await registration.pushManager.getSubscription();
-    }
-    return null;
-  } catch (error) {
-    console.error('Fout bij ophalen van push abonnement:', error);
-    return null;
+    const res = await fetch('/api/push/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ client_id: clientId, title, message, url }),
+    })
+    return res.ok
+  } catch {
+    return false
   }
 }
 
 /**
  * Convert VAPID key from base64 to Uint8Array
- * Required for subscribeToPushNotifications
  */
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
-  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding)
-    .replace(/-/g, '+')
-    .replace(/_/g, '/');
-
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+  const rawData = window.atob(base64)
+  const outputArray = new Uint8Array(rawData.length)
   for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
+    outputArray[i] = rawData.charCodeAt(i)
   }
-  return outputArray;
+  return outputArray
 }

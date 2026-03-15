@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase-admin'
+import { sendPushToUsers } from '@/lib/push-server'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
@@ -103,6 +104,14 @@ export async function GET(request: NextRequest) {
           { status: 500 }
         );
       }
+
+      // Send push notifications to all clients (fire & forget)
+      const clientIds = clients.map((c) => c.id)
+      sendPushToUsers(clientIds, {
+        title: 'Vraag van je coach',
+        body: 'Er staat een nieuwe vraag voor je klaar',
+        url: '/client/prompts',
+      }).catch((err) => console.error('Push send error:', err))
     }
 
     return NextResponse.json({

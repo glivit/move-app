@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase'
+import { sendPushToClient } from '@/lib/push-notifications'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 
 interface Message {
@@ -136,6 +137,10 @@ export function useMessageSubscription(userId: string, otherUserId: string) {
       setMessages((prev) =>
         prev.map((m) => (m.id === optimisticMsg.id ? (data as Message) : m))
       )
+
+      // Send push notification to the other user (fire & forget)
+      sendPushToClient(otherUserId, 'Nieuw bericht', content.substring(0, 100), '/client/messages')
+
       return { data }
     },
     [userId, otherUserId]

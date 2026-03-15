@@ -11,6 +11,7 @@ import {
 import { ClientHealthSummary } from '@/components/coach/ClientHealthSummary'
 import { ProgramAssignModal } from '@/components/coach/ProgramAssignModal'
 import type { CheckIn, IntakeForm, Profile } from '@/types'
+import { sendPushToClient } from '@/lib/push-notifications'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -383,6 +384,8 @@ export function ClientProfileTabs({
       if (!error && data) {
         setMessages((prev) => [...prev, data])
         setNewMessage('')
+        // Push notification (fire & forget)
+        sendPushToClient(profile.id, 'Nieuw bericht', newMessage.trim().substring(0, 100), '/client/messages')
       }
     } catch (error) {
       console.error('Error sending message:', error)
