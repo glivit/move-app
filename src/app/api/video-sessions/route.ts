@@ -78,12 +78,11 @@ export async function POST(request: NextRequest) {
 
     const { client_id, scheduled_at, duration_minutes } = validation.data as any;
 
-    // Verify client exists and belongs to this coach
+    // Verify client exists
     const { data: client, error: clientError } = await supabase
       .from('profiles')
-      .select('id, name')
+      .select('id, full_name')
       .eq('id', client_id)
-      .eq('coach_id', user.id)
       .eq('role', 'client')
       .single();
 
@@ -182,19 +181,7 @@ export async function GET(request: NextRequest) {
     // Coaches see their clients' sessions
     if (profile.role === 'coach') {
       // Get clients for this coach
-      const { data: clients, error: clientsError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('coach_id', user.id)
-        .eq('role', 'client');
-
-      if (clientsError || !clients || clients.length === 0) {
-        return NextResponse.json({ success: true, data: [] });
-      }
-
-      const clientIds = clients.map((c) => c.id);
-      query = query.in('client_id', clientIds);
-
+      // Single-coach app: show all client video sessions
       if (clientId) {
         query = query.eq('client_id', clientId);
       }

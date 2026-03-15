@@ -145,15 +145,25 @@ export function useMessageSubscription(userId: string, otherUserId: string) {
   const markAsRead = useCallback(async () => {
     const supabase = createClient()
     const unread = messages.filter(
-      (m) => m.sender_id === otherUserId && !m.read_at
+      (m) => m.sender_id === otherUserId && !m.read_at && !m.id.startsWith('temp-')
     )
     if (unread.length === 0) return
 
     const ids = unread.map((m) => m.id)
-    await supabase
+    const readAt = new Date().toISOString()
+    const { error } = await supabase
       .from('messages')
-      .update({ read_at: new Date().toISOString() })
+      .update({ read_at: readAt })
       .in('id', ids)
+
+    if (!error) {
+      // Update local state immediately to reflect read status
+      setMessages((prev) =>
+        prev.map((m) =>
+          ids.includes(m.id) ? { ...m, read_at: readAt } : m
+        )
+      )
+    }
   }, [messages, otherUserId])
 
   return { messages, loading, sendMessage, markAsRead }
@@ -242,6 +252,17 @@ export function useConversationList(coachId: string) {
         'postgres_changes',
         {
           event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+        },
+        () => {
+          refresh()
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
           schema: 'public',
           table: 'messages',
         },

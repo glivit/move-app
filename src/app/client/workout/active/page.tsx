@@ -290,7 +290,7 @@ function ActiveWorkoutPage() {
 
   // Check if all sets are completed for current exercise
   const currentExerciseId = exercises[currentExerciseIndex]?.id
-  const currentSets = currentExerciseId ? sets[currentExerciseId] : []
+  const currentSets = currentExerciseId ? (sets[currentExerciseId] || []) : []
   const allSetsCompleted = currentSets.length > 0 && currentSets.every((s) => s.completed)
   const completedSetsCount = currentSets.filter((s) => s.completed).length
 

@@ -164,7 +164,30 @@ export default function ClientMessagesPage() {
                   if (prev.some((m) => m.id === msg.id)) return prev
                   return [...prev, msg]
                 })
+
+                // Auto-mark incoming coach messages as read
+                if (msg.sender_id === coach.id && !msg.read_at) {
+                  supabase
+                    .from('messages')
+                    .update({ read_at: new Date().toISOString() })
+                    .eq('id', msg.id)
+                    .then(() => {})
+                }
               }
+            }
+          )
+          .on(
+            'postgres_changes',
+            {
+              event: 'UPDATE',
+              schema: 'public',
+              table: 'messages',
+            },
+            (payload) => {
+              const msg = payload.new as Message
+              setMessages((prev) =>
+                prev.map((m) => (m.id === msg.id ? msg : m))
+              )
             }
           )
           .subscribe()
