@@ -89,8 +89,10 @@ export default function NewExercisePage() {
 
     try {
       setLoading(true)
-      const { error } = await supabase.from('exercises').insert([
-        {
+      const res = await fetch('/api/exercises', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           name: name.trim(),
           name_nl: nameNl.trim() || null,
           body_part: bodyPart,
@@ -100,13 +102,13 @@ export default function NewExercisePage() {
           coach_tips: coachTips.trim() || null,
           coach_notes: coachNotes.trim() || null,
           gif_url: gifUrl.trim() || null,
-          is_custom: true,
-          is_visible: true,
-          sort_order: 9999,
-        },
-      ])
+        }),
+      })
 
-      if (error) throw error
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Fout bij aanmaken')
+      }
 
       setToast({ type: 'success', message: 'Oefening aangemaakt!' })
       setTimeout(() => {

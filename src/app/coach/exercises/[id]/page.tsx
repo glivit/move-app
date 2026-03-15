@@ -108,19 +108,23 @@ export default function ExerciseDetailPage() {
 
     try {
       setSaving(true)
-      const { error } = await supabase
-        .from('exercises')
-        .update({
-          name_nl: nameNl || null,
-          coach_tips: coachTips || null,
-          coach_notes: coachNotes || null,
-          instructions: instructions || null,
+      const res = await fetch(`/api/exercises/${exercise.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name_nl: nameNl,
+          coach_tips: coachTips,
+          coach_notes: coachNotes,
+          instructions: instructions,
           is_visible: isVisible,
-          category: category || null,
-        })
-        .eq('id', exercise.id)
+          category: category,
+        }),
+      })
 
-      if (error) throw error
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Fout bij opslaan')
+      }
 
       setToast({ type: 'success', message: 'Oefening opgeslagen' })
       setTimeout(() => setToast(null), 3000)
