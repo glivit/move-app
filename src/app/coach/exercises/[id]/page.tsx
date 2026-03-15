@@ -15,7 +15,7 @@ interface Exercise {
   secondary_muscles?: string
   equipment: string
   gif_url?: string
-  instructions?: string
+  instructions?: string | string[]
   coach_tips?: string
   coach_notes?: string
   category?: string
@@ -91,7 +91,11 @@ export default function ExerciseDetailPage() {
         setCoachNotes(ex.coach_notes || '')
         setIsVisible(ex.is_visible)
         setCategory(ex.category || '')
-        setInstructions(ex.instructions || '')
+        setInstructions(
+          Array.isArray(ex.instructions)
+            ? ex.instructions.join('\n')
+            : ex.instructions || ''
+        )
       } catch (error) {
         console.error('Failed to fetch exercise:', error)
         setToast({ type: 'error', message: 'Fout bij laden oefening' })

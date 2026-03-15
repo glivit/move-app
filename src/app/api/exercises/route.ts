@@ -48,7 +48,11 @@ export async function POST(request: NextRequest) {
         category: body.category || null,
         coach_tips: body.coach_tips || null,
         coach_notes: body.coach_notes || null,
-        instructions: body.instructions || null,
+        instructions: body.instructions
+          ? (typeof body.instructions === 'string'
+            ? body.instructions.split('\n').map((s: string) => s.trim()).filter(Boolean)
+            : body.instructions)
+          : [],
         gif_url: body.gif_url || null,
         is_custom: true,
         is_visible: true,

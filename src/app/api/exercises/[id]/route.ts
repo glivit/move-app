@@ -47,7 +47,16 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (body.name_nl !== undefined) updateData.name_nl = body.name_nl || null
     if (body.coach_tips !== undefined) updateData.coach_tips = body.coach_tips || null
     if (body.coach_notes !== undefined) updateData.coach_notes = body.coach_notes || null
-    if (body.instructions !== undefined) updateData.instructions = body.instructions || null
+    if (body.instructions !== undefined) {
+      // instructions is a text[] (array) in the database
+      if (typeof body.instructions === 'string') {
+        updateData.instructions = body.instructions.trim()
+          ? body.instructions.split('\n').map((s: string) => s.trim()).filter(Boolean)
+          : []
+      } else {
+        updateData.instructions = body.instructions || []
+      }
+    }
     if (body.is_visible !== undefined) updateData.is_visible = body.is_visible
     if (body.category !== undefined) updateData.category = body.category || null
 
