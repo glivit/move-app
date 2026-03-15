@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
 
       // Unread messages count
       supabase.from('messages').select('id', { count: 'exact', head: true })
-        .eq('recipient_id', user.id).eq('read', false),
+        .eq('receiver_id', user.id).is('read_at', null),
 
       // Next video call — only truly future, not completed or cancelled
       supabase.from('video_sessions').select('id, scheduled_at, duration_minutes')
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
 
       // Pending prompts (coach sent, client hasn't responded)
       supabase.from('prompt_responses').select('id, prompt_id, prompts(question)')
-        .eq('client_id', user.id).is('response', null)
+        .eq('client_id', user.id).eq('response', '')
         .order('created_at', { ascending: false }).limit(1),
     ])
 

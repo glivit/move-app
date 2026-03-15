@@ -44,7 +44,7 @@ export function MessageSearch() {
           content,
           created_at,
           sender:profiles!messages_sender_id_fkey(id, full_name),
-          recipient:profiles!messages_recipient_id_fkey(id, full_name)
+          recipient:profiles!messages_receiver_id_fkey(id, full_name)
         `
         )
         .ilike('content', `%${query}%`)

@@ -5,8 +5,9 @@ import Link from 'next/link'
 import {
   Dumbbell, CheckCircle, ChevronRight, Apple, Video,
   MessageSquare, Calendar, ArrowUpRight, ShieldCheck,
-  Flame, TrendingDown, TrendingUp, Activity, Bell
+  Flame, TrendingDown, TrendingUp, Activity
 } from 'lucide-react'
+import { NotificationCenter } from '@/components/client/NotificationCenter'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -198,17 +199,10 @@ export default function ClientDashboard() {
               {formatDate(new Date())}
             </p>
           </div>
-          {/* Notification bell */}
-          <Link href="/client/messages" className="relative p-2 mt-1">
-            <Bell strokeWidth={1.5} className="w-6 h-6 text-[#5C5A55]" />
-            {data.notificationCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-[20px] rounded-full bg-[#FF3B30] flex items-center justify-center px-1">
-                <span className="text-[11px] font-bold text-white leading-none">
-                  {data.notificationCount > 9 ? '9+' : data.notificationCount}
-                </span>
-              </span>
-            )}
-          </Link>
+          {/* Notification bell with dropdown */}
+          <div className="mt-1">
+            <NotificationCenter />
+          </div>
         </div>
       </div>
 

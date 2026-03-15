@@ -117,9 +117,9 @@ export default function BroadcastsPage() {
       // Create individual messages for each client
       const messages = selectedClientIds.map((clientId) => ({
         sender_id: user.id,
-        recipient_id: clientId,
+        receiver_id: clientId,
         content: message,
-        broadcast_id: broadcastData.id,
+        message_type: 'text' as const,
       }));
 
       const { error: messagesError } = await supabase
