@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
         full_name,
         role: 'client',
       },
-      redirectTo: `${appUrl}/auth/callback?type=invite`,
+      redirectTo: `${appUrl}/auth/callback/invite`,
     },
   })
 

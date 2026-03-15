@@ -1,6 +1,13 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { NextRequest, NextResponse } from 'next/server'
 
+/**
+ * Main auth callback — handles code exchange and smart redirect.
+ *
+ * Supabase redirects here after email verification with ?code=xxx
+ * The ?type= param we set in redirectTo often gets lost, so we also
+ * auto-detect invites via app_metadata.invited_at
+ */
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
@@ -10,7 +17,7 @@ export async function GET(request: NextRequest) {
 
   // Handle error from Supabase (e.g., expired link)
   if (error) {
-    console.error('Auth callback error:', error, errorDescription)
+    console.error('[Auth Callback] error:', error, errorDescription)
     const loginUrl = new URL('/', request.url)
     loginUrl.searchParams.set('error', errorDescription || 'Er ging iets mis met de verificatie.')
     return NextResponse.redirect(loginUrl)
@@ -21,25 +28,35 @@ export async function GET(request: NextRequest) {
     const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
 
     if (exchangeError) {
-      console.error('Code exchange error:', exchangeError)
+      console.error('[Auth Callback] exchange error:', exchangeError)
       const loginUrl = new URL('/', request.url)
       loginUrl.searchParams.set('error', 'Link is verlopen. Vraag een nieuwe aan.')
       return NextResponse.redirect(loginUrl)
     }
 
-    // Password recovery — redirect to set new password
+    const { data: { user } } = await supabase.auth.getUser()
+
+    // Explicit type param (if Supabase preserved it)
     if (type === 'recovery') {
       return NextResponse.redirect(new URL('/auth/reset-password', request.url))
     }
-
-    // Invite — new client needs to set their first password
     if (type === 'invite') {
       return NextResponse.redirect(new URL('/auth/set-password', request.url))
     }
 
-    // Check if user has a role, redirect accordingly
-    const { data: { user } } = await supabase.auth.getUser()
+    // Auto-detect: invited user arriving for the first time
     if (user) {
+      const invitedAt = user.app_metadata?.invited_at
+      const providers = user.app_metadata?.providers || []
+      // invited_at is set by Supabase on inviteUserByEmail / generateLink type=invite
+      // Also check: user has no password provider yet (never set a password)
+      const hasNoPassword = !providers.includes('email')
+
+      if (invitedAt && hasNoPassword) {
+        return NextResponse.redirect(new URL('/auth/set-password', request.url))
+      }
+
+      // Normal login — redirect based on role
       const { data: profile } = await supabase
         .from('profiles')
         .select('role')
@@ -48,11 +65,13 @@ export async function GET(request: NextRequest) {
 
       if (profile?.role === 'coach') {
         return NextResponse.redirect(new URL('/coach', request.url))
-      } else {
-        return NextResponse.redirect(new URL('/client', request.url))
       }
+      return NextResponse.redirect(new URL('/client', request.url))
     }
   }
 
-  return NextResponse.redirect(new URL('/', request.url))
+  // No code — maybe Supabase used implicit flow (hash fragment)
+  // In that case, the client-side needs to handle it
+  // Redirect to a client-side handler page
+  return NextResponse.redirect(new URL('/auth/verify', request.url))
 }
