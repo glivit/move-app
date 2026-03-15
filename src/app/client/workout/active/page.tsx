@@ -18,6 +18,7 @@ interface Exercise {
   name: string
   name_nl: string
   gif_url: string
+  video_url: string | null
   instructions: string
   coach_tips: string
 }
@@ -360,7 +361,7 @@ function ActiveWorkoutPage() {
 
       {/* Top bar */}
       <header className="sticky top-0 bg-white/90 backdrop-blur-xl border-b border-[#F0F0ED] z-40">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <button
             onClick={handleClose}
             className="p-2 hover:bg-client-surface-muted rounded-full transition-colors"
@@ -370,10 +371,7 @@ function ActiveWorkoutPage() {
           </button>
 
           <div className="text-center flex-1">
-            <p className="text-[12px] text-client-text-secondary font-medium uppercase tracking-wide">
-              Set {completedSetsCount + 1} van {currentSets.length}
-            </p>
-            <h1 className="font-semibold text-text-primary mt-0.5 text-[17px]">
+            <h1 className="font-semibold text-text-primary text-[17px] tracking-[-0.01em]">
               {exerciseData.name_nl || exerciseData.name}
             </h1>
           </div>
@@ -381,36 +379,82 @@ function ActiveWorkoutPage() {
           <div className="w-10" />
         </div>
 
-        {/* Progress bar */}
-        <div className="h-1 bg-client-surface-muted">
-          <div
-            className="h-full bg-[#8B6914] transition-all"
-            style={{
-              width: `${((currentExerciseIndex + 1) / exercises.length) * 100}%`,
-            }}
-          />
+        {/* Exercise dots + set progress */}
+        <div className="max-w-2xl mx-auto px-4 pb-3">
+          {/* Exercise navigation dots */}
+          <div className="flex items-center justify-center gap-1.5 mb-2">
+            {exercises.map((_, idx) => {
+              const exSets = sets[exercises[idx].id] || []
+              const exDone = exSets.length > 0 && exSets.every(s => s.completed)
+              return (
+                <button
+                  key={idx}
+                  onClick={() => { setSlideDirection(idx > currentExerciseIndex ? 'right' : 'left'); setCurrentExerciseIndex(idx); setExpandedTips(false); setExpandedInstructions(false) }}
+                  className={`rounded-full transition-all duration-300 ${
+                    idx === currentExerciseIndex
+                      ? 'w-6 h-2 bg-[#8B6914]'
+                      : exDone
+                        ? 'w-2 h-2 bg-[#34C759]'
+                        : 'w-2 h-2 bg-[#E0DDD8]'
+                  }`}
+                  aria-label={`Oefening ${idx + 1}`}
+                />
+              )
+            })}
+          </div>
+          {/* Set progress dots */}
+          <div className="flex items-center justify-center gap-1">
+            {currentSets.map((s, idx) => (
+              <div
+                key={idx}
+                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                  s.completed ? 'bg-[#34C759] scale-110' : 'bg-[#E0DDD8]'
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-6 pb-32">
         <div key={currentExerciseIndex} className={slideDirection === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left'}>
-        {/* Exercise GIF — lazy loaded */}
-        <div className="mb-6">
+        {/* Exercise GIF — large, prominent display */}
+        <div className="mb-5 -mx-4">
           {exerciseData.gif_url ? (
-            <div className="bg-[#FAFAFA] rounded-2xl overflow-hidden aspect-square flex items-center justify-center">
+            <div className="bg-[#F5F2ED] overflow-hidden flex items-center justify-center" style={{ maxHeight: '50vh' }}>
               <img
                 src={exerciseData.gif_url}
                 alt={exerciseData.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
                 loading="lazy"
                 decoding="async"
-                style={{ mixBlendMode: 'multiply' }}
+                style={{ mixBlendMode: 'multiply', maxHeight: '50vh' }}
               />
             </div>
           ) : (
-            <div className="bg-client-surface-muted rounded-2xl aspect-square flex items-center justify-center">
+            <div className="bg-client-surface-muted rounded-2xl mx-4 aspect-video flex items-center justify-center">
               <Zap size={48} strokeWidth={1.5} className="text-client-text-secondary opacity-30" />
             </div>
+          )}
+        </div>
+
+        {/* Exercise info bar */}
+        <div className="flex items-center justify-between mb-4 px-1">
+          <div className="flex items-center gap-2 text-[13px] text-client-text-secondary">
+            <span className="font-semibold text-[#8B6914]">{currentExercise.sets} sets</span>
+            <span>·</span>
+            <span>{currentExercise.reps_min}{currentExercise.reps_max !== currentExercise.reps_min ? `-${currentExercise.reps_max}` : ''} reps</span>
+            {currentExercise.rest_seconds > 0 && (
+              <>
+                <span>·</span>
+                <span>{currentExercise.rest_seconds}s rust</span>
+              </>
+            )}
+          </div>
+          {currentExercise.tempo && (
+            <span className="text-[12px] font-medium text-[#9B7B2E] bg-[#9B7B2E]/10 px-2 py-0.5 rounded-full">
+              Tempo {currentExercise.tempo}
+            </span>
           )}
         </div>
 
@@ -502,14 +546,23 @@ function ActiveWorkoutPage() {
             </button>
 
             {allSetsCompleted ? (
-              <button
-                onClick={handleNextExercise}
-                disabled={currentExerciseIndex === exercises.length - 1}
-                className="flex-1 py-3 px-4 rounded-xl bg-[#8B6914] text-white font-semibold flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-[#6F5612] transition-colors"
-              >
-                {currentExerciseIndex === exercises.length - 1 ? 'Klaar' : 'Volgende'}
-                <ChevronRight size={18} strokeWidth={1.5} />
-              </button>
+              currentExerciseIndex === exercises.length - 1 ? (
+                <button
+                  onClick={() => router.push(`/client/workout/complete?sessionId=${session?.id}`)}
+                  className="flex-1 py-3 px-4 rounded-xl bg-[#34C759] text-white font-semibold flex items-center justify-center gap-2 hover:bg-[#2DB84E] transition-colors shadow-[0_4px_16px_rgba(52,199,89,0.3)]"
+                >
+                  Workout afronden
+                  <Check size={18} strokeWidth={2} />
+                </button>
+              ) : (
+                <button
+                  onClick={handleNextExercise}
+                  className="flex-1 py-3 px-4 rounded-xl bg-[#8B6914] text-white font-semibold flex items-center justify-center gap-2 hover:bg-[#6F5612] transition-colors"
+                >
+                  Volgende
+                  <ChevronRight size={18} strokeWidth={1.5} />
+                </button>
+              )
             ) : (
               <div className="flex-1 py-3 px-4 rounded-xl bg-client-surface-muted flex items-center justify-center gap-2">
                 <AlertCircle size={18} strokeWidth={1.5} className="text-client-text-secondary" />

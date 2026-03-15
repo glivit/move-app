@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
-import { Video, Calendar, Clock, ArrowRight, Phone } from 'lucide-react'
+import { Video, Calendar, Clock, ArrowRight, Phone, Download, ExternalLink } from 'lucide-react'
+import { getGoogleCalendarUrl, downloadICS } from '@/lib/calendar'
 
 interface VideoSession {
   id: string
@@ -70,6 +71,18 @@ export default function ClientVideoPage() {
     const end = new Date(start.getTime() + session.duration_minutes * 60000)
     const joinWindow = new Date(start.getTime() - 5 * 60000) // 5 min before
     return now >= joinWindow && now <= end && session.daily_room_url
+  }
+
+  function getCalendarEvent(session: VideoSession) {
+    const start = new Date(session.scheduled_at)
+    const end = new Date(start.getTime() + session.duration_minutes * 60000)
+    return {
+      title: 'MŌVE Video Call met je coach',
+      description: 'Video coaching sessie via MŌVE Studio.\\nOpen de app om deel te nemen.',
+      startDate: start,
+      endDate: end,
+      location: 'MŌVE Studio (online)',
+    }
   }
 
   function statusLabel(status: string) {
@@ -160,6 +173,26 @@ export default function ClientVideoPage() {
                         Je kunt 5 minuten voor de start deelnemen
                       </div>
                     )}
+
+                    {/* Calendar actions */}
+                    <div className="flex gap-2 mt-3">
+                      <a
+                        href={getGoogleCalendarUrl(getCalendarEvent(session))}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[#E5E5E5] text-[12px] font-medium text-[#5C5A55] hover:bg-[#F5F5F3] transition-colors"
+                      >
+                        <ExternalLink strokeWidth={1.5} className="w-3.5 h-3.5" />
+                        Google Calendar
+                      </a>
+                      <button
+                        onClick={() => downloadICS(getCalendarEvent(session), `move-call-${session.id.slice(0, 8)}.ics`)}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[#E5E5E5] text-[12px] font-medium text-[#5C5A55] hover:bg-[#F5F5F3] transition-colors"
+                      >
+                        <Download strokeWidth={1.5} className="w-3.5 h-3.5" />
+                        Download .ics
+                      </button>
+                    </div>
                   </div>
                 )
               })}

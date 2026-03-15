@@ -476,6 +476,7 @@ export interface Database {
           secondary_muscles: string[]
           equipment: string
           gif_url: string | null
+          video_url: string | null
           instructions: string[]
           coach_tips: string | null
           coach_notes: string | null
@@ -495,6 +496,7 @@ export interface Database {
           secondary_muscles?: string[]
           equipment?: string
           gif_url?: string | null
+          video_url?: string | null
           instructions?: string[]
           coach_tips?: string | null
           coach_notes?: string | null
@@ -514,6 +516,7 @@ export interface Database {
           secondary_muscles?: string[]
           equipment?: string
           gif_url?: string | null
+          video_url?: string | null
           instructions?: string[]
           coach_tips?: string | null
           coach_notes?: string | null

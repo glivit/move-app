@@ -32,6 +32,18 @@ const EQUIPMENT = [
   { value: 'kettlebell', label: 'Kettlebell' },
   { value: 'medicine ball', label: 'Medicine Ball' },
   { value: 'resistance band', label: 'Resistance Band' },
+  { value: 'smith machine', label: 'Smith Machine' },
+  { value: 'trx', label: 'TRX / Suspension' },
+  { value: 'foam roller', label: 'Foam Roller' },
+  { value: 'ez bar', label: 'EZ Curl Bar' },
+  { value: 'trap bar', label: 'Trap Bar / Hex Bar' },
+  { value: 'pull up bar', label: 'Pull-up Bar' },
+  { value: 'dip station', label: 'Dip Station' },
+  { value: 'bench', label: 'Bench' },
+  { value: 'box', label: 'Box / Step' },
+  { value: 'battle rope', label: 'Battle Rope' },
+  { value: 'landmine', label: 'Landmine' },
+  { value: 'sled', label: 'Sled' },
 ]
 
 const CATEGORIES = [
@@ -75,6 +87,7 @@ export default function NewExercisePage() {
   const [coachTips, setCoachTips] = useState('')
   const [coachNotes, setCoachNotes] = useState('')
   const [gifUrl, setGifUrl] = useState('')
+  const [videoUrl, setVideoUrl] = useState('')
 
   const supabase = createClient()
 
@@ -102,6 +115,7 @@ export default function NewExercisePage() {
           coach_tips: coachTips.trim() || null,
           coach_notes: coachNotes.trim() || null,
           gif_url: gifUrl.trim() || null,
+          video_url: videoUrl.trim() || null,
         }),
       })
 
@@ -263,6 +277,21 @@ export default function NewExercisePage() {
             className="w-full px-3 py-2 border border-client-border rounded-lg text-[15px] placeholder-client-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/20"
           />
           <p className="text-[13px] text-client-text-secondary mt-2">Voeg een animatie toe aan je oefening</p>
+        </div>
+
+        {/* Video URL */}
+        <div className="bg-white rounded-2xl shadow-clean p-4">
+          <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
+            VIDEO URL (optioneel)
+          </label>
+          <input
+            type="url"
+            value={videoUrl}
+            onChange={(e) => setVideoUrl(e.target.value)}
+            placeholder="https://youtube.com/watch?v=... of directe video URL"
+            className="w-full px-3 py-2 border border-client-border rounded-lg text-[15px] placeholder-client-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/20"
+          />
+          <p className="text-[13px] text-client-text-secondary mt-2">YouTube, Vimeo of directe videolink voor uitleg bij de oefening</p>
         </div>
 
         {/* Coach Tips */}

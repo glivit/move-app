@@ -15,6 +15,7 @@ interface Exercise {
   secondary_muscles?: string
   equipment: string
   gif_url?: string
+  video_url?: string
   instructions?: string | string[]
   coach_tips?: string
   coach_notes?: string
@@ -70,6 +71,8 @@ export default function ExerciseDetailPage() {
   const [isVisible, setIsVisible] = useState(true)
   const [category, setCategory] = useState('')
   const [instructions, setInstructions] = useState('')
+  const [gifUrl, setGifUrl] = useState('')
+  const [videoUrl, setVideoUrl] = useState('')
 
   const supabase = createClient()
 
@@ -91,6 +94,8 @@ export default function ExerciseDetailPage() {
         setCoachNotes(ex.coach_notes || '')
         setIsVisible(ex.is_visible)
         setCategory(ex.category || '')
+        setGifUrl(ex.gif_url || '')
+        setVideoUrl(ex.video_url || '')
         setInstructions(
           Array.isArray(ex.instructions)
             ? ex.instructions.join('\n')
@@ -122,6 +127,8 @@ export default function ExerciseDetailPage() {
           instructions: instructions,
           is_visible: isVisible,
           category: category,
+          gif_url: gifUrl,
+          video_url: videoUrl,
         }),
       })
 
@@ -210,6 +217,42 @@ export default function ExerciseDetailPage() {
             </div>
           </div>
 
+          {/* Video Display */}
+          {exercise.video_url && (
+            <div className="bg-white rounded-2xl shadow-clean overflow-hidden">
+              <div className="p-3 border-b border-client-border">
+                <p className="text-[12px] font-semibold text-client-text-secondary">VIDEO</p>
+              </div>
+              <div className="aspect-video">
+                {exercise.video_url.includes('youtube.com') || exercise.video_url.includes('youtu.be') ? (
+                  <iframe
+                    src={`https://www.youtube.com/embed/${
+                      exercise.video_url.includes('youtu.be')
+                        ? exercise.video_url.split('/').pop()?.split('?')[0]
+                        : new URL(exercise.video_url).searchParams.get('v')
+                    }`}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : exercise.video_url.includes('vimeo.com') ? (
+                  <iframe
+                    src={`https://player.vimeo.com/video/${exercise.video_url.split('/').pop()}`}
+                    className="w-full h-full"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video
+                    src={exercise.video_url}
+                    controls
+                    className="w-full h-full object-contain bg-black"
+                  />
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Basic Info */}
           <div className="bg-white rounded-2xl shadow-clean p-4 space-y-4">
             <div>
@@ -266,6 +309,35 @@ export default function ExerciseDetailPage() {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* GIF URL */}
+          <div className="bg-white rounded-2xl shadow-clean p-4">
+            <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
+              GIF URL
+            </label>
+            <input
+              type="url"
+              value={gifUrl}
+              onChange={(e) => setGifUrl(e.target.value)}
+              placeholder="https://example.com/exercise.gif"
+              className="w-full px-3 py-2 border border-client-border rounded-lg text-[15px] placeholder-client-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/20"
+            />
+          </div>
+
+          {/* Video URL */}
+          <div className="bg-white rounded-2xl shadow-clean p-4">
+            <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
+              VIDEO URL
+            </label>
+            <input
+              type="url"
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
+              placeholder="https://youtube.com/watch?v=... of directe video URL"
+              className="w-full px-3 py-2 border border-client-border rounded-lg text-[15px] placeholder-client-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/20"
+            />
+            <p className="text-[13px] text-client-text-secondary mt-2">YouTube, Vimeo of directe videolink</p>
           </div>
 
           {/* Coach Tips */}

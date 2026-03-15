@@ -5,10 +5,10 @@ import { createClient } from '@/lib/supabase'
 import { PhotoSlider } from '@/components/ui/PhotoSlider'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  CartesianGrid, Area, AreaChart, ComposedChart, ReferenceLine
+  CartesianGrid, Area, AreaChart, ComposedChart, ReferenceLine, PieChart, Pie, Cell
 } from 'recharts'
 import type { CheckIn } from '@/types'
-import { Trophy, Camera, TrendingUp, TrendingDown, Minus, ArrowUpRight, ArrowDownRight, ChevronDown } from 'lucide-react'
+import { Trophy, Camera, TrendingUp, TrendingDown, Minus, ArrowUpRight, ArrowDownRight, ChevronDown, Flame } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -69,6 +69,24 @@ function deltaColor(val: number, inverted = false) {
   const positive = inverted ? val < 0 : val > 0
   return positive ? '#34C759' : '#FF3B30'
 }
+
+const MUSCLE_GROUP_COLORS: { [key: string]: string } = {
+  'Chest': '#FF6B6B',
+  'Back': '#4ECDC4',
+  'Shoulders': '#45B7D1',
+  'Arms': '#96CEB4',
+  'Legs': '#FFEAA7',
+  'Core': '#DDA0DD',
+  'Borst': '#FF6B6B',
+  'Rug': '#4ECDC4',
+  'Schouders': '#45B7D1',
+  'Armen': '#96CEB4',
+  'Benen': '#FFEAA7',
+  'Buik': '#DDA0DD',
+  'Overig': '#C7C7CC',
+}
+
+const FALLBACK_COLORS = ['#FF9500', '#007AFF', '#AF52DE', '#34C759', '#FF3B30', '#5856D6', '#FF2D55', '#00C7BE']
 
 // ─── Component ──────────────────────────────────────────────
 
@@ -254,6 +272,60 @@ export default function ProgressPage() {
         workouts: data.workouts.size,
       }))
   }, [workoutSets, cutoffDate, timeRange])
+
+  // Muscle group volume breakdown
+  const muscleGroupVolume = useMemo(() => {
+    const exerciseMap = new Map(exercises.map(e => [e.id, e]))
+    const groupMap: { [key: string]: { volume: number; sets: number } } = {}
+
+    workoutSets
+      .filter(s => s.completed && s.weight_kg && s.actual_reps && filterByTime(s.created_at))
+      .forEach(set => {
+        const exercise = exerciseMap.get(set.exercise_id)
+        const group = exercise?.body_part || 'Overig'
+        if (!groupMap[group]) groupMap[group] = { volume: 0, sets: 0 }
+        groupMap[group].volume += (set.weight_kg || 0) * (set.actual_reps || 0)
+        groupMap[group].sets++
+      })
+
+    const totalVolume = Object.values(groupMap).reduce((s, g) => s + g.volume, 0)
+    return Object.entries(groupMap)
+      .map(([group, data]) => ({
+        name: group.charAt(0).toUpperCase() + group.slice(1),
+        volume: Math.round(data.volume),
+        sets: data.sets,
+        percentage: totalVolume > 0 ? Math.round((data.volume / totalVolume) * 100) : 0,
+      }))
+      .sort((a, b) => b.volume - a.volume)
+  }, [exercises, workoutSets, cutoffDate])
+
+  // Training frequency heatmap (last 12 weeks)
+  const trainingHeatmap = useMemo(() => {
+    const now = new Date()
+    const weeks: { weekLabel: string; days: { date: string; trained: boolean }[] }[] = []
+
+    for (let w = 11; w >= 0; w--) {
+      const weekStart = new Date(now)
+      weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1 - w * 7) // Monday
+      const days: { date: string; trained: boolean }[] = []
+
+      for (let d = 0; d < 7; d++) {
+        const day = new Date(weekStart)
+        day.setDate(day.getDate() + d)
+        const dateStr = day.toISOString().split('T')[0]
+        const hasSets = workoutSets.some(s =>
+          s.completed && new Date(s.created_at).toISOString().split('T')[0] === dateStr
+        )
+        days.push({ date: dateStr, trained: hasSets })
+      }
+
+      weeks.push({
+        weekLabel: getWeekNumber(weekStart),
+        days,
+      })
+    }
+    return weeks
+  }, [workoutSets])
 
   // Body measurement charts
   const lichaamData = useMemo(() =>
@@ -566,6 +638,80 @@ export default function ProgressPage() {
                   )
                 })}
               </div>
+
+              {/* Photo timeline strip */}
+              {checkinsWithPhotos.length >= 3 && (
+                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                  <h3 className="text-[15px] font-semibold text-[#1A1A18] mb-4">Foto tijdlijn</h3>
+
+                  {/* Timeline scroll */}
+                  <div className="overflow-x-auto -mx-2 px-2 pb-2">
+                    <div className="flex gap-3" style={{ minWidth: 'max-content' }}>
+                      {checkinsWithPhotos.map((checkin, idx) => {
+                        const photoUrl = (checkin as any)[`photo_${activeAngle}_url`] || (checkin as any).photo_front_url
+                        const isSelected = checkin.date === compareFrom || checkin.date === compareTo
+                        const isFrom = checkin.date === compareFrom
+                        const isTo = checkin.date === compareTo
+
+                        // Calculate weeks since first photo
+                        const firstDate = new Date(checkinsWithPhotos[0].date)
+                        const thisDate = new Date(checkin.date)
+                        const weeksSinceStart = Math.round((thisDate.getTime() - firstDate.getTime()) / (7 * 24 * 60 * 60 * 1000))
+
+                        // Show interval markers at 4, 8, 12 weeks
+                        const showIntervalMarker = weeksSinceStart > 0 && weeksSinceStart % 4 === 0
+
+                        return (
+                          <div key={checkin.date} className="flex flex-col items-center gap-1.5">
+                            <button
+                              onClick={() => {
+                                if (!compareFrom || (compareFrom && compareTo)) {
+                                  setCompareFrom(checkin.date)
+                                  setCompareTo('')
+                                } else {
+                                  if (new Date(checkin.date) > new Date(compareFrom)) {
+                                    setCompareTo(checkin.date)
+                                  } else {
+                                    setCompareTo(compareFrom)
+                                    setCompareFrom(checkin.date)
+                                  }
+                                }
+                              }}
+                              className="w-16 h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0"
+                              style={{
+                                borderColor: isSelected ? '#8B6914' : '#F0F0ED',
+                                boxShadow: isSelected ? '0 0 0 2px rgba(139,105,20,0.2)' : 'none',
+                              }}
+                            >
+                              {photoUrl ? (
+                                <img src={photoUrl} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full bg-[#F5F5F3] flex items-center justify-center">
+                                  <Camera strokeWidth={1.5} className="w-4 h-4 text-[#C7C7CC]" />
+                                </div>
+                              )}
+                            </button>
+                            <span className={`text-[10px] font-medium ${isSelected ? 'text-[#8B6914]' : 'text-[#C7C7CC]'}`}>
+                              {new Date(checkin.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
+                            </span>
+                            {isFrom && <span className="text-[9px] font-bold text-[#8B6914] bg-[#8B6914]/10 px-1.5 py-0.5 rounded">VOOR</span>}
+                            {isTo && <span className="text-[9px] font-bold text-[#8B6914] bg-[#8B6914]/10 px-1.5 py-0.5 rounded">NA</span>}
+                            {showIntervalMarker && !isFrom && !isTo && (
+                              <span className="text-[9px] font-medium text-[#FF9500] bg-[#FF9500]/10 px-1.5 py-0.5 rounded">
+                                {weeksSinceStart}w
+                              </span>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-[#C7C7CC] mt-2 text-center">
+                    Tik op twee foto's om ze te vergelijken
+                  </p>
+                </div>
+              )}
             </>
           ) : checkinsWithPhotos.length === 1 ? (
             <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
@@ -751,6 +897,128 @@ export default function ProgressPage() {
                   </ResponsiveContainer>
                 </div>
               </div>
+
+              {/* Muscle group volume breakdown */}
+              {muscleGroupVolume.length > 0 && (
+                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                  <h3 className="text-[15px] font-semibold text-[#1A1A18] mb-4">Volume per spiergroep</h3>
+
+                  {/* Donut chart + legend */}
+                  <div className="flex items-center gap-4">
+                    <div className="w-[140px] h-[140px] shrink-0">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={muscleGroupVolume}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={38}
+                            outerRadius={65}
+                            paddingAngle={2}
+                            dataKey="volume"
+                          >
+                            {muscleGroupVolume.map((entry, index) => (
+                              <Cell
+                                key={entry.name}
+                                fill={MUSCLE_GROUP_COLORS[entry.name] || FALLBACK_COLORS[index % FALLBACK_COLORS.length]}
+                              />
+                            ))}
+                          </Pie>
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      {muscleGroupVolume.map((group, index) => {
+                        const color = MUSCLE_GROUP_COLORS[group.name] || FALLBACK_COLORS[index % FALLBACK_COLORS.length]
+                        return (
+                          <div key={group.name} className="flex items-center gap-2.5">
+                            <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[13px] font-medium text-[#1A1A18] truncate">{group.name}</span>
+                                <span className="text-[12px] font-semibold text-[#8E8E93] shrink-0 ml-2">{group.percentage}%</span>
+                              </div>
+                              <div className="w-full h-1.5 bg-[#F0F0ED] rounded-full mt-1 overflow-hidden">
+                                <div
+                                  className="h-full rounded-full transition-all duration-500"
+                                  style={{ width: `${group.percentage}%`, backgroundColor: color }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Sets per group */}
+                  <div className="mt-4 pt-4 border-t border-[#F0F0ED] grid grid-cols-2 gap-2">
+                    {muscleGroupVolume.slice(0, 6).map((group, index) => {
+                      const color = MUSCLE_GROUP_COLORS[group.name] || FALLBACK_COLORS[index % FALLBACK_COLORS.length]
+                      return (
+                        <div key={group.name} className="flex items-center gap-2 px-3 py-2 bg-[#FAFAFA] rounded-xl">
+                          <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                          <span className="text-[12px] text-[#8E8E93] truncate">{group.name}</span>
+                          <span className="text-[12px] font-bold text-[#1A1A18] ml-auto">{group.sets} sets</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Training frequency heatmap */}
+              {trainingHeatmap.length > 0 && (
+                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Flame strokeWidth={1.5} className="w-4 h-4 text-[#FF9500]" />
+                    <h3 className="text-[15px] font-semibold text-[#1A1A18]">Trainingsfrequentie</h3>
+                  </div>
+
+                  {/* Day labels */}
+                  <div className="flex gap-1 mb-1">
+                    <div className="w-8 shrink-0" />
+                    {['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'].map(day => (
+                      <div key={day} className="flex-1 text-center text-[9px] font-medium text-[#C7C7CC]">{day}</div>
+                    ))}
+                  </div>
+
+                  {/* Heatmap grid */}
+                  <div className="space-y-1">
+                    {trainingHeatmap.map((week) => (
+                      <div key={week.weekLabel} className="flex gap-1 items-center">
+                        <span className="w-8 text-[9px] text-[#C7C7CC] font-medium shrink-0">{week.weekLabel}</span>
+                        {week.days.map((day) => {
+                          const isFuture = new Date(day.date) > new Date()
+                          return (
+                            <div
+                              key={day.date}
+                              className="flex-1 aspect-square rounded-[3px] transition-colors"
+                              style={{
+                                backgroundColor: isFuture
+                                  ? '#FAFAFA'
+                                  : day.trained
+                                    ? '#FF9500'
+                                    : '#F0F0ED',
+                                opacity: isFuture ? 0.5 : 1,
+                              }}
+                              title={`${new Date(day.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}${day.trained ? ' — Getraind' : ''}`}
+                            />
+                          )
+                        })}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Legend */}
+                  <div className="flex items-center justify-end gap-2 mt-3 pt-2">
+                    <span className="text-[10px] text-[#C7C7CC]">Niet getraind</span>
+                    <div className="w-3 h-3 rounded-[2px] bg-[#F0F0ED]" />
+                    <div className="w-3 h-3 rounded-[2px] bg-[#FF9500]" />
+                    <span className="text-[10px] text-[#C7C7CC]">Getraind</span>
+                  </div>
+                </div>
+              )}
             </>
           ) : (
             <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">

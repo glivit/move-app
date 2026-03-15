@@ -54,6 +54,7 @@ export async function POST(request: NextRequest) {
             : body.instructions)
           : [],
         gif_url: body.gif_url || null,
+        video_url: body.video_url || null,
         is_custom: true,
         is_visible: true,
         sort_order: 9999,

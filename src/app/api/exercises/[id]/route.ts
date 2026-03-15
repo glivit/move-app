@@ -57,8 +57,13 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         updateData.instructions = body.instructions || []
       }
     }
+    if (body.gif_url !== undefined) updateData.gif_url = body.gif_url || null
+    if (body.video_url !== undefined) updateData.video_url = body.video_url || null
     if (body.is_visible !== undefined) updateData.is_visible = body.is_visible
     if (body.category !== undefined) updateData.category = body.category || null
+    if (body.body_part !== undefined) updateData.body_part = body.body_part
+    if (body.target_muscle !== undefined) updateData.target_muscle = body.target_muscle
+    if (body.equipment !== undefined) updateData.equipment = body.equipment
 
     const { data, error } = await adminDb
       .from('exercises')
