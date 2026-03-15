@@ -10,13 +10,16 @@ import {
   ChevronRight,
   Check,
   AlertCircle,
-  Zap,
 } from 'lucide-react'
+import { ExerciseMedia } from '@/components/ExerciseMedia'
 
 interface Exercise {
   id: string
   name: string
   name_nl: string
+  body_part: string
+  target_muscle: string
+  equipment: string
   gif_url: string
   video_url: string | null
   instructions: string
@@ -459,24 +462,19 @@ function ActiveWorkoutPage() {
 
       <main className="max-w-2xl mx-auto px-4 py-6 pb-32">
         <div key={currentExerciseIndex} className={slideDirection === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left'}>
-        {/* Exercise GIF — large, prominent display */}
+        {/* Exercise media — premium display */}
         <div className="mb-5 -mx-4">
-          {exerciseData.gif_url ? (
-            <div className="bg-[#F5F2ED] overflow-hidden flex items-center justify-center" style={{ maxHeight: '50vh' }}>
-              <img
-                src={exerciseData.gif_url}
-                alt={exerciseData.name}
-                className="w-full h-full object-contain"
-                loading="lazy"
-                decoding="async"
-                style={{ mixBlendMode: 'multiply', maxHeight: '50vh' }}
-              />
-            </div>
-          ) : (
-            <div className="bg-client-surface-muted rounded-2xl mx-4 aspect-video flex items-center justify-center">
-              <Zap size={48} strokeWidth={1.5} className="text-client-text-secondary opacity-30" />
-            </div>
-          )}
+          <ExerciseMedia
+            name={exerciseData.name}
+            nameNl={exerciseData.name_nl}
+            bodyPart={exerciseData.body_part || 'chest'}
+            targetMuscle={exerciseData.target_muscle}
+            equipment={exerciseData.equipment}
+            gifUrl={exerciseData.gif_url}
+            videoUrl={exerciseData.video_url}
+            variant="hero"
+            showLabels={true}
+          />
         </div>
 
         {/* Exercise info bar */}
