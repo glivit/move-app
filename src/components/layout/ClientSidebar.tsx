@@ -54,25 +54,28 @@ export function ClientSidebar() {
   }
 
   return (
-    <aside className="hidden lg:flex lg:fixed lg:inset-y-0 lg:left-0 lg:w-[280px] lg:flex-col bg-white border-r border-[#ECEAE5] z-40">
+    <aside
+      className="hidden lg:flex lg:fixed lg:inset-y-0 lg:left-0 lg:w-[280px] lg:flex-col bg-[#FAF8F5] border-r border-[#E6E2DC] z-40"
+      style={{ boxShadow: 'inset -1px 0 0 rgba(255,255,255,0.5), 1px 0 8px rgba(26,25,23,0.03)' }}
+    >
       {/* Logo — generous spacing, editorial feel */}
-      <div className="px-7 pt-8 pb-6">
+      <div className="px-7 pt-9 pb-7">
         <h1
-          className="text-[26px] font-semibold tracking-[-0.03em] text-[#1A1A18]"
+          className="text-[28px] font-semibold tracking-[-0.03em] text-[#1A1917]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           MŌVE
         </h1>
-        <p className="text-[11px] font-medium text-[#AEAEB2] mt-1 uppercase tracking-[0.12em]">
+        <p className="text-[10px] font-semibold text-[#9C9A95] mt-1.5 uppercase tracking-[0.14em]">
           Personal Coaching
         </p>
       </div>
 
-      {/* Thin separator */}
-      <div className="mx-5 h-px bg-gradient-to-r from-transparent via-[#ECEAE5] to-transparent" />
+      {/* Separator */}
+      <div className="mx-6 h-px bg-gradient-to-r from-transparent via-[#E6E2DC] to-transparent" />
 
       {/* Main navigation */}
-      <nav className="flex-1 px-4 py-5 space-y-0.5">
+      <nav className="flex-1 px-4 py-5 space-y-0.5 overflow-y-auto">
         {mainNavItems.map((item) => {
           const Icon = item.icon
           const active = isActive(item.href)
@@ -81,35 +84,35 @@ export function ClientSidebar() {
               key={item.href}
               href={item.href}
               className={`
-                group flex items-center gap-3.5 px-4 py-2.5 rounded-xl text-[14px] font-medium
-                transition-all duration-[280ms] ease-[cubic-bezier(0.4,0,0.2,1)]
+                group flex items-center gap-3.5 px-4 py-2.5 rounded-xl text-[14px] font-medium relative
+                transition-all duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)]
                 ${active
-                  ? 'bg-[#F8F5ED] text-[#8B6914]'
-                  : 'text-[#6E6E73] hover:bg-[#F4F3F0] hover:text-[#1A1A18]'
+                  ? 'bg-gradient-to-r from-[#F7F3EA] to-[#F5F2ED] text-[#7A6124] shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_1px_2px_rgba(155,123,46,0.06)]'
+                  : 'text-[#5C5A55] hover:bg-[#F0EDE8] hover:text-[#1A1917]'
                 }
               `}
             >
               <Icon
-                className={`w-[18px] h-[18px] shrink-0 transition-colors duration-[280ms] ${
-                  active ? 'text-[#8B6914]' : 'text-[#AEAEB2] group-hover:text-[#6E6E73]'
+                className={`w-[18px] h-[18px] shrink-0 transition-colors duration-[350ms] ${
+                  active ? 'text-[#9B7B2E]' : 'text-[#9C9A95] group-hover:text-[#5C5A55]'
                 }`}
-                strokeWidth={1.5}
+                strokeWidth={active ? 1.7 : 1.5}
               />
               <span className="tracking-[-0.01em]">{item.label}</span>
               {item.href === '/client/messages' && (
-                <span className="ml-auto w-2 h-2 rounded-full bg-[#D93025] hidden" id="msg-badge" />
+                <span className="ml-auto w-2 h-2 rounded-full bg-[#C4372A] hidden" id="msg-badge" />
               )}
               {active && !item.href.includes('messages') && (
-                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#8B6914]" />
+                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#9B7B2E] shadow-[0_0_4px_rgba(155,123,46,0.4)]" />
               )}
             </Link>
           )
         })}
 
-        {/* Thin separator */}
-        <div className="!my-4 mx-1 h-px bg-gradient-to-r from-transparent via-[#ECEAE5] to-transparent" />
+        {/* Separator */}
+        <div className="!my-4 mx-1 h-px bg-gradient-to-r from-transparent via-[#E6E2DC] to-transparent" />
 
-        <p className="px-4 pb-2 text-[10px] font-semibold text-[#AEAEB2] uppercase tracking-[0.1em]">
+        <p className="px-4 pb-2 text-[10px] font-bold text-[#BAB8B3] uppercase tracking-[0.12em]">
           Meer
         </p>
 
@@ -121,23 +124,23 @@ export function ClientSidebar() {
               key={item.href}
               href={item.href}
               className={`
-                group flex items-center gap-3.5 px-4 py-2.5 rounded-xl text-[14px] font-medium
-                transition-all duration-[280ms] ease-[cubic-bezier(0.4,0,0.2,1)]
+                group flex items-center gap-3.5 px-4 py-2.5 rounded-xl text-[14px] font-medium relative
+                transition-all duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)]
                 ${active
-                  ? 'bg-[#F8F5ED] text-[#8B6914]'
-                  : 'text-[#6E6E73] hover:bg-[#F4F3F0] hover:text-[#1A1A18]'
+                  ? 'bg-gradient-to-r from-[#F7F3EA] to-[#F5F2ED] text-[#7A6124] shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_1px_2px_rgba(155,123,46,0.06)]'
+                  : 'text-[#5C5A55] hover:bg-[#F0EDE8] hover:text-[#1A1917]'
                 }
               `}
             >
               <Icon
-                className={`w-[18px] h-[18px] shrink-0 transition-colors duration-[280ms] ${
-                  active ? 'text-[#8B6914]' : 'text-[#AEAEB2] group-hover:text-[#6E6E73]'
+                className={`w-[18px] h-[18px] shrink-0 transition-colors duration-[350ms] ${
+                  active ? 'text-[#9B7B2E]' : 'text-[#9C9A95] group-hover:text-[#5C5A55]'
                 }`}
-                strokeWidth={1.5}
+                strokeWidth={active ? 1.7 : 1.5}
               />
               <span className="tracking-[-0.01em]">{item.label}</span>
               {active && (
-                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#8B6914]" />
+                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#9B7B2E] shadow-[0_0_4px_rgba(155,123,46,0.4)]" />
               )}
             </Link>
           )
@@ -145,11 +148,11 @@ export function ClientSidebar() {
       </nav>
 
       {/* Dark mode + Logout */}
-      <div className="px-4 py-4 border-t border-[#ECEAE5] space-y-0.5">
+      <div className="px-4 py-4 border-t border-[#E6E2DC] space-y-0.5">
         <DarkModeToggle />
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3.5 w-full px-4 py-2.5 rounded-xl text-[14px] font-medium text-[#D93025] hover:bg-[#D93025]/5 transition-all duration-[280ms]"
+          className="flex items-center gap-3.5 w-full px-4 py-2.5 rounded-xl text-[14px] font-medium text-[#C4372A] hover:bg-[#C4372A]/5 transition-all duration-[280ms]"
         >
           <LogOut className="w-[18px] h-[18px] shrink-0" strokeWidth={1.5} />
           <span>Uitloggen</span>

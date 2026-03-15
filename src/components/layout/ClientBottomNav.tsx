@@ -14,9 +14,9 @@ const navItems = [
 ]
 
 const quickActions = [
-  { href: '/client/check-in', label: 'Check-in', icon: ClipboardCheck, color: 'bg-[#2D9D4E]' },
-  { href: '/client/messages', label: 'Bericht', icon: Send, color: 'bg-[#8B6914]' },
-  { href: '/client/workout', label: 'Workout', icon: Dumbbell, color: 'bg-[#3478F6]' },
+  { href: '/client/check-in', label: 'Check-in', icon: ClipboardCheck, color: 'bg-[#3D8B5C]' },
+  { href: '/client/messages', label: 'Bericht', icon: Send, color: 'bg-[#9B7B2E]' },
+  { href: '/client/workout', label: 'Workout', icon: Dumbbell, color: 'bg-[#3068C4]' },
 ]
 
 export function ClientBottomNav() {
@@ -60,7 +60,7 @@ export function ClientBottomNav() {
       )}
 
       {/* Bottom Nav Bar */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-2xl border-t border-[#ECEAE5] pb-safe">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 glass-warm border-t border-[#E6E2DC] pb-safe">
         <div className="max-w-lg mx-auto flex items-center justify-around h-16">
           {navItems.map((item) => {
             const Icon = item.icon
@@ -75,11 +75,11 @@ export function ClientBottomNav() {
                 >
                   <div className={`
                     w-[52px] h-[52px] rounded-2xl flex items-center justify-center
-                    shadow-[0_4px_16px_rgba(26,26,24,0.12)]
+                    shadow-[0_4px_16px_rgba(26,25,23,0.12)]
                     transition-all duration-[280ms] ease-[cubic-bezier(0.4,0,0.2,1)]
                     ${showQuickAdd
-                      ? 'bg-[#6E6E73] rotate-45 scale-95'
-                      : 'bg-[#1A1A18] scale-100 hover:bg-[#2A2A28]'
+                      ? 'bg-[#5C5A55] rotate-45 scale-95'
+                      : 'bg-[#1A1917] scale-100 hover:bg-[#2A2A28]'
                     }
                   `}>
                     {showQuickAdd
@@ -98,17 +98,17 @@ export function ClientBottomNav() {
                 className={`
                   flex flex-col items-center justify-center gap-1 min-w-[56px] py-1
                   transition-all duration-[280ms] ease-[cubic-bezier(0.4,0,0.2,1)]
-                  ${active ? 'text-[#8B6914]' : 'text-[#AEAEB2]'}
+                  ${active ? 'text-[#9B7B2E]' : 'text-[#9C9A95]'}
                 `}
               >
                 <div className="relative">
                   <Icon className="w-[22px] h-[22px]" strokeWidth={active ? 1.8 : 1.5} />
                   {item.href === '/client/messages' && (
-                    <span className="absolute -top-0.5 -right-1 w-2.5 h-2.5 rounded-full bg-[#D93025] border-2 border-white hidden" id="chat-badge-mobile" />
+                    <span className="absolute -top-0.5 -right-1 w-2.5 h-2.5 rounded-full bg-[#C4372A] border-2 border-white hidden" id="chat-badge-mobile" />
                   )}
                 </div>
                 <span className="text-[10px] font-semibold tracking-[-0.01em]">{item.label}</span>
-                {active && <div className="w-1 h-1 rounded-full bg-[#8B6914]" />}
+                {active && <div className="w-1 h-1 rounded-full bg-[#9B7B2E]" />}
               </Link>
             )
           })}

@@ -6,15 +6,15 @@ import { NotificationPermission } from '@/components/notifications/NotificationP
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="client-app min-h-screen bg-[#F9F8F5]">
+    <div className="client-app min-h-screen bg-[#F5F2ED]">
       {/* Desktop sidebar */}
       <ClientSidebar />
 
       {/* Mobile header — frosted glass, premium */}
-      <header className="lg:hidden sticky top-0 z-30 bg-white/95 backdrop-blur-2xl border-b border-[#ECEAE5]">
+      <header className="lg:hidden sticky top-0 z-30 glass-warm border-b border-[#E6E2DC]">
         <div className="max-w-2xl mx-auto px-5 py-3.5">
           <h1
-            className="display text-lg font-semibold text-center text-[#1A1A18] tracking-[-0.03em]"
+            className="display text-lg font-semibold text-center text-[#1A1917] tracking-[-0.03em]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             MŌVE

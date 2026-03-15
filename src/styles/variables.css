@@ -1,50 +1,56 @@
 :root {
-  /* ━━━ Premium Color Palette ━━━ Warm cream tones, architectural restraint */
+  /* ━━━ Premium Palette ━━━ Warm, tactile, luxe wellness studio */
 
-  /* Surfaces — warm cream instead of cold gray */
-  --color-bg: #F9F8F5;
-  --color-bg-dark: #1A1A18;
+  /* Surfaces — layered warmth */
+  --color-bg: #F5F2ED;
+  --color-bg-elevated: #FAF8F5;
+  --color-bg-dark: #1A1917;
   --color-surface: #FFFFFF;
-  --color-surface-muted: #F4F3F0;
+  --color-surface-warm: #FDFCFA;
+  --color-surface-muted: #F0EDE8;
 
-  /* Accent — refined gold */
-  --color-accent: #8B6914;
-  --color-accent-dark: #6F5612;
-  --color-accent-hover: #A07B1A;
+  /* Accent — burnished gold */
+  --color-accent: #9B7B2E;
+  --color-accent-dark: #7A6124;
+  --color-accent-hover: #B08E35;
+  --color-accent-glow: rgba(155, 123, 46, 0.12);
 
-  /* Typography — warm neutrals */
-  --color-text-primary: #1A1A18;
-  --color-text-secondary: #6E6E73;
-  --color-text-muted: #AEAEB2;
+  /* Typography — deep warm */
+  --color-text-primary: #1A1917;
+  --color-text-secondary: #5C5A55;
+  --color-text-muted: #9C9A95;
+  --color-text-faint: #BAB8B3;
 
-  /* Borders — warm, barely visible */
-  --color-border: #ECEAE5;
+  /* Borders — warm, layered */
+  --color-border: #E6E2DC;
+  --color-border-subtle: #EEEBE6;
+  --color-border-strong: #D9D5CE;
 
-  /* Status — muted, sophisticated */
-  --color-success: #2D9D4E;
-  --color-warning: #E68A00;
-  --color-error: #D93025;
+  /* Status — sophisticated, muted */
+  --color-success: #3D8B5C;
+  --color-warning: #C47D15;
+  --color-error: #C4372A;
 
   /* Client surfaces */
-  --color-client-bg: #F9F8F5;
+  --color-client-bg: #F5F2ED;
   --color-client-surface: #FFFFFF;
-  --color-client-surface-muted: #F4F3F0;
-  --color-client-border: #ECEAE5;
-  --color-client-border-strong: #E0DDD7;
-  --color-client-text-secondary: #6E6E73;
-  --color-client-text-muted: #AEAEB2;
-  --color-accent-light: rgba(139, 105, 20, 0.07);
-  --color-accent-subtle: rgba(139, 105, 20, 0.11);
-  --color-accent-surface: #F8F5ED;
+  --color-client-surface-muted: #F0EDE8;
+  --color-client-border: #E6E2DC;
+  --color-client-border-strong: #D9D5CE;
+  --color-client-text-secondary: #5C5A55;
+  --color-client-text-muted: #9C9A95;
+  --color-accent-light: rgba(155, 123, 46, 0.06);
+  --color-accent-subtle: rgba(155, 123, 46, 0.10);
+  --color-accent-surface: #F7F3EA;
 
-  /* Data visualization — refined, less saturated */
-  --color-data-orange: #E68A00;
-  --color-data-red: #D93025;
-  --color-data-purple: #9B59B6;
-  --color-data-green: #2D9D4E;
-  --color-data-blue: #3478F6;
-  --color-data-pink: #E84393;
-  --color-data-yellow: #F0B429;
+  /* Data visualization */
+  --color-data-orange: #C47D15;
+  --color-data-red: #C4372A;
+  --color-data-purple: #7B5EA7;
+  --color-data-green: #3D8B5C;
+  --color-data-blue: #3068C4;
+  --color-data-pink: #B8447A;
+  --color-data-yellow: #D4A12A;
 
   /* Typography */
   --font-display: 'Cormorant Garamond', serif;
@@ -78,21 +84,23 @@
   --space-24: 6rem;
 
   /* Border Radius */
-  --radius-sm: 0.375rem;
-  --radius-md: 0.625rem;
-  --radius-lg: 0.875rem;
-  --radius-xl: 1.125rem;
-  --radius-2xl: 1.375rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
   --radius-full: 9999px;
 
-  /* Shadows — extremely subtle, architectural */
-  --shadow-sm: 0 1px 2px rgba(26, 26, 24, 0.03);
-  --shadow-md: 0 2px 12px rgba(26, 26, 24, 0.05);
-  --shadow-lg: 0 8px 24px rgba(26, 26, 24, 0.07);
-  --shadow-clean: 0 1px 4px rgba(26, 26, 24, 0.03);
-  --shadow-clean-hover: 0 4px 16px rgba(26, 26, 24, 0.06);
+  /* Shadows — tactile, multi-layered for depth */
+  --shadow-sm: 0 1px 2px rgba(26, 25, 23, 0.04), 0 1px 3px rgba(26, 25, 23, 0.02);
+  --shadow-md: 0 2px 4px rgba(26, 25, 23, 0.04), 0 4px 16px rgba(26, 25, 23, 0.06);
+  --shadow-lg: 0 4px 8px rgba(26, 25, 23, 0.04), 0 12px 32px rgba(26, 25, 23, 0.08);
+  --shadow-xl: 0 8px 16px rgba(26, 25, 23, 0.06), 0 20px 48px rgba(26, 25, 23, 0.10);
+  --shadow-card: 0 1px 3px rgba(26, 25, 23, 0.04), 0 4px 12px rgba(26, 25, 23, 0.03);
+  --shadow-card-hover: 0 4px 8px rgba(26, 25, 23, 0.06), 0 12px 28px rgba(26, 25, 23, 0.08);
+  --shadow-inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 
-  /* Transitions — calm, premium */
+  /* Transitions — premium */
   --ease-premium: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
