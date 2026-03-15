@@ -4,6 +4,10 @@ import { ServiceWorkerInit } from '@/components/ServiceWorkerInit'
 import { OfflineIndicator } from '@/components/OfflineIndicator'
 import './globals.css'
 
+// Force all routes to be dynamically rendered — prevents prerender errors
+// with client components that use Supabase auth (Next.js 16 compatibility)
+export const dynamic = 'force-dynamic'
+
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],

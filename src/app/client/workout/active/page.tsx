@@ -362,13 +362,13 @@ function ActiveWorkoutPage() {
             </div>
           </div>
 
-          {/* Confetti keyframes */}
-          <style jsx>{`
+          {/* Confetti keyframes — injected as global style to avoid styled-jsx dependency */}
+          <style dangerouslySetInnerHTML={{ __html: `
             @keyframes confettiFall {
               0% { opacity: 1; transform: translateY(0) rotate(0deg); }
               100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
             }
-          `}</style>
+          `}} />
         </>
       )}
 

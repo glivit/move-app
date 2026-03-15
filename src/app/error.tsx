@@ -1,8 +1,7 @@
 'use client'
 
-import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
-import { AlertCircle } from 'lucide-react'
+// Simplified error page — no external component imports to avoid
+// Next.js 16 _global-error prerender issues
 
 interface ErrorPageProps {
   error: Error & { digest?: string }
@@ -11,33 +10,40 @@ interface ErrorPageProps {
 
 export default function ErrorPage({ error, reset }: ErrorPageProps) {
   return (
-    <div className="min-h-screen bg-bg text-text-primary flex items-center justify-center px-4">
-      <div className="max-w-md w-full">
-        <Card padding="lg" className="space-y-6">
-          <div className="flex justify-center">
-            <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center">
-              <AlertCircle className="h-6 w-6 text-red-600" />
-            </div>
+    <div className="min-h-screen bg-[#F5F2ED] flex items-center justify-center px-4">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] p-8 space-y-6">
+        <div className="flex justify-center">
+          <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-red-600">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
           </div>
+        </div>
 
-          <div className="text-center space-y-2">
-            <h1 className="text-2xl font-display font-semibold">Er ging iets mis</h1>
-            <p className="text-text-muted">
-              {error.message || 'Er is een onverwachte fout opgetreden. Probeer het alstublieft opnieuw.'}
-            </p>
-          </div>
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl font-semibold text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
+            Er ging iets mis
+          </h1>
+          <p className="text-[14px] text-[#9C9A95]">
+            {error.message || 'Er is een onverwachte fout opgetreden. Probeer het alstublieft opnieuw.'}
+          </p>
+        </div>
 
-          <div className="space-y-3">
-            <Button onClick={reset} fullWidth>
-              Opnieuw proberen
-            </Button>
-            <a href="/">
-              <Button variant="secondary" fullWidth>
-                Terug naar homepagina
-              </Button>
-            </a>
-          </div>
-        </Card>
+        <div className="space-y-3">
+          <button
+            onClick={reset}
+            className="w-full py-3 rounded-xl bg-[#1A1917] text-white text-[14px] font-semibold hover:bg-[#2A2A28] transition-colors"
+          >
+            Opnieuw proberen
+          </button>
+          <a href="/" className="block">
+            <button className="w-full py-3 rounded-xl border border-[#E6E2DC] text-[#5C5A55] text-[14px] font-semibold hover:bg-[#F5F2ED] transition-colors">
+              Terug naar homepagina
+            </button>
+          </a>
+        </div>
       </div>
     </div>
   )
