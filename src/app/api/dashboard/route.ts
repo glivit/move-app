@@ -121,12 +121,14 @@ export async function GET(request: NextRequest) {
     // Streak: consecutive days with a completed workout or rest day compliance
     const streak = await computeStreak(supabase, user.id)
 
-    // Meals from nutrition plan
+    // Meals from nutrition plan — ensure each meal has a unique ID
     const planMeals = (nutritionPlan as any)?.meals || []
-    const mealStatus = planMeals.map((meal: any) => {
-      const log = todayMealLogs.find((l: any) => l.meal_id === meal.id)
+    const mealStatus = planMeals.map((meal: any, index: number) => {
+      // Generate stable unique ID: use meal.id if it exists, otherwise create from name+index
+      const mealId = meal.id || `meal-${index}-${(meal.name || '').toLowerCase().replace(/\s+/g, '-')}`
+      const log = todayMealLogs.find((l: any) => l.meal_id === mealId || l.meal_name === meal.name)
       return {
-        id: meal.id,
+        id: mealId,
         name: meal.name,
         time: meal.time || null,
         completed: log?.completed || false,
@@ -151,11 +153,14 @@ export async function GET(request: NextRequest) {
       weightChangeMonth = +(weightEntries[weightEntries.length - 1].value - weightEntries[0].value).toFixed(1)
     }
 
-    // Pending prompt question
-    const pendingPrompt = promptsRes.data
+    // Pending prompt question — promptsRes.data is an array (no .single())
+    const promptRow = Array.isArray(promptsRes.data) && promptsRes.data.length > 0
+      ? promptsRes.data[0]
+      : null
+    const pendingPrompt = promptRow
       ? {
-          id: (promptsRes.data as any).id,
-          question: (promptsRes.data as any).prompts?.question || null,
+          id: (promptRow as any).id,
+          question: (promptRow as any).prompts?.question || null,
         }
       : null
 

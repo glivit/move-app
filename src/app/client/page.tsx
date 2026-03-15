@@ -249,6 +249,12 @@ export default function ClientDashboard() {
                 {training.today.focus && <>{training.today.focus} · </>}
                 ±{training.today.durationMin} min
               </p>
+              {/* Na voltooiing: toon volgende training */}
+              {training.today.completed && training.next && (
+                <p className="text-[13px] text-[#9C9A95] mt-2">
+                  Volgende: <span className="font-medium text-[#5C5A55]">{training.next.name}</span> {training.next.label}
+                </p>
+              )}
             </div>
             {!training.today.completed && (
               <span className="px-5 py-2.5 rounded-xl bg-[#1A1917] text-white text-[13px] font-semibold group-hover:bg-[#2A2A28] transition-colors shrink-0 shadow-[0_2px_8px_rgba(26,25,23,0.2)]">
@@ -257,7 +263,7 @@ export default function ClientDashboard() {
             )}
           </div>
         ) : (
-          /* ── Rustdag ── */
+          /* ── Rustdag — toon altijd volgende training ── */
           <div>
             <div className="flex items-center gap-2.5 mb-3">
               <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-[#F5F2ED]">
@@ -268,9 +274,13 @@ export default function ClientDashboard() {
             <h3 className="text-[20px] font-semibold text-[#9C9A95] tracking-[-0.02em]">
               Rustdag vandaag
             </h3>
-            {training.next && (
+            {training.next ? (
               <p className="text-[14px] text-[#5C5A55] mt-1">
                 Volgende training: <span className="font-medium text-[#1A1917]">{training.next.name}</span> {training.next.label}
+              </p>
+            ) : (
+              <p className="text-[14px] text-[#9C9A95] mt-1">
+                Geen trainingen gepland deze week
               </p>
             )}
           </div>
@@ -445,51 +455,43 @@ export default function ClientDashboard() {
         </div>
       )}
 
-      {/* ═══ BLOK 4 — MOMENTUM STRIP ═════════════════════════ */}
-      {(momentum.streakDays > 0 || momentum.workoutsThisWeek > 0 || momentum.weightChangeMonth !== null) && (
-        <div
-          className="flex items-center gap-4 px-5 py-3.5 rounded-2xl bg-[#F5F2ED]/60 border border-[#E8E4DD] animate-slide-up overflow-x-auto"
-          style={{ animationDelay: '260ms', animationFillMode: 'both' }}
-        >
-          {momentum.streakDays > 0 && (
-            <div className="flex items-center gap-1.5 shrink-0">
-              <Flame strokeWidth={1.5} className="w-4 h-4 text-[#C47D15]" />
-              <span className="text-[13px] font-semibold text-[#5C5A55]">
-                {momentum.streakDays}d actief
-              </span>
-            </div>
-          )}
-
-          {momentum.streakDays > 0 && momentum.workoutsThisWeek > 0 && (
-            <div className="w-px h-4 bg-[#D1CFC9] shrink-0" />
-          )}
-
-          {momentum.workoutsThisWeek > 0 && (
-            <div className="flex items-center gap-1.5 shrink-0">
-              <Activity strokeWidth={1.5} className="w-4 h-4 text-[#3068C4]" />
-              <span className="text-[13px] font-semibold text-[#5C5A55]">
-                {momentum.workoutsThisWeek} {momentum.workoutsThisWeek === 1 ? 'training' : 'trainingen'}
-              </span>
-            </div>
-          )}
-
-          {momentum.weightChangeMonth !== null && (
-            <>
-              <div className="w-px h-4 bg-[#D1CFC9] shrink-0" />
-              <div className="flex items-center gap-1.5 shrink-0">
-                {momentum.weightChangeMonth <= 0 ? (
-                  <TrendingDown strokeWidth={1.5} className="w-4 h-4 text-[#3D8B5C]" />
-                ) : (
-                  <TrendingUp strokeWidth={1.5} className="w-4 h-4 text-[#C47D15]" />
-                )}
-                <span className="text-[13px] font-semibold text-[#5C5A55]">
-                  {momentum.weightChangeMonth > 0 ? '+' : ''}{momentum.weightChangeMonth}kg
-                </span>
-              </div>
-            </>
-          )}
+      {/* ═══ BLOK 4 — MOMENTUM STRIP (altijd zichtbaar) ═══════ */}
+      <div
+        className="flex items-center gap-4 px-5 py-3.5 rounded-2xl bg-[#F5F2ED]/60 border border-[#E8E4DD] animate-slide-up overflow-x-auto"
+        style={{ animationDelay: '260ms', animationFillMode: 'both' }}
+      >
+        <div className="flex items-center gap-1.5 shrink-0">
+          <Flame strokeWidth={1.5} className="w-4 h-4 text-[#C47D15]" />
+          <span className="text-[13px] font-semibold text-[#5C5A55]">
+            {momentum.streakDays}d streak
+          </span>
         </div>
-      )}
+
+        <div className="w-px h-4 bg-[#D1CFC9] shrink-0" />
+
+        <div className="flex items-center gap-1.5 shrink-0">
+          <Activity strokeWidth={1.5} className="w-4 h-4 text-[#3068C4]" />
+          <span className="text-[13px] font-semibold text-[#5C5A55]">
+            {momentum.workoutsThisWeek} {momentum.workoutsThisWeek === 1 ? 'training' : 'trainingen'} deze week
+          </span>
+        </div>
+
+        {momentum.weightChangeMonth !== null && (
+          <>
+            <div className="w-px h-4 bg-[#D1CFC9] shrink-0" />
+            <div className="flex items-center gap-1.5 shrink-0">
+              {momentum.weightChangeMonth <= 0 ? (
+                <TrendingDown strokeWidth={1.5} className="w-4 h-4 text-[#3D8B5C]" />
+              ) : (
+                <TrendingUp strokeWidth={1.5} className="w-4 h-4 text-[#C47D15]" />
+              )}
+              <span className="text-[13px] font-semibold text-[#5C5A55]">
+                {momentum.weightChangeMonth > 0 ? '+' : ''}{momentum.weightChangeMonth}kg
+              </span>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 }
