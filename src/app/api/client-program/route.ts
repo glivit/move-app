@@ -60,23 +60,31 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Get workout count for this week
+    // Get completed workouts for this week (only count completed, unique per day)
     const today = new Date()
     const weekStart = new Date(today)
     weekStart.setDate(today.getDate() - today.getDay())
     weekStart.setHours(0, 0, 0, 0)
 
-    const { count: workoutsThisWeek } = await adminClient
+    const { data: completedSessions } = await adminClient
       .from('workout_sessions')
-      .select('*', { count: 'exact', head: true })
+      .select('template_day_id')
       .eq('client_id', user.id)
+      .eq('client_program_id', activeProgram.id)
+      .not('completed_at', 'is', null)
       .gte('started_at', weekStart.toISOString())
       .lte('started_at', new Date().toISOString())
+
+    // Count unique completed days (not duplicate sessions)
+    const uniqueCompletedDays = new Set(
+      (completedSessions || []).map(s => s.template_day_id)
+    )
+    const workoutsThisWeek = uniqueCompletedDays.size
 
     return NextResponse.json({
       program: activeProgram,
       days,
-      workoutsThisWeek: workoutsThisWeek || 0,
+      workoutsThisWeek,
     })
   } catch (error) {
     console.error('Error fetching client program:', error)

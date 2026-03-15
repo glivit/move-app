@@ -74,7 +74,6 @@ export default function ExercisesPage() {
         .select('id, name, name_nl, body_part, target_muscle, equipment, gif_url', {
           count: 'exact',
         })
-        .is('is_custom', false)
         .eq('is_visible', true)
 
       // Apply body part filter

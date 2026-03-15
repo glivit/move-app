@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server';
+import { createAdminClient } from '@/lib/supabase-admin';
 import { NextRequest, NextResponse } from 'next/server';
 
 interface GetSessionParams {
@@ -37,8 +38,16 @@ export async function GET(request: NextRequest, { params }: GetSessionParams) {
 
     const { id } = await params;
 
+    // Use admin client to bypass RLS for data queries
+    let adminDb;
+    try {
+      adminDb = createAdminClient();
+    } catch {
+      adminDb = supabase;
+    }
+
     // Get the session
-    const { data: session, error: sessionError } = await supabase
+    const { data: session, error: sessionError } = await adminDb
       .from('video_sessions')
       .select('*')
       .eq('id', id)
@@ -52,7 +61,7 @@ export async function GET(request: NextRequest, { params }: GetSessionParams) {
     }
 
     // Verify user has access to this session
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await adminDb
       .from('profiles')
       .select('role, coach_id')
       .eq('id', user.id)
@@ -70,7 +79,7 @@ export async function GET(request: NextRequest, { params }: GetSessionParams) {
 
     if (profile.role === 'coach') {
       // Coach can access sessions for their clients
-      const { data: client } = await supabase
+      const { data: client } = await adminDb
         .from('profiles')
         .select('id')
         .eq('id', session.client_id)
@@ -127,8 +136,16 @@ export async function PATCH(
     const { id } = await params;
     const body = (await request.json()) as UpdateSessionRequest;
 
+    // Use admin client to bypass RLS for data queries
+    let adminDb;
+    try {
+      adminDb = createAdminClient();
+    } catch {
+      adminDb = supabase;
+    }
+
     // Get the session first
-    const { data: session, error: sessionError } = await supabase
+    const { data: session, error: sessionError } = await adminDb
       .from('video_sessions')
       .select('*')
       .eq('id', id)
@@ -142,7 +159,7 @@ export async function PATCH(
     }
 
     // Verify user has access to this session
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await adminDb
       .from('profiles')
       .select('role, coach_id')
       .eq('id', user.id)
@@ -164,7 +181,7 @@ export async function PATCH(
     }
 
     // Verify coach has access to this session
-    const { data: client } = await supabase
+    const { data: client } = await adminDb
       .from('profiles')
       .select('id')
       .eq('id', session.client_id)
@@ -197,7 +214,7 @@ export async function PATCH(
     }
 
     // Update the session
-    const { data: updatedSession, error: updateError } = await supabase
+    const { data: updatedSession, error: updateError } = await adminDb
       .from('video_sessions')
       .update(updateData)
       .eq('id', id)

@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server';
+import { createAdminClient } from '@/lib/supabase-admin';
 import { createRoom } from '@/lib/daily';
 import { videoSessionSchema } from '@/lib/validation';
 import { NextRequest, NextResponse } from 'next/server';
@@ -41,8 +42,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Use admin client to bypass RLS for data queries
+    let adminDb;
+    try {
+      adminDb = createAdminClient();
+    } catch {
+      adminDb = supabase;
+    }
+
     // Verify user is a coach
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await adminDb
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -79,7 +88,7 @@ export async function POST(request: NextRequest) {
     const { client_id, scheduled_at, duration_minutes } = validation.data as any;
 
     // Verify client exists
-    const { data: client, error: clientError } = await supabase
+    const { data: client, error: clientError } = await adminDb
       .from('profiles')
       .select('id, full_name')
       .eq('id', client_id)
@@ -98,7 +107,7 @@ export async function POST(request: NextRequest) {
     const roomUrl = await createRoom(roomName);
 
     // Save to database
-    const { data: session, error: insertError } = await supabase
+    const { data: session, error: insertError } = await adminDb
       .from('video_sessions')
       .insert({
         client_id,
@@ -159,8 +168,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Use admin client to bypass RLS for data queries
+    let adminDb;
+    try {
+      adminDb = createAdminClient();
+    } catch {
+      adminDb = supabase;
+    }
+
     // Get user role
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await adminDb
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -176,11 +193,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const clientId = searchParams.get('client_id');
 
-    let query = supabase.from('video_sessions').select('*');
+    let query = adminDb.from('video_sessions').select('*');
 
     // Coaches see their clients' sessions
     if (profile.role === 'coach') {
-      // Get clients for this coach
       // Single-coach app: show all client video sessions
       if (clientId) {
         query = query.eq('client_id', clientId);

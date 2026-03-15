@@ -69,6 +69,7 @@ export default function ExerciseDetailPage() {
   const [coachNotes, setCoachNotes] = useState('')
   const [isVisible, setIsVisible] = useState(true)
   const [category, setCategory] = useState('')
+  const [instructions, setInstructions] = useState('')
 
   const supabase = createClient()
 
@@ -90,6 +91,7 @@ export default function ExerciseDetailPage() {
         setCoachNotes(ex.coach_notes || '')
         setIsVisible(ex.is_visible)
         setCategory(ex.category || '')
+        setInstructions(ex.instructions || '')
       } catch (error) {
         console.error('Failed to fetch exercise:', error)
         setToast({ type: 'error', message: 'Fout bij laden oefening' })
@@ -112,6 +114,7 @@ export default function ExerciseDetailPage() {
           name_nl: nameNl || null,
           coach_tips: coachTips || null,
           coach_notes: coachNotes || null,
+          instructions: instructions || null,
           is_visible: isVisible,
           category: category || null,
         })
@@ -302,14 +305,19 @@ export default function ExerciseDetailPage() {
           </div>
 
           {/* Instructions */}
-          {exercise.instructions && (
-            <div className="bg-white rounded-2xl shadow-clean p-4">
-              <p className="text-[13px] font-semibold text-client-text-secondary mb-3">INSTRUCTIES</p>
-              <div className="prose prose-sm max-w-none text-[15px] text-text-primary">
-                <p className="whitespace-pre-wrap">{exercise.instructions}</p>
-              </div>
-            </div>
-          )}
+          <div className="bg-white rounded-2xl shadow-clean p-4">
+            <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
+              INSTRUCTIES
+            </label>
+            <textarea
+              value={instructions}
+              onChange={(e) => setInstructions(e.target.value)}
+              placeholder="Voeg uitvoeringsinstructies toe..."
+              rows={6}
+              className="w-full px-3 py-2 border border-client-border rounded-lg text-[15px] placeholder-client-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/20 resize-none"
+            />
+            <p className="text-[13px] text-client-text-secondary mt-2">Zichtbaar voor cliënten bij de oefening</p>
+          </div>
         </div>
       </div>
 
