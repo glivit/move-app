@@ -26,6 +26,26 @@ export default async function CheckInReviewPage({ params }: Props) {
 
   if (!checkin) notFound()
 
+  // Generate signed URLs for photos
+  const photoFields = ['photo_front_url', 'photo_back_url', 'photo_left_url', 'photo_right_url'] as const
+  const signedPhotoUrls: Record<string, string | null> = {}
+  for (const field of photoFields) {
+    const url = checkin[field]
+    if (url) {
+      const match = url.match(/\/storage\/v1\/object\/public\/checkin-photos\/(.+)$/)
+      if (match) {
+        const { data: signedData } = await supabase.storage
+          .from('checkin-photos')
+          .createSignedUrl(match[1], 3600)
+        signedPhotoUrls[field] = signedData?.signedUrl || url
+      } else {
+        signedPhotoUrls[field] = url
+      }
+    } else {
+      signedPhotoUrls[field] = null
+    }
+  }
+
   // Get previous check-in for comparison
   const { data: previousCheckin } = await supabase
     .from('checkins')
@@ -72,20 +92,18 @@ export default async function CheckInReviewPage({ params }: Props) {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { url: checkin.photo_front_url, label: 'Voor' },
-              { url: checkin.photo_back_url, label: 'Achter' },
-              { url: checkin.photo_left_url, label: 'Links' },
-              { url: checkin.photo_right_url, label: 'Rechts' },
+              { url: signedPhotoUrls.photo_front_url, label: 'Voor' },
+              { url: signedPhotoUrls.photo_back_url, label: 'Achter' },
+              { url: signedPhotoUrls.photo_left_url, label: 'Links' },
+              { url: signedPhotoUrls.photo_right_url, label: 'Rechts' },
             ].map((photo, idx) => (
               <div key={idx} className="space-y-2">
                 <div className="relative w-full aspect-square rounded-2xl overflow-hidden flex items-center justify-center bg-white border border-client-border">
                   {photo.url ? (
-                    <Image
+                    <img
                       src={photo.url}
                       alt={`Photo ${photo.label}`}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 50vw, 25vw"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center gap-2">

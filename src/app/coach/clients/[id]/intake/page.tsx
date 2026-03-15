@@ -2,11 +2,21 @@ export const dynamic = 'force-dynamic'
 
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, User, Target, Dumbbell, Heart, Apple, Moon, Ruler, Camera } from 'lucide-react'
+import { ArrowLeft, Target, Dumbbell, Heart, Apple, Moon, Ruler, Camera, ImageOff } from 'lucide-react'
 import Link from 'next/link'
 
 interface Props {
   params: Promise<{ id: string }>
+}
+
+// Extract storage path from a Supabase public URL
+function extractStoragePath(url: string): string | null {
+  try {
+    const match = url.match(/\/storage\/v1\/object\/public\/checkin-photos\/(.+)$/)
+    return match ? match[1] : null
+  } catch {
+    return null
+  }
 }
 
 export default async function IntakeFormPage({ params }: Props) {
@@ -44,7 +54,30 @@ export default async function IntakeFormPage({ params }: Props) {
     )
   }
 
-  const i = intake as any // Use any for new columns not yet in cached types
+  const i = intake as any
+
+  // Generate signed URLs for photos (works even if bucket is not public)
+  const photoEntries = [
+    { key: 'photo_front_url', label: 'Voorkant' },
+    { key: 'photo_back_url', label: 'Achterkant' },
+    { key: 'photo_left_url', label: 'Linkerkant' },
+    { key: 'photo_right_url', label: 'Rechterkant' },
+  ]
+
+  const signedPhotos: { url: string; label: string }[] = []
+  for (const { key, label } of photoEntries) {
+    if (i[key]) {
+      const path = extractStoragePath(i[key])
+      if (path) {
+        const { data: signedData } = await supabase.storage
+          .from('checkin-photos')
+          .createSignedUrl(path, 3600) // 1 hour expiry
+        if (signedData?.signedUrl) {
+          signedPhotos.push({ url: signedData.signedUrl, label })
+        }
+      }
+    }
+  }
 
   const Section = ({ icon: Icon, title, children }: { icon: any; title: string; children: React.ReactNode }) => (
     <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
@@ -67,13 +100,6 @@ export default async function IntakeFormPage({ params }: Props) {
       </div>
     )
   }
-
-  const photos = [
-    { url: i.photo_front_url, label: 'Voorkant' },
-    { url: i.photo_back_url, label: 'Achterkant' },
-    { url: i.photo_left_url, label: 'Linkerkant' },
-    { url: i.photo_right_url, label: 'Rechterkant' },
-  ].filter(p => p.url)
 
   const tapeMeasurements = [
     { label: 'Borst', value: i.chest_cm },
@@ -232,10 +258,10 @@ export default async function IntakeFormPage({ params }: Props) {
       </Section>
 
       {/* Startfoto's */}
-      {photos.length > 0 && (
+      {signedPhotos.length > 0 && (
         <Section icon={Camera} title="Startfoto's">
           <div className="grid grid-cols-2 gap-3">
-            {photos.map(({ url, label }) => (
+            {signedPhotos.map(({ url, label }) => (
               <div key={label} className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#FAFAFA]">
                 <img src={url} alt={label} className="w-full h-full object-cover" />
                 <span className="absolute bottom-2 left-2 text-xs font-medium text-white bg-black/50 px-2 py-0.5 rounded">
