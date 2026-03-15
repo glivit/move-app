@@ -80,6 +80,13 @@ export function ProgramAssignModal({
       end.setDate(end.getDate() + durationWeeks * 7)
       const endDateString = end.toISOString().split('T')[0]
 
+      // Deactivate any existing active programs for this client
+      await supabase
+        .from('client_programs')
+        .update({ is_active: false })
+        .eq('client_id', selectedClientId)
+        .eq('is_active', true)
+
       const { error: insertError } = await supabase.from('client_programs').insert({
         client_id: selectedClientId,
         template_id: templateId,
