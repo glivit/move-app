@@ -502,6 +502,14 @@ export default function ClientDashboard() {
           </>
         )}
       </div>
+
+      {/* DEBUG — verwijder later */}
+      <Link
+        href="/client/push-test"
+        className="block text-center text-[11px] text-[#D1CFC9] py-2"
+      >
+        push debug →
+      </Link>
     </div>
   )
 }
