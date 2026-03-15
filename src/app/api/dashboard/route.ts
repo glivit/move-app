@@ -64,10 +64,11 @@ export async function GET(request: NextRequest) {
       supabase.from('messages').select('id', { count: 'exact', head: true })
         .eq('recipient_id', user.id).eq('read', false),
 
-      // Next video call
-      supabase.from('video_sessions').select('id, scheduled_at')
-        .eq('client_id', user.id).eq('status', 'scheduled')
-        .gte('scheduled_at', now).order('scheduled_at').limit(1),
+      // Next video call — only truly future, not completed or cancelled
+      supabase.from('video_sessions').select('id, scheduled_at, duration_minutes')
+        .eq('client_id', user.id).in('status', ['scheduled'])
+        .gte('scheduled_at', new Date(Date.now() - 60 * 60 * 1000).toISOString()) // allow 1h past start
+        .order('scheduled_at').limit(1),
 
       // Today's accountability check
       supabase.from('accountability_responses').select('id, responded')
@@ -211,7 +212,14 @@ export async function GET(request: NextRequest) {
         accountabilityPending,
         pendingPrompt,
         unreadMessages: messagesRes.count || 0,
-        nextVideoCall: videoRes.data?.[0] || null,
+        nextVideoCall: (() => {
+          const vc = videoRes.data?.[0]
+          if (!vc) return null
+          // Only show if the call hasn't ended yet (scheduled_at + duration + 30min buffer)
+          const endTime = new Date(vc.scheduled_at).getTime() + ((vc.duration_minutes || 30) + 30) * 60000
+          if (Date.now() > endTime) return null
+          return { id: vc.id, scheduled_at: vc.scheduled_at }
+        })(),
         checkInDue: (() => {
           if (!profile?.start_date) return null
           const daysElapsed = Math.floor((Date.now() - new Date(profile.start_date).getTime()) / 86400000)
@@ -225,6 +233,12 @@ export async function GET(request: NextRequest) {
         workoutsThisWeek: weekWorkouts.length,
         weightChangeMonth,
       },
+
+      // Total notification count for badge
+      notificationCount:
+        (messagesRes.count || 0) +
+        (pendingPrompt ? 1 : 0) +
+        (accountabilityPending ? 1 : 0),
     })
   } catch (err) {
     console.error('Dashboard API error:', err)

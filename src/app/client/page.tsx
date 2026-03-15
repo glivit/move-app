@@ -5,7 +5,7 @@ import Link from 'next/link'
 import {
   Dumbbell, CheckCircle, ChevronRight, Apple, Video,
   MessageSquare, Calendar, ArrowUpRight, ShieldCheck,
-  Flame, TrendingDown, TrendingUp, Activity
+  Flame, TrendingDown, TrendingUp, Activity, Bell
 } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
@@ -59,6 +59,7 @@ interface DashboardData {
     workoutsThisWeek: number
     weightChangeMonth: number | null
   }
+  notificationCount: number
 }
 
 // ─── Helpers ────────────────────────────────────────────────
@@ -183,17 +184,32 @@ export default function ClientDashboard() {
   return (
     <div className="pb-24 space-y-5">
 
-      {/* ═══ BEGROETING + DATUM ═══════════════════════════════ */}
+      {/* ═══ BEGROETING + DATUM + NOTIFICATION BELL ═══════════ */}
       <div className="pt-1 mb-2 animate-fade-in">
-        <h1
-          className="text-[36px] font-semibold text-[#1A1917] tracking-[-0.03em] leading-tight mb-1.5"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          {getGreeting()}, {firstName}
-        </h1>
-        <p className="text-[15px] text-[#5C5A55] capitalize tracking-[-0.01em]">
-          {formatDate(new Date())}
-        </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1
+              className="text-[36px] font-semibold text-[#1A1917] tracking-[-0.03em] leading-tight mb-1.5"
+              style={{ fontFamily: 'var(--font-display)' }}
+            >
+              {getGreeting()}, {firstName}
+            </h1>
+            <p className="text-[15px] text-[#5C5A55] capitalize tracking-[-0.01em]">
+              {formatDate(new Date())}
+            </p>
+          </div>
+          {/* Notification bell */}
+          <Link href="/client/messages" className="relative p-2 mt-1">
+            <Bell strokeWidth={1.5} className="w-6 h-6 text-[#5C5A55]" />
+            {data.notificationCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-[20px] rounded-full bg-[#FF3B30] flex items-center justify-center px-1">
+                <span className="text-[11px] font-bold text-white leading-none">
+                  {data.notificationCount > 9 ? '9+' : data.notificationCount}
+                </span>
+              </span>
+            )}
+          </Link>
+        </div>
       </div>
 
       {/* ═══ URGENTE BADGES (berichten, video call) ═══════════ */}

@@ -408,10 +408,11 @@ function ActiveWorkoutPage() {
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-client-surface-muted rounded-full transition-colors"
+            className="p-3 -ml-1 hover:bg-[#F5F2ED] active:bg-[#EDE8E0] rounded-full transition-colors touch-manipulation"
             aria-label="Close workout"
+            style={{ WebkitTapHighlightColor: 'transparent', minWidth: '44px', minHeight: '44px' }}
           >
-            <X size={24} strokeWidth={1.5} className="text-text-primary" />
+            <X size={22} strokeWidth={2} className="text-[#1A1917]" />
           </button>
 
           <div className="text-center flex-1">
@@ -573,7 +574,7 @@ function ActiveWorkoutPage() {
         </div>{/* end animation wrapper */}
 
         {/* Navigation buttons */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#F0F0ED] p-4">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#F0F0ED] p-4 pb-safe">
           <div className="max-w-2xl mx-auto flex gap-3">
             <button
               onClick={handlePrevExercise}
@@ -690,6 +691,9 @@ function SetRow({
     onComplete()
   }
 
+  // Show previous weight hint on first set only (when not yet filled in)
+  const showPrevHint = index === 0 && prefilledWeight && !set.completed && !set.weight_kg
+
   return (
     <div
       className={`rounded-xl border transition-all ${
@@ -699,46 +703,60 @@ function SetRow({
       } p-4`}
     >
       <div className="flex items-center gap-3">
-        <div className="text-[13px] font-semibold text-client-text-secondary min-w-[40px]">
+        <div className="text-[13px] font-semibold text-[#9C9A95] min-w-[40px]">
           Set {index + 1}
         </div>
 
-        {/* Weight input */}
-        <input
-          type="number"
-          step="0.5"
-          min="0"
-          value={weight}
-          onChange={(e) => handleWeightChange(e.target.value)}
-          placeholder="kg"
-          disabled={set.completed}
-          className="w-20 px-3 py-2 border border-[#F0F0ED] rounded-lg text-[14px] text-center font-medium disabled:opacity-50 disabled:bg-client-surface-muted"
-        />
+        {/* Weight input with previous hint */}
+        <div className="relative">
+          <input
+            type="number"
+            step="0.5"
+            min="0"
+            inputMode="decimal"
+            value={weight}
+            onChange={(e) => handleWeightChange(e.target.value)}
+            placeholder={prefilledWeight ? `${prefilledWeight}` : 'kg'}
+            disabled={set.completed}
+            className="w-[76px] px-3 py-2.5 border border-[#F0F0ED] rounded-xl text-[15px] text-center font-semibold text-[#1A1917] disabled:opacity-50 disabled:bg-[#F5F2ED] focus:border-[#C8A96E] focus:ring-1 focus:ring-[#C8A96E]/30 transition-all placeholder:text-[#D1CFC9] placeholder:font-normal"
+          />
+          {showPrevHint && (
+            <span className="absolute -top-5 left-0 right-0 text-center text-[10px] text-[#BAB8B3] font-medium">
+              vorige: {prefilledWeight}kg
+            </span>
+          )}
+          <span className="absolute -bottom-4 left-0 right-0 text-center text-[10px] text-[#BAB8B3]">kg</span>
+        </div>
 
-        <span className="text-[12px] text-client-text-secondary">×</span>
+        <span className="text-[13px] text-[#D1CFC9] font-medium">×</span>
 
         {/* Reps input */}
-        <input
-          type="number"
-          min="0"
-          value={reps}
-          onChange={(e) => handleRepsChange(e.target.value)}
-          placeholder="reps"
-          disabled={set.completed}
-          className="w-20 px-3 py-2 border border-[#F0F0ED] rounded-lg text-[14px] text-center font-medium disabled:opacity-50 disabled:bg-client-surface-muted"
-        />
+        <div className="relative">
+          <input
+            type="number"
+            min="0"
+            inputMode="numeric"
+            value={reps}
+            onChange={(e) => handleRepsChange(e.target.value)}
+            placeholder={set.prescribed_reps?.toString() || 'reps'}
+            disabled={set.completed}
+            className="w-[76px] px-3 py-2.5 border border-[#F0F0ED] rounded-xl text-[15px] text-center font-semibold text-[#1A1917] disabled:opacity-50 disabled:bg-[#F5F2ED] focus:border-[#C8A96E] focus:ring-1 focus:ring-[#C8A96E]/30 transition-all placeholder:text-[#D1CFC9] placeholder:font-normal"
+          />
+          <span className="absolute -bottom-4 left-0 right-0 text-center text-[10px] text-[#BAB8B3]">reps</span>
+        </div>
 
         {/* Complete button */}
         <button
           onClick={handleCompleteClick}
           disabled={set.completed}
-          className={`ml-auto p-3 rounded-lg transition-all flex-shrink-0 ${
+          className={`ml-auto w-11 h-11 rounded-xl transition-all flex-shrink-0 flex items-center justify-center touch-manipulation ${
             set.completed
               ? 'bg-[#34C759] text-white'
-              : 'bg-[#8B6914] text-white hover:bg-[#6F5612]'
+              : 'bg-[#1A1917] text-white hover:bg-[#2A2A28] active:scale-95'
           }`}
+          style={{ WebkitTapHighlightColor: 'transparent' }}
         >
-          <Check size={18} strokeWidth={2} />
+          <Check size={18} strokeWidth={2.5} />
         </button>
       </div>
     </div>
