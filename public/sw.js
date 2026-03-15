@@ -118,43 +118,53 @@ self.addEventListener('push', (event) => {
     } = data;
 
     event.waitUntil(
-      self.registration.showNotification(title, {
-        body,
-        icon,
-        badge,
-        tag,
-        vibrate,
-        data: { url, ...data },
-        requireInteraction: false,
-        dir: 'ltr',
-        lang: 'nl',
-        timestamp: Date.now(),
-        image: data.image,
-      })
+      Promise.all([
+        // Show the notification
+        self.registration.showNotification(title, {
+          body,
+          icon,
+          badge,
+          tag,
+          vibrate,
+          data: { url, ...data },
+          requireInteraction: false,
+          dir: 'ltr',
+          lang: 'nl',
+          timestamp: Date.now(),
+          image: data.image,
+        }),
+        // Set the app badge (red number on app icon)
+        navigator.setAppBadge
+          ? navigator.setAppBadge().catch(() => {})
+          : Promise.resolve(),
+      ])
     );
   } catch (error) {
     console.error('[SW] Push error:', error);
   }
 });
 
-// ── Notification click: open/focus app ───────────────────────────
+// ── Notification click: open/focus app + clear badge ─────────────
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const url = event.notification.data?.url || '/';
 
   event.waitUntil(
-    clients
-      .matchAll({ type: 'window', includeUncontrolled: true })
-      .then((windowClients) => {
-        // Focus existing window if open
-        for (const client of windowClients) {
-          if (new URL(client.url).pathname === url && 'focus' in client) {
-            return client.focus();
+    Promise.all([
+      // Clear app badge
+      navigator.clearAppBadge ? navigator.clearAppBadge().catch(() => {}) : Promise.resolve(),
+      // Focus or open window
+      clients
+        .matchAll({ type: 'window', includeUncontrolled: true })
+        .then((windowClients) => {
+          for (const client of windowClients) {
+            if (new URL(client.url).pathname === url && 'focus' in client) {
+              return client.focus();
+            }
           }
-        }
-        // Otherwise open new window
-        return clients.openWindow(url);
-      })
+          return clients.openWindow(url);
+        }),
+    ])
   );
 });
 
@@ -162,6 +172,9 @@ self.addEventListener('notificationclick', (event) => {
 self.addEventListener('message', (event) => {
   if (event.data?.type === 'SKIP_WAITING') {
     self.skipWaiting();
+  }
+  if (event.data?.type === 'CLEAR_BADGE') {
+    if (navigator.clearAppBadge) navigator.clearAppBadge().catch(() => {});
   }
   if (event.data?.type === 'CLEAR_CACHE') {
     caches.delete(CACHE_NAME);

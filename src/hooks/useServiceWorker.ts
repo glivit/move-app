@@ -17,6 +17,21 @@ export function useServiceWorker() {
         console.error('[MŌVE] SW registration failed:', error)
       })
 
+    // Clear app badge when app is opened/focused
+    const clearBadge = () => {
+      if ('clearAppBadge' in navigator) {
+        (navigator as any).clearAppBadge().catch(() => {})
+      }
+      // Also tell SW to clear
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_BADGE' })
+      }
+    }
+    clearBadge() // Clear on load
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') clearBadge()
+    })
+
     // Refresh page when new SW takes control
     let refreshing = false
     navigator.serviceWorker.addEventListener('controllerchange', () => {
