@@ -6,6 +6,7 @@ import { ClientProfileTabs } from '@/components/coach/ClientProfileTabs'
 import { PackageBadge } from '@/components/ui/PackageBadge'
 import { ReportButton } from '@/components/coach/ReportButton'
 import { SendNotificationButton } from '@/components/coach/SendNotificationButton'
+import { ResendInviteButton } from '@/components/coach/ResendInviteButton'
 import { ArrowLeft, Calendar, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -116,6 +117,7 @@ export default async function ClientProfilePage({ params }: Props) {
 
           {/* Actions */}
           <div className="flex items-center gap-2 flex-shrink-0">
+            <ResendInviteButton clientId={id} clientName={profile.full_name} />
             <SendNotificationButton clientId={id} clientName={profile.full_name} />
             <ReportButton clientId={id} clientName={profile.full_name} />
           </div>
