@@ -225,14 +225,23 @@ export default function SchedulePage() {
                 Smart scheduling & overzicht
               </p>
             </div>
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all hover:opacity-90 text-white"
-              style={{ backgroundColor: '#1A1A18' }}
-            >
-              <Plus size={20} strokeWidth={1.5} />
-              Nieuwe afspraak
-            </button>
+            <div className="flex gap-3">
+              <Link
+                href="/coach/schedule/availability"
+                className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all hover:opacity-90 text-[14px] border border-[#F0F0ED] bg-white text-[#1A1A18] hover:bg-[#F5F0E8]"
+              >
+                <Clock size={18} strokeWidth={1.5} />
+                Beschikbaarheid
+              </Link>
+              <button
+                onClick={() => setShowForm(!showForm)}
+                className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all hover:opacity-90 text-white"
+                style={{ backgroundColor: '#1A1A18' }}
+              >
+                <Plus size={20} strokeWidth={1.5} />
+                Nieuwe afspraak
+              </button>
+            </div>
           </div>
 
           {/* Tab switcher */}

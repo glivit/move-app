@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText, Download, Loader2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { FileText, Download, Loader2, ExternalLink } from 'lucide-react'
 
 interface ReportButtonProps {
   clientId: string
@@ -9,6 +10,7 @@ interface ReportButtonProps {
 }
 
 export function ReportButton({ clientId, clientName }: ReportButtonProps) {
+  const router = useRouter()
   const [generating, setGenerating] = useState(false)
   const [period, setPeriod] = useState(4)
   const [showOptions, setShowOptions] = useState(false)
@@ -46,10 +48,15 @@ export function ReportButton({ clientId, clientName }: ReportButtonProps) {
       setShowOptions(false)
       setCoachNotes('')
     } catch (error: any) {
-      alert(error.message || 'Er ging iets fout bij het genereren van het rapport')
+      // Fallback to report preview page if PDF generation fails
+      router.push(`/coach/clients/${clientId}/report`)
     } finally {
       setGenerating(false)
     }
+  }
+
+  const openReportPreview = () => {
+    router.push(`/coach/clients/${clientId}/report`)
   }
 
   if (!showOptions) {
@@ -116,24 +123,33 @@ export function ReportButton({ clientId, clientName }: ReportButtonProps) {
         />
       </div>
 
-      {/* Generate button */}
-      <button
-        onClick={generateReport}
-        disabled={generating}
-        className="w-full py-3 px-4 bg-[#8B6914] text-white rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2 hover:bg-[#6F5612] transition-colors disabled:opacity-60"
-      >
-        {generating ? (
-          <>
-            <Loader2 size={16} className="animate-spin" />
-            Rapport genereren...
-          </>
-        ) : (
-          <>
-            <Download size={16} strokeWidth={1.5} />
-            Download PDF
-          </>
-        )}
-      </button>
+      {/* Action buttons */}
+      <div className="flex gap-2">
+        <button
+          onClick={generateReport}
+          disabled={generating}
+          className="flex-1 py-3 px-4 bg-[#8B6914] text-white rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2 hover:bg-[#6F5612] transition-colors disabled:opacity-60"
+        >
+          {generating ? (
+            <>
+              <Loader2 size={16} className="animate-spin" />
+              Genereren...
+            </>
+          ) : (
+            <>
+              <Download size={16} strokeWidth={1.5} />
+              Download PDF
+            </>
+          )}
+        </button>
+        <button
+          onClick={openReportPreview}
+          className="py-3 px-4 bg-[#F0F0ED] text-[#1A1A18] rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2 hover:bg-[#E8E8E5] transition-colors"
+        >
+          <ExternalLink size={16} strokeWidth={1.5} />
+          Preview
+        </button>
+      </div>
     </div>
   )
 }

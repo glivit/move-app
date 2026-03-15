@@ -19,6 +19,8 @@ import {
   Heart,
   UsersRound,
   ShieldCheck,
+  Pill,
+  Calendar,
 } from 'lucide-react'
 
 const mainNavItems = [
@@ -34,8 +36,10 @@ const mainNavItems = [
 const secondaryNavItems = [
   { href: '/client/accountability', label: 'Dagelijkse check', icon: ShieldCheck },
   { href: '/client/check-in', label: 'Check-in', icon: ClipboardCheck },
+  { href: '/client/supplements', label: 'Supplementen', icon: Pill },
   { href: '/client/health', label: 'Gezondheid', icon: Heart },
   { href: '/client/video', label: 'Video Calls', icon: Video },
+  { href: '/client/booking', label: 'Sessie boeken', icon: Calendar },
   { href: '/client/resources', label: 'Kennisbank', icon: BookOpen },
   { href: '/client/profile', label: 'Instellingen', icon: Settings },
 ]
