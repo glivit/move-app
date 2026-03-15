@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Users, ClipboardCheck, MessageSquare,
   BookOpen, Radio, CreditCard, FileText, Dumbbell, ClipboardList,
-  Menu, X, LogOut, MoreVertical, Calendar, Apple, UsersRound
+  Menu, X, LogOut, MoreVertical, Calendar, Apple, UsersRound, ShieldCheck
 } from 'lucide-react'
 import { useState } from 'react'
 import { signOut } from '@/lib/auth'
@@ -17,6 +17,7 @@ const mainNavItems = [
   { href: '/coach/programs', label: "Programma's", icon: ClipboardList },
   { href: '/coach/nutrition', label: 'Voeding', icon: Apple },
   { href: '/coach/check-ins', label: 'Check-ins', icon: ClipboardCheck },
+  { href: '/coach/accountability', label: 'Accountability', icon: ShieldCheck },
   { href: '/coach/messages', label: 'Berichten', icon: MessageSquare },
   { href: '/coach/community', label: 'Community', icon: UsersRound },
 ]

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Home, LineChart, Plus, MessageCircle, User, X, ClipboardCheck, Send, Dumbbell } from 'lucide-react'
+import { Home, LineChart, Plus, MessageCircle, User, X, ClipboardCheck, Send, Dumbbell, ShieldCheck } from 'lucide-react'
 
 const navItems = [
   { href: '/client', label: 'Home', icon: Home },
@@ -15,7 +15,7 @@ const navItems = [
 
 const quickActions = [
   { href: '/client/check-in', label: 'Check-in', icon: ClipboardCheck, color: 'bg-[#3D8B5C]' },
-  { href: '/client/messages', label: 'Bericht', icon: Send, color: 'bg-[#9B7B2E]' },
+  { href: '/client/accountability', label: 'Dag check', icon: ShieldCheck, color: 'bg-[#C47D15]' },
   { href: '/client/workout', label: 'Workout', icon: Dumbbell, color: 'bg-[#3068C4]' },
 ]
 

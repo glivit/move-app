@@ -6,8 +6,9 @@ import Link from 'next/link'
 import {
   ChevronRight, Dumbbell, Activity, Apple, TrendingUp, Calendar,
   CheckCircle, Circle, Flame, MessageSquare, Video, Droplets, Trophy,
-  ArrowUpRight
+  ArrowUpRight, ShieldCheck
 } from 'lucide-react'
+import { OnboardingChecklist } from '@/components/client/OnboardingChecklist'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -115,6 +116,7 @@ export default function ClientDashboard() {
   const [habitStreaks, setHabitStreaks] = useState<Record<string, number>>({})
   const [unreadMessages, setUnreadMessages] = useState(0)
   const [nextVideoCall, setNextVideoCall] = useState<{ id: string; scheduled_at: string } | null>(null)
+  const [accountabilityPending, setAccountabilityPending] = useState(false)
   const [loading, setLoading] = useState(true)
   const [togglingHabit, setTogglingHabit] = useState<string | null>(null)
 
@@ -171,6 +173,17 @@ export default function ClientDashboard() {
           setHabits(habitsData.habits || [])
           setHabitCompletions(habitsData.completions || [])
           setHabitStreaks(habitsData.streaks || {})
+        }
+      } catch {}
+
+      // Load accountability status
+      try {
+        const accRes = await fetch('/api/accountability')
+        if (accRes.ok) {
+          const accData = await accRes.json()
+          if (accData.data && !accData.data.responded) {
+            setAccountabilityPending(true)
+          }
         }
       } catch {}
     } catch (err) {
@@ -277,6 +290,34 @@ export default function ClientDashboard() {
           </Link>
         )}
       </div>
+
+      {/* ─── ONBOARDING CHECKLIST ─────────────────────── */}
+      <OnboardingChecklist />
+
+      {/* ─── ACCOUNTABILITY PROMPT ────────────────────── */}
+      {accountabilityPending && (
+        <Link
+          href="/client/accountability"
+          className="block rounded-2xl p-5 border transition-all duration-[280ms] animate-slide-up"
+          style={{
+            animationDelay: '70ms',
+            animationFillMode: 'both',
+            background: 'linear-gradient(135deg, rgba(196,125,21,0.08) 0%, rgba(196,125,21,0.02) 100%)',
+            borderColor: 'rgba(196,125,21,0.2)',
+          }}
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-[#C47D15] flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(196,125,21,0.3)]">
+              <ShieldCheck strokeWidth={1.5} className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[16px] font-semibold text-[#1A1917] tracking-[-0.01em]">Dagelijkse check</p>
+              <p className="text-[14px] text-[#C47D15] mt-0.5">Laat even weten hoe je dag was</p>
+            </div>
+            <ArrowUpRight strokeWidth={1.5} className="w-5 h-5 text-[#C47D15] shrink-0" />
+          </div>
+        </Link>
+      )}
 
       {/* ─── VANDAAG'S TRAINING ───────────────────────── */}
       <Link

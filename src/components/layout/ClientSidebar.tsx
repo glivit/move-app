@@ -18,6 +18,7 @@ import {
   LogOut,
   Heart,
   UsersRound,
+  ShieldCheck,
 } from 'lucide-react'
 
 const mainNavItems = [
@@ -31,6 +32,7 @@ const mainNavItems = [
 ]
 
 const secondaryNavItems = [
+  { href: '/client/accountability', label: 'Dagelijkse check', icon: ShieldCheck },
   { href: '/client/check-in', label: 'Check-in', icon: ClipboardCheck },
   { href: '/client/health', label: 'Gezondheid', icon: Heart },
   { href: '/client/video', label: 'Video Calls', icon: Video },
