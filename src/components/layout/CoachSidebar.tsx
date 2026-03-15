@@ -38,6 +38,11 @@ const mobileBottomItems = [
 ]
 
 const mobileMenuItems = [
+  { href: '/coach/exercises', label: 'Oefeningen', icon: Dumbbell },
+  { href: '/coach/programs', label: "Programma's", icon: ClipboardList },
+  { href: '/coach/nutrition', label: 'Voeding', icon: Apple },
+  { href: '/coach/accountability', label: 'Accountability', icon: ShieldCheck },
+  { href: '/coach/community', label: 'Community', icon: UsersRound },
   { href: '/coach/prompts', label: 'Prompts', icon: FileText },
   { href: '/coach/broadcasts', label: 'Broadcasts', icon: Radio },
   { href: '/coach/resources', label: 'Kennisbank', icon: BookOpen },
