@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
   const { full_name, email, phone, package: pkg, start_date } = validation.data
 
   const admin = createAdminClient()
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://move-knokke.be'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://movestudio.be'
 
   // Generate invite link WITHOUT sending Supabase's default email
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({

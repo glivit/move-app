@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
   // 4. Try test send if subscriptions exist
   if (subs && subs.length > 0 && vapidPublic && vapidPrivate) {
     try {
-      webpush.setVapidDetails('mailto:info@move-knokke.be', vapidPublic, vapidPrivate)
+      webpush.setVapidDetails('mailto:info@movestudio.be', vapidPublic, vapidPrivate)
 
       // Get full subscription data with keys
       const { data: fullSubs } = await supabase

@@ -15,8 +15,8 @@ function getResend(): Resend {
   return _resend
 }
 
-const FROM_EMAIL = process.env.EMAIL_FROM || 'MŌVE <noreply@move-knokke.be>'
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://move-knokke.be'
+const FROM_EMAIL = process.env.EMAIL_FROM || 'MŌVE <noreply@movestudio.be>'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://movestudio.be'
 
 /**
  * Send a branded invite email to a new client
@@ -143,7 +143,7 @@ function baseLayout(content: string, preheader?: string) {
             <td align="center" style="padding-top:32px;">
               <p style="margin:0;font-size:12px;color:#BAB8B3;line-height:1.5;">
                 MŌVE — Personal Training Studio Knokke<br>
-                <a href="${APP_URL}" style="color:#9B7B2E;text-decoration:none;">move-knokke.be</a>
+                <a href="${APP_URL}" style="color:#9B7B2E;text-decoration:none;">movestudio.be</a>
               </p>
             </td>
           </tr>

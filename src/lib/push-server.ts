@@ -12,7 +12,7 @@ let vapidConfigured = false
 
 function ensureVapid() {
   if (vapidConfigured || !VAPID_PUBLIC || !VAPID_PRIVATE) return
-  webpush.setVapidDetails('mailto:info@move-knokke.be', VAPID_PUBLIC, VAPID_PRIVATE)
+  webpush.setVapidDetails('mailto:info@movestudio.be', VAPID_PUBLIC, VAPID_PRIVATE)
   vapidConfigured = true
 }
 

@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   }
 
   const admin = createAdminClient()
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://move-knokke.be'
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://movestudio.be'
 
   // Generate password reset link without sending Supabase's default email
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
