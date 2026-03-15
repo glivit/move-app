@@ -85,7 +85,7 @@ export function NotificationCenter() {
             title: b.title || 'Bericht van je coach',
             description: (b.content || '').substring(0, 80),
             timestamp: b.created_at,
-            url: '/client/notifications',
+            url: `/client/notifications/${b.id}`,
           })
         })
     }

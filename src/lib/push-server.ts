@@ -17,12 +17,12 @@ function ensureVapid() {
 }
 
 /**
- * Count unread notifications for a user (messages + prompts)
+ * Count unread notifications for a user (messages + prompts + broadcasts)
  */
 async function getUnreadCount(userId: string): Promise<number> {
   const supabase = createAdminClient()
 
-  const [messagesRes, promptsRes] = await Promise.all([
+  const [messagesRes, promptsRes, broadcastsRes] = await Promise.all([
     supabase
       .from('messages')
       .select('id', { count: 'exact', head: true })
@@ -33,9 +33,21 @@ async function getUnreadCount(userId: string): Promise<number> {
       .select('id', { count: 'exact', head: true })
       .eq('client_id', userId)
       .eq('response', ''),
+    supabase
+      .from('broadcasts')
+      .select('id, target_clients, read_by')
+      .order('created_at', { ascending: false })
+      .limit(20),
   ])
 
-  return (messagesRes.count || 0) + (promptsRes.count || 0)
+  // Count broadcasts where user is targeted but hasn't read
+  const unreadBroadcasts = (broadcastsRes.data || []).filter((b: any) => {
+    const targets = b.target_clients || []
+    const readBy = b.read_by || []
+    return targets.includes(userId) && !readBy.includes(userId)
+  }).length
+
+  return (messagesRes.count || 0) + (promptsRes.count || 0) + unreadBroadcasts
 }
 
 /**

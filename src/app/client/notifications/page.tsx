@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
 import { ArrowLeft, Megaphone, FileText, Check, ChevronRight } from 'lucide-react'
@@ -25,7 +26,7 @@ export default function NotificationsPage() {
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([])
   const [prompts, setPrompts] = useState<PendingPrompt[]>([])
   const [loading, setLoading] = useState(true)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
@@ -81,34 +82,8 @@ export default function NotificationsPage() {
     setLoading(false)
   }
 
-  async function markBroadcastRead(broadcastId: string) {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
-    // Toggle expanded
-    setExpandedId(expandedId === broadcastId ? null : broadcastId)
-
-    // Mark as read via direct update on read_by array
-    const broadcast = broadcasts.find(b => b.id === broadcastId)
-    if (broadcast && !broadcast.read) {
-      // Fetch current read_by, then append user.id
-      const { data } = await supabase
-        .from('broadcasts')
-        .select('read_by')
-        .eq('id', broadcastId)
-        .single()
-      const currentReadBy = (data?.read_by as string[]) || []
-      if (!currentReadBy.includes(user.id)) {
-        await supabase
-          .from('broadcasts')
-          .update({ read_by: [...currentReadBy, user.id] })
-          .eq('id', broadcastId)
-      }
-
-      setBroadcasts(prev =>
-        prev.map(b => b.id === broadcastId ? { ...b, read: true } : b)
-      )
-    }
+  function openBroadcast(broadcastId: string) {
+    router.push(`/client/notifications/${broadcastId}`)
   }
 
   if (loading) {
@@ -189,8 +164,7 @@ export default function NotificationsPage() {
             <BroadcastCard
               key={b.id}
               broadcast={b}
-              expanded={expandedId === b.id}
-              onTap={() => markBroadcastRead(b.id)}
+              onTap={() => openBroadcast(b.id)}
             />
           ))}
         </div>
@@ -206,8 +180,7 @@ export default function NotificationsPage() {
             <BroadcastCard
               key={b.id}
               broadcast={b}
-              expanded={expandedId === b.id}
-              onTap={() => setExpandedId(expandedId === b.id ? null : b.id)}
+              onTap={() => openBroadcast(b.id)}
             />
           ))}
         </div>
@@ -216,9 +189,8 @@ export default function NotificationsPage() {
   )
 }
 
-function BroadcastCard({ broadcast, expanded, onTap }: {
+function BroadcastCard({ broadcast, onTap }: {
   broadcast: Broadcast
-  expanded: boolean
   onTap: () => void
 }) {
   const isUnread = !broadcast.read
@@ -226,7 +198,7 @@ function BroadcastCard({ broadcast, expanded, onTap }: {
   return (
     <button
       onClick={onTap}
-      className={`w-full text-left rounded-2xl p-5 transition-all ${
+      className={`w-full text-left rounded-2xl p-5 transition-all active:scale-[0.98] ${
         isUnread
           ? 'border-2 border-[#3068C4]/25 bg-gradient-to-br from-[#F0F5FF] to-white shadow-sm'
           : 'border border-[#F0F0ED] bg-white'
@@ -252,15 +224,9 @@ function BroadcastCard({ broadcast, expanded, onTap }: {
             )}
           </div>
 
-          {expanded ? (
-            <p className="text-[14px] text-[#5C5A55] mt-2 leading-relaxed whitespace-pre-wrap">
-              {broadcast.content}
-            </p>
-          ) : (
-            <p className="text-[14px] text-[#9C9A95] mt-1 line-clamp-2">
-              {broadcast.content}
-            </p>
-          )}
+          <p className="text-[14px] text-[#9C9A95] mt-1 line-clamp-2">
+            {broadcast.content}
+          </p>
 
           <div className="flex items-center gap-2 mt-2.5">
             <p className="text-[12px] text-[#D1CFC9]">
@@ -274,6 +240,9 @@ function BroadcastCard({ broadcast, expanded, onTap }: {
             )}
           </div>
         </div>
+        <ChevronRight strokeWidth={1.5} className={`w-5 h-5 flex-shrink-0 mt-2 ${
+          isUnread ? 'text-[#3068C4]' : 'text-[#D1CFC9]'
+        }`} />
       </div>
     </button>
   )

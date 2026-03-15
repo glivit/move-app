@@ -117,6 +117,8 @@ self.addEventListener('push', (event) => {
       vibrate = [200, 100, 200],
     } = data;
 
+    const badgeNum = data.badgeCount || 1;
+
     event.waitUntil(
       Promise.all([
         // Show the notification
@@ -126,17 +128,24 @@ self.addEventListener('push', (event) => {
           badge,
           tag,
           vibrate,
-          data: { url, ...data },
+          data: { url, badgeCount: badgeNum, ...data },
           requireInteraction: false,
           dir: 'ltr',
           lang: 'nl',
           timestamp: Date.now(),
           image: data.image,
         }),
-        // Set the app badge count (number on app icon, like WhatsApp)
-        navigator.setAppBadge
-          ? navigator.setAppBadge(data.badgeCount || 1).catch(() => {})
-          : Promise.resolve(),
+        // Set the app badge count on icon (iOS 16.4+ PWA, Android)
+        // Try both self.navigator and navigator (different browser implementations)
+        (async () => {
+          try {
+            if (typeof navigator !== 'undefined' && 'setAppBadge' in navigator) {
+              await navigator.setAppBadge(badgeNum);
+            } else if (typeof self !== 'undefined' && 'setAppBadge' in self.navigator) {
+              await self.navigator.setAppBadge(badgeNum);
+            }
+          } catch (_) { /* badge API not supported */ }
+        })(),
       ])
     );
   } catch (error) {
@@ -144,7 +153,7 @@ self.addEventListener('push', (event) => {
   }
 });
 
-// ── Notification click: open/focus app + clear badge ─────────────
+// ── Notification click: open/focus app + navigate + clear badge ──
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const url = event.notification.data?.url || '/';
@@ -152,16 +161,25 @@ self.addEventListener('notificationclick', (event) => {
   event.waitUntil(
     Promise.all([
       // Clear app badge
-      navigator.clearAppBadge ? navigator.clearAppBadge().catch(() => {}) : Promise.resolve(),
-      // Focus or open window
+      (async () => {
+        try {
+          if ('clearAppBadge' in navigator) await navigator.clearAppBadge();
+        } catch (_) {}
+      })(),
+      // Focus existing window and navigate, or open new one
       clients
         .matchAll({ type: 'window', includeUncontrolled: true })
         .then((windowClients) => {
+          // If app is already open, navigate it to the URL
           for (const client of windowClients) {
-            if (new URL(client.url).pathname === url && 'focus' in client) {
-              return client.focus();
+            if ('focus' in client) {
+              client.focus();
+              // Navigate to the target URL
+              client.navigate(url);
+              return;
             }
           }
+          // No open window — open new one
           return clients.openWindow(url);
         }),
     ])

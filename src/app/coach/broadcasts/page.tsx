@@ -116,9 +116,10 @@ export default function BroadcastsPage() {
       }
 
       // Send push notification to each client (fire & forget)
-      // Broadcasts are NOT chat messages — they show in /client/notifications
+      // Broadcasts open fullscreen at /client/notifications/{broadcastId}
+      const bcId = broadcastData.id
       selectedClientIds.forEach((clientId) => {
-        sendPushToClient(clientId, title || 'MŌVE', message.substring(0, 100), '/client/notifications')
+        sendPushToClient(clientId, title || 'MŌVE', message.substring(0, 100), `/client/notifications/${bcId}`)
       });
 
       // Add to broadcasts list
