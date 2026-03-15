@@ -133,9 +133,9 @@ self.addEventListener('push', (event) => {
           timestamp: Date.now(),
           image: data.image,
         }),
-        // Set the app badge (red number on app icon)
+        // Set the app badge count (number on app icon, like WhatsApp)
         navigator.setAppBadge
-          ? navigator.setAppBadge().catch(() => {})
+          ? navigator.setAppBadge(data.badgeCount || 1).catch(() => {})
           : Promise.resolve(),
       ])
     );

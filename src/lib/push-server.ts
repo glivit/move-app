@@ -17,6 +17,28 @@ function ensureVapid() {
 }
 
 /**
+ * Count unread notifications for a user (messages + prompts)
+ */
+async function getUnreadCount(userId: string): Promise<number> {
+  const supabase = createAdminClient()
+
+  const [messagesRes, promptsRes] = await Promise.all([
+    supabase
+      .from('messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('receiver_id', userId)
+      .is('read_at', null),
+    supabase
+      .from('prompt_responses')
+      .select('id', { count: 'exact', head: true })
+      .eq('client_id', userId)
+      .eq('response', ''),
+  ])
+
+  return (messagesRes.count || 0) + (promptsRes.count || 0)
+}
+
+/**
  * Send push notification to a specific user (all their active devices)
  */
 export async function sendPushToUser(
@@ -30,12 +52,17 @@ export async function sendPushToUser(
 
   const supabase = createAdminClient()
 
-  const { data: subscriptions } = await supabase
-    .from('push_subscriptions')
-    .select('id, endpoint, p256dh, auth')
-    .eq('user_id', userId)
-    .eq('is_active', true)
+  // Get subscriptions + unread count in parallel
+  const [subsResult, badgeCount] = await Promise.all([
+    supabase
+      .from('push_subscriptions')
+      .select('id, endpoint, p256dh, auth')
+      .eq('user_id', userId)
+      .eq('is_active', true),
+    getUnreadCount(userId),
+  ])
 
+  const subscriptions = subsResult.data
   if (!subscriptions || subscriptions.length === 0) {
     return { sent: 0, total: 0 }
   }
@@ -46,6 +73,7 @@ export async function sendPushToUser(
     url: payload.url || '/client',
     tag: payload.tag || `move-${Date.now()}`,
     icon: '/icon-192x192.png',
+    badgeCount: badgeCount || 1,
   })
 
   let sent = 0
