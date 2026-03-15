@@ -1,30 +1,58 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { Eye, EyeOff, CheckCircle } from 'lucide-react'
 
 export default function ResetPasswordPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const [hasSession, setHasSession] = useState(true)
+  const [hasSession, setHasSession] = useState(false)
+  const [verifying, setVerifying] = useState(true)
 
-  // Check if user has a valid session (from the reset link)
+  // Verify token and establish session
   useEffect(() => {
     const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) {
+    const tokenHash = searchParams.get('token_hash')
+    const type = searchParams.get('type')
+
+    async function verifyAndInit() {
+      // If we have a token_hash, verify it first to create a session
+      if (tokenHash) {
+        const { error: otpError } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: (type as 'recovery' | 'email') || 'recovery',
+        })
+
+        if (otpError) {
+          console.error('[ResetPassword] verifyOtp error:', otpError)
+          setHasSession(false)
+          setError('Je reset-link is verlopen of al gebruikt. Vraag een nieuwe aan via de login pagina.')
+          setVerifying(false)
+          return
+        }
+      }
+
+      // Check for a valid session
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        setHasSession(true)
+      } else {
         setHasSession(false)
         setError('Je reset-link is verlopen of ongeldig. Vraag een nieuwe aan via de login pagina.')
       }
-    })
-  }, [])
+      setVerifying(false)
+    }
+
+    verifyAndInit()
+  }, [searchParams])
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -61,6 +89,17 @@ export default function ResetPasswordPage() {
     }
 
     setSuccess(true)
+  }
+
+  if (verifying) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-8 h-8 border-2 border-[#9B7B2E] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-[15px] text-[#9C9A95]">Link verifiëren...</p>
+        </div>
+      </div>
+    )
   }
 
   if (success) {

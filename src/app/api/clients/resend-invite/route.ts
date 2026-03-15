@@ -57,7 +57,6 @@ export async function POST(request: NextRequest) {
         full_name: clientProfile.full_name,
         role: 'client',
       },
-      redirectTo: `${appUrl}/auth/callback/invite`,
     },
   })
 
@@ -69,7 +68,10 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const inviteLink = linkData.properties.action_link
+  // Build direct link — bypass Supabase redirect, use verifyOtp on our page
+  const actionUrl = new URL(linkData.properties.action_link)
+  const tokenHash = actionUrl.searchParams.get('token')
+  const inviteLink = `${appUrl}/auth/set-password?token_hash=${tokenHash}&type=invite`
 
   try {
     await sendInviteEmail({

@@ -16,9 +16,6 @@ export async function POST(request: NextRequest) {
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
     type: 'recovery',
     email,
-    options: {
-      redirectTo: `${appUrl}/auth/callback/recovery`,
-    },
   })
 
   if (linkError) {
@@ -27,7 +24,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true })
   }
 
-  const resetLink = linkData.properties.action_link
+  // Extract token_hash from Supabase's action_link and build our OWN direct link.
+  // This bypasses Supabase's redirect (implicit flow / hash fragments get lost).
+  const actionUrl = new URL(linkData.properties.action_link)
+  const tokenHash = actionUrl.searchParams.get('token')
+  const resetLink = `${appUrl}/auth/reset-password?token_hash=${tokenHash}&type=recovery`
 
   // Get user name for personalization
   const { data: profile } = await admin

@@ -58,7 +58,6 @@ export async function POST(request: NextRequest) {
         full_name,
         role: 'client',
       },
-      redirectTo: `${appUrl}/auth/callback/invite`,
     },
   })
 
@@ -70,11 +69,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: linkError.message }, { status: 400 })
   }
 
-  // The generated link contains a token — extract and rebuild for our domain
-  // Supabase generateLink returns a link like:
-  // https://<project>.supabase.co/auth/v1/verify?token=...&type=invite&redirect_to=...
-  // We need to use this as-is (it handles the token exchange)
-  const inviteLink = linkData.properties.action_link
+  // Extract token_hash from Supabase's action_link and build our OWN direct link.
+  // This completely bypasses Supabase's redirect (which uses implicit flow / hash
+  // fragments that get lost). Instead, user goes directly to our set-password page
+  // which calls verifyOtp() client-side.
+  const actionUrl = new URL(linkData.properties.action_link)
+  const tokenHash = actionUrl.searchParams.get('token')
+  const inviteLink = `${appUrl}/auth/set-password?token_hash=${tokenHash}&type=invite`
 
   // Update the auto-created profile with additional data
   const { error: profileError } = await admin

@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { Eye, EyeOff, CheckCircle, Lock } from 'lucide-react'
 
 export default function SetPasswordPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -14,19 +15,40 @@ export default function SetPasswordPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [userName, setUserName] = useState('')
+  const [verifying, setVerifying] = useState(true)
 
   useEffect(() => {
-    // Get user info to personalize the page
     const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    const tokenHash = searchParams.get('token_hash')
+    const type = searchParams.get('type')
+
+    async function verifyAndInit() {
+      // If we have a token_hash, verify it first to create a session
+      if (tokenHash) {
+        const { error: otpError } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: (type as 'invite' | 'email') || 'invite',
+        })
+
+        if (otpError) {
+          console.error('[SetPassword] verifyOtp error:', otpError)
+          router.replace('/?error=Uitnodigingslink is verlopen of al gebruikt. Vraag je coach om een nieuwe.')
+          return
+        }
+      }
+
+      // Now check for a valid session
+      const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         setUserName(user.user_metadata?.full_name || '')
+        setVerifying(false)
       } else {
-        // No session — link expired or invalid
         router.replace('/?error=Link is verlopen. Vraag je coach om een nieuwe uitnodiging.')
       }
-    })
-  }, [router])
+    }
+
+    verifyAndInit()
+  }, [searchParams, router])
 
   const handleSetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -56,6 +78,17 @@ export default function SetPasswordPage() {
     }
 
     setSuccess(true)
+  }
+
+  if (verifying) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-8 h-8 border-2 border-[#9B7B2E] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-[15px] text-[#9C9A95]">Account verifiëren...</p>
+        </div>
+      </div>
+    )
   }
 
   if (success) {
