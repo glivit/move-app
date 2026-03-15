@@ -1,7 +1,14 @@
 import { createAdminClient } from '@/lib/supabase-admin'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { clientCreationSchema } from '@/lib/validation'
+import { sendInviteEmail } from '@/lib/email'
 import { NextRequest, NextResponse } from 'next/server'
+
+const PACKAGE_LABELS: Record<string, string> = {
+  essential: 'Essential',
+  performance: 'Performance',
+  elite: 'Elite',
+}
 
 export async function POST(request: NextRequest) {
   // Verify the requesting user is a coach
@@ -40,23 +47,34 @@ export async function POST(request: NextRequest) {
   const { full_name, email, phone, package: pkg, start_date } = validation.data
 
   const admin = createAdminClient()
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://move-knokke.be'
 
-  // Invite user by email — this creates the user AND sends the invite email
-  const { data: newUser, error: inviteError } = await admin.auth.admin.inviteUserByEmail(email, {
-    data: {
-      full_name,
-      role: 'client',
+  // Generate invite link WITHOUT sending Supabase's default email
+  const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
+    type: 'invite',
+    email,
+    options: {
+      data: {
+        full_name,
+        role: 'client',
+      },
+      redirectTo: `${appUrl}/auth/callback?type=invite`,
     },
-    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?type=invite`,
   })
 
-  if (inviteError) {
-    // If user already exists, try to just send a magic link
-    if (inviteError.message?.includes('already been registered')) {
+  if (linkError) {
+    if (linkError.message?.includes('already been registered') ||
+        linkError.message?.includes('already exists')) {
       return NextResponse.json({ error: 'Dit e-mailadres is al geregistreerd.' }, { status: 400 })
     }
-    return NextResponse.json({ error: inviteError.message }, { status: 400 })
+    return NextResponse.json({ error: linkError.message }, { status: 400 })
   }
+
+  // The generated link contains a token — extract and rebuild for our domain
+  // Supabase generateLink returns a link like:
+  // https://<project>.supabase.co/auth/v1/verify?token=...&type=invite&redirect_to=...
+  // We need to use this as-is (it handles the token exchange)
+  const inviteLink = linkData.properties.action_link
 
   // Update the auto-created profile with additional data
   const { error: profileError } = await admin
@@ -66,12 +84,29 @@ export async function POST(request: NextRequest) {
       package: pkg,
       start_date,
     })
-    .eq('id', newUser.user.id)
+    .eq('id', linkData.user.id)
 
   if (profileError) {
     console.error('Profile update error:', profileError)
-    // Don't fail — user was invited, profile can be updated later
   }
 
-  return NextResponse.json({ success: true, userId: newUser.user.id }, { status: 201 })
+  // Send branded invite email via Resend
+  try {
+    await sendInviteEmail({
+      to: email,
+      clientName: full_name,
+      inviteLink,
+      packageName: PACKAGE_LABELS[pkg] || pkg,
+    })
+  } catch (emailError) {
+    console.error('Email send error:', emailError)
+    // User was created in Supabase but email failed — coach can resend later
+    return NextResponse.json({
+      success: true,
+      userId: linkData.user.id,
+      warning: 'Client aangemaakt maar email kon niet verstuurd worden. Probeer later opnieuw.',
+    }, { status: 201 })
+  }
+
+  return NextResponse.json({ success: true, userId: linkData.user.id }, { status: 201 })
 }

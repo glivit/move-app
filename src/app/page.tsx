@@ -112,22 +112,20 @@ function LoginPageInner() {
     setResetLoading(true)
     setError('')
 
-    const supabase = createClient()
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
-    })
-
-    if (resetError) {
-      console.error('Password reset error:', resetError)
-      if (resetError.message?.includes('rate limit') || resetError.message?.includes('429')) {
-        setError('Te veel verzoeken. Wacht even en probeer opnieuw.')
-      } else if (resetError.message?.includes('not found') || resetError.message?.includes('not registered')) {
-        setError('Dit e-mailadres is niet bekend. Controleer het adres.')
+    try {
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        setError(data.error || 'Er ging iets mis. Probeer opnieuw.')
       } else {
-        setError(`Reset mislukt: ${resetError.message || 'Onbekende fout'}. Probeer opnieuw.`)
+        setResetSent(true)
       }
-    } else {
-      setResetSent(true)
+    } catch {
+      setError('Verbindingsfout. Controleer je internet en probeer opnieuw.')
     }
     setResetLoading(false)
   }
