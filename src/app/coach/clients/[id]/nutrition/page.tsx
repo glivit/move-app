@@ -95,7 +95,7 @@ function calcMacro(food: FoodEntry, key: 'calories' | 'protein' | 'carbs' | 'fat
 }
 
 function totalMealMacro(meal: MealMoment, key: 'calories' | 'protein' | 'carbs' | 'fat') {
-  return meal.foods.reduce((sum, f) => sum + calcMacro(f, key), 0)
+  return (meal.foods || []).reduce((sum, f) => sum + calcMacro(f, key), 0)
 }
 
 function totalPlanMacro(meals: MealMoment[], key: 'calories' | 'protein' | 'carbs' | 'fat') {
@@ -342,7 +342,7 @@ export default function NutritionPage() {
     setMeals((prev) =>
       prev.map((m) =>
         m.id === mealId
-          ? { ...m, foods: m.foods.filter((f) => f.id !== foodId) }
+          ? { ...m, foods: (m.foods || []).filter((f) => f.id !== foodId) }
           : m
       )
     )
@@ -354,7 +354,7 @@ export default function NutritionPage() {
         m.id === mealId
           ? {
               ...m,
-              foods: m.foods.map((f) =>
+              foods: (m.foods || []).map((f) =>
                 f.id === foodId ? { ...f, grams } : f
               ),
             }
@@ -970,7 +970,7 @@ export default function NutritionPage() {
                             className="text-[12px] text-[#8E8E93] bg-transparent border-none p-0 focus:outline-none w-16"
                           />
                           <span className="text-[12px] text-[#C7C7CC]">·</span>
-                          <span className="text-[12px] text-[#8E8E93]">{meal.foods.length} items</span>
+                          <span className="text-[12px] text-[#8E8E93]">{(meal.foods || []).length} items</span>
                         </div>
                       </div>
                     </div>
@@ -993,9 +993,9 @@ export default function NutritionPage() {
                   {isExpanded && (
                     <div className="border-t border-[#F0F0ED]">
                       {/* Food Items */}
-                      {meal.foods.length > 0 && (
+                      {(meal.foods || []).length > 0 && (
                         <div className="divide-y divide-[#F0F0ED]">
-                          {meal.foods.map((food) => (
+                          {(meal.foods || []).map((food) => (
                             <div key={food.id} className="px-5 py-3 flex items-center gap-3 group">
                               {/* Food Image */}
                               <div className="w-10 h-10 rounded-lg bg-[#F5F5F3] border border-[#F0F0ED] flex items-center justify-center overflow-hidden shrink-0">

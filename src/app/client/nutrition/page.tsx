@@ -192,7 +192,7 @@ export default function ClientNutritionPage() {
           meal_id: meal.id,
           meal_name: meal.name,
           completed: nowCompleted,
-          foods_eaten: existing?.foods_eaten || meal.foods,
+          foods_eaten: existing?.foods_eaten || meal.foods || [],
           client_notes: existing?.client_notes || null,
         }),
       })
@@ -202,7 +202,7 @@ export default function ClientNutritionPage() {
           meal_id: meal.id,
           meal_name: meal.name,
           completed: nowCompleted,
-          foods_eaten: existing?.foods_eaten || meal.foods,
+          foods_eaten: existing?.foods_eaten || meal.foods || [],
           client_notes: existing?.client_notes || null,
           completed_at: nowCompleted ? new Date().toISOString() : null,
         }
@@ -236,13 +236,13 @@ export default function ClientNutritionPage() {
           meal_id: mealId,
           meal_name: meal.name,
           completed: existing?.completed || false,
-          foods_eaten: existing?.foods_eaten || meal.foods,
+          foods_eaten: existing?.foods_eaten || meal.foods || [],
           client_notes: noteText.trim() || null,
         }),
       })
 
       const newLog: MealLog = {
-        ...(existing || { meal_id: mealId, meal_name: meal.name, completed: false, foods_eaten: meal.foods, completed_at: null }),
+        ...(existing || { meal_id: mealId, meal_name: meal.name, completed: false, foods_eaten: meal.foods || [], completed_at: null }),
         client_notes: noteText.trim() || null,
       }
       setLogs(new Map(logs.set(mealId, newLog)))
@@ -416,7 +416,8 @@ export default function ClientNutritionPage() {
             const isSaving = savingMeal === meal.id
             const hasNotes = log?.client_notes
 
-            const mealCal = meal.foods.reduce((s, f) => s + calcMacro(f, 'calories'), 0)
+            const foods = meal.foods || []
+            const mealCal = foods.reduce((s, f) => s + calcMacro(f, 'calories'), 0)
 
             return (
               <div
@@ -461,7 +462,7 @@ export default function ClientNutritionPage() {
                       )}
                     </div>
                     <p className="text-[12px] text-[#C7C7CC] mt-0.5">
-                      {meal.time} · {mealCal} kcal · {meal.foods.length} items
+                      {meal.time} · {mealCal} kcal · {foods.length} items
                     </p>
                   </button>
 
@@ -483,7 +484,7 @@ export default function ClientNutritionPage() {
                   <div className="border-t border-[#F0F0ED]">
                     {/* Foods list */}
                     <div className="divide-y divide-[#F0F0ED]">
-                      {meal.foods.map((food) => (
+                      {foods.map((food) => (
                         <div key={food.id} className="px-4 py-2.5 flex items-center gap-3">
                           <div className="w-8 h-8 rounded-lg bg-[#F5F5F3] flex items-center justify-center overflow-hidden shrink-0">
                             {food.image ? (

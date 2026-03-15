@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { Dumbbell, ChevronRight, Calendar } from 'lucide-react'
 
@@ -24,13 +23,8 @@ interface TemplateDay {
   exercise_count?: number
 }
 
-interface User {
-  id: string
-}
-
 export default function WorkoutOverviewPage() {
   const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
   const [program, setProgram] = useState<ClientProgram | null>(null)
   const [days, setDays] = useState<TemplateDay[]>([])
   const [loading, setLoading] = useState(true)
@@ -39,71 +33,24 @@ export default function WorkoutOverviewPage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const supabase = createClient()
-
-        // Get current user
-        const { data: { user: authUser } } = await supabase.auth.getUser()
-        if (!authUser) {
-          router.push('/auth/login')
-          return
-        }
-
-        setUser({ id: authUser.id })
-
-        // Get active program for current user
-        const { data: activeProgram } = await supabase
-          .from('client_programs')
-          .select('*')
-          .eq('client_id', authUser.id)
-          .eq('is_active', true)
-          .single()
-
-        if (!activeProgram) {
+        // Use API route to bypass RLS issues on client_programs
+        const res = await fetch('/api/client-program')
+        if (!res.ok) {
+          if (res.status === 401) {
+            router.push('/auth/login')
+            return
+          }
           setLoading(false)
           return
         }
 
-        setProgram(activeProgram as ClientProgram)
+        const data = await res.json()
 
-        // Get all template days for this program with exercise count
-        const { data: templateDays } = await supabase
-          .from('program_template_days')
-          .select('*')
-          .eq('template_id', activeProgram.template_id)
-          .order('sort_order', { ascending: true })
-
-        if (templateDays) {
-          // Fetch exercise count for each day
-          const daysWithCounts = await Promise.all(
-            templateDays.map(async (day: any) => {
-              const { count } = await supabase
-                .from('program_template_exercises')
-                .select('*', { count: 'exact', head: true })
-                .eq('template_day_id', day.id)
-
-              return {
-                ...day,
-                exercise_count: count || 0,
-              }
-            })
-          )
-          setDays(daysWithCounts)
+        if (data.program) {
+          setProgram(data.program)
+          setDays(data.days || [])
+          setWorkoutsThisWeek(data.workoutsThisWeek || 0)
         }
-
-        // Get workout count for this week
-        const today = new Date()
-        const weekStart = new Date(today)
-        weekStart.setDate(today.getDate() - today.getDay())
-        weekStart.setHours(0, 0, 0, 0)
-
-        const { count } = await supabase
-          .from('workout_sessions')
-          .select('*', { count: 'exact', head: true })
-          .eq('client_id', authUser.id)
-          .gte('started_at', weekStart.toISOString())
-          .lte('started_at', new Date().toISOString())
-
-        setWorkoutsThisWeek(count || 0)
       } catch (error) {
         console.error('Error loading program:', error)
       } finally {

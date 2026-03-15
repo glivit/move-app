@@ -101,14 +101,17 @@ function ActiveWorkoutPage() {
 
         setUser({ id: authUser.id })
 
-        // Fetch exercises for this day
-        const { data: exercisesData } = await supabase
-          .from('program_template_exercises')
-          .select('*, exercises(*)')
-          .eq('template_day_id', dayId)
-          .order('sort_order', { ascending: true })
+        // Fetch exercises via API to bypass RLS
+        const res = await fetch(`/api/client-workout?dayId=${dayId}`)
+        if (!res.ok) {
+          router.push('/client/workout')
+          return
+        }
+        const apiData = await res.json()
+        const exercisesData = apiData.exercises
+        const apiLastWeights = apiData.lastWeights || {}
 
-        if (exercisesData) {
+        if (exercisesData && exercisesData.length > 0) {
           setExercises(exercisesData as ProgramTemplateExercise[])
 
           // Initialize sets for each exercise
@@ -131,20 +134,7 @@ function ActiveWorkoutPage() {
             }
             setsMap[ex.id] = setsList
 
-            // Get last workout weight for this exercise
-            const { data: lastSets } = await supabase
-              .from('workout_sets')
-              .select('weight_kg')
-              .eq('exercise_id', ex.exercise_id)
-              .eq('completed', true)
-              .order('created_at', { ascending: false })
-              .limit(1)
-
-            if (lastSets && lastSets.length > 0) {
-              weightsMap[ex.id] = lastSets[0].weight_kg
-            } else {
-              weightsMap[ex.id] = ex.weight_suggestion || null
-            }
+            weightsMap[ex.id] = apiLastWeights[ex.id] || ex.weight_suggestion || null
           }
 
           setSets(setsMap)
