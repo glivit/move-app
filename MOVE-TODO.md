@@ -271,27 +271,47 @@ Na grondige analyse van TrueCoach, TrainHeroic, PT Distinction, My PT Hub, Train
 - [x] Coach dashboard: workout feedback overzicht met moeilijkheidsgraad
 - [x] Workout feedback API voor coach review
 
-**Sprint 3** (TODO):
-7. Automatische onboarding flow
-8. Smart scheduling
-9. PDF voortgangsrapporten
+**Sprint 3** (KLAAR):
+- [x] Smart scheduling (coach beschikbaarheid, client booking, geblokkeerde dagen)
+- [x] PDF voortgangsrapporten (preview page + data API)
+- [x] Supplement & medicatie tracker (CRUD, dagelijks afvinken, per tijdstip)
+- [x] Periodisering & blokplanning visueel (Gantt chart, intensiteitscurve, fase editor)
+- [x] Exercise DB uitbreiding (12 nieuwe equipment types, video_url veld)
+- [x] Muscle group volume breakdown (donut chart + progress bars)
+- [x] Training frequency heatmap (12 weken grid)
+- [x] Photo timeline strip met interval markers
 
 **Sprint 4** (TODO):
-10. Periodisering visueel
-11. Video form feedback
-12. Content bibliotheek 2.0
+- [ ] Workout timer & superset flow
+- [ ] Automatische onboarding flow
+- [ ] Content bibliotheek 2.0 upgrade
+- [ ] Video form feedback
 
 **Sprint 5+** (TODO):
-13. Wearable integratie
-14. Community/groepschat
-15. AI features
+- [ ] Wearable integratie
+- [ ] Community/groepschat
+- [ ] AI features
+- [ ] Multi-language support
+- [ ] Whitelabel PWA
 
 ---
 
 ## SQL Migraties — Handmatig uitvoeren
 
-Ga naar **Supabase Dashboard > SQL Editor** en voer uit:
+Ga naar **Supabase Dashboard > SQL Editor** en voer in volgorde uit:
 
 1. `supabase/migrations/003_nutrition_logs.sql` — voeding tracking
 2. `supabase/migrations/004_habits.sql` — habit tracker
 3. `supabase/migrations/005_workout_feedback.sql` — workout feedback
+4. `supabase/migrations/006_push_subscriptions.sql` — push notificaties
+5. `supabase/migrations/007_periodization.sql` — training phases + preferred days
+6. `supabase/migrations/008_content_library.sql` — content bibliotheek
+7. `supabase/migrations/009_health_data.sql` — health metrics
+8. `supabase/migrations/010_community.sql` — community features
+9. `supabase/migrations/011_supersets.sql` — superset groups
+10. `supabase/migrations/012_dutch_exercise_names.sql` — NL oefening namen
+11. `supabase/migrations/013_seed_programs_and_diet.sql` — seed data
+12. `supabase/migrations/014_scheduling.sql` — coach beschikbaarheid & booking
+13. `supabase/migrations/015_supplements.sql` — supplement tracker
+14. `supabase/migrations/016_exercise_video_url.sql` — video URL op oefeningen
+15. `supabase/migrations/20260315_accountability_logs.sql` — accountability logs

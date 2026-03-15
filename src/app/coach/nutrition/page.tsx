@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
-import { Apple, ChevronRight, Search, Eye, CheckCircle, AlertCircle, Droplets, Copy, BookOpen, Users, Loader2 } from 'lucide-react'
+import { Apple, ChevronRight, Search, Eye, CheckCircle, AlertCircle, Droplets, Copy, BookOpen, Users, Loader2, Plus } from 'lucide-react'
 
 interface DailySummary {
   client_id: string
@@ -257,6 +257,13 @@ export default function NutritionOverviewPage() {
               Voedingsplannen en dagelijkse compliance van je cliënten
             </p>
           </div>
+          <Link
+            href="/coach/nutrition/new"
+            className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium text-[14px] transition-all hover:opacity-90 text-white bg-[#1A1A18]"
+          >
+            <Plus size={18} strokeWidth={1.5} />
+            Nieuw plan
+          </Link>
         </div>
 
         {/* Stats Cards */}
@@ -282,12 +289,20 @@ export default function NutritionOverviewPage() {
         </div>
 
         {/* Nutrition Templates */}
-        {templates.length > 0 && (
           <div className="mb-8">
-            <div className="flex items-center gap-2 mb-3">
-              <BookOpen strokeWidth={1.5} className="w-4 h-4 text-[#8B6914]" />
-              <h2 className="text-[15px] font-semibold text-[#1A1A18]">Voedingsplan templates</h2>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <BookOpen strokeWidth={1.5} className="w-4 h-4 text-[#8B6914]" />
+                <h2 className="text-[15px] font-semibold text-[#1A1A18]">Voedingsplan templates</h2>
+              </div>
+              <Link
+                href="/coach/nutrition/new"
+                className="text-[12px] font-semibold text-[#8B6914] hover:underline"
+              >
+                + Nieuwe template
+              </Link>
             </div>
+        {templates.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {templates.map((template) => {
                 const meals = Array.isArray(template.meals) ? template.meals : []
@@ -324,8 +339,20 @@ export default function NutritionOverviewPage() {
                 )
               })}
             </div>
-          </div>
+        ) : (
+            <div className="bg-white rounded-2xl p-8 border border-dashed border-[#C7C7CC] text-center">
+              <BookOpen strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#C7C7CC]" />
+              <p className="text-[14px] font-medium text-[#8E8E93] mb-2">Nog geen templates</p>
+              <p className="text-[12px] text-[#C7C7CC] mb-4">Maak een voedingsplan template aan om snel toe te wijzen aan cliënten</p>
+              <Link
+                href="/coach/nutrition/new"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold bg-[#8B6914] text-white hover:bg-[#7A5C12] transition-colors"
+              >
+                <Plus size={16} /> Eerste template maken
+              </Link>
+            </div>
         )}
+          </div>
 
         {/* Assign Template Modal */}
         {showAssignModal && (

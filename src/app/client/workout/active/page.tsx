@@ -318,17 +318,58 @@ function ActiveWorkoutPage() {
         />
       )}
 
-      {/* PR Celebration Toast */}
+      {/* PR Celebration with Confetti */}
       {prCelebration && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-bounce-in">
-          <div className="bg-[#FF9500] text-white rounded-2xl px-6 py-3 shadow-[0_8px_24px_rgba(255,149,0,0.3)] flex items-center gap-3">
-            <span className="text-2xl">🏆</span>
-            <div>
-              <p className="text-[13px] font-bold uppercase tracking-wide">Nieuw PR!</p>
-              <p className="text-[12px] opacity-90">{prCelebration}</p>
+        <>
+          {/* Confetti overlay */}
+          <div className="fixed inset-0 z-40 pointer-events-none overflow-hidden">
+            {Array.from({ length: 50 }).map((_, i) => {
+              const left = Math.random() * 100
+              const delay = Math.random() * 0.8
+              const duration = 1.5 + Math.random() * 1.5
+              const size = 6 + Math.random() * 8
+              const colors = ['#FF9500', '#8B6914', '#FF3B30', '#34C759', '#007AFF', '#AF52DE', '#FFD700']
+              const color = colors[i % colors.length]
+              const rotation = Math.random() * 360
+              return (
+                <div
+                  key={i}
+                  style={{
+                    position: 'absolute',
+                    left: `${left}%`,
+                    top: '-10px',
+                    width: `${size}px`,
+                    height: `${size * 0.6}px`,
+                    backgroundColor: color,
+                    borderRadius: '2px',
+                    transform: `rotate(${rotation}deg)`,
+                    animation: `confettiFall ${duration}s ease-in ${delay}s forwards`,
+                    opacity: 0,
+                  }}
+                />
+              )
+            })}
+          </div>
+
+          {/* Toast */}
+          <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-bounce-in">
+            <div className="bg-[#FF9500] text-white rounded-2xl px-6 py-4 shadow-[0_8px_24px_rgba(255,149,0,0.3)] flex items-center gap-3">
+              <span className="text-3xl">🏆</span>
+              <div>
+                <p className="text-[14px] font-bold uppercase tracking-wide">Nieuw PR!</p>
+                <p className="text-[13px] opacity-90">{prCelebration}</p>
+              </div>
             </div>
           </div>
-        </div>
+
+          {/* Confetti keyframes */}
+          <style jsx>{`
+            @keyframes confettiFall {
+              0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+              100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+            }
+          `}</style>
+        </>
       )}
 
       {/* Close confirmation dialog */}

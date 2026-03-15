@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/accountability",
       "schedule": "0 20 * * *"
+    },
+    {
+      "path": "/api/cron/meeting-reminders",
+      "schedule": "*/15 * * * *"
     }
   ]
 }
