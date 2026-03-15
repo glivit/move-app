@@ -115,26 +115,10 @@ export default function BroadcastsPage() {
         return;
       }
 
-      // Create individual messages for each client
-      const messages = selectedClientIds.map((clientId) => ({
-        sender_id: user.id,
-        receiver_id: clientId,
-        content: message,
-        message_type: 'text' as const,
-      }));
-
-      const { error: messagesError } = await supabase
-        .from('messages')
-        .insert(messages);
-
-      if (messagesError) {
-        console.error('Fout bij aanmaken van berichten:', messagesError);
-        return;
-      }
-
       // Send push notification to each client (fire & forget)
+      // Broadcasts are NOT chat messages — they show in /client/notifications
       selectedClientIds.forEach((clientId) => {
-        sendPushToClient(clientId, title || 'MŌVE', message.substring(0, 100), '/client/messages')
+        sendPushToClient(clientId, title || 'MŌVE', message.substring(0, 100), '/client/notifications')
       });
 
       // Add to broadcasts list

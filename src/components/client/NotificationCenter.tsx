@@ -1,13 +1,13 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { Bell, MessageCircle, FileText, X } from 'lucide-react'
+import { Bell, Megaphone, FileText, MessageCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { formatDistanceToNow } from 'date-fns'
 import { nl } from 'date-fns/locale'
 import Link from 'next/link'
 
-type NotificationType = 'message' | 'prompt'
+type NotificationType = 'broadcast' | 'prompt' | 'message'
 
 interface Notification {
   id: string
@@ -16,6 +16,21 @@ interface Notification {
   description: string
   timestamp: string
   url: string
+}
+
+const notifConfig: Record<NotificationType, { icon: React.ReactNode; bg: string }> = {
+  broadcast: {
+    icon: <Megaphone className="w-4 h-4 text-[#3068C4]" />,
+    bg: 'bg-[#3068C4]/8',
+  },
+  prompt: {
+    icon: <FileText className="w-4 h-4 text-[#9B7B2E]" />,
+    bg: 'bg-[#C8A96E]/10',
+  },
+  message: {
+    icon: <MessageCircle className="w-4 h-4 text-[#3068C4]" />,
+    bg: 'bg-[#3068C4]/8',
+  },
 }
 
 export function NotificationCenter() {
@@ -28,15 +43,14 @@ export function NotificationCenter() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    // Parallel: unread messages + pending prompts
-    const [messagesRes, promptsRes] = await Promise.all([
+    const [broadcastsRes, promptsRes, messagesRes] = await Promise.all([
+      // Unread broadcasts targeted at this client
       supabase
-        .from('messages')
-        .select('id, content, sender_id, created_at')
-        .eq('receiver_id', user.id)
-        .is('read_at', null)
+        .from('broadcasts')
+        .select('id, title, content, created_at, target_clients, read_by')
         .order('created_at', { ascending: false })
         .limit(10),
+      // Pending prompts
       supabase
         .from('prompt_responses')
         .select('id, created_at, prompts(question)')
@@ -44,32 +58,62 @@ export function NotificationCenter() {
         .eq('response', '')
         .order('created_at', { ascending: false })
         .limit(5),
+      // Unread messages
+      supabase
+        .from('messages')
+        .select('id, content, created_at')
+        .eq('receiver_id', user.id)
+        .is('read_at', null)
+        .order('created_at', { ascending: false })
+        .limit(5),
     ])
 
     const notifs: Notification[] = []
 
-    if (messagesRes.data) {
-      messagesRes.data.forEach((msg: any) => {
+    // Broadcasts — only unread ones targeted at this user
+    if (broadcastsRes.data) {
+      broadcastsRes.data
+        .filter((b: any) => {
+          const targets = b.target_clients || []
+          const readBy = b.read_by || []
+          return targets.includes(user.id) && !readBy.includes(user.id)
+        })
+        .forEach((b: any) => {
+          notifs.push({
+            id: `bc-${b.id}`,
+            type: 'broadcast',
+            title: b.title || 'Bericht van je coach',
+            description: (b.content || '').substring(0, 80),
+            timestamp: b.created_at,
+            url: '/client/notifications',
+          })
+        })
+    }
+
+    // Prompts
+    if (promptsRes.data) {
+      promptsRes.data.forEach((p: any) => {
         notifs.push({
-          id: `msg-${msg.id}`,
-          type: 'message',
-          title: 'Nieuw bericht van je coach',
-          description: (msg.content || '').substring(0, 80),
-          timestamp: msg.created_at,
-          url: '/client/messages',
+          id: `pr-${p.id}`,
+          type: 'prompt',
+          title: 'Vraag van je coach',
+          description: (p.prompts?.question || '').substring(0, 80),
+          timestamp: p.created_at,
+          url: '/client/prompts',
         })
       })
     }
 
-    if (promptsRes.data) {
-      promptsRes.data.forEach((p: any) => {
+    // Messages
+    if (messagesRes.data) {
+      messagesRes.data.forEach((m: any) => {
         notifs.push({
-          id: `prompt-${p.id}`,
-          type: 'prompt',
-          title: 'Vraag van je coach',
-          description: (p.prompts?.question || 'Beantwoord de vraag van je coach').substring(0, 80),
-          timestamp: p.created_at,
-          url: '/client/prompts',
+          id: `msg-${m.id}`,
+          type: 'message',
+          title: 'Nieuw bericht',
+          description: (m.content || '').substring(0, 80),
+          timestamp: m.created_at,
+          url: '/client/messages',
         })
       })
     }
@@ -78,31 +122,24 @@ export function NotificationCenter() {
     setNotifications(notifs)
   }, [supabase])
 
-  useEffect(() => {
-    load()
-  }, [load])
+  useEffect(() => { load() }, [load])
 
   // Close on outside click
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
+    const handler = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setIsOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
   }, [])
 
   const count = notifications.length
 
-  const notifIcon: Record<NotificationType, React.ReactNode> = {
-    message: <MessageCircle className="w-4 h-4 text-[#3068C4]" />,
-    prompt: <FileText className="w-4 h-4 text-[#9B7B2E]" />,
-  }
-
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Bell button */}
+      {/* Bell */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 rounded-xl hover:bg-[#F5F2ED] transition-colors"
@@ -127,17 +164,15 @@ export function NotificationCenter() {
             border: '1px solid #F0F0ED',
           }}
         >
-          {/* Header */}
           <div className="px-4 py-3 border-b border-[#F0F0ED] flex items-center justify-between">
             <h3 className="text-[15px] font-semibold text-[#1A1917] tracking-[-0.01em]">Meldingen</h3>
             {count > 0 && (
               <span className="text-[12px] font-medium text-[#9B7B2E] bg-[#9B7B2E]/8 px-2 py-0.5 rounded-full">
-                {count} nieuw
+                {count}
               </span>
             )}
           </div>
 
-          {/* List */}
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
               <div className="p-8 text-center">
@@ -152,8 +187,8 @@ export function NotificationCenter() {
                   onClick={() => setIsOpen(false)}
                   className="flex items-start gap-3 px-4 py-3.5 border-b border-[#F0F0ED]/60 hover:bg-[#F5F2ED]/50 transition-colors"
                 >
-                  <div className="flex-shrink-0 mt-0.5 w-8 h-8 rounded-full bg-[#F5F2ED] flex items-center justify-center">
-                    {notifIcon[n.type]}
+                  <div className={`flex-shrink-0 mt-0.5 w-8 h-8 rounded-full flex items-center justify-center ${notifConfig[n.type].bg}`}>
+                    {notifConfig[n.type].icon}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[14px] font-medium text-[#1A1917] tracking-[-0.01em]">{n.title}</p>
@@ -166,6 +201,17 @@ export function NotificationCenter() {
               ))
             )}
           </div>
+
+          {/* Link naar volledige pagina */}
+          {count > 0 && (
+            <Link
+              href="/client/notifications"
+              onClick={() => setIsOpen(false)}
+              className="block text-center text-[13px] font-medium text-[#9B7B2E] py-3 border-t border-[#F0F0ED] hover:bg-[#F5F2ED]/50 transition-colors"
+            >
+              Alle meldingen bekijken
+            </Link>
+          )}
         </div>
       )}
     </div>

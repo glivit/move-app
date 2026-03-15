@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
       videoRes,
       accountabilityRes,
       promptsRes,
+      broadcastsRes,
     ] = await Promise.all([
       // Profile
       supabase.from('profiles').select('id, full_name, role, package, start_date')
@@ -78,6 +79,12 @@ export async function GET(request: NextRequest) {
       supabase.from('prompt_responses').select('id, prompt_id, prompts(question)')
         .eq('client_id', user.id).eq('response', '')
         .order('created_at', { ascending: false }).limit(1),
+
+      // Unread broadcasts targeted at this client
+      supabase.from('broadcasts')
+        .select('id, title, content, created_at, target_clients, read_by')
+        .order('created_at', { ascending: false })
+        .limit(20),
     ])
 
     // ── Compute derived data ──────────────────────────────
@@ -170,6 +177,13 @@ export async function GET(request: NextRequest) {
       ? !(accountabilityRes.data as any).responded
       : false
 
+    // Unread broadcasts count — targeted at this user and not yet read
+    const unreadBroadcastCount = (broadcastsRes.data || []).filter((b: any) => {
+      const targets = b.target_clients || []
+      const readBy = b.read_by || []
+      return targets.includes(user.id) && !readBy.includes(user.id)
+    }).length
+
     // ── Response ──────────────────────────────────────────
 
     return NextResponse.json({
@@ -238,7 +252,8 @@ export async function GET(request: NextRequest) {
       notificationCount:
         (messagesRes.count || 0) +
         (pendingPrompt ? 1 : 0) +
-        (accountabilityPending ? 1 : 0),
+        (accountabilityPending ? 1 : 0) +
+        unreadBroadcastCount,
     })
   } catch (err) {
     console.error('Dashboard API error:', err)
