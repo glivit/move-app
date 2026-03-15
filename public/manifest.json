@@ -1,78 +1,100 @@
 {
-  "name": "MŌVE",
+  "name": "MŌVE — Transform. Perform. Endure.",
   "short_name": "MŌVE",
   "description": "Premium coaching platform by MŌVE, Knokke",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "theme_color": "#C8A96E",
+  "theme_color": "#1A1917",
   "background_color": "#F5F0EA",
-  "categories": ["health", "fitness"],
-  "screenshots": [
-    {
-      "src": "/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    }
-  ],
+  "categories": ["health", "fitness", "lifestyle"],
+  "lang": "nl-BE",
+  "dir": "ltr",
+  "prefer_related_applications": false,
   "icons": [
     {
+      "src": "/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192x192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512x512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "shortcuts": [
     {
       "name": "Check-in",
       "short_name": "Check-in",
-      "description": "Log your weekly check-in",
+      "description": "Log je wekelijkse check-in",
       "url": "/client/check-in",
-      "icons": [
-        {
-          "src": "/icon-192x192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
     },
     {
       "name": "Training",
       "short_name": "Training",
-      "description": "View your training program",
+      "description": "Bekijk je trainingsschema",
       "url": "/client/program",
-      "icons": [
-        {
-          "src": "/icon-192x192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
     },
     {
       "name": "Berichten",
       "short_name": "Berichten",
-      "description": "Message your coach",
+      "description": "Stuur een bericht naar je coach",
       "url": "/client/messages",
-      "icons": [
-        {
-          "src": "/icon-192x192.png",
-          "sizes": "192x192"
-        }
-      ]
+      "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
     }
   ]
 }

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Cormorant_Garamond, DM_Sans, DM_Mono } from 'next/font/google'
 import { ServiceWorkerInit } from '@/components/ServiceWorkerInit'
 import { OfflineIndicator } from '@/components/OfflineIndicator'
+import { InstallPrompt } from '@/components/InstallPrompt'
 import './globals.css'
 
 // Force all routes to be dynamically rendered — prevents prerender errors
@@ -82,9 +83,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="msapplication-config" content="/browserconfig.xml" />
       </head>
       <body suppressHydrationWarning className="min-h-screen bg-bg text-text-primary font-body antialiased">
-        {/* <ServiceWorkerInit /> */}
-        {/* <OfflineIndicator /> */}
+        <ServiceWorkerInit />
+        <OfflineIndicator />
         {children}
+        <InstallPrompt />
       </body>
     </html>
   )

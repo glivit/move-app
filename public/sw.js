@@ -1,119 +1,169 @@
 /**
- * Service Worker for MŌVE coaching app
- * Handles push notifications and background synchronization
+ * Unified Service Worker for MŌVE coaching app
+ * Handles: caching, offline support, push notifications
  */
 
-const APP_NAME = 'MŌVE';
-const APP_ICON = '/icon-192x192.png';
-const APP_COLOR = '#C8A96E'; // Gold accent color
+const CACHE_NAME = 'move-v2';
+const OFFLINE_URL = '/offline';
 
-/**
- * Handle incoming push notifications
- */
-self.addEventListener('push', (event) => {
-  try {
-    // Parse notification data from push event
-    const data = event.data?.json() || {};
+// Essential files to pre-cache on install
+const PRECACHE_URLS = [
+  '/',
+  '/offline',
+  '/manifest.json',
+  '/icon-192x192.png',
+  '/icon-512x512.png',
+  '/apple-touch-icon.png',
+];
 
-    const {
-      title = APP_NAME,
-      body = 'Je hebt een nieuwe melding',
-      icon = APP_ICON,
-      badge = APP_ICON,
-      url = '/',
-      tag = 'move-notification',
-      actions = [],
-      vibrate = [200, 100, 200],
-    } = data;
-
-    const notificationOptions = {
-      body,
-      icon,
-      badge,
-      tag,
-      vibrate,
-      data: { url, ...data },
-      actions,
-      requireInteraction: false,
-      badge: badge,
-      image: data.image,
-      dir: 'ltr',
-      lang: 'nl',
-      timestamp: Date.now(),
-      ...data.notificationOptions,
-    };
-
-    event.waitUntil(
-      self.registration.showNotification(title, notificationOptions)
-    );
-  } catch (error) {
-    console.error('Fout bij verwerken van push melding:', error);
-  }
-});
-
-/**
- * Handle notification clicks
- */
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-
-  const { url = '/' } = event.notification.data;
-
+// ── Install: pre-cache essential assets ──────────────────────────
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // Check if the app is already open
-      for (let client of clientList) {
-        if (client.url === url && 'focus' in client) {
-          return client.focus();
-        }
-      }
-      // If not open, open a new window
-      if (clients.openWindow) {
-        return clients.openWindow(url);
-      }
-    })
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .then(() => self.skipWaiting())
   );
 });
 
-/**
- * Handle notification close
- */
-self.addEventListener('notificationclose', (event) => {
-  // Could be used for analytics tracking
-  console.log('Melding gesloten:', event.notification.tag);
+// ── Activate: clean up old caches ────────────────────────────────
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((names) =>
+      Promise.all(
+        names
+          .filter((name) => name !== CACHE_NAME)
+          .map((name) => caches.delete(name))
+      )
+    ).then(() => self.clients.claim())
+  );
 });
 
-/**
- * Handle notification action clicks (if actions are used)
- */
-self.addEventListener('notificationclick', (event) => {
-  if (event.action) {
-    // Handle specific action click if needed
-    console.log('Melding actie aangeklikt:', event.action);
+// ── Fetch: network-first for pages, cache-first for assets ──────
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // Skip non-GET, cross-origin, API calls, and Supabase requests
+  if (
+    request.method !== 'GET' ||
+    url.origin !== location.origin ||
+    url.pathname.startsWith('/api/') ||
+    url.pathname.startsWith('/auth/')
+  ) {
+    return;
+  }
+
+  // Static assets: cache-first
+  if (
+    request.destination === 'image' ||
+    request.destination === 'font' ||
+    request.destination === 'style' ||
+    request.destination === 'script'
+  ) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        if (cached) return cached;
+        return fetch(request).then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((c) => c.put(request, clone));
+          }
+          return response;
+        }).catch(() => {
+          if (request.destination === 'image') {
+            return caches.match('/icon-192x192.png');
+          }
+          return new Response('', { status: 408 });
+        });
+      })
+    );
+    return;
+  }
+
+  // Pages: network-first, fallback to cache, then offline page
+  event.respondWith(
+    fetch(request)
+      .then((response) => {
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((c) => c.put(request, clone));
+        }
+        return response;
+      })
+      .catch(() =>
+        caches.match(request).then((cached) => {
+          if (cached) return cached;
+          if (request.destination === 'document' || request.destination === '') {
+            return caches.match(OFFLINE_URL);
+          }
+          return new Response('', { status: 408 });
+        })
+      )
+  );
+});
+
+// ── Push notifications ───────────────────────────────────────────
+self.addEventListener('push', (event) => {
+  try {
+    const data = event.data?.json() || {};
+    const {
+      title = 'MŌVE',
+      body = 'Je hebt een nieuwe melding',
+      icon = '/icon-192x192.png',
+      badge = '/icon-96x96.png',
+      url = '/',
+      tag = 'move-notification',
+      vibrate = [200, 100, 200],
+    } = data;
+
+    event.waitUntil(
+      self.registration.showNotification(title, {
+        body,
+        icon,
+        badge,
+        tag,
+        vibrate,
+        data: { url, ...data },
+        requireInteraction: false,
+        dir: 'ltr',
+        lang: 'nl',
+        timestamp: Date.now(),
+        image: data.image,
+      })
+    );
+  } catch (error) {
+    console.error('[SW] Push error:', error);
   }
 });
 
-/**
- * Install event - cache assets
- */
-self.addEventListener('install', (event) => {
-  console.log('Service Worker installeren');
-  self.skipWaiting();
+// ── Notification click: open/focus app ───────────────────────────
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || '/';
+
+  event.waitUntil(
+    clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((windowClients) => {
+        // Focus existing window if open
+        for (const client of windowClients) {
+          if (new URL(client.url).pathname === url && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        // Otherwise open new window
+        return clients.openWindow(url);
+      })
+  );
 });
 
-/**
- * Activate event - clean up old caches
- */
-self.addEventListener('activate', (event) => {
-  console.log('Service Worker activeren');
-  event.waitUntil(clients.claim());
-});
-
-/**
- * Handle messages from the app
- */
+// ── Messages from app ────────────────────────────────────────────
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
+  if (event.data?.type === 'SKIP_WAITING') {
     self.skipWaiting();
+  }
+  if (event.data?.type === 'CLEAR_CACHE') {
+    caches.delete(CACHE_NAME);
   }
 });

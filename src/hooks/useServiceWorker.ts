@@ -3,29 +3,21 @@ import { useEffect } from 'react'
 export function useServiceWorker() {
   useEffect(() => {
     if (typeof window === 'undefined') return
+    if (!('serviceWorker' in navigator)) return
 
-    // Only register in production or if explicitly enabled
-    if (!('serviceWorker' in navigator)) {
-      console.log('Service Workers not supported')
-      return
-    }
-
-    // Register service worker
+    // Register unified service worker (caching + push)
     navigator.serviceWorker
-      .register('/service-worker.js', { scope: '/' })
+      .register('/sw.js', { scope: '/' })
       .then((registration) => {
-        console.log('Service Worker registered:', registration)
-
-        // Check for updates periodically
-        setInterval(() => {
-          registration.update()
-        }, 60000) // Check every minute
+        console.log('[MŌVE] Service Worker registered')
+        // Check for updates every 5 minutes
+        setInterval(() => registration.update(), 5 * 60 * 1000)
       })
       .catch((error) => {
-        console.error('Service Worker registration failed:', error)
+        console.error('[MŌVE] SW registration failed:', error)
       })
 
-    // Listen for controller change
+    // Refresh page when new SW takes control
     let refreshing = false
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (refreshing) return
