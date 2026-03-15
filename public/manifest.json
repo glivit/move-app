@@ -1,6 +1,7 @@
 {
   "name": "MŌVE — Transform. Perform. Endure.",
   "short_name": "MŌVE",
+  "id": "/",
   "description": "Premium coaching platform by MŌVE, Knokke",
   "start_url": "/",
   "scope": "/",

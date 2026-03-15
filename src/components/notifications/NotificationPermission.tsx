@@ -1,96 +1,107 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Bell, BellOff, X } from 'lucide-react'
+import { Bell, X } from 'lucide-react'
+
+const DISMISS_KEY = 'move-push-dismissed-at'
+const DISMISS_DURATION = 24 * 60 * 60 * 1000 // 24 hours — then show again
 
 export function NotificationPermission() {
-  const [permission, setPermission] = useState<NotificationPermission | 'unsupported'>('default')
-  const [dismissed, setDismissed] = useState(false)
+  const [show, setShow] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [showBanner, setShowBanner] = useState(false)
 
   useEffect(() => {
-    // Check if push is supported
-    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
-      setPermission('unsupported')
+    // Must be in a PWA context or browser that supports push
+    if (
+      typeof window === 'undefined' ||
+      !('serviceWorker' in navigator) ||
+      !('PushManager' in window) ||
+      !('Notification' in window)
+    ) return
+
+    // Already granted — silently ensure subscription is saved
+    if (Notification.permission === 'granted') {
+      ensureSubscription()
       return
     }
 
-    setPermission(Notification.permission)
+    // Denied — can't do anything
+    if (Notification.permission === 'denied') return
 
-    // Show banner after a short delay if permission not yet granted
-    if (Notification.permission === 'default') {
-      const dismissed = localStorage.getItem('move-push-dismissed')
-      if (!dismissed) {
-        const timer = setTimeout(() => setShowBanner(true), 3000)
-        return () => clearTimeout(timer)
-      }
+    // Default — check if recently dismissed
+    const dismissedAt = localStorage.getItem(DISMISS_KEY)
+    if (dismissedAt) {
+      const elapsed = Date.now() - parseInt(dismissedAt, 10)
+      if (elapsed < DISMISS_DURATION) return // Still within dismiss window
+      localStorage.removeItem(DISMISS_KEY)
     }
+
+    // Show banner after 2 seconds
+    const timer = setTimeout(() => setShow(true), 2000)
+    return () => clearTimeout(timer)
   }, [])
 
-  const subscribe = async () => {
-    setLoading(true)
+  async function ensureSubscription() {
     try {
-      // Register service worker
-      const registration = await navigator.serviceWorker.register('/sw.js')
-      await navigator.serviceWorker.ready
-
-      // Request notification permission
-      const result = await Notification.requestPermission()
-      setPermission(result)
-
-      if (result !== 'granted') {
-        setLoading(false)
-        return
-      }
-
-      // Subscribe to push
       const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
-      if (!vapidKey) {
-        console.error('VAPID public key not configured')
-        setLoading(false)
-        return
+      if (!vapidKey) return
+
+      const registration = await navigator.serviceWorker.ready
+
+      // Check if already subscribed
+      let sub = await registration.pushManager.getSubscription()
+      if (!sub) {
+        sub = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(vapidKey) as BufferSource,
+        })
       }
 
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidKey) as BufferSource,
-      })
-
-      // Save subscription to server
-      const response = await fetch('/api/push', {
+      // Save to server (upsert — safe to call multiple times)
+      await fetch('/api/push', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subscription: subscription.toJSON() }),
+        body: JSON.stringify({ subscription: sub.toJSON() }),
       })
+    } catch (err) {
+      console.error('[Push] ensureSubscription failed:', err)
+    }
+  }
 
-      if (!response.ok) {
-        console.error('Failed to save subscription')
+  async function subscribe() {
+    setLoading(true)
+    try {
+      // Register SW if not already
+      await navigator.serviceWorker.register('/sw.js')
+      await navigator.serviceWorker.ready
+
+      // Request permission (must be from user gesture — this is a click handler)
+      const result = await Notification.requestPermission()
+      if (result !== 'granted') {
+        setShow(false)
+        return
       }
 
-      setShowBanner(false)
+      await ensureSubscription()
+      setShow(false)
     } catch (error) {
-      console.error('Push subscription failed:', error)
+      console.error('[Push] Subscribe failed:', error)
     } finally {
       setLoading(false)
     }
   }
 
-  const dismiss = () => {
-    setDismissed(true)
-    setShowBanner(false)
-    localStorage.setItem('move-push-dismissed', 'true')
+  function dismiss() {
+    setShow(false)
+    localStorage.setItem(DISMISS_KEY, Date.now().toString())
   }
 
-  // Don't show anything if unsupported, already granted, or denied
-  if (permission === 'unsupported' || permission === 'granted' || permission === 'denied' || !showBanner || dismissed) {
-    return null
-  }
+  if (!show) return null
 
   return (
-    <div className="fixed bottom-24 left-4 right-4 z-50 lg:bottom-8 lg:left-auto lg:right-8 lg:max-w-sm animate-in slide-in-from-bottom">
+    <div className="fixed bottom-24 left-4 right-4 z-50 lg:bottom-8 lg:left-auto lg:right-8 lg:max-w-sm">
       <div
-        className="rounded-2xl p-4 shadow-lg border"
+        className="rounded-2xl p-4 border"
         style={{
           backgroundColor: 'white',
           borderColor: '#F0F0ED',
@@ -110,32 +121,29 @@ export function NotificationPermission() {
               Meldingen inschakelen
             </p>
             <p className="text-xs mt-0.5" style={{ color: '#8E8E93' }}>
-              Ontvang herinneringen voor je training en berichten van je coach.
+              Ontvang berichten van je coach direct op je iPhone.
             </p>
 
             <div className="flex gap-2 mt-3">
               <button
                 onClick={subscribe}
                 disabled={loading}
-                className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold text-white transition-all"
-                style={{ backgroundColor: '#8B6914' }}
+                className="flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold text-white transition-all active:scale-[0.97]"
+                style={{ backgroundColor: '#8B6914', minHeight: '44px' }}
               >
                 {loading ? 'Bezig...' : 'Inschakelen'}
               </button>
               <button
                 onClick={dismiss}
-                className="py-2 px-3 rounded-xl text-xs font-semibold transition-all"
-                style={{ color: '#8E8E93', backgroundColor: '#FAFAFA' }}
+                className="py-2.5 px-3 rounded-xl text-xs font-semibold transition-all active:scale-[0.97]"
+                style={{ color: '#8E8E93', backgroundColor: '#FAFAFA', minHeight: '44px' }}
               >
                 Later
               </button>
             </div>
           </div>
 
-          <button
-            onClick={dismiss}
-            className="flex-shrink-0 p-1"
-          >
+          <button onClick={dismiss} className="flex-shrink-0 p-1">
             <X strokeWidth={1.5} className="w-4 h-4" style={{ color: '#C7C7CC' }} />
           </button>
         </div>
