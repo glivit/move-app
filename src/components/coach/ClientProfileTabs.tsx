@@ -488,7 +488,17 @@ export function ClientProfileTabs({
 
             {intakeForm && intakeForm.completed && (
               <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
-                <h3 className="text-[15px] font-semibold text-text-primary mb-4">Intake informatie</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-[15px] font-semibold text-text-primary">Intake informatie</h3>
+                  <Link
+                    href={`/coach/clients/${profile.id}/intake`}
+                    className="text-[13px] font-medium flex items-center gap-1 hover:opacity-70 transition-opacity"
+                    style={{ color: '#8B6914' }}
+                  >
+                    Volledig formulier
+                    <ArrowUpRight className="w-3.5 h-3.5" strokeWidth={2} />
+                  </Link>
+                </div>
                 <div className="space-y-4 text-[14px]">
                   {intakeForm.primary_goal && (
                     <div>
@@ -506,6 +516,26 @@ export function ClientProfileTabs({
                     <div>
                       <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Blessures / beperkingen</p>
                       <p className="mt-1 text-text-primary">{intakeForm.injuries_limitations}</p>
+                    </div>
+                  )}
+                  {(intakeForm as any).weight_kg && (
+                    <div className="flex gap-6">
+                      <div>
+                        <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Gewicht</p>
+                        <p className="mt-1 text-text-primary">{(intakeForm as any).weight_kg} kg</p>
+                      </div>
+                      {(intakeForm as any).height_cm && (
+                        <div>
+                          <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Lengte</p>
+                          <p className="mt-1 text-text-primary">{(intakeForm as any).height_cm} cm</p>
+                        </div>
+                      )}
+                      {(intakeForm as any).age && (
+                        <div>
+                          <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Leeftijd</p>
+                          <p className="mt-1 text-text-primary">{(intakeForm as any).age} jaar</p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
