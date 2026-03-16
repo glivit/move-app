@@ -13,6 +13,7 @@ import {
   Users,
   Link2,
   Unlink,
+  Trash2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { ExerciseSearchModal } from '@/components/coach/ExerciseSearchModal'
@@ -75,6 +76,8 @@ export default function ProgramEditorPage() {
   const [showExerciseModal, setShowExerciseModal] = useState(false)
   const [showAssignModal, setShowAssignModal] = useState(false)
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null)
+  const [confirmDeleteDay, setConfirmDeleteDay] = useState<string | null>(null)
+  const [deletingDay, setDeletingDay] = useState(false)
 
   const templateId = params.id
 
@@ -213,6 +216,50 @@ export default function ProgramEditorPage() {
       }
     } catch (error) {
       console.error('Failed to add day:', error)
+    }
+  }
+
+  const handleRemoveDay = async (dayId: string) => {
+    setDeletingDay(true)
+    try {
+      // First delete all exercises for this day
+      const { error: exError } = await supabase
+        .from('program_template_exercises')
+        .delete()
+        .eq('template_day_id', dayId)
+
+      if (exError) throw exError
+
+      // Then delete the day itself
+      const { error: dayError } = await supabase
+        .from('program_template_days')
+        .delete()
+        .eq('id', dayId)
+
+      if (dayError) throw dayError
+
+      const remainingDays = days.filter((d) => d.id !== dayId)
+      setDays(remainingDays)
+      setConfirmDeleteDay(null)
+
+      // Switch to first remaining day or null
+      if (activeDayId === dayId) {
+        setActiveDayId(remainingDays.length > 0 ? remainingDays[0].id : null)
+      }
+
+      // Update days_per_week on template
+      if (program) {
+        const newCount = remainingDays.length
+        setProgram({ ...program, days_per_week: newCount })
+        await supabase
+          .from('program_templates')
+          .update({ days_per_week: newCount })
+          .eq('id', templateId)
+      }
+    } catch (error) {
+      console.error('Failed to remove day:', error)
+    } finally {
+      setDeletingDay(false)
     }
   }
 
@@ -577,6 +624,43 @@ export default function ProgramEditorPage() {
                     className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#F0F0ED] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
                   />
                 </div>
+              </div>
+
+              {/* Delete Day */}
+              <div className="mt-5 pt-5 border-t border-[#F0F0ED]">
+                {confirmDeleteDay === activeDay.id ? (
+                  <div className="flex items-center gap-3">
+                    <p className="text-[13px] text-[#D14343] font-medium flex-1">
+                      &quot;{activeDay.name}&quot; verwijderen? Alle oefeningen worden ook verwijderd.
+                    </p>
+                    <button
+                      onClick={() => setConfirmDeleteDay(null)}
+                      className="px-3 py-1.5 rounded-lg text-[12px] font-medium border border-[#F0F0ED] text-[#8E8E93] hover:bg-[#FAFAFA] transition-colors"
+                    >
+                      Annuleren
+                    </button>
+                    <button
+                      onClick={() => handleRemoveDay(activeDay.id)}
+                      disabled={deletingDay}
+                      className="px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-[#D14343] text-white hover:bg-[#B83A3A] transition-colors disabled:opacity-50 flex items-center gap-1"
+                    >
+                      {deletingDay ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-3 h-3" />
+                      )}
+                      Verwijderen
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setConfirmDeleteDay(activeDay.id)}
+                    className="inline-flex items-center gap-1.5 text-[12px] font-medium text-[#D14343] hover:underline"
+                  >
+                    <Trash2 strokeWidth={1.5} className="w-3.5 h-3.5" />
+                    Dag verwijderen
+                  </button>
+                )}
               </div>
             </div>
 
