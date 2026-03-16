@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, Suspense } from 'react'
+import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { RestTimer } from '@/components/client/RestTimer'
@@ -56,6 +56,45 @@ interface WorkoutSession {
   started_at: string
 }
 
+// --- Auto-save helpers ---
+const STORAGE_KEY = 'move_active_workout'
+
+interface SavedWorkoutState {
+  sessionId: string
+  dayId: string
+  programId: string
+  sets: Record<string, SetData[]>
+  currentExerciseIndex: number
+  savedAt: number // timestamp
+}
+
+function saveWorkoutState(state: SavedWorkoutState) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+  } catch { /* storage full or unavailable */ }
+}
+
+function loadWorkoutState(dayId: string, programId: string): SavedWorkoutState | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return null
+    const saved: SavedWorkoutState = JSON.parse(raw)
+    // Must match same workout (same day + program) and be less than 4 hours old
+    if (saved.dayId === dayId && saved.programId === programId && (Date.now() - saved.savedAt) < 4 * 60 * 60 * 1000) {
+      return saved
+    }
+    // Stale or different workout — clean up
+    localStorage.removeItem(STORAGE_KEY)
+    return null
+  } catch {
+    return null
+  }
+}
+
+function clearWorkoutState() {
+  try { localStorage.removeItem(STORAGE_KEY) } catch { /* ok */ }
+}
+
 export default function ActiveWorkoutPageWrapper() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#8B6914] border-t-transparent rounded-full animate-spin" /></div>}>
@@ -85,7 +124,55 @@ function ActiveWorkoutPage() {
   const [slideDirection, setSlideDirection] = useState<'right' | 'left'>('right')
   const [prCelebration, setPrCelebration] = useState<string | null>(null) // exercise name for PR toast
 
-  // Load exercises and create workout session
+  // Ref to latest sets for auto-save (avoids stale closures in event listeners)
+  const setsRef = useRef(sets)
+  const sessionRef = useRef(session)
+  const exerciseIndexRef = useRef(currentExerciseIndex)
+  useEffect(() => { setsRef.current = sets }, [sets])
+  useEffect(() => { sessionRef.current = session }, [session])
+  useEffect(() => { exerciseIndexRef.current = currentExerciseIndex }, [currentExerciseIndex])
+
+  // --- Auto-save: persist state to localStorage on every set change ---
+  useEffect(() => {
+    if (!session || !dayId || !programId || Object.keys(sets).length === 0) return
+    saveWorkoutState({
+      sessionId: session.id,
+      dayId,
+      programId,
+      sets,
+      currentExerciseIndex,
+      savedAt: Date.now(),
+    })
+  }, [sets, currentExerciseIndex, session, dayId, programId])
+
+  // --- Auto-save on visibility change (app backgrounded) and beforeunload ---
+  useEffect(() => {
+    const persist = () => {
+      const s = sessionRef.current
+      if (!s || !dayId || !programId) return
+      saveWorkoutState({
+        sessionId: s.id,
+        dayId,
+        programId,
+        sets: setsRef.current,
+        currentExerciseIndex: exerciseIndexRef.current,
+        savedAt: Date.now(),
+      })
+    }
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') persist()
+    }
+
+    document.addEventListener('visibilitychange', handleVisibility)
+    window.addEventListener('beforeunload', persist)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility)
+      window.removeEventListener('beforeunload', persist)
+    }
+  }, [dayId, programId])
+
+  // Load exercises and create or resume workout session
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -118,10 +205,96 @@ function ActiveWorkoutPage() {
         if (exercisesData && exercisesData.length > 0) {
           setExercises(exercisesData as ProgramTemplateExercise[])
 
-          // Initialize sets for each exercise
-          const setsMap: Record<string, SetData[]> = {}
           const weightsMap: Record<string, number | null> = {}
+          for (const ex of exercisesData as ProgramTemplateExercise[]) {
+            weightsMap[ex.id] = apiLastWeights[ex.id] || ex.weight_suggestion || null
+          }
+          setLastWorkoutWeights(weightsMap)
 
+          // --- Try to restore from localStorage ---
+          const saved = loadWorkoutState(dayId, programId)
+
+          if (saved) {
+            // Verify the session still exists in DB and is not completed
+            const { data: existingSession } = await supabase
+              .from('workout_sessions')
+              .select('id, started_at, completed_at')
+              .eq('id', saved.sessionId)
+              .single()
+
+            if (existingSession && !existingSession.completed_at) {
+              // Restore saved state
+              setSession({ id: existingSession.id, started_at: existingSession.started_at })
+              setSets(saved.sets)
+              setCurrentExerciseIndex(saved.currentExerciseIndex)
+              return // skip creating new session
+            } else {
+              // Session was completed or deleted — clear stale data
+              clearWorkoutState()
+            }
+          }
+
+          // --- Also check DB for an incomplete session for this day (fallback) ---
+          const { data: dbSession } = await supabase
+            .from('workout_sessions')
+            .select('id, started_at')
+            .eq('client_id', authUser.id)
+            .eq('template_day_id', dayId)
+            .is('completed_at', null)
+            .order('started_at', { ascending: false })
+            .limit(1)
+            .single()
+
+          if (dbSession) {
+            // Found an incomplete session — resume it, reload completed sets from DB
+            setSession({ id: dbSession.id, started_at: dbSession.started_at })
+
+            const { data: dbSets } = await supabase
+              .from('workout_sets')
+              .select('*')
+              .eq('workout_session_id', dbSession.id)
+
+            // Build sets map: start with fresh template, then overlay DB completed sets
+            const setsMap: Record<string, SetData[]> = {}
+            for (const ex of exercisesData as ProgramTemplateExercise[]) {
+              const setsList: SetData[] = []
+              for (let i = 0; i < ex.sets; i++) {
+                // Check if this set was already completed in DB
+                const dbSet = dbSets?.find(
+                  (s: any) => s.exercise_id === ex.exercise_id && s.set_number === i + 1
+                )
+                if (dbSet) {
+                  setsList.push({
+                    id: dbSet.id,
+                    set_number: i + 1,
+                    prescribed_reps: dbSet.prescribed_reps || ex.reps_min,
+                    actual_reps: dbSet.actual_reps,
+                    weight_kg: dbSet.weight_kg,
+                    is_warmup: dbSet.is_warmup || false,
+                    completed: dbSet.completed || false,
+                    is_pr: dbSet.is_pr || false,
+                  })
+                } else {
+                  setsList.push({
+                    id: `temp-${ex.id}-${i}`,
+                    set_number: i + 1,
+                    prescribed_reps: ex.reps_min,
+                    actual_reps: null,
+                    weight_kg: null,
+                    is_warmup: false,
+                    completed: false,
+                    is_pr: false,
+                  })
+                }
+              }
+              setsMap[ex.id] = setsList
+            }
+            setSets(setsMap)
+            return // resumed from DB
+          }
+
+          // --- No existing session: create fresh ---
+          const setsMap: Record<string, SetData[]> = {}
           for (const ex of exercisesData as ProgramTemplateExercise[]) {
             const setsList: SetData[] = []
             for (let i = 0; i < ex.sets; i++) {
@@ -137,14 +310,10 @@ function ActiveWorkoutPage() {
               })
             }
             setsMap[ex.id] = setsList
-
-            weightsMap[ex.id] = apiLastWeights[ex.id] || ex.weight_suggestion || null
           }
-
           setSets(setsMap)
-          setLastWorkoutWeights(weightsMap)
 
-          // Create workout session
+          // Create new workout session
           const { data: newSession } = await supabase
             .from('workout_sessions')
             .insert({
@@ -279,6 +448,7 @@ function ActiveWorkoutPage() {
   }
 
   const confirmClose = () => {
+    clearWorkoutState()
     router.push('/client/workout')
   }
 
@@ -588,7 +758,7 @@ function ActiveWorkoutPage() {
             {allSetsCompleted ? (
               currentExerciseIndex === exercises.length - 1 ? (
                 <button
-                  onClick={() => router.push(`/client/workout/complete?sessionId=${session?.id}`)}
+                  onClick={() => { clearWorkoutState(); router.push(`/client/workout/complete?sessionId=${session?.id}`) }}
                   className="flex-1 py-3 px-4 rounded-xl bg-[#34C759] text-white font-semibold flex items-center justify-center gap-2 hover:bg-[#2DB84E] transition-colors shadow-[0_4px_16px_rgba(52,199,89,0.3)]"
                 >
                   Workout afronden
