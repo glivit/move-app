@@ -295,7 +295,7 @@ export default function ClientNutritionPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA]">
+      <div className="min-h-screen bg-[#EEEBE3]">
         <div className="max-w-lg mx-auto px-5 py-8">
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#1A1917] border-t-transparent" />
@@ -307,17 +307,17 @@ export default function ClientNutritionPage() {
 
   if (!plan) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA]">
+      <div className="min-h-screen bg-[#EEEBE3]">
         <div className="max-w-lg mx-auto px-5 py-8 pb-28">
-          <h1 className="text-[28px] font-[family-name:var(--font-display)] text-[#1A1A18] mb-2">
+          <h1 className="text-[28px] font-[family-name:var(--font-display)] text-[#1A1917] mb-2">
             Voeding
           </h1>
-          <div className="bg-white rounded-2xl p-10 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center mt-6">
+          <div className="bg-white p-10 border border-[#E8E4DC] text-center mt-6">
             <span className="text-[40px] block mb-3">🍎</span>
-            <h2 className="text-[17px] font-semibold text-[#1A1A18] mb-2">
+            <h2 className="text-[17px] font-semibold text-[#1A1917] mb-2">
               Nog geen voedingsplan
             </h2>
-            <p className="text-[13px] text-[#8E8E93]">
+            <p className="text-[13px] text-[#A09D96]">
               Je coach maakt binnenkort een voedingsplan voor je aan.
             </p>
           </div>
@@ -327,35 +327,35 @@ export default function ClientNutritionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA]">
+    <div className="min-h-screen bg-[#EEEBE3]">
       <div className="max-w-lg mx-auto px-5 py-8 pb-28">
         {/* Header */}
-        <h1 className="text-[28px] font-[family-name:var(--font-display)] text-[#1A1A18] mb-1">
+        <h1 className="text-[28px] font-[family-name:var(--font-display)] text-[#1A1917] mb-1">
           Voeding
         </h1>
-        <p className="text-[13px] text-[#8E8E93] mb-6">{plan.title}</p>
+        <p className="text-[13px] text-[#A09D96] mb-6">{plan.title}</p>
 
         {/* Date Navigator */}
         <div className="flex items-center justify-between mb-6">
           <button
             onClick={() => navigateDate(-1)}
-            className="p-2 rounded-xl hover:bg-white transition-colors"
+            className="p-2 hover:bg-white transition-colors"
           >
-            <ChevronLeft strokeWidth={1.5} className="w-5 h-5 text-[#8E8E93]" />
+            <ChevronLeft strokeWidth={1.5} className="w-5 h-5 text-[#A09D96]" />
           </button>
-          <p className="text-[15px] font-semibold text-[#1A1A18]">
+          <p className="text-[15px] font-semibold text-[#1A1917]">
             {formatDate(selectedDate)}
           </p>
           <button
             onClick={() => navigateDate(1)}
-            className="p-2 rounded-xl hover:bg-white transition-colors"
+            className="p-2 hover:bg-white transition-colors"
           >
-            <ChevronRight strokeWidth={1.5} className="w-5 h-5 text-[#8E8E93]" />
+            <ChevronRight strokeWidth={1.5} className="w-5 h-5 text-[#A09D96]" />
           </button>
         </div>
 
         {/* Progress Ring + Macros */}
-        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] mb-4">
+        <div className="bg-white p-5 border border-[#E8E4DC] mb-4">
           <div className="flex items-center gap-5">
             {/* Completion circle */}
             <div className="relative w-20 h-20 shrink-0">
@@ -374,7 +374,7 @@ export default function ClientNutritionPage() {
                 {completionPct === 100 ? (
                   <Check strokeWidth={2.5} className="w-6 h-6 text-[#34C759]" />
                 ) : (
-                  <span className="text-[15px] font-bold text-[#1A1A18]">{completionPct}%</span>
+                  <span className="text-[15px] font-bold text-[#1A1917]">{completionPct}%</span>
                 )}
               </div>
             </div>
@@ -388,17 +388,17 @@ export default function ClientNutritionPage() {
                 { label: 'Vet', actual: actualFat, target: targetFat, color: '#AF52DE', unit: 'g' },
               ].map(({ label, actual, target, color, unit }) => (
                 <div key={label} className="flex items-center gap-2">
-                  <span className="text-[11px] text-[#8E8E93] w-10 shrink-0">{label}</span>
-                  <div className="flex-1 h-2 bg-[#E8E4DC] rounded-full overflow-hidden">
+                  <span className="text-[11px] text-[#A09D96] w-10 shrink-0">{label}</span>
+                  <div className="flex-1 h-2 bg-[#E8E4DC] overflow-hidden">
                     <div
-                      className="h-full rounded-full transition-all duration-500"
+                      className="h-full transition-all duration-500"
                       style={{
                         width: `${Math.min((actual / (target || 1)) * 100, 100)}%`,
                         backgroundColor: color,
                       }}
                     />
                   </div>
-                  <span className="text-[11px] font-medium text-[#1A1A18] w-20 text-right shrink-0">
+                  <span className="text-[11px] font-medium text-[#1A1917] w-20 text-right shrink-0">
                     {actual}/{target}{unit || ''}
                   </span>
                 </div>
@@ -422,7 +422,7 @@ export default function ClientNutritionPage() {
             return (
               <div
                 key={meal.id}
-                className={`rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border overflow-hidden transition-all ${
+                className={`border overflow-hidden transition-all ${
                   isCompleted
                     ? 'bg-[#34C759]/5 border-[#34C759]/20'
                     : 'bg-white border-[#E8E4DC]'
@@ -434,10 +434,10 @@ export default function ClientNutritionPage() {
                   <button
                     onClick={() => toggleMealComplete(meal)}
                     disabled={isSaving}
-                    className={`w-8 h-8 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                    className={`w-8 h-8 border-2 flex items-center justify-center shrink-0 transition-all ${
                       isCompleted
                         ? 'bg-[#34C759] border-[#34C759]'
-                        : 'border-[#C7C7CC] hover:border-[#1A1917]'
+                        : 'border-[#C5C2BC] hover:border-[#1A1917]'
                     } ${isSaving ? 'opacity-50' : ''}`}
                   >
                     {isCompleted && <Check strokeWidth={2.5} className="w-4 h-4 text-white" />}
@@ -453,7 +453,7 @@ export default function ClientNutritionPage() {
                   >
                     <div className="flex items-center gap-2">
                       <p className={`text-[15px] font-medium truncate ${
-                        isCompleted ? 'text-[#34C759] line-through' : 'text-[#1A1A18]'
+                        isCompleted ? 'text-[#34C759] line-through' : 'text-[#1A1917]'
                       }`}>
                         {meal.name}
                       </p>
@@ -461,7 +461,7 @@ export default function ClientNutritionPage() {
                         <MessageSquare strokeWidth={1.5} className="w-3.5 h-3.5 text-[#1A1917] shrink-0" />
                       )}
                     </div>
-                    <p className="text-[12px] text-[#C7C7CC] mt-0.5">
+                    <p className="text-[12px] text-[#C5C2BC] mt-0.5">
                       {meal.time} · {mealCal} kcal · {foods.length} items
                     </p>
                   </button>
@@ -472,9 +472,9 @@ export default function ClientNutritionPage() {
                     className="p-1"
                   >
                     {isExpanded ? (
-                      <ChevronUp strokeWidth={1.5} className="w-4 h-4 text-[#C7C7CC]" />
+                      <ChevronUp strokeWidth={1.5} className="w-4 h-4 text-[#C5C2BC]" />
                     ) : (
-                      <ChevronDown strokeWidth={1.5} className="w-4 h-4 text-[#C7C7CC]" />
+                      <ChevronDown strokeWidth={1.5} className="w-4 h-4 text-[#C5C2BC]" />
                     )}
                   </button>
                 </div>
@@ -486,7 +486,7 @@ export default function ClientNutritionPage() {
                     <div className="divide-y divide-[#E8E4DC]">
                       {foods.map((food) => (
                         <div key={food.id} className="px-4 py-2.5 flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-[#F5F5F3] flex items-center justify-center overflow-hidden shrink-0">
+                          <div className="w-8 h-8 bg-[#F5F5F3] flex items-center justify-center overflow-hidden shrink-0">
                             {food.image ? (
                               <img src={food.image} alt="" className="w-full h-full object-cover" />
                             ) : (
@@ -494,10 +494,10 @@ export default function ClientNutritionPage() {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-[13px] font-medium text-[#1A1A18] truncate">{food.name}</p>
-                            <p className="text-[11px] text-[#C7C7CC]">{food.grams}g</p>
+                            <p className="text-[13px] font-medium text-[#1A1917] truncate">{food.name}</p>
+                            <p className="text-[11px] text-[#C5C2BC]">{food.grams}g</p>
                           </div>
-                          <div className="text-right text-[11px] text-[#8E8E93] shrink-0">
+                          <div className="text-right text-[11px] text-[#A09D96] shrink-0">
                             <span className="text-[#FF9500] font-medium">{calcMacro(food, 'calories')}</span> kcal
                           </div>
                         </div>
@@ -514,18 +514,18 @@ export default function ClientNutritionPage() {
                             placeholder="Aanpassing of opmerking... bijv. 'Vervangen door cottage cheese'"
                             rows={2}
                             autoFocus
-                            className="w-full px-3 py-2 rounded-xl border border-[#E8E4DC] text-[13px] text-[#1A1A18] bg-white placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917] resize-none"
+                            className="w-full px-3 py-2 border border-[#E8E4DC] text-[13px] text-[#1A1917] bg-white placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none"
                           />
                           <div className="flex gap-2 justify-end">
                             <button
                               onClick={() => setEditingNotes(null)}
-                              className="px-3 py-1.5 rounded-lg text-[12px] text-[#8E8E93]"
+                              className="px-3 py-1.5 text-[12px] text-[#A09D96]"
                             >
                               Annuleer
                             </button>
                             <button
                               onClick={() => saveNotes(meal.id)}
-                              className="px-3 py-1.5 rounded-lg bg-[#1A1917] text-white text-[12px] font-medium"
+                              className="px-3 py-1.5 bg-[#1A1917] text-white text-[12px] font-medium"
                             >
                               Opslaan
                             </button>
@@ -537,7 +537,7 @@ export default function ClientNutritionPage() {
                             setNoteText(log?.client_notes || '')
                             setEditingNotes(meal.id)
                           }}
-                          className="flex items-center gap-2 text-[12px] text-[#8E8E93] hover:text-[#1A1917] transition-colors"
+                          className="flex items-center gap-2 text-[12px] text-[#A09D96] hover:text-[#1A1917] transition-colors"
                         >
                           <Pencil strokeWidth={1.5} className="w-3.5 h-3.5" />
                           {hasNotes ? (
@@ -558,29 +558,29 @@ export default function ClientNutritionPage() {
         {/* Daily Summary Panel */}
         <button
           onClick={() => setShowDailyPanel(!showDailyPanel)}
-          className="w-full bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] flex items-center justify-between mb-4"
+          className="w-full bg-white p-4 border border-[#E8E4DC] flex items-center justify-between mb-4"
         >
           <div className="flex items-center gap-3">
             <span className="text-[20px]">📝</span>
             <div className="text-left">
-              <p className="text-[14px] font-medium text-[#1A1A18]">Dagnotitie &amp; gevoel</p>
-              <p className="text-[12px] text-[#C7C7CC]">
+              <p className="text-[14px] font-medium text-[#1A1917]">Dagnotitie &amp; gevoel</p>
+              <p className="text-[12px] text-[#C5C2BC]">
                 {mood ? MOODS.find(m => m.key === mood)?.emoji : ''} {dailyNote ? dailyNote.slice(0, 40) + (dailyNote.length > 40 ? '...' : '') : 'Hoe ging je dag?'}
               </p>
             </div>
           </div>
           {showDailyPanel ? (
-            <ChevronUp strokeWidth={1.5} className="w-4 h-4 text-[#C7C7CC]" />
+            <ChevronUp strokeWidth={1.5} className="w-4 h-4 text-[#C5C2BC]" />
           ) : (
-            <ChevronDown strokeWidth={1.5} className="w-4 h-4 text-[#C7C7CC]" />
+            <ChevronDown strokeWidth={1.5} className="w-4 h-4 text-[#C5C2BC]" />
           )}
         </button>
 
         {showDailyPanel && (
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] mb-4 space-y-5">
+          <div className="bg-white p-5 border border-[#E8E4DC] mb-4 space-y-5">
             {/* Mood */}
             <div>
-              <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-2">
+              <p className="text-label text-[#A09D96] uppercase tracking-[0.12em] mb-2">
                 Hoe voel je je vandaag?
               </p>
               <div className="flex gap-2">
@@ -588,14 +588,14 @@ export default function ClientNutritionPage() {
                   <button
                     key={m.key}
                     onClick={() => { setMood(m.key); setTimeout(saveDailySummary, 100) }}
-                    className={`flex-1 py-2.5 rounded-xl text-center transition-all border ${
+                    className={`flex-1 py-2.5 text-center transition-all border ${
                       mood === m.key
                         ? 'border-[#1A1917] bg-[#1A1917]/5'
-                        : 'border-[#E8E4DC] hover:border-[#C7C7CC]'
+                        : 'border-[#E8E4DC] hover:border-[#C5C2BC]'
                     }`}
                   >
                     <span className="text-[20px] block">{m.emoji}</span>
-                    <span className="text-[10px] text-[#8E8E93] mt-0.5 block">{m.label}</span>
+                    <span className="text-[10px] text-[#A09D96] mt-0.5 block">{m.label}</span>
                   </button>
                 ))}
               </div>
@@ -603,7 +603,7 @@ export default function ClientNutritionPage() {
 
             {/* Water */}
             <div>
-              <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-2">
+              <p className="text-label text-[#A09D96] uppercase tracking-[0.12em] mb-2">
                 Water (liter)
               </p>
               <div className="flex items-center gap-2">
@@ -611,10 +611,10 @@ export default function ClientNutritionPage() {
                   <button
                     key={l}
                     onClick={() => { setWater(l); setTimeout(saveDailySummary, 100) }}
-                    className={`flex-1 py-2 rounded-xl text-center text-[13px] font-medium transition-all border ${
+                    className={`flex-1 py-2 text-center text-[13px] font-medium uppercase tracking-wider transition-all border ${
                       water === l
                         ? 'border-[#007AFF] bg-[#007AFF]/5 text-[#007AFF]'
-                        : 'border-[#E8E4DC] text-[#8E8E93] hover:border-[#C7C7CC]'
+                        : 'border-[#E8E4DC] text-[#A09D96] hover:border-[#C5C2BC]'
                     }`}
                   >
                     {l}L
@@ -625,7 +625,7 @@ export default function ClientNutritionPage() {
 
             {/* Daily note */}
             <div>
-              <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-2">
+              <p className="text-label text-[#A09D96] uppercase tracking-[0.12em] mb-2">
                 Dagnotitie voor je coach
               </p>
               <textarea
@@ -634,7 +634,7 @@ export default function ClientNutritionPage() {
                 onBlur={saveDailySummary}
                 placeholder="Hoe ging het vandaag? Honger gehad? Iets vervangen?"
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl border border-[#E8E4DC] text-[13px] text-[#1A1A18] bg-white placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917] resize-none"
+                className="w-full px-4 py-3 border border-[#E8E4DC] text-[13px] text-[#1A1917] bg-white placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none"
               />
             </div>
           </div>
@@ -642,9 +642,9 @@ export default function ClientNutritionPage() {
 
         {/* Guidelines reminder */}
         {plan.guidelines && (
-          <div className="bg-[#1A1917]/5 rounded-2xl p-4 border border-[#1A1917]/10">
+          <div className="bg-[#1A1917]/5 p-4 border border-[#1A1917]/10">
             <p className="text-[12px] text-[#1A1917] font-medium mb-1">Richtlijnen van je coach</p>
-            <p className="text-[12px] text-[#8E8E93] leading-relaxed whitespace-pre-wrap">
+            <p className="text-[12px] text-[#A09D96] leading-relaxed whitespace-pre-wrap">
               {plan.guidelines}
             </p>
           </div>

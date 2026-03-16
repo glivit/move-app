@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import { ChevronRight, AlertCircle, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react'
+import { ArrowRight, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -43,7 +43,11 @@ interface ExerciseGroup {
 
 export default function WorkoutCompletePageWrapper() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#1A1917] border-t-transparent rounded-full animate-spin" /></div>}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#EEEBE3] flex items-center justify-center">
+        <div className="w-6 h-6 border-[1.5px] border-[#CCC7BC] border-t-[#1A1917] rounded-full animate-spin" />
+      </div>
+    }>
       <WorkoutCompletePage />
     </Suspense>
   )
@@ -64,9 +68,9 @@ function WorkoutCompletePage() {
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
-  // ─── Confetti (hook BEFORE any conditional returns) ───────
+  // ─── Confetti ───────
   const spawnConfetti = useCallback(() => {
-    const colors = ['#FF9500', '#1A1917', '#34C759', '#007AFF', '#FF3B30', '#AF52DE', '#FFCC00']
+    const colors = ['#1A1917', '#E8E4DC', '#34C759', '#007AFF', '#FFD700', '#AF52DE', '#FF9500']
     const container = document.body
     for (let i = 0; i < 40; i++) {
       const el = document.createElement('div')
@@ -75,7 +79,7 @@ function WorkoutCompletePage() {
       el.style.width = `${6 + Math.random() * 8}px`
       el.style.height = `${6 + Math.random() * 8}px`
       el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
-      el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px'
+      el.style.borderRadius = '0'
       el.style.animationDelay = `${Math.random() * 1.5}s`
       el.style.animationDuration = `${2 + Math.random() * 2}s`
       container.appendChild(el)
@@ -86,13 +90,8 @@ function WorkoutCompletePage() {
   useEffect(() => {
     const loadSession = async () => {
       try {
-        if (!sessionId) {
-          router.push('/client/workout')
-          return
-        }
-
+        if (!sessionId) { router.push('/client/workout'); return }
         const supabase = createClient()
-
         const { data: sessionData } = await supabase
           .from('workout_sessions')
           .select('*, workout_sets(*, exercises(id, name, name_nl))')
@@ -102,8 +101,6 @@ function WorkoutCompletePage() {
         if (sessionData) {
           const sd = sessionData as unknown as WorkoutSessionComplete
           setSession(sd)
-
-          // Group sets by exercise
           const groups: Record<string, ExerciseGroup> = {}
           for (const set of sd.workout_sets || []) {
             const exId = set.exercise_id
@@ -126,11 +123,10 @@ function WorkoutCompletePage() {
         setLoading(false)
       }
     }
-
     loadSession()
   }, [sessionId, router])
 
-  // Trigger confetti when PRs detected (hook BEFORE conditional returns)
+  // Trigger confetti when PRs detected
   const prsCount = session?.workout_sets?.filter((s) => s.is_pr).length || 0
   useEffect(() => {
     if (prsCount > 0) {
@@ -156,16 +152,13 @@ function WorkoutCompletePage() {
 
   const handleComplete = async () => {
     if (!session) return
-
     try {
       setSaving(true)
       const supabase = createClient()
-
       const startTime = new Date(session.started_at)
       const endTime = new Date()
       const durationSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000)
 
-      // Update session with feedback
       await supabase
         .from('workout_sessions')
         .update({
@@ -178,24 +171,16 @@ function WorkoutCompletePage() {
         })
         .eq('id', sessionId)
 
-      // Update pain flags per exercise
       const painUpdates = exerciseGroups
         .filter(g => g.painFlag)
         .map(g =>
           supabase
             .from('workout_sets')
-            .update({
-              pain_flag: true,
-              pain_notes: g.painNotes || null,
-            })
+            .update({ pain_flag: true, pain_notes: g.painNotes || null })
             .eq('workout_session_id', sessionId)
             .eq('exercise_id', g.exerciseId)
         )
-
-      if (painUpdates.length > 0) {
-        await Promise.all(painUpdates)
-      }
-
+      if (painUpdates.length > 0) await Promise.all(painUpdates)
       router.push('/client/workout')
     } catch (error) {
       console.error('Error completing workout:', error)
@@ -203,23 +188,20 @@ function WorkoutCompletePage() {
     }
   }
 
-  // ─── Loading / Empty states ─────────────────────────────
+  // ─── Loading / Empty ─────────────────────────────────────
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
-        <div className="animate-pulse">
-          <div className="w-32 h-32 bg-[#E8E4DC] rounded-2xl mb-4" />
-          <div className="w-24 h-4 bg-[#E8E4DC] rounded mx-auto" />
-        </div>
+      <div className="min-h-screen bg-[#EEEBE3] flex items-center justify-center">
+        <div className="w-6 h-6 border-[1.5px] border-[#CCC7BC] border-t-[#1A1917] rounded-full animate-spin" />
       </div>
     )
   }
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
-        <p className="text-[#1A1A18]">Sessie niet gevonden</p>
+      <div className="min-h-screen bg-[#EEEBE3] flex items-center justify-center">
+        <p className="text-[#A09D96] text-[14px]">Sessie niet gevonden</p>
       </div>
     )
   }
@@ -229,30 +211,27 @@ function WorkoutCompletePage() {
   const workoutSets = session.workout_sets || []
   const totalSets = workoutSets.length
   const totalVolume = workoutSets.reduce((sum, set) => {
-    const weight = set.weight_kg || 0
-    const reps = set.actual_reps || 0
-    return sum + weight * reps
+    return sum + (set.weight_kg || 0) * (set.actual_reps || 0)
   }, 0)
 
   const startTime = new Date(session.started_at)
   const endTime = new Date()
   const minutes = Math.floor((endTime.getTime() - startTime.getTime()) / 1000 / 60)
-  const secs = Math.floor(((endTime.getTime() - startTime.getTime()) / 1000) % 60)
 
   const moodEmojis = [
-    { value: 1, emoji: '😫', label: 'Verschrikkelijk' },
+    { value: 1, emoji: '😫', label: 'Slecht' },
     { value: 2, emoji: '😐', label: 'Matig' },
     { value: 3, emoji: '😊', label: 'Goed' },
     { value: 4, emoji: '💪', label: 'Sterk' },
-    { value: 5, emoji: '🔥', label: 'Geweldig' },
+    { value: 5, emoji: '🔥', label: 'Top' },
   ]
 
   const difficultyOptions = [
-    { value: 1, label: 'Te makkelijk', color: '#007AFF', bg: '#007AFF' },
-    { value: 2, label: 'Makkelijk', color: '#34C759', bg: '#34C759' },
-    { value: 3, label: 'Perfect', color: '#1A1917', bg: '#1A1917' },
-    { value: 4, label: 'Zwaar', color: '#FF9500', bg: '#FF9500' },
-    { value: 5, label: 'Te zwaar', color: '#FF3B30', bg: '#FF3B30' },
+    { value: 1, label: 'Makkelijk', color: '#3D8B5C' },
+    { value: 2, label: 'Goed', color: '#1A1917' },
+    { value: 3, label: 'Perfect', color: '#1A1917' },
+    { value: 4, label: 'Zwaar', color: '#C47D15' },
+    { value: 5, label: 'Te zwaar', color: '#FF3B30' },
   ]
 
   const painCount = exerciseGroups.filter(g => g.painFlag).length
@@ -260,114 +239,99 @@ function WorkoutCompletePage() {
   // ─── Render ─────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA]">
-      {/* Celebratory header */}
-      <header className="bg-white border-b border-[#E8E4DC] pt-6">
-        <div className="max-w-2xl mx-auto px-4 text-center pb-8">
-          <div className="text-6xl mb-4">🎉</div>
-          <h1 className="font-display text-3xl font-semibold text-[#1A1A18]">
-            Workout Klaar!
-          </h1>
-          <p className="text-[#8E8E93] text-[14px] mt-2">
-            Geweldige prestatie!
-          </p>
-        </div>
-      </header>
+    <div className="min-h-screen bg-[#EEEBE3]">
 
-      <main className="max-w-2xl mx-auto px-4 py-6 pb-32">
-        {/* Stats grid */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
-            <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-2">Duur</p>
-            <p className="text-3xl font-bold text-[#1A1A18]">{minutes}m {secs}s</p>
-          </div>
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
-            <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-2">Sets</p>
-            <p className="text-3xl font-bold text-[#1A1A18]">{totalSets}</p>
-          </div>
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] col-span-2">
-            <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-2">Totaal volume</p>
-            <p className="text-3xl font-bold text-[#1A1A18]">{totalVolume.toLocaleString('nl-BE')} kg</p>
-          </div>
-          {prsCount > 0 && (
-            <div className="bg-[#FF9500]/10 rounded-2xl p-5 border border-[#FF9500]/20 col-span-2">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">🏆</span>
-                <div>
-                  <p className="text-[12px] text-[#FF9500] uppercase font-medium tracking-wide">Persoonlijke records</p>
-                  <p className="text-[17px] font-semibold text-[#FF9500] mt-0.5">{prsCount} {prsCount === 1 ? 'PR' : 'PRs'} bereikt!</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Section: Mood */}
-        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] mb-4">
-          <p className="text-[13px] text-[#8E8E93] uppercase font-medium tracking-wide mb-4">
-            Hoe voelde je je?
+      {/* ═══ HEADER — editorial celebration ═══════════════ */}
+      <div className="pt-16 pb-10 text-center">
+        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#A09D96] mb-4">Voltooid</p>
+        <h1
+          className="text-[40px] font-semibold text-[#1A1917] tracking-[-0.03em] leading-none"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          Goed gedaan
+        </h1>
+        {prsCount > 0 && (
+          <p className="text-[14px] text-[#1A1917] mt-3 font-medium">
+            🏆 {prsCount} {prsCount === 1 ? 'nieuw record' : 'nieuwe records'}
           </p>
-          <div className="flex justify-between gap-2">
+        )}
+      </div>
+
+      {/* ═══ STATS — editorial numbers ═══════════════════ */}
+      <div className="flex justify-center gap-10 pb-8 border-b border-[#E8E4DC]">
+        <div className="text-center">
+          <p className="text-[28px] font-bold text-[#1A1917] tabular-nums">{minutes}</p>
+          <p className="text-label mt-1">Minuten</p>
+        </div>
+        <div className="text-center">
+          <p className="text-[28px] font-bold text-[#1A1917] tabular-nums">{totalSets}</p>
+          <p className="text-label mt-1">Sets</p>
+        </div>
+        <div className="text-center">
+          <p className="text-[28px] font-bold text-[#1A1917] tabular-nums">
+            {totalVolume > 1000 ? `${(totalVolume / 1000).toFixed(1)}t` : `${totalVolume}`}
+          </p>
+          <p className="text-label mt-1">Volume</p>
+        </div>
+      </div>
+
+      <main className="max-w-lg mx-auto px-4 py-8 pb-32 space-y-6">
+
+        {/* ═══ GEVOEL — editorial mood picker ══════════════ */}
+        <div>
+          <p className="text-label mb-4">Hoe voelde je je?</p>
+          <div className="flex gap-2">
             {moodEmojis.map((mood) => (
               <button
                 key={mood.value}
                 onClick={() => setMoodRating(mood.value)}
-                className={`flex-1 aspect-square rounded-xl flex flex-col items-center justify-center gap-1 transition-all border-2 ${
+                className={`flex-1 py-4 flex flex-col items-center gap-1.5 transition-all border ${
                   moodRating === mood.value
-                    ? 'border-[#1A1917] bg-[#EDEAE4]'
-                    : 'border-transparent hover:bg-[#E8E4DC]'
+                    ? 'border-[#1A1917] bg-white'
+                    : 'border-[#E8E4DC] bg-white/50 hover:bg-white'
                 }`}
               >
-                <span className="text-2xl">{mood.emoji}</span>
-                <span className="text-[10px] text-[#8E8E93] font-medium">{mood.label}</span>
+                <span className="text-[24px]">{mood.emoji}</span>
+                <span className="text-[10px] text-[#A09D96] font-medium uppercase tracking-[0.04em]">{mood.label}</span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Section: Difficulty */}
-        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] mb-4">
-          <p className="text-[13px] text-[#8E8E93] uppercase font-medium tracking-wide mb-4">
-            Moeilijkheidsgraad
-          </p>
+        {/* ═══ MOEILIJKHEID ════════════════════════════════ */}
+        <div>
+          <p className="text-label mb-4">Moeilijkheidsgraad</p>
           <div className="flex gap-2">
             {difficultyOptions.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => setDifficultyRating(opt.value)}
-                className={`flex-1 py-2.5 px-1 rounded-xl text-center transition-all border-2 ${
+                className={`flex-1 py-3 text-center transition-all border text-[12px] font-semibold uppercase tracking-[0.04em] ${
                   difficultyRating === opt.value
-                    ? 'text-white'
-                    : 'border-transparent bg-[#E8E4DC] text-[#8E8E93] hover:bg-[#E8E8E5]'
+                    ? 'border-[#1A1917] bg-[#1A1917] text-white'
+                    : 'border-[#E8E4DC] bg-white/50 text-[#A09D96] hover:bg-white'
                 }`}
-                style={
-                  difficultyRating === opt.value
-                    ? { backgroundColor: opt.bg, borderColor: opt.bg }
-                    : undefined
-                }
               >
-                <span className="text-[12px] font-semibold leading-tight">{opt.label}</span>
+                {opt.label}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Section: Pain / Discomfort per exercise */}
+        {/* ═══ PIJN PER OEFENING ══════════════════════════ */}
         {exerciseGroups.length > 0 && (
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] mb-4">
+          <div>
             <div className="flex items-center justify-between mb-4">
-              <p className="text-[13px] text-[#8E8E93] uppercase font-medium tracking-wide">
-                Pijn of ongemak?
-              </p>
+              <p className="text-label">Pijn of ongemak?</p>
               {painCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full bg-[#FF3B30]/10 text-[#FF3B30] text-[11px] font-semibold">
+                <span className="text-[11px] font-semibold text-[#FF3B30]">
                   {painCount} oefening{painCount !== 1 ? 'en' : ''}
                 </span>
               )}
             </div>
-            <div className="space-y-2">
-              {exerciseGroups.map((group) => (
-                <div key={group.exerciseId} className="rounded-xl border border-[#E8E4DC] overflow-hidden">
+            <div className="bg-white border border-[#E8E4DC]">
+              {exerciseGroups.map((group, i) => (
+                <div key={group.exerciseId} className={i > 0 ? 'border-t border-[#F0EDE8]' : ''}>
                   <button
                     onClick={() => {
                       togglePain(group.exerciseId)
@@ -377,38 +341,38 @@ function WorkoutCompletePage() {
                         setExpandedExercise(null)
                       }
                     }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${
-                      group.painFlag ? 'bg-[#FF3B30]/5' : 'hover:bg-[#E8E4DC]/50'
+                    className={`w-full flex items-center gap-3 px-5 py-3.5 transition-colors ${
+                      group.painFlag ? 'bg-[#FF3B30]/5' : 'hover:bg-[#FAF8F3]'
                     }`}
                   >
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                      group.painFlag ? 'border-[#FF3B30] bg-[#FF3B30]' : 'border-[#C7C7CC]'
+                    <div className={`w-5 h-5 border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                      group.painFlag ? 'border-[#FF3B30] bg-[#FF3B30]' : 'border-[#DDD9D0]'
                     }`}>
                       {group.painFlag && (
-                        <AlertTriangle size={12} strokeWidth={2.5} className="text-white" />
+                        <AlertTriangle size={11} strokeWidth={2.5} className="text-white" />
                       )}
                     </div>
                     <span className={`text-[14px] font-medium flex-1 text-left ${
-                      group.painFlag ? 'text-[#FF3B30]' : 'text-[#1A1A18]'
+                      group.painFlag ? 'text-[#FF3B30]' : 'text-[#1A1917]'
                     }`}>
                       {group.name}
                     </span>
-                    <span className="text-[12px] text-[#C7C7CC]">
+                    <span className="text-[12px] text-[#C5C2BC]">
                       {group.sets.length} sets
                     </span>
-                    {group.painFlag ? (
+                    {group.painFlag && (
                       expandedExercise === group.exerciseId
-                        ? <ChevronUp size={16} className="text-[#FF3B30]" />
-                        : <ChevronDown size={16} className="text-[#FF3B30]" />
-                    ) : null}
+                        ? <ChevronUp size={14} className="text-[#FF3B30]" />
+                        : <ChevronDown size={14} className="text-[#FF3B30]" />
+                    )}
                   </button>
                   {group.painFlag && expandedExercise === group.exerciseId && (
-                    <div className="px-4 pb-3 bg-[#FF3B30]/5">
+                    <div className="px-5 pb-4 bg-[#FF3B30]/5">
                       <textarea
                         value={group.painNotes}
                         onChange={(e) => setPainNotes(group.exerciseId, e.target.value)}
                         placeholder="Waar voelde je pijn? (bijv. linkerschouder, onderrug...)"
-                        className="w-full px-3 py-2 border border-[#FF3B30]/20 rounded-lg text-[13px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#FF3B30]/40 resize-none h-16 bg-white"
+                        className="w-full px-4 py-3 border border-[#FF3B30]/20 text-[13px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#FF3B30]/40 resize-none h-16 bg-white"
                       />
                     </div>
                   )}
@@ -418,56 +382,43 @@ function WorkoutCompletePage() {
           </div>
         )}
 
-        {/* Section: Feedback for coach */}
-        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] mb-4">
-          <label className="block">
-            <p className="text-[13px] text-[#8E8E93] uppercase font-medium tracking-wide mb-3">
-              Feedback voor je coach
-            </p>
-            <p className="text-[12px] text-[#C7C7CC] mb-3">
-              Welke oefeningen wil je meer of minder? Suggesties?
-            </p>
-            <textarea
-              value={feedbackText}
-              onChange={(e) => setFeedbackText(e.target.value)}
-              placeholder="bijv. &quot;Meer core oefeningen&quot;, &quot;Hip thrusts zijn te zwaar&quot;..."
-              className="w-full px-4 py-3 border border-[#E8E4DC] rounded-xl text-[14px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
-            />
-          </label>
+        {/* ═══ FEEDBACK VOOR COACH ════════════════════════ */}
+        <div>
+          <p className="text-label mb-2">Feedback voor je coach</p>
+          <p className="text-[12px] text-[#C5C2BC] mb-3">Welke oefeningen wil je meer of minder?</p>
+          <textarea
+            value={feedbackText}
+            onChange={(e) => setFeedbackText(e.target.value)}
+            placeholder="bijv. &quot;Meer core oefeningen&quot;, &quot;Hip thrusts zijn te zwaar&quot;..."
+            className="w-full px-4 py-3 border border-[#E8E4DC] bg-white text-[14px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
+          />
         </div>
 
-        {/* Section: Notes */}
-        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] mb-6">
-          <label className="block">
-            <p className="text-[13px] text-[#8E8E93] uppercase font-medium tracking-wide mb-3">
-              Notities (optioneel)
-            </p>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Hoe ging het? Extra opmerkingen..."
-              className="w-full px-4 py-3 border border-[#E8E4DC] rounded-xl text-[14px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
-            />
-          </label>
+        {/* ═══ NOTITIES ═══════════════════════════════════ */}
+        <div>
+          <p className="text-label mb-3">Notities <span className="font-normal text-[#C5C2BC]">(optioneel)</span></p>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Hoe ging het? Extra opmerkingen..."
+            className="w-full px-4 py-3 border border-[#E8E4DC] bg-white text-[14px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
+          />
         </div>
 
-        {/* Save button */}
+        {/* ═══ OPSLAAN CTA ════════════════════════════════ */}
         <button
           onClick={handleComplete}
           disabled={saving}
-          className="w-full py-4 px-4 bg-[#1A1917] text-white rounded-xl font-semibold text-[16px] flex items-center justify-center gap-2 hover:bg-[#6F5612] transition-colors disabled:opacity-60"
+          className="w-full py-4 bg-[#1A1917] text-white font-semibold text-[14px] uppercase tracking-[0.08em] flex items-center justify-center gap-2 hover:bg-[#333330] transition-colors disabled:opacity-50"
         >
-          {saving ? 'Opslaan...' : 'Opslaan & Afsluiten'}
-          <ChevronRight size={20} strokeWidth={1.5} />
+          {saving ? 'Opslaan...' : 'Opslaan & afsluiten'}
+          <ArrowRight size={16} strokeWidth={2} />
         </button>
 
-        {/* Info */}
-        <div className="mt-6 flex gap-3 bg-[#007AFF]/5 rounded-xl p-4 border border-[#007AFF]/20">
-          <AlertCircle size={18} strokeWidth={1.5} className="text-[#007AFF] flex-shrink-0 mt-0.5" />
-          <p className="text-[13px] text-[#007AFF] font-medium">
-            Je coach ziet deze feedback bij de volgende programma-aanpassing
-          </p>
-        </div>
+        {/* Info note */}
+        <p className="text-center text-[12px] text-[#C5C2BC]">
+          Je coach ziet deze feedback bij de volgende aanpassing
+        </p>
       </main>
     </div>
   )

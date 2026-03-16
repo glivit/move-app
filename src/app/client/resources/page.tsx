@@ -114,8 +114,8 @@ export default function ResourcesPage() {
 
       {/* Search */}
       <div
-        className="flex items-center gap-3 px-4 py-3 rounded-2xl"
-        style={{ backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+        className="flex items-center gap-3 px-4 py-3 border"
+        style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
       >
         <Search size={18} strokeWidth={1.5} style={{ color: '#C7C7CC' }} />
         <input
@@ -135,11 +135,11 @@ export default function ResourcesPage() {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className="px-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all"
+              className="px-4 py-2 text-[13px] font-semibold uppercase tracking-[0.12em] whitespace-nowrap transition-all border"
               style={{
                 backgroundColor: selectedCategory === cat ? '#1A1917' : 'white',
                 color: selectedCategory === cat ? 'white' : '#8E8E93',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                borderColor: selectedCategory === cat ? '#1A1917' : '#E8E4DC',
               }}
             >
               {cat}
@@ -152,13 +152,13 @@ export default function ResourcesPage() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-white rounded-2xl animate-pulse" />
+            <div key={i} className="h-32 bg-white border border-[#E8E4DC] animate-pulse" />
           ))}
         </div>
       ) : filteredResources.length === 0 ? (
         <div
-          className="rounded-2xl p-12 text-center"
-          style={{ backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+          className="p-12 text-center border"
+          style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
         >
           <BookOpen size={40} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#C7C7CC' }} />
           <p className="text-[14px]" style={{ color: '#8E8E93' }}>Geen content gevonden</p>
@@ -172,8 +172,8 @@ export default function ResourcesPage() {
                 <button
                   key={resource.id}
                   onClick={() => { setSelectedResource(resource); trackView(resource.id) }}
-                  className="w-full text-left rounded-2xl overflow-hidden transition-all hover:shadow-md"
-                  style={{ backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                  className="w-full text-left overflow-hidden transition-all border"
+                  style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
                 >
                   {resource.thumbnail_url ? (
                     <div className="relative aspect-[21/9] overflow-hidden">
@@ -229,8 +229,8 @@ export default function ResourcesPage() {
               <button
                 key={resource.id}
                 onClick={() => { setSelectedResource(resource); trackView(resource.id) }}
-                className="w-full text-left rounded-2xl overflow-hidden transition-all hover:shadow-md"
-                style={{ backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                className="w-full text-left overflow-hidden transition-all border"
+                style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
               >
                 {resource.thumbnail_url ? (
                   <div className="relative aspect-video overflow-hidden">
@@ -276,8 +276,8 @@ export default function ResourcesPage() {
         <div className="fixed inset-0 z-50 flex items-end lg:items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSelectedResource(null)} />
           <div
-            className="relative w-full max-w-2xl mx-4 mb-4 lg:mb-0 max-h-[85vh] overflow-y-auto rounded-2xl"
-            style={{ backgroundColor: 'white' }}
+            className="relative w-full max-w-2xl mx-4 mb-4 lg:mb-0 max-h-[85vh] overflow-y-auto border"
+            style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
           >
             <button
               onClick={() => setSelectedResource(null)}
@@ -287,7 +287,7 @@ export default function ResourcesPage() {
             </button>
 
             {selectedResource.content_type === 'video' && selectedResource.video_url && (
-              <div className="aspect-video bg-black rounded-t-2xl overflow-hidden">
+              <div className="aspect-video bg-black overflow-hidden">
                 <iframe
                   src={getYouTubeEmbedUrl(selectedResource.video_url) || selectedResource.video_url}
                   className="w-full h-full"
@@ -298,7 +298,7 @@ export default function ResourcesPage() {
             )}
 
             {selectedResource.content_type !== 'video' && selectedResource.thumbnail_url && (
-              <div className="aspect-[21/9] overflow-hidden rounded-t-2xl">
+              <div className="aspect-[21/9] overflow-hidden">
                 <img src={selectedResource.thumbnail_url} alt="" className="w-full h-full object-cover" />
               </div>
             )}
@@ -338,8 +338,8 @@ export default function ResourcesPage() {
                   href={selectedResource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 rounded-xl text-[13px] font-semibold transition-all"
-                  style={{ backgroundColor: '#F5F2EC', color: '#1A1917' }}
+                  className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 text-[13px] font-semibold uppercase tracking-[0.12em] transition-all border"
+                  style={{ backgroundColor: 'white', color: '#1A1917', borderColor: '#E8E4DC' }}
                 >
                   Bekijk externe link
                   <ChevronRight size={14} strokeWidth={2} />

@@ -262,17 +262,17 @@ export default function ClientMessagesPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col h-[calc(100vh-80px)] bg-client-bg">
-        <div className="px-4 py-4 border-b border-client-border">
+      <div className="flex flex-col h-[calc(100vh-80px)] bg-[#EEEBE3]">
+        <div className="px-4 py-4 border-b border-[#E8E4DC]">
           <div className="animate-pulse space-y-2">
-            <div className="h-5 bg-client-surface-muted rounded w-32" />
-            <div className="h-3 bg-client-surface-muted rounded w-24" />
+            <div className="h-5 bg-[#F0EDE8] rounded w-32" />
+            <div className="h-3 bg-[#F0EDE8] rounded w-24" />
           </div>
         </div>
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-pulse space-y-3">
-            <div className="h-3 bg-client-surface-muted rounded w-48 mx-auto" />
-            <div className="h-3 bg-client-surface-muted rounded w-64 mx-auto" />
+            <div className="h-3 bg-[#F0EDE8] rounded w-48 mx-auto" />
+            <div className="h-3 bg-[#F0EDE8] rounded w-64 mx-auto" />
           </div>
         </div>
       </div>
@@ -281,9 +281,9 @@ export default function ClientMessagesPage() {
 
   if (!currentUserId || !coachId) {
     return (
-      <div className="flex flex-col h-[calc(100vh-80px)] bg-client-bg items-center justify-center">
-        <MessageCircle size={48} className="text-client-text-muted mb-4" />
-        <p className="text-client-text-muted">
+      <div className="flex flex-col h-[calc(100vh-80px)] bg-[#EEEBE3] items-center justify-center">
+        <MessageCircle size={48} className="text-[#C5C2BC] mb-4" />
+        <p className="text-[#C5C2BC]">
           {!currentUserId ? 'Niet aangemeld' : 'Coach niet beschikbaar'}
         </p>
       </div>
@@ -294,11 +294,11 @@ export default function ClientMessagesPage() {
   const dateKeys = Object.keys(groupedMessages)
 
   return (
-    <div className="flex flex-col h-[calc(100vh-80px)] bg-client-bg -mx-4 -mt-4">
+    <div className="flex flex-col h-[calc(100vh-80px)] bg-[#EEEBE3] -mx-4 -mt-4">
       {/* Header */}
-      <div className="px-4 py-4 border-b border-client-border">
-        <h1 className="text-lg font-semibold text-text-primary">{coachName}</h1>
-        <p className="text-xs text-client-text-muted mt-0.5">Je coach</p>
+      <div className="px-4 py-4 border-b border-[#E8E4DC]">
+        <h1 className="text-lg font-semibold text-[#1A1917]">{coachName}</h1>
+        <p className="text-xs text-[#C5C2BC] mt-0.5">Je coach</p>
       </div>
 
       {/* Messages */}
@@ -311,13 +311,13 @@ export default function ClientMessagesPage() {
             <div className="text-center space-y-3">
               <MessageCircle
                 size={48}
-                className="text-client-text-muted mx-auto"
+                className="text-[#C5C2BC] mx-auto"
                 strokeWidth={1.5}
               />
-              <p className="text-text-primary font-medium">
+              <p className="text-[#1A1917] font-medium">
                 Start een gesprek met je coach
               </p>
-              <p className="text-xs text-client-text-muted">
+              <p className="text-xs text-[#C5C2BC]">
                 Je coach zal je snel beantwoorden
               </p>
             </div>
@@ -328,11 +328,11 @@ export default function ClientMessagesPage() {
               <div key={dateKey} className="space-y-3">
                 {/* Date separator */}
                 <div className="flex items-center gap-3 py-2">
-                  <div className="flex-1 h-px bg-client-border" />
-                  <span className="text-xs text-client-text-muted font-medium px-2">
+                  <div className="flex-1 h-px bg-[#E8E4DC]" />
+                  <span className="text-xs text-[#C5C2BC] font-medium px-2">
                     {dateKey}
                   </span>
-                  <div className="flex-1 h-px bg-client-border" />
+                  <div className="flex-1 h-px bg-[#E8E4DC]" />
                 </div>
 
                 {/* Messages for this date */}

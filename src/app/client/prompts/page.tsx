@@ -24,8 +24,8 @@ interface SubmittedResponse extends PromptResponse {
 function PromptCardSkeleton() {
   return (
     <div
-      className="rounded-2xl p-6 shadow-clean animate-shimmer"
-      style={{ backgroundColor: '#FFFFFF' }}
+      className="p-6 border animate-shimmer"
+      style={{ backgroundColor: '#FFFFFF', borderColor: '#E8E4DC' }}
     >
       <div className="h-6 w-3/4 bg-gray-200 rounded animate-shimmer mb-4" />
       <div className="space-y-3 mb-6">
@@ -62,7 +62,7 @@ function ScoreSelector({
           <button
             key={score}
             onClick={() => onChange(score)}
-            className="w-10 h-10 rounded-lg font-medium text-sm transition-all border border-transparent"
+            className="w-10 h-10 font-medium text-sm uppercase tracking-[0.12em] transition-all border"
             style={{
               backgroundColor: value === score ? '#1A1917' : '#FFFFFF',
               color: value === score ? '#FFFFFF' : '#8E8E93',
@@ -127,8 +127,8 @@ function PromptCard({
 
   return (
     <div
-      className="rounded-2xl p-6 shadow-clean overflow-hidden"
-      style={{ backgroundColor: '#FFFFFF' }}
+      className="p-6 overflow-hidden border"
+      style={{ backgroundColor: '#FFFFFF', borderColor: '#E8E4DC' }}
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Question */}
@@ -146,11 +146,12 @@ function PromptCard({
             onChange={(e) => setResponse(e.target.value)}
             placeholder="Schrijf hier je gedachten en gevoelens op..."
             rows={4}
-            className="w-full px-4 py-3 border-0 rounded-2xl focus:outline-none focus:ring-2 transition-all"
+            className="w-full px-4 py-3 border focus:outline-none focus:ring-2 transition-all"
             style={{
               backgroundColor: '#F5F5F3',
               color: '#1A1A18',
               outlineColor: '#1A1917',
+              borderColor: '#E8E4DC',
             }}
           />
         </div>
@@ -179,12 +180,13 @@ function PromptCard({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full px-6 py-3 rounded-2xl font-medium transition-all flex items-center justify-center gap-2"
+            className="w-full px-6 py-3 font-medium uppercase tracking-[0.12em] transition-all flex items-center justify-center gap-2 border"
             style={{
               backgroundColor: '#1A1A18',
               color: '#FFFFFF',
               opacity: isSubmitting ? 0.6 : 1,
               cursor: isSubmitting ? 'not-allowed' : 'pointer',
+              borderColor: '#1A1A18',
             }}
           >
             {isSubmitting ? 'Opslaan...' : 'Opslaan'}
@@ -342,10 +344,10 @@ export default function ClientPromptsPage() {
         {/* Success Message */}
         {submitSuccess && (
           <div
-            className="rounded-2xl p-4 mb-6 shadow-clean flex items-center gap-3 border-l-4"
+            className="p-4 mb-6 flex items-center gap-3 border"
             style={{
               backgroundColor: '#F0FDF4',
-              borderLeftColor: '#22C55E',
+              borderColor: '#22C55E',
             }}
           >
             <Check size={20} style={{ color: '#22C55E' }} strokeWidth={1.5} />
@@ -366,8 +368,8 @@ export default function ClientPromptsPage() {
           </div>
         ) : unansweredPrompts.length === 0 ? (
           <div
-            className="rounded-2xl p-12 text-center shadow-clean"
-            style={{ backgroundColor: '#FFFFFF' }}
+            className="p-12 text-center border"
+            style={{ backgroundColor: '#FFFFFF', borderColor: '#E8E4DC' }}
           >
             <MessageSquare
               size={48}
@@ -410,10 +412,11 @@ export default function ClientPromptsPage() {
               <div>
                 <button
                   onClick={() => setShowAnswered(!showAnswered)}
-                  className="w-full flex items-center justify-between px-6 py-4 rounded-2xl transition-all shadow-clean"
+                  className="w-full flex items-center justify-between px-6 py-4 transition-all border"
                   style={{
                     backgroundColor: '#FFFFFF',
                     color: '#1A1A18',
+                    borderColor: '#E8E4DC',
                   }}
                 >
                   <span className="font-semibold text-[15px]">
@@ -435,8 +438,8 @@ export default function ClientPromptsPage() {
                     {answeredPrompts.map((prompt) => (
                       <div
                         key={prompt.id}
-                        className="rounded-2xl p-6 shadow-clean"
-                        style={{ backgroundColor: '#FFFFFF' }}
+                        className="p-6 border"
+                        style={{ backgroundColor: '#FFFFFF', borderColor: '#E8E4DC' }}
                       >
                         <p
                           className="text-sm font-medium mb-3"

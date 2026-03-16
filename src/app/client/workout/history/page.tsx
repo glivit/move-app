@@ -168,7 +168,7 @@ export default function WorkoutHistoryPage() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-16 bg-client-surface-muted rounded-2xl animate-pulse"
+              className="h-16 bg-white border border-[#E8E4DC] animate-pulse"
             />
           ))}
         </div>
@@ -186,12 +186,12 @@ export default function WorkoutHistoryPage() {
       </div>
 
       {/* Calendar */}
-      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden">
+      <div className="bg-white border border-[#E8E4DC] overflow-hidden">
         {/* Month header */}
         <div className="px-4 py-4 border-b border-[#E8E4DC] flex items-center justify-between">
           <button
             onClick={handlePrevMonth}
-            className="p-2 hover:bg-client-surface-muted rounded-lg transition-colors"
+            className="p-2 hover:bg-[#F5F2EC] transition-colors border border-[#E8E4DC]"
             aria-label="Previous month"
           >
             <ChevronLeft size={20} strokeWidth={1.5} className="text-text-primary" />
@@ -203,7 +203,7 @@ export default function WorkoutHistoryPage() {
 
           <button
             onClick={handleNextMonth}
-            className="p-2 hover:bg-client-surface-muted rounded-lg transition-colors"
+            className="p-2 hover:bg-[#F5F2EC] transition-colors border border-[#E8E4DC]"
             aria-label="Next month"
           >
             <ChevronRight size={20} strokeWidth={1.5} className="text-text-primary" />
@@ -228,8 +228,8 @@ export default function WorkoutHistoryPage() {
             return (
               <div
                 key={index}
-                className={`aspect-square flex items-center justify-center text-[13px] font-medium rounded-lg relative ${
-                  !isCurrentMonth ? 'text-client-text-muted' : 'text-text-primary'
+                className={`aspect-square flex items-center justify-center text-[13px] font-medium relative ${
+                  !isCurrentMonth ? 'text-[#C5C2BC]' : 'text-[#1A1917]'
                 } ${isToday ? 'bg-[#1A1917] text-white font-semibold' : ''}`}
               >
                 {day.date}
@@ -269,27 +269,27 @@ export default function WorkoutHistoryPage() {
             return (
               <div
                 key={workout.id}
-                className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden"
+                className="bg-white border border-[#E8E4DC] overflow-hidden"
               >
                 {/* Summary */}
                 <button
                   onClick={() =>
                     setExpandedWorkoutId(isExpanded ? null : workout.id)
                   }
-                  className="w-full px-5 py-4 text-left hover:bg-client-surface-muted transition-colors"
+                  className="w-full px-5 py-4 text-left hover:bg-[#F5F2EC] transition-colors"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="text-[14px] font-semibold text-text-primary">
+                        <p className="text-[14px] font-semibold text-[#1A1917]">
                           {dateStr}
                         </p>
-                        <span className="text-xs text-client-text-secondary">
+                        <span className="text-xs text-[#8E8E93]">
                           {(Array.isArray(workout.program_template_days) ? workout.program_template_days[0]?.name : workout.program_template_days?.name) || 'Training'}
                         </span>
                       </div>
 
-                      <div className="mt-2 flex items-center gap-4 text-[13px] text-client-text-secondary">
+                      <div className="mt-2 flex items-center gap-4 text-[13px] text-[#8E8E93]">
                         <span>⏱ {formatDuration(workout.duration_seconds)}</span>
                         <span>📊 {volume.toLocaleString('nl-BE')} kg</span>
                         <span>{getMoodEmoji(workout.mood_rating)}</span>
@@ -299,7 +299,7 @@ export default function WorkoutHistoryPage() {
                     <ChevronRight
                       size={20}
                       strokeWidth={1.5}
-                      className={`text-client-text-secondary flex-shrink-0 mt-0.5 transition-transform ${
+                      className={`text-[#8E8E93] flex-shrink-0 mt-0.5 transition-transform ${
                         isExpanded ? 'rotate-90' : ''
                       }`}
                     />
@@ -308,14 +308,14 @@ export default function WorkoutHistoryPage() {
 
                 {/* Details (expanded) */}
                 {isExpanded && (
-                  <div className="border-t border-[#E8E4DC] px-5 py-4 bg-client-surface-muted space-y-3">
+                  <div className="border-t border-[#E8E4DC] px-5 py-4 bg-[#F5F2EC] space-y-3">
                     {/* Notes */}
                     {workout.notes && (
                       <div>
-                        <p className="text-[12px] text-client-text-secondary font-medium uppercase tracking-wide mb-2">
+                        <p className="text-[11px] text-[#A09D96] font-medium uppercase tracking-[0.12em] mb-2">
                           Notities
                         </p>
-                        <p className="text-[13px] text-text-primary whitespace-pre-wrap">
+                        <p className="text-[13px] text-[#1A1917] whitespace-pre-wrap">
                           {workout.notes}
                         </p>
                       </div>
@@ -324,19 +324,19 @@ export default function WorkoutHistoryPage() {
                     {/* Set breakdown */}
                     {workout.workout_sets && workout.workout_sets.length > 0 && (
                       <div>
-                        <p className="text-[12px] text-client-text-secondary font-medium uppercase tracking-wide mb-2">
+                        <p className="text-[11px] text-[#A09D96] font-medium uppercase tracking-[0.12em] mb-2">
                           Sets
                         </p>
                         <div className="grid grid-cols-3 gap-2">
                           {workout.workout_sets.map((set, idx) => (
                             <div
                               key={idx}
-                              className="bg-white rounded-lg p-3 text-center border border-[#E8E4DC]"
+                              className="bg-white p-3 text-center border border-[#E8E4DC]"
                             >
-                              <p className="text-[11px] text-client-text-secondary mb-1">
+                              <p className="text-[11px] text-[#A09D96] mb-1">
                                 Set {idx + 1}
                               </p>
-                              <p className="text-[13px] font-semibold text-text-primary">
+                              <p className="text-[13px] font-semibold text-[#1A1917]">
                                 {set.weight_kg || '—'} ×{' '}
                                 {set.actual_reps || '—'}
                               </p>
@@ -352,11 +352,11 @@ export default function WorkoutHistoryPage() {
           })}
         </div>
       ) : (
-        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
-          <p className="text-[14px] text-client-text-secondary">
+        <div className="bg-white p-8 border border-[#E8E4DC] text-center">
+          <p className="text-[14px] text-[#8E8E93]">
             Geen trainingen geregistreerd
           </p>
-          <p className="text-[13px] text-client-text-muted mt-1">
+          <p className="text-[13px] text-[#C5C2BC] mt-1">
             Voltooi je eerste training om te beginnen
           </p>
         </div>

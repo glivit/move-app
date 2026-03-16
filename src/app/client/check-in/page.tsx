@@ -181,21 +181,21 @@ export default function CheckInPage() {
   if (submitted) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-clean p-8 max-w-sm w-full text-center space-y-6">
+        <div className="bg-white p-8 max-w-sm w-full text-center space-y-6 border border-[#E8E4DC]">
           <div className="flex justify-center">
-            <div className="w-24 h-24 rounded-full bg-[#E8F5E9] flex items-center justify-center animate-[scale-in_0.5s_ease-out]">
+            <div className="w-24 h-24 bg-[#E8F5E9] flex items-center justify-center animate-[scale-in_0.5s_ease-out]">
               <CheckCircle className="h-12 w-12 text-[#34C759]" strokeWidth={1.5} />
             </div>
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-display font-semibold text-[#1A1A18]">Check-in ingediend!</h2>
-            <p className="text-text-secondary text-sm leading-relaxed">
+            <h2 className="text-editorial-h2 font-display font-semibold text-[#1A1917]">Check-in ingediend!</h2>
+            <p className="text-[#A09D96] text-sm leading-relaxed">
               Je coach bekijkt je resultaten binnen 24 uur. Je krijgt een melding zodra de review klaar is.
             </p>
           </div>
           <button
             onClick={() => router.push('/client')}
-            className="w-full bg-[#1A1A18] text-white rounded-2xl py-3.5 font-medium transition-all duration-300 hover:bg-[#2A2A28]"
+            className="w-full bg-[#1A1917] text-white py-3.5 font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[#2A2A28]"
           >
             Terug naar dashboard
           </button>
@@ -207,19 +207,19 @@ export default function CheckInPage() {
   if (!canSubmit) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-clean p-8 max-w-sm w-full text-center space-y-6">
+        <div className="bg-white p-8 max-w-sm w-full text-center space-y-6 border border-[#E8E4DC]">
           <div className="flex justify-center">
-            <div className="w-20 h-20 rounded-full bg-[#FFF3E0] flex items-center justify-center">
+            <div className="w-20 h-20 bg-[#FFF3E0] flex items-center justify-center">
               <Calendar className="h-10 w-10 text-[#FF9800]" strokeWidth={1.5} />
             </div>
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-display font-semibold text-[#1A1A18]">Check-in</h2>
-            <p className="text-text-secondary text-sm leading-relaxed">{windowMessage}</p>
+            <h2 className="text-2xl font-display font-semibold text-[#1A1917]">Check-in</h2>
+            <p className="text-[#A09D96] text-sm leading-relaxed">{windowMessage}</p>
           </div>
           <button
             onClick={() => router.push('/client')}
-            className="w-full bg-[#1A1A18] text-white rounded-2xl py-3.5 font-medium transition-all duration-300 hover:bg-[#2A2A28]"
+            className="w-full bg-[#1A1917] text-white py-3.5 font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[#2A2A28]"
           >
             Terug naar dashboard
           </button>
@@ -232,8 +232,8 @@ export default function CheckInPage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-display font-semibold text-[#1A1A18]">Maandelijkse check-in</h1>
-        <p className="text-text-secondary mt-2">Stap {currentStep + 1} van {steps.length}</p>
+        <h1 className="text-editorial-h2 font-display font-semibold text-[#1A1917]">Maandelijkse check-in</h1>
+        <p className="text-[#A09D96] mt-2">Stap {currentStep + 1} van {steps.length}</p>
       </div>
 
       {/* Progress Bar with Icons */}
@@ -288,7 +288,7 @@ export default function CheckInPage() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3">
+        <div className="bg-red-50 border border-red-200 px-4 py-3">
           <p className="text-sm text-red-700">{error}</p>
         </div>
       )}
@@ -296,18 +296,18 @@ export default function CheckInPage() {
       {/* Step Header with Icon and Description */}
       <div className="space-y-4">
         <div className="flex items-start gap-4">
-          <div className="w-14 h-14 rounded-xl bg-[#F5F5F5] flex items-center justify-center flex-shrink-0">
-            {(() => { const Icon = steps[currentStep].icon; return Icon ? <Icon className="w-7 h-7 text-[#1A1A18]" strokeWidth={1.5} /> : null })()}
+          <div className="w-14 h-14 bg-[#F5F5F5] flex items-center justify-center flex-shrink-0">
+            {(() => { const Icon = steps[currentStep].icon; return Icon ? <Icon className="w-7 h-7 text-[#1A1917]" strokeWidth={1.5} /> : null })()}
           </div>
           <div>
-            <h2 className="text-xl font-display font-semibold text-[#1A1A18]">{steps[currentStep].title}</h2>
-            <p className="text-text-secondary text-sm mt-1">{steps[currentStep].description}</p>
+            <h2 className="text-editorial-h3 font-display font-semibold text-[#1A1917]">{steps[currentStep].title}</h2>
+            <p className="text-[#A09D96] text-sm mt-1">{steps[currentStep].description}</p>
           </div>
         </div>
       </div>
 
       {/* Step content */}
-      <div className="bg-white rounded-2xl shadow-clean p-6 transition-all duration-300">
+      <div className="bg-white p-6 transition-all duration-300 border border-[#E8E4DC]">
         {currentStep === 0 && (
           <PhotoUploadStep
             photos={data.photos}
@@ -342,7 +342,7 @@ export default function CheckInPage() {
         {currentStep > 0 && (
           <button
             onClick={() => setCurrentStep(currentStep - 1)}
-            className="flex-1 px-6 py-3.5 text-[#999] font-medium rounded-2xl hover:bg-[#F5F5F5] transition-all duration-300"
+            className="flex-1 px-6 py-3.5 text-[#C5C2BC] font-medium uppercase tracking-wider hover:bg-[#F5F5F5] transition-all duration-300 border border-[#E8E4DC]"
           >
             Vorige
           </button>
@@ -350,7 +350,7 @@ export default function CheckInPage() {
         {currentStep < steps.length - 1 ? (
           <button
             onClick={() => setCurrentStep(currentStep + 1)}
-            className="flex-1 bg-[#1A1A18] text-white rounded-2xl py-3.5 font-medium transition-all duration-300 hover:bg-[#2A2A28]"
+            className="flex-1 bg-[#1A1917] text-white py-3.5 font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[#2A2A28]"
           >
             Volgende
           </button>
@@ -358,7 +358,7 @@ export default function CheckInPage() {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="flex-1 bg-[#1A1A18] text-white rounded-2xl py-3.5 font-medium transition-all duration-300 hover:bg-[#2A2A28] disabled:opacity-50"
+            className="flex-1 bg-[#1A1917] text-white py-3.5 font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[#2A2A28] disabled:opacity-50"
           >
             {submitting ? 'Bezig met indienen...' : 'Check-in indienen'}
           </button>

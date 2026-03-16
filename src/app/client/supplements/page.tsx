@@ -151,7 +151,7 @@ export default function SupplementsPage() {
         </div>
         <div className="space-y-4">
           {[1, 2].map(i => (
-            <div key={i} className="bg-white rounded-2xl h-24 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] animate-pulse" />
+            <div key={i} className="bg-white h-24 border border-[#E8E4DC] animate-pulse" />
           ))}
         </div>
       </div>
@@ -168,7 +168,7 @@ export default function SupplementsPage() {
         </div>
         <button
           onClick={() => setShowAdd(!showAdd)}
-          className="w-10 h-10 rounded-xl bg-[#1A1917] text-white flex items-center justify-center hover:bg-[#6B5110] transition-colors"
+          className="w-10 h-10 bg-[#1A1917] text-white flex items-center justify-center hover:bg-[#6B5110] transition-colors border border-[#1A1917]"
         >
           {showAdd ? <X className="w-5 h-5" strokeWidth={1.5} /> : <Plus className="w-5 h-5" strokeWidth={1.5} />}
         </button>
@@ -176,7 +176,7 @@ export default function SupplementsPage() {
 
       {/* Daily progress */}
       {totalCount > 0 && (
-        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
+        <div className="bg-white p-5 border border-[#E8E4DC]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full flex items-center justify-center"
@@ -195,9 +195,9 @@ export default function SupplementsPage() {
               {totalCount > 0 ? Math.round((loggedCount / totalCount) * 100) : 0}%
             </span>
           </div>
-          <div className="w-full h-2 bg-[#E8E4DC] rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-[#E8E4DC] overflow-hidden">
             <div
-              className="h-full rounded-full transition-all duration-500"
+              className="h-full transition-all duration-500"
               style={{
                 width: `${totalCount > 0 ? (loggedCount / totalCount) * 100 : 0}%`,
                 backgroundColor: loggedCount === totalCount ? '#34C759' : '#FF9500',
@@ -209,39 +209,39 @@ export default function SupplementsPage() {
 
       {/* Add form */}
       {showAdd && (
-        <form onSubmit={addSupplement} className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#1A1917]/20 space-y-4">
+        <form onSubmit={addSupplement} className="bg-white p-5 border border-[#E8E4DC] space-y-4">
           <h3 className="text-[15px] font-semibold text-[#1A1A18]">Nieuw supplement toevoegen</h3>
 
           <div>
-            <label className="text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide block mb-1.5">Naam *</label>
+            <label className="text-[11px] font-semibold text-[#A09D96] uppercase tracking-[0.12em] block mb-1.5">Naam *</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="bijv. Creatine, Vitamine D, Omega-3..."
               required
-              className="w-full px-3 py-2.5 border border-[#E8E4DC] rounded-xl text-[14px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
+              className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[14px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
             />
           </div>
 
           <div>
-            <label className="text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide block mb-1.5">Dosering</label>
+            <label className="text-[11px] font-semibold text-[#A09D96] uppercase tracking-[0.12em] block mb-1.5">Dosering</label>
             <input
               type="text"
               value={dosage}
               onChange={(e) => setDosage(e.target.value)}
               placeholder="bijv. 5g, 2000 IU, 1 capsule..."
-              className="w-full px-3 py-2.5 border border-[#E8E4DC] rounded-xl text-[14px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
+              className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[14px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide block mb-1.5">Frequentie</label>
+              <label className="text-[11px] font-semibold text-[#A09D96] uppercase tracking-[0.12em] block mb-1.5">Frequentie</label>
               <select
                 value={frequency}
                 onChange={(e) => setFrequency(e.target.value)}
-                className="w-full px-3 py-2.5 border border-[#E8E4DC] rounded-xl text-[14px] text-[#1A1A18] focus:outline-none focus:border-[#1A1917]"
+                className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[14px] text-[#1A1A18] focus:outline-none focus:border-[#1A1917]"
               >
                 {FREQUENCY_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -249,11 +249,11 @@ export default function SupplementsPage() {
               </select>
             </div>
             <div>
-              <label className="text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide block mb-1.5">Tijdstip</label>
+              <label className="text-[11px] font-semibold text-[#A09D96] uppercase tracking-[0.12em] block mb-1.5">Tijdstip</label>
               <select
                 value={timeOfDay}
                 onChange={(e) => setTimeOfDay(e.target.value)}
-                className="w-full px-3 py-2.5 border border-[#E8E4DC] rounded-xl text-[14px] text-[#1A1A18] focus:outline-none focus:border-[#1A1917]"
+                className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[14px] text-[#1A1A18] focus:outline-none focus:border-[#1A1917]"
               >
                 {TIME_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -265,7 +265,7 @@ export default function SupplementsPage() {
           <button
             type="submit"
             disabled={saving || !name.trim()}
-            className="w-full py-3 bg-[#1A1917] text-white rounded-xl font-semibold text-[14px] hover:bg-[#6B5110] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-3 bg-[#1A1917] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#6B5110] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 border border-[#1A1917]"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Toevoegen
@@ -282,7 +282,7 @@ export default function SupplementsPage() {
               <div key={group.value}>
                 <div className="flex items-center gap-2 mb-3">
                   <GroupIcon className="w-4 h-4 text-[#8E8E93]" strokeWidth={1.5} />
-                  <h3 className="text-[13px] font-semibold text-[#8E8E93] uppercase tracking-wide">{group.label}</h3>
+                  <h3 className="text-[11px] font-semibold text-[#A09D96] uppercase tracking-[0.12em]">{group.label}</h3>
                 </div>
                 <div className="space-y-2">
                   {group.items.map(supplement => {
@@ -291,14 +291,14 @@ export default function SupplementsPage() {
                     return (
                       <div
                         key={supplement.id}
-                        className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border transition-all"
+                        className="bg-white p-4 border transition-all"
                         style={{ borderColor: logged ? '#34C759' : '#E8E4DC' }}
                       >
                         <div className="flex items-center gap-3">
                           <button
                             onClick={() => toggleLog(supplement.id)}
                             disabled={toggling}
-                            className="w-8 h-8 rounded-full border-2 flex items-center justify-center shrink-0 transition-all"
+                            className="w-8 h-8 border-2 flex items-center justify-center shrink-0 transition-all"
                             style={{
                               borderColor: logged ? '#34C759' : '#E0DDD8',
                               backgroundColor: logged ? '#34C759' : 'transparent',
@@ -341,7 +341,7 @@ export default function SupplementsPage() {
           })}
         </div>
       ) : !showAdd ? (
-        <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
+        <div className="bg-white p-12 border border-[#E8E4DC] text-center">
           <Pill strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[#C7C7CC]" />
           <p className="text-[15px] font-semibold text-[#1A1A18] mb-2">Nog geen supplementen</p>
           <p className="text-[13px] text-[#8E8E93] mb-4">
@@ -349,7 +349,7 @@ export default function SupplementsPage() {
           </p>
           <button
             onClick={() => setShowAdd(true)}
-            className="px-5 py-2.5 bg-[#1A1917] text-white rounded-xl font-semibold text-[14px] hover:bg-[#6B5110] transition-colors"
+            className="px-5 py-2.5 bg-[#1A1917] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#6B5110] transition-colors border border-[#1A1917]"
           >
             Eerste supplement toevoegen
           </button>
