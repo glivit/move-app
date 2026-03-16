@@ -27,12 +27,12 @@ function ExerciseInfoPanel({ exerciseData }: { exerciseData: Exercise }) {
   return (
     <div className="px-5 pb-3 space-y-3">
       {/* Large GIF display */}
-      <div className="overflow-hidden bg-[#2A2824] rounded-xl relative" style={{ maxHeight: '50vh' }}>
+      <div className="overflow-hidden bg-[#F5F2EC] rounded-xl relative" style={{ maxHeight: '50vh' }}>
         {hasGif ? (
           <>
             {!imgLoaded && (
               <div className="aspect-[4/3] flex items-center justify-center">
-                <div className="w-8 h-8 border-[1.5px] border-[#5A5650] border-t-white/40 rounded-full animate-spin" />
+                <div className="w-8 h-8 border-[1.5px] border-[#DDD9D0] border-t-[#1A1917] rounded-full animate-spin" />
               </div>
             )}
             <img
@@ -52,7 +52,7 @@ function ExerciseInfoPanel({ exerciseData }: { exerciseData: Exercise }) {
           </>
         ) : (
           <div className="aspect-[4/3] flex items-center justify-center">
-            <p className="text-[12px] text-[#5A5650]">{exerciseData.target_muscle}</p>
+            <p className="text-[12px] text-[#CCC7BC]">{exerciseData.target_muscle}</p>
           </div>
         )}
       </div>
@@ -60,12 +60,12 @@ function ExerciseInfoPanel({ exerciseData }: { exerciseData: Exercise }) {
       {/* Equipment + muscle labels */}
       <div className="flex items-center gap-2">
         {exerciseData.equipment && (
-          <span className="text-[11px] font-semibold text-[#B0ADA6] bg-[#44413D] px-2.5 py-1 rounded-lg">
+          <span className="text-[11px] font-semibold text-[#6B6862] bg-[#F0EDE8] px-2.5 py-1 rounded-lg">
             {exerciseData.equipment}
           </span>
         )}
         {exerciseData.target_muscle && (
-          <span className="text-[11px] font-semibold text-[#B0ADA6] bg-[#44413D] px-2.5 py-1 rounded-lg">
+          <span className="text-[11px] font-semibold text-[#6B6862] bg-[#F0EDE8] px-2.5 py-1 rounded-lg">
             {exerciseData.target_muscle}
           </span>
         )}
@@ -73,17 +73,17 @@ function ExerciseInfoPanel({ exerciseData }: { exerciseData: Exercise }) {
 
       {/* Collapsible: Coach tips */}
       {exerciseData.coach_tips && (
-        <div className="border border-[#44413D] rounded-xl overflow-hidden">
+        <div className="border border-[#F0EDE8] rounded-xl overflow-hidden">
           <button
             onClick={() => setShowTips(!showTips)}
             className="w-full flex items-center justify-between p-3"
           >
-            <p className="text-[11px] font-semibold text-[#9A9690] uppercase tracking-[0.08em]">Coach tips</p>
-            <ChevronDown size={14} className={`text-[#9A9690] transition-transform ${showTips ? 'rotate-180' : ''}`} />
+            <p className="text-[11px] font-semibold text-[#A09D96] uppercase tracking-[0.08em]">Coach tips</p>
+            <ChevronDown size={14} className={`text-[#A09D96] transition-transform ${showTips ? 'rotate-180' : ''}`} />
           </button>
           {showTips && (
             <div className="px-3 pb-3 -mt-1">
-              <p className="text-[13px] text-[#B0ADA6] leading-relaxed">{exerciseData.coach_tips}</p>
+              <p className="text-[13px] text-[#6B6862] leading-relaxed">{exerciseData.coach_tips}</p>
             </div>
           )}
         </div>
@@ -91,17 +91,17 @@ function ExerciseInfoPanel({ exerciseData }: { exerciseData: Exercise }) {
 
       {/* Collapsible: Instructions */}
       {exerciseData.instructions && (
-        <div className="border border-[#44413D] rounded-xl overflow-hidden">
+        <div className="border border-[#F0EDE8] rounded-xl overflow-hidden">
           <button
             onClick={() => setShowInstructions(!showInstructions)}
             className="w-full flex items-center justify-between p-3"
           >
-            <p className="text-[11px] font-semibold text-[#9A9690] uppercase tracking-[0.08em]">Uitvoering</p>
-            <ChevronDown size={14} className={`text-[#9A9690] transition-transform ${showInstructions ? 'rotate-180' : ''}`} />
+            <p className="text-[11px] font-semibold text-[#A09D96] uppercase tracking-[0.08em]">Uitvoering</p>
+            <ChevronDown size={14} className={`text-[#A09D96] transition-transform ${showInstructions ? 'rotate-180' : ''}`} />
           </button>
           {showInstructions && (
             <div className="px-3 pb-3 -mt-1">
-              <p className="text-[13px] text-[#B0ADA6] leading-relaxed whitespace-pre-wrap">{exerciseData.instructions}</p>
+              <p className="text-[13px] text-[#6B6862] leading-relaxed whitespace-pre-wrap">{exerciseData.instructions}</p>
             </div>
           )}
         </div>
@@ -258,32 +258,32 @@ function ExercisePickerModal({
   }, [searchQuery, exercises])
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-[80] flex items-end">
-      <div className="w-full max-h-[85vh] bg-[#2A2824] rounded-t-2xl flex flex-col animate-slide-up">
+    <div className="fixed inset-0 bg-black/30 z-[80] flex items-end">
+      <div className="w-full max-h-[85vh] bg-[#EEEBE3] rounded-t-2xl flex flex-col animate-slide-up">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#44413D]">
-          <h3 className="text-[18px] font-semibold text-white" style={{ fontFamily: 'var(--font-display)' }}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#E5E1D9]">
+          <h3 className="text-[18px] font-semibold text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
             Oefening toevoegen
           </h3>
           <button
             onClick={onClose}
-            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[#E5E1D9] transition-colors"
           >
-            <X size={18} strokeWidth={1.5} className="text-[#B0ADA6]" />
+            <X size={18} strokeWidth={1.5} className="text-[#6B6862]" />
           </button>
         </div>
 
         {/* Search */}
         <div className="px-5 py-3">
-          <div className="flex items-center gap-2 bg-[#353330] rounded-xl px-3.5 py-2.5 border border-[#44413D] focus-within:border-[var(--color-pop)]">
-            <Search size={16} strokeWidth={1.5} className="text-[#9A9690] flex-shrink-0" />
+          <div className="flex items-center gap-2 bg-white rounded-xl px-3.5 py-2.5 shadow-[var(--shadow-card)] focus-within:ring-2 focus-within:ring-[var(--color-pop)]/30">
+            <Search size={16} strokeWidth={1.5} className="text-[#A09D96] flex-shrink-0" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Zoek oefening..."
               autoFocus
-              className="flex-1 bg-transparent text-[14px] text-white placeholder-[#5A5650] border-none focus:outline-none"
+              className="flex-1 bg-transparent text-[14px] text-[#1A1917] placeholder-[#CCC7BC] border-none focus:outline-none"
             />
           </div>
         </div>
@@ -292,28 +292,28 @@ function ExercisePickerModal({
         <div className="flex-1 overflow-y-auto px-5 pb-8">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="w-6 h-6 border-[1.5px] border-[#5A5650] border-t-white/40 rounded-full animate-spin" />
+              <div className="w-6 h-6 border-[1.5px] border-[#DDD9D0] border-t-[#1A1917] rounded-full animate-spin" />
             </div>
           ) : filteredExercises.length === 0 ? (
-            <p className="text-center text-[14px] text-[#5A5650] py-12">Geen oefeningen gevonden</p>
+            <p className="text-center text-[14px] text-[#A09D96] py-12">Geen oefeningen gevonden</p>
           ) : (
             <div className="space-y-1">
               {filteredExercises.map((ex) => (
                 <button
                   key={ex.id}
                   onClick={() => onSelect(ex)}
-                  className="w-full text-left px-4 py-3.5 rounded-xl hover:bg-[#353330] transition-colors flex items-center gap-3"
+                  className="w-full text-left px-4 py-3.5 rounded-xl hover:bg-white transition-colors flex items-center gap-3"
                 >
-                  <div className="w-10 h-10 bg-[#353330] rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm">
                     {ex.gif_url ? (
                       <img src={ex.gif_url} alt="" className="w-full h-full object-cover" style={{ filter: 'saturate(0.3)' }} />
                     ) : (
-                      <span className="text-[10px] text-[#5A5650] uppercase">{ex.target_muscle?.slice(0, 3)}</span>
+                      <span className="text-[10px] text-[#A09D96] uppercase">{ex.target_muscle?.slice(0, 3)}</span>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-medium text-white truncate">{ex.name_nl || ex.name}</p>
-                    <p className="text-[11px] text-[#9A9690] mt-0.5">
+                    <p className="text-[14px] font-medium text-[#1A1917] truncate">{ex.name_nl || ex.name}</p>
+                    <p className="text-[11px] text-[#A09D96] mt-0.5">
                       {ex.target_muscle}{ex.equipment ? ` · ${ex.equipment}` : ''}
                     </p>
                   </div>
@@ -333,8 +333,8 @@ function ExercisePickerModal({
 export default function ActiveWorkoutPageWrapper() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#2A2824] flex items-center justify-center">
-        <div className="w-6 h-6 border-[1.5px] border-[#5A5650] border-t-white/40 rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#EEEBE3] flex items-center justify-center">
+        <div className="w-6 h-6 border-[1.5px] border-[#DDD9D0] border-t-[#1A1917] rounded-full animate-spin" />
       </div>
     }>
       <ActiveWorkoutPage />
@@ -626,9 +626,7 @@ function ActiveWorkoutPage() {
   // --- Minimize workout (persistent bar) ---
   const handleMinimize = () => {
     if (!session || !dayId || !programId) return
-    // Save state to localStorage for the persistent bar
     saveWorkoutState({ sessionId: session.id, dayId, programId, sets, savedAt: Date.now() })
-    // Store minimal bar data
     try {
       localStorage.setItem('move_minimized_workout', JSON.stringify({
         sessionId: session.id,
@@ -666,14 +664,14 @@ function ActiveWorkoutPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#2A2824] flex items-center justify-center">
-        <div className="w-6 h-6 border-[1.5px] border-[#5A5650] border-t-white/40 rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#EEEBE3] flex items-center justify-center">
+        <div className="w-6 h-6 border-[1.5px] border-[#DDD9D0] border-t-[#1A1917] rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="fixed inset-0 bg-[#2A2824] z-50 overflow-y-auto pt-safe">
+    <div className="fixed inset-0 bg-[#EEEBE3] z-50 overflow-y-auto pt-safe">
       {/* PR Celebration */}
       {prCelebration && (
         <>
@@ -683,7 +681,7 @@ function ActiveWorkoutPage() {
               const delay = Math.random() * 0.6
               const dur = 1.5 + Math.random() * 1
               const size = 6 + Math.random() * 6
-              const colors = ['#D46A3A', '#E8E4DC', '#3D8B5C', '#FF3B30', '#007AFF', '#FFD700']
+              const colors = ['#D46A3A', '#1A1917', '#3D8B5C', '#FF3B30', '#007AFF', '#FFD700']
               return (
                 <div key={i} style={{ position: 'absolute', left: `${left}%`, top: '-10px', width: `${size}px`, height: `${size * 0.6}px`, backgroundColor: colors[i % colors.length], borderRadius: '2px', transform: `rotate(${Math.random() * 360}deg)`, animation: `confettiFall ${dur}s ease-in ${delay}s forwards`, opacity: 0 }} />
               )
@@ -704,19 +702,19 @@ function ActiveWorkoutPage() {
 
       {/* Close confirmation — bottom sheet */}
       {closeConfirm && (
-        <div className="fixed inset-0 bg-black/50 z-[70] flex items-end">
-          <div className="w-full bg-[#353330] p-6 rounded-t-2xl animate-slide-up">
+        <div className="fixed inset-0 bg-black/30 z-[70] flex items-end">
+          <div className="w-full bg-white p-6 rounded-t-2xl shadow-[var(--shadow-elevated)] animate-slide-up">
             <h3
-              className="text-[20px] font-semibold text-white tracking-[-0.02em] mb-2"
+              className="text-[20px] font-semibold text-[#1A1917] tracking-[-0.02em] mb-2"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               Training afsluiten?
             </h3>
-            <p className="text-[14px] text-[#B0ADA6] mb-6">Je voortgang wordt opgeslagen.</p>
+            <p className="text-[14px] text-[#A09D96] mb-6">Je voortgang wordt opgeslagen.</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setCloseConfirm(false)}
-                className="flex-1 bg-[#44413D] text-white py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors hover:bg-[#4A4740]"
+                className="flex-1 bg-[#F5F2EC] text-[#1A1917] py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors hover:bg-[#EEEBE3]"
               >
                 Doorgaan
               </button>
@@ -740,19 +738,19 @@ function ActiveWorkoutPage() {
       )}
 
       {/* ═══ TOP BAR ═══════════════════════════════ */}
-      <header className="sticky top-0 bg-[#2A2824]/95 backdrop-blur-xl z-40">
+      <header className="sticky top-0 bg-[#EEEBE3]/95 backdrop-blur-xl z-40 border-b border-[#E5E1D9]">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <button
             onClick={handleMinimize}
-            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors touch-manipulation"
+            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-[#E5E1D9] transition-colors touch-manipulation"
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
-            <X size={20} strokeWidth={1.5} className="text-[#B0ADA6]" />
+            <X size={20} strokeWidth={1.5} className="text-[#6B6862]" />
           </button>
 
-          <div className="flex items-center gap-2 bg-[#353330] px-3 py-1.5 rounded-xl">
+          <div className="flex items-center gap-2 bg-white px-3.5 py-1.5 rounded-xl shadow-sm">
             <Clock size={14} strokeWidth={1.5} className="text-[var(--color-pop)]" />
-            <span className="text-[15px] font-semibold text-white tabular-nums tracking-[-0.02em]">
+            <span className="text-[15px] font-semibold text-[#1A1917] tabular-nums tracking-[-0.02em]">
               {formatTimer(workoutSeconds)}
             </span>
           </div>
@@ -762,7 +760,7 @@ function ActiveWorkoutPage() {
             className={`px-5 h-10 rounded-xl font-semibold text-[12px] uppercase tracking-[0.08em] transition-all ${
               allDone
                 ? 'bg-[var(--color-pop)] text-white shadow-lg shadow-[var(--color-pop)]/20'
-                : 'bg-[#44413D] text-[#B0ADA6]'
+                : 'bg-[#E5E1D9] text-[#A09D96]'
             }`}
           >
             Klaar
@@ -770,7 +768,7 @@ function ActiveWorkoutPage() {
         </div>
 
         {/* Progress line */}
-        <div className="h-[2px] bg-[#44413D]">
+        <div className="h-[2px] bg-[#E5E1D9]">
           <div
             className="h-full bg-[var(--color-pop)] transition-all duration-500"
             style={{ width: `${totalSets > 0 ? (completedTotal / totalSets) * 100 : 0}%` }}
@@ -792,10 +790,10 @@ function ActiveWorkoutPage() {
           return (
             <div
               key={ex.id}
-              className={`rounded-2xl border transition-all ${
+              className={`rounded-2xl transition-all ${
                 exDone
-                  ? 'border-[#555249] bg-[#3A3835]'
-                  : 'border-[#44413D] bg-[#353330]'
+                  ? 'bg-white/60 shadow-sm'
+                  : 'bg-white shadow-[var(--shadow-card)]'
               }`}
             >
               {/* Exercise header */}
@@ -808,22 +806,22 @@ function ActiveWorkoutPage() {
                   >
                     <h3
                       className={`text-[16px] font-semibold leading-tight tracking-[-0.01em] ${
-                        exDone ? 'text-white/40' : 'text-white'
+                        exDone ? 'text-[#A09D96]' : 'text-[#1A1917]'
                       }`}
                     >
                       {exerciseData.name_nl || exerciseData.name}
                     </h3>
-                    <Info size={13} strokeWidth={1.5} className="text-[#9A9690] flex-shrink-0" />
+                    <Info size={13} strokeWidth={1.5} className="text-[#CCC7BC] flex-shrink-0" />
                   </button>
                   <span className={`text-[12px] font-medium tabular-nums ml-2 px-2 py-0.5 rounded-lg ${
-                    exDone ? 'bg-[var(--color-pop)]/20 text-[var(--color-pop)]' : 'text-[#9A9690]'
+                    exDone ? 'bg-[var(--color-pop-light)] text-[var(--color-pop)]' : 'text-[#A09D96]'
                   }`}>
                     {exCompleted}/{exSets.length}
                   </span>
                 </div>
 
                 {/* Meta */}
-                <div className="flex items-center gap-2 text-[11px] text-[#9A9690] uppercase tracking-[0.06em]">
+                <div className="flex items-center gap-2 text-[11px] text-[#A09D96] uppercase tracking-[0.06em]">
                   <span>{ex.sets}×{ex.reps_min}{ex.reps_max !== ex.reps_min ? `-${ex.reps_max}` : ''}</span>
                   {ex.rest_seconds > 0 && <><span>·</span><span>{ex.rest_seconds}s rust</span></>}
                   {ex.tempo && <><span>·</span><span>{ex.tempo}</span></>}
@@ -843,7 +841,7 @@ function ActiveWorkoutPage() {
                   value={exerciseNotes[ex.id] || ''}
                   onChange={(e) => setExerciseNotes(prev => ({ ...prev, [ex.id]: e.target.value }))}
                   placeholder="Notities..."
-                  className="w-full px-0 py-1 bg-transparent text-[12px] text-[#AAA69E] placeholder-[#5A5650] border-none focus:outline-none focus:text-[#AAA]"
+                  className="w-full px-0 py-1 bg-transparent text-[12px] text-[#6B6862] placeholder-[#CCC7BC] border-none focus:outline-none"
                 />
               </div>
 
@@ -851,10 +849,10 @@ function ActiveWorkoutPage() {
               <div className="px-5 pb-4">
                 {/* Header */}
                 <div className="flex items-center gap-2 mb-2 px-1">
-                  <span className="text-[10px] font-bold text-[#8A8682] uppercase tracking-[0.1em] w-[32px]">Set</span>
-                  <span className="text-[10px] font-bold text-[#8A8682] uppercase tracking-[0.1em] flex-1 text-center">Vorige</span>
-                  <span className="text-[10px] font-bold text-[#8A8682] uppercase tracking-[0.1em] w-[72px] text-center">KG</span>
-                  <span className="text-[10px] font-bold text-[#8A8682] uppercase tracking-[0.1em] w-[64px] text-center">Reps</span>
+                  <span className="text-[10px] font-bold text-[#A09D96] uppercase tracking-[0.1em] w-[32px]">Set</span>
+                  <span className="text-[10px] font-bold text-[#A09D96] uppercase tracking-[0.1em] flex-1 text-center">Vorige</span>
+                  <span className="text-[10px] font-bold text-[#A09D96] uppercase tracking-[0.1em] w-[72px] text-center">KG</span>
+                  <span className="text-[10px] font-bold text-[#A09D96] uppercase tracking-[0.1em] w-[64px] text-center">Reps</span>
                   <span className="w-[36px]" />
                 </div>
 
@@ -883,7 +881,7 @@ function ActiveWorkoutPage() {
                         {/* Inline rest timer */}
                         {isRestActive && activeRestTimer && (
                           <div className="flex items-center gap-2 px-1 py-1.5">
-                            <div className="flex-1 h-[3px] bg-[#44413D] rounded-full overflow-hidden">
+                            <div className="flex-1 h-[3px] bg-[#E5E1D9] rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-[var(--color-pop)] rounded-full transition-all duration-1000 ease-linear"
                                 style={{ width: `${((activeRestTimer.total - activeRestTimer.seconds) / activeRestTimer.total) * 100}%` }}
@@ -905,7 +903,7 @@ function ActiveWorkoutPage() {
                 {/* Add set */}
                 <button
                   onClick={() => addSet(ex.id)}
-                  className="w-full mt-3 py-2.5 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#AAA69E] uppercase tracking-[0.06em] rounded-xl hover:bg-white/10 transition-colors touch-manipulation"
+                  className="w-full mt-3 py-2.5 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#A09D96] uppercase tracking-[0.06em] rounded-xl hover:bg-[#F5F2EC] transition-colors touch-manipulation"
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   <Plus size={13} strokeWidth={2} />
@@ -931,7 +929,7 @@ function ActiveWorkoutPage() {
         <div className="mt-2 space-y-2">
           <button
             onClick={() => setShowExercisePicker(true)}
-            className="w-full py-3.5 bg-[#44413D] text-white rounded-xl font-semibold text-[13px] uppercase tracking-[0.06em] flex items-center justify-center gap-2 hover:bg-[#4A4740] transition-colors"
+            className="w-full py-3.5 bg-white text-[#1A1917] rounded-xl font-semibold text-[13px] uppercase tracking-[0.06em] flex items-center justify-center gap-2 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-all"
           >
             <Plus size={14} strokeWidth={2} />
             Oefening toevoegen
@@ -947,19 +945,19 @@ function ActiveWorkoutPage() {
 
         {/* Discard confirmation */}
         {showDiscardConfirm && (
-          <div className="fixed inset-0 bg-black/50 z-[70] flex items-end">
-            <div className="w-full bg-[#353330] p-6 rounded-t-2xl animate-slide-up">
+          <div className="fixed inset-0 bg-black/30 z-[70] flex items-end">
+            <div className="w-full bg-white p-6 rounded-t-2xl shadow-[var(--shadow-elevated)] animate-slide-up">
               <h3
-                className="text-[20px] font-semibold text-white tracking-[-0.02em] mb-2"
+                className="text-[20px] font-semibold text-[#1A1917] tracking-[-0.02em] mb-2"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 Workout verwijderen?
               </h3>
-              <p className="text-[14px] text-[#B0ADA6] mb-6">Alle voortgang wordt permanent verwijderd.</p>
+              <p className="text-[14px] text-[#A09D96] mb-6">Alle voortgang wordt permanent verwijderd.</p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowDiscardConfirm(false)}
-                  className="flex-1 bg-[#44413D] text-white py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-[#4A4740] transition-colors"
+                  className="flex-1 bg-[#F5F2EC] text-[#1A1917] py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-[#EEEBE3] transition-colors"
                 >
                   Annuleer
                 </button>
@@ -1036,13 +1034,13 @@ function SetRow({
     <div className={`flex items-center gap-2 px-1 py-1.5 transition-all ${set.completed ? 'opacity-40' : ''}`}>
       {/* Set number */}
       <span className={`text-[13px] font-bold tabular-nums w-[32px] ${
-        set.completed ? 'text-white' : 'text-[#9A9690]'
+        set.completed ? 'text-[#1A1917]' : 'text-[#A09D96]'
       }`}>
         {index + 1}
       </span>
 
       {/* Previous */}
-      <span className="flex-1 text-[12px] text-[#8A8682] text-center truncate tabular-nums">
+      <span className="flex-1 text-[12px] text-[#CCC7BC] text-center truncate tabular-nums">
         {prevLabel}
       </span>
 
@@ -1056,7 +1054,7 @@ function SetRow({
         onChange={(e) => handleWeightChange(e.target.value)}
         placeholder={prefilledWeight ? `${prefilledWeight}` : '—'}
         disabled={set.completed}
-        className="w-[72px] px-2 py-2.5 bg-[#2A2824] border border-[#44413D] rounded-lg text-[14px] text-center font-semibold text-white tabular-nums disabled:opacity-40 focus:border-[var(--color-pop)] focus:outline-none transition-all placeholder:text-[#5A5650] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        className="w-[72px] px-2 py-2.5 bg-[#F5F2EC] border border-[#E5E1D9] rounded-lg text-[14px] text-center font-semibold text-[#1A1917] tabular-nums disabled:opacity-40 focus:border-[var(--color-pop)] focus:outline-none transition-all placeholder:text-[#CCC7BC] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />
 
       {/* Reps input */}
@@ -1068,7 +1066,7 @@ function SetRow({
         onChange={(e) => handleRepsChange(e.target.value)}
         placeholder={set.prescribed_reps?.toString() || '—'}
         disabled={set.completed}
-        className="w-[64px] px-2 py-2.5 bg-[#2A2824] border border-[#44413D] rounded-lg text-[14px] text-center font-semibold text-white tabular-nums disabled:opacity-40 focus:border-[var(--color-pop)] focus:outline-none transition-all placeholder:text-[#5A5650] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        className="w-[64px] px-2 py-2.5 bg-[#F5F2EC] border border-[#E5E1D9] rounded-lg text-[14px] text-center font-semibold text-[#1A1917] tabular-nums disabled:opacity-40 focus:border-[var(--color-pop)] focus:outline-none transition-all placeholder:text-[#CCC7BC] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />
 
       {/* Check button */}
@@ -1078,7 +1076,7 @@ function SetRow({
         className={`w-[36px] h-[36px] flex items-center justify-center flex-shrink-0 rounded-lg transition-all touch-manipulation ${
           set.completed
             ? 'bg-[var(--color-pop)] text-white'
-            : 'bg-[#44413D] text-[#9A9690] hover:bg-[#4A4740] active:scale-95'
+            : 'bg-[#F5F2EC] text-[#CCC7BC] hover:bg-[#E5E1D9] active:scale-95'
         }`}
         style={{ WebkitTapHighlightColor: 'transparent' }}
       >
