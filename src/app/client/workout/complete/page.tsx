@@ -64,6 +64,25 @@ function WorkoutCompletePage() {
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
+  // ─── Confetti (hook BEFORE any conditional returns) ───────
+  const spawnConfetti = useCallback(() => {
+    const colors = ['#FF9500', '#8B6914', '#34C759', '#007AFF', '#FF3B30', '#AF52DE', '#FFCC00']
+    const container = document.body
+    for (let i = 0; i < 40; i++) {
+      const el = document.createElement('div')
+      el.className = 'confetti-particle'
+      el.style.left = `${Math.random() * 100}vw`
+      el.style.width = `${6 + Math.random() * 8}px`
+      el.style.height = `${6 + Math.random() * 8}px`
+      el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
+      el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px'
+      el.style.animationDelay = `${Math.random() * 1.5}s`
+      el.style.animationDuration = `${2 + Math.random() * 2}s`
+      container.appendChild(el)
+      setTimeout(() => el.remove(), 5000)
+    }
+  }, [])
+
   useEffect(() => {
     const loadSession = async () => {
       try {
@@ -111,6 +130,14 @@ function WorkoutCompletePage() {
     loadSession()
   }, [sessionId, router])
 
+  // Trigger confetti when PRs detected (hook BEFORE conditional returns)
+  const prsCount = session?.workout_sets?.filter((s) => s.is_pr).length || 0
+  useEffect(() => {
+    if (prsCount > 0) {
+      setTimeout(() => spawnConfetti(), 500)
+    }
+  }, [prsCount, spawnConfetti])
+
   const togglePain = (exerciseId: string) => {
     setExerciseGroups(prev =>
       prev.map(g =>
@@ -151,7 +178,7 @@ function WorkoutCompletePage() {
         })
         .eq('id', sessionId)
 
-      // Update pain flags per exercise (batch update all sets for flagged exercises)
+      // Update pain flags per exercise
       const painUpdates = exerciseGroups
         .filter(g => g.painFlag)
         .map(g =>
@@ -197,42 +224,15 @@ function WorkoutCompletePage() {
     )
   }
 
-  // ─── Confetti for PRs ──────────────────────────────────
-  const spawnConfetti = useCallback(() => {
-    const colors = ['#FF9500', '#8B6914', '#34C759', '#007AFF', '#FF3B30', '#AF52DE', '#FFCC00']
-    const container = document.body
-    for (let i = 0; i < 40; i++) {
-      const el = document.createElement('div')
-      el.className = 'confetti-particle'
-      el.style.left = `${Math.random() * 100}vw`
-      el.style.width = `${6 + Math.random() * 8}px`
-      el.style.height = `${6 + Math.random() * 8}px`
-      el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
-      el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px'
-      el.style.animationDelay = `${Math.random() * 1.5}s`
-      el.style.animationDuration = `${2 + Math.random() * 2}s`
-      container.appendChild(el)
-      setTimeout(() => el.remove(), 5000)
-    }
-  }, [])
-
   // ─── Computed stats ─────────────────────────────────────
 
-  const sets = session.workout_sets || []
-  const totalSets = sets.length
-  const totalVolume = sets.reduce((sum, set) => {
+  const workoutSets = session.workout_sets || []
+  const totalSets = workoutSets.length
+  const totalVolume = workoutSets.reduce((sum, set) => {
     const weight = set.weight_kg || 0
     const reps = set.actual_reps || 0
     return sum + weight * reps
   }, 0)
-  const prsCount = sets.filter((s) => s.is_pr).length
-
-  // Trigger confetti if PRs were achieved
-  useEffect(() => {
-    if (prsCount > 0) {
-      setTimeout(() => spawnConfetti(), 500)
-    }
-  }, [prsCount, spawnConfetti])
 
   const startTime = new Date(session.started_at)
   const endTime = new Date()
