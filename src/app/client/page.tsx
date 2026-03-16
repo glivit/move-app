@@ -43,6 +43,13 @@ interface DashboardData {
       name: string
       time: string | null
       completed: boolean
+      items: Array<{
+        name: string
+        grams: number | null
+        calories: number
+        protein: number
+      }>
+      clientNotes: string | null
     }>
     mealsCompleted: number
     mealsTotal: number
@@ -397,41 +404,71 @@ export default function ClientDashboard() {
             </div>
           </div>
 
-          {/* Meal checklist */}
+          {/* Meal checklist with food details */}
           <div className="divide-y divide-[#F0F0ED]">
             {nutrition.meals.map((meal) => (
-              <button
-                key={meal.id}
-                onClick={() => toggleMeal(meal.id, meal.name, meal.completed)}
-                disabled={togglingMeal === meal.id}
-                className="w-full px-6 py-3.5 flex items-center gap-3.5 hover:bg-[#FAFAF8] transition-colors text-left"
-              >
-                <div
-                  className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-200"
-                  style={{
-                    backgroundColor: meal.completed ? '#3D8B5C' : 'transparent',
-                    border: meal.completed ? 'none' : '1.5px solid #D1CFC9',
-                  }}
+              <div key={meal.id} className="px-6 py-4">
+                {/* Meal header with checkbox */}
+                <button
+                  onClick={() => toggleMeal(meal.id, meal.name, meal.completed)}
+                  disabled={togglingMeal === meal.id}
+                  className="w-full flex items-center gap-3.5 hover:opacity-80 transition-opacity text-left"
                 >
-                  {meal.completed && (
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                      <path d="M2.5 6L5 8.5L9.5 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                  <div
+                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-200"
+                    style={{
+                      backgroundColor: meal.completed ? '#3D8B5C' : 'transparent',
+                      border: meal.completed ? 'none' : '1.5px solid #D1CFC9',
+                    }}
+                  >
+                    {meal.completed && (
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M2.5 6L5 8.5L9.5 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </div>
+                  <span
+                    className="text-[13px] font-semibold uppercase tracking-[0.05em] transition-all duration-200"
+                    style={{
+                      color: meal.completed ? '#9C9A95' : '#1A1917',
+                    }}
+                  >
+                    {meal.name}
+                  </span>
+                  {meal.time && (
+                    <span className="text-[11px] text-[#BAB8B3] ml-auto">{meal.time}</span>
                   )}
-                </div>
-                <span
-                  className="text-[15px] transition-all duration-200 tracking-[-0.01em]"
-                  style={{
-                    color: meal.completed ? '#9C9A95' : '#1A1917',
-                    fontWeight: meal.completed ? 400 : 500,
-                  }}
-                >
-                  {meal.name}
-                </span>
-                {meal.time && (
-                  <span className="text-[12px] text-[#BAB8B3] ml-auto">{meal.time}</span>
+                </button>
+
+                {/* Food items list */}
+                {meal.items && meal.items.length > 0 && (
+                  <div className="ml-[38px] mt-2 space-y-1">
+                    {meal.items.map((item, idx) => (
+                      <div key={idx} className="flex items-center justify-between">
+                        <span
+                          className="text-[13px] tracking-[-0.01em]"
+                          style={{
+                            color: meal.completed ? '#BAB8B3' : '#5C5A55',
+                            textDecoration: meal.completed ? 'line-through' : 'none',
+                          }}
+                        >
+                          {item.name}{item.grams ? ` — ${item.grams}g` : ''}
+                        </span>
+                        <span className="text-[11px] text-[#BAB8B3] shrink-0 ml-2">
+                          {item.calories > 0 ? `${item.calories} kcal` : ''}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 )}
-              </button>
+
+                {/* Client note indicator */}
+                {meal.clientNotes && (
+                  <div className="ml-[38px] mt-1.5">
+                    <p className="text-[11px] text-[#C47D15] italic truncate">{meal.clientNotes}</p>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
 

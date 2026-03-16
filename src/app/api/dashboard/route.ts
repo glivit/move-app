@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         .eq('client_id', user.id).eq('is_active', true).single(),
 
       // Today's meal logs
-      supabase.from('nutrition_logs').select('meal_id, meal_name, completed, completed_at')
+      supabase.from('nutrition_logs').select('meal_id, meal_name, completed, completed_at, client_notes')
         .eq('client_id', user.id).eq('date', today),
 
       // Today's nutrition summary
@@ -153,6 +153,13 @@ export async function GET(request: NextRequest) {
         name: meal.name,
         time: meal.time || null,
         completed: log?.completed || false,
+        items: (meal.items || meal.foods || []).map((item: any) => ({
+          name: item.name,
+          grams: item.grams || null,
+          calories: item.calories || (item.per100g ? Math.round((item.per100g.calories * (item.grams || 100)) / 100) : 0),
+          protein: item.protein || (item.per100g ? Math.round((item.per100g.protein * (item.grams || 100)) / 100) : 0),
+        })),
+        clientNotes: log?.client_notes || null,
       }
     })
     const mealsCompleted = mealStatus.filter((m: any) => m.completed).length

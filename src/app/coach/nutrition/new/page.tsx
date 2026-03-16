@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import {
   ChevronLeft, Save, Loader2, Plus, Trash2,
-  UtensilsCrossed, Flame, Beef, Wheat, Droplet
+  UtensilsCrossed, Flame, Beef, Wheat, Droplet,
+  Search, X
 } from 'lucide-react'
+import { FoodSearch, type FoodItem } from '@/components/coach/FoodSearch'
 
 interface MealItem {
   name: string
@@ -15,6 +17,14 @@ interface MealItem {
   protein: number
   carbs: number
   fat: number
+  grams?: number
+  per100g?: {
+    calories: number
+    protein: number
+    carbs: number
+    fat: number
+  }
+  image?: string | null
 }
 
 interface Meal {
@@ -53,6 +63,7 @@ export default function NewNutritionPlanPage() {
   const [selectedClient, setSelectedClient] = useState<string | null>(null)
   const [clients, setClients] = useState<{ id: string; full_name: string }[]>([])
   const [loadingClients, setLoadingClients] = useState(false)
+  const [showFoodSearch, setShowFoodSearch] = useState<number | null>(null) // mealIndex or null
 
   // Load clients if assigning directly
   async function loadClients() {
@@ -128,6 +139,30 @@ export default function NewNutritionPlanPage() {
     }))
   }
 
+  function handleFoodSelected(food: FoodItem, grams: number, mealIndex: number) {
+    const item: MealItem = {
+      name: food.name,
+      description: food.brand ? `${food.brand} — ${grams}g` : `${grams}g`,
+      calories: Math.round((food.per100g.calories * grams) / 100),
+      protein: Math.round((food.per100g.protein * grams) / 100),
+      carbs: Math.round((food.per100g.carbs * grams) / 100),
+      fat: Math.round((food.per100g.fat * grams) / 100),
+      grams,
+      per100g: {
+        calories: food.per100g.calories,
+        protein: food.per100g.protein,
+        carbs: food.per100g.carbs,
+        fat: food.per100g.fat,
+      },
+      image: food.image_small || null,
+    }
+    setMeals(prev => prev.map((m, i) => {
+      if (i !== mealIndex) return m
+      return { ...m, items: [...m.items, item] }
+    }))
+    setShowFoodSearch(null)
+  }
+
   async function savePlan() {
     if (!title.trim()) return
     setSaving(true)
@@ -148,10 +183,25 @@ export default function NewNutritionPlanPage() {
         protein_g: proteinG,
         carbs_g: carbsG,
         fat_g: fatG,
-        meals: meals.map(m => ({
+        meals: meals.map((m, mIdx) => ({
+          id: `meal-${mIdx}-${m.name.toLowerCase().replace(/\s+/g, '-')}`,
           name: m.name,
           time: m.time,
           items: m.items.filter(it => it.name.trim()),
+          // Also save as foods array for client nutrition page compatibility
+          foods: m.items.filter(it => it.name.trim()).map((it, fIdx) => ({
+            id: `food-${mIdx}-${fIdx}`,
+            name: it.name,
+            brand: null,
+            image: it.image || null,
+            grams: it.grams || 100,
+            per100g: it.per100g || {
+              calories: it.calories,
+              protein: it.protein,
+              carbs: it.carbs,
+              fat: it.fat,
+            },
+          })),
         })),
         guidelines: guidelines.trim() || null,
         is_active: !isTemplate, // Templates are stored under coach ID, not active for client
@@ -407,59 +457,114 @@ export default function NewNutritionPlanPage() {
                 {meal.items.length > 0 && (
                   <div className="space-y-2 mb-3">
                     {meal.items.map((item, itemIndex) => (
-                      <div key={itemIndex} className="flex items-center gap-2 pl-7">
-                        <input
-                          type="text"
-                          value={item.name}
-                          onChange={(e) => updateMealItem(mealIndex, itemIndex, 'name', e.target.value)}
-                          placeholder="Voedingsmiddel"
-                          className="flex-1 text-[13px] text-[#1A1A18] px-2 py-1.5 border border-[#F0F0ED] rounded-lg focus:outline-none focus:border-[#8B6914] placeholder-[#C7C7CC]"
-                        />
-                        <input
-                          type="number"
-                          value={item.calories || ''}
-                          onChange={(e) => updateMealItem(mealIndex, itemIndex, 'calories', parseInt(e.target.value) || 0)}
-                          placeholder="kcal"
-                          className="w-16 text-[12px] text-[#1A1A18] px-2 py-1.5 border border-[#F0F0ED] rounded-lg focus:outline-none focus:border-[#8B6914] placeholder-[#C7C7CC] text-center"
-                        />
-                        <input
-                          type="number"
-                          value={item.protein || ''}
-                          onChange={(e) => updateMealItem(mealIndex, itemIndex, 'protein', parseInt(e.target.value) || 0)}
-                          placeholder="P"
-                          className="w-12 text-[12px] text-[#FF3B30] px-2 py-1.5 border border-[#F0F0ED] rounded-lg focus:outline-none focus:border-[#8B6914] placeholder-[#C7C7CC] text-center"
-                        />
-                        <input
-                          type="number"
-                          value={item.carbs || ''}
-                          onChange={(e) => updateMealItem(mealIndex, itemIndex, 'carbs', parseInt(e.target.value) || 0)}
-                          placeholder="K"
-                          className="w-12 text-[12px] text-[#FF9500] px-2 py-1.5 border border-[#F0F0ED] rounded-lg focus:outline-none focus:border-[#8B6914] placeholder-[#C7C7CC] text-center"
-                        />
-                        <input
-                          type="number"
-                          value={item.fat || ''}
-                          onChange={(e) => updateMealItem(mealIndex, itemIndex, 'fat', parseInt(e.target.value) || 0)}
-                          placeholder="V"
-                          className="w-12 text-[12px] text-[#007AFF] px-2 py-1.5 border border-[#F0F0ED] rounded-lg focus:outline-none focus:border-[#8B6914] placeholder-[#C7C7CC] text-center"
-                        />
-                        <button
-                          onClick={() => removeMealItem(mealIndex, itemIndex)}
-                          className="p-1 text-[#C7C7CC] hover:text-[#FF3B30]"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
+                      <div key={itemIndex}>
+                        {item.per100g ? (
+                          /* Food from database — nice display */
+                          <div className="flex items-center gap-2 pl-7 bg-[#FAFAFA] rounded-lg p-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-white border border-[#F0F0ED] flex items-center justify-center overflow-hidden shrink-0">
+                              {item.image ? (
+                                <img src={item.image} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <span className="text-[14px]">🍽️</span>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[13px] font-medium text-[#1A1A18] truncate">{item.name}</p>
+                              <p className="text-[11px] text-[#8E8E93]">{item.grams}g</p>
+                            </div>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <span className="text-[11px] font-semibold text-[#FF9500]">{item.calories}</span>
+                              <span className="text-[10px] text-[#8E8E93]">kcal</span>
+                            </div>
+                            <div className="flex items-center gap-1 shrink-0 text-[10px]">
+                              <span className="text-[#FF3B30] font-medium">{item.protein}P</span>
+                              <span className="text-[#FF9500] font-medium">{item.carbs}K</span>
+                              <span className="text-[#007AFF] font-medium">{item.fat}V</span>
+                            </div>
+                            <button
+                              onClick={() => removeMealItem(mealIndex, itemIndex)}
+                              className="p-1 text-[#C7C7CC] hover:text-[#FF3B30] shrink-0"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ) : (
+                          /* Manual entry — editable fields */
+                          <div className="flex items-center gap-2 pl-7">
+                            <input
+                              type="text"
+                              value={item.name}
+                              onChange={(e) => updateMealItem(mealIndex, itemIndex, 'name', e.target.value)}
+                              placeholder="Voedingsmiddel"
+                              className="flex-1 text-[13px] text-[#1A1A18] px-2 py-1.5 border border-[#F0F0ED] rounded-lg focus:outline-none focus:border-[#8B6914] placeholder-[#C7C7CC]"
+                            />
+                            <input
+                              type="number"
+                              value={item.calories || ''}
+                              onChange={(e) => updateMealItem(mealIndex, itemIndex, 'calories', parseInt(e.target.value) || 0)}
+                              placeholder="kcal"
+                              className="w-16 text-[12px] text-[#1A1A18] px-2 py-1.5 border border-[#F0F0ED] rounded-lg focus:outline-none focus:border-[#8B6914] placeholder-[#C7C7CC] text-center"
+                            />
+                            <input
+                              type="number"
+                              value={item.protein || ''}
+                              onChange={(e) => updateMealItem(mealIndex, itemIndex, 'protein', parseInt(e.target.value) || 0)}
+                              placeholder="P"
+                              className="w-12 text-[12px] text-[#FF3B30] px-2 py-1.5 border border-[#F0F0ED] rounded-lg focus:outline-none focus:border-[#8B6914] placeholder-[#C7C7CC] text-center"
+                            />
+                            <input
+                              type="number"
+                              value={item.carbs || ''}
+                              onChange={(e) => updateMealItem(mealIndex, itemIndex, 'carbs', parseInt(e.target.value) || 0)}
+                              placeholder="K"
+                              className="w-12 text-[12px] text-[#FF9500] px-2 py-1.5 border border-[#F0F0ED] rounded-lg focus:outline-none focus:border-[#8B6914] placeholder-[#C7C7CC] text-center"
+                            />
+                            <input
+                              type="number"
+                              value={item.fat || ''}
+                              onChange={(e) => updateMealItem(mealIndex, itemIndex, 'fat', parseInt(e.target.value) || 0)}
+                              placeholder="V"
+                              className="w-12 text-[12px] text-[#007AFF] px-2 py-1.5 border border-[#F0F0ED] rounded-lg focus:outline-none focus:border-[#8B6914] placeholder-[#C7C7CC] text-center"
+                            />
+                            <button
+                              onClick={() => removeMealItem(mealIndex, itemIndex)}
+                              className="p-1 text-[#C7C7CC] hover:text-[#FF3B30]"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
                 )}
 
-                <button
-                  onClick={() => addItemToMeal(mealIndex)}
-                  className="ml-7 text-[12px] font-medium text-[#8B6914] hover:underline"
-                >
-                  + Voedingsmiddel toevoegen
-                </button>
+                {/* Food Search Panel */}
+                {showFoodSearch === mealIndex && (
+                  <div className="ml-7 mb-3">
+                    <FoodSearch
+                      onSelect={(food, grams) => handleFoodSelected(food, grams, mealIndex)}
+                      onClose={() => setShowFoodSearch(null)}
+                    />
+                  </div>
+                )}
+
+                {/* Add buttons: search or manual */}
+                <div className="ml-7 flex items-center gap-3">
+                  <button
+                    onClick={() => setShowFoodSearch(showFoodSearch === mealIndex ? null : mealIndex)}
+                    className="flex items-center gap-1.5 text-[12px] font-semibold text-[#8B6914] px-3 py-1.5 rounded-lg bg-[#F5F0E8] hover:bg-[#EDE5D4] transition-colors"
+                  >
+                    <Search className="w-3.5 h-3.5" />
+                    Zoek voedingsmiddel
+                  </button>
+                  <button
+                    onClick={() => addItemToMeal(mealIndex)}
+                    className="text-[12px] font-medium text-[#8E8E93] hover:text-[#8B6914] transition-colors"
+                  >
+                    + Handmatig toevoegen
+                  </button>
+                </div>
               </div>
             ))}
           </div>
