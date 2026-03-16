@@ -194,7 +194,7 @@ export default function ExercisesPage() {
       <SubPageHeader overline="Training" title="Oefeningen" backHref="/client/progress" />
 
       {/* Summary */}
-      <div className="flex gap-4 mb-6 border-b border-[#E8E4DC] pb-5">
+      <div className="flex gap-4 mb-6 border-b border-[#F0EDE8] pb-5">
         <div className="text-center flex-1">
           <p className="text-[22px] font-bold text-[#1A1917]">{exerciseStats.length}</p>
           <p className="text-label mt-1">Oefeningen</p>
@@ -221,7 +221,7 @@ export default function ExercisesPage() {
           placeholder="Zoek oefening..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-9 pr-4 py-2.5 bg-white border border-[#E8E4DC] text-[14px] text-[#1A1917] placeholder-[#C5C2BC] focus:border-[#1A1917] outline-none"
+          className="w-full pl-9 pr-4 py-2.5 bg-white border border-[#E8E4DC] text-[14px] text-[#1A1917] placeholder-[#C5C2BC] focus:border-[#1A1917] outline-none rounded-xl"
         />
       </div>
 
@@ -229,7 +229,7 @@ export default function ExercisesPage() {
       <div className="flex gap-1 mb-5 overflow-x-auto pb-1 -mx-4 px-4">
         <button
           onClick={() => setSelectedGroup(null)}
-          className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 transition-all ${
+          className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 transition-all rounded-xl ${
             !selectedGroup ? 'bg-[#1A1917] text-white' : 'text-[#A09D96] hover:text-[#1A1917]'
           }`}
         >
@@ -239,7 +239,7 @@ export default function ExercisesPage() {
           <button
             key={group}
             onClick={() => setSelectedGroup(selectedGroup === group ? null : group)}
-            className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 transition-all ${
+            className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 transition-all rounded-xl ${
               selectedGroup === group ? 'bg-[#1A1917] text-white' : 'text-[#A09D96] hover:text-[#1A1917]'
             }`}
           >
@@ -258,7 +258,7 @@ export default function ExercisesPage() {
           filtered.map(stat => (
             <div
               key={stat.exercise.id}
-              className="border border-[#E8E4DC] bg-white p-4"
+              className="bg-white p-4 rounded-2xl shadow-[var(--shadow-card)]"
             >
               <div className="flex items-start gap-3">
                 <div className="flex-1 min-w-0">

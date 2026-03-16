@@ -151,7 +151,7 @@ export default function SupplementsPage() {
         </div>
         <div className="space-y-4">
           {[1, 2].map(i => (
-            <div key={i} className="bg-white h-24 border border-[#E8E4DC] animate-pulse" />
+            <div key={i} className="bg-white h-24 rounded-2xl shadow-[var(--shadow-card)] animate-pulse" />
           ))}
         </div>
       </div>
@@ -168,7 +168,7 @@ export default function SupplementsPage() {
         </div>
         <button
           onClick={() => setShowAdd(!showAdd)}
-          className="w-10 h-10 bg-[#1A1917] text-white flex items-center justify-center hover:bg-[#6B5110] transition-colors border border-[#1A1917]"
+          className="w-10 h-10 bg-[#1A1917] text-white flex items-center justify-center hover:bg-[#6B5110] transition-colors rounded-xl"
         >
           {showAdd ? <X className="w-5 h-5" strokeWidth={1.5} /> : <Plus className="w-5 h-5" strokeWidth={1.5} />}
         </button>
@@ -176,7 +176,7 @@ export default function SupplementsPage() {
 
       {/* Daily progress */}
       {totalCount > 0 && (
-        <div className="bg-white p-5 border border-[#E8E4DC]">
+        <div className="bg-white p-5 rounded-2xl shadow-[var(--shadow-card)]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full flex items-center justify-center"
@@ -209,7 +209,7 @@ export default function SupplementsPage() {
 
       {/* Add form */}
       {showAdd && (
-        <form onSubmit={addSupplement} className="bg-white p-5 border border-[#E8E4DC] space-y-4">
+        <form onSubmit={addSupplement} className="bg-white p-5 rounded-2xl shadow-[var(--shadow-card)] space-y-4">
           <h3 className="text-[15px] font-semibold text-[#1A1917]">Nieuw supplement toevoegen</h3>
 
           <div>
@@ -220,7 +220,7 @@ export default function SupplementsPage() {
               onChange={(e) => setName(e.target.value)}
               placeholder="bijv. Creatine, Vitamine D, Omega-3..."
               required
-              className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[14px] text-[#1A1917] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
+              className="w-full px-3 py-2.5 border border-[#F0EDE8] rounded-xl bg-[#FAF8F3] text-[14px] text-[#1A1917] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
             />
           </div>
 
@@ -231,7 +231,7 @@ export default function SupplementsPage() {
               value={dosage}
               onChange={(e) => setDosage(e.target.value)}
               placeholder="bijv. 5g, 2000 IU, 1 capsule..."
-              className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[14px] text-[#1A1917] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
+              className="w-full px-3 py-2.5 border border-[#F0EDE8] rounded-xl bg-[#FAF8F3] text-[14px] text-[#1A1917] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
             />
           </div>
 
@@ -241,7 +241,7 @@ export default function SupplementsPage() {
               <select
                 value={frequency}
                 onChange={(e) => setFrequency(e.target.value)}
-                className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917]"
+                className="w-full px-3 py-2.5 border border-[#F0EDE8] rounded-xl bg-[#FAF8F3] text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917]"
               >
                 {FREQUENCY_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -253,7 +253,7 @@ export default function SupplementsPage() {
               <select
                 value={timeOfDay}
                 onChange={(e) => setTimeOfDay(e.target.value)}
-                className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917]"
+                className="w-full px-3 py-2.5 border border-[#F0EDE8] rounded-xl bg-[#FAF8F3] text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917]"
               >
                 {TIME_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -265,7 +265,7 @@ export default function SupplementsPage() {
           <button
             type="submit"
             disabled={saving || !name.trim()}
-            className="w-full py-3 bg-[#1A1917] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#6B5110] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 border border-[#1A1917]"
+            className="w-full py-3 bg-[#1A1917] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#6B5110] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 rounded-xl"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Toevoegen
@@ -291,14 +291,14 @@ export default function SupplementsPage() {
                     return (
                       <div
                         key={supplement.id}
-                        className="bg-white p-4 border transition-all"
+                        className="bg-white p-4 rounded-2xl shadow-[var(--shadow-card)] transition-all"
                         style={{ borderColor: logged ? '#34C759' : '#E8E4DC' }}
                       >
                         <div className="flex items-center gap-3">
                           <button
                             onClick={() => toggleLog(supplement.id)}
                             disabled={toggling}
-                            className="w-8 h-8 border-2 flex items-center justify-center shrink-0 transition-all"
+                            className="w-8 h-8 border-2 flex items-center justify-center shrink-0 transition-all rounded-md"
                             style={{
                               borderColor: logged ? '#34C759' : '#E0DDD8',
                               backgroundColor: logged ? '#34C759' : 'transparent',
@@ -341,7 +341,7 @@ export default function SupplementsPage() {
           })}
         </div>
       ) : !showAdd ? (
-        <div className="bg-white p-12 border border-[#E8E4DC] text-center">
+        <div className="bg-white p-12 rounded-2xl shadow-[var(--shadow-card)] text-center">
           <Pill strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[#C7C7CC]" />
           <p className="text-[15px] font-semibold text-[#1A1917] mb-2">Nog geen supplementen</p>
           <p className="text-[13px] text-[#A09D96] mb-4">
@@ -349,7 +349,7 @@ export default function SupplementsPage() {
           </p>
           <button
             onClick={() => setShowAdd(true)}
-            className="px-5 py-2.5 bg-[#1A1917] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#6B5110] transition-colors border border-[#1A1917]"
+            className="px-5 py-2.5 bg-[#1A1917] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#6B5110] transition-colors rounded-xl"
           >
             Eerste supplement toevoegen
           </button>

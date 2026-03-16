@@ -181,7 +181,7 @@ export default function CheckInPage() {
   if (submitted) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4 py-8">
-        <div className="bg-white p-8 max-w-sm w-full text-center space-y-6">
+        <div className="bg-white p-8 max-w-sm w-full text-center space-y-6 rounded-2xl shadow-[var(--shadow-card)]">
           <div className="flex justify-center">
             <div className="w-24 h-24 bg-[#E8F5E9] flex items-center justify-center animate-[scale-in_0.5s_ease-out]">
               <CheckCircle className="h-12 w-12 text-[#34C759]" strokeWidth={1.5} />
@@ -195,7 +195,7 @@ export default function CheckInPage() {
           </div>
           <button
             onClick={() => router.push('/client')}
-            className="w-full bg-[#1A1917] text-white py-3.5 font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[#2A2A28]"
+            className="w-full bg-[#1A1917] text-white py-3.5 font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[#2A2A28] rounded-xl"
           >
             Terug naar dashboard
           </button>
@@ -207,7 +207,7 @@ export default function CheckInPage() {
   if (!canSubmit) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4 py-8">
-        <div className="bg-white p-8 max-w-sm w-full text-center space-y-6">
+        <div className="bg-white p-8 max-w-sm w-full text-center space-y-6 rounded-2xl shadow-[var(--shadow-card)]">
           <div className="flex justify-center">
             <div className="w-20 h-20 bg-[#FFF3E0] flex items-center justify-center">
               <Calendar className="h-10 w-10 text-[#FF9800]" strokeWidth={1.5} />
@@ -219,7 +219,7 @@ export default function CheckInPage() {
           </div>
           <button
             onClick={() => router.push('/client')}
-            className="w-full bg-[#1A1917] text-white py-3.5 font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[#2A2A28]"
+            className="w-full bg-[#1A1917] text-white py-3.5 font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[#2A2A28] rounded-xl"
           >
             Terug naar dashboard
           </button>
@@ -307,7 +307,7 @@ export default function CheckInPage() {
       </div>
 
       {/* Step content */}
-      <div className="bg-white p-6 transition-all duration-300">
+      <div className="bg-white p-6 transition-all duration-300 rounded-2xl shadow-[var(--shadow-card)]">
         {currentStep === 0 && (
           <PhotoUploadStep
             photos={data.photos}
@@ -342,7 +342,7 @@ export default function CheckInPage() {
         {currentStep > 0 && (
           <button
             onClick={() => setCurrentStep(currentStep - 1)}
-            className="flex-1 px-6 py-3.5 text-[#C5C2BC] font-medium uppercase tracking-wider hover:bg-[#F5F5F5] transition-all duration-300 border border-[#E8E4DC]"
+            className="flex-1 px-6 py-3.5 text-[#C5C2BC] font-medium uppercase tracking-wider hover:bg-[#F5F5F5] transition-all duration-300 rounded-xl shadow-[var(--shadow-card)]"
           >
             Vorige
           </button>
@@ -350,7 +350,7 @@ export default function CheckInPage() {
         {currentStep < steps.length - 1 ? (
           <button
             onClick={() => setCurrentStep(currentStep + 1)}
-            className="flex-1 bg-[#1A1917] text-white py-3.5 font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[#2A2A28]"
+            className="flex-1 bg-[#1A1917] text-white py-3.5 font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[#2A2A28] rounded-xl"
           >
             Volgende
           </button>
@@ -358,7 +358,7 @@ export default function CheckInPage() {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="flex-1 bg-[#1A1917] text-white py-3.5 font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[#2A2A28] disabled:opacity-50"
+            className="flex-1 bg-[#1A1917] text-white py-3.5 font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[#2A2A28] disabled:opacity-50 rounded-xl"
           >
             {submitting ? 'Bezig met indienen...' : 'Check-in indienen'}
           </button>

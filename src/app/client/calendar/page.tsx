@@ -314,7 +314,7 @@ export default function CalendarPage() {
       </div>
 
       {/* ═══ DAY NAVIGATION ════════════════════════════════════ */}
-      <div className="border-t border-[#E8E4DC] pt-5">
+      <div className="border-t border-[#F0EDE8] pt-5">
         <div className="flex items-center justify-between mb-4">
           <button onClick={prevDay} className="w-9 h-9 flex items-center justify-center text-[#A09D96] hover:text-[#1A1917] transition-colors">
             <ArrowLeft size={18} strokeWidth={1.5} />
@@ -340,7 +340,7 @@ export default function CalendarPage() {
           const exercises = groupExercises(w.workout_sets || [])
 
           return (
-            <div key={w.id} className="border border-[#E8E4DC] bg-white mb-3 overflow-hidden">
+            <div key={w.id} className="bg-white rounded-2xl shadow-[var(--shadow-card)] mb-3 overflow-hidden">
               {/* Workout header */}
               <div className="flex items-center gap-3 p-4">
                 <div className="w-10 h-10 bg-[#3D8B5C]/10 flex items-center justify-center shrink-0">
@@ -407,7 +407,7 @@ export default function CalendarPage() {
 
         {/* Video sessions */}
         {selectedDayData.videoSessions.map(v => (
-          <div key={v.id} className="border border-[#E8E4DC] bg-white p-4 mb-3">
+          <div key={v.id} className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4 mb-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-[#3068C4]/10 flex items-center justify-center shrink-0">
                 <Video size={18} strokeWidth={1.5} className="text-[#3068C4]" />
@@ -421,7 +421,7 @@ export default function CalendarPage() {
               {v.status === 'scheduled' && (
                 <button
                   onClick={() => router.push(`/client/video/${v.id}`)}
-                  className="px-3 py-1.5 bg-[#3068C4] text-white text-[11px] font-semibold uppercase tracking-[0.06em]"
+                  className="px-3 py-1.5 bg-[#3068C4] text-white text-[11px] font-semibold uppercase tracking-[0.06em] rounded-xl"
                 >
                   Join
                 </button>
@@ -432,7 +432,7 @@ export default function CalendarPage() {
 
         {/* Planned workout */}
         {!hasCompleted && plannedForDay && isFutureOrToday && (
-          <div className="border border-[#E8E4DC] bg-white p-4 mb-3">
+          <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4 mb-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-[#E5E1D9] flex items-center justify-center shrink-0">
                 <Dumbbell size={18} strokeWidth={1.5} className="text-[#A09D96]" />
@@ -446,7 +446,7 @@ export default function CalendarPage() {
               {isToday(selectedDate) && (
                 <button
                   onClick={() => router.push('/client/workout')}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-[#1A1917] text-white text-[11px] font-semibold uppercase tracking-[0.06em]"
+                  className="flex items-center gap-1 px-3 py-1.5 bg-[#1A1917] text-white text-[11px] font-semibold uppercase tracking-[0.06em] rounded-xl"
                 >
                   <Play size={12} strokeWidth={2} />
                   Start

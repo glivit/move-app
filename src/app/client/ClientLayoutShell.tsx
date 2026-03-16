@@ -3,6 +3,7 @@
 import { ClientBottomNav } from '@/components/layout/ClientBottomNav'
 import { ClientSidebar } from '@/components/layout/ClientSidebar'
 import { NotificationPermission } from '@/components/notifications/NotificationPermission'
+import { ActiveWorkoutBar } from '@/components/workout/ActiveWorkoutBar'
 
 export default function ClientLayoutShell({ children }: { children: React.ReactNode }) {
   return (
@@ -28,6 +29,9 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
           {children}
         </div>
       </main>
+
+      {/* Active workout persistent bar */}
+      <ActiveWorkoutBar />
 
       {/* Mobile bottom nav */}
       <ClientBottomNav />

@@ -113,7 +113,7 @@ export default function ResourcesPage() {
       </div>
 
       {/* Search */}
-      <div className="flex items-center gap-3 px-4 py-3 bg-white">
+      <div className="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-[var(--shadow-card)] bg-white">
         <Search size={18} strokeWidth={1.5} style={{ color: '#C7C7CC' }} />
         <input
           type="text"
@@ -132,10 +132,10 @@ export default function ResourcesPage() {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className="px-4 py-2 text-[13px] font-semibold uppercase tracking-[0.12em] whitespace-nowrap transition-all border"
+              className="px-4 py-2 rounded-xl text-[13px] font-semibold uppercase tracking-[0.12em] whitespace-nowrap transition-all border"
               style={{
                 backgroundColor: selectedCategory === cat ? '#1A1917' : 'white',
-                color: selectedCategory === cat ? 'white' : '#8E8E93',
+                color: selectedCategory === cat ? 'white' : '#A09D96',
                 borderColor: selectedCategory === cat ? '#1A1917' : '#E8E4DC',
               }}
             >
@@ -149,11 +149,11 @@ export default function ResourcesPage() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-white border border-[#E8E4DC] animate-pulse" />
+            <div key={i} className="h-32 bg-white rounded-2xl shadow-[var(--shadow-card)] animate-pulse" />
           ))}
         </div>
       ) : filteredResources.length === 0 ? (
-        <div className="p-12 text-center bg-white">
+        <div className="p-12 text-center bg-white rounded-2xl shadow-[var(--shadow-card)]">
           <BookOpen size={40} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#C7C7CC' }} />
           <p className="text-[14px]" style={{ color: '#A09D96' }}>Geen content gevonden</p>
         </div>
@@ -166,7 +166,7 @@ export default function ResourcesPage() {
                 <button
                   key={resource.id}
                   onClick={() => { setSelectedResource(resource); trackView(resource.id) }}
-                  className="w-full text-left overflow-hidden transition-all bg-white"
+                  className="w-full text-left overflow-hidden transition-all bg-white rounded-2xl shadow-[var(--shadow-card)]"
                 >
                   {resource.thumbnail_url ? (
                     <div className="relative aspect-[21/9] overflow-hidden">
@@ -222,7 +222,7 @@ export default function ResourcesPage() {
               <button
                 key={resource.id}
                 onClick={() => { setSelectedResource(resource); trackView(resource.id) }}
-                className="w-full text-left overflow-hidden transition-all bg-white"
+                className="w-full text-left overflow-hidden transition-all bg-white rounded-2xl shadow-[var(--shadow-card)]"
               >
                 {resource.thumbnail_url ? (
                   <div className="relative aspect-video overflow-hidden">
@@ -267,7 +267,7 @@ export default function ResourcesPage() {
       {selectedResource && (
         <div className="fixed inset-0 z-50 flex items-end lg:items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSelectedResource(null)} />
-          <div className="relative w-full max-w-2xl mx-4 mb-4 lg:mb-0 max-h-[85vh] overflow-y-auto bg-white">
+          <div className="relative w-full max-w-2xl mx-4 mb-4 lg:mb-0 max-h-[85vh] overflow-y-auto bg-white rounded-2xl shadow-[var(--shadow-card)]">
             <button
               onClick={() => setSelectedResource(null)}
               className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center bg-black/20 backdrop-blur-sm"
@@ -304,7 +304,7 @@ export default function ResourcesPage() {
                   {selectedResource.category}
                 </span>
                 {selectedResource.duration_minutes ? (
-                  <span className="flex items-center gap-1 text-[11px]" style={{ color: '#8E8E93' }}>
+                  <span className="flex items-center gap-1 text-[11px]" style={{ color: '#A09D96' }}>
                     <Clock size={10} strokeWidth={1.5} />
                     {selectedResource.duration_minutes} min
                   </span>
@@ -327,7 +327,7 @@ export default function ResourcesPage() {
                   href={selectedResource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 text-[13px] font-semibold uppercase tracking-[0.12em] transition-all border"
+                  className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 rounded-xl text-[13px] font-semibold uppercase tracking-[0.12em] transition-all border"
                   style={{ backgroundColor: 'white', color: '#1A1917', borderColor: '#E8E4DC' }}
                 >
                   Bekijk externe link

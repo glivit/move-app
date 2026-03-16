@@ -128,7 +128,7 @@ export default function BookingPage() {
           <h1 className="text-editorial-h2 text-[#1A1917] mb-2">Videocall boeken</h1>
           <p className="text-[#A09D96] text-[15px]">Laden...</p>
         </div>
-        <div className="bg-white h-64 border border-[#E8E4DC] animate-pulse" />
+        <div className="bg-white h-64 rounded-2xl shadow-[var(--shadow-card)] animate-pulse" />
       </div>
     )
   }
@@ -158,7 +158,7 @@ export default function BookingPage() {
       </div>
 
       {slots.length === 0 ? (
-        <div className="bg-white p-12 border border-[#E8E4DC] text-center">
+        <div className="bg-white p-12 rounded-2xl shadow-[var(--shadow-card)] text-center">
           <Calendar strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[#C5C2BC]" />
           <p className="text-[15px] font-semibold text-[#1A1917] mb-2">Geen beschikbare tijden</p>
           <p className="text-[13px] text-[#A09D96]">
@@ -168,7 +168,7 @@ export default function BookingPage() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Calendar */}
-          <div className="bg-white p-5 border border-[#E8E4DC]">
+          <div className="bg-white p-5 rounded-2xl shadow-[var(--shadow-card)]">
             <div className="flex items-center justify-between mb-4">
               <button
                 onClick={() => setCalendarMonth(prev => {
@@ -239,7 +239,7 @@ export default function BookingPage() {
           {/* Time slots */}
           <div className="space-y-4">
             {selectedDate && (
-              <div className="bg-white p-5 border border-[#E8E4DC]">
+              <div className="bg-white p-5 rounded-2xl shadow-[var(--shadow-card)]">
                 <h3 className="text-[15px] font-semibold text-[#1A1917] mb-1">
                   {new Date(selectedDate).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </h3>
@@ -250,7 +250,7 @@ export default function BookingPage() {
                     <button
                       key={slot.datetime}
                       onClick={() => setSelectedSlot(slot)}
-                      className={`py-2.5 px-3 text-[14px] font-medium uppercase tracking-wider transition-all border ${
+                      className={`py-2.5 px-3 text-[14px] font-medium uppercase tracking-wider transition-all border rounded-xl ${
                         selectedSlot?.datetime === slot.datetime
                           ? 'bg-[#1A1917] text-white border-[#1A1917]'
                           : 'bg-white text-[#1A1917] border-[#E8E4DC] hover:border-[#1A1917]/30 hover:bg-[#F5F5F5]'
@@ -265,7 +265,7 @@ export default function BookingPage() {
 
             {/* Booking confirmation */}
             {selectedSlot && (
-              <div className="bg-white p-5 border border-[#E8E4DC]">
+              <div className="bg-white p-5 rounded-2xl shadow-[var(--shadow-card)]">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-[#1A1917]/10 flex items-center justify-center">
                     <Video className="w-5 h-5 text-[#1A1917]" strokeWidth={1.5} />
@@ -288,7 +288,7 @@ export default function BookingPage() {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Waar wil je het over hebben?"
-                    className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[13px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none h-16"
+                    className="w-full px-3 py-2.5 border border-[#E8E4DC] rounded-xl text-[13px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none h-16"
                   />
                 </div>
 

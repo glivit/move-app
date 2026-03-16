@@ -10,6 +10,7 @@ import {
   Clock,
   Info,
   ChevronDown,
+  Search,
 } from 'lucide-react'
 import { ExerciseMedia } from '@/components/ExerciseMedia'
 
@@ -26,12 +27,12 @@ function ExerciseInfoPanel({ exerciseData }: { exerciseData: Exercise }) {
   return (
     <div className="px-5 pb-3 space-y-3">
       {/* Large GIF display */}
-      <div className="overflow-hidden bg-[#F8F6F2] relative" style={{ maxHeight: '50vh' }}>
+      <div className="overflow-hidden bg-[#2A2824] rounded-xl relative" style={{ maxHeight: '50vh' }}>
         {hasGif ? (
           <>
             {!imgLoaded && (
               <div className="aspect-[4/3] flex items-center justify-center">
-                <div className="w-8 h-8 border-[1.5px] border-[#DDD9D0] border-t-[#1A1917] rounded-full animate-spin" />
+                <div className="w-8 h-8 border-[1.5px] border-[#5A5650] border-t-white/40 rounded-full animate-spin" />
               </div>
             )}
             <img
@@ -51,9 +52,7 @@ function ExerciseInfoPanel({ exerciseData }: { exerciseData: Exercise }) {
           </>
         ) : (
           <div className="aspect-[4/3] flex items-center justify-center">
-            <div className="text-center">
-              <p className="text-[12px] text-[#C5C2BC]">{exerciseData.target_muscle}</p>
-            </div>
+            <p className="text-[12px] text-[#5A5650]">{exerciseData.target_muscle}</p>
           </div>
         )}
       </div>
@@ -61,12 +60,12 @@ function ExerciseInfoPanel({ exerciseData }: { exerciseData: Exercise }) {
       {/* Equipment + muscle labels */}
       <div className="flex items-center gap-2">
         {exerciseData.equipment && (
-          <span className="text-[11px] font-semibold text-[#B0ADA6] bg-[#44413D] px-2.5 py-1">
+          <span className="text-[11px] font-semibold text-[#B0ADA6] bg-[#44413D] px-2.5 py-1 rounded-lg">
             {exerciseData.equipment}
           </span>
         )}
         {exerciseData.target_muscle && (
-          <span className="text-[11px] font-semibold text-[#B0ADA6] bg-[#44413D] px-2.5 py-1">
+          <span className="text-[11px] font-semibold text-[#B0ADA6] bg-[#44413D] px-2.5 py-1 rounded-lg">
             {exerciseData.target_muscle}
           </span>
         )}
@@ -74,7 +73,7 @@ function ExerciseInfoPanel({ exerciseData }: { exerciseData: Exercise }) {
 
       {/* Collapsible: Coach tips */}
       {exerciseData.coach_tips && (
-        <div className="border border-[#44413D]">
+        <div className="border border-[#44413D] rounded-xl overflow-hidden">
           <button
             onClick={() => setShowTips(!showTips)}
             className="w-full flex items-center justify-between p-3"
@@ -92,7 +91,7 @@ function ExerciseInfoPanel({ exerciseData }: { exerciseData: Exercise }) {
 
       {/* Collapsible: Instructions */}
       {exerciseData.instructions && (
-        <div className="border border-[#44413D]">
+        <div className="border border-[#44413D] rounded-xl overflow-hidden">
           <button
             onClick={() => setShowInstructions(!showInstructions)}
             className="w-full flex items-center justify-between p-3"
@@ -204,6 +203,133 @@ function formatTimer(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
+// ─── Exercise Picker Modal ────────────────────────────────
+
+function ExercisePickerModal({
+  onSelect,
+  onClose,
+}: {
+  onSelect: (exercise: Exercise) => void
+  onClose: () => void
+}) {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [exercises, setExercises] = useState<Exercise[]>([])
+  const [loading, setLoading] = useState(true)
+  const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([])
+
+  useEffect(() => {
+    const loadExercises = async () => {
+      try {
+        const supabase = createClient()
+        const { data } = await supabase
+          .from('exercises')
+          .select('id, name, name_nl, body_part, target_muscle, equipment, gif_url, video_url, instructions, coach_tips')
+          .order('name_nl', { ascending: true })
+          .limit(500)
+        if (data) {
+          setExercises(data as Exercise[])
+          setFilteredExercises(data as Exercise[])
+        }
+      } catch (err) {
+        console.error('Error loading exercises:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadExercises()
+  }, [])
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredExercises(exercises)
+      return
+    }
+    const q = searchQuery.toLowerCase()
+    setFilteredExercises(
+      exercises.filter(
+        (ex) =>
+          (ex.name_nl || '').toLowerCase().includes(q) ||
+          (ex.name || '').toLowerCase().includes(q) ||
+          (ex.body_part || '').toLowerCase().includes(q) ||
+          (ex.target_muscle || '').toLowerCase().includes(q) ||
+          (ex.equipment || '').toLowerCase().includes(q)
+      )
+    )
+  }, [searchQuery, exercises])
+
+  return (
+    <div className="fixed inset-0 bg-black/60 z-[80] flex items-end">
+      <div className="w-full max-h-[85vh] bg-[#2A2824] rounded-t-2xl flex flex-col animate-slide-up">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#44413D]">
+          <h3 className="text-[18px] font-semibold text-white" style={{ fontFamily: 'var(--font-display)' }}>
+            Oefening toevoegen
+          </h3>
+          <button
+            onClick={onClose}
+            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors"
+          >
+            <X size={18} strokeWidth={1.5} className="text-[#B0ADA6]" />
+          </button>
+        </div>
+
+        {/* Search */}
+        <div className="px-5 py-3">
+          <div className="flex items-center gap-2 bg-[#353330] rounded-xl px-3.5 py-2.5 border border-[#44413D] focus-within:border-[var(--color-pop)]">
+            <Search size={16} strokeWidth={1.5} className="text-[#9A9690] flex-shrink-0" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Zoek oefening..."
+              autoFocus
+              className="flex-1 bg-transparent text-[14px] text-white placeholder-[#5A5650] border-none focus:outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Exercise list */}
+        <div className="flex-1 overflow-y-auto px-5 pb-8">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="w-6 h-6 border-[1.5px] border-[#5A5650] border-t-white/40 rounded-full animate-spin" />
+            </div>
+          ) : filteredExercises.length === 0 ? (
+            <p className="text-center text-[14px] text-[#5A5650] py-12">Geen oefeningen gevonden</p>
+          ) : (
+            <div className="space-y-1">
+              {filteredExercises.map((ex) => (
+                <button
+                  key={ex.id}
+                  onClick={() => onSelect(ex)}
+                  className="w-full text-left px-4 py-3.5 rounded-xl hover:bg-[#353330] transition-colors flex items-center gap-3"
+                >
+                  <div className="w-10 h-10 bg-[#353330] rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    {ex.gif_url ? (
+                      <img src={ex.gif_url} alt="" className="w-full h-full object-cover" style={{ filter: 'saturate(0.3)' }} />
+                    ) : (
+                      <span className="text-[10px] text-[#5A5650] uppercase">{ex.target_muscle?.slice(0, 3)}</span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[14px] font-medium text-white truncate">{ex.name_nl || ex.name}</p>
+                    <p className="text-[11px] text-[#9A9690] mt-0.5">
+                      {ex.target_muscle}{ex.equipment ? ` · ${ex.equipment}` : ''}
+                    </p>
+                  </div>
+                  <Plus size={16} strokeWidth={2} className="text-[var(--color-pop)] flex-shrink-0" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── Main Wrapper ──────────────────────────────────────────
+
 export default function ActiveWorkoutPageWrapper() {
   return (
     <Suspense fallback={
@@ -235,6 +361,7 @@ function ActiveWorkoutPage() {
   const [activeRestTimer, setActiveRestTimer] = useState<{ exerciseId: string; setIndex: number; seconds: number; total: number } | null>(null)
   const [exerciseNotes, setExerciseNotes] = useState<Record<string, string>>({})
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
+  const [showExercisePicker, setShowExercisePicker] = useState(false)
 
   // Refs for auto-save
   const setsRef = useRef(sets)
@@ -285,6 +412,13 @@ function ActiveWorkoutPage() {
       window.removeEventListener('beforeunload', persist)
     }
   }, [dayId, programId])
+
+  // --- Check for addExercise param ---
+  useEffect(() => {
+    if (searchParams.get('addExercise') === '1') {
+      setShowExercisePicker(true)
+    }
+  }, [searchParams])
 
   // --- Load data ---
   useEffect(() => {
@@ -413,7 +547,6 @@ function ActiveWorkoutPage() {
         updatedSets[exerciseId] = [...updatedSets[exerciseId]]
         updatedSets[exerciseId][setIndex] = { ...setData, id: insertedSet.id, completed: true, is_pr: isPR }
 
-        // Propagate weight to next uncompleted set
         if (setData.weight_kg && setIndex + 1 < updatedSets[exerciseId].length && !updatedSets[exerciseId][setIndex + 1].completed) {
           if (!updatedSets[exerciseId][setIndex + 1].weight_kg) {
             updatedSets[exerciseId][setIndex + 1] = { ...updatedSets[exerciseId][setIndex + 1], weight_kg: setData.weight_kg }
@@ -426,7 +559,6 @@ function ActiveWorkoutPage() {
           setTimeout(() => setPrCelebration(null), 3000)
         }
 
-        // Start inline rest timer
         if (exerciseRef && exerciseRef.rest_seconds > 0) {
           setActiveRestTimer({ exerciseId, setIndex, seconds: exerciseRef.rest_seconds, total: exerciseRef.rest_seconds })
         }
@@ -453,13 +585,64 @@ function ActiveWorkoutPage() {
     })
   }
 
+  // --- Add exercise from picker ---
+  const handleAddExercise = (exercise: Exercise) => {
+    const tempId = `added-${exercise.id}-${Date.now()}`
+    const newPTE: ProgramTemplateExercise = {
+      id: tempId,
+      exercise_id: exercise.id,
+      sets: 3,
+      reps_min: 10,
+      reps_max: 12,
+      rest_seconds: 60,
+      tempo: '',
+      rpe_target: 0,
+      weight_suggestion: 0,
+      notes: '',
+      exercises: exercise,
+    }
+    setExercises(prev => [...prev, newPTE])
+    setSets(prev => ({
+      ...prev,
+      [tempId]: Array.from({ length: 3 }, (_, i) => ({
+        id: `temp-${tempId}-${i}`,
+        set_number: i + 1,
+        prescribed_reps: 10,
+        actual_reps: null,
+        weight_kg: null,
+        is_warmup: false,
+        completed: false,
+        is_pr: false,
+      })),
+    }))
+    setShowExercisePicker(false)
+  }
+
   const handleFinish = () => {
     clearWorkoutState()
     router.push(`/client/workout/complete?sessionId=${session?.id}`)
   }
 
+  // --- Minimize workout (persistent bar) ---
+  const handleMinimize = () => {
+    if (!session || !dayId || !programId) return
+    // Save state to localStorage for the persistent bar
+    saveWorkoutState({ sessionId: session.id, dayId, programId, sets, savedAt: Date.now() })
+    // Store minimal bar data
+    try {
+      localStorage.setItem('move_minimized_workout', JSON.stringify({
+        sessionId: session.id,
+        dayId,
+        programId,
+        startedAt: session.started_at,
+      }))
+    } catch { /* ok */ }
+    router.push('/client')
+  }
+
   const confirmClose = () => {
     clearWorkoutState()
+    try { localStorage.removeItem('move_minimized_workout') } catch { /* ok */ }
     router.push('/client/workout')
   }
 
@@ -472,6 +655,7 @@ function ActiveWorkoutPage() {
       await supabase.from('workout_sessions').delete().eq('id', session.id)
     } catch (err) { console.error('Discard error:', err) }
     clearWorkoutState()
+    try { localStorage.removeItem('move_minimized_workout') } catch { /* ok */ }
     router.push('/client/workout')
   }
 
@@ -499,18 +683,18 @@ function ActiveWorkoutPage() {
               const delay = Math.random() * 0.6
               const dur = 1.5 + Math.random() * 1
               const size = 6 + Math.random() * 6
-              const colors = ['#FFFFFF', '#E8E4DC', '#34C759', '#FF3B30', '#007AFF', '#FFD700']
+              const colors = ['#D46A3A', '#E8E4DC', '#3D8B5C', '#FF3B30', '#007AFF', '#FFD700']
               return (
-                <div key={i} style={{ position: 'absolute', left: `${left}%`, top: '-10px', width: `${size}px`, height: `${size * 0.6}px`, backgroundColor: colors[i % colors.length], borderRadius: '0', transform: `rotate(${Math.random() * 360}deg)`, animation: `confettiFall ${dur}s ease-in ${delay}s forwards`, opacity: 0 }} />
+                <div key={i} style={{ position: 'absolute', left: `${left}%`, top: '-10px', width: `${size}px`, height: `${size * 0.6}px`, backgroundColor: colors[i % colors.length], borderRadius: '2px', transform: `rotate(${Math.random() * 360}deg)`, animation: `confettiFall ${dur}s ease-in ${delay}s forwards`, opacity: 0 }} />
               )
             })}
           </div>
           <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[61] animate-bounce-in">
-            <div className="bg-white text-[#2A2824] px-6 py-3 flex items-center gap-3">
+            <div className="bg-[var(--color-pop)] text-white px-6 py-3 rounded-2xl flex items-center gap-3 shadow-lg">
               <span className="text-2xl">🏆</span>
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.12em]">Nieuw PR</p>
-                <p className="text-[13px] text-[#6B6862]">{prCelebration}</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/80">Nieuw PR</p>
+                <p className="text-[14px] font-semibold">{prCelebration}</p>
               </div>
             </div>
           </div>
@@ -518,10 +702,10 @@ function ActiveWorkoutPage() {
         </>
       )}
 
-      {/* Close confirmation — editorial bottom sheet */}
+      {/* Close confirmation — bottom sheet */}
       {closeConfirm && (
         <div className="fixed inset-0 bg-black/50 z-[70] flex items-end">
-          <div className="w-full bg-[#353330] p-6 animate-slide-up">
+          <div className="w-full bg-[#353330] p-6 rounded-t-2xl animate-slide-up">
             <h3
               className="text-[20px] font-semibold text-white tracking-[-0.02em] mb-2"
               style={{ fontFamily: 'var(--font-display)' }}
@@ -532,13 +716,13 @@ function ActiveWorkoutPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => setCloseConfirm(false)}
-                className="flex-1 bg-[#44413D] text-white py-3.5 font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors hover:bg-[#4A4740]"
+                className="flex-1 bg-[#44413D] text-white py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors hover:bg-[#4A4740]"
               >
                 Doorgaan
               </button>
               <button
                 onClick={confirmClose}
-                className="flex-1 bg-[#FF3B30] text-white py-3.5 font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors hover:bg-[#E5352B]"
+                className="flex-1 bg-[#FF3B30] text-white py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors hover:bg-[#E5352B]"
               >
                 Afsluiten
               </button>
@@ -547,29 +731,37 @@ function ActiveWorkoutPage() {
         </div>
       )}
 
-      {/* ═══ TOP BAR — editorial, minimal ═══════════════════ */}
+      {/* Exercise picker modal */}
+      {showExercisePicker && (
+        <ExercisePickerModal
+          onSelect={handleAddExercise}
+          onClose={() => setShowExercisePicker(false)}
+        />
+      )}
+
+      {/* ═══ TOP BAR ═══════════════════════════════ */}
       <header className="sticky top-0 bg-[#2A2824]/95 backdrop-blur-xl z-40">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <button
-            onClick={() => setCloseConfirm(true)}
-            className="w-10 h-10 flex items-center justify-center hover:bg-white/10 transition-colors touch-manipulation"
+            onClick={handleMinimize}
+            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors touch-manipulation"
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             <X size={20} strokeWidth={1.5} className="text-[#B0ADA6]" />
           </button>
 
-          <div className="flex items-center gap-2">
-            <Clock size={14} strokeWidth={1.5} className="text-[#9A9690]" />
-            <span className="text-[16px] font-semibold text-white tabular-nums tracking-[-0.02em]">
+          <div className="flex items-center gap-2 bg-[#353330] px-3 py-1.5 rounded-xl">
+            <Clock size={14} strokeWidth={1.5} className="text-[var(--color-pop)]" />
+            <span className="text-[15px] font-semibold text-white tabular-nums tracking-[-0.02em]">
               {formatTimer(workoutSeconds)}
             </span>
           </div>
 
           <button
             onClick={handleFinish}
-            className={`px-5 h-10 font-semibold text-[12px] uppercase tracking-[0.08em] transition-all ${
+            className={`px-5 h-10 rounded-xl font-semibold text-[12px] uppercase tracking-[0.08em] transition-all ${
               allDone
-                ? 'bg-white text-[#2A2824]'
+                ? 'bg-[var(--color-pop)] text-white shadow-lg shadow-[var(--color-pop)]/20'
                 : 'bg-[#44413D] text-[#B0ADA6]'
             }`}
           >
@@ -578,15 +770,15 @@ function ActiveWorkoutPage() {
         </div>
 
         {/* Progress line */}
-        <div className="h-[1px] bg-[#44413D]">
+        <div className="h-[2px] bg-[#44413D]">
           <div
-            className="h-full bg-white transition-all duration-500"
+            className="h-full bg-[var(--color-pop)] transition-all duration-500"
             style={{ width: `${totalSets > 0 ? (completedTotal / totalSets) * 100 : 0}%` }}
           />
         </div>
       </header>
 
-      {/* ═══ EXERCISE LIST — editorial cards ═══════════════ */}
+      {/* ═══ EXERCISE LIST ═══════════════════════════ */}
       <main className="max-w-lg mx-auto px-4 py-6 pb-24 space-y-3">
         {exercises.map((ex) => {
           const exSets = sets[ex.id] || []
@@ -600,7 +792,7 @@ function ActiveWorkoutPage() {
           return (
             <div
               key={ex.id}
-              className={`border transition-all ${
+              className={`rounded-2xl border transition-all ${
                 exDone
                   ? 'border-[#555249] bg-[#3A3835]'
                   : 'border-[#44413D] bg-[#353330]'
@@ -623,7 +815,9 @@ function ActiveWorkoutPage() {
                     </h3>
                     <Info size={13} strokeWidth={1.5} className="text-[#9A9690] flex-shrink-0" />
                   </button>
-                  <span className="text-[12px] text-[#9A9690] font-medium tabular-nums ml-2">
+                  <span className={`text-[12px] font-medium tabular-nums ml-2 px-2 py-0.5 rounded-lg ${
+                    exDone ? 'bg-[var(--color-pop)]/20 text-[var(--color-pop)]' : 'text-[#9A9690]'
+                  }`}>
                     {exCompleted}/{exSets.length}
                   </span>
                 </div>
@@ -689,15 +883,15 @@ function ActiveWorkoutPage() {
                         {/* Inline rest timer */}
                         {isRestActive && activeRestTimer && (
                           <div className="flex items-center gap-2 px-1 py-1.5">
-                            <div className="flex-1 h-[2px] bg-[#44413D] overflow-hidden">
+                            <div className="flex-1 h-[3px] bg-[#44413D] rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-white transition-all duration-1000 ease-linear"
+                                className="h-full bg-[var(--color-pop)] rounded-full transition-all duration-1000 ease-linear"
                                 style={{ width: `${((activeRestTimer.total - activeRestTimer.seconds) / activeRestTimer.total) * 100}%` }}
                               />
                             </div>
                             <button
                               onClick={() => setActiveRestTimer(null)}
-                              className="text-[12px] font-semibold text-white tabular-nums min-w-[44px] text-right"
+                              className="text-[12px] font-semibold text-[var(--color-pop)] tabular-nums min-w-[44px] text-right"
                             >
                               {formatTimer(activeRestTimer.seconds)}
                             </button>
@@ -711,7 +905,7 @@ function ActiveWorkoutPage() {
                 {/* Add set */}
                 <button
                   onClick={() => addSet(ex.id)}
-                  className="w-full mt-3 py-2.5 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#AAA69E] uppercase tracking-[0.06em] hover:bg-white/10 transition-colors touch-manipulation"
+                  className="w-full mt-3 py-2.5 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#AAA69E] uppercase tracking-[0.06em] rounded-xl hover:bg-white/10 transition-colors touch-manipulation"
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   <Plus size={13} strokeWidth={2} />
@@ -726,7 +920,7 @@ function ActiveWorkoutPage() {
         {allDone && (
           <button
             onClick={handleFinish}
-            className="w-full py-4 bg-white text-[#2A2824] font-bold text-[14px] uppercase tracking-[0.08em] flex items-center justify-center gap-2 hover:bg-[#F0EDE8] transition-all"
+            className="w-full py-4 bg-[var(--color-pop)] text-white rounded-2xl font-bold text-[14px] uppercase tracking-[0.08em] flex items-center justify-center gap-2 shadow-lg shadow-[var(--color-pop)]/20 hover:shadow-[var(--color-pop)]/30 transition-all"
           >
             <Check size={18} strokeWidth={2.5} />
             Workout afronden
@@ -736,8 +930,8 @@ function ActiveWorkoutPage() {
         {/* Bottom actions */}
         <div className="mt-2 space-y-2">
           <button
-            onClick={() => router.push(`/client/workout/active?dayId=${dayId}&programId=${programId}&addExercise=1`)}
-            className="w-full py-3.5 bg-[#44413D] text-white font-semibold text-[13px] uppercase tracking-[0.06em] flex items-center justify-center gap-2 hover:bg-[#4A4740] transition-colors"
+            onClick={() => setShowExercisePicker(true)}
+            className="w-full py-3.5 bg-[#44413D] text-white rounded-xl font-semibold text-[13px] uppercase tracking-[0.06em] flex items-center justify-center gap-2 hover:bg-[#4A4740] transition-colors"
           >
             <Plus size={14} strokeWidth={2} />
             Oefening toevoegen
@@ -745,7 +939,7 @@ function ActiveWorkoutPage() {
 
           <button
             onClick={() => setShowDiscardConfirm(true)}
-            className="w-full py-3 text-[#FF3B30] text-[13px] font-medium hover:bg-[#FF3B30]/5 transition-colors"
+            className="w-full py-3 rounded-xl text-[#FF3B30] text-[13px] font-medium hover:bg-[#FF3B30]/5 transition-colors"
           >
             Workout verwijderen
           </button>
@@ -754,7 +948,7 @@ function ActiveWorkoutPage() {
         {/* Discard confirmation */}
         {showDiscardConfirm && (
           <div className="fixed inset-0 bg-black/50 z-[70] flex items-end">
-            <div className="w-full bg-[#353330] p-6 animate-slide-up">
+            <div className="w-full bg-[#353330] p-6 rounded-t-2xl animate-slide-up">
               <h3
                 className="text-[20px] font-semibold text-white tracking-[-0.02em] mb-2"
                 style={{ fontFamily: 'var(--font-display)' }}
@@ -765,13 +959,13 @@ function ActiveWorkoutPage() {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowDiscardConfirm(false)}
-                  className="flex-1 bg-[#44413D] text-white py-3.5 font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-[#4A4740] transition-colors"
+                  className="flex-1 bg-[#44413D] text-white py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-[#4A4740] transition-colors"
                 >
                   Annuleer
                 </button>
                 <button
                   onClick={discardWorkout}
-                  className="flex-1 bg-[#FF3B30] text-white py-3.5 font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-[#E5352B] transition-colors"
+                  className="flex-1 bg-[#FF3B30] text-white py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-[#E5352B] transition-colors"
                 >
                   Verwijderen
                 </button>
@@ -802,7 +996,6 @@ function SetRow({
   const [weight, setWeight] = useState(defaultWeight)
   const [reps, setReps] = useState(set.actual_reps?.toString() || set.prescribed_reps?.toString() || '')
 
-  // Sync weight when propagated from previous set completion
   useEffect(() => {
     if (!set.completed && set.weight_kg && !weight) {
       setWeight(set.weight_kg.toString())
@@ -863,7 +1056,7 @@ function SetRow({
         onChange={(e) => handleWeightChange(e.target.value)}
         placeholder={prefilledWeight ? `${prefilledWeight}` : '—'}
         disabled={set.completed}
-        className="w-[72px] px-2 py-2.5 bg-[#353330] border border-[#44413D] text-[14px] text-center font-semibold text-white tabular-nums disabled:opacity-40 focus:border-white/30 focus:outline-none transition-all placeholder:text-[#5A5650] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        className="w-[72px] px-2 py-2.5 bg-[#2A2824] border border-[#44413D] rounded-lg text-[14px] text-center font-semibold text-white tabular-nums disabled:opacity-40 focus:border-[var(--color-pop)] focus:outline-none transition-all placeholder:text-[#5A5650] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />
 
       {/* Reps input */}
@@ -875,16 +1068,16 @@ function SetRow({
         onChange={(e) => handleRepsChange(e.target.value)}
         placeholder={set.prescribed_reps?.toString() || '—'}
         disabled={set.completed}
-        className="w-[64px] px-2 py-2.5 bg-[#353330] border border-[#44413D] text-[14px] text-center font-semibold text-white tabular-nums disabled:opacity-40 focus:border-white/30 focus:outline-none transition-all placeholder:text-[#5A5650] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        className="w-[64px] px-2 py-2.5 bg-[#2A2824] border border-[#44413D] rounded-lg text-[14px] text-center font-semibold text-white tabular-nums disabled:opacity-40 focus:border-[var(--color-pop)] focus:outline-none transition-all placeholder:text-[#5A5650] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />
 
       {/* Check button */}
       <button
         onClick={handleCompleteClick}
         disabled={set.completed}
-        className={`w-[36px] h-[36px] flex items-center justify-center flex-shrink-0 transition-all touch-manipulation ${
+        className={`w-[36px] h-[36px] flex items-center justify-center flex-shrink-0 rounded-lg transition-all touch-manipulation ${
           set.completed
-            ? 'bg-white text-[#2A2824]'
+            ? 'bg-[var(--color-pop)] text-white'
             : 'bg-[#44413D] text-[#9A9690] hover:bg-[#4A4740] active:scale-95'
         }`}
         style={{ WebkitTapHighlightColor: 'transparent' }}

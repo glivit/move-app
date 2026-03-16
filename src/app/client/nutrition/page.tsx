@@ -312,7 +312,7 @@ export default function ClientNutritionPage() {
           <h1 className="text-editorial-h2 text-[#1A1917] mb-2">
             Voeding
           </h1>
-          <div className="bg-white p-10 border border-[#E8E4DC] text-center mt-6">
+          <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-10 text-center mt-6">
             <span className="text-[40px] block mb-3">🍎</span>
             <h2 className="text-[17px] font-semibold text-[#1A1917] mb-2">
               Nog geen voedingsplan
@@ -355,12 +355,12 @@ export default function ClientNutritionPage() {
         </div>
 
         {/* Progress Ring + Macros */}
-        <div className="bg-white p-5 border border-[#E8E4DC] mb-4">
+        <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-5 mb-4">
           <div className="flex items-center gap-5">
             {/* Completion circle */}
             <div className="relative w-20 h-20 shrink-0">
               <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
-                <circle cx="18" cy="18" r="16" fill="none" stroke="#E8E4DC" strokeWidth="3" />
+                <circle cx="18" cy="18" r="16" fill="none" stroke="#F0EDE8" strokeWidth="3" />
                 <circle
                   cx="18" cy="18" r="16" fill="none"
                   stroke={completionPct === 100 ? '#34C759' : '#1A1917'}
@@ -389,9 +389,9 @@ export default function ClientNutritionPage() {
               ].map(({ label, actual, target, color, unit }) => (
                 <div key={label} className="flex items-center gap-2">
                   <span className="text-[11px] text-[#A09D96] w-10 shrink-0">{label}</span>
-                  <div className="flex-1 h-2 bg-[#E8E4DC] overflow-hidden">
+                  <div className="flex-1 h-2 bg-[#F0EDE8] rounded-full overflow-hidden">
                     <div
-                      className="h-full transition-all duration-500"
+                      className="h-full transition-all duration-500 rounded-full"
                       style={{
                         width: `${Math.min((actual / (target || 1)) * 100, 100)}%`,
                         backgroundColor: color,
@@ -422,7 +422,7 @@ export default function ClientNutritionPage() {
             return (
               <div
                 key={meal.id}
-                className={`border overflow-hidden transition-all ${
+                className={`border rounded-2xl overflow-hidden transition-all ${
                   isCompleted
                     ? 'bg-[#34C759]/5 border-[#34C759]/20'
                     : 'bg-white border-[#E8E4DC]'
@@ -434,7 +434,7 @@ export default function ClientNutritionPage() {
                   <button
                     onClick={() => toggleMealComplete(meal)}
                     disabled={isSaving}
-                    className={`w-8 h-8 border-2 flex items-center justify-center shrink-0 transition-all ${
+                    className={`w-8 h-8 border-2 rounded-xl flex items-center justify-center shrink-0 transition-all ${
                       isCompleted
                         ? 'bg-[#34C759] border-[#34C759]'
                         : 'border-[#C5C2BC] hover:border-[#1A1917]'
@@ -481,9 +481,9 @@ export default function ClientNutritionPage() {
 
                 {/* Expanded: food details + notes */}
                 {isExpanded && (
-                  <div className="border-t border-[#E8E4DC]">
+                  <div className="border-t border-[#F0EDE8]">
                     {/* Foods list */}
-                    <div className="divide-y divide-[#E8E4DC]">
+                    <div className="divide-y divide-[#F0EDE8]">
                       {foods.map((food) => (
                         <div key={food.id} className="px-4 py-2.5 flex items-center gap-3">
                           <div className="w-8 h-8 bg-[#F5F5F3] flex items-center justify-center overflow-hidden shrink-0">
@@ -505,7 +505,7 @@ export default function ClientNutritionPage() {
                     </div>
 
                     {/* Notes section */}
-                    <div className="px-4 py-3 border-t border-[#E8E4DC] bg-[#FAFAFA]">
+                    <div className="px-4 py-3 border-t border-[#F0EDE8] bg-[#FAF8F3]">
                       {editingNotes === meal.id ? (
                         <div className="space-y-2">
                           <textarea
@@ -514,18 +514,18 @@ export default function ClientNutritionPage() {
                             placeholder="Aanpassing of opmerking... bijv. 'Vervangen door cottage cheese'"
                             rows={2}
                             autoFocus
-                            className="w-full px-3 py-2 border border-[#E8E4DC] text-[13px] text-[#1A1917] bg-white placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none"
+                            className="w-full px-3 py-2 border border-[#E8E4DC] rounded-xl text-[13px] text-[#1A1917] bg-white placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none"
                           />
                           <div className="flex gap-2 justify-end">
                             <button
                               onClick={() => setEditingNotes(null)}
-                              className="px-3 py-1.5 text-[12px] text-[#A09D96]"
+                              className="px-3 py-1.5 rounded-xl text-[12px] text-[#A09D96]"
                             >
                               Annuleer
                             </button>
                             <button
                               onClick={() => saveNotes(meal.id)}
-                              className="px-3 py-1.5 bg-[#1A1917] text-white text-[12px] font-medium"
+                              className="px-3 py-1.5 rounded-xl bg-[#1A1917] text-white text-[12px] font-medium"
                             >
                               Opslaan
                             </button>
@@ -558,7 +558,7 @@ export default function ClientNutritionPage() {
         {/* Daily Summary Panel */}
         <button
           onClick={() => setShowDailyPanel(!showDailyPanel)}
-          className="w-full bg-white p-4 border border-[#E8E4DC] flex items-center justify-between mb-4"
+          className="w-full bg-white rounded-2xl shadow-[var(--shadow-card)] p-4 flex items-center justify-between mb-4"
         >
           <div className="flex items-center gap-3">
             <span className="text-[20px]">📝</span>
@@ -577,7 +577,7 @@ export default function ClientNutritionPage() {
         </button>
 
         {showDailyPanel && (
-          <div className="bg-white p-5 border border-[#E8E4DC] mb-4 space-y-5">
+          <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-5 mb-4 space-y-5">
             {/* Mood */}
             <div>
               <p className="text-label text-[#A09D96] uppercase tracking-[0.12em] mb-2">
@@ -588,7 +588,7 @@ export default function ClientNutritionPage() {
                   <button
                     key={m.key}
                     onClick={() => { setMood(m.key); setTimeout(saveDailySummary, 100) }}
-                    className={`flex-1 py-2.5 text-center transition-all border ${
+                    className={`flex-1 py-2.5 text-center transition-all border rounded-xl ${
                       mood === m.key
                         ? 'border-[#1A1917] bg-[#1A1917]/5'
                         : 'border-[#E8E4DC] hover:border-[#C5C2BC]'
@@ -611,7 +611,7 @@ export default function ClientNutritionPage() {
                   <button
                     key={l}
                     onClick={() => { setWater(l); setTimeout(saveDailySummary, 100) }}
-                    className={`flex-1 py-2 text-center text-[13px] font-medium uppercase tracking-wider transition-all border ${
+                    className={`flex-1 py-2 text-center text-[13px] font-medium uppercase tracking-wider transition-all border rounded-xl ${
                       water === l
                         ? 'border-[#007AFF] bg-[#007AFF]/5 text-[#007AFF]'
                         : 'border-[#E8E4DC] text-[#A09D96] hover:border-[#C5C2BC]'
@@ -634,7 +634,7 @@ export default function ClientNutritionPage() {
                 onBlur={saveDailySummary}
                 placeholder="Hoe ging het vandaag? Honger gehad? Iets vervangen?"
                 rows={3}
-                className="w-full px-4 py-3 border border-[#E8E4DC] text-[13px] text-[#1A1917] bg-white placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none"
+                className="w-full px-4 py-3 border border-[#E8E4DC] rounded-xl text-[13px] text-[#1A1917] bg-white placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none"
               />
             </div>
           </div>

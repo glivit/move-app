@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import { ArrowRight, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react'
+import { ArrowRight, AlertTriangle, ChevronDown, ChevronUp, Trophy, Timer, Layers, BarChart3 } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -70,7 +70,7 @@ function WorkoutCompletePage() {
 
   // ─── Confetti ───────
   const spawnConfetti = useCallback(() => {
-    const colors = ['#1A1917', '#E8E4DC', '#34C759', '#007AFF', '#FFD700', '#AF52DE', '#FF9500']
+    const colors = ['#D46A3A', '#E8E4DC', '#3D8B5C', '#007AFF', '#FFD700', '#AF52DE', '#FF9500']
     const container = document.body
     for (let i = 0; i < 40; i++) {
       const el = document.createElement('div')
@@ -79,7 +79,7 @@ function WorkoutCompletePage() {
       el.style.width = `${6 + Math.random() * 8}px`
       el.style.height = `${6 + Math.random() * 8}px`
       el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
-      el.style.borderRadius = '0'
+      el.style.borderRadius = '2px'
       el.style.animationDelay = `${Math.random() * 1.5}s`
       el.style.animationDuration = `${2 + Math.random() * 2}s`
       container.appendChild(el)
@@ -126,12 +126,9 @@ function WorkoutCompletePage() {
     loadSession()
   }, [sessionId, router])
 
-  // Trigger confetti when PRs detected
   const prsCount = session?.workout_sets?.filter((s) => s.is_pr).length || 0
   useEffect(() => {
-    if (prsCount > 0) {
-      setTimeout(() => spawnConfetti(), 500)
-    }
+    if (prsCount > 0) setTimeout(() => spawnConfetti(), 500)
   }, [prsCount, spawnConfetti])
 
   const togglePain = (exerciseId: string) => {
@@ -188,8 +185,6 @@ function WorkoutCompletePage() {
     }
   }
 
-  // ─── Loading / Empty ─────────────────────────────────────
-
   if (loading) {
     return (
       <div className="min-h-screen bg-[#EEEBE3] flex items-center justify-center">
@@ -206,14 +201,9 @@ function WorkoutCompletePage() {
     )
   }
 
-  // ─── Computed stats ─────────────────────────────────────
-
   const workoutSets = session.workout_sets || []
   const totalSets = workoutSets.length
-  const totalVolume = workoutSets.reduce((sum, set) => {
-    return sum + (set.weight_kg || 0) * (set.actual_reps || 0)
-  }, 0)
-
+  const totalVolume = workoutSets.reduce((sum, set) => sum + (set.weight_kg || 0) * (set.actual_reps || 0), 0)
   const startTime = new Date(session.started_at)
   const endTime = new Date()
   const minutes = Math.floor((endTime.getTime() - startTime.getTime()) / 1000 / 60)
@@ -227,89 +217,98 @@ function WorkoutCompletePage() {
   ]
 
   const difficultyOptions = [
-    { value: 1, label: 'Makkelijk', color: '#3D8B5C' },
-    { value: 2, label: 'Goed', color: '#1A1917' },
-    { value: 3, label: 'Perfect', color: '#1A1917' },
-    { value: 4, label: 'Zwaar', color: '#C47D15' },
-    { value: 5, label: 'Te zwaar', color: '#FF3B30' },
+    { value: 1, label: 'Makkelijk' },
+    { value: 2, label: 'Goed' },
+    { value: 3, label: 'Perfect' },
+    { value: 4, label: 'Zwaar' },
+    { value: 5, label: 'Te zwaar' },
   ]
 
   const painCount = exerciseGroups.filter(g => g.painFlag).length
 
-  // ─── Render ─────────────────────────────────────────────
-
   return (
     <div className="min-h-screen bg-[#EEEBE3]">
 
-      {/* ═══ HEADER — editorial celebration ═══════════════ */}
-      <div className="pt-16 pb-10 text-center">
-        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#A09D96] mb-4">Voltooid</p>
-        <h1
-          className="text-[40px] font-semibold text-[#1A1917] tracking-[-0.03em] leading-none"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
+      {/* ═══ HEADER — celebration ═══════════════════ */}
+      <div className="pt-16 pb-8 text-center">
+        <p className="text-label mb-4">Voltooid</p>
+        <h1 className="text-editorial-h1 text-[#1A1917]">
           Goed gedaan
         </h1>
         {prsCount > 0 && (
-          <p className="text-[14px] text-[#1A1917] mt-3 font-medium">
-            🏆 {prsCount} {prsCount === 1 ? 'nieuw record' : 'nieuwe records'}
-          </p>
+          <div className="mt-4 inline-flex items-center gap-2 bg-[var(--color-pop-light)] px-4 py-2 rounded-xl">
+            <Trophy size={16} strokeWidth={2} className="text-[var(--color-pop)]" />
+            <span className="text-[14px] font-semibold text-[var(--color-pop)]">
+              {prsCount} {prsCount === 1 ? 'nieuw record' : 'nieuwe records'}
+            </span>
+          </div>
         )}
       </div>
 
-      {/* ═══ STATS — editorial numbers ═══════════════════ */}
-      <div className="flex justify-center gap-10 pb-8 border-b border-[#E8E4DC]">
-        <div className="text-center">
-          <p className="text-[28px] font-bold text-[#1A1917] tabular-nums">{minutes}</p>
-          <p className="text-label mt-1">Minuten</p>
-        </div>
-        <div className="text-center">
-          <p className="text-[28px] font-bold text-[#1A1917] tabular-nums">{totalSets}</p>
-          <p className="text-label mt-1">Sets</p>
-        </div>
-        <div className="text-center">
-          <p className="text-[28px] font-bold text-[#1A1917] tabular-nums">
-            {totalVolume > 1000 ? `${(totalVolume / 1000).toFixed(1)}t` : `${totalVolume}`}
-          </p>
-          <p className="text-label mt-1">Volume</p>
+      {/* ═══ STATS — editorial cards ═══════════════ */}
+      <div className="max-w-lg mx-auto px-4 mb-8">
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4 text-center">
+            <div className="w-8 h-8 bg-[var(--color-pop-light)] rounded-lg flex items-center justify-center mx-auto mb-2">
+              <Timer size={16} strokeWidth={2} className="text-[var(--color-pop)]" />
+            </div>
+            <p className="text-[24px] font-bold text-[#1A1917] tabular-nums">{minutes}</p>
+            <p className="text-label mt-0.5">Minuten</p>
+          </div>
+          <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4 text-center">
+            <div className="w-8 h-8 bg-[#F0EDE8] rounded-lg flex items-center justify-center mx-auto mb-2">
+              <Layers size={16} strokeWidth={2} className="text-[#6B6862]" />
+            </div>
+            <p className="text-[24px] font-bold text-[#1A1917] tabular-nums">{totalSets}</p>
+            <p className="text-label mt-0.5">Sets</p>
+          </div>
+          <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4 text-center">
+            <div className="w-8 h-8 bg-[#F0EDE8] rounded-lg flex items-center justify-center mx-auto mb-2">
+              <BarChart3 size={16} strokeWidth={2} className="text-[#6B6862]" />
+            </div>
+            <p className="text-[24px] font-bold text-[#1A1917] tabular-nums">
+              {totalVolume > 1000 ? `${(totalVolume / 1000).toFixed(1)}t` : `${totalVolume}`}
+            </p>
+            <p className="text-label mt-0.5">Volume</p>
+          </div>
         </div>
       </div>
 
-      <main className="max-w-lg mx-auto px-4 py-8 pb-32 space-y-6">
+      <main className="max-w-lg mx-auto px-4 pb-32 space-y-6">
 
-        {/* ═══ GEVOEL — editorial mood picker ══════════════ */}
-        <div>
+        {/* ═══ GEVOEL — mood picker ══════════════════ */}
+        <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-5">
           <p className="text-label mb-4">Hoe voelde je je?</p>
           <div className="flex gap-2">
             {moodEmojis.map((mood) => (
               <button
                 key={mood.value}
                 onClick={() => setMoodRating(mood.value)}
-                className={`flex-1 py-4 flex flex-col items-center gap-1.5 transition-all border ${
+                className={`flex-1 py-3.5 flex flex-col items-center gap-1.5 transition-all rounded-xl ${
                   moodRating === mood.value
-                    ? 'border-[#1A1917] bg-white'
-                    : 'border-[#E8E4DC] bg-white/50 hover:bg-white'
+                    ? 'bg-[var(--color-pop-light)] ring-2 ring-[var(--color-pop)]'
+                    : 'bg-[#F5F2EC] hover:bg-[#F0EDE8]'
                 }`}
               >
-                <span className="text-[24px]">{mood.emoji}</span>
+                <span className="text-[22px]">{mood.emoji}</span>
                 <span className="text-[10px] text-[#A09D96] font-medium uppercase tracking-[0.04em]">{mood.label}</span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* ═══ MOEILIJKHEID ════════════════════════════════ */}
-        <div>
+        {/* ═══ MOEILIJKHEID ════════════════════════ */}
+        <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-5">
           <p className="text-label mb-4">Moeilijkheidsgraad</p>
           <div className="flex gap-2">
             {difficultyOptions.map((opt) => (
               <button
                 key={opt.value}
                 onClick={() => setDifficultyRating(opt.value)}
-                className={`flex-1 py-3 text-center transition-all border text-[12px] font-semibold uppercase tracking-[0.04em] ${
+                className={`flex-1 py-3 text-center transition-all text-[12px] font-semibold uppercase tracking-[0.04em] rounded-xl ${
                   difficultyRating === opt.value
-                    ? 'border-[#1A1917] bg-[#1A1917] text-white'
-                    : 'border-[#E8E4DC] bg-white/50 text-[#A09D96] hover:bg-white'
+                    ? 'bg-[#1A1917] text-white'
+                    : 'bg-[#F5F2EC] text-[#A09D96] hover:bg-[#F0EDE8]'
                 }`}
               >
                 {opt.label}
@@ -318,105 +317,98 @@ function WorkoutCompletePage() {
           </div>
         </div>
 
-        {/* ═══ PIJN PER OEFENING ══════════════════════════ */}
+        {/* ═══ PIJN PER OEFENING ══════════════════ */}
         {exerciseGroups.length > 0 && (
-          <div>
-            <div className="flex items-center justify-between mb-4">
+          <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] overflow-hidden">
+            <div className="flex items-center justify-between p-5 pb-3">
               <p className="text-label">Pijn of ongemak?</p>
               {painCount > 0 && (
-                <span className="text-[11px] font-semibold text-[#FF3B30]">
+                <span className="text-[11px] font-semibold text-[#FF3B30] bg-[#FF3B30]/8 px-2.5 py-1 rounded-lg">
                   {painCount} oefening{painCount !== 1 ? 'en' : ''}
                 </span>
               )}
             </div>
-            <div className="bg-white border border-[#E8E4DC]">
-              {exerciseGroups.map((group, i) => (
-                <div key={group.exerciseId} className={i > 0 ? 'border-t border-[#F0EDE8]' : ''}>
-                  <button
-                    onClick={() => {
-                      togglePain(group.exerciseId)
-                      if (!group.painFlag) {
-                        setExpandedExercise(group.exerciseId)
-                      } else {
-                        setExpandedExercise(null)
-                      }
-                    }}
-                    className={`w-full flex items-center gap-3 px-5 py-3.5 transition-colors ${
-                      group.painFlag ? 'bg-[#FF3B30]/5' : 'hover:bg-[#FAF8F3]'
-                    }`}
-                  >
-                    <div className={`w-5 h-5 border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                      group.painFlag ? 'border-[#FF3B30] bg-[#FF3B30]' : 'border-[#DDD9D0]'
-                    }`}>
+            <div className="px-5 pb-5">
+              <div className="rounded-xl overflow-hidden border border-[#F0EDE8]">
+                {exerciseGroups.map((group, i) => (
+                  <div key={group.exerciseId} className={i > 0 ? 'border-t border-[#F0EDE8]' : ''}>
+                    <button
+                      onClick={() => {
+                        togglePain(group.exerciseId)
+                        setExpandedExercise(!group.painFlag ? group.exerciseId : null)
+                      }}
+                      className={`w-full flex items-center gap-3 px-4 py-3.5 transition-colors ${
+                        group.painFlag ? 'bg-[#FF3B30]/5' : 'hover:bg-[#FAF8F3]'
+                      }`}
+                    >
+                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                        group.painFlag ? 'border-[#FF3B30] bg-[#FF3B30]' : 'border-[#DDD9D0]'
+                      }`}>
+                        {group.painFlag && <AlertTriangle size={10} strokeWidth={2.5} className="text-white" />}
+                      </div>
+                      <span className={`text-[14px] font-medium flex-1 text-left ${
+                        group.painFlag ? 'text-[#FF3B30]' : 'text-[#1A1917]'
+                      }`}>
+                        {group.name}
+                      </span>
+                      <span className="text-[12px] text-[#CCC7BC]">{group.sets.length} sets</span>
                       {group.painFlag && (
-                        <AlertTriangle size={11} strokeWidth={2.5} className="text-white" />
+                        expandedExercise === group.exerciseId
+                          ? <ChevronUp size={14} className="text-[#FF3B30]" />
+                          : <ChevronDown size={14} className="text-[#FF3B30]" />
                       )}
-                    </div>
-                    <span className={`text-[14px] font-medium flex-1 text-left ${
-                      group.painFlag ? 'text-[#FF3B30]' : 'text-[#1A1917]'
-                    }`}>
-                      {group.name}
-                    </span>
-                    <span className="text-[12px] text-[#C5C2BC]">
-                      {group.sets.length} sets
-                    </span>
-                    {group.painFlag && (
-                      expandedExercise === group.exerciseId
-                        ? <ChevronUp size={14} className="text-[#FF3B30]" />
-                        : <ChevronDown size={14} className="text-[#FF3B30]" />
+                    </button>
+                    {group.painFlag && expandedExercise === group.exerciseId && (
+                      <div className="px-4 pb-4 bg-[#FF3B30]/5">
+                        <textarea
+                          value={group.painNotes}
+                          onChange={(e) => setPainNotes(group.exerciseId, e.target.value)}
+                          placeholder="Waar voelde je pijn? (bijv. linkerschouder, onderrug...)"
+                          className="w-full px-4 py-3 border border-[#FF3B30]/20 rounded-xl text-[13px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#FF3B30]/40 resize-none h-16 bg-white"
+                        />
+                      </div>
                     )}
-                  </button>
-                  {group.painFlag && expandedExercise === group.exerciseId && (
-                    <div className="px-5 pb-4 bg-[#FF3B30]/5">
-                      <textarea
-                        value={group.painNotes}
-                        onChange={(e) => setPainNotes(group.exerciseId, e.target.value)}
-                        placeholder="Waar voelde je pijn? (bijv. linkerschouder, onderrug...)"
-                        className="w-full px-4 py-3 border border-[#FF3B30]/20 text-[13px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#FF3B30]/40 resize-none h-16 bg-white"
-                      />
-                    </div>
-                  )}
-                </div>
-              ))}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
 
-        {/* ═══ FEEDBACK VOOR COACH ════════════════════════ */}
-        <div>
+        {/* ═══ FEEDBACK VOOR COACH ════════════════ */}
+        <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-5">
           <p className="text-label mb-2">Feedback voor je coach</p>
-          <p className="text-[12px] text-[#C5C2BC] mb-3">Welke oefeningen wil je meer of minder?</p>
+          <p className="text-[12px] text-[#CCC7BC] mb-3">Welke oefeningen wil je meer of minder?</p>
           <textarea
             value={feedbackText}
             onChange={(e) => setFeedbackText(e.target.value)}
             placeholder="bijv. &quot;Meer core oefeningen&quot;, &quot;Hip thrusts zijn te zwaar&quot;..."
-            className="w-full px-4 py-3 border border-[#E8E4DC] bg-white text-[14px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
+            className="w-full px-4 py-3 border border-[#F0EDE8] rounded-xl bg-[#FAF8F3] text-[14px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
           />
         </div>
 
-        {/* ═══ NOTITIES ═══════════════════════════════════ */}
-        <div>
+        {/* ═══ NOTITIES ═══════════════════════════ */}
+        <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-5">
           <p className="text-label mb-3">Notities <span className="font-normal text-[#C5C2BC]">(optioneel)</span></p>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Hoe ging het? Extra opmerkingen..."
-            className="w-full px-4 py-3 border border-[#E8E4DC] bg-white text-[14px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
+            className="w-full px-4 py-3 border border-[#F0EDE8] rounded-xl bg-[#FAF8F3] text-[14px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
           />
         </div>
 
-        {/* ═══ OPSLAAN CTA ════════════════════════════════ */}
+        {/* ═══ OPSLAAN CTA ════════════════════════ */}
         <button
           onClick={handleComplete}
           disabled={saving}
-          className="w-full py-4 bg-[#1A1917] text-white font-semibold text-[14px] uppercase tracking-[0.08em] flex items-center justify-center gap-2 hover:bg-[#333330] transition-colors disabled:opacity-50"
+          className="btn-pop w-full flex items-center justify-center gap-2 disabled:opacity-50"
         >
           {saving ? 'Opslaan...' : 'Opslaan & afsluiten'}
           <ArrowRight size={16} strokeWidth={2} />
         </button>
 
-        {/* Info note */}
-        <p className="text-center text-[12px] text-[#C5C2BC]">
+        <p className="text-center text-[12px] text-[#CCC7BC]">
           Je coach ziet deze feedback bij de volgende aanpassing
         </p>
       </main>

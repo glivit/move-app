@@ -24,8 +24,8 @@ interface SubmittedResponse extends PromptResponse {
 function PromptCardSkeleton() {
   return (
     <div
-      className="p-6 border animate-shimmer"
-      style={{ backgroundColor: '#FFFFFF', borderColor: '#E8E4DC' }}
+      className="p-6 border animate-shimmer rounded-2xl"
+      style={{ backgroundColor: '#FFFFFF', borderColor: '#F0EDE8' }}
     >
       <div className="h-6 w-3/4 bg-gray-200 rounded animate-shimmer mb-4" />
       <div className="space-y-3 mb-6">
@@ -62,10 +62,10 @@ function ScoreSelector({
           <button
             key={score}
             onClick={() => onChange(score)}
-            className="w-10 h-10 font-medium text-sm uppercase tracking-[0.12em] transition-all border"
+            className="w-10 h-10 font-medium text-sm uppercase tracking-[0.12em] transition-all border rounded-xl"
             style={{
               backgroundColor: value === score ? '#1A1917' : '#FFFFFF',
-              color: value === score ? '#FFFFFF' : '#8E8E93',
+              color: value === score ? '#FFFFFF' : '#A09D96',
               borderColor: value === score ? '#1A1917' : '#E5E5E5',
             }}
           >
@@ -127,8 +127,8 @@ function PromptCard({
 
   return (
     <div
-      className="p-6 overflow-hidden border"
-      style={{ backgroundColor: '#FFFFFF', borderColor: '#E8E4DC' }}
+      className="p-6 overflow-hidden border rounded-2xl"
+      style={{ backgroundColor: '#FFFFFF', borderColor: '#F0EDE8' }}
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Question */}
@@ -146,12 +146,12 @@ function PromptCard({
             onChange={(e) => setResponse(e.target.value)}
             placeholder="Schrijf hier je gedachten en gevoelens op..."
             rows={4}
-            className="w-full px-4 py-3 border focus:outline-none focus:ring-2 transition-all"
+            className="w-full px-4 py-3 border focus:outline-none focus:ring-2 transition-all rounded-xl"
             style={{
               backgroundColor: '#F5F5F3',
               color: '#1A1A18',
               outlineColor: '#1A1917',
-              borderColor: '#E8E4DC',
+              borderColor: '#F0EDE8',
             }}
           />
         </div>
@@ -180,7 +180,7 @@ function PromptCard({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full px-6 py-3 font-medium uppercase tracking-[0.12em] transition-all flex items-center justify-center gap-2 border"
+            className="w-full px-6 py-3 font-medium uppercase tracking-[0.12em] transition-all flex items-center justify-center gap-2 border rounded-xl"
             style={{
               backgroundColor: '#1A1A18',
               color: '#FFFFFF',
@@ -367,7 +367,7 @@ export default function ClientPromptsPage() {
             ))}
           </div>
         ) : unansweredPrompts.length === 0 ? (
-          <div className="p-12 text-center bg-white">
+          <div className="p-12 text-center bg-white rounded-2xl">
             <MessageSquare
               size={48}
               style={{ color: '#1A1917' }}
@@ -409,7 +409,7 @@ export default function ClientPromptsPage() {
               <div>
                 <button
                   onClick={() => setShowAnswered(!showAnswered)}
-                  className="w-full flex items-center justify-between px-6 py-4 transition-all bg-white"
+                  className="w-full flex items-center justify-between px-6 py-4 transition-all bg-white rounded-2xl"
                   style={{
                     color: '#1A1A18',
                   }}
@@ -433,7 +433,7 @@ export default function ClientPromptsPage() {
                     {answeredPrompts.map((prompt) => (
                       <div
                         key={prompt.id}
-                        className="p-6 bg-white"
+                        className="p-6 bg-white rounded-2xl"
                       >
                         <p
                           className="text-sm font-medium mb-3"

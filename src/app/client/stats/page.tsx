@@ -339,7 +339,7 @@ export default function StatsPage() {
       <SubPageHeader overline="Training" title="Statistieken" backHref="/client/progress" />
 
       {/* Tab bar */}
-      <div className="flex border-b border-[#E8E4DC] mb-5">
+      <div className="flex border-b border-[#F0EDE8] mb-5">
         {tabs.map(tab => (
           <button
             key={tab.id}
@@ -397,7 +397,7 @@ export default function StatsPage() {
           <select
             value={selectedExercise || ''}
             onChange={(e) => setSelectedExercise(e.target.value || null)}
-            className="w-full py-2.5 px-4 bg-white border border-[#E8E4DC] text-[14px] text-[#1A1917] appearance-none pr-10 focus:border-[#1A1917] outline-none"
+            className="w-full py-2.5 px-4 bg-white border border-[#E8E4DC] text-[14px] text-[#1A1917] appearance-none pr-10 focus:border-[#1A1917] outline-none rounded-xl"
           >
             <option value="">Selecteer een oefening...</option>
             {availableExercises.map(ex => (
@@ -440,7 +440,7 @@ export default function StatsPage() {
       {activeTab === 'kracht' && (
         <div>
           {krachtData.length > 0 ? (
-            <div className="border border-[#E8E4DC] bg-white p-4">
+            <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4">
               <p className="text-label mb-3">Max gewicht per week (kg)</p>
               <ResponsiveContainer width="100%" height={220}>
                 {groupBy === 'spiergroep' ? (
@@ -476,7 +476,7 @@ export default function StatsPage() {
       {activeTab === 'volume' && (
         <div>
           {volumeData.length > 0 ? (
-            <div className="border border-[#E8E4DC] bg-white p-4">
+            <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4">
               <p className="text-label mb-3">
                 Volume per week {groupBy === 'spiergroep' ? '(ton)' : '(kg)'}
               </p>
@@ -526,7 +526,7 @@ export default function StatsPage() {
                 const group = ex ? getMuscleGroup(ex.target_muscle) : 'Overig'
 
                 return (
-                  <div key={pr.id} className="border border-[#E8E4DC] bg-white p-4">
+                  <div key={pr.id} className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 flex items-center justify-center shrink-0" style={{ backgroundColor: `${GROUP_COLORS[group] || '#A09D96'}15` }}>
                         <Trophy size={16} strokeWidth={1.5} style={{ color: GROUP_COLORS[group] || '#A09D96' }} />

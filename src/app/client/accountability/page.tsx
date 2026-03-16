@@ -94,7 +94,7 @@ export default function AccountabilityPage() {
         <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
         <div className="space-y-3">
           {[1, 2].map(i => (
-            <div key={i} className="h-32 bg-[#F0F0F0] animate-pulse border border-[#E8E4DC]" />
+            <div key={i} className="h-32 bg-[#F0EDE8] animate-pulse rounded-2xl shadow-[var(--shadow-card)]" />
           ))}
         </div>
       </div>
@@ -106,7 +106,7 @@ export default function AccountabilityPage() {
     return (
       <div className="space-y-6">
         <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
-        <div className="bg-white p-8 border border-[#E8E4DC] text-center">
+        <div className="bg-white p-8 rounded-2xl shadow-[var(--shadow-card)] text-center">
           <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#34C759] mx-auto mb-3" />
           <p className="font-semibold text-[#1A1917] text-lg">Alles op schema!</p>
           <p className="text-[14px] text-[#A09D96] mt-2">
@@ -122,7 +122,7 @@ export default function AccountabilityPage() {
     return (
       <div className="space-y-6">
         <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
-        <div className="bg-white p-8 border border-[#E8E4DC] text-center">
+        <div className="bg-white p-8 rounded-2xl shadow-[var(--shadow-card)] text-center">
           <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#34C759] mx-auto mb-3" />
           <p className="font-semibold text-[#1A1917] text-lg">Bedankt voor je feedback!</p>
           <p className="text-[14px] text-[#A09D96] mt-2">
@@ -156,7 +156,7 @@ export default function AccountabilityPage() {
       {/* Status cards */}
       <div className="space-y-3">
         {/* Workout status */}
-        <div className={`p-5 border ${
+        <div className={`p-5 border rounded-2xl shadow-[var(--shadow-card)] ${
           log.workout_completed
             ? 'bg-[#F0FDF4] border-[#BBF7D0]'
             : 'bg-[#FFF7ED] border-[#FED7AA]'
@@ -187,14 +187,14 @@ export default function AccountabilityPage() {
                 onChange={(e) => setWorkoutReason(e.target.value)}
                 placeholder="Bijv. drukke werkdag, niet lekker gevoeld, reisdag..."
                 rows={3}
-                className="w-full px-3 py-2 bg-white border border-[#E8E4DC] text-[14px] placeholder-[#A09D96] focus:outline-none focus:border-[#1A1917] resize-none"
+                className="w-full px-3 py-2 bg-white border border-[#E8E4DC] text-[14px] placeholder-[#A09D96] focus:outline-none focus:border-[#1A1917] resize-none rounded-xl"
               />
             </div>
           )}
         </div>
 
         {/* Nutrition status */}
-        <div className={`p-5 border ${
+        <div className={`p-5 border rounded-2xl shadow-[var(--shadow-card)] ${
           log.nutrition_logged
             ? 'bg-[#F0FDF4] border-[#BBF7D0]'
             : 'bg-[#FFF7ED] border-[#FED7AA]'
@@ -240,7 +240,7 @@ export default function AccountabilityPage() {
                 onChange={(e) => setNutritionReason(e.target.value)}
                 placeholder="Bijv. uit eten geweest, vergeten, weekend..."
                 rows={3}
-                className="w-full px-3 py-2 bg-white border border-[#E8E4DC] text-[14px] placeholder-[#A09D96] focus:outline-none focus:border-[#1A1917] resize-none"
+                className="w-full px-3 py-2 bg-white border border-[#E8E4DC] text-[14px] placeholder-[#A09D96] focus:outline-none focus:border-[#1A1917] resize-none rounded-xl"
               />
             </div>
           )}
@@ -256,7 +256,7 @@ export default function AccountabilityPage() {
       <button
         onClick={handleSubmit}
         disabled={submitting}
-        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#1A1917] text-white font-semibold uppercase tracking-wider text-[15px] hover:bg-[#2A2A28] transition-colors disabled:opacity-50"
+        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#1A1917] text-white font-semibold uppercase tracking-wider text-[15px] hover:bg-[#2A2A28] transition-colors disabled:opacity-50 rounded-xl"
       >
         {submitting ? (
           <>

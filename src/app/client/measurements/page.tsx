@@ -86,7 +86,7 @@ function MetricCard({ label, data, unit, color, invertDelta = false }: {
   const deltaPositive = delta !== null ? (invertDelta ? delta < 0 : delta > 0) : null
 
   return (
-    <div className="border border-[#E8E4DC] bg-white p-4">
+    <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4">
       <div className="flex items-baseline justify-between mb-3">
         <p className="text-label">{label}</p>
         {delta !== null && (
@@ -180,7 +180,7 @@ export default function MeasurementsPage() {
         action={
           <button
             onClick={() => router.push('/client/check-in')}
-            className="flex items-center gap-1.5 px-4 py-2 bg-[#1A1917] text-white text-[12px] font-semibold uppercase tracking-[0.08em]"
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#1A1917] text-white text-[12px] font-semibold uppercase tracking-[0.08em] rounded-xl"
           >
             <Plus size={14} strokeWidth={2} />
             Meting
@@ -189,7 +189,7 @@ export default function MeasurementsPage() {
       />
 
       {/* ═══ TAB BAR ═════════════════════════════════════════ */}
-      <div className="flex border-b border-[#E8E4DC] mb-6">
+      <div className="flex border-b border-[#F0EDE8] mb-6">
         {tabs.map(tab => {
           const Icon = tab.icon
           return (
@@ -218,7 +218,7 @@ export default function MeasurementsPage() {
               <p className="text-[14px] text-[#A09D96] mb-4">Nog geen progressiefoto's</p>
               <button
                 onClick={() => router.push('/client/check-in')}
-                className="px-6 py-3 bg-[#1A1917] text-white text-[13px] font-semibold uppercase tracking-[0.06em]"
+                className="px-6 py-3 bg-[#1A1917] text-white text-[13px] font-semibold uppercase tracking-[0.06em] rounded-xl"
               >
                 Eerste meting starten
               </button>
@@ -306,7 +306,7 @@ export default function MeasurementsPage() {
               <p className="text-[14px] text-[#A09D96] mb-4">Nog geen lichaamsmetingen</p>
               <button
                 onClick={() => router.push('/client/check-in')}
-                className="px-6 py-3 bg-[#1A1917] text-white text-[13px] font-semibold uppercase tracking-[0.06em]"
+                className="px-6 py-3 bg-[#1A1917] text-white text-[13px] font-semibold uppercase tracking-[0.06em] rounded-xl"
               >
                 Eerste meting starten
               </button>
@@ -332,7 +332,7 @@ export default function MeasurementsPage() {
               <p className="text-[14px] text-[#A09D96] mb-4">Nog geen omtrekmetingen</p>
               <button
                 onClick={() => router.push('/client/check-in')}
-                className="px-6 py-3 bg-[#1A1917] text-white text-[13px] font-semibold uppercase tracking-[0.06em]"
+                className="px-6 py-3 bg-[#1A1917] text-white text-[13px] font-semibold uppercase tracking-[0.06em] rounded-xl"
               >
                 Eerste meting starten
               </button>
