@@ -80,25 +80,39 @@ export async function GET(request: NextRequest) {
 
       const hasProgram = activeProgram && activeProgram.length > 0
 
-      // Check if client logged nutrition today
-      const { count: nutritionCount } = await supabase
-        .from('nutrition_logs')
-        .select('*', { count: 'exact', head: true })
-        .eq('client_id', client.id)
-        .gte('created_at', todayStart.toISOString())
-        .lt('created_at', todayEnd.toISOString())
-
-      const didNutrition = (nutritionCount || 0) > 0
-
-      // Check if client has an active nutrition plan
+      // Check if client has an active nutrition plan with meals
       const { data: activePlan } = await supabase
         .from('nutrition_plans')
-        .select('id')
+        .select('id, meals')
         .eq('client_id', client.id)
         .eq('is_active', true)
         .limit(1)
 
       const hasPlan = activePlan && activePlan.length > 0
+      const totalPlanMeals = hasPlan
+        ? (Array.isArray((activePlan[0] as any).meals) ? (activePlan[0] as any).meals.length : 0)
+        : 0
+
+      // Check how many meals the client actually completed today
+      let didNutrition = false
+      let mealsCompleted = 0
+
+      if (hasPlan && totalPlanMeals > 0) {
+        const todayStr = todayStart.toISOString().split('T')[0]
+        const { data: dailySummary } = await supabase
+          .from('nutrition_daily_summary')
+          .select('meals_completed, meals_planned')
+          .eq('client_id', client.id)
+          .eq('date', todayStr)
+          .single()
+
+        mealsCompleted = dailySummary?.meals_completed || 0
+        // Nutrition is "done" only when ALL meals are completed
+        didNutrition = mealsCompleted >= totalPlanMeals
+      } else if (!hasPlan) {
+        // No plan = nothing to track
+        didNutrition = true
+      }
 
       // Only prompt if they have something assigned but didn't do it
       const missedWorkout = hasProgram && !didWorkout
@@ -114,6 +128,8 @@ export async function GET(request: NextRequest) {
           date: todayStart.toISOString().split('T')[0],
           workout_completed: didWorkout,
           nutrition_logged: didNutrition,
+          meals_completed: hasPlan ? mealsCompleted : null,
+          meals_total: hasPlan ? totalPlanMeals : null,
           workout_reason: null,
           nutrition_reason: null,
           responded: false,
@@ -128,10 +144,14 @@ export async function GET(request: NextRequest) {
       // Build notification message
       const missing = []
       if (missedWorkout) missing.push('training')
-      if (missedNutrition) missing.push('voeding')
+      if (missedNutrition && mealsCompleted > 0) {
+        missing.push(`voeding (${mealsCompleted}/${totalPlanMeals} maaltijden)`)
+      } else if (missedNutrition) {
+        missing.push('voeding')
+      }
 
       const title = 'Hoe was je dag? 💪'
-      const message = `Hey ${client.full_name?.split(' ')[0] || ''}, je hebt vandaag nog geen ${missing.join(' en ')} gelogd. Laat even weten hoe het ging!`
+      const message = `Hey ${client.full_name?.split(' ')[0] || ''}, je hebt vandaag nog geen ${missing.join(' en ')} afgerond. Laat even weten hoe het ging!`
 
       // Send push notification
       const { data: subscriptions } = await supabase

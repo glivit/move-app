@@ -3,12 +3,15 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Dumbbell, UtensilsCrossed, CheckCircle2, Send, Loader2 } from 'lucide-react'
+import { SubPageHeader } from '@/components/layout/SubPageHeader'
 
 interface AccountabilityLog {
   id: string
   date: string
   workout_completed: boolean
   nutrition_logged: boolean
+  meals_completed: number | null
+  meals_total: number | null
   workout_reason: string | null
   nutrition_reason: string | null
   responded: boolean
@@ -53,7 +56,7 @@ export default function AccountabilityPage() {
       return
     }
     if (!log.nutrition_logged && !nutritionReason.trim()) {
-      setError('Vul in waarom je je voeding niet hebt bijgehouden')
+      setError('Vul in waarom je je voeding niet volledig hebt gelogd')
       return
     }
 
@@ -88,7 +91,7 @@ export default function AccountabilityPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <h1 className="font-display text-2xl font-semibold text-[#1A1917]">Dagelijkse check</h1>
+        <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
         <div className="space-y-3">
           {[1, 2].map(i => (
             <div key={i} className="h-32 bg-[#F0F0F0] animate-pulse border border-[#E8E4DC]" />
@@ -102,12 +105,12 @@ export default function AccountabilityPage() {
   if (!log) {
     return (
       <div className="space-y-6">
-        <h1 className="font-display text-2xl font-semibold text-[#1A1917]">Dagelijkse check</h1>
+        <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
         <div className="bg-white p-8 border border-[#E8E4DC] text-center">
           <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#34C759] mx-auto mb-3" />
           <p className="font-semibold text-[#1A1917] text-lg">Alles op schema!</p>
           <p className="text-[14px] text-[#A09D96] mt-2">
-            Je hebt vandaag alles gedaan. Ga zo door! 💪
+            Je hebt vandaag alles gedaan. Ga zo door!
           </p>
         </div>
       </div>
@@ -118,7 +121,7 @@ export default function AccountabilityPage() {
   if (submitted) {
     return (
       <div className="space-y-6">
-        <h1 className="font-display text-2xl font-semibold text-[#1A1917]">Dagelijkse check</h1>
+        <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
         <div className="bg-white p-8 border border-[#E8E4DC] text-center">
           <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#34C759] mx-auto mb-3" />
           <p className="font-semibold text-[#1A1917] text-lg">Bedankt voor je feedback!</p>
@@ -132,15 +135,23 @@ export default function AccountabilityPage() {
 
   const needsWorkoutReason = !log.workout_completed
   const needsNutritionReason = !log.nutrition_logged
+  const hasMealProgress = log.meals_completed !== null && log.meals_total !== null && log.meals_total > 0
+
+  // Build nutrition status text
+  const nutritionStatusText = (() => {
+    if (log.nutrition_logged) return 'Volledig bijgehouden vandaag'
+    if (hasMealProgress && log.meals_completed! > 0) {
+      return `${log.meals_completed} van ${log.meals_total} maaltijden gelogd`
+    }
+    return 'Niet bijgehouden vandaag'
+  })()
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-semibold text-[#1A1917]">Dagelijkse check</h1>
-        <p className="text-[14px] text-[#A09D96] mt-1">
-          Even terugblikken op je dag
-        </p>
-      </div>
+      <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
+      <p className="text-[14px] text-[#A09D96] -mt-4">
+        Even terugblikken op je dag
+      </p>
 
       {/* Status cards */}
       <div className="space-y-3">
@@ -161,7 +172,7 @@ export default function AccountabilityPage() {
             <div>
               <p className="font-semibold text-[#1A1917]">Training</p>
               <p className="text-[13px] text-[#A09D96]">
-                {log.workout_completed ? 'Voltooid vandaag ✓' : 'Niet voltooid vandaag'}
+                {log.workout_completed ? 'Voltooid vandaag' : 'Niet voltooid vandaag'}
               </p>
             </div>
           </div>
@@ -196,18 +207,33 @@ export default function AccountabilityPage() {
                 log.nutrition_logged ? 'text-[#34C759]' : 'text-[#FF9500]'
               } />
             </div>
-            <div>
+            <div className="flex-1">
               <p className="font-semibold text-[#1A1917]">Voeding</p>
               <p className="text-[13px] text-[#A09D96]">
-                {log.nutrition_logged ? 'Bijgehouden vandaag ✓' : 'Niet bijgehouden vandaag'}
+                {nutritionStatusText}
               </p>
             </div>
           </div>
 
+          {/* Meal progress bar when partially complete */}
+          {hasMealProgress && !log.nutrition_logged && log.meals_completed! > 0 && (
+            <div className="mt-2 mb-3">
+              <div className="h-2 bg-[#FED7AA]/50 overflow-hidden">
+                <div
+                  className="h-full bg-[#FF9500] transition-all"
+                  style={{ width: `${(log.meals_completed! / log.meals_total!) * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
+
           {needsNutritionReason && (
             <div className="mt-3">
               <label className="block text-[13px] font-medium text-[#1A1917] mb-1.5">
-                Waarom heb je je voeding niet gelogd? <span className="text-[#C4372A]">*</span>
+                {hasMealProgress && log.meals_completed! > 0
+                  ? 'Waarom heb je niet alle maaltijden gelogd?'
+                  : 'Waarom heb je je voeding niet gelogd?'
+                } <span className="text-[#C4372A]">*</span>
               </label>
               <textarea
                 value={nutritionReason}
