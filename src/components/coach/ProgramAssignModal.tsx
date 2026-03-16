@@ -16,6 +16,7 @@ interface ProgramAssignModalProps {
   templateId: string
   templateName: string
   durationWeeks: number
+  preSelectedClientId?: string
 }
 
 export function ProgramAssignModal({
@@ -24,9 +25,10 @@ export function ProgramAssignModal({
   templateId,
   templateName,
   durationWeeks,
+  preSelectedClientId,
 }: ProgramAssignModalProps) {
   const [clients, setClients] = useState<Client[]>([])
-  const [selectedClientId, setSelectedClientId] = useState('')
+  const [selectedClientId, setSelectedClientId] = useState(preSelectedClientId || '')
   const [programName, setProgramName] = useState(templateName)
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
   const [coachNotes, setCoachNotes] = useState('')
@@ -50,7 +52,9 @@ export function ProgramAssignModal({
 
         if (error) throw error
         setClients(data || [])
-        if (data && data.length > 0) {
+        if (preSelectedClientId) {
+          setSelectedClientId(preSelectedClientId)
+        } else if (data && data.length > 0) {
           setSelectedClientId(data[0].id)
         }
       } catch (err) {

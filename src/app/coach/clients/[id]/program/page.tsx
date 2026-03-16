@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Dumbbell, ArrowLeft, ChevronDown, Plus, Calendar, ExternalLink } from 'lucide-react'
+import { Dumbbell, ArrowLeft, ChevronDown, Plus, Calendar, ExternalLink, StopCircle, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
@@ -70,6 +70,9 @@ export default function ProgramPage() {
   const [templates, setTemplates] = useState<ProgramTemplate[]>([])
   const [showAssignModal, setShowAssignModal] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<ProgramTemplate | null>(null)
+  const [showStopConfirm, setShowStopConfirm] = useState(false)
+  const [stopping, setStopping] = useState(false)
+  const [showSwitchPicker, setShowSwitchPicker] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -153,6 +156,27 @@ export default function ProgramPage() {
       console.error('Error loading data:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function stopProgram() {
+    if (!activeProgram) return
+    setStopping(true)
+    try {
+      await supabase
+        .from('client_programs')
+        .update({ is_active: false })
+        .eq('id', activeProgram.id)
+
+      setActiveProgram(null)
+      setTemplateInfo(null)
+      setTemplateDays([])
+      setExercisesByDay({})
+      setShowStopConfirm(false)
+    } catch (err) {
+      console.error('Stop error:', err)
+    } finally {
+      setStopping(false)
     }
   }
 
@@ -271,13 +295,64 @@ export default function ProgramPage() {
                 )}
               </div>
 
-              {/* Template Link */}
-              <Link
-                href={`/coach/programs/${activeProgram.template_id}`}
-                className="inline-flex items-center gap-1.5 text-[13px] font-medium text-accent-dark hover:underline"
-              >
-                Template bewerken <ExternalLink strokeWidth={1.5} className="w-3.5 h-3.5" />
-              </Link>
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3 flex-wrap">
+                <Link
+                  href={`/coach/programs/${activeProgram.template_id}`}
+                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-accent-dark hover:underline"
+                >
+                  Template bewerken <ExternalLink strokeWidth={1.5} className="w-3.5 h-3.5" />
+                </Link>
+
+                <div className="w-px h-4 bg-client-border" />
+
+                <button
+                  onClick={() => setShowSwitchPicker(true)}
+                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#3068C4] hover:underline"
+                >
+                  <RefreshCw strokeWidth={1.5} className="w-3.5 h-3.5" />
+                  Ander programma toewijzen
+                </button>
+
+                <button
+                  onClick={() => setShowStopConfirm(true)}
+                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#D14343] hover:underline"
+                >
+                  <StopCircle strokeWidth={1.5} className="w-3.5 h-3.5" />
+                  Programma stoppen
+                </button>
+              </div>
+
+              {/* Stop Confirmation */}
+              {showStopConfirm && (
+                <div className="mt-4 p-4 bg-[#FFF5F5] border border-[#FFD4D4] rounded-xl">
+                  <p className="text-[14px] text-[#D14343] font-medium mb-3">
+                    Weet je zeker dat je het huidige programma wilt stoppen voor {clientName}?
+                  </p>
+                  <p className="text-[12px] text-[#8E8E93] mb-4">
+                    De trainingshistorie blijft bewaard. Je kan altijd een nieuw programma toewijzen.
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setShowStopConfirm(false)}
+                      className="px-4 py-2 rounded-lg text-[13px] font-medium border border-[#F0F0ED] text-[#8E8E93] hover:bg-white transition-colors"
+                    >
+                      Annuleren
+                    </button>
+                    <button
+                      onClick={stopProgram}
+                      disabled={stopping}
+                      className="px-4 py-2 rounded-lg text-[13px] font-semibold bg-[#D14343] text-white hover:bg-[#B83A3A] transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                    >
+                      {stopping ? (
+                        <><span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Stoppen...</>
+                      ) : (
+                        'Ja, stop programma'
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
             </Card>
 
             {/* Training Days */}
@@ -423,6 +498,65 @@ export default function ProgramPage() {
         )}
       </div>
 
+      {/* Switch Program Picker Overlay */}
+      {showSwitchPicker && (
+        <>
+          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" onClick={() => setShowSwitchPicker(false)} />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[80vh] overflow-hidden">
+              <div className="p-5 border-b border-[#F0F0ED] flex items-center justify-between">
+                <div>
+                  <h2 className="text-[17px] font-semibold text-[#1A1A18]">Ander programma kiezen</h2>
+                  <p className="text-[12px] text-[#8E8E93] mt-0.5">Het huidige programma wordt automatisch gestopt</p>
+                </div>
+                <button onClick={() => setShowSwitchPicker(false)} className="text-[#8E8E93] hover:text-[#1A1A18] p-1">
+                  <span className="sr-only">Sluiten</span>✕
+                </button>
+              </div>
+              <div className="p-5 overflow-y-auto max-h-[60vh] space-y-3">
+                {templates.filter(t => t.id !== activeProgram?.template_id).length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-[14px] text-[#8E8E93]">Geen andere templates beschikbaar</p>
+                    <Link
+                      href="/coach/programs/new"
+                      className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-semibold text-accent-dark hover:underline"
+                    >
+                      <Plus strokeWidth={1.5} className="w-4 h-4" />
+                      Nieuw programma aanmaken
+                    </Link>
+                  </div>
+                ) : (
+                  templates.filter(t => t.id !== activeProgram?.template_id).map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => {
+                        setSelectedTemplate(t)
+                        setShowSwitchPicker(false)
+                        setShowAssignModal(true)
+                      }}
+                      className="w-full flex items-center justify-between p-4 bg-[#FAFAFA] rounded-xl border border-[#F0F0ED] hover:border-[#8B6914] hover:bg-[#FFF8ED] transition-all text-left"
+                    >
+                      <div>
+                        <h5 className="text-[14px] font-semibold text-[#1A1A18]">{t.name}</h5>
+                        <p className="text-[12px] text-[#8E8E93] mt-0.5">
+                          {t.duration_weeks}w · {t.days_per_week}d/w · {difficultyLabels[t.difficulty] || t.difficulty}
+                        </p>
+                        {t.description && (
+                          <p className="text-[11px] text-[#BAB8B3] mt-1 line-clamp-1">{t.description}</p>
+                        )}
+                      </div>
+                      <span className="text-[12px] font-semibold text-[#8B6914] shrink-0 ml-3">
+                        Selecteer →
+                      </span>
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Assign Modal */}
       {selectedTemplate && (
         <ProgramAssignModal
@@ -430,11 +564,13 @@ export default function ProgramPage() {
           onClose={() => {
             setShowAssignModal(false)
             setSelectedTemplate(null)
+            setShowSwitchPicker(false)
             loadData()
           }}
           templateId={selectedTemplate.id}
           templateName={selectedTemplate.name}
           durationWeeks={selectedTemplate.duration_weeks}
+          preSelectedClientId={params.id}
         />
       )}
     </div>
