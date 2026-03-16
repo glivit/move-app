@@ -41,10 +41,41 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch exercises' }, { status: 500 })
     }
 
-    // Get last workout weights for each exercise
+    // Get last workout's complete set data for each exercise (per-set weight × reps)
     const lastWeights: Record<string, number | null> = {}
+    const previousSets: Record<string, Array<{ set_number: number; weight_kg: number | null; actual_reps: number | null }>> = {}
+
     if (exercisesData) {
+      // Find the most recent completed workout session for this day
+      const { data: lastSession } = await adminClient
+        .from('workout_sessions')
+        .select('id')
+        .eq('client_id', user.id)
+        .eq('template_day_id', dayId)
+        .not('completed_at', 'is', null)
+        .order('completed_at', { ascending: false })
+        .limit(1)
+        .single()
+
       for (const ex of exercisesData) {
+        // Get all completed sets from last session for this exercise
+        if (lastSession) {
+          const { data: prevSets } = await adminClient
+            .from('workout_sets')
+            .select('set_number, weight_kg, actual_reps')
+            .eq('workout_session_id', lastSession.id)
+            .eq('exercise_id', ex.exercise_id)
+            .eq('completed', true)
+            .order('set_number', { ascending: true })
+
+          if (prevSets && prevSets.length > 0) {
+            previousSets[ex.id] = prevSets
+            lastWeights[ex.id] = prevSets[0].weight_kg
+            continue
+          }
+        }
+
+        // Fallback: get most recent weight for this exercise from any session
         const { data: lastSets } = await adminClient
           .from('workout_sets')
           .select('weight_kg')
@@ -61,6 +92,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       exercises: exercisesData || [],
       lastWeights,
+      previousSets,
     })
   } catch (error) {
     console.error('Error in client-workout API:', error)
