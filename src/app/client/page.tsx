@@ -140,9 +140,9 @@ function WeekCalendar({ scheduleDays, completedDates }: {
               </span>
               <div className={`w-10 h-10 flex items-center justify-center rounded-full transition-all ${
                 isSelected
-                  ? 'bg-[#1A1917]'
+                  ? 'bg-[var(--color-pop)] shadow-[0_2px_8px_rgba(212,106,58,0.3)]'
                   : day.isToday
-                    ? 'bg-white'
+                    ? 'bg-white shadow-[var(--shadow-card)]'
                     : ''
               }`}>
                 <span className={`text-[15px] font-bold ${
@@ -166,7 +166,7 @@ function WeekCalendar({ scheduleDays, completedDates }: {
 
       {/* Selected day detail — slides in */}
       {selectedInfo && (
-        <div className="bg-white p-5 mt-2 animate-fade-in">
+        <div className="bg-white rounded-2xl p-5 mt-2 shadow-[var(--shadow-card)] animate-fade-in">
           {selectedInfo.scheduled ? (
             <Link
               href="/client/workout"
@@ -323,28 +323,28 @@ export default function ClientDashboard() {
         </div>
       </div>
 
-      {/* ═══ MOMENTUM — large numbers, minimal ═════════════ */}
-      <div className="flex items-end gap-8 mb-12 animate-fade-in" style={{ animationDelay: '60ms' }}>
-        <div>
-          <p className="text-[32px] font-bold text-[#1A1917] leading-none tracking-tight">
+      {/* ═══ MOMENTUM — playful stat pills ═════════════════ */}
+      <div className="flex gap-3 mb-12 animate-fade-in" style={{ animationDelay: '60ms' }}>
+        <div className="flex-1 bg-white rounded-2xl p-5 shadow-[var(--shadow-card)]">
+          <p className="text-[32px] font-bold text-[var(--color-pop)] leading-none tracking-tight">
             {momentum.streakDays}
           </p>
-          <p className="text-[12px] text-[#A09D96] mt-1 font-medium">dagen streak</p>
+          <p className="text-[12px] text-[#A09D96] mt-2 font-medium">dagen streak</p>
         </div>
-        <div>
+        <div className="flex-1 bg-white rounded-2xl p-5 shadow-[var(--shadow-card)]">
           <p className="text-[32px] font-bold text-[#1A1917] leading-none tracking-tight">
             {momentum.workoutsThisWeek}
           </p>
-          <p className="text-[12px] text-[#A09D96] mt-1 font-medium">deze week</p>
+          <p className="text-[12px] text-[#A09D96] mt-2 font-medium">deze week</p>
         </div>
         {momentum.weightChangeMonth !== null && (
-          <div>
+          <div className="flex-1 bg-white rounded-2xl p-5 shadow-[var(--shadow-card)]">
             <p className="text-[32px] font-bold leading-none tracking-tight" style={{
               color: momentum.weightChangeMonth <= 0 ? '#3D8B5C' : '#C47D15'
             }}>
               {momentum.weightChangeMonth > 0 ? '+' : ''}{momentum.weightChangeMonth}
             </p>
-            <p className="text-[12px] text-[#A09D96] mt-1 font-medium">kg deze maand</p>
+            <p className="text-[12px] text-[#A09D96] mt-2 font-medium">kg deze maand</p>
           </div>
         )}
       </div>
@@ -353,14 +353,14 @@ export default function ClientDashboard() {
       {(actions.unreadMessages > 0 || actions.nextVideoCall) && (
         <div className="flex gap-3 mb-10 animate-fade-in" style={{ animationDelay: '90ms' }}>
           {actions.unreadMessages > 0 && (
-            <Link href="/client/messages" className="flex items-center gap-2.5 px-5 py-3 bg-white hover:bg-[#FAF8F3] transition-colors">
-              <MessageSquare strokeWidth={1.5} className="w-4 h-4 text-[#1A1917]" />
+            <Link href="/client/messages" className="flex items-center gap-2.5 px-5 py-3 bg-white rounded-xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
+              <MessageSquare strokeWidth={1.5} className="w-4 h-4 text-[var(--color-pop)]" />
               <span className="text-[13px] font-semibold text-[#1A1917]">{actions.unreadMessages} {actions.unreadMessages === 1 ? 'bericht' : 'berichten'}</span>
             </Link>
           )}
           {actions.nextVideoCall && (
-            <Link href={`/client/video/${actions.nextVideoCall.id}`} className="flex items-center gap-2.5 px-5 py-3 bg-white hover:bg-[#FAF8F3] transition-colors">
-              <Video strokeWidth={1.5} className="w-4 h-4 text-[#1A1917]" />
+            <Link href={`/client/video/${actions.nextVideoCall.id}`} className="flex items-center gap-2.5 px-5 py-3 bg-white rounded-xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
+              <Video strokeWidth={1.5} className="w-4 h-4 text-[var(--color-pop)]" />
               <span className="text-[13px] font-semibold text-[#1A1917]">
                 Videocall {new Date(actions.nextVideoCall.scheduled_at).toLocaleDateString('nl-BE', { weekday: 'short', day: 'numeric' })}
               </span>
@@ -373,7 +373,7 @@ export default function ClientDashboard() {
       {showOnboarding && (
         <Link
           href="/onboarding"
-          className="block bg-[#1A1917] p-7 mb-10 animate-slide-up group"
+          className="block bg-[#1A1917] rounded-2xl p-7 mb-10 animate-slide-up group"
           style={{ animationDelay: '100ms' }}
         >
           <div className="flex items-center justify-between mb-5">
@@ -385,7 +385,7 @@ export default function ClientDashboard() {
           <p className="text-[17px] font-semibold text-white mb-5">
             Vul je intake formulier in zodat je coach je programma kan opstellen
           </p>
-          <div className="w-full h-[3px] bg-white/20 overflow-hidden">
+          <div className="w-full h-[3px] bg-white/20 rounded-full overflow-hidden">
             <div
               className="h-full bg-white transition-all duration-500"
               style={{ width: `${(onboarding.currentStep / onboarding.totalSteps) * 100}%` }}
@@ -406,7 +406,7 @@ export default function ClientDashboard() {
       {/* ═══ TRAINING — editorial card ═══════════════════ */}
       <Link
         href="/client/workout"
-        className="block bg-white p-7 mb-3 group animate-slide-up"
+        className="block bg-white rounded-2xl p-7 mb-3 shadow-[var(--shadow-card)] group animate-slide-up hover:shadow-[var(--shadow-card-hover)] transition-shadow"
         style={{ animationDelay: '150ms' }}
       >
         {training.today ? (
@@ -434,7 +434,7 @@ export default function ClientDashboard() {
 
             {!training.today.completed && (
               <div className="mt-7">
-                <span className="btn-primary inline-flex">
+                <span className="btn-pop inline-flex">
                   Start workout
                 </span>
               </div>
@@ -465,7 +465,7 @@ export default function ClientDashboard() {
 
       {/* ═══ VOEDING — editorial checklist ════════════════ */}
       {nutrition && nutrition.mealsTotal > 0 && (
-        <div className="bg-white animate-slide-up mb-3" style={{ animationDelay: '210ms' }}>
+        <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] animate-slide-up mb-3 overflow-hidden" style={{ animationDelay: '210ms' }}>
           {/* Header */}
           <div className="px-7 pt-7 pb-5">
             <div className="flex items-center justify-between mb-2">
@@ -478,12 +478,12 @@ export default function ClientDashboard() {
             </div>
 
             {/* Progress line */}
-            <div className="w-full h-[2px] bg-[#E5E1D9] mt-3">
+            <div className="w-full h-[3px] bg-[#E5E1D9] rounded-full mt-3">
               <div
-                className="h-full transition-all duration-500"
+                className="h-full rounded-full transition-all duration-500"
                 style={{
                   width: `${nutrition.mealsTotal > 0 ? (nutrition.mealsCompleted / nutrition.mealsTotal) * 100 : 0}%`,
-                  backgroundColor: nutrition.mealsCompleted === nutrition.mealsTotal ? '#3D8B5C' : '#1A1917',
+                  backgroundColor: nutrition.mealsCompleted === nutrition.mealsTotal ? '#3D8B5C' : 'var(--color-pop)',
                 }}
               />
             </div>
@@ -499,10 +499,10 @@ export default function ClientDashboard() {
               >
                 {/* Custom checkbox */}
                 <div
-                  className="w-5 h-5 border flex items-center justify-center shrink-0 transition-all duration-200"
+                  className="w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-all duration-200"
                   style={{
-                    backgroundColor: meal.completed ? '#1A1917' : 'transparent',
-                    borderColor: meal.completed ? '#1A1917' : '#CCC7BC',
+                    backgroundColor: meal.completed ? '#3D8B5C' : 'transparent',
+                    borderColor: meal.completed ? '#3D8B5C' : '#CCC7BC',
                   }}
                 >
                   {meal.completed && (
@@ -548,9 +548,9 @@ export default function ClientDashboard() {
       {hasActions && (
         <div className="animate-slide-up mt-3" style={{ animationDelay: '270ms' }}>
           {actions.pendingPrompt && (
-            <Link href="/client/prompts" className="flex items-center gap-4 bg-white px-7 py-6 mb-3 group hover:bg-[#FAF8F3] transition-colors">
-              <div className="w-10 h-10 bg-[#1A1917] flex items-center justify-center shrink-0">
-                <MessageSquare strokeWidth={1.5} className="w-5 h-5 text-white" />
+            <Link href="/client/prompts" className="flex items-center gap-4 bg-white rounded-2xl px-7 py-6 mb-3 shadow-[var(--shadow-card)] group hover:shadow-[var(--shadow-card-hover)] transition-shadow">
+              <div className="w-10 h-10 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center shrink-0">
+                <MessageSquare strokeWidth={1.5} className="w-5 h-5 text-[var(--color-pop)]" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[14px] font-semibold text-[#1A1917]">Wekelijkse reflectie</p>
@@ -563,9 +563,9 @@ export default function ClientDashboard() {
           )}
 
           {actions.accountabilityPending && (
-            <Link href="/client/accountability" className="flex items-center gap-4 bg-white px-7 py-6 mb-3 group hover:bg-[#FAF8F3] transition-colors">
-              <div className="w-10 h-10 bg-[#1A1917] flex items-center justify-center shrink-0">
-                <ShieldCheck strokeWidth={1.5} className="w-5 h-5 text-white" />
+            <Link href="/client/accountability" className="flex items-center gap-4 bg-white rounded-2xl px-7 py-6 mb-3 shadow-[var(--shadow-card)] group hover:shadow-[var(--shadow-card-hover)] transition-shadow">
+              <div className="w-10 h-10 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center shrink-0">
+                <ShieldCheck strokeWidth={1.5} className="w-5 h-5 text-[var(--color-pop)]" />
               </div>
               <div className="flex-1">
                 <p className="text-[14px] font-semibold text-[#1A1917]">Dagelijkse check</p>
@@ -576,9 +576,9 @@ export default function ClientDashboard() {
           )}
 
           {actions.checkInDue !== null && (
-            <Link href="/client/check-in" className="flex items-center gap-4 bg-white px-7 py-6 group hover:bg-[#FAF8F3] transition-colors">
-              <div className="w-10 h-10 bg-[#1A1917] flex items-center justify-center shrink-0">
-                <Calendar strokeWidth={1.5} className="w-5 h-5 text-white" />
+            <Link href="/client/check-in" className="flex items-center gap-4 bg-white rounded-2xl px-7 py-6 shadow-[var(--shadow-card)] group hover:shadow-[var(--shadow-card-hover)] transition-shadow">
+              <div className="w-10 h-10 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center shrink-0">
+                <Calendar strokeWidth={1.5} className="w-5 h-5 text-[var(--color-pop)]" />
               </div>
               <div className="flex-1">
                 <p className="text-[14px] font-semibold text-[#1A1917]">Maandelijkse meting</p>

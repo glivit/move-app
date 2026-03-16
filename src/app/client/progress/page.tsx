@@ -205,39 +205,39 @@ export default function ProgressPage() {
       </div>
 
       {/* ═══ HEADLINE STATS ══════════════════════════════════ */}
-      <div className="flex justify-between mb-12">
-        <div className="text-center">
-          <p className="text-[28px] font-bold text-[#1A1917] leading-none">
+      <div className="grid grid-cols-4 gap-3 mb-12">
+        <div className="bg-white rounded-2xl p-4 text-center shadow-[var(--shadow-card)]">
+          <p className="text-[26px] font-bold text-[#1A1917] leading-none">
             <AnimatedNumber value={headline.daysOnProgram} />
           </p>
-          <p className="text-[12px] text-[#A09D96] mt-2 font-medium">Dagen</p>
+          <p className="text-[11px] text-[#A09D96] mt-2 font-medium">Dagen</p>
         </div>
-        <div className="text-center">
-          <p className="text-[28px] font-bold text-[#1A1917] leading-none">
+        <div className="bg-white rounded-2xl p-4 text-center shadow-[var(--shadow-card)]">
+          <p className="text-[26px] font-bold text-[var(--color-pop)] leading-none">
             <AnimatedNumber value={headline.streak} />
           </p>
-          <p className="text-[12px] text-[#A09D96] mt-2 font-medium">Streak</p>
+          <p className="text-[11px] text-[#A09D96] mt-2 font-medium">Streak</p>
         </div>
-        <div className="text-center">
-          <p className="text-[28px] font-bold text-[#1A1917] leading-none">
+        <div className="bg-white rounded-2xl p-4 text-center shadow-[var(--shadow-card)]">
+          <p className="text-[26px] font-bold text-[#1A1917] leading-none">
             <AnimatedNumber value={headline.totalWorkouts} />
           </p>
-          <p className="text-[12px] text-[#A09D96] mt-2 font-medium">Workouts</p>
+          <p className="text-[11px] text-[#A09D96] mt-2 font-medium">Workouts</p>
         </div>
-        <div className="text-center">
-          <p className="text-[28px] font-bold text-[#1A1917] leading-none">
+        <div className="bg-white rounded-2xl p-4 text-center shadow-[var(--shadow-card)]">
+          <p className="text-[26px] font-bold text-[#7B5EA7] leading-none">
             <AnimatedNumber value={headline.totalPrs} />
           </p>
-          <p className="text-[12px] text-[#A09D96] mt-2 font-medium">Records</p>
+          <p className="text-[11px] text-[#A09D96] mt-2 font-medium">Records</p>
         </div>
       </div>
 
       {/* ═══ 12 WEEK ACTIVITY CHART ══════════════════════════ */}
       {weeklyStats.length > 0 && (
-        <div className="bg-white p-7 mb-10">
+        <div className="bg-white rounded-2xl p-7 mb-10 shadow-[var(--shadow-card)]">
           <div className="flex items-baseline justify-between mb-6">
             <div>
-              <span className="text-[32px] font-bold text-[#1A1917] leading-none">{thisWeekVal}</span>
+              <span className="text-[32px] font-bold text-[var(--color-pop)] leading-none">{thisWeekVal}</span>
               <span className="text-[14px] text-[#A09D96] ml-2">{chartLabel} deze week</span>
             </div>
             <span className="text-[12px] text-[#C5C2BC]">12 weken</span>
@@ -248,8 +248,8 @@ export default function ProgressPage() {
             {chartData.map((val, i) => (
               <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
                 <div
-                  className={`w-full transition-all ${
-                    i === chartData.length - 1 ? 'bg-[#1A1917]' : 'bg-[#E5E1D9]'
+                  className={`w-full rounded-t-md transition-all ${
+                    i === chartData.length - 1 ? 'bg-[var(--color-pop)]' : 'bg-[#E5E1D9]'
                   }`}
                   style={{ height: `${Math.max((val / maxVal) * 100, 3)}%` }}
                 />
@@ -272,7 +272,7 @@ export default function ProgressPage() {
               <button
                 key={mode}
                 onClick={() => setChartMode(mode)}
-                className={`px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.06em] transition-all ${
+                className={`px-4 py-2.5 rounded-lg text-[12px] font-semibold uppercase tracking-[0.06em] transition-all ${
                   chartMode === mode
                     ? 'bg-[#1A1917] text-white'
                     : 'text-[#A09D96] hover:text-[#1A1917]'
@@ -290,7 +290,7 @@ export default function ProgressPage() {
       {body.weightData.length >= 2 && (
         <Link
           href="/client/measurements"
-          className="block bg-white p-7 mb-3 hover:bg-[#FAF8F3] transition-colors group"
+          className="block bg-white rounded-2xl p-7 mb-3 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow group"
         >
           <div className="flex items-center justify-between mb-5">
             <span className="text-label">Gewicht</span>
@@ -326,7 +326,7 @@ export default function ProgressPage() {
       {strength.recentPrs.length > 0 && (
         <Link
           href="/client/stats"
-          className="block bg-white overflow-hidden hover:bg-[#FAF8F3] transition-colors group mb-3"
+          className="block bg-white rounded-2xl overflow-hidden shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow group mb-3"
         >
           <div className="flex items-center justify-between px-7 pt-7 pb-4">
             <span className="text-label">Recente records</span>
@@ -353,30 +353,38 @@ export default function ProgressPage() {
       <div className="grid grid-cols-2 gap-3 mt-10">
         <Link
           href="/client/stats"
-          className="flex flex-col items-start p-6 bg-white hover:bg-[#FAF8F3] transition-colors"
+          className="flex flex-col items-start p-6 bg-white rounded-2xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow"
         >
-          <BarChart3 size={20} strokeWidth={1.5} className="text-[#A09D96] mb-4" />
+          <div className="w-10 h-10 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center mb-4">
+            <BarChart3 size={18} strokeWidth={1.5} className="text-[var(--color-pop)]" />
+          </div>
           <span className="text-[14px] font-semibold text-[#1A1917]">Statistieken</span>
         </Link>
         <Link
           href="/client/exercises"
-          className="flex flex-col items-start p-6 bg-white hover:bg-[#FAF8F3] transition-colors"
+          className="flex flex-col items-start p-6 bg-white rounded-2xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow"
         >
-          <Dumbbell size={20} strokeWidth={1.5} className="text-[#A09D96] mb-4" />
+          <div className="w-10 h-10 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center mb-4">
+            <Dumbbell size={18} strokeWidth={1.5} className="text-[var(--color-pop)]" />
+          </div>
           <span className="text-[14px] font-semibold text-[#1A1917]">Oefeningen</span>
         </Link>
         <Link
           href="/client/measurements"
-          className="flex flex-col items-start p-6 bg-white hover:bg-[#FAF8F3] transition-colors"
+          className="flex flex-col items-start p-6 bg-white rounded-2xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow"
         >
-          <Ruler size={20} strokeWidth={1.5} className="text-[#A09D96] mb-4" />
+          <div className="w-10 h-10 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center mb-4">
+            <Ruler size={18} strokeWidth={1.5} className="text-[var(--color-pop)]" />
+          </div>
           <span className="text-[14px] font-semibold text-[#1A1917]">Metingen</span>
         </Link>
         <Link
           href="/client/calendar"
-          className="flex flex-col items-start p-6 bg-white hover:bg-[#FAF8F3] transition-colors"
+          className="flex flex-col items-start p-6 bg-white rounded-2xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow"
         >
-          <Calendar size={20} strokeWidth={1.5} className="text-[#A09D96] mb-4" />
+          <div className="w-10 h-10 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center mb-4">
+            <Calendar size={18} strokeWidth={1.5} className="text-[var(--color-pop)]" />
+          </div>
           <span className="text-[14px] font-semibold text-[#1A1917]">Kalender</span>
         </Link>
       </div>
