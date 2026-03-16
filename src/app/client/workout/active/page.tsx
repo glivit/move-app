@@ -133,6 +133,8 @@ function ActiveWorkoutPage() {
   const [prCelebration, setPrCelebration] = useState<string | null>(null)
   const [workoutSeconds, setWorkoutSeconds] = useState(0)
   const [activeRestTimer, setActiveRestTimer] = useState<{ exerciseId: string; setIndex: number; seconds: number; total: number } | null>(null)
+  const [exerciseNotes, setExerciseNotes] = useState<Record<string, string>>({})
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
 
   // Refs for auto-save
   const setsRef = useRef(sets)
@@ -361,6 +363,18 @@ function ActiveWorkoutPage() {
     router.push('/client/workout')
   }
 
+  // Discard workout — delete session + all sets from DB
+  const discardWorkout = async () => {
+    if (!session) return
+    try {
+      const supabase = createClient()
+      await supabase.from('workout_sets').delete().eq('workout_session_id', session.id)
+      await supabase.from('workout_sessions').delete().eq('id', session.id)
+    } catch (err) { console.error('Discard error:', err) }
+    clearWorkoutState()
+    router.push('/client/workout')
+  }
+
   // Compute totals
   const totalSets = Object.values(sets).flat().length
   const completedTotal = Object.values(sets).flat().filter(s => s.completed).length
@@ -523,6 +537,17 @@ function ActiveWorkoutPage() {
                 </div>
               )}
 
+              {/* Notes field */}
+              <div className="px-4 pb-2">
+                <input
+                  type="text"
+                  value={exerciseNotes[ex.id] || ''}
+                  onChange={(e) => setExerciseNotes(prev => ({ ...prev, [ex.id]: e.target.value }))}
+                  placeholder="Notities toevoegen..."
+                  className="w-full px-0 py-1 bg-transparent text-[12px] text-[#8A8A8A] placeholder-[#444] border-none focus:outline-none focus:text-[#CCCAC5]"
+                />
+              </div>
+
               {/* Sets table */}
               <div className="px-4 pb-3">
                 {/* Table header */}
@@ -601,6 +626,38 @@ function ActiveWorkoutPage() {
             <Check size={20} strokeWidth={2.5} />
             Workout afronden
           </button>
+        )}
+
+        {/* Bottom actions */}
+        <div className="mt-2 space-y-2">
+          <button
+            onClick={() => router.push(`/client/workout/active?dayId=${dayId}&programId=${programId}&addExercise=1`)}
+            className="w-full py-3.5 bg-[#C8A96E] text-[#111110] rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2"
+          >
+            <Plus size={16} strokeWidth={2.5} />
+            Oefening toevoegen
+          </button>
+
+          <button
+            onClick={() => setShowDiscardConfirm(true)}
+            className="w-full py-3 text-[#FF3B30] text-[13px] font-medium hover:bg-[#FF3B30]/10 rounded-xl transition-colors"
+          >
+            Workout verwijderen
+          </button>
+        </div>
+
+        {/* Discard confirmation */}
+        {showDiscardConfirm && (
+          <div className="fixed inset-0 bg-black/60 z-[70] flex items-end">
+            <div className="w-full bg-[#1E1E1C] rounded-t-3xl p-6 animate-slide-up">
+              <h3 className="text-lg font-semibold text-white mb-2">Workout verwijderen?</h3>
+              <p className="text-[#8A8A8A] text-[14px] mb-6">Alle voortgang van deze sessie wordt permanent verwijderd.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setShowDiscardConfirm(false)} className="flex-1 bg-[#2A2A28] text-white rounded-xl py-3 font-semibold">Annuleer</button>
+                <button onClick={discardWorkout} className="flex-1 bg-[#FF3B30] text-white rounded-xl py-3 font-semibold">Verwijderen</button>
+              </div>
+            </div>
+          </div>
         )}
       </main>
     </div>
