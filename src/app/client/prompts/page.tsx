@@ -333,10 +333,10 @@ export default function ClientPromptsPage() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2" style={{ color: '#1A1A18' }}>
+          <h1 className="text-editorial-h2 text-[#1A1917]">
             Reflectie vragen
           </h1>
-          <p className="text-[15px]" style={{ color: '#8E8E93' }}>
+          <p className="text-[15px]" style={{ color: '#A09D96' }}>
             Deel je gedachten met je coach
           </p>
         </div>
@@ -367,10 +367,7 @@ export default function ClientPromptsPage() {
             ))}
           </div>
         ) : unansweredPrompts.length === 0 ? (
-          <div
-            className="p-12 text-center border"
-            style={{ backgroundColor: '#FFFFFF', borderColor: '#E8E4DC' }}
-          >
+          <div className="p-12 text-center bg-white">
             <MessageSquare
               size={48}
               style={{ color: '#1A1917' }}
@@ -383,7 +380,7 @@ export default function ClientPromptsPage() {
             >
               Geen openstaande reflectie vragen
             </p>
-            <p className="text-[13px]" style={{ color: '#8E8E93' }}>
+            <p className="text-[13px]" style={{ color: '#A09D96' }}>
               Je bent helemaal bij met je vragen!
             </p>
           </div>
@@ -412,11 +409,9 @@ export default function ClientPromptsPage() {
               <div>
                 <button
                   onClick={() => setShowAnswered(!showAnswered)}
-                  className="w-full flex items-center justify-between px-6 py-4 transition-all border"
+                  className="w-full flex items-center justify-between px-6 py-4 transition-all bg-white"
                   style={{
-                    backgroundColor: '#FFFFFF',
                     color: '#1A1A18',
-                    borderColor: '#E8E4DC',
                   }}
                 >
                   <span className="font-semibold text-[15px]">
@@ -438,8 +433,7 @@ export default function ClientPromptsPage() {
                     {answeredPrompts.map((prompt) => (
                       <div
                         key={prompt.id}
-                        className="p-6 border"
-                        style={{ backgroundColor: '#FFFFFF', borderColor: '#E8E4DC' }}
+                        className="p-6 bg-white"
                       >
                         <p
                           className="text-sm font-medium mb-3"
@@ -449,7 +443,7 @@ export default function ClientPromptsPage() {
                         </p>
                         <p
                           className="text-[14px] mb-4"
-                          style={{ color: '#8E8E93' }}
+                          style={{ color: '#A09D96' }}
                         >
                           {prompt.response}
                         </p>

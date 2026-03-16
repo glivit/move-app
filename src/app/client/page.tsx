@@ -3,10 +3,9 @@
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import {
-  Dumbbell, CheckCircle, ChevronRight, Apple, Video,
+  CheckCircle, ChevronRight, Video,
   MessageSquare, Calendar, ArrowRight, ShieldCheck,
   Flame, TrendingDown, TrendingUp, Activity,
-  ClipboardList, AlertCircle, ChevronLeft
 } from 'lucide-react'
 import { NotificationCenter } from '@/components/client/NotificationCenter'
 
@@ -91,7 +90,7 @@ function formatDate(date: Date) {
   return date.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })
 }
 
-// ─── Week Calendar ──────────────────────────────────────────
+// ─── Week Calendar — clean dot style ────────────────────────
 
 function WeekCalendar({ scheduleDays, completedDates }: {
   scheduleDays: Array<{ dayNumber: number; name: string; focus: string | null }>
@@ -99,11 +98,10 @@ function WeekCalendar({ scheduleDays, completedDates }: {
 }) {
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const today = new Date()
-  const todayDow = today.getDay() === 0 ? 7 : today.getDay() // 1=ma, 7=zo
-  const dayLabels = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']
+  const dayLabels = ['M', 'D', 'W', 'D', 'V', 'Z', 'Z']
 
-  // Build 14 days from today
-  const days = Array.from({ length: 14 }, (_, i) => {
+  // Build 7 days from today (current week view)
+  const days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(today)
     d.setDate(today.getDate() + i)
     const dow = d.getDay() === 0 ? 7 : d.getDay()
@@ -125,80 +123,73 @@ function WeekCalendar({ scheduleDays, completedDates }: {
   const selectedInfo = selectedDay !== null ? days[selectedDay] : null
 
   return (
-    <div className="bg-white border border-[#E8E4DC] animate-slide-up" style={{ animationDelay: '240ms' }}>
-      <div className="px-5 pt-5 pb-3">
-        <div className="flex items-center gap-2 mb-4">
-          <Calendar size={16} strokeWidth={1.5} className="text-[#1A1917]" />
-          <span className="text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.06em]">Schema</span>
-        </div>
-
-        {/* Day pills — scrollable row */}
-        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
-          {days.map((day, i) => {
-            const isSelected = selectedDay === i
-            const hasTraining = !!day.scheduled
-            return (
-              <button
-                key={day.dateStr}
-                onClick={() => setSelectedDay(isSelected ? null : i)}
-                className={`flex flex-col items-center min-w-[42px] py-2 px-1 transition-all shrink-0 ${
-                  isSelected
-                    ? 'bg-[#1A1917] text-white'
-                    : day.isToday
-                      ? 'bg-[#F5F2EC]'
-                      : ''
-                }`}
-              >
-                <span className={`text-[10px] font-semibold uppercase ${
-                  isSelected ? 'text-white/70' : 'text-[#A09D96]'
-                }`}>
-                  {day.dayLabel}
-                </span>
-                <span className={`text-[16px] font-bold mt-0.5 ${
+    <div className="animate-slide-up mb-10" style={{ animationDelay: '120ms' }}>
+      {/* Day circles row */}
+      <div className="flex justify-between items-center px-2 mb-3">
+        {days.map((day, i) => {
+          const isSelected = selectedDay === i
+          const hasTraining = !!day.scheduled
+          return (
+            <button
+              key={day.dateStr}
+              onClick={() => setSelectedDay(isSelected ? null : i)}
+              className="flex flex-col items-center gap-1.5"
+            >
+              <span className="text-[11px] font-semibold text-[#A09D96] uppercase">
+                {day.dayLabel}
+              </span>
+              <div className={`w-10 h-10 flex items-center justify-center rounded-full transition-all ${
+                isSelected
+                  ? 'bg-[#1A1917]'
+                  : day.isToday
+                    ? 'bg-white'
+                    : ''
+              }`}>
+                <span className={`text-[15px] font-bold ${
                   isSelected ? 'text-white' : 'text-[#1A1917]'
                 }`}>
                   {day.dayOfMonth}
                 </span>
-                {/* Indicator dot */}
-                <div className="h-1.5 mt-1">
-                  {day.completed ? (
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#34C759]" />
-                  ) : hasTraining ? (
-                    <div className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white/50' : 'bg-[#1A1917]'}`} />
-                  ) : null}
-                </div>
-              </button>
-            )
-          })}
-        </div>
+              </div>
+              {/* Status dot */}
+              <div className="h-[6px]">
+                {day.completed ? (
+                  <div className="w-[6px] h-[6px] rounded-full bg-[#3D8B5C]" />
+                ) : hasTraining ? (
+                  <div className="w-[6px] h-[6px] rounded-full bg-[var(--color-pop)]" />
+                ) : null}
+              </div>
+            </button>
+          )
+        })}
       </div>
 
-      {/* Selected day detail */}
+      {/* Selected day detail — slides in */}
       {selectedInfo && (
-        <div className="px-5 py-4 border-t border-[#F0EDE8]">
+        <div className="bg-white p-5 mt-2 animate-fade-in">
           {selectedInfo.scheduled ? (
             <Link
               href="/client/workout"
               className="flex items-center justify-between group"
             >
               <div>
-                <p className="text-[14px] font-semibold text-[#1A1917]">
+                <p className="text-[15px] font-semibold text-[#1A1917]">
                   {selectedInfo.scheduled.name}
                 </p>
                 {selectedInfo.scheduled.focus && (
-                  <p className="text-[12px] text-[#A09D96] mt-0.5">
+                  <p className="text-[13px] text-[#A09D96] mt-1">
                     {selectedInfo.scheduled.focus}
                   </p>
                 )}
               </div>
               {selectedInfo.completed ? (
-                <CheckCircle strokeWidth={1.5} className="w-5 h-5 text-[#34C759] shrink-0" />
+                <CheckCircle strokeWidth={1.5} className="w-5 h-5 text-[#3D8B5C] shrink-0" />
               ) : (
                 <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:text-[#1A1917] transition-colors shrink-0" />
               )}
             </Link>
           ) : (
-            <p className="text-[14px] text-[#A09D96]">Rustdag</p>
+            <p className="text-[15px] text-[#A09D96]">Rustdag</p>
           )}
         </div>
       )}
@@ -315,67 +306,63 @@ export default function ClientDashboard() {
     <div className="pb-28">
 
       {/* ═══ EDITORIAL HEADER ═══════════════════════════════ */}
-      <div className="animate-fade-in mb-10">
+      <div className="animate-fade-in mb-12">
         <div className="flex items-start justify-between">
           <div>
             <span className="text-label">{formatDate(new Date())}</span>
-            <h1 className="text-editorial-h1 text-[#1A1917] mt-3">
+            <h1 className="text-editorial-h1 text-[#1A1917] mt-4">
               {getGreeting()},
             </h1>
             <h1 className="text-editorial-h1 text-[#1A1917]">
               {firstName}.
             </h1>
           </div>
-          <div className="mt-4">
+          <div className="mt-5">
             <NotificationCenter />
           </div>
         </div>
       </div>
 
-      {/* ═══ MOMENTUM — editorial stat strip ═══════════════ */}
-      <div className="flex items-center gap-6 mb-10 animate-fade-in" style={{ animationDelay: '60ms' }}>
-        <div className="flex items-center gap-2">
-          <Flame strokeWidth={1.5} className="w-4 h-4 text-[#C47D15]" />
-          <span className="text-[14px] font-semibold text-[#1A1917]">{momentum.streakDays}</span>
-          <span className="text-[13px] text-[#A09D96]">dagen</span>
+      {/* ═══ MOMENTUM — large numbers, minimal ═════════════ */}
+      <div className="flex items-end gap-8 mb-12 animate-fade-in" style={{ animationDelay: '60ms' }}>
+        <div>
+          <p className="text-[32px] font-bold text-[#1A1917] leading-none tracking-tight">
+            {momentum.streakDays}
+          </p>
+          <p className="text-[12px] text-[#A09D96] mt-1 font-medium">dagen streak</p>
         </div>
-        <div className="w-px h-4 bg-[#DDD9D0]" />
-        <div className="flex items-center gap-2">
-          <Activity strokeWidth={1.5} className="w-4 h-4 text-[#3068C4]" />
-          <span className="text-[14px] font-semibold text-[#1A1917]">{momentum.workoutsThisWeek}</span>
-          <span className="text-[13px] text-[#A09D96]">deze week</span>
+        <div>
+          <p className="text-[32px] font-bold text-[#1A1917] leading-none tracking-tight">
+            {momentum.workoutsThisWeek}
+          </p>
+          <p className="text-[12px] text-[#A09D96] mt-1 font-medium">deze week</p>
         </div>
         {momentum.weightChangeMonth !== null && (
-          <>
-            <div className="w-px h-4 bg-[#DDD9D0]" />
-            <div className="flex items-center gap-2">
-              {momentum.weightChangeMonth <= 0 ? (
-                <TrendingDown strokeWidth={1.5} className="w-4 h-4 text-[#3D8B5C]" />
-              ) : (
-                <TrendingUp strokeWidth={1.5} className="w-4 h-4 text-[#C47D15]" />
-              )}
-              <span className="text-[14px] font-semibold text-[#1A1917]">
-                {momentum.weightChangeMonth > 0 ? '+' : ''}{momentum.weightChangeMonth}kg
-              </span>
-            </div>
-          </>
+          <div>
+            <p className="text-[32px] font-bold leading-none tracking-tight" style={{
+              color: momentum.weightChangeMonth <= 0 ? '#3D8B5C' : '#C47D15'
+            }}>
+              {momentum.weightChangeMonth > 0 ? '+' : ''}{momentum.weightChangeMonth}
+            </p>
+            <p className="text-[12px] text-[#A09D96] mt-1 font-medium">kg deze maand</p>
+          </div>
         )}
       </div>
 
       {/* ═══ URGENTE BADGES ═════════════════════════════════ */}
       {(actions.unreadMessages > 0 || actions.nextVideoCall) && (
-        <div className="flex gap-3 mb-8 animate-fade-in" style={{ animationDelay: '90ms' }}>
+        <div className="flex gap-3 mb-10 animate-fade-in" style={{ animationDelay: '90ms' }}>
           {actions.unreadMessages > 0 && (
-            <Link href="/client/messages" className="flex items-center gap-2 px-4 py-2.5 bg-white border border-[#E8E4DC] hover:border-[#CCC7BC] transition-colors">
-              <MessageSquare strokeWidth={1.5} className="w-4 h-4 text-[#3068C4]" />
+            <Link href="/client/messages" className="flex items-center gap-2.5 px-5 py-3 bg-white hover:bg-[#FAF8F3] transition-colors">
+              <MessageSquare strokeWidth={1.5} className="w-4 h-4 text-[#1A1917]" />
               <span className="text-[13px] font-semibold text-[#1A1917]">{actions.unreadMessages} {actions.unreadMessages === 1 ? 'bericht' : 'berichten'}</span>
             </Link>
           )}
           {actions.nextVideoCall && (
-            <Link href={`/client/video/${actions.nextVideoCall.id}`} className="flex items-center gap-2 px-4 py-2.5 bg-white border border-[#E8E4DC] hover:border-[#CCC7BC] transition-colors">
-              <Video strokeWidth={1.5} className="w-4 h-4 text-[#3D8B5C]" />
+            <Link href={`/client/video/${actions.nextVideoCall.id}`} className="flex items-center gap-2.5 px-5 py-3 bg-white hover:bg-[#FAF8F3] transition-colors">
+              <Video strokeWidth={1.5} className="w-4 h-4 text-[#1A1917]" />
               <span className="text-[13px] font-semibold text-[#1A1917]">
-                Video {new Date(actions.nextVideoCall.scheduled_at).toLocaleDateString('nl-BE', { weekday: 'short', day: 'numeric' })}
+                Videocall {new Date(actions.nextVideoCall.scheduled_at).toLocaleDateString('nl-BE', { weekday: 'short', day: 'numeric' })}
               </span>
             </Link>
           )}
@@ -386,16 +373,16 @@ export default function ClientDashboard() {
       {showOnboarding && (
         <Link
           href="/onboarding"
-          className="block bg-[#1A1917] p-6 mb-8 animate-slide-up group"
-          style={{ animationDelay: '120ms' }}
+          className="block bg-[#1A1917] p-7 mb-10 animate-slide-up group"
+          style={{ animationDelay: '100ms' }}
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-5">
             <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#A09D96]">
               Profiel voltooien
             </span>
             <ArrowRight strokeWidth={1.5} className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
           </div>
-          <p className="text-[17px] font-semibold text-white mb-4">
+          <p className="text-[17px] font-semibold text-white mb-5">
             Vul je intake formulier in zodat je coach je programma kan opstellen
           </p>
           <div className="w-full h-[3px] bg-white/20 overflow-hidden">
@@ -404,7 +391,7 @@ export default function ClientDashboard() {
               style={{ width: `${(onboarding.currentStep / onboarding.totalSteps) * 100}%` }}
             />
           </div>
-          <span className="text-[12px] text-[#A09D96] mt-2 block">
+          <span className="text-[12px] text-[#A09D96] mt-2.5 block">
             {onboarding.currentStep} van {onboarding.totalSteps}
           </span>
         </Link>
@@ -419,12 +406,12 @@ export default function ClientDashboard() {
       {/* ═══ TRAINING — editorial card ═══════════════════ */}
       <Link
         href="/client/workout"
-        className="block bg-white p-6 mb-2 group animate-slide-up"
+        className="block bg-white p-7 mb-3 group animate-slide-up"
         style={{ animationDelay: '150ms' }}
       >
         {training.today ? (
           <div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-5">
               <span className="text-label">
                 {training.today.completed ? 'Voltooid' : 'Training vandaag'}
               </span>
@@ -435,7 +422,7 @@ export default function ClientDashboard() {
               )}
             </div>
 
-            <h2 className="text-editorial-h3 text-[#1A1917] mb-2">
+            <h2 className="text-editorial-h3 text-[#1A1917] mb-3">
               {training.today.name}
             </h2>
 
@@ -446,7 +433,7 @@ export default function ClientDashboard() {
             </p>
 
             {!training.today.completed && (
-              <div className="mt-6">
+              <div className="mt-7">
                 <span className="btn-primary inline-flex">
                   Start workout
                 </span>
@@ -454,21 +441,21 @@ export default function ClientDashboard() {
             )}
 
             {training.today.completed && training.next && (
-              <p className="text-[13px] text-[#A09D96] mt-4">
-                Volgende → {training.next.name} {training.next.label}
+              <p className="text-[13px] text-[#A09D96] mt-5">
+                Volgende: {training.next.name} {training.next.label}
               </p>
             )}
           </div>
         ) : (
           <div>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-5">
               <span className="text-label">Training</span>
             </div>
-            <h2 className="text-editorial-h3 text-[#A09D96] mb-2">
+            <h2 className="text-editorial-h3 text-[#A09D96]">
               Rustdag
             </h2>
             {training.next && (
-              <p className="text-[14px] text-[#6B6862]">
+              <p className="text-[14px] text-[#6B6862] mt-3">
                 Volgende training: {training.next.name} {training.next.label}
               </p>
             )}
@@ -476,15 +463,12 @@ export default function ClientDashboard() {
         )}
       </Link>
 
-      {/* Thin divider between sections */}
-      <div className="h-px bg-[#E8E4DC] mb-2" />
-
       {/* ═══ VOEDING — editorial checklist ════════════════ */}
       {nutrition && nutrition.mealsTotal > 0 && (
-        <div className="bg-white animate-slide-up mb-2" style={{ animationDelay: '210ms' }}>
+        <div className="bg-white animate-slide-up mb-3" style={{ animationDelay: '210ms' }}>
           {/* Header */}
-          <div className="px-6 pt-6 pb-4">
-            <div className="flex items-center justify-between mb-1">
+          <div className="px-7 pt-7 pb-5">
+            <div className="flex items-center justify-between mb-2">
               <span className="text-label">Voeding</span>
               <span className="text-[14px] font-semibold" style={{
                 color: nutrition.mealsCompleted === nutrition.mealsTotal && nutrition.mealsTotal > 0 ? '#3D8B5C' : '#A09D96'
@@ -493,7 +477,7 @@ export default function ClientDashboard() {
               </span>
             </div>
 
-            {/* Thin progress line */}
+            {/* Progress line */}
             <div className="w-full h-[2px] bg-[#E5E1D9] mt-3">
               <div
                 className="h-full transition-all duration-500"
@@ -511,7 +495,7 @@ export default function ClientDashboard() {
               <button
                 onClick={() => toggleMeal(meal.id, meal.name, meal.completed)}
                 disabled={togglingMeal === meal.id}
-                className="w-full flex items-center gap-4 px-6 py-4 hover:bg-[#FAF8F3] transition-colors text-left"
+                className="w-full flex items-center gap-4 px-7 py-4.5 hover:bg-[#FAF8F3] transition-colors text-left"
               >
                 {/* Custom checkbox */}
                 <div
@@ -535,7 +519,6 @@ export default function ClientDashboard() {
                     {meal.name}
                   </span>
 
-                  {/* Food items inline */}
                   {meal.items && meal.items.length > 0 && !meal.completed && (
                     <p className="text-[12px] text-[#A09D96] mt-0.5 truncate">
                       {meal.items.map(i => i.name).join(', ')}
@@ -553,7 +536,7 @@ export default function ClientDashboard() {
           {/* Link */}
           <Link
             href="/client/nutrition"
-            className="flex items-center justify-between px-6 py-3.5 border-t border-[#F0EDE8] hover:bg-[#FAF8F3] transition-colors"
+            className="flex items-center justify-between px-7 py-4 border-t border-[#F0EDE8] hover:bg-[#FAF8F3] transition-colors"
           >
             <span className="text-[13px] font-medium text-[#6B6862]">Bekijk voedingsplan</span>
             <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC]" />
@@ -561,13 +544,11 @@ export default function ClientDashboard() {
         </div>
       )}
 
-      <div className="h-px bg-[#E8E4DC] mb-2" />
-
       {/* ═══ ACTIES — editorial action cards ═══════════════ */}
       {hasActions && (
-        <div className="animate-slide-up" style={{ animationDelay: '270ms' }}>
+        <div className="animate-slide-up mt-3" style={{ animationDelay: '270ms' }}>
           {actions.pendingPrompt && (
-            <Link href="/client/prompts" className="flex items-center gap-4 bg-white px-6 py-5 border-b border-[#F0EDE8] group hover:bg-[#FAF8F3] transition-colors">
+            <Link href="/client/prompts" className="flex items-center gap-4 bg-white px-7 py-6 mb-3 group hover:bg-[#FAF8F3] transition-colors">
               <div className="w-10 h-10 bg-[#1A1917] flex items-center justify-center shrink-0">
                 <MessageSquare strokeWidth={1.5} className="w-5 h-5 text-white" />
               </div>
@@ -582,7 +563,7 @@ export default function ClientDashboard() {
           )}
 
           {actions.accountabilityPending && (
-            <Link href="/client/accountability" className="flex items-center gap-4 bg-white px-6 py-5 border-b border-[#F0EDE8] group hover:bg-[#FAF8F3] transition-colors">
+            <Link href="/client/accountability" className="flex items-center gap-4 bg-white px-7 py-6 mb-3 group hover:bg-[#FAF8F3] transition-colors">
               <div className="w-10 h-10 bg-[#1A1917] flex items-center justify-center shrink-0">
                 <ShieldCheck strokeWidth={1.5} className="w-5 h-5 text-white" />
               </div>
@@ -595,7 +576,7 @@ export default function ClientDashboard() {
           )}
 
           {actions.checkInDue !== null && (
-            <Link href="/client/check-in" className="flex items-center gap-4 bg-white px-6 py-5 group hover:bg-[#FAF8F3] transition-colors">
+            <Link href="/client/check-in" className="flex items-center gap-4 bg-white px-7 py-6 group hover:bg-[#FAF8F3] transition-colors">
               <div className="w-10 h-10 bg-[#1A1917] flex items-center justify-center shrink-0">
                 <Calendar strokeWidth={1.5} className="w-5 h-5 text-white" />
               </div>

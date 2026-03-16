@@ -133,7 +133,7 @@ export default function ClientProgramPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold text-text-primary">Training</h1>
+          <h1 className="text-editorial-h2 text-[#1A1917]">Training</h1>
         </div>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
@@ -151,7 +151,7 @@ export default function ClientProgramPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold text-text-primary">Training</h1>
+          <h1 className="text-editorial-h2 text-[#1A1917]">Training</h1>
         </div>
         <div className="bg-white rounded-2xl p-8 shadow-clean text-center">
           <Dumbbell
@@ -174,8 +174,8 @@ export default function ClientProgramPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold text-text-primary">Training</h1>
-        <p className="text-[14px] text-client-text-secondary mt-1">
+        <h1 className="text-editorial-h2 text-[#1A1917]">Training</h1>
+        <p className="text-[14px] text-[#A09D96] mt-1">
           {program.title}
         </p>
       </div>

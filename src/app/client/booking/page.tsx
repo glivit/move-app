@@ -125,7 +125,7 @@ export default function BookingPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-editorial-h2 font-[family-name:var(--font-display)] text-[#1A1917] mb-2">Sessie boeken</h1>
+          <h1 className="text-editorial-h2 text-[#1A1917] mb-2">Videocall boeken</h1>
           <p className="text-[#A09D96] text-[15px]">Laden...</p>
         </div>
         <div className="bg-white h-64 border border-[#E8E4DC] animate-pulse" />
@@ -153,7 +153,7 @@ export default function BookingPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-editorial-h2 font-[family-name:var(--font-display)] text-[#1A1917] mb-2">Sessie boeken</h1>
+        <h1 className="text-editorial-h2 text-[#1A1917] mb-2">Videocall boeken</h1>
         <p className="text-[#A09D96] text-[15px]">Kies een beschikbaar moment voor je volgende coaching sessie</p>
       </div>
 
@@ -300,7 +300,7 @@ export default function BookingPage() {
                   {booking ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> Boeken...</>
                   ) : (
-                    <><Calendar className="w-4 h-4" /> Sessie boeken</>
+                    <><Calendar className="w-4 h-4" /> Videocall boeken</>
                   )}
                 </button>
               </div>

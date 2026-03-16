@@ -106,17 +106,14 @@ export default function ResourcesPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold" style={{ color: '#1A1A18' }}>Kennisbank</h1>
-        <p className="text-[14px] mt-1" style={{ color: '#8E8E93' }}>
+        <h1 className="text-editorial-h2 text-[#1A1917]">Kennisbank</h1>
+        <p className="text-[14px] mt-1" style={{ color: '#A09D96' }}>
           Artikelen, video&apos;s en tips van je coach
         </p>
       </div>
 
       {/* Search */}
-      <div
-        className="flex items-center gap-3 px-4 py-3 border"
-        style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
-      >
+      <div className="flex items-center gap-3 px-4 py-3 bg-white">
         <Search size={18} strokeWidth={1.5} style={{ color: '#C7C7CC' }} />
         <input
           type="text"
@@ -156,12 +153,9 @@ export default function ResourcesPage() {
           ))}
         </div>
       ) : filteredResources.length === 0 ? (
-        <div
-          className="p-12 text-center border"
-          style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
-        >
+        <div className="p-12 text-center bg-white">
           <BookOpen size={40} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#C7C7CC' }} />
-          <p className="text-[14px]" style={{ color: '#8E8E93' }}>Geen content gevonden</p>
+          <p className="text-[14px]" style={{ color: '#A09D96' }}>Geen content gevonden</p>
         </div>
       ) : (
         <>
@@ -172,8 +166,7 @@ export default function ResourcesPage() {
                 <button
                   key={resource.id}
                   onClick={() => { setSelectedResource(resource); trackView(resource.id) }}
-                  className="w-full text-left overflow-hidden transition-all border"
-                  style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
+                  className="w-full text-left overflow-hidden transition-all bg-white"
                 >
                   {resource.thumbnail_url ? (
                     <div className="relative aspect-[21/9] overflow-hidden">
@@ -214,7 +207,7 @@ export default function ResourcesPage() {
                     <h3 className="text-[16px] font-semibold mb-1" style={{ color: '#1A1A18' }}>
                       {resource.title}
                     </h3>
-                    <p className="text-[13px] line-clamp-2" style={{ color: '#8E8E93' }}>
+                    <p className="text-[13px] line-clamp-2" style={{ color: '#A09D96' }}>
                       {resource.description}
                     </p>
                   </div>
@@ -229,8 +222,7 @@ export default function ResourcesPage() {
               <button
                 key={resource.id}
                 onClick={() => { setSelectedResource(resource); trackView(resource.id) }}
-                className="w-full text-left overflow-hidden transition-all border"
-                style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
+                className="w-full text-left overflow-hidden transition-all bg-white"
               >
                 {resource.thumbnail_url ? (
                   <div className="relative aspect-video overflow-hidden">
@@ -275,10 +267,7 @@ export default function ResourcesPage() {
       {selectedResource && (
         <div className="fixed inset-0 z-50 flex items-end lg:items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSelectedResource(null)} />
-          <div
-            className="relative w-full max-w-2xl mx-4 mb-4 lg:mb-0 max-h-[85vh] overflow-y-auto border"
-            style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
-          >
+          <div className="relative w-full max-w-2xl mx-4 mb-4 lg:mb-0 max-h-[85vh] overflow-y-auto bg-white">
             <button
               onClick={() => setSelectedResource(null)}
               className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center bg-black/20 backdrop-blur-sm"
@@ -325,7 +314,7 @@ export default function ResourcesPage() {
               <h2 className="text-xl font-bold mb-2" style={{ color: '#1A1A18' }}>
                 {selectedResource.title}
               </h2>
-              <p className="text-[14px] mb-4" style={{ color: '#8E8E93' }}>
+              <p className="text-[14px] mb-4" style={{ color: '#A09D96' }}>
                 {selectedResource.description}
               </p>
 

@@ -24,6 +24,11 @@
   --color-accent-subtle: rgba(26, 25, 23, 0.08);
   --color-accent-surface: #EDEAE4;
 
+  /* Pop accent — warm terracotta for active indicators */
+  --color-pop: #D46A3A;
+  --color-pop-light: rgba(212, 106, 58, 0.12);
+  --color-pop-muted: rgba(212, 106, 58, 0.25);
+
   /* Typography */
   --color-text-primary: #1A1917;
   --color-text-secondary: #6B6862;

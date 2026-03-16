@@ -146,8 +146,8 @@ export default function SupplementsPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-[32px] font-[family-name:var(--font-display)] text-[#1A1A18] mb-2">Supplementen</h1>
-          <p className="text-[#8E8E93] text-[15px]">Laden...</p>
+          <h1 className="text-editorial-h2 text-[#1A1917] mb-2">Supplementen</h1>
+          <p className="text-[#A09D96] text-[15px]">Laden...</p>
         </div>
         <div className="space-y-4">
           {[1, 2].map(i => (
@@ -163,8 +163,8 @@ export default function SupplementsPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-[32px] font-[family-name:var(--font-display)] text-[#1A1A18] mb-2">Supplementen</h1>
-          <p className="text-[#8E8E93] text-[15px]">Track je dagelijkse supplementen en medicatie</p>
+          <h1 className="text-editorial-h2 text-[#1A1917] mb-2">Supplementen</h1>
+          <p className="text-[#A09D96] text-[15px]">Track je dagelijkse supplementen en medicatie</p>
         </div>
         <button
           onClick={() => setShowAdd(!showAdd)}
@@ -185,10 +185,10 @@ export default function SupplementsPage() {
                   style={{ color: loggedCount === totalCount ? '#34C759' : '#FF9500' }} />
               </div>
               <div>
-                <p className="text-[15px] font-semibold text-[#1A1A18]">
+                <p className="text-[15px] font-semibold text-[#1A1917]">
                   {loggedCount === totalCount ? 'Alles ingenomen!' : `${loggedCount} van ${totalCount} ingenomen`}
                 </p>
-                <p className="text-[12px] text-[#8E8E93]">Vandaag</p>
+                <p className="text-[12px] text-[#A09D96]">Vandaag</p>
               </div>
             </div>
             <span className="text-[20px] font-bold" style={{ color: loggedCount === totalCount ? '#34C759' : '#FF9500' }}>
@@ -210,7 +210,7 @@ export default function SupplementsPage() {
       {/* Add form */}
       {showAdd && (
         <form onSubmit={addSupplement} className="bg-white p-5 border border-[#E8E4DC] space-y-4">
-          <h3 className="text-[15px] font-semibold text-[#1A1A18]">Nieuw supplement toevoegen</h3>
+          <h3 className="text-[15px] font-semibold text-[#1A1917]">Nieuw supplement toevoegen</h3>
 
           <div>
             <label className="text-[11px] font-semibold text-[#A09D96] uppercase tracking-[0.12em] block mb-1.5">Naam *</label>
@@ -220,7 +220,7 @@ export default function SupplementsPage() {
               onChange={(e) => setName(e.target.value)}
               placeholder="bijv. Creatine, Vitamine D, Omega-3..."
               required
-              className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[14px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
+              className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[14px] text-[#1A1917] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
             />
           </div>
 
@@ -231,7 +231,7 @@ export default function SupplementsPage() {
               value={dosage}
               onChange={(e) => setDosage(e.target.value)}
               placeholder="bijv. 5g, 2000 IU, 1 capsule..."
-              className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[14px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
+              className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[14px] text-[#1A1917] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
             />
           </div>
 
@@ -241,7 +241,7 @@ export default function SupplementsPage() {
               <select
                 value={frequency}
                 onChange={(e) => setFrequency(e.target.value)}
-                className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[14px] text-[#1A1A18] focus:outline-none focus:border-[#1A1917]"
+                className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917]"
               >
                 {FREQUENCY_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -253,7 +253,7 @@ export default function SupplementsPage() {
               <select
                 value={timeOfDay}
                 onChange={(e) => setTimeOfDay(e.target.value)}
-                className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[14px] text-[#1A1A18] focus:outline-none focus:border-[#1A1917]"
+                className="w-full px-3 py-2.5 border border-[#E8E4DC] text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917]"
               >
                 {TIME_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -281,7 +281,7 @@ export default function SupplementsPage() {
             return (
               <div key={group.value}>
                 <div className="flex items-center gap-2 mb-3">
-                  <GroupIcon className="w-4 h-4 text-[#8E8E93]" strokeWidth={1.5} />
+                  <GroupIcon className="w-4 h-4 text-[#A09D96]" strokeWidth={1.5} />
                   <h3 className="text-[11px] font-semibold text-[#A09D96] uppercase tracking-[0.12em]">{group.label}</h3>
                 </div>
                 <div className="space-y-2">
@@ -305,18 +305,18 @@ export default function SupplementsPage() {
                             }}
                           >
                             {toggling ? (
-                              <Loader2 className="w-4 h-4 animate-spin text-[#8E8E93]" />
+                              <Loader2 className="w-4 h-4 animate-spin text-[#A09D96]" />
                             ) : logged ? (
                               <Check className="w-4 h-4 text-white" strokeWidth={2.5} />
                             ) : null}
                           </button>
                           <div className="flex-1 min-w-0">
-                            <p className={`text-[15px] font-semibold ${logged ? 'text-[#8E8E93] line-through' : 'text-[#1A1A18]'}`}>
+                            <p className={`text-[15px] font-semibold ${logged ? 'text-[#A09D96] line-through' : 'text-[#1A1917]'}`}>
                               {supplement.name}
                             </p>
                             <div className="flex items-center gap-2 mt-0.5">
                               {supplement.dosage && (
-                                <span className="text-[12px] text-[#8E8E93]">{supplement.dosage}</span>
+                                <span className="text-[12px] text-[#A09D96]">{supplement.dosage}</span>
                               )}
                               <span className="text-[12px] text-[#C7C7CC]">{supplement.frequency}</span>
                             </div>
@@ -343,8 +343,8 @@ export default function SupplementsPage() {
       ) : !showAdd ? (
         <div className="bg-white p-12 border border-[#E8E4DC] text-center">
           <Pill strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[#C7C7CC]" />
-          <p className="text-[15px] font-semibold text-[#1A1A18] mb-2">Nog geen supplementen</p>
-          <p className="text-[13px] text-[#8E8E93] mb-4">
+          <p className="text-[15px] font-semibold text-[#1A1917] mb-2">Nog geen supplementen</p>
+          <p className="text-[13px] text-[#A09D96] mb-4">
             Voeg je supplementen en medicatie toe om ze dagelijks bij te houden.
           </p>
           <button

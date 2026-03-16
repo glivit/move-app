@@ -181,14 +181,14 @@ export default function CheckInPage() {
   if (submitted) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4 py-8">
-        <div className="bg-white p-8 max-w-sm w-full text-center space-y-6 border border-[#E8E4DC]">
+        <div className="bg-white p-8 max-w-sm w-full text-center space-y-6">
           <div className="flex justify-center">
             <div className="w-24 h-24 bg-[#E8F5E9] flex items-center justify-center animate-[scale-in_0.5s_ease-out]">
               <CheckCircle className="h-12 w-12 text-[#34C759]" strokeWidth={1.5} />
             </div>
           </div>
           <div className="space-y-2">
-            <h2 className="text-editorial-h2 font-display font-semibold text-[#1A1917]">Check-in ingediend!</h2>
+            <h2 className="text-editorial-h2 text-[#1A1917]">Check-in ingediend!</h2>
             <p className="text-[#A09D96] text-sm leading-relaxed">
               Je coach bekijkt je resultaten binnen 24 uur. Je krijgt een melding zodra de review klaar is.
             </p>
@@ -207,14 +207,14 @@ export default function CheckInPage() {
   if (!canSubmit) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4 py-8">
-        <div className="bg-white p-8 max-w-sm w-full text-center space-y-6 border border-[#E8E4DC]">
+        <div className="bg-white p-8 max-w-sm w-full text-center space-y-6">
           <div className="flex justify-center">
             <div className="w-20 h-20 bg-[#FFF3E0] flex items-center justify-center">
               <Calendar className="h-10 w-10 text-[#FF9800]" strokeWidth={1.5} />
             </div>
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-display font-semibold text-[#1A1917]">Check-in</h2>
+            <h2 className="text-editorial-h2 text-[#1A1917]">Check-in</h2>
             <p className="text-[#A09D96] text-sm leading-relaxed">{windowMessage}</p>
           </div>
           <button
@@ -232,7 +232,7 @@ export default function CheckInPage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-editorial-h2 font-display font-semibold text-[#1A1917]">Maandelijkse check-in</h1>
+        <h1 className="text-editorial-h2 text-[#1A1917]">Maandelijkse check-in</h1>
         <p className="text-[#A09D96] mt-2">Stap {currentStep + 1} van {steps.length}</p>
       </div>
 
@@ -300,14 +300,14 @@ export default function CheckInPage() {
             {(() => { const Icon = steps[currentStep].icon; return Icon ? <Icon className="w-7 h-7 text-[#1A1917]" strokeWidth={1.5} /> : null })()}
           </div>
           <div>
-            <h2 className="text-editorial-h3 font-display font-semibold text-[#1A1917]">{steps[currentStep].title}</h2>
+            <h2 className="text-editorial-h3 text-[#1A1917]">{steps[currentStep].title}</h2>
             <p className="text-[#A09D96] text-sm mt-1">{steps[currentStep].description}</p>
           </div>
         </div>
       </div>
 
       {/* Step content */}
-      <div className="bg-white p-6 transition-all duration-300 border border-[#E8E4DC]">
+      <div className="bg-white p-6 transition-all duration-300">
         {currentStep === 0 && (
           <PhotoUploadStep
             photos={data.photos}

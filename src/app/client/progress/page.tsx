@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import {
-  Flame, Dumbbell, Trophy, TrendingDown, TrendingUp,
+  Dumbbell, Trophy, TrendingDown, TrendingUp,
   ChevronRight,
   Calendar, BarChart3, Ruler
 } from 'lucide-react'
@@ -196,60 +196,60 @@ export default function ProgressPage() {
   const thisWeekVal = chartData.length > 0 ? chartData[chartData.length - 1] : 0
 
   return (
-    <div className="pb-24 space-y-6">
+    <div className="pb-28">
 
       {/* ═══ HEADER ══════════════════════════════════════════ */}
-      <div className="pt-1 mb-1">
+      <div className="mb-10">
         <p className="text-label mb-2">Jouw traject</p>
         <h1 className="text-editorial-h2 text-[#1A1917]">Voortgang</h1>
       </div>
 
       {/* ═══ HEADLINE STATS ══════════════════════════════════ */}
-      <div className="flex justify-between border-b border-[#E8E4DC] pb-6">
+      <div className="flex justify-between mb-12">
         <div className="text-center">
-          <p className="text-[24px] font-bold text-[#1A1917]">
+          <p className="text-[28px] font-bold text-[#1A1917] leading-none">
             <AnimatedNumber value={headline.daysOnProgram} />
           </p>
-          <p className="text-label mt-1">Dagen</p>
+          <p className="text-[12px] text-[#A09D96] mt-2 font-medium">Dagen</p>
         </div>
         <div className="text-center">
-          <p className="text-[24px] font-bold text-[#1A1917]">
+          <p className="text-[28px] font-bold text-[#1A1917] leading-none">
             <AnimatedNumber value={headline.streak} />
           </p>
-          <p className="text-label mt-1">Streak</p>
+          <p className="text-[12px] text-[#A09D96] mt-2 font-medium">Streak</p>
         </div>
         <div className="text-center">
-          <p className="text-[24px] font-bold text-[#1A1917]">
+          <p className="text-[28px] font-bold text-[#1A1917] leading-none">
             <AnimatedNumber value={headline.totalWorkouts} />
           </p>
-          <p className="text-label mt-1">Workouts</p>
+          <p className="text-[12px] text-[#A09D96] mt-2 font-medium">Workouts</p>
         </div>
         <div className="text-center">
-          <p className="text-[24px] font-bold text-[#1A1917]">
+          <p className="text-[28px] font-bold text-[#1A1917] leading-none">
             <AnimatedNumber value={headline.totalPrs} />
           </p>
-          <p className="text-label mt-1">Records</p>
+          <p className="text-[12px] text-[#A09D96] mt-2 font-medium">Records</p>
         </div>
       </div>
 
       {/* ═══ 12 WEEK ACTIVITY CHART ══════════════════════════ */}
       {weeklyStats.length > 0 && (
-        <div className="py-2">
-          <div className="flex items-baseline justify-between mb-4">
+        <div className="bg-white p-7 mb-10">
+          <div className="flex items-baseline justify-between mb-6">
             <div>
-              <span className="text-[28px] font-bold text-[#1A1917]">{thisWeekVal}</span>
-              <span className="text-[14px] text-[#A09D96] ml-1">{chartLabel} deze week</span>
+              <span className="text-[32px] font-bold text-[#1A1917] leading-none">{thisWeekVal}</span>
+              <span className="text-[14px] text-[#A09D96] ml-2">{chartLabel} deze week</span>
             </div>
             <span className="text-[12px] text-[#C5C2BC]">12 weken</span>
           </div>
 
           {/* Bars */}
-          <div className="flex items-end gap-[3px] h-[80px] mb-2">
+          <div className="flex items-end gap-[3px] h-[90px] mb-3">
             {chartData.map((val, i) => (
               <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
                 <div
                   className={`w-full transition-all ${
-                    i === chartData.length - 1 ? 'bg-[#1A1917]' : 'bg-[#DDD9D0]'
+                    i === chartData.length - 1 ? 'bg-[#1A1917]' : 'bg-[#E5E1D9]'
                   }`}
                   style={{ height: `${Math.max((val / maxVal) * 100, 3)}%` }}
                 />
@@ -258,7 +258,7 @@ export default function ProgressPage() {
           </div>
 
           {/* Week labels */}
-          <div className="flex gap-[3px] mb-4">
+          <div className="flex gap-[3px] mb-6">
             {weeklyStats.map((w, i) => (
               <div key={i} className="flex-1 text-center">
                 {i % 4 === 0 && <span className="text-[9px] text-[#C5C2BC]">{w.week}</span>}
@@ -272,7 +272,7 @@ export default function ProgressPage() {
               <button
                 key={mode}
                 onClick={() => setChartMode(mode)}
-                className={`px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.06em] transition-all ${
+                className={`px-4 py-2.5 text-[12px] font-semibold uppercase tracking-[0.06em] transition-all ${
                   chartMode === mode
                     ? 'bg-[#1A1917] text-white'
                     : 'text-[#A09D96] hover:text-[#1A1917]'
@@ -290,28 +290,21 @@ export default function ProgressPage() {
       {body.weightData.length >= 2 && (
         <Link
           href="/client/measurements"
-          className="block border border-[#E8E4DC] bg-white p-5 hover:bg-[#FAF8F3] transition-colors group"
+          className="block bg-white p-7 mb-3 hover:bg-[#FAF8F3] transition-colors group"
         >
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              {body.weightChange !== null && body.weightChange <= 0 ? (
-                <TrendingDown strokeWidth={1.5} className="w-4 h-4 text-[#3D8B5C]" />
-              ) : (
-                <TrendingUp strokeWidth={1.5} className="w-4 h-4 text-[#C47D15]" />
-              )}
-              <span className="text-[13px] font-semibold text-[#1A1917]">Gewicht</span>
-            </div>
+          <div className="flex items-center justify-between mb-5">
+            <span className="text-label">Gewicht</span>
             <ChevronRight size={16} strokeWidth={1.5} className="text-[#CCC7BC] group-hover:translate-x-0.5 transition-transform" />
           </div>
 
           <div className="flex items-end justify-between">
             <div>
-              <p className="text-[28px] font-bold text-[#1A1917] tracking-[-0.02em] leading-none">
+              <p className="text-[32px] font-bold text-[#1A1917] tracking-[-0.02em] leading-none">
                 {body.weightCurrent}
                 <span className="text-[14px] font-medium text-[#A09D96] ml-1">kg</span>
               </p>
               {body.weightChange !== null && (
-                <p className="text-[13px] mt-1.5 font-semibold" style={{
+                <p className="text-[13px] mt-2 font-semibold" style={{
                   color: body.weightChange <= 0 ? '#3D8B5C' : '#C47D15'
                 }}>
                   {body.weightChange > 0 ? '+' : ''}{body.weightChange} kg
@@ -333,65 +326,57 @@ export default function ProgressPage() {
       {strength.recentPrs.length > 0 && (
         <Link
           href="/client/stats"
-          className="block border border-[#E8E4DC] bg-white overflow-hidden hover:bg-[#FAF8F3] transition-colors group"
+          className="block bg-white overflow-hidden hover:bg-[#FAF8F3] transition-colors group mb-3"
         >
-          <div className="flex items-center justify-between px-5 pt-5 pb-3">
-            <div className="flex items-center gap-2">
-              <Trophy strokeWidth={1.5} className="w-4 h-4 text-[#7B5EA7]" />
-              <span className="text-[13px] font-semibold text-[#1A1917]">Recente records</span>
-            </div>
+          <div className="flex items-center justify-between px-7 pt-7 pb-4">
+            <span className="text-label">Recente records</span>
             <ChevronRight size={16} strokeWidth={1.5} className="text-[#CCC7BC] group-hover:translate-x-0.5 transition-transform" />
           </div>
-          <div className="divide-y divide-[#F0EDE8]">
-            {strength.recentPrs.slice(0, 3).map((pr) => (
-              <div key={pr.id} className="flex items-center gap-3 px-5 py-3">
-                <div className="w-8 h-8 bg-[#7B5EA7]/10 flex items-center justify-center shrink-0">
-                  <Trophy strokeWidth={1.5} className="w-3.5 h-3.5 text-[#7B5EA7]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-medium text-[#1A1917] truncate">{pr.exercise}</p>
-                  <p className="text-[11px] text-[#A09D96]">
-                    {new Date(pr.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
-                  </p>
-                </div>
-                <span className="text-[16px] font-bold text-[#7B5EA7]">
-                  {pr.value} {pr.type === 'weight' ? 'kg' : pr.type === 'reps' ? 'reps' : 'kg'}
-                </span>
+          {strength.recentPrs.slice(0, 3).map((pr) => (
+            <div key={pr.id} className="flex items-center gap-4 px-7 py-4 border-t border-[#F0EDE8]">
+              <div className="flex-1 min-w-0">
+                <p className="text-[14px] font-medium text-[#1A1917] truncate">{pr.exercise}</p>
+                <p className="text-[11px] text-[#A09D96] mt-0.5">
+                  {new Date(pr.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
+                </p>
               </div>
-            ))}
-          </div>
+              <span className="text-[16px] font-bold text-[#7B5EA7]">
+                {pr.value} {pr.type === 'weight' ? 'kg' : pr.type === 'reps' ? 'reps' : 'kg'}
+              </span>
+            </div>
+          ))}
         </Link>
       )}
 
 
       {/* ═══ QUICK LINKS — editorial grid ═══════════════════ */}
-      <div className="grid grid-cols-2 border border-[#E8E4DC]">
+      <div className="grid grid-cols-2 gap-3 mt-10">
         <Link
           href="/client/stats"
-          className="flex flex-col items-start p-5 border-r border-b border-[#E8E4DC] bg-white hover:bg-[#FAF8F3] transition-colors"
+          className="flex flex-col items-start p-6 bg-white hover:bg-[#FAF8F3] transition-colors"
         >
-          <BarChart3 size={20} strokeWidth={1.5} className="text-[#A09D96] mb-3" />
+          <BarChart3 size={20} strokeWidth={1.5} className="text-[#A09D96] mb-4" />
           <span className="text-[14px] font-semibold text-[#1A1917]">Statistieken</span>
         </Link>
         <Link
           href="/client/exercises"
-          className="flex flex-col items-start p-5 border-b border-[#E8E4DC] bg-white hover:bg-[#FAF8F3] transition-colors"
+          className="flex flex-col items-start p-6 bg-white hover:bg-[#FAF8F3] transition-colors"
         >
-          <Dumbbell size={20} strokeWidth={1.5} className="text-[#A09D96] mb-3" />
+          <Dumbbell size={20} strokeWidth={1.5} className="text-[#A09D96] mb-4" />
           <span className="text-[14px] font-semibold text-[#1A1917]">Oefeningen</span>
         </Link>
         <Link
           href="/client/measurements"
-          className="flex flex-col items-start p-5 border-r border-[#E8E4DC] bg-white hover:bg-[#FAF8F3] transition-colors"
+          className="flex flex-col items-start p-6 bg-white hover:bg-[#FAF8F3] transition-colors"
         >
-          <Ruler size={20} strokeWidth={1.5} className="text-[#A09D96] mb-3" />
+          <Ruler size={20} strokeWidth={1.5} className="text-[#A09D96] mb-4" />
           <span className="text-[14px] font-semibold text-[#1A1917]">Metingen</span>
         </Link>
         <Link
           href="/client/calendar"
-          className="flex flex-col items-start p-5 bg-white hover:bg-[#FAF8F3] transition-colors"
+          className="flex flex-col items-start p-6 bg-white hover:bg-[#FAF8F3] transition-colors"
         >
-          <Calendar size={20} strokeWidth={1.5} className="text-[#A09D96] mb-3" />
+          <Calendar size={20} strokeWidth={1.5} className="text-[#A09D96] mb-4" />
           <span className="text-[14px] font-semibold text-[#1A1917]">Kalender</span>
         </Link>
       </div>

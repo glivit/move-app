@@ -309,7 +309,7 @@ export default function ClientNutritionPage() {
     return (
       <div className="min-h-screen bg-[#EEEBE3]">
         <div className="max-w-lg mx-auto px-5 py-8 pb-28">
-          <h1 className="text-[28px] font-[family-name:var(--font-display)] text-[#1A1917] mb-2">
+          <h1 className="text-editorial-h2 text-[#1A1917] mb-2">
             Voeding
           </h1>
           <div className="bg-white p-10 border border-[#E8E4DC] text-center mt-6">
@@ -330,7 +330,7 @@ export default function ClientNutritionPage() {
     <div className="min-h-screen bg-[#EEEBE3]">
       <div className="max-w-lg mx-auto px-5 py-8 pb-28">
         {/* Header */}
-        <h1 className="text-[28px] font-[family-name:var(--font-display)] text-[#1A1917] mb-1">
+        <h1 className="text-editorial-h2 text-[#1A1917] mb-1">
           Voeding
         </h1>
         <p className="text-[13px] text-[#A09D96] mb-6">{plan.title}</p>

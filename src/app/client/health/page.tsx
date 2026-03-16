@@ -121,9 +121,9 @@ export default function HealthPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div><h1 className="text-2xl font-semibold" style={{ color: '#1A1A18' }}>Gezondheid</h1></div>
+        <div><h1 className="text-editorial-h2 text-[#1A1917]">Gezondheid</h1></div>
         <div className="space-y-3">
-          {[1, 2, 3].map((i) => <div key={i} className="h-24 bg-white border border-[#E8E4DC] animate-pulse" />)}
+          {[1, 2, 3].map((i) => <div key={i} className="h-24 bg-white animate-pulse" />)}
         </div>
       </div>
     )
@@ -133,8 +133,8 @@ export default function HealthPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-semibold" style={{ color: '#1A1A18' }}>Gezondheid</h1>
-        <p className="text-[14px] mt-1" style={{ color: '#8E8E93' }}>
+        <h1 className="text-editorial-h2 text-[#1A1917]">Gezondheid</h1>
+        <p className="text-[14px] mt-1" style={{ color: '#A09D96' }}>
           Track je dagelijkse gezondheidsdata
         </p>
       </div>
@@ -142,45 +142,33 @@ export default function HealthPage() {
       {/* Weekly Averages */}
       {weekAvg && (
         <div className="grid grid-cols-3 gap-3">
-          <div
-            className="p-4 text-center border"
-            style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
-          >
+          <div className="p-4 text-center bg-white">
             <Footprints size={18} strokeWidth={1.5} className="mx-auto mb-1" style={{ color: '#FF9500' }} />
             <p className="text-[18px] font-bold" style={{ color: '#1A1A18' }}>
               {(weekAvg.steps / 1000).toFixed(1)}k
             </p>
-            <p className="text-[11px]" style={{ color: '#8E8E93' }}>Gem. stappen</p>
+            <p className="text-[11px]" style={{ color: '#A09D96' }}>Gem. stappen</p>
           </div>
-          <div
-            className="p-4 text-center border"
-            style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
-          >
+          <div className="p-4 text-center bg-white">
             <Moon size={18} strokeWidth={1.5} className="mx-auto mb-1" style={{ color: '#AF52DE' }} />
             <p className="text-[18px] font-bold" style={{ color: '#1A1A18' }}>
               {weekAvg.sleep}u
             </p>
-            <p className="text-[11px]" style={{ color: '#8E8E93' }}>Gem. slaap</p>
+            <p className="text-[11px]" style={{ color: '#A09D96' }}>Gem. slaap</p>
           </div>
-          <div
-            className="p-4 text-center border"
-            style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
-          >
+          <div className="p-4 text-center bg-white">
             <Droplets size={18} strokeWidth={1.5} className="mx-auto mb-1" style={{ color: '#007AFF' }} />
             <p className="text-[18px] font-bold" style={{ color: '#1A1A18' }}>
               {(weekAvg.water / 1000).toFixed(1)}L
             </p>
-            <p className="text-[11px]" style={{ color: '#8E8E93' }}>Gem. water</p>
+            <p className="text-[11px]" style={{ color: '#A09D96' }}>Gem. water</p>
           </div>
         </div>
       )}
 
       {/* Mini Chart */}
       {chartData.length > 2 && (
-        <div
-          className="p-4 border"
-          style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
-        >
+        <div className="p-4 bg-white">
           <p className="text-[13px] font-semibold mb-3" style={{ color: '#1A1A18' }}>
             Laatste 7 dagen
           </p>
@@ -204,10 +192,7 @@ export default function HealthPage() {
       )}
 
       {/* Today's Input */}
-      <div
-        className="p-5 border"
-        style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
-      >
+      <div className="p-5 bg-white">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-[15px] font-semibold" style={{ color: '#1A1A18' }}>
             Vandaag
@@ -224,7 +209,7 @@ export default function HealthPage() {
               <Footprints size={16} strokeWidth={1.5} style={{ color: '#FF9500' }} />
             </div>
             <div className="flex-1">
-              <label className="text-[12px] font-medium" style={{ color: '#8E8E93' }}>Stappen</label>
+              <label className="text-[12px] font-medium" style={{ color: '#A09D96' }}>Stappen</label>
               <input
                 type="number"
                 value={todayData.steps || ''}
@@ -242,7 +227,7 @@ export default function HealthPage() {
               <Moon size={16} strokeWidth={1.5} style={{ color: '#AF52DE' }} />
             </div>
             <div className="flex-1">
-              <label className="text-[12px] font-medium" style={{ color: '#8E8E93' }}>Slaap (uren)</label>
+              <label className="text-[12px] font-medium" style={{ color: '#A09D96' }}>Slaap (uren)</label>
               <input
                 type="number"
                 step="0.5"
@@ -257,7 +242,7 @@ export default function HealthPage() {
 
           {/* Sleep quality */}
           <div>
-            <label className="text-[12px] font-medium" style={{ color: '#8E8E93' }}>Slaapkwaliteit</label>
+            <label className="text-[12px] font-medium" style={{ color: '#A09D96' }}>Slaapkwaliteit</label>
             <div className="flex gap-2 mt-1.5">
               {SLEEP_QUALITY_OPTIONS.map((opt) => (
                 <button
@@ -267,7 +252,7 @@ export default function HealthPage() {
                   style={{
                     borderColor: todayData.sleep_quality === opt.value ? opt.color : '#E8E4DC',
                     backgroundColor: todayData.sleep_quality === opt.value ? `${opt.color}15` : 'white',
-                    color: todayData.sleep_quality === opt.value ? opt.color : '#8E8E93',
+                    color: todayData.sleep_quality === opt.value ? opt.color : '#A09D96',
                   }}
                 >
                   <span className="text-lg block">{opt.emoji}</span>
@@ -283,7 +268,7 @@ export default function HealthPage() {
               <Droplets size={16} strokeWidth={1.5} style={{ color: '#007AFF' }} />
             </div>
             <div className="flex-1">
-              <label className="text-[12px] font-medium" style={{ color: '#8E8E93' }}>Water (ml)</label>
+              <label className="text-[12px] font-medium" style={{ color: '#A09D96' }}>Water (ml)</label>
               <input
                 type="number"
                 step="250"
@@ -315,7 +300,7 @@ export default function HealthPage() {
               <Heart size={16} strokeWidth={1.5} style={{ color: '#FF3B30' }} />
             </div>
             <div className="flex-1">
-              <label className="text-[12px] font-medium" style={{ color: '#8E8E93' }}>Rusthartslag (bpm)</label>
+              <label className="text-[12px] font-medium" style={{ color: '#A09D96' }}>Rusthartslag (bpm)</label>
               <input
                 type="number"
                 value={todayData.resting_heart_rate || ''}
@@ -333,7 +318,7 @@ export default function HealthPage() {
               <div className="w-9 h-9 flex items-center justify-center border" style={{ backgroundColor: '#FFF3E0', borderColor: '#FFE4CC' }}>
                 <Brain size={16} strokeWidth={1.5} style={{ color: '#FF9500' }} />
               </div>
-              <label className="text-[12px] font-medium" style={{ color: '#8E8E93' }}>
+              <label className="text-[12px] font-medium" style={{ color: '#A09D96' }}>
                 Stressniveau: {todayData.stress_level || '–'}/10
               </label>
             </div>
@@ -372,7 +357,7 @@ export default function HealthPage() {
 
           {/* Notes */}
           <div>
-            <label className="text-[12px] font-medium" style={{ color: '#8E8E93' }}>Notities</label>
+            <label className="text-[12px] font-medium" style={{ color: '#A09D96' }}>Notities</label>
             <textarea
               value={todayData.notes || ''}
               onChange={(e) => updateField('notes', e.target.value)}
