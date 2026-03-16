@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Dumbbell, ChevronRight, Calendar } from 'lucide-react'
+import { Dumbbell, ChevronRight, ArrowRight } from 'lucide-react'
 
 interface ClientProgram {
   id: string
@@ -33,7 +33,6 @@ export default function WorkoutOverviewPage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Use API route to bypass RLS issues on client_programs
         const res = await fetch('/api/client-program')
         if (!res.ok) {
           if (res.status === 401) {
@@ -68,16 +67,14 @@ export default function WorkoutOverviewPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="font-display text-2xl font-semibold text-text-primary">Training</h1>
+      <div className="pb-28">
+        <div className="mb-8">
+          <div className="h-4 w-24 bg-[#E5E1D9] mb-3 animate-pulse" />
+          <div className="h-10 w-56 bg-[#E5E1D9] animate-pulse" />
         </div>
-        <div className="space-y-3">
+        <div className="space-y-px">
           {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="h-24 bg-client-surface-muted rounded-2xl animate-pulse"
-            />
+            <div key={i} className="h-20 bg-white animate-pulse" />
           ))}
         </div>
       </div>
@@ -86,20 +83,19 @@ export default function WorkoutOverviewPage() {
 
   if (!program) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="font-display text-2xl font-semibold text-text-primary">Training</h1>
+      <div className="pb-28">
+        <div className="mb-8">
+          <span className="text-label">Training</span>
+          <h1 className="text-editorial-h2 text-[#1A1917] mt-3">
+            Geen programma
+          </h1>
         </div>
-        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
-          <Dumbbell
-            size={48}
-            strokeWidth={1.5}
-            className="text-client-text-secondary opacity-30 mx-auto mb-3"
-          />
-          <p className="font-medium text-text-primary">
-            Je coach heeft nog geen programma toegewezen
+        <div className="bg-white p-8 text-center">
+          <Dumbbell size={40} strokeWidth={1} className="text-[#CCC7BC] mx-auto mb-4" />
+          <p className="text-[15px] font-medium text-[#1A1917] mb-1">
+            Nog geen programma toegewezen
           </p>
-          <p className="text-[14px] text-client-text-secondary mt-2">
+          <p className="text-[13px] text-[#A09D96]">
             Je coach zal binnenkort een trainingsplan voor je opstellen.
           </p>
         </div>
@@ -108,61 +104,54 @@ export default function WorkoutOverviewPage() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header — editorial */}
-      <div>
-        <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-[#A09D96] mb-2">
-          Week {program.current_week}
-        </p>
-        <h1
-          className="text-[32px] font-semibold text-text-primary tracking-[-0.02em] leading-tight"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
+    <div className="pb-28">
+      {/* Editorial header */}
+      <div className="mb-8">
+        <span className="text-label">Week {program.current_week}</span>
+        <h1 className="text-editorial-h2 text-[#1A1917] mt-3">
           {program.name}
         </h1>
       </div>
 
-      {/* Week progress — minimal */}
-      <div className="flex items-center gap-3">
-        <div className="flex-1 h-1 bg-[#E5E1D9] rounded-full overflow-hidden">
+      {/* Week progress — thin editorial line */}
+      <div className="flex items-center gap-3 mb-8">
+        <div className="flex-1 h-[2px] bg-[#E5E1D9]">
           <div
-            className="h-full bg-[#1A1917] rounded-full transition-all duration-500"
+            className="h-full bg-[#1A1917] transition-all duration-500"
             style={{ width: `${days.length > 0 ? (workoutsThisWeek / days.length) * 100 : 0}%` }}
           />
         </div>
-        <span className="text-[13px] font-semibold text-[#6B6862] shrink-0">
-          {workoutsThisWeek}/{days.length}
+        <span className="text-[13px] font-semibold text-[#6B6862]">
+          {workoutsThisWeek} van {days.length}
         </span>
       </div>
 
-      {/* Training days */}
-      <div className="space-y-3">
-        {days.map((day) => (
+      {/* Training days — stacked, no gaps, editorial list */}
+      <div className="bg-white">
+        {days.map((day, i) => (
           <button
             key={day.id}
             onClick={() => handleStartWorkout(day)}
-            className="w-full bg-white rounded-xl p-5 border border-[#E8E4DC] text-left hover:border-[#CCC7BC] transition-all duration-300"
+            className={`w-full text-left px-6 py-5 flex items-center justify-between gap-4 group hover:bg-[#FAF8F3] transition-colors ${
+              i > 0 ? 'border-t border-[#F0EDE8]' : ''
+            }`}
           >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex items-baseline gap-2.5">
-                  <h3 className="font-semibold text-text-primary tracking-[-0.01em]">
-                    {day.name}
-                  </h3>
-                  {day.focus && (
-                    <span className="text-[11px] uppercase tracking-[0.06em] text-[#A09D96] font-medium">
-                      {day.focus}
-                    </span>
-                  )}
-                </div>
-                <div className="mt-1.5 flex items-center gap-2 text-[13px] text-client-text-secondary">
-                  <span>{day.exercise_count} oefeningen</span>
-                  <span className="text-[#CCC7BC]">·</span>
-                  <span>±{day.estimated_duration_min} min</span>
-                </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-baseline gap-3">
+                <h3 className="text-[16px] font-semibold text-[#1A1917] tracking-[-0.01em]">
+                  {day.name}
+                </h3>
+                {day.focus && (
+                  <span className="text-[11px] uppercase tracking-[0.08em] text-[#A09D96] font-medium">
+                    {day.focus}
+                  </span>
+                )}
               </div>
-              <ChevronRight size={18} strokeWidth={1.5} className="text-[#CCC7BC] flex-shrink-0 mt-1" />
+              <p className="text-[13px] text-[#A09D96] mt-1">
+                {day.exercise_count} oefeningen · ±{day.estimated_duration_min} min
+              </p>
             </div>
+            <ArrowRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:translate-x-1 group-hover:text-[#1A1917] transition-all shrink-0" />
           </button>
         ))}
       </div>

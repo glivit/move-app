@@ -22,6 +22,7 @@ import {
   BarChart3,
   Settings,
   ChevronDown,
+  ArrowRight,
 } from 'lucide-react'
 
 interface Profile {
@@ -36,8 +37,8 @@ interface Profile {
 
 interface WeeklyStats {
   week: string
-  duration: number // minutes
-  volume: number // kg
+  duration: number
+  volume: number
   sets: number
 }
 
@@ -85,7 +86,6 @@ export default function ProfilePage() {
 
         if (profileData) setProfile(profileData)
 
-        // Fetch workout stats
         const { data: sessions, count } = await supabase
           .from('workout_sessions')
           .select('id, started_at, completed_at, duration_seconds, workout_sets(weight_kg, actual_reps)', { count: 'exact' })
@@ -95,17 +95,15 @@ export default function ProfilePage() {
 
         setTotalWorkouts(count || 0)
 
-        // Build weekly stats for last 12 weeks
         if (sessions) {
           const weeks: Record<string, WeeklyStats> = {}
           const now = new Date()
 
-          // Initialize last 12 weeks
           for (let i = 11; i >= 0; i--) {
             const d = new Date(now)
             d.setDate(d.getDate() - i * 7)
             const weekStart = new Date(d)
-            weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1) // Monday
+            weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1)
             const key = weekStart.toISOString().slice(0, 10)
             const label = `${weekStart.getDate()}/${weekStart.getMonth() + 1}`
             weeks[key] = { week: label, duration: 0, volume: 0, sets: 0 }
@@ -130,7 +128,6 @@ export default function ProfilePage() {
           const statsArr = Object.values(weeks)
           setWeeklyStats(statsArr)
 
-          // This week minutes
           if (statsArr.length > 0) {
             setThisWeekMinutes(statsArr[statsArr.length - 1].duration)
           }
@@ -158,125 +155,135 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="space-y-4 pb-20">
-        <div className="flex flex-col items-center space-y-4 py-6">
-          <div className="w-20 h-20 bg-[#E8E4DC] rounded-full animate-pulse" />
-          <div className="h-6 w-40 bg-[#E8E4DC] rounded-lg animate-pulse" />
+      <div className="pb-28">
+        <div className="flex flex-col items-center py-8">
+          <div className="w-20 h-20 bg-[#E5E1D9] rounded-full animate-pulse" />
+          <div className="h-6 w-40 bg-[#E5E1D9] mt-4 animate-pulse" />
         </div>
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-20 bg-[#E8E4DC] rounded-2xl animate-pulse" />
-        ))}
       </div>
     )
   }
 
-  // Chart data
+  // Chart
   const chartData = weeklyStats.map(w => {
     if (chartMode === 'duration') return w.duration
-    if (chartMode === 'volume') return Math.round(w.volume / 1000) // in tons
+    if (chartMode === 'volume') return Math.round(w.volume / 1000)
     return w.sets
   })
   const maxVal = Math.max(...chartData, 1)
-
-  const chartLabel = chartMode === 'duration' ? 'minuten' : chartMode === 'volume' ? 'ton' : 'sets'
+  const chartLabel = chartMode === 'duration' ? 'min' : chartMode === 'volume' ? 'ton' : 'sets'
   const thisWeekVal = chartData.length > 0 ? chartData[chartData.length - 1] : 0
 
+  const menuSections = [
+    {
+      items: [
+        { href: '/client/profile/edit', icon: User, label: 'Persoonlijke gegevens' },
+        { href: '/client/profile/notifications', icon: Bell, label: 'Meldingen' },
+        { href: '/client/profile/goals', icon: Target, label: 'Doelen' },
+        { href: '/client/profile/diet', icon: UtensilsCrossed, label: 'Voedingsvoorkeuren' },
+        { href: '/client/profile/health', icon: AlertCircle, label: 'Blessures & beperkingen' },
+      ]
+    },
+    {
+      items: [
+        { href: '/client/profile/invoices', icon: Receipt, label: 'Facturen' },
+        { href: '/client/profile/help', icon: HelpCircle, label: 'Help & FAQ' },
+        { href: '/client/profile/privacy', icon: Shield, label: 'Privacy' },
+      ]
+    },
+  ]
+
   return (
-    <div className="space-y-4 pb-20">
-      {/* --- Profile header --- */}
-      <div className="bg-white rounded-xl border border-[#E8E4DC] p-6">
-        <div className="flex items-center gap-4">
-          {/* Avatar */}
-          <div className="w-16 h-16 rounded-full bg-[#1A1917] text-white flex items-center justify-center text-xl font-semibold flex-shrink-0">
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full rounded-full object-cover" />
-            ) : (
-              getInitials(profile?.full_name)
-            )}
-          </div>
+    <div className="pb-28">
 
-          <div className="flex-1 min-w-0">
-            <h1 className="text-[17px] font-semibold text-[#1A1A18] truncate">{profile?.full_name || 'Profiel'}</h1>
-            <p className="text-[13px] text-[#8E8E93] mt-0.5">Lid sinds {formatMemberSince(profile?.created_at || '')}</p>
-          </div>
-
-          <button
-            onClick={() => router.push('/client/profile/edit')}
-            className="p-2 rounded-full hover:bg-[#E8E4DC] transition-colors"
-          >
-            <Settings size={20} strokeWidth={1.5} className="text-[#8E8E93]" />
-          </button>
+      {/* ═══ PROFILE HEADER — editorial, centered ═══════ */}
+      <div className="flex flex-col items-center pt-4 pb-8">
+        {/* Avatar */}
+        <div className="w-20 h-20 rounded-full bg-[#1A1917] text-white flex items-center justify-center text-[22px] font-semibold mb-4 overflow-hidden">
+          {profile?.avatar_url ? (
+            <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full object-cover" />
+          ) : (
+            getInitials(profile?.full_name)
+          )}
         </div>
 
-        {/* Stats row */}
-        <div className="grid grid-cols-3 gap-3 mt-5">
-          <div className="text-center">
-            <p className="text-[20px] font-bold text-[#1A1A18]">{totalWorkouts}</p>
-            <p className="text-[11px] text-[#8E8E93] uppercase tracking-wider font-medium">Workouts</p>
-          </div>
-          <div className="text-center border-x border-[#E8E4DC]">
-            <p className="text-[20px] font-bold text-[#1A1A18]">
-              {weeklyStats.reduce((sum, w) => sum + w.volume, 0) > 1000
-                ? `${(weeklyStats.reduce((sum, w) => sum + w.volume, 0) / 1000).toFixed(0)}t`
-                : `${weeklyStats.reduce((sum, w) => sum + w.volume, 0)}kg`
-              }
-            </p>
-            <p className="text-[11px] text-[#8E8E93] uppercase tracking-wider font-medium">Volume</p>
-          </div>
-          <div className="text-center">
-            <p className="text-[20px] font-bold text-[#1A1A18]">
-              {weeklyStats.reduce((sum, w) => sum + w.sets, 0)}
-            </p>
-            <p className="text-[11px] text-[#8E8E93] uppercase tracking-wider font-medium">Sets</p>
-          </div>
+        <h1
+          className="text-[24px] font-semibold text-[#1A1917] tracking-[-0.02em]"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          {profile?.full_name || 'Profiel'}
+        </h1>
+        <p className="text-[13px] text-[#A09D96] mt-1">
+          Lid sinds {formatMemberSince(profile?.created_at || '')}
+        </p>
+      </div>
+
+      {/* ═══ STATS — editorial numbers ═══════════════════ */}
+      <div className="flex justify-center gap-10 pb-8 border-b border-[#E8E4DC]">
+        <div className="text-center">
+          <p className="text-[24px] font-bold text-[#1A1917]">{totalWorkouts}</p>
+          <p className="text-label mt-1">Workouts</p>
+        </div>
+        <div className="text-center">
+          <p className="text-[24px] font-bold text-[#1A1917]">
+            {weeklyStats.reduce((sum, w) => sum + w.volume, 0) > 1000
+              ? `${(weeklyStats.reduce((sum, w) => sum + w.volume, 0) / 1000).toFixed(0)}t`
+              : `${weeklyStats.reduce((sum, w) => sum + w.volume, 0)}kg`
+            }
+          </p>
+          <p className="text-label mt-1">Volume</p>
+        </div>
+        <div className="text-center">
+          <p className="text-[24px] font-bold text-[#1A1917]">
+            {weeklyStats.reduce((sum, w) => sum + w.sets, 0)}
+          </p>
+          <p className="text-label mt-1">Sets</p>
         </div>
       </div>
 
-      {/* --- Activity chart --- */}
-      <div className="bg-white rounded-xl border border-[#E8E4DC] p-5">
-        <div className="flex items-baseline justify-between mb-1">
+      {/* ═══ ACTIVITY CHART ═════════════════════════════ */}
+      <div className="py-6 border-b border-[#E8E4DC]">
+        <div className="flex items-baseline justify-between mb-4">
           <div>
-            <p className="text-[22px] font-bold text-[#1A1A18]">
-              {thisWeekVal} <span className="text-[13px] font-medium text-[#8E8E93]">{chartLabel}</span>
-            </p>
-            <p className="text-[12px] text-[#8E8E93]">deze week</p>
+            <span className="text-[28px] font-bold text-[#1A1917]">{thisWeekVal}</span>
+            <span className="text-[14px] text-[#A09D96] ml-1">{chartLabel} deze week</span>
           </div>
-          <span className="text-[12px] text-[#8E8E93]">Laatste 12 weken</span>
+          <span className="text-[12px] text-[#C5C2BC]">12 weken</span>
         </div>
 
-        {/* Bar chart */}
-        <div className="flex items-end gap-[3px] h-[100px] mt-3 mb-2">
+        {/* Bars */}
+        <div className="flex items-end gap-[3px] h-[80px] mb-2">
           {chartData.map((val, i) => (
             <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
               <div
-                className={`w-full rounded-sm transition-all ${
-                  i === chartData.length - 1 ? 'bg-[#333330]' : 'bg-[#333330]/40'
+                className={`w-full transition-all ${
+                  i === chartData.length - 1 ? 'bg-[#1A1917]' : 'bg-[#DDD9D0]'
                 }`}
-                style={{ height: `${Math.max((val / maxVal) * 100, 2)}%` }}
+                style={{ height: `${Math.max((val / maxVal) * 100, 3)}%` }}
               />
             </div>
           ))}
         </div>
 
         {/* Week labels */}
-        <div className="flex gap-[3px]">
+        <div className="flex gap-[3px] mb-4">
           {weeklyStats.map((w, i) => (
             <div key={i} className="flex-1 text-center">
-              {i % 3 === 0 && <span className="text-[9px] text-[#C5C2BC]">{w.week}</span>}
+              {i % 4 === 0 && <span className="text-[9px] text-[#C5C2BC]">{w.week}</span>}
             </div>
           ))}
         </div>
 
-        {/* Chart mode tabs */}
-        <div className="flex gap-2 mt-3">
+        {/* Mode toggles */}
+        <div className="flex gap-1">
           {(['duration', 'volume', 'sets'] as ChartMode[]).map(mode => (
             <button
               key={mode}
               onClick={() => setChartMode(mode)}
-              className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all ${
+              className={`px-4 py-2 text-[12px] font-semibold uppercase tracking-[0.06em] transition-all ${
                 chartMode === mode
                   ? 'bg-[#1A1917] text-white'
-                  : 'bg-[#E8E4DC] text-[#8E8E93] hover:bg-[#E8E8E5]'
+                  : 'text-[#A09D96] hover:text-[#1A1917]'
               }`}
             >
               {mode === 'duration' ? 'Duur' : mode === 'volume' ? 'Volume' : 'Sets'}
@@ -285,119 +292,86 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* --- Dashboard tiles --- */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* ═══ QUICK LINKS — editorial grid ═══════════════ */}
+      <div className="grid grid-cols-2 border-b border-[#E8E4DC]">
         <button
           onClick={() => router.push('/client/progress')}
-          className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-left hover:border-[#CCC7BC] transition-all duration-300"
+          className="flex flex-col items-start p-5 border-r border-b border-[#E8E4DC] hover:bg-[#FAF8F3] transition-colors"
         >
-          <TrendingUp size={22} strokeWidth={1.5} className="text-[#1A1917] mb-2" />
-          <p className="text-[14px] font-semibold text-[#1A1A18]">Statistieken</p>
+          <TrendingUp size={20} strokeWidth={1.5} className="text-[#A09D96] mb-3" />
+          <span className="text-[14px] font-semibold text-[#1A1917]">Statistieken</span>
         </button>
         <button
           onClick={() => router.push('/client/workout/history')}
-          className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-left hover:border-[#CCC7BC] transition-all duration-300"
+          className="flex flex-col items-start p-5 border-b border-[#E8E4DC] hover:bg-[#FAF8F3] transition-colors"
         >
-          <Dumbbell size={22} strokeWidth={1.5} className="text-[#1A1917] mb-2" />
-          <p className="text-[14px] font-semibold text-[#1A1A18]">Oefeningen</p>
+          <Dumbbell size={20} strokeWidth={1.5} className="text-[#A09D96] mb-3" />
+          <span className="text-[14px] font-semibold text-[#1A1917]">Oefeningen</span>
         </button>
         <button
           onClick={() => router.push('/client/check-in')}
-          className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-left hover:border-[#CCC7BC] transition-all duration-300"
+          className="flex flex-col items-start p-5 border-r border-[#E8E4DC] hover:bg-[#FAF8F3] transition-colors"
         >
-          <BarChart3 size={22} strokeWidth={1.5} className="text-[#1A1917] mb-2" />
-          <p className="text-[14px] font-semibold text-[#1A1A18]">Metingen</p>
+          <BarChart3 size={20} strokeWidth={1.5} className="text-[#A09D96] mb-3" />
+          <span className="text-[14px] font-semibold text-[#1A1917]">Metingen</span>
         </button>
         <button
           onClick={() => router.push('/client/workout/history')}
-          className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-left hover:border-[#CCC7BC] transition-all duration-300"
+          className="flex flex-col items-start p-5 hover:bg-[#FAF8F3] transition-colors"
         >
-          <Calendar size={22} strokeWidth={1.5} className="text-[#1A1917] mb-2" />
-          <p className="text-[14px] font-semibold text-[#1A1A18]">Kalender</p>
+          <Calendar size={20} strokeWidth={1.5} className="text-[#A09D96] mb-3" />
+          <span className="text-[14px] font-semibold text-[#1A1917]">Kalender</span>
         </button>
       </div>
 
-      {/* --- Settings groups --- */}
-      <div className="bg-white rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] divide-y divide-[#E8E4DC]">
-        <a href="/client/profile/edit" className="flex items-center justify-between px-5 py-3.5 hover:bg-[#F8F8F6] transition-colors">
-          <div className="flex items-center gap-3">
-            <User size={18} strokeWidth={1.5} className="text-[#1A1917]" />
-            <span className="text-[14px] text-[#1A1A18]">Persoonlijke gegevens</span>
-          </div>
-          <ChevronRight size={16} strokeWidth={1.5} className="text-[#C7C7CC]" />
-        </a>
-        <a href="/client/profile/notifications" className="flex items-center justify-between px-5 py-3.5 hover:bg-[#F8F8F6] transition-colors">
-          <div className="flex items-center gap-3">
-            <Bell size={18} strokeWidth={1.5} className="text-[#1A1917]" />
-            <span className="text-[14px] text-[#1A1A18]">Meldingen</span>
-          </div>
-          <ChevronRight size={16} strokeWidth={1.5} className="text-[#C7C7CC]" />
-        </a>
-        <a href="/client/profile/goals" className="flex items-center justify-between px-5 py-3.5 hover:bg-[#F8F8F6] transition-colors">
-          <div className="flex items-center gap-3">
-            <Target size={18} strokeWidth={1.5} className="text-[#1A1917]" />
-            <span className="text-[14px] text-[#1A1A18]">Mijn doelen</span>
-          </div>
-          <ChevronRight size={16} strokeWidth={1.5} className="text-[#C7C7CC]" />
-        </a>
-        <a href="/client/profile/diet" className="flex items-center justify-between px-5 py-3.5 hover:bg-[#F8F8F6] transition-colors">
-          <div className="flex items-center gap-3">
-            <UtensilsCrossed size={18} strokeWidth={1.5} className="text-[#1A1917]" />
-            <span className="text-[14px] text-[#1A1A18]">Voedingsvoorkeuren</span>
-          </div>
-          <ChevronRight size={16} strokeWidth={1.5} className="text-[#C7C7CC]" />
-        </a>
-        <a href="/client/profile/health" className="flex items-center justify-between px-5 py-3.5 hover:bg-[#F8F8F6] transition-colors">
-          <div className="flex items-center gap-3">
-            <AlertCircle size={18} strokeWidth={1.5} className="text-[#1A1917]" />
-            <span className="text-[14px] text-[#1A1A18]">Blessures & beperkingen</span>
-          </div>
-          <ChevronRight size={16} strokeWidth={1.5} className="text-[#C7C7CC]" />
-        </a>
-      </div>
-
-      <div className="bg-white rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] divide-y divide-[#E8E4DC]">
-        <div className="flex items-center justify-between px-5 py-3.5">
-          <div className="flex items-center gap-3">
-            <CreditCard size={18} strokeWidth={1.5} className="text-[#1A1917]" />
-            <span className="text-[14px] text-[#1A1A18]">Pakket</span>
-          </div>
-          <span className="text-[13px] font-semibold text-[#1A1917]">{profile?.package?.toUpperCase() || 'STANDAARD'}</span>
+      {/* ═══ SETTINGS — editorial list ═══════════════════ */}
+      {menuSections.map((section, si) => (
+        <div key={si} className={si > 0 ? 'border-t-8 border-[#EEEBE3]' : ''}>
+          {section.items.map((item, i) => {
+            const Icon = item.icon
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                className={`flex items-center justify-between px-6 py-4 hover:bg-[#FAF8F3] transition-colors ${
+                  i > 0 ? 'border-t border-[#F0EDE8]' : ''
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Icon size={18} strokeWidth={1.5} className="text-[#A09D96]" />
+                  <span className="text-[14px] text-[#1A1917]">{item.label}</span>
+                </div>
+                <ChevronRight size={16} strokeWidth={1.5} className="text-[#CCC7BC]" />
+              </a>
+            )
+          })}
         </div>
-        <a href="/client/profile/invoices" className="flex items-center justify-between px-5 py-3.5 hover:bg-[#F8F8F6] transition-colors">
+      ))}
+
+      {/* Pakket */}
+      <div className="border-t-8 border-[#EEEBE3]">
+        <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <Receipt size={18} strokeWidth={1.5} className="text-[#1A1917]" />
-            <span className="text-[14px] text-[#1A1A18]">Facturen</span>
+            <CreditCard size={18} strokeWidth={1.5} className="text-[#A09D96]" />
+            <span className="text-[14px] text-[#1A1917]">Pakket</span>
           </div>
-          <ChevronRight size={16} strokeWidth={1.5} className="text-[#C7C7CC]" />
-        </a>
-        <a href="/client/profile/help" className="flex items-center justify-between px-5 py-3.5 hover:bg-[#F8F8F6] transition-colors">
-          <div className="flex items-center gap-3">
-            <HelpCircle size={18} strokeWidth={1.5} className="text-[#1A1917]" />
-            <span className="text-[14px] text-[#1A1A18]">Help & FAQ</span>
-          </div>
-          <ChevronRight size={16} strokeWidth={1.5} className="text-[#C7C7CC]" />
-        </a>
-        <a href="/client/profile/privacy" className="flex items-center justify-between px-5 py-3.5 hover:bg-[#F8F8F6] transition-colors">
-          <div className="flex items-center gap-3">
-            <Shield size={18} strokeWidth={1.5} className="text-[#1A1917]" />
-            <span className="text-[14px] text-[#1A1A18]">Privacy beleid</span>
-          </div>
-          <ChevronRight size={16} strokeWidth={1.5} className="text-[#C7C7CC]" />
-        </a>
+          <span className="text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.04em]">{profile?.package || 'Standaard'}</span>
+        </div>
       </div>
 
       {/* Logout */}
-      <button
-        onClick={handleLogout}
-        disabled={signingOut}
-        className="w-full bg-white rounded-xl border border-[#E8E4DC] px-5 py-3.5 flex items-center justify-center gap-2 text-[#FF3B30] font-semibold text-[14px] hover:bg-[#FFF5F5] transition-colors disabled:opacity-50"
-      >
-        <LogOut size={18} strokeWidth={1.5} />
-        {signingOut ? 'Afmelden...' : 'Afmelden'}
-      </button>
+      <div className="border-t-8 border-[#EEEBE3] mb-4">
+        <button
+          onClick={handleLogout}
+          disabled={signingOut}
+          className="w-full px-6 py-4 flex items-center justify-center gap-2 text-[#C4372A] font-semibold text-[14px] hover:bg-[#FFF5F5] transition-colors disabled:opacity-50"
+        >
+          <LogOut size={16} strokeWidth={1.5} />
+          {signingOut ? 'Afmelden...' : 'Afmelden'}
+        </button>
+      </div>
 
-      <p className="text-center text-[11px] text-[#C7C7CC]">MŌVE v1.0.0</p>
+      <p className="text-center text-[11px] text-[#C5C2BC] pb-4">MŌVE v1.0</p>
     </div>
   )
 }

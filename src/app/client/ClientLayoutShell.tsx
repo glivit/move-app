@@ -10,21 +10,21 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
       {/* Desktop sidebar */}
       <ClientSidebar />
 
-      {/* Mobile header — editorial, clean */}
-      <header className="lg:hidden sticky top-0 z-30 glass-warm border-b border-[#DDD9D0]">
-        <div className="max-w-2xl mx-auto px-6 py-4">
-          <h1
-            className="text-[22px] font-semibold text-center text-[#1A1917] tracking-[0.12em] uppercase"
+      {/* Mobile header — thin, editorial */}
+      <header className="lg:hidden sticky top-0 z-30 bg-[#EEEBE3]/90 backdrop-blur-lg border-b border-[#E8E4DC]">
+        <div className="max-w-2xl mx-auto px-6 h-12 flex items-center justify-center">
+          <span
+            className="text-[15px] font-semibold tracking-[0.2em] uppercase text-[#1A1917]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             MŌVE
-          </h1>
+          </span>
         </div>
       </header>
 
-      {/* Main content — generous whitespace */}
+      {/* Main content — 16px side padding (8px grid), generous vertical */}
       <main className="lg:pl-[280px]">
-        <div className="max-w-3xl mx-auto px-6 py-8 lg:py-12">
+        <div className="max-w-lg mx-auto px-4 pt-8 pb-4 lg:max-w-3xl lg:px-6 lg:pt-12">
           {children}
         </div>
       </main>
