@@ -101,13 +101,13 @@ function getBodyPartLabel(bodyPart: string) {
 // ─── Body part accent colors ─────────────────────────────────────────
 
 const bodyPartAccents: Record<string, { bg: string; text: string; border: string }> = {
-  chest: { bg: 'rgba(200,169,110,0.08)', text: '#9B7B2E', border: 'rgba(200,169,110,0.15)' },
+  chest: { bg: 'rgba(200,169,110,0.08)', text: '#1A1917', border: 'rgba(200,169,110,0.15)' },
   back: { bg: 'rgba(48,104,196,0.08)', text: '#3068C4', border: 'rgba(48,104,196,0.15)' },
-  shoulders: { bg: 'rgba(139,105,20,0.08)', text: '#8B6914', border: 'rgba(139,105,20,0.15)' },
+  shoulders: { bg: 'rgba(139,105,20,0.08)', text: '#1A1917', border: 'rgba(139,105,20,0.15)' },
   arms: { bg: 'rgba(196,125,21,0.08)', text: '#C47D15', border: 'rgba(196,125,21,0.15)' },
   legs: { bg: 'rgba(61,139,92,0.08)', text: '#3D8B5C', border: 'rgba(61,139,92,0.15)' },
   core: { bg: 'rgba(192,75,55,0.08)', text: '#C04B37', border: 'rgba(192,75,55,0.15)' },
-  cardio: { bg: 'rgba(200,169,110,0.08)', text: '#9B7B2E', border: 'rgba(200,169,110,0.15)' },
+  cardio: { bg: 'rgba(200,169,110,0.08)', text: '#1A1917', border: 'rgba(200,169,110,0.15)' },
 }
 
 function getAccent(bodyPart: string) {
@@ -166,7 +166,7 @@ export function ExerciseMedia({
             {/* Loading skeleton */}
             {!imgLoaded && (
               <div className="aspect-[4/3] flex items-center justify-center">
-                <div className="w-12 h-12 text-[#C8A96E]/30">
+                <div className="w-12 h-12 text-[#333330]/30">
                   {getMuscleIcon(bodyPart)}
                 </div>
               </div>
@@ -248,7 +248,7 @@ export function ExerciseMedia({
                 className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
                 style={{
                   backgroundColor: 'rgba(26,25,23,0.06)',
-                  color: '#5C5A55',
+                  color: '#6B6862',
                   backdropFilter: 'blur(4px)',
                 }}
               >

@@ -87,7 +87,7 @@ export default function InviteCallbackPage() {
           <button
             onClick={() => router.replace('/')}
             className="text-[15px] font-medium px-6 py-2.5 rounded-xl transition-colors"
-            style={{ backgroundColor: '#C8A96E', color: '#fff' }}
+            style={{ backgroundColor: '#333330', color: '#fff' }}
           >
             Naar inlogpagina
           </button>
@@ -99,8 +99,8 @@ export default function InviteCallbackPage() {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="text-center space-y-4">
-        <div className="w-8 h-8 border-2 border-[#9B7B2E] border-t-transparent rounded-full animate-spin mx-auto" />
-        <p className="text-[15px] text-[#9C9A95]">Account activeren...</p>
+        <div className="w-8 h-8 border-2 border-[#1A1917] border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-[15px] text-[#A09D96]">Account activeren...</p>
       </div>
     </div>
   )

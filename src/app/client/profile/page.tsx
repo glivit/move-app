@@ -160,11 +160,11 @@ export default function ProfilePage() {
     return (
       <div className="space-y-4 pb-20">
         <div className="flex flex-col items-center space-y-4 py-6">
-          <div className="w-20 h-20 bg-[#F0F0ED] rounded-full animate-pulse" />
-          <div className="h-6 w-40 bg-[#F0F0ED] rounded-lg animate-pulse" />
+          <div className="w-20 h-20 bg-[#E8E4DC] rounded-full animate-pulse" />
+          <div className="h-6 w-40 bg-[#E8E4DC] rounded-lg animate-pulse" />
         </div>
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-20 bg-[#F0F0ED] rounded-2xl animate-pulse" />
+          <div key={i} className="h-20 bg-[#E8E4DC] rounded-2xl animate-pulse" />
         ))}
       </div>
     )
@@ -184,10 +184,10 @@ export default function ProfilePage() {
   return (
     <div className="space-y-4 pb-20">
       {/* --- Profile header --- */}
-      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] p-6">
+      <div className="bg-white rounded-xl border border-[#E8E4DC] p-6">
         <div className="flex items-center gap-4">
           {/* Avatar */}
-          <div className="w-16 h-16 rounded-full bg-[#8B6914] text-white flex items-center justify-center text-xl font-semibold flex-shrink-0">
+          <div className="w-16 h-16 rounded-full bg-[#1A1917] text-white flex items-center justify-center text-xl font-semibold flex-shrink-0">
             {profile?.avatar_url ? (
               <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full rounded-full object-cover" />
             ) : (
@@ -202,7 +202,7 @@ export default function ProfilePage() {
 
           <button
             onClick={() => router.push('/client/profile/edit')}
-            className="p-2 rounded-full hover:bg-[#F0F0ED] transition-colors"
+            className="p-2 rounded-full hover:bg-[#E8E4DC] transition-colors"
           >
             <Settings size={20} strokeWidth={1.5} className="text-[#8E8E93]" />
           </button>
@@ -214,7 +214,7 @@ export default function ProfilePage() {
             <p className="text-[20px] font-bold text-[#1A1A18]">{totalWorkouts}</p>
             <p className="text-[11px] text-[#8E8E93] uppercase tracking-wider font-medium">Workouts</p>
           </div>
-          <div className="text-center border-x border-[#F0F0ED]">
+          <div className="text-center border-x border-[#E8E4DC]">
             <p className="text-[20px] font-bold text-[#1A1A18]">
               {weeklyStats.reduce((sum, w) => sum + w.volume, 0) > 1000
                 ? `${(weeklyStats.reduce((sum, w) => sum + w.volume, 0) / 1000).toFixed(0)}t`
@@ -233,7 +233,7 @@ export default function ProfilePage() {
       </div>
 
       {/* --- Activity chart --- */}
-      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] p-5">
+      <div className="bg-white rounded-xl border border-[#E8E4DC] p-5">
         <div className="flex items-baseline justify-between mb-1">
           <div>
             <p className="text-[22px] font-bold text-[#1A1A18]">
@@ -250,7 +250,7 @@ export default function ProfilePage() {
             <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
               <div
                 className={`w-full rounded-sm transition-all ${
-                  i === chartData.length - 1 ? 'bg-[#C8A96E]' : 'bg-[#C8A96E]/40'
+                  i === chartData.length - 1 ? 'bg-[#333330]' : 'bg-[#333330]/40'
                 }`}
                 style={{ height: `${Math.max((val / maxVal) * 100, 2)}%` }}
               />
@@ -262,7 +262,7 @@ export default function ProfilePage() {
         <div className="flex gap-[3px]">
           {weeklyStats.map((w, i) => (
             <div key={i} className="flex-1 text-center">
-              {i % 3 === 0 && <span className="text-[9px] text-[#BAB8B3]">{w.week}</span>}
+              {i % 3 === 0 && <span className="text-[9px] text-[#C5C2BC]">{w.week}</span>}
             </div>
           ))}
         </div>
@@ -275,8 +275,8 @@ export default function ProfilePage() {
               onClick={() => setChartMode(mode)}
               className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all ${
                 chartMode === mode
-                  ? 'bg-[#8B6914] text-white'
-                  : 'bg-[#F0F0ED] text-[#8E8E93] hover:bg-[#E8E8E5]'
+                  ? 'bg-[#1A1917] text-white'
+                  : 'bg-[#E8E4DC] text-[#8E8E93] hover:bg-[#E8E8E5]'
               }`}
             >
               {mode === 'duration' ? 'Duur' : mode === 'volume' ? 'Volume' : 'Sets'}
@@ -289,98 +289,98 @@ export default function ProfilePage() {
       <div className="grid grid-cols-2 gap-3">
         <button
           onClick={() => router.push('/client/progress')}
-          className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-left hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-shadow"
+          className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-left hover:border-[#CCC7BC] transition-all duration-300"
         >
-          <TrendingUp size={22} strokeWidth={1.5} className="text-[#8B6914] mb-2" />
+          <TrendingUp size={22} strokeWidth={1.5} className="text-[#1A1917] mb-2" />
           <p className="text-[14px] font-semibold text-[#1A1A18]">Statistieken</p>
         </button>
         <button
           onClick={() => router.push('/client/workout/history')}
-          className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-left hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-shadow"
+          className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-left hover:border-[#CCC7BC] transition-all duration-300"
         >
-          <Dumbbell size={22} strokeWidth={1.5} className="text-[#8B6914] mb-2" />
+          <Dumbbell size={22} strokeWidth={1.5} className="text-[#1A1917] mb-2" />
           <p className="text-[14px] font-semibold text-[#1A1A18]">Oefeningen</p>
         </button>
         <button
           onClick={() => router.push('/client/check-in')}
-          className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-left hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-shadow"
+          className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-left hover:border-[#CCC7BC] transition-all duration-300"
         >
-          <BarChart3 size={22} strokeWidth={1.5} className="text-[#8B6914] mb-2" />
+          <BarChart3 size={22} strokeWidth={1.5} className="text-[#1A1917] mb-2" />
           <p className="text-[14px] font-semibold text-[#1A1A18]">Metingen</p>
         </button>
         <button
           onClick={() => router.push('/client/workout/history')}
-          className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-left hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-shadow"
+          className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-left hover:border-[#CCC7BC] transition-all duration-300"
         >
-          <Calendar size={22} strokeWidth={1.5} className="text-[#8B6914] mb-2" />
+          <Calendar size={22} strokeWidth={1.5} className="text-[#1A1917] mb-2" />
           <p className="text-[14px] font-semibold text-[#1A1A18]">Kalender</p>
         </button>
       </div>
 
       {/* --- Settings groups --- */}
-      <div className="bg-white rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] divide-y divide-[#F0F0ED]">
+      <div className="bg-white rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] divide-y divide-[#E8E4DC]">
         <a href="/client/profile/edit" className="flex items-center justify-between px-5 py-3.5 hover:bg-[#F8F8F6] transition-colors">
           <div className="flex items-center gap-3">
-            <User size={18} strokeWidth={1.5} className="text-[#8B6914]" />
+            <User size={18} strokeWidth={1.5} className="text-[#1A1917]" />
             <span className="text-[14px] text-[#1A1A18]">Persoonlijke gegevens</span>
           </div>
           <ChevronRight size={16} strokeWidth={1.5} className="text-[#C7C7CC]" />
         </a>
         <a href="/client/profile/notifications" className="flex items-center justify-between px-5 py-3.5 hover:bg-[#F8F8F6] transition-colors">
           <div className="flex items-center gap-3">
-            <Bell size={18} strokeWidth={1.5} className="text-[#8B6914]" />
+            <Bell size={18} strokeWidth={1.5} className="text-[#1A1917]" />
             <span className="text-[14px] text-[#1A1A18]">Meldingen</span>
           </div>
           <ChevronRight size={16} strokeWidth={1.5} className="text-[#C7C7CC]" />
         </a>
         <a href="/client/profile/goals" className="flex items-center justify-between px-5 py-3.5 hover:bg-[#F8F8F6] transition-colors">
           <div className="flex items-center gap-3">
-            <Target size={18} strokeWidth={1.5} className="text-[#8B6914]" />
+            <Target size={18} strokeWidth={1.5} className="text-[#1A1917]" />
             <span className="text-[14px] text-[#1A1A18]">Mijn doelen</span>
           </div>
           <ChevronRight size={16} strokeWidth={1.5} className="text-[#C7C7CC]" />
         </a>
         <a href="/client/profile/diet" className="flex items-center justify-between px-5 py-3.5 hover:bg-[#F8F8F6] transition-colors">
           <div className="flex items-center gap-3">
-            <UtensilsCrossed size={18} strokeWidth={1.5} className="text-[#8B6914]" />
+            <UtensilsCrossed size={18} strokeWidth={1.5} className="text-[#1A1917]" />
             <span className="text-[14px] text-[#1A1A18]">Voedingsvoorkeuren</span>
           </div>
           <ChevronRight size={16} strokeWidth={1.5} className="text-[#C7C7CC]" />
         </a>
         <a href="/client/profile/health" className="flex items-center justify-between px-5 py-3.5 hover:bg-[#F8F8F6] transition-colors">
           <div className="flex items-center gap-3">
-            <AlertCircle size={18} strokeWidth={1.5} className="text-[#8B6914]" />
+            <AlertCircle size={18} strokeWidth={1.5} className="text-[#1A1917]" />
             <span className="text-[14px] text-[#1A1A18]">Blessures & beperkingen</span>
           </div>
           <ChevronRight size={16} strokeWidth={1.5} className="text-[#C7C7CC]" />
         </a>
       </div>
 
-      <div className="bg-white rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] divide-y divide-[#F0F0ED]">
+      <div className="bg-white rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] divide-y divide-[#E8E4DC]">
         <div className="flex items-center justify-between px-5 py-3.5">
           <div className="flex items-center gap-3">
-            <CreditCard size={18} strokeWidth={1.5} className="text-[#8B6914]" />
+            <CreditCard size={18} strokeWidth={1.5} className="text-[#1A1917]" />
             <span className="text-[14px] text-[#1A1A18]">Pakket</span>
           </div>
-          <span className="text-[13px] font-semibold text-[#8B6914]">{profile?.package?.toUpperCase() || 'STANDAARD'}</span>
+          <span className="text-[13px] font-semibold text-[#1A1917]">{profile?.package?.toUpperCase() || 'STANDAARD'}</span>
         </div>
         <a href="/client/profile/invoices" className="flex items-center justify-between px-5 py-3.5 hover:bg-[#F8F8F6] transition-colors">
           <div className="flex items-center gap-3">
-            <Receipt size={18} strokeWidth={1.5} className="text-[#8B6914]" />
+            <Receipt size={18} strokeWidth={1.5} className="text-[#1A1917]" />
             <span className="text-[14px] text-[#1A1A18]">Facturen</span>
           </div>
           <ChevronRight size={16} strokeWidth={1.5} className="text-[#C7C7CC]" />
         </a>
         <a href="/client/profile/help" className="flex items-center justify-between px-5 py-3.5 hover:bg-[#F8F8F6] transition-colors">
           <div className="flex items-center gap-3">
-            <HelpCircle size={18} strokeWidth={1.5} className="text-[#8B6914]" />
+            <HelpCircle size={18} strokeWidth={1.5} className="text-[#1A1917]" />
             <span className="text-[14px] text-[#1A1A18]">Help & FAQ</span>
           </div>
           <ChevronRight size={16} strokeWidth={1.5} className="text-[#C7C7CC]" />
         </a>
         <a href="/client/profile/privacy" className="flex items-center justify-between px-5 py-3.5 hover:bg-[#F8F8F6] transition-colors">
           <div className="flex items-center gap-3">
-            <Shield size={18} strokeWidth={1.5} className="text-[#8B6914]" />
+            <Shield size={18} strokeWidth={1.5} className="text-[#1A1917]" />
             <span className="text-[14px] text-[#1A1A18]">Privacy beleid</span>
           </div>
           <ChevronRight size={16} strokeWidth={1.5} className="text-[#C7C7CC]" />
@@ -391,7 +391,7 @@ export default function ProfilePage() {
       <button
         onClick={handleLogout}
         disabled={signingOut}
-        className="w-full bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] px-5 py-3.5 flex items-center justify-center gap-2 text-[#FF3B30] font-semibold text-[14px] hover:bg-[#FFF5F5] transition-colors disabled:opacity-50"
+        className="w-full bg-white rounded-xl border border-[#E8E4DC] px-5 py-3.5 flex items-center justify-center gap-2 text-[#FF3B30] font-semibold text-[14px] hover:bg-[#FFF5F5] transition-colors disabled:opacity-50"
       >
         <LogOut size={18} strokeWidth={1.5} />
         {signingOut ? 'Afmelden...' : 'Afmelden'}

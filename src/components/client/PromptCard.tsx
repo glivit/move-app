@@ -42,9 +42,9 @@ function ScoreSelector({ label, value, onChange }: ScoreSelectorProps) {
             onClick={() => onChange(score)}
             className="w-10 h-10 rounded-lg font-medium text-sm transition-colors border-2 border-gray-300"
             style={{
-              backgroundColor: value === score ? '#8B6914' : '#fff',
+              backgroundColor: value === score ? '#1A1917' : '#fff',
               color: value === score ? '#fff' : '#999',
-              borderColor: value === score ? '#8B6914' : '#ddd',
+              borderColor: value === score ? '#1A1917' : '#ddd',
             }}
           >
             {score}
@@ -100,7 +100,7 @@ export function PromptCard({
             placeholder="Schrijf hier je gedachten en gevoelens op..."
             rows={4}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
-            style={{ outlineColor: '#8B6914' }}
+            style={{ outlineColor: '#1A1917' }}
           />
         </div>
 
@@ -128,7 +128,7 @@ export function PromptCard({
             disabled={isSubmitting}
             className="flex items-center gap-2"
             style={{
-              backgroundColor: '#8B6914',
+              backgroundColor: '#1A1917',
               color: '#fff',
               opacity: isSubmitting ? 0.6 : 1,
             }}

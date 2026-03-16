@@ -298,7 +298,7 @@ export default function ClientNutritionPage() {
       <div className="min-h-screen bg-[#FAFAFA]">
         <div className="max-w-lg mx-auto px-5 py-8">
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#8B6914] border-t-transparent" />
+            <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#1A1917] border-t-transparent" />
           </div>
         </div>
       </div>
@@ -312,7 +312,7 @@ export default function ClientNutritionPage() {
           <h1 className="text-[28px] font-[family-name:var(--font-display)] text-[#1A1A18] mb-2">
             Voeding
           </h1>
-          <div className="bg-white rounded-2xl p-10 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center mt-6">
+          <div className="bg-white rounded-2xl p-10 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center mt-6">
             <span className="text-[40px] block mb-3">🍎</span>
             <h2 className="text-[17px] font-semibold text-[#1A1A18] mb-2">
               Nog geen voedingsplan
@@ -355,15 +355,15 @@ export default function ClientNutritionPage() {
         </div>
 
         {/* Progress Ring + Macros */}
-        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] mb-4">
+        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] mb-4">
           <div className="flex items-center gap-5">
             {/* Completion circle */}
             <div className="relative w-20 h-20 shrink-0">
               <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
-                <circle cx="18" cy="18" r="16" fill="none" stroke="#F0F0ED" strokeWidth="3" />
+                <circle cx="18" cy="18" r="16" fill="none" stroke="#E8E4DC" strokeWidth="3" />
                 <circle
                   cx="18" cy="18" r="16" fill="none"
-                  stroke={completionPct === 100 ? '#34C759' : '#8B6914'}
+                  stroke={completionPct === 100 ? '#34C759' : '#1A1917'}
                   strokeWidth="3"
                   strokeDasharray={`${completionPct} 100`}
                   strokeLinecap="round"
@@ -389,7 +389,7 @@ export default function ClientNutritionPage() {
               ].map(({ label, actual, target, color, unit }) => (
                 <div key={label} className="flex items-center gap-2">
                   <span className="text-[11px] text-[#8E8E93] w-10 shrink-0">{label}</span>
-                  <div className="flex-1 h-2 bg-[#F0F0ED] rounded-full overflow-hidden">
+                  <div className="flex-1 h-2 bg-[#E8E4DC] rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{
@@ -425,7 +425,7 @@ export default function ClientNutritionPage() {
                 className={`rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border overflow-hidden transition-all ${
                   isCompleted
                     ? 'bg-[#34C759]/5 border-[#34C759]/20'
-                    : 'bg-white border-[#F0F0ED]'
+                    : 'bg-white border-[#E8E4DC]'
                 }`}
               >
                 {/* Meal header */}
@@ -437,12 +437,12 @@ export default function ClientNutritionPage() {
                     className={`w-8 h-8 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
                       isCompleted
                         ? 'bg-[#34C759] border-[#34C759]'
-                        : 'border-[#C7C7CC] hover:border-[#8B6914]'
+                        : 'border-[#C7C7CC] hover:border-[#1A1917]'
                     } ${isSaving ? 'opacity-50' : ''}`}
                   >
                     {isCompleted && <Check strokeWidth={2.5} className="w-4 h-4 text-white" />}
                     {isSaving && (
-                      <div className="w-4 h-4 border-2 border-[#8B6914] border-t-transparent rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-[#1A1917] border-t-transparent rounded-full animate-spin" />
                     )}
                   </button>
 
@@ -458,7 +458,7 @@ export default function ClientNutritionPage() {
                         {meal.name}
                       </p>
                       {hasNotes && (
-                        <MessageSquare strokeWidth={1.5} className="w-3.5 h-3.5 text-[#8B6914] shrink-0" />
+                        <MessageSquare strokeWidth={1.5} className="w-3.5 h-3.5 text-[#1A1917] shrink-0" />
                       )}
                     </div>
                     <p className="text-[12px] text-[#C7C7CC] mt-0.5">
@@ -481,9 +481,9 @@ export default function ClientNutritionPage() {
 
                 {/* Expanded: food details + notes */}
                 {isExpanded && (
-                  <div className="border-t border-[#F0F0ED]">
+                  <div className="border-t border-[#E8E4DC]">
                     {/* Foods list */}
-                    <div className="divide-y divide-[#F0F0ED]">
+                    <div className="divide-y divide-[#E8E4DC]">
                       {foods.map((food) => (
                         <div key={food.id} className="px-4 py-2.5 flex items-center gap-3">
                           <div className="w-8 h-8 rounded-lg bg-[#F5F5F3] flex items-center justify-center overflow-hidden shrink-0">
@@ -505,7 +505,7 @@ export default function ClientNutritionPage() {
                     </div>
 
                     {/* Notes section */}
-                    <div className="px-4 py-3 border-t border-[#F0F0ED] bg-[#FAFAFA]">
+                    <div className="px-4 py-3 border-t border-[#E8E4DC] bg-[#FAFAFA]">
                       {editingNotes === meal.id ? (
                         <div className="space-y-2">
                           <textarea
@@ -514,7 +514,7 @@ export default function ClientNutritionPage() {
                             placeholder="Aanpassing of opmerking... bijv. 'Vervangen door cottage cheese'"
                             rows={2}
                             autoFocus
-                            className="w-full px-3 py-2 rounded-xl border border-[#F0F0ED] text-[13px] text-[#1A1A18] bg-white placeholder-[#C7C7CC] focus:outline-none focus:border-[#8B6914] resize-none"
+                            className="w-full px-3 py-2 rounded-xl border border-[#E8E4DC] text-[13px] text-[#1A1A18] bg-white placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917] resize-none"
                           />
                           <div className="flex gap-2 justify-end">
                             <button
@@ -525,7 +525,7 @@ export default function ClientNutritionPage() {
                             </button>
                             <button
                               onClick={() => saveNotes(meal.id)}
-                              className="px-3 py-1.5 rounded-lg bg-[#8B6914] text-white text-[12px] font-medium"
+                              className="px-3 py-1.5 rounded-lg bg-[#1A1917] text-white text-[12px] font-medium"
                             >
                               Opslaan
                             </button>
@@ -537,11 +537,11 @@ export default function ClientNutritionPage() {
                             setNoteText(log?.client_notes || '')
                             setEditingNotes(meal.id)
                           }}
-                          className="flex items-center gap-2 text-[12px] text-[#8E8E93] hover:text-[#8B6914] transition-colors"
+                          className="flex items-center gap-2 text-[12px] text-[#8E8E93] hover:text-[#1A1917] transition-colors"
                         >
                           <Pencil strokeWidth={1.5} className="w-3.5 h-3.5" />
                           {hasNotes ? (
-                            <span className="text-[#8B6914]">{log?.client_notes}</span>
+                            <span className="text-[#1A1917]">{log?.client_notes}</span>
                           ) : (
                             <span>Notitie toevoegen (vervangen, aanpassing...)</span>
                           )}
@@ -558,7 +558,7 @@ export default function ClientNutritionPage() {
         {/* Daily Summary Panel */}
         <button
           onClick={() => setShowDailyPanel(!showDailyPanel)}
-          className="w-full bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] flex items-center justify-between mb-4"
+          className="w-full bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] flex items-center justify-between mb-4"
         >
           <div className="flex items-center gap-3">
             <span className="text-[20px]">📝</span>
@@ -577,7 +577,7 @@ export default function ClientNutritionPage() {
         </button>
 
         {showDailyPanel && (
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] mb-4 space-y-5">
+          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] mb-4 space-y-5">
             {/* Mood */}
             <div>
               <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-2">
@@ -590,8 +590,8 @@ export default function ClientNutritionPage() {
                     onClick={() => { setMood(m.key); setTimeout(saveDailySummary, 100) }}
                     className={`flex-1 py-2.5 rounded-xl text-center transition-all border ${
                       mood === m.key
-                        ? 'border-[#8B6914] bg-[#8B6914]/5'
-                        : 'border-[#F0F0ED] hover:border-[#C7C7CC]'
+                        ? 'border-[#1A1917] bg-[#1A1917]/5'
+                        : 'border-[#E8E4DC] hover:border-[#C7C7CC]'
                     }`}
                   >
                     <span className="text-[20px] block">{m.emoji}</span>
@@ -614,7 +614,7 @@ export default function ClientNutritionPage() {
                     className={`flex-1 py-2 rounded-xl text-center text-[13px] font-medium transition-all border ${
                       water === l
                         ? 'border-[#007AFF] bg-[#007AFF]/5 text-[#007AFF]'
-                        : 'border-[#F0F0ED] text-[#8E8E93] hover:border-[#C7C7CC]'
+                        : 'border-[#E8E4DC] text-[#8E8E93] hover:border-[#C7C7CC]'
                     }`}
                   >
                     {l}L
@@ -634,7 +634,7 @@ export default function ClientNutritionPage() {
                 onBlur={saveDailySummary}
                 placeholder="Hoe ging het vandaag? Honger gehad? Iets vervangen?"
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl border border-[#F0F0ED] text-[13px] text-[#1A1A18] bg-white placeholder-[#C7C7CC] focus:outline-none focus:border-[#8B6914] resize-none"
+                className="w-full px-4 py-3 rounded-xl border border-[#E8E4DC] text-[13px] text-[#1A1A18] bg-white placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917] resize-none"
               />
             </div>
           </div>
@@ -642,8 +642,8 @@ export default function ClientNutritionPage() {
 
         {/* Guidelines reminder */}
         {plan.guidelines && (
-          <div className="bg-[#8B6914]/5 rounded-2xl p-4 border border-[#8B6914]/10">
-            <p className="text-[12px] text-[#8B6914] font-medium mb-1">Richtlijnen van je coach</p>
+          <div className="bg-[#1A1917]/5 rounded-2xl p-4 border border-[#1A1917]/10">
+            <p className="text-[12px] text-[#1A1917] font-medium mb-1">Richtlijnen van je coach</p>
             <p className="text-[12px] text-[#8E8E93] leading-relaxed whitespace-pre-wrap">
               {plan.guidelines}
             </p>

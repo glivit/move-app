@@ -63,7 +63,7 @@ export function ClientCard({ client }: ClientCardProps) {
             </div>
 
             <ArrowRight
-              className="h-4 w-4 text-[#BAB8B3] group-hover:text-accent-dark group-hover:translate-x-1 transition-all shrink-0 mt-1"
+              className="h-4 w-4 text-[#C5C2BC] group-hover:text-accent-dark group-hover:translate-x-1 transition-all shrink-0 mt-1"
               strokeWidth={1.5}
             />
           </div>

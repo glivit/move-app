@@ -64,9 +64,9 @@ function ScoreSelector({
             onClick={() => onChange(score)}
             className="w-10 h-10 rounded-lg font-medium text-sm transition-all border border-transparent"
             style={{
-              backgroundColor: value === score ? '#8B6914' : '#FFFFFF',
+              backgroundColor: value === score ? '#1A1917' : '#FFFFFF',
               color: value === score ? '#FFFFFF' : '#8E8E93',
-              borderColor: value === score ? '#8B6914' : '#E5E5E5',
+              borderColor: value === score ? '#1A1917' : '#E5E5E5',
             }}
           >
             {score}
@@ -150,7 +150,7 @@ function PromptCard({
             style={{
               backgroundColor: '#F5F5F3',
               color: '#1A1A18',
-              outlineColor: '#8B6914',
+              outlineColor: '#1A1917',
             }}
           />
         </div>
@@ -371,7 +371,7 @@ export default function ClientPromptsPage() {
           >
             <MessageSquare
               size={48}
-              style={{ color: '#8B6914' }}
+              style={{ color: '#1A1917' }}
               className="mx-auto mb-4"
               strokeWidth={1.5}
             />
@@ -420,11 +420,11 @@ export default function ClientPromptsPage() {
                     Eerdere antwoorden ({answeredPrompts.length})
                   </span>
                   {showAnswered ? (
-                    <ChevronUp size={20} style={{ color: '#8B6914' }} strokeWidth={1.5} />
+                    <ChevronUp size={20} style={{ color: '#1A1917' }} strokeWidth={1.5} />
                   ) : (
                     <ChevronDown
                       size={20}
-                      style={{ color: '#8B6914' }}
+                      style={{ color: '#1A1917' }}
                       strokeWidth={1.5}
                     />
                   )}
@@ -452,7 +452,7 @@ export default function ClientPromptsPage() {
                         </p>
                         <div
                           className="flex gap-4 text-[12px]"
-                          style={{ color: '#8B6914' }}
+                          style={{ color: '#1A1917' }}
                         >
                           {prompt.mood_score && (
                             <span>Stemming: {prompt.mood_score}/5</span>

@@ -18,7 +18,7 @@ export interface CheckInData {
   coachNotes?: string | null
 }
 
-const ACCENT_COLOR = '#8B6914'
+const ACCENT_COLOR = '#1A1917'
 const TEXT_COLOR = '#1A1A18'
 const BG_COLOR = '#FAFAFA'
 const SECONDARY_TEXT = '#8B8B88'

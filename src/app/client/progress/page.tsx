@@ -361,7 +361,7 @@ export default function ProgressPage() {
   ]
 
   const TimeRangeBar = () => (
-    <div className="flex gap-1 p-1 bg-[#F0F0ED] rounded-xl">
+    <div className="flex gap-1 p-1 bg-[#E8E4DC] rounded-xl">
       {timeRangeOptions.map(opt => (
         <button
           key={opt.value}
@@ -389,7 +389,7 @@ export default function ProgressPage() {
         </div>
         <div className="space-y-4">
           {[1, 2].map(i => (
-            <div key={i} className="bg-white rounded-2xl h-64 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] animate-pulse" />
+            <div key={i} className="bg-white rounded-2xl h-64 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] animate-pulse" />
           ))}
         </div>
       </div>
@@ -404,7 +404,7 @@ export default function ProgressPage() {
   ]
 
   const tabs: { key: TabType; label: string; color: string }[] = [
-    { key: 'fotos', label: "Foto's", color: '#8B6914' },
+    { key: 'fotos', label: "Foto's", color: '#1A1917' },
     { key: 'kracht', label: 'Kracht', color: '#007AFF' },
     { key: 'volume', label: 'Volume', color: '#FF9500' },
     { key: 'prs', label: "PR's", color: '#AF52DE' },
@@ -426,7 +426,7 @@ export default function ProgressPage() {
             { label: 'Vetpercentage', value: deltas.bodyFat, unit: '%', inverted: true },
             { label: 'Spiermassa', value: deltas.muscle, unit: 'kg', inverted: false },
           ].map((stat) => (
-            <div key={stat.label} className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+            <div key={stat.label} className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
               <p className="text-[11px] text-[#8E8E93] uppercase font-medium tracking-wide">{stat.label}</p>
               {stat.value !== null ? (
                 <div className="flex items-center gap-1.5 mt-2">
@@ -472,7 +472,7 @@ export default function ProgressPage() {
           {checkinsWithPhotos.length >= 2 ? (
             <>
               {/* Date Selectors */}
-              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide mb-2">
@@ -481,7 +481,7 @@ export default function ProgressPage() {
                     <select
                       value={compareFrom}
                       onChange={(e) => setCompareFrom(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl border border-[#F0F0ED] text-[14px] text-[#1A1A18] bg-white focus:outline-none focus:border-[#8B6914]"
+                      className="w-full px-3 py-2.5 rounded-xl border border-[#E8E4DC] text-[14px] text-[#1A1A18] bg-white focus:outline-none focus:border-[#1A1917]"
                     >
                       {checkinsWithPhotos.map((c) => (
                         <option key={c.date} value={c.date}>
@@ -497,7 +497,7 @@ export default function ProgressPage() {
                     <select
                       value={compareTo}
                       onChange={(e) => setCompareTo(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl border border-[#F0F0ED] text-[14px] text-[#1A1A18] bg-white focus:outline-none focus:border-[#8B6914]"
+                      className="w-full px-3 py-2.5 rounded-xl border border-[#E8E4DC] text-[14px] text-[#1A1A18] bg-white focus:outline-none focus:border-[#1A1917]"
                     >
                       {checkinsWithPhotos.map((c) => (
                         <option key={c.date} value={c.date}>
@@ -509,13 +509,13 @@ export default function ProgressPage() {
                 </div>
 
                 {/* Quick presets */}
-                <div className="flex gap-2 mt-3 pt-3 border-t border-[#F0F0ED]">
+                <div className="flex gap-2 mt-3 pt-3 border-t border-[#E8E4DC]">
                   <button
                     onClick={() => {
                       setCompareFrom(checkinsWithPhotos[0].date)
                       setCompareTo(checkinsWithPhotos[checkinsWithPhotos.length - 1].date)
                     }}
-                    className="px-3 py-1.5 rounded-lg text-[12px] font-medium bg-[#8B6914]/10 text-[#8B6914] hover:bg-[#8B6914]/20 transition-colors"
+                    className="px-3 py-1.5 rounded-lg text-[12px] font-medium bg-[#1A1917]/10 text-[#1A1917] hover:bg-[#1A1917]/20 transition-colors"
                   >
                     Eerste vs laatste
                   </button>
@@ -546,9 +546,9 @@ export default function ProgressPage() {
                       disabled={!available}
                       className="flex-1 px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-all"
                       style={{
-                        backgroundColor: activeAngle === key ? '#8B6914' : available ? 'white' : '#F5F5F3',
+                        backgroundColor: activeAngle === key ? '#1A1917' : available ? 'white' : '#F5F5F3',
                         color: activeAngle === key ? 'white' : available ? '#1A1A18' : '#C7C7CC',
-                        border: `1px solid ${activeAngle === key ? '#8B6914' : '#F0F0ED'}`,
+                        border: `1px solid ${activeAngle === key ? '#1A1917' : '#E8E4DC'}`,
                       }}
                     >
                       {label}
@@ -565,7 +565,7 @@ export default function ProgressPage() {
 
                   if (!beforeUrl || !afterUrl) {
                     return (
-                      <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+                      <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
                         <Camera strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#C7C7CC]" />
                         <p className="text-[14px] text-[#8E8E93]">Geen foto beschikbaar voor deze hoek</p>
                       </div>
@@ -589,7 +589,7 @@ export default function ProgressPage() {
 
               {/* Weight comparison strip */}
               {fromCheckin && toCheckin && fromCheckin.weight_kg && toCheckin.weight_kg && (
-                <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                   <div className="flex items-center justify-between">
                     <div className="text-center flex-1">
                       <p className="text-[11px] text-[#8E8E93] uppercase font-medium">Voor</p>
@@ -623,7 +623,7 @@ export default function ProgressPage() {
                       onClick={() => url && setActiveAngle(key)}
                       className="rounded-xl overflow-hidden border-2 transition-all aspect-[3/4]"
                       style={{
-                        borderColor: activeAngle === key ? '#8B6914' : '#F0F0ED',
+                        borderColor: activeAngle === key ? '#1A1917' : '#E8E4DC',
                         opacity: url ? 1 : 0.4,
                       }}
                     >
@@ -641,7 +641,7 @@ export default function ProgressPage() {
 
               {/* Photo timeline strip */}
               {checkinsWithPhotos.length >= 3 && (
-                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                   <h3 className="text-[15px] font-semibold text-[#1A1A18] mb-4">Foto tijdlijn</h3>
 
                   {/* Timeline scroll */}
@@ -679,7 +679,7 @@ export default function ProgressPage() {
                               }}
                               className="w-16 h-20 rounded-xl overflow-hidden border-2 transition-all shrink-0"
                               style={{
-                                borderColor: isSelected ? '#8B6914' : '#F0F0ED',
+                                borderColor: isSelected ? '#1A1917' : '#E8E4DC',
                                 boxShadow: isSelected ? '0 0 0 2px rgba(139,105,20,0.2)' : 'none',
                               }}
                             >
@@ -691,11 +691,11 @@ export default function ProgressPage() {
                                 </div>
                               )}
                             </button>
-                            <span className={`text-[10px] font-medium ${isSelected ? 'text-[#8B6914]' : 'text-[#C7C7CC]'}`}>
+                            <span className={`text-[10px] font-medium ${isSelected ? 'text-[#1A1917]' : 'text-[#C7C7CC]'}`}>
                               {new Date(checkin.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                             </span>
-                            {isFrom && <span className="text-[9px] font-bold text-[#8B6914] bg-[#8B6914]/10 px-1.5 py-0.5 rounded">VOOR</span>}
-                            {isTo && <span className="text-[9px] font-bold text-[#8B6914] bg-[#8B6914]/10 px-1.5 py-0.5 rounded">NA</span>}
+                            {isFrom && <span className="text-[9px] font-bold text-[#1A1917] bg-[#1A1917]/10 px-1.5 py-0.5 rounded">VOOR</span>}
+                            {isTo && <span className="text-[9px] font-bold text-[#1A1917] bg-[#1A1917]/10 px-1.5 py-0.5 rounded">NA</span>}
                             {showIntervalMarker && !isFrom && !isTo && (
                               <span className="text-[9px] font-medium text-[#FF9500] bg-[#FF9500]/10 px-1.5 py-0.5 rounded">
                                 {weeksSinceStart}w
@@ -714,15 +714,15 @@ export default function ProgressPage() {
               )}
             </>
           ) : checkinsWithPhotos.length === 1 ? (
-            <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
-              <Camera strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[#8B6914]" />
+            <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
+              <Camera strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[#1A1917]" />
               <p className="text-[15px] font-semibold text-[#1A1A18] mb-2">Eerste foto's opgeslagen!</p>
               <p className="text-[13px] text-[#8E8E93]">
                 Na je volgende check-in kun je je foto's hier vergelijken met een interactieve slider.
               </p>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+            <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
               <Camera strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[#C7C7CC]" />
               <p className="text-[15px] font-semibold text-[#1A1A18] mb-2">Nog geen foto's</p>
               <p className="text-[13px] text-[#8E8E93]">
@@ -737,14 +737,14 @@ export default function ProgressPage() {
       {activeTab === 'kracht' && (
         <div className="space-y-4">
           <TimeRangeBar />
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
             <label className="text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide block mb-2">
               Oefening
             </label>
             <select
               value={selectedExerciseId}
               onChange={(e) => setSelectedExerciseId(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-[#F0F0ED] bg-white text-[15px] text-[#1A1A18] focus:outline-none focus:border-[#007AFF]"
+              className="w-full px-4 py-2.5 rounded-xl border border-[#E8E4DC] bg-white text-[15px] text-[#1A1A18] focus:outline-none focus:border-[#007AFF]"
             >
               {exercisesWithData.map(ex => (
                 <option key={ex.id} value={ex.id}>{ex.name_nl || ex.name}</option>
@@ -755,7 +755,7 @@ export default function ProgressPage() {
           {krachtData.length > 1 ? (
             <>
               {/* Strength chart */}
-              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-[15px] font-semibold text-[#1A1A18]">
                     Max gewicht — {selectedExercise?.name_nl || selectedExercise?.name}
@@ -778,13 +778,13 @@ export default function ProgressPage() {
                           <stop offset="95%" stopColor="#007AFF" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#F0F0ED" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DC" />
                       <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#8E8E93' }} />
                       <YAxis tick={{ fontSize: 11, fill: '#8E8E93' }} domain={['dataMin - 5', 'dataMax + 5']} />
                       <Tooltip
                         contentStyle={{
                           backgroundColor: 'white',
-                          border: '1px solid #F0F0ED',
+                          border: '1px solid #E8E4DC',
                           borderRadius: '12px',
                           fontSize: '13px',
                         }}
@@ -798,18 +798,18 @@ export default function ProgressPage() {
               </div>
 
               {/* Volume per session for this exercise */}
-              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                 <h3 className="text-[15px] font-semibold text-[#1A1A18] mb-4">Volume per sessie (kg)</h3>
                 <div style={{ height: 200 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={krachtData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#F0F0ED" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DC" />
                       <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#8E8E93' }} />
                       <YAxis tick={{ fontSize: 11, fill: '#8E8E93' }} />
                       <Tooltip
                         contentStyle={{
                           backgroundColor: 'white',
-                          border: '1px solid #F0F0ED',
+                          border: '1px solid #E8E4DC',
                           borderRadius: '12px',
                           fontSize: '13px',
                         }}
@@ -822,7 +822,7 @@ export default function ProgressPage() {
               </div>
             </>
           ) : (
-            <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+            <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
               <TrendingUp strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#C7C7CC]" />
               <p className="text-[14px] text-[#8E8E93]">
                 {exercisesWithData.length === 0
@@ -842,21 +842,21 @@ export default function ProgressPage() {
             <>
               {/* Volume stats */}
               <div className="grid grid-cols-3 gap-3">
-                <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+                <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
                   <p className="text-[11px] text-[#8E8E93] uppercase font-medium">Deze week</p>
                   <p className="text-[20px] font-bold text-[#FF9500] mt-1">
                     {volumeData.length > 0 ? volumeData[volumeData.length - 1].volume.toLocaleString('nl-BE') : 0}
                   </p>
                   <p className="text-[11px] text-[#C7C7CC]">kg volume</p>
                 </div>
-                <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+                <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
                   <p className="text-[11px] text-[#8E8E93] uppercase font-medium">Gem./week</p>
                   <p className="text-[20px] font-bold text-[#1A1A18] mt-1">
                     {Math.round(volumeData.reduce((s, d) => s + d.volume, 0) / volumeData.length).toLocaleString('nl-BE')}
                   </p>
                   <p className="text-[11px] text-[#C7C7CC]">kg volume</p>
                 </div>
-                <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+                <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
                   <p className="text-[11px] text-[#8E8E93] uppercase font-medium">Totaal sets</p>
                   <p className="text-[20px] font-bold text-[#1A1A18] mt-1">
                     {volumeData.reduce((s, d) => s + d.sets, 0)}
@@ -865,7 +865,7 @@ export default function ProgressPage() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                 <h3 className="text-[15px] font-semibold text-[#1A1A18] mb-4">Wekelijks totaalvolume</h3>
                 <div style={{ height: 250 }}>
                   <ResponsiveContainer width="100%" height="100%">
@@ -876,13 +876,13 @@ export default function ProgressPage() {
                           <stop offset="95%" stopColor="#FF9500" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#F0F0ED" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DC" />
                       <XAxis dataKey="week" tick={{ fontSize: 11, fill: '#8E8E93' }} />
                       <YAxis tick={{ fontSize: 11, fill: '#8E8E93' }} />
                       <Tooltip
                         contentStyle={{
                           backgroundColor: 'white',
-                          border: '1px solid #F0F0ED',
+                          border: '1px solid #E8E4DC',
                           borderRadius: '12px',
                           fontSize: '13px',
                         }}
@@ -900,7 +900,7 @@ export default function ProgressPage() {
 
               {/* Muscle group volume breakdown */}
               {muscleGroupVolume.length > 0 && (
-                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                   <h3 className="text-[15px] font-semibold text-[#1A1A18] mb-4">Volume per spiergroep</h3>
 
                   {/* Donut chart + legend */}
@@ -938,7 +938,7 @@ export default function ProgressPage() {
                                 <span className="text-[13px] font-medium text-[#1A1A18] truncate">{group.name}</span>
                                 <span className="text-[12px] font-semibold text-[#8E8E93] shrink-0 ml-2">{group.percentage}%</span>
                               </div>
-                              <div className="w-full h-1.5 bg-[#F0F0ED] rounded-full mt-1 overflow-hidden">
+                              <div className="w-full h-1.5 bg-[#E8E4DC] rounded-full mt-1 overflow-hidden">
                                 <div
                                   className="h-full rounded-full transition-all duration-500"
                                   style={{ width: `${group.percentage}%`, backgroundColor: color }}
@@ -952,7 +952,7 @@ export default function ProgressPage() {
                   </div>
 
                   {/* Sets per group */}
-                  <div className="mt-4 pt-4 border-t border-[#F0F0ED] grid grid-cols-2 gap-2">
+                  <div className="mt-4 pt-4 border-t border-[#E8E4DC] grid grid-cols-2 gap-2">
                     {muscleGroupVolume.slice(0, 6).map((group, index) => {
                       const color = MUSCLE_GROUP_COLORS[group.name] || FALLBACK_COLORS[index % FALLBACK_COLORS.length]
                       return (
@@ -969,7 +969,7 @@ export default function ProgressPage() {
 
               {/* Training frequency heatmap */}
               {trainingHeatmap.length > 0 && (
-                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                   <div className="flex items-center gap-2 mb-4">
                     <Flame strokeWidth={1.5} className="w-4 h-4 text-[#FF9500]" />
                     <h3 className="text-[15px] font-semibold text-[#1A1A18]">Trainingsfrequentie</h3>
@@ -999,7 +999,7 @@ export default function ProgressPage() {
                                   ? '#FAFAFA'
                                   : day.trained
                                     ? '#FF9500'
-                                    : '#F0F0ED',
+                                    : '#E8E4DC',
                                 opacity: isFuture ? 0.5 : 1,
                               }}
                               title={`${new Date(day.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}${day.trained ? ' — Getraind' : ''}`}
@@ -1013,7 +1013,7 @@ export default function ProgressPage() {
                   {/* Legend */}
                   <div className="flex items-center justify-end gap-2 mt-3 pt-2">
                     <span className="text-[10px] text-[#C7C7CC]">Niet getraind</span>
-                    <div className="w-3 h-3 rounded-[2px] bg-[#F0F0ED]" />
+                    <div className="w-3 h-3 rounded-[2px] bg-[#E8E4DC]" />
                     <div className="w-3 h-3 rounded-[2px] bg-[#FF9500]" />
                     <span className="text-[10px] text-[#C7C7CC]">Getraind</span>
                   </div>
@@ -1021,7 +1021,7 @@ export default function ProgressPage() {
               )}
             </>
           ) : (
-            <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+            <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
               <p className="text-[14px] text-[#8E8E93]">Log workouts om je volume te tracken</p>
             </div>
           )}
@@ -1051,7 +1051,7 @@ export default function ProgressPage() {
                 {personalRecords.map(pr => (
                   <div
                     key={pr.id}
-                    className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] flex items-center gap-4"
+                    className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] flex items-center gap-4"
                   >
                     <div className="w-10 h-10 rounded-xl bg-[#AF52DE]/10 flex items-center justify-center shrink-0">
                       <Trophy strokeWidth={1.5} className="w-5 h-5 text-[#AF52DE]" />
@@ -1075,7 +1075,7 @@ export default function ProgressPage() {
               </div>
             </>
           ) : (
-            <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+            <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
               <Trophy strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[#C7C7CC]" />
               <p className="text-[15px] font-semibold text-[#1A1A18] mb-2">Nog geen PR's</p>
               <p className="text-[13px] text-[#8E8E93]">Log workouts en je PR's worden automatisch bijgehouden</p>
@@ -1091,7 +1091,7 @@ export default function ProgressPage() {
           {lichaamData.length > 0 ? (
             <>
               {/* Weight chart */}
-              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                 <h3 className="text-[15px] font-semibold text-[#1A1A18] mb-4">Gewicht</h3>
                 <div style={{ height: 220 }}>
                   <ResponsiveContainer width="100%" height="100%">
@@ -1102,11 +1102,11 @@ export default function ProgressPage() {
                           <stop offset="95%" stopColor="#34C759" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#F0F0ED" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DC" />
                       <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#8E8E93' }} />
                       <YAxis tick={{ fontSize: 11, fill: '#8E8E93' }} domain={['dataMin - 2', 'dataMax + 2']} />
                       <Tooltip
-                        contentStyle={{ backgroundColor: 'white', border: '1px solid #F0F0ED', borderRadius: '12px', fontSize: '13px' }}
+                        contentStyle={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '12px', fontSize: '13px' }}
                         formatter={(value: any) => [`${value} kg`, 'Gewicht']}
                       />
                       <Area type="monotone" dataKey="weight" stroke="#34C759" strokeWidth={2.5}
@@ -1118,7 +1118,7 @@ export default function ProgressPage() {
 
               {/* Body fat chart */}
               {lichaamData.some(d => d.bodyFat) && (
-                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                   <h3 className="text-[15px] font-semibold text-[#1A1A18] mb-4">Vetpercentage</h3>
                   <div style={{ height: 220 }}>
                     <ResponsiveContainer width="100%" height="100%">
@@ -1129,11 +1129,11 @@ export default function ProgressPage() {
                             <stop offset="95%" stopColor="#AF52DE" stopOpacity={0} />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#F0F0ED" />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DC" />
                         <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#8E8E93' }} />
                         <YAxis tick={{ fontSize: 11, fill: '#8E8E93' }} />
                         <Tooltip
-                          contentStyle={{ backgroundColor: 'white', border: '1px solid #F0F0ED', borderRadius: '12px', fontSize: '13px' }}
+                          contentStyle={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '12px', fontSize: '13px' }}
                           formatter={(value: any) => [`${value}%`, 'Vetpercentage']}
                         />
                         <Area type="monotone" dataKey="bodyFat" stroke="#AF52DE" strokeWidth={2.5}
@@ -1146,7 +1146,7 @@ export default function ProgressPage() {
 
               {/* Current measurements */}
               {latest && (
-                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                   <h3 className="text-[15px] font-semibold text-[#1A1A18] mb-4">Huidige metingen</h3>
                   <div className="grid grid-cols-2 gap-3">
                     {[
@@ -1167,7 +1167,7 @@ export default function ProgressPage() {
               )}
             </>
           ) : (
-            <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+            <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
               <p className="text-[14px] text-[#8E8E93]">Dien je eerste check-in in om lichaamsdata te zien</p>
             </div>
           )}

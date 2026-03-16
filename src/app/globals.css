@@ -2,48 +2,48 @@
 @import "../styles/variables.css";
 
 @theme {
-  /* ━━━ Premium Design System ━━━ Tactile warmth, luxe wellness */
+  /* ━━━ MŌVE Editorial Design System ━━━ Aesop-inspired, monochromatic, warm */
 
-  /* Surfaces */
-  --color-bg: #F5F2ED;
-  --color-bg-elevated: #FAF8F5;
+  /* Surfaces — warm cream stone */
+  --color-bg: #EEEBE3;
+  --color-bg-elevated: #F5F2EC;
   --color-bg-dark: #1A1917;
   --color-surface: #FFFFFF;
-  --color-surface-warm: #FDFCFA;
-  --color-surface-muted: #F0EDE8;
+  --color-surface-warm: #FAF8F3;
+  --color-surface-muted: #E5E1D9;
 
-  /* Accent */
-  --color-accent: #9B7B2E;
-  --color-accent-dark: #7A6124;
-  --color-accent-hover: #B08E35;
-  --color-accent-light: rgba(155, 123, 46, 0.06);
-  --color-accent-subtle: rgba(155, 123, 46, 0.10);
-  --color-accent-surface: #F7F3EA;
+  /* Accent — editorial charcoal (no gold) */
+  --color-accent: #1A1917;
+  --color-accent-dark: #111110;
+  --color-accent-hover: #333330;
+  --color-accent-light: rgba(26, 25, 23, 0.04);
+  --color-accent-subtle: rgba(26, 25, 23, 0.08);
+  --color-accent-surface: #EDEAE4;
 
-  /* Typography */
+  /* Typography — deep warm */
   --color-text-primary: #1A1917;
-  --color-text-secondary: #5C5A55;
-  --color-text-muted: #9C9A95;
-  --color-text-faint: #BAB8B3;
+  --color-text-secondary: #6B6862;
+  --color-text-muted: #A09D96;
+  --color-text-faint: #C5C2BC;
 
-  /* Borders */
-  --color-border: #E6E2DC;
-  --color-border-subtle: #EEEBE6;
-  --color-border-strong: #D9D5CE;
+  /* Borders — warm stone */
+  --color-border: #DDD9D0;
+  --color-border-subtle: #E8E4DC;
+  --color-border-strong: #CCC7BC;
 
-  /* Status */
+  /* Status — muted, sophisticated */
   --color-success: #3D8B5C;
   --color-warning: #C47D15;
   --color-error: #C4372A;
 
   /* Client surfaces */
-  --color-client-bg: #F5F2ED;
+  --color-client-bg: #EEEBE3;
   --color-client-surface: #FFFFFF;
-  --color-client-surface-muted: #F0EDE8;
-  --color-client-border: #E6E2DC;
-  --color-client-border-strong: #D9D5CE;
-  --color-client-text-secondary: #5C5A55;
-  --color-client-text-muted: #9C9A95;
+  --color-client-surface-muted: #E5E1D9;
+  --color-client-border: #DDD9D0;
+  --color-client-border-strong: #CCC7BC;
+  --color-client-text-secondary: #6B6862;
+  --color-client-text-muted: #A09D96;
 
   /* Data visualization */
   --color-data-orange: #C47D15;
@@ -63,17 +63,17 @@
   --spacing-18: 4.5rem;
   --spacing-22: 5.5rem;
 
-  /* Border Radius */
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.25rem;
-  --radius-2xl: 1.5rem;
+  /* Border Radius — slightly less round for editorial feel */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
 
-  /* Shadows — tactile depth */
-  --shadow-card: 0 1px 3px rgba(26, 25, 23, 0.04), 0 4px 12px rgba(26, 25, 23, 0.03);
-  --shadow-elevated: 0 4px 8px rgba(26, 25, 23, 0.04), 0 12px 32px rgba(26, 25, 23, 0.08);
-  --shadow-card-hover: 0 4px 8px rgba(26, 25, 23, 0.06), 0 12px 28px rgba(26, 25, 23, 0.08);
+  /* Shadows — subtle, refined */
+  --shadow-card: 0 1px 2px rgba(26, 25, 23, 0.03), 0 2px 8px rgba(26, 25, 23, 0.02);
+  --shadow-elevated: 0 2px 6px rgba(26, 25, 23, 0.04), 0 8px 24px rgba(26, 25, 23, 0.06);
+  --shadow-card-hover: 0 2px 6px rgba(26, 25, 23, 0.05), 0 8px 20px rgba(26, 25, 23, 0.06);
 }
 
 /* ━━━ Base Styles ━━━ */
@@ -93,7 +93,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .client-app {
-  background-color: #F5F2ED;
+  background-color: #EEEBE3;
 }
 
 .client-app h1,
@@ -295,7 +295,7 @@ input:focus,
 textarea:focus,
 select:focus {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(155, 123, 46, 0.08);
+  box-shadow: 0 0 0 3px rgba(26, 25, 23, 0.06);
 }
 
 /* ━━━ Dark mode ━━━ */
@@ -319,9 +319,9 @@ select:focus {
   --color-client-border-strong: #3A3A38;
   --color-client-text-secondary: #9C9A95;
   --color-client-text-muted: #5C5A55;
-  --color-accent-light: rgba(155, 123, 46, 0.12);
-  --color-accent-subtle: rgba(155, 123, 46, 0.18);
-  --color-accent-surface: #1E1C14;
+  --color-accent-light: rgba(26, 25, 23, 0.08);
+  --color-accent-subtle: rgba(26, 25, 23, 0.14);
+  --color-accent-surface: #1E1E1C;
 }
 .dark body, .dark {
   background-color: var(--color-bg);

@@ -51,7 +51,7 @@ export default function HelpPage() {
     <div className="space-y-6 pb-20">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#8B6914]">
+        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#1A1917]">
           <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
         </button>
         <h1 className="text-[22px] font-semibold text-[#1A1A18]" style={{ fontFamily: 'var(--font-display)' }}>
@@ -62,7 +62,7 @@ export default function HelpPage() {
       {/* Contact Coach */}
       <a
         href="/client/messages"
-        className="bg-[#8B6914] rounded-2xl p-5 flex items-center gap-4 text-white hover:bg-[#7A5C12] transition-colors"
+        className="bg-[#1A1917] rounded-2xl p-5 flex items-center gap-4 text-white hover:bg-[#7A5C12] transition-colors"
       >
         <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
           <MessageSquare strokeWidth={1.5} className="w-6 h-6" />
@@ -76,7 +76,7 @@ export default function HelpPage() {
       {/* FAQ */}
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Veelgestelde vragen</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] divide-y divide-[#F0F0ED]">
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] divide-y divide-[#E8E4DC]">
           {FAQ_ITEMS.map((item, index) => (
             <div key={index}>
               <button

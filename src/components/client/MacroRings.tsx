@@ -41,7 +41,7 @@ function MacroRing({ label, current, target, color }: RingProps) {
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="#F0F0ED"
+          stroke="#E8E4DC"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
         />

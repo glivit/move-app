@@ -45,14 +45,14 @@ export function ClientHealthSummary({ clientId }: Props) {
   }
 
   if (loading) {
-    return <div className="h-32 bg-white rounded-2xl animate-pulse border border-[#F0F0ED]" />
+    return <div className="h-32 bg-white rounded-2xl animate-pulse border border-[#E8E4DC]" />
   }
 
   if (metrics.length === 0) {
     return (
       <div
         className="rounded-2xl border p-6 text-center"
-        style={{ backgroundColor: 'white', borderColor: '#F0F0ED', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+        style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
       >
         <Heart size={24} strokeWidth={1.5} className="mx-auto mb-2" style={{ color: '#C7C7CC' }} />
         <p className="text-[13px]" style={{ color: '#8E8E93' }}>
@@ -92,7 +92,7 @@ export function ClientHealthSummary({ clientId }: Props) {
   return (
     <div
       className="rounded-2xl border p-6"
-      style={{ backgroundColor: 'white', borderColor: '#F0F0ED', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+      style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
     >
       <h3 className="text-[15px] font-semibold mb-4" style={{ color: '#1A1A18' }}>
         Gezondheidsoverzicht (14d)

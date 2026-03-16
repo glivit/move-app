@@ -186,9 +186,9 @@ export default function WorkoutHistoryPage() {
       </div>
 
       {/* Calendar */}
-      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden">
         {/* Month header */}
-        <div className="px-4 py-4 border-b border-[#F0F0ED] flex items-center justify-between">
+        <div className="px-4 py-4 border-b border-[#E8E4DC] flex items-center justify-between">
           <button
             onClick={handlePrevMonth}
             className="p-2 hover:bg-client-surface-muted rounded-lg transition-colors"
@@ -211,7 +211,7 @@ export default function WorkoutHistoryPage() {
         </div>
 
         {/* Day labels */}
-        <div className="grid grid-cols-7 gap-0 px-2 py-2 text-center border-b border-[#F0F0ED]">
+        <div className="grid grid-cols-7 gap-0 px-2 py-2 text-center border-b border-[#E8E4DC]">
           {['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'].map((day) => (
             <div key={day} className="text-[12px] font-semibold text-client-text-secondary py-2">
               {day}
@@ -230,7 +230,7 @@ export default function WorkoutHistoryPage() {
                 key={index}
                 className={`aspect-square flex items-center justify-center text-[13px] font-medium rounded-lg relative ${
                   !isCurrentMonth ? 'text-client-text-muted' : 'text-text-primary'
-                } ${isToday ? 'bg-[#8B6914] text-white font-semibold' : ''}`}
+                } ${isToday ? 'bg-[#1A1917] text-white font-semibold' : ''}`}
               >
                 {day.date}
 
@@ -269,7 +269,7 @@ export default function WorkoutHistoryPage() {
             return (
               <div
                 key={workout.id}
-                className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] overflow-hidden"
+                className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden"
               >
                 {/* Summary */}
                 <button
@@ -308,7 +308,7 @@ export default function WorkoutHistoryPage() {
 
                 {/* Details (expanded) */}
                 {isExpanded && (
-                  <div className="border-t border-[#F0F0ED] px-5 py-4 bg-client-surface-muted space-y-3">
+                  <div className="border-t border-[#E8E4DC] px-5 py-4 bg-client-surface-muted space-y-3">
                     {/* Notes */}
                     {workout.notes && (
                       <div>
@@ -331,7 +331,7 @@ export default function WorkoutHistoryPage() {
                           {workout.workout_sets.map((set, idx) => (
                             <div
                               key={idx}
-                              className="bg-white rounded-lg p-3 text-center border border-[#F0F0ED]"
+                              className="bg-white rounded-lg p-3 text-center border border-[#E8E4DC]"
                             >
                               <p className="text-[11px] text-client-text-secondary mb-1">
                                 Set {idx + 1}
@@ -352,7 +352,7 @@ export default function WorkoutHistoryPage() {
           })}
         </div>
       ) : (
-        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
           <p className="text-[14px] text-client-text-secondary">
             Geen trainingen geregistreerd
           </p>

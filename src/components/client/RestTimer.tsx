@@ -95,7 +95,7 @@ export function RestTimer({ initialSeconds, onComplete, onDismiss }: RestTimerPr
           <circle cx="100" cy="100" r={radius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="6" />
           <circle
             cx="100" cy="100" r={radius} fill="none"
-            stroke={isFinished ? '#34C759' : secondsLeft <= 3 ? '#FF9500' : '#9B7B2E'}
+            stroke={isFinished ? '#34C759' : secondsLeft <= 3 ? '#FF9500' : '#1A1917'}
             strokeWidth="6" strokeLinecap="round"
             strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
             className="transition-all duration-1000 ease-linear"

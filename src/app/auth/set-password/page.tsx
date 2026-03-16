@@ -84,8 +84,8 @@ export default function SetPasswordPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="w-8 h-8 border-2 border-[#9B7B2E] border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-[15px] text-[#9C9A95]">Account verifiëren...</p>
+          <div className="w-8 h-8 border-2 border-[#1A1917] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-[15px] text-[#A09D96]">Account verifiëren...</p>
         </div>
       </div>
     )
@@ -110,7 +110,7 @@ export default function SetPasswordPage() {
           </div>
           <button
             onClick={() => router.push('/client')}
-            className="w-full bg-[#8B6914] text-white rounded-2xl py-3.5 font-medium hover:bg-[#6F5612] transition-all"
+            className="w-full bg-[#1A1917] text-white rounded-2xl py-3.5 font-medium hover:bg-[#6F5612] transition-all"
           >
             Ga naar mijn dashboard
           </button>
@@ -161,7 +161,7 @@ export default function SetPasswordPage() {
                 placeholder="Minstens 6 tekens"
                 required
                 autoComplete="new-password"
-                className="w-full pl-12 pr-12 py-3.5 rounded-2xl bg-[#F5F5F3] border-0 text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:ring-2 focus:ring-[#8B6914] transition-all"
+                className="w-full pl-12 pr-12 py-3.5 rounded-2xl bg-[#F5F5F3] border-0 text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:ring-2 focus:ring-[#1A1917] transition-all"
               />
               <button
                 type="button"
@@ -189,7 +189,7 @@ export default function SetPasswordPage() {
                 placeholder="Herhaal je wachtwoord"
                 required
                 autoComplete="new-password"
-                className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-[#F5F5F3] border-0 text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:ring-2 focus:ring-[#8B6914] transition-all"
+                className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-[#F5F5F3] border-0 text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:ring-2 focus:ring-[#1A1917] transition-all"
               />
             </div>
           </div>
@@ -210,7 +210,7 @@ export default function SetPasswordPage() {
                             : password.length >= 8
                               ? '#FF9500'
                               : '#FF3B30'
-                          : '#F0F0ED',
+                          : '#E8E4DC',
                     }}
                   />
                 ))}
@@ -230,7 +230,7 @@ export default function SetPasswordPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#8B6914] text-white rounded-2xl py-3.5 font-medium hover:bg-[#6F5612] disabled:opacity-70 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+            className="w-full bg-[#1A1917] text-white rounded-2xl py-3.5 font-medium hover:bg-[#6F5612] disabled:opacity-70 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
           >
             {loading ? (
               <>

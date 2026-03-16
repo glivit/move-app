@@ -128,7 +128,7 @@ export default function BookingPage() {
           <h1 className="text-[32px] font-[family-name:var(--font-display)] text-[#1A1A18] mb-2">Sessie boeken</h1>
           <p className="text-[#8E8E93] text-[15px]">Laden...</p>
         </div>
-        <div className="bg-white rounded-2xl h-64 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] animate-pulse" />
+        <div className="bg-white rounded-2xl h-64 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] animate-pulse" />
       </div>
     )
   }
@@ -158,7 +158,7 @@ export default function BookingPage() {
       </div>
 
       {slots.length === 0 ? (
-        <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+        <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
           <Calendar strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[#C7C7CC]" />
           <p className="text-[15px] font-semibold text-[#1A1A18] mb-2">Geen beschikbare tijden</p>
           <p className="text-[13px] text-[#8E8E93]">
@@ -168,14 +168,14 @@ export default function BookingPage() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Calendar */}
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
             <div className="flex items-center justify-between mb-4">
               <button
                 onClick={() => setCalendarMonth(prev => {
                   const d = new Date(prev.year, prev.month - 1)
                   return { year: d.getFullYear(), month: d.getMonth() }
                 })}
-                className="p-2 rounded-lg hover:bg-[#F0F0ED] transition-colors"
+                className="p-2 rounded-lg hover:bg-[#E8E4DC] transition-colors"
               >
                 <ChevronLeft className="w-4 h-4 text-[#8E8E93]" />
               </button>
@@ -187,7 +187,7 @@ export default function BookingPage() {
                   const d = new Date(prev.year, prev.month + 1)
                   return { year: d.getFullYear(), month: d.getMonth() }
                 })}
-                className="p-2 rounded-lg hover:bg-[#F0F0ED] transition-colors"
+                className="p-2 rounded-lg hover:bg-[#E8E4DC] transition-colors"
               >
                 <ChevronRight className="w-4 h-4 text-[#8E8E93]" />
               </button>
@@ -215,9 +215,9 @@ export default function BookingPage() {
                     disabled={!day.hasSlots || isPast}
                     className={`aspect-square rounded-lg flex flex-col items-center justify-center text-[13px] transition-all relative ${
                       isSelected
-                        ? 'bg-[#8B6914] text-white font-bold'
+                        ? 'bg-[#1A1917] text-white font-bold'
                         : day.hasSlots && !isPast
-                          ? 'text-[#1A1A18] hover:bg-[#F5F0E8] font-medium'
+                          ? 'text-[#1A1A18] hover:bg-[#EDEAE4] font-medium'
                           : !day.isCurrentMonth
                             ? 'text-[#E0DDD8]'
                             : 'text-[#C7C7CC]'
@@ -225,7 +225,7 @@ export default function BookingPage() {
                   >
                     {day.date.getDate()}
                     {day.hasSlots && !isPast && !isSelected && (
-                      <div className="w-1 h-1 rounded-full bg-[#8B6914] absolute bottom-1" />
+                      <div className="w-1 h-1 rounded-full bg-[#1A1917] absolute bottom-1" />
                     )}
                     {isToday && !isSelected && (
                       <div className="w-1 h-1 rounded-full bg-[#FF9500] absolute bottom-1" />
@@ -239,7 +239,7 @@ export default function BookingPage() {
           {/* Time slots */}
           <div className="space-y-4">
             {selectedDate && (
-              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                 <h3 className="text-[15px] font-semibold text-[#1A1A18] mb-1">
                   {new Date(selectedDate).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </h3>
@@ -252,8 +252,8 @@ export default function BookingPage() {
                       onClick={() => setSelectedSlot(slot)}
                       className={`py-2.5 px-3 rounded-xl text-[14px] font-medium transition-all border ${
                         selectedSlot?.datetime === slot.datetime
-                          ? 'bg-[#8B6914] text-white border-[#8B6914]'
-                          : 'bg-white text-[#1A1A18] border-[#F0F0ED] hover:border-[#8B6914]/30 hover:bg-[#F5F0E8]'
+                          ? 'bg-[#1A1917] text-white border-[#1A1917]'
+                          : 'bg-white text-[#1A1A18] border-[#E8E4DC] hover:border-[#1A1917]/30 hover:bg-[#EDEAE4]'
                       }`}
                     >
                       {slot.time}
@@ -265,10 +265,10 @@ export default function BookingPage() {
 
             {/* Booking confirmation */}
             {selectedSlot && (
-              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#8B6914]/20">
+              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#1A1917]/20">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-[#8B6914]/10 flex items-center justify-center">
-                    <Video className="w-5 h-5 text-[#8B6914]" strokeWidth={1.5} />
+                  <div className="w-10 h-10 rounded-full bg-[#1A1917]/10 flex items-center justify-center">
+                    <Video className="w-5 h-5 text-[#1A1917]" strokeWidth={1.5} />
                   </div>
                   <div>
                     <p className="text-[15px] font-semibold text-[#1A1A18]">Video coaching sessie</p>
@@ -288,14 +288,14 @@ export default function BookingPage() {
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Waar wil je het over hebben?"
-                    className="w-full px-3 py-2.5 border border-[#F0F0ED] rounded-xl text-[13px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#8B6914] resize-none h-16"
+                    className="w-full px-3 py-2.5 border border-[#E8E4DC] rounded-xl text-[13px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917] resize-none h-16"
                   />
                 </div>
 
                 <button
                   onClick={handleBook}
                   disabled={booking}
-                  className="w-full py-3 bg-[#8B6914] text-white rounded-xl font-semibold text-[14px] hover:bg-[#6B5110] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-[#1A1917] text-white rounded-xl font-semibold text-[14px] hover:bg-[#6B5110] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {booking ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> Boeken...</>

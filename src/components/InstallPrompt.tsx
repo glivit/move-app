@@ -80,22 +80,22 @@ export function InstallPrompt() {
   if (showPrompt && deferredPrompt) {
     return (
       <div className="fixed bottom-20 left-4 right-4 z-50 md:bottom-6 md:left-auto md:right-6 md:max-w-sm animate-in slide-in-from-bottom-4">
-        <div className="bg-white rounded-2xl shadow-xl border border-[#F0F0ED] p-5">
+        <div className="bg-white rounded-2xl shadow-xl border border-[#E8E4DC] p-5">
           <div className="flex items-start gap-4">
             <div className="bg-[#1A1917] rounded-xl p-2.5 shrink-0">
-              <Download className="h-5 w-5 text-[#C8A96E]" />
+              <Download className="h-5 w-5 text-[#333330]" />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-[#1A1917] text-sm">
                 Installeer MŌVE
               </h3>
-              <p className="text-xs text-[#9C9A95] mt-0.5">
+              <p className="text-xs text-[#A09D96] mt-0.5">
                 Voeg toe aan je startscherm voor de volledige app-ervaring
               </p>
             </div>
             <button
               onClick={handleDismiss}
-              className="text-[#BAB8B3] hover:text-[#9C9A95] p-1 -mr-1 -mt-1"
+              className="text-[#C5C2BC] hover:text-[#A09D96] p-1 -mr-1 -mt-1"
             >
               <X className="h-4 w-4" />
             </button>
@@ -103,7 +103,7 @@ export function InstallPrompt() {
           <div className="flex gap-3 mt-4">
             <button
               onClick={handleDismiss}
-              className="flex-1 text-sm text-[#9C9A95] py-2.5 rounded-xl hover:bg-[#F5F2ED] transition-colors"
+              className="flex-1 text-sm text-[#A09D96] py-2.5 rounded-xl hover:bg-[#EEEBE3] transition-colors"
             >
               Later
             </button>
@@ -123,16 +123,16 @@ export function InstallPrompt() {
   if (showIOSGuide) {
     return (
       <div className="fixed bottom-20 left-4 right-4 z-50 animate-in slide-in-from-bottom-4">
-        <div className="bg-white rounded-2xl shadow-xl border border-[#F0F0ED] p-5">
+        <div className="bg-white rounded-2xl shadow-xl border border-[#E8E4DC] p-5">
           <div className="flex items-start gap-4">
             <div className="bg-[#1A1917] rounded-xl p-2.5 shrink-0">
-              <Download className="h-5 w-5 text-[#C8A96E]" />
+              <Download className="h-5 w-5 text-[#333330]" />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-[#1A1917] text-sm">
                 Installeer MŌVE
               </h3>
-              <p className="text-xs text-[#9C9A95] mt-1 leading-relaxed">
+              <p className="text-xs text-[#A09D96] mt-1 leading-relaxed">
                 Tik op{' '}
                 <Share className="h-3.5 w-3.5 inline-block text-[#007AFF] -mt-0.5" />{' '}
                 <span className="font-medium text-[#1A1917]">Deel</span> onderaan
@@ -143,7 +143,7 @@ export function InstallPrompt() {
             </div>
             <button
               onClick={handleDismiss}
-              className="text-[#BAB8B3] hover:text-[#9C9A95] p-1 -mr-1 -mt-1"
+              className="text-[#C5C2BC] hover:text-[#A09D96] p-1 -mr-1 -mt-1"
             >
               <X className="h-4 w-4" />
             </button>

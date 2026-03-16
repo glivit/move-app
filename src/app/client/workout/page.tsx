@@ -90,7 +90,7 @@ export default function WorkoutOverviewPage() {
         <div>
           <h1 className="font-display text-2xl font-semibold text-text-primary">Training</h1>
         </div>
-        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
           <Dumbbell
             size={48}
             strokeWidth={1.5}
@@ -108,26 +108,31 @@ export default function WorkoutOverviewPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-8">
+      {/* Header — editorial */}
       <div>
-        <h1 className="font-display text-2xl font-semibold text-text-primary">Training</h1>
-        <p className="text-[14px] text-client-text-secondary mt-1">
-          {program.name} • Week {program.current_week}
+        <p className="text-[13px] font-medium uppercase tracking-[0.12em] text-[#A09D96] mb-2">
+          Week {program.current_week}
         </p>
+        <h1
+          className="text-[32px] font-semibold text-text-primary tracking-[-0.02em] leading-tight"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          {program.name}
+        </h1>
       </div>
 
-      {/* Week stats */}
-      <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] flex items-center gap-3">
-        <div className="bg-[#F5F0E8] rounded-full p-3">
-          <Calendar size={20} strokeWidth={1.5} className="text-[#8B6914]" />
+      {/* Week progress — minimal */}
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-1 bg-[#E5E1D9] rounded-full overflow-hidden">
+          <div
+            className="h-full bg-[#1A1917] rounded-full transition-all duration-500"
+            style={{ width: `${days.length > 0 ? (workoutsThisWeek / days.length) * 100 : 0}%` }}
+          />
         </div>
-        <div>
-          <p className="text-[13px] text-client-text-secondary">Deze week</p>
-          <p className="font-semibold text-text-primary">
-            {workoutsThisWeek} van {days.length} trainingen voltooid
-          </p>
-        </div>
+        <span className="text-[13px] font-semibold text-[#6B6862] shrink-0">
+          {workoutsThisWeek}/{days.length}
+        </span>
       </div>
 
       {/* Training days */}
@@ -136,27 +141,27 @@ export default function WorkoutOverviewPage() {
           <button
             key={day.id}
             onClick={() => handleStartWorkout(day)}
-            className="w-full bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-left hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-shadow"
+            className="w-full bg-white rounded-xl p-5 border border-[#E8E4DC] text-left hover:border-[#CCC7BC] transition-all duration-300"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
-                <div className="flex items-baseline gap-2">
-                  <h3 className="font-semibold text-text-primary">
+                <div className="flex items-baseline gap-2.5">
+                  <h3 className="font-semibold text-text-primary tracking-[-0.01em]">
                     {day.name}
                   </h3>
                   {day.focus && (
-                    <span className="text-[12px] bg-[#F5F0E8] text-[#8B6914] px-2 py-0.5 rounded-full font-medium">
+                    <span className="text-[11px] uppercase tracking-[0.06em] text-[#A09D96] font-medium">
                       {day.focus}
                     </span>
                   )}
                 </div>
-                <div className="mt-2 flex items-center gap-2 text-[13px] text-client-text-secondary">
+                <div className="mt-1.5 flex items-center gap-2 text-[13px] text-client-text-secondary">
                   <span>{day.exercise_count} oefeningen</span>
-                  <span>•</span>
-                  <span>±{day.estimated_duration_min} minuten</span>
+                  <span className="text-[#CCC7BC]">·</span>
+                  <span>±{day.estimated_duration_min} min</span>
                 </div>
               </div>
-              <ChevronRight size={20} strokeWidth={1.5} className="text-client-text-secondary flex-shrink-0 mt-1" />
+              <ChevronRight size={18} strokeWidth={1.5} className="text-[#CCC7BC] flex-shrink-0 mt-1" />
             </div>
           </button>
         ))}

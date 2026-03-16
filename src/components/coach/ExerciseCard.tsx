@@ -25,13 +25,13 @@ const bodyPartLabels: Record<string, string> = {
 }
 
 const bodyPartColors: Record<string, string> = {
-  chest: '#9B7B2E',
+  chest: '#1A1917',
   back: '#3068C4',
-  shoulders: '#8B6914',
+  shoulders: '#1A1917',
   arms: '#C47D15',
   legs: '#3D8B5C',
   core: '#C04B37',
-  cardio: '#9B7B2E',
+  cardio: '#1A1917',
 }
 
 export function ExerciseCard({
@@ -43,12 +43,12 @@ export function ExerciseCard({
   equipment,
   gif_url,
 }: ExerciseCardProps) {
-  const partColor = bodyPartColors[body_part?.toLowerCase()] || '#9B7B2E'
+  const partColor = bodyPartColors[body_part?.toLowerCase()] || '#1A1917'
   const partLabel = bodyPartLabels[body_part?.toLowerCase()] || body_part
 
   return (
     <Link href={`/coach/exercises/${id}`}>
-      <div className="bg-white rounded-2xl border border-[#F0F0ED] overflow-hidden hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition-all duration-200 cursor-pointer h-full flex flex-col">
+      <div className="bg-white rounded-2xl border border-[#E8E4DC] overflow-hidden hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition-all duration-200 cursor-pointer h-full flex flex-col">
         {/* Media area */}
         <ExerciseMedia
           name={name}
@@ -77,7 +77,7 @@ export function ExerciseCard({
             </span>
 
             {equipment && (
-              <span className="bg-[#F5F2ED] text-[#5C5A55] text-[11px] font-medium px-2.5 py-1 rounded-full">
+              <span className="bg-[#EEEBE3] text-[#6B6862] text-[11px] font-medium px-2.5 py-1 rounded-full">
                 {equipment.charAt(0).toUpperCase() + equipment.slice(1)}
               </span>
             )}
@@ -85,7 +85,7 @@ export function ExerciseCard({
 
           {/* Target Muscle */}
           {target_muscle && (
-            <p className="text-[13px] text-[#9C9A95] mt-auto">
+            <p className="text-[13px] text-[#A09D96] mt-auto">
               {target_muscle.charAt(0).toUpperCase() + target_muscle.slice(1)}
             </p>
           )}

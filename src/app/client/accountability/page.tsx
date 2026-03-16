@@ -103,7 +103,7 @@ export default function AccountabilityPage() {
     return (
       <div className="space-y-6">
         <h1 className="font-display text-2xl font-semibold text-text-primary">Dagelijkse check</h1>
-        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
           <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#34C759] mx-auto mb-3" />
           <p className="font-semibold text-text-primary text-lg">Alles op schema!</p>
           <p className="text-[14px] text-client-text-secondary mt-2">
@@ -119,7 +119,7 @@ export default function AccountabilityPage() {
     return (
       <div className="space-y-6">
         <h1 className="font-display text-2xl font-semibold text-text-primary">Dagelijkse check</h1>
-        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
           <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#34C759] mx-auto mb-3" />
           <p className="font-semibold text-text-primary text-lg">Bedankt voor je feedback!</p>
           <p className="text-[14px] text-client-text-secondary mt-2">
@@ -176,7 +176,7 @@ export default function AccountabilityPage() {
                 onChange={(e) => setWorkoutReason(e.target.value)}
                 placeholder="Bijv. drukke werkdag, niet lekker gevoeld, reisdag..."
                 rows={3}
-                className="w-full px-3 py-2 bg-white border border-[#E5E5E5] rounded-xl text-[14px] placeholder-client-text-secondary focus:outline-none focus:ring-2 focus:ring-[#8B6914]/20 resize-none"
+                className="w-full px-3 py-2 bg-white border border-[#E5E5E5] rounded-xl text-[14px] placeholder-client-text-secondary focus:outline-none focus:ring-2 focus:ring-[#1A1917]/20 resize-none"
               />
             </div>
           )}
@@ -214,7 +214,7 @@ export default function AccountabilityPage() {
                 onChange={(e) => setNutritionReason(e.target.value)}
                 placeholder="Bijv. uit eten geweest, vergeten, weekend..."
                 rows={3}
-                className="w-full px-3 py-2 bg-white border border-[#E5E5E5] rounded-xl text-[14px] placeholder-client-text-secondary focus:outline-none focus:ring-2 focus:ring-[#8B6914]/20 resize-none"
+                className="w-full px-3 py-2 bg-white border border-[#E5E5E5] rounded-xl text-[14px] placeholder-client-text-secondary focus:outline-none focus:ring-2 focus:ring-[#1A1917]/20 resize-none"
               />
             </div>
           )}
@@ -230,7 +230,7 @@ export default function AccountabilityPage() {
       <button
         onClick={handleSubmit}
         disabled={submitting}
-        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#8B6914] text-white rounded-2xl font-semibold text-[15px] hover:bg-[#7A5C12] transition-colors disabled:opacity-50"
+        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#1A1917] text-white rounded-2xl font-semibold text-[15px] hover:bg-[#7A5C12] transition-colors disabled:opacity-50"
       >
         {submitting ? (
           <>

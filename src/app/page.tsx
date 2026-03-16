@@ -158,8 +158,8 @@ function LoginPageInner() {
         </div>
 
         {/* Gradient accent glow */}
-        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-[#8B6914]/20 rounded-full blur-[120px]" />
-        <div className="absolute bottom-1/4 -right-32 w-80 h-80 bg-[#8B6914]/10 rounded-full blur-[100px]" />
+        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-[#1A1917]/20 rounded-full blur-[120px]" />
+        <div className="absolute bottom-1/4 -right-32 w-80 h-80 bg-[#1A1917]/10 rounded-full blur-[100px]" />
 
         <div className="relative z-10 w-full max-w-lg text-center lg:text-left space-y-10">
           {/* Logo */}
@@ -167,7 +167,7 @@ function LoginPageInner() {
             <h1 className="text-7xl lg:text-8xl font-display font-semibold tracking-tight mb-6">
               MŌVE
             </h1>
-            <div className="w-20 h-[2px] bg-gradient-to-r from-[#8B6914] to-[#C4962C] mx-auto lg:mx-0 mb-6" />
+            <div className="w-20 h-[2px] bg-gradient-to-r from-[#1A1917] to-[#C4962C] mx-auto lg:mx-0 mb-6" />
             <p className="text-white/60 text-lg leading-relaxed max-w-md">
               Jouw persoonlijke coaching ervaring
             </p>
@@ -181,7 +181,7 @@ function LoginPageInner() {
               { label: 'Directe communicatie met je coach' },
             ].map((feature, i) => (
               <div key={i} className="flex items-center gap-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#8B6914]" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[#1A1917]" />
                 <span className="text-white/50 text-[15px]">{feature.label}</span>
               </div>
             ))}
@@ -247,7 +247,7 @@ function LoginPageInner() {
                     placeholder="jouw@email.be"
                     required
                     autoComplete="email"
-                    className="w-full px-5 py-3.5 rounded-2xl bg-[#F5F5F3] border-0 text-[#1A1A18] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8B6914] transition-all"
+                    className="w-full px-5 py-3.5 rounded-2xl bg-[#F5F5F3] border-0 text-[#1A1A18] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1A1917] transition-all"
                   />
                 </div>
                 <button
@@ -289,7 +289,7 @@ function LoginPageInner() {
                 placeholder="jouw@email.be"
                 required
                 autoComplete="email"
-                className="w-full px-5 py-3.5 rounded-2xl bg-[#F5F5F3] border-0 text-[#1A1A18] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8B6914] transition-all"
+                className="w-full px-5 py-3.5 rounded-2xl bg-[#F5F5F3] border-0 text-[#1A1A18] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1A1917] transition-all"
               />
             </div>
 
@@ -316,7 +316,7 @@ function LoginPageInner() {
                   placeholder="••••••••"
                   required
                   autoComplete="current-password"
-                  className="w-full px-5 py-3.5 rounded-2xl bg-[#F5F5F3] border-0 text-[#1A1A18] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8B6914] transition-all pr-12"
+                  className="w-full px-5 py-3.5 rounded-2xl bg-[#F5F5F3] border-0 text-[#1A1A18] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1A1917] transition-all pr-12"
                 />
                 <button
                   type="button"
@@ -406,7 +406,7 @@ function LoginPageInner() {
           {/* Sign Up Link */}
           <p className="text-center text-sm text-gray-600">
             Nog geen account?{' '}
-            <a href="mailto:contact@movecoaching.be" className="text-[#8B6914] font-medium hover:underline">
+            <a href="mailto:contact@movecoaching.be" className="text-[#1A1917] font-medium hover:underline">
               Neem contact op
             </a>
           </p>

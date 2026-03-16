@@ -115,7 +115,7 @@ export function ComplianceWidget() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] p-6">
+      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-6">
         <div className="h-5 w-40 bg-[#F5F5F3] rounded animate-pulse mb-4" />
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
@@ -134,7 +134,7 @@ export function ComplianceWidget() {
   const onTrack = clients.filter(c => c.compliancePercent >= 80)
 
   return (
-    <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] p-6">
+    <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-6">
       <div className="flex items-center justify-between mb-5">
         <h3 className="text-[17px] font-semibold text-[#1A1A18]">Compliance deze week</h3>
         <div className="flex items-center gap-1.5 text-[13px] font-medium">

@@ -448,7 +448,7 @@ export default function NutritionPage() {
       <div className="min-h-screen bg-[#FAFAFA]">
         <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="flex items-center justify-center h-96">
-            <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#8B6914] border-t-transparent" />
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#1A1917] border-t-transparent" />
           </div>
         </div>
       </div>
@@ -486,7 +486,7 @@ export default function NutritionPage() {
           {hasActivePlan && (
             <button
               onClick={() => { setIsEditing(true); loadPlanIntoState(activePlan) }}
-              className="px-5 py-2.5 rounded-xl font-semibold text-white transition-all hover:opacity-90 flex items-center gap-2 bg-[#8B6914]"
+              className="px-5 py-2.5 rounded-xl font-semibold text-white transition-all hover:opacity-90 flex items-center gap-2 bg-[#1A1917]"
             >
               <Copy strokeWidth={1.5} className="w-4 h-4" />
               Bewerken
@@ -542,7 +542,7 @@ export default function NutritionPage() {
         {activeTab === 'compliance' && activePlan && (
           <div className="space-y-4">
             {/* Date Navigator */}
-            <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+            <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
               <div className="flex items-center justify-between">
                 <button
                   onClick={() => navigateComplianceDate(-1)}
@@ -567,7 +567,7 @@ export default function NutritionPage() {
 
               {/* Week mini bar chart */}
               {weekHistory.length > 0 && (
-                <div className="flex items-end justify-center gap-2 mt-4 pt-4 border-t border-[#F0F0ED]">
+                <div className="flex items-end justify-center gap-2 mt-4 pt-4 border-t border-[#E8E4DC]">
                   {weekHistory.map((day) => {
                     const pct = day.planned > 0 ? (day.completed / day.planned) * 100 : 0
                     const isSelected = day.date === complianceDate
@@ -582,7 +582,7 @@ export default function NutritionPage() {
                           className="w-8 rounded-lg transition-all"
                           style={{
                             height: `${Math.max(4, pct * 0.4)}px`,
-                            backgroundColor: pct >= 80 ? '#34C759' : pct >= 50 ? '#FF9500' : pct > 0 ? '#FF3B30' : '#F0F0ED',
+                            backgroundColor: pct >= 80 ? '#34C759' : pct >= 50 ? '#FF9500' : pct > 0 ? '#FF3B30' : '#E8E4DC',
                             opacity: isSelected ? 1 : 0.5,
                           }}
                         />
@@ -601,10 +601,10 @@ export default function NutritionPage() {
 
             {complianceLoading ? (
               <div className="flex items-center justify-center py-16">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#8B6914] border-t-transparent" />
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#1A1917] border-t-transparent" />
               </div>
             ) : complianceLogs.length === 0 && !complianceSummary ? (
-              <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+              <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
                 <Eye strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#C7C7CC]" />
                 <p className="text-[15px] font-medium text-[#8E8E93] mb-1">Geen tracking data</p>
                 <p className="text-[13px] text-[#C7C7CC]">
@@ -615,7 +615,7 @@ export default function NutritionPage() {
               <>
                 {/* Summary Card */}
                 {complianceSummary && (
-                  <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                  <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-[15px] font-semibold text-[#1A1A18]">Dagelijkse samenvatting</h3>
                       {complianceSummary.meals_planned > 0 && (
@@ -656,7 +656,7 @@ export default function NutritionPage() {
                             <p className="text-[18px] font-bold mt-1" style={{ color: m.color }}>
                               {m.value}{m.unit}
                             </p>
-                            <div className="w-full h-1.5 bg-[#F0F0ED] rounded-full mt-1.5 overflow-hidden">
+                            <div className="w-full h-1.5 bg-[#E8E4DC] rounded-full mt-1.5 overflow-hidden">
                               <div
                                 className="h-full rounded-full transition-all"
                                 style={{ width: `${pct}%`, backgroundColor: m.color }}
@@ -671,7 +671,7 @@ export default function NutritionPage() {
                     </div>
 
                     {/* Mood, Water, Note */}
-                    <div className="flex items-center gap-4 pt-3 border-t border-[#F0F0ED] flex-wrap">
+                    <div className="flex items-center gap-4 pt-3 border-t border-[#E8E4DC] flex-wrap">
                       {complianceSummary.mood && (
                         <div className="flex items-center gap-1.5">
                           <span className="text-[18px]">{MOOD_EMOJI[complianceSummary.mood] || '😐'}</span>
@@ -705,13 +705,13 @@ export default function NutritionPage() {
                     {complianceLogs.map((log) => (
                       <div
                         key={log.id}
-                        className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] overflow-hidden"
+                        className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden"
                       >
                         <div className="px-5 py-4 flex items-center gap-3">
                           <div
                             className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
                             style={{
-                              backgroundColor: log.completed ? '#34C759' + '15' : '#F0F0ED',
+                              backgroundColor: log.completed ? '#34C759' + '15' : '#E8E4DC',
                             }}
                           >
                             {log.completed ? (
@@ -740,7 +740,7 @@ export default function NutritionPage() {
 
                         {/* Foods eaten */}
                         {log.foods_eaten && log.foods_eaten.length > 0 && (
-                          <div className="border-t border-[#F0F0ED] divide-y divide-[#F0F0ED]">
+                          <div className="border-t border-[#E8E4DC] divide-y divide-[#E8E4DC]">
                             {log.foods_eaten.map((food: any, idx: number) => (
                               <div key={idx} className="px-5 py-2.5 flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-lg bg-[#F5F5F3] flex items-center justify-center overflow-hidden shrink-0">
@@ -764,9 +764,9 @@ export default function NutritionPage() {
 
                         {/* Client note */}
                         {log.client_notes && (
-                          <div className="border-t border-[#F0F0ED] px-5 py-3">
+                          <div className="border-t border-[#E8E4DC] px-5 py-3">
                             <div className="flex items-start gap-2">
-                              <Pencil strokeWidth={1.5} className="w-3.5 h-3.5 text-[#8B6914] mt-0.5 shrink-0" />
+                              <Pencil strokeWidth={1.5} className="w-3.5 h-3.5 text-[#1A1917] mt-0.5 shrink-0" />
                               <p className="text-[12px] text-[#8E8E93] italic">{log.client_notes}</p>
                             </div>
                           </div>
@@ -784,10 +784,10 @@ export default function NutritionPage() {
         {hasActivePlan && activeTab === 'plan' && (
           <div className="space-y-4">
             {/* Macro Summary Card */}
-            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-[17px] font-semibold text-[#1A1A18]">{activePlan.title}</h2>
-                <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-[#8B6914]/10 text-[#8B6914]">
+                <span className="text-[11px] font-semibold px-3 py-1 rounded-full bg-[#1A1917]/10 text-[#1A1917]">
                   Actief
                 </span>
               </div>
@@ -817,11 +817,11 @@ export default function NutritionPage() {
 
             {/* Meal Cards (readonly) */}
             {Array.isArray(activePlan.meals) && activePlan.meals.map((meal: any, idx: number) => (
-              <div key={idx} className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] overflow-hidden">
+              <div key={idx} className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden">
                 <div className="px-5 py-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-[#FAFAFA] flex items-center justify-center">
-                      <Clock strokeWidth={1.5} className="w-5 h-5 text-[#8B6914]" />
+                      <Clock strokeWidth={1.5} className="w-5 h-5 text-[#1A1917]" />
                     </div>
                     <div>
                       <p className="text-[15px] font-semibold text-[#1A1A18]">{meal.name || meal.moment}</p>
@@ -835,7 +835,7 @@ export default function NutritionPage() {
                   </div>
                 </div>
                 {meal.foods && meal.foods.length > 0 && (
-                  <div className="border-t border-[#F0F0ED] divide-y divide-[#F0F0ED]">
+                  <div className="border-t border-[#E8E4DC] divide-y divide-[#E8E4DC]">
                     {meal.foods.map((food: any, fIdx: number) => (
                       <div key={fIdx} className="px-5 py-3 flex items-center gap-3">
                         <div className="w-9 h-9 rounded-lg bg-[#F5F5F3] flex items-center justify-center overflow-hidden shrink-0">
@@ -864,7 +864,7 @@ export default function NutritionPage() {
 
             {/* Guidelines */}
             {activePlan.guidelines && (
-              <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+              <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                 <h3 className="text-[15px] font-semibold text-[#1A1A18] mb-3">Richtlijnen</h3>
                 <p className="text-[13px] text-[#8E8E93] whitespace-pre-wrap leading-relaxed">
                   {activePlan.guidelines}
@@ -878,7 +878,7 @@ export default function NutritionPage() {
         {showEditor && activeTab === 'plan' && (
           <div className="space-y-6">
             {/* Plan Title */}
-            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
               <label className="block text-[13px] font-medium text-[#1A1A18] mb-2">
                 Plan titel
               </label>
@@ -887,7 +887,7 @@ export default function NutritionPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="bijv. Bulkfase voedingsplan, Cutting schema..."
-                className="w-full px-4 py-3 rounded-xl border border-[#F0F0ED] text-[15px] text-[#1A1A18] bg-white placeholder-[#C7C7CC] focus:outline-none focus:border-[#8B6914] focus:ring-1 focus:ring-[#8B6914]/20"
+                className="w-full px-4 py-3 rounded-xl border border-[#E8E4DC] text-[15px] text-[#1A1A18] bg-white placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917] focus:ring-1 focus:ring-[#1A1917]/20"
               />
 
               <div className="grid grid-cols-2 gap-4 mt-4">
@@ -897,7 +897,7 @@ export default function NutritionPage() {
                     type="date"
                     value={validFrom}
                     onChange={(e) => setValidFrom(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#F0F0ED] text-[14px] text-[#1A1A18] bg-white"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[#E8E4DC] text-[14px] text-[#1A1A18] bg-white"
                   />
                 </div>
                 <div>
@@ -906,14 +906,14 @@ export default function NutritionPage() {
                     type="date"
                     value={validUntil}
                     onChange={(e) => setValidUntil(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#F0F0ED] text-[14px] text-[#1A1A18] bg-white"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[#E8E4DC] text-[14px] text-[#1A1A18] bg-white"
                   />
                 </div>
               </div>
             </div>
 
             {/* Live Macro Totals */}
-            <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+            <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
               <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-3">
                 Dagelijks totaal (berekend)
               </p>
@@ -948,7 +948,7 @@ export default function NutritionPage() {
               return (
                 <div
                   key={meal.id}
-                  className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] overflow-hidden"
+                  className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden"
                 >
                   {/* Meal Header */}
                   <button
@@ -956,8 +956,8 @@ export default function NutritionPage() {
                     className="w-full px-5 py-4 flex items-center justify-between hover:bg-[#FAFAFA] transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-[#8B6914]/10 flex items-center justify-center">
-                        <Clock strokeWidth={1.5} className="w-5 h-5 text-[#8B6914]" />
+                      <div className="w-10 h-10 rounded-xl bg-[#1A1917]/10 flex items-center justify-center">
+                        <Clock strokeWidth={1.5} className="w-5 h-5 text-[#1A1917]" />
                       </div>
                       <div className="text-left">
                         <p className="text-[15px] font-semibold text-[#1A1A18]">{meal.name}</p>
@@ -991,14 +991,14 @@ export default function NutritionPage() {
 
                   {/* Expanded Content */}
                   {isExpanded && (
-                    <div className="border-t border-[#F0F0ED]">
+                    <div className="border-t border-[#E8E4DC]">
                       {/* Food Items */}
                       {(meal.foods || []).length > 0 && (
-                        <div className="divide-y divide-[#F0F0ED]">
+                        <div className="divide-y divide-[#E8E4DC]">
                           {(meal.foods || []).map((food) => (
                             <div key={food.id} className="px-5 py-3 flex items-center gap-3 group">
                               {/* Food Image */}
-                              <div className="w-10 h-10 rounded-lg bg-[#F5F5F3] border border-[#F0F0ED] flex items-center justify-center overflow-hidden shrink-0">
+                              <div className="w-10 h-10 rounded-lg bg-[#F5F5F3] border border-[#E8E4DC] flex items-center justify-center overflow-hidden shrink-0">
                                 {food.image ? (
                                   <img
                                     src={food.image}
@@ -1032,7 +1032,7 @@ export default function NutritionPage() {
                                   onChange={(e) =>
                                     handleUpdateFoodGrams(meal.id, food.id, parseInt(e.target.value) || 0)
                                   }
-                                  className="w-16 px-2 py-1 rounded-lg border border-[#F0F0ED] text-[13px] text-center text-[#1A1A18] bg-white"
+                                  className="w-16 px-2 py-1 rounded-lg border border-[#E8E4DC] text-[13px] text-center text-[#1A1A18] bg-white"
                                   min={1}
                                 />
                                 <span className="text-[11px] text-[#C7C7CC]">g</span>
@@ -1071,7 +1071,7 @@ export default function NutritionPage() {
                         ) : (
                           <button
                             onClick={() => setSearchingMealId(meal.id)}
-                            className="w-full px-4 py-3 rounded-xl border-2 border-dashed border-[#F0F0ED] text-[13px] font-medium text-[#8E8E93] hover:border-[#8B6914]/30 hover:text-[#8B6914] hover:bg-[#8B6914]/5 transition-all flex items-center justify-center gap-2"
+                            className="w-full px-4 py-3 rounded-xl border-2 border-dashed border-[#E8E4DC] text-[13px] font-medium text-[#8E8E93] hover:border-[#1A1917]/30 hover:text-[#1A1917] hover:bg-[#1A1917]/5 transition-all flex items-center justify-center gap-2"
                           >
                             <Search strokeWidth={1.5} className="w-4 h-4" />
                             Voedingsmiddel toevoegen
@@ -1096,7 +1096,7 @@ export default function NutritionPage() {
 
             {/* Add Meal Moment */}
             {showAddMeal ? (
-              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                 <p className="text-[13px] font-medium text-[#1A1A18] mb-3">Nieuw maaltijdmoment</p>
                 <div className="flex flex-wrap gap-2 mb-3">
                   {MEAL_PRESETS.filter((p) => !meals.some((m) => m.name === p)).map((preset) => (
@@ -1105,9 +1105,9 @@ export default function NutritionPage() {
                       onClick={() => setNewMealName(preset)}
                       className="px-3 py-1.5 rounded-lg text-[12px] font-medium border transition-colors"
                       style={{
-                        backgroundColor: newMealName === preset ? '#8B6914' : 'white',
+                        backgroundColor: newMealName === preset ? '#1A1917' : 'white',
                         color: newMealName === preset ? 'white' : '#8E8E93',
-                        borderColor: newMealName === preset ? '#8B6914' : '#F0F0ED',
+                        borderColor: newMealName === preset ? '#1A1917' : '#E8E4DC',
                       }}
                     >
                       {preset}
@@ -1120,24 +1120,24 @@ export default function NutritionPage() {
                     value={newMealName}
                     onChange={(e) => setNewMealName(e.target.value)}
                     placeholder="Naam maaltijdmoment"
-                    className="flex-1 px-4 py-2.5 rounded-xl border border-[#F0F0ED] text-[14px] text-[#1A1A18] bg-white"
+                    className="flex-1 px-4 py-2.5 rounded-xl border border-[#E8E4DC] text-[14px] text-[#1A1A18] bg-white"
                   />
                   <input
                     type="time"
                     value={newMealTime}
                     onChange={(e) => setNewMealTime(e.target.value)}
-                    className="px-3 py-2.5 rounded-xl border border-[#F0F0ED] text-[14px] text-[#1A1A18] bg-white w-28"
+                    className="px-3 py-2.5 rounded-xl border border-[#E8E4DC] text-[14px] text-[#1A1A18] bg-white w-28"
                   />
                   <button
                     onClick={handleAddMeal}
                     disabled={!newMealName.trim()}
-                    className="px-4 py-2.5 rounded-xl bg-[#8B6914] text-white text-[13px] font-semibold hover:bg-[#6F5612] transition-colors disabled:opacity-40"
+                    className="px-4 py-2.5 rounded-xl bg-[#1A1917] text-white text-[13px] font-semibold hover:bg-[#6F5612] transition-colors disabled:opacity-40"
                   >
                     Toevoegen
                   </button>
                   <button
                     onClick={() => setShowAddMeal(false)}
-                    className="px-4 py-2.5 rounded-xl border border-[#F0F0ED] text-[13px] font-medium text-[#8E8E93] bg-white hover:bg-[#FAFAFA] transition-colors"
+                    className="px-4 py-2.5 rounded-xl border border-[#E8E4DC] text-[13px] font-medium text-[#8E8E93] bg-white hover:bg-[#FAFAFA] transition-colors"
                   >
                     Annuleer
                   </button>
@@ -1146,7 +1146,7 @@ export default function NutritionPage() {
             ) : (
               <button
                 onClick={() => setShowAddMeal(true)}
-                className="w-full px-4 py-4 rounded-2xl border-2 border-dashed border-[#F0F0ED] text-[14px] font-medium text-[#8E8E93] hover:border-[#8B6914]/30 hover:text-[#8B6914] hover:bg-white transition-all flex items-center justify-center gap-2"
+                className="w-full px-4 py-4 rounded-2xl border-2 border-dashed border-[#E8E4DC] text-[14px] font-medium text-[#8E8E93] hover:border-[#1A1917]/30 hover:text-[#1A1917] hover:bg-white transition-all flex items-center justify-center gap-2"
               >
                 <Plus strokeWidth={1.5} className="w-5 h-5" />
                 Maaltijdmoment toevoegen
@@ -1154,7 +1154,7 @@ export default function NutritionPage() {
             )}
 
             {/* Guidelines */}
-            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
               <label className="block text-[13px] font-medium text-[#1A1A18] mb-2">
                 Richtlijnen voor {clientName}
               </label>
@@ -1163,7 +1163,7 @@ export default function NutritionPage() {
                 onChange={(e) => setGuidelines(e.target.value)}
                 placeholder="Bijv. Drink minimaal 2.5L water per dag. Eet 30 min voor de training een snack..."
                 rows={4}
-                className="w-full px-4 py-3 rounded-xl border border-[#F0F0ED] text-[14px] text-[#1A1A18] bg-white placeholder-[#C7C7CC] focus:outline-none focus:border-[#8B6914] focus:ring-1 focus:ring-[#8B6914]/20 resize-none"
+                className="w-full px-4 py-3 rounded-xl border border-[#E8E4DC] text-[14px] text-[#1A1A18] bg-white placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917] focus:ring-1 focus:ring-[#1A1917]/20 resize-none"
               />
             </div>
 
@@ -1172,7 +1172,7 @@ export default function NutritionPage() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex-1 px-6 py-4 rounded-2xl font-semibold text-white transition-all hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2 bg-[#8B6914] shadow-lg"
+                className="flex-1 px-6 py-4 rounded-2xl font-semibold text-white transition-all hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2 bg-[#1A1917] shadow-lg"
               >
                 <Check strokeWidth={2} className="w-5 h-5" />
                 {saving ? 'Opslaan...' : 'Voedingsplan opslaan'}
@@ -1180,7 +1180,7 @@ export default function NutritionPage() {
               {isEditing && (
                 <button
                   onClick={() => { setIsEditing(false); loadPlanIntoState(activePlan) }}
-                  className="px-6 py-4 rounded-2xl font-semibold border border-[#F0F0ED] text-[#8E8E93] bg-white hover:bg-[#FAFAFA] transition-colors shadow-lg"
+                  className="px-6 py-4 rounded-2xl font-semibold border border-[#E8E4DC] text-[#8E8E93] bg-white hover:bg-[#FAFAFA] transition-colors shadow-lg"
                 >
                   Annuleren
                 </button>

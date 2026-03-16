@@ -141,9 +141,9 @@ function baseLayout(content: string, preheader?: string) {
           <!-- Footer -->
           <tr>
             <td align="center" style="padding-top:32px;">
-              <p style="margin:0;font-size:12px;color:#BAB8B3;line-height:1.5;">
+              <p style="margin:0;font-size:12px;color:#C5C2BC;line-height:1.5;">
                 MŌVE — Personal Training Studio Knokke<br>
-                <a href="${APP_URL}" style="color:#9B7B2E;text-decoration:none;">movestudio.be</a>
+                <a href="${APP_URL}" style="color:#1A1917;text-decoration:none;">movestudio.be</a>
               </p>
             </td>
           </tr>
@@ -166,14 +166,14 @@ function inviteTemplate(params: {
 
   const content = `
     <!-- Gold accent bar -->
-    <div style="height:4px;background:linear-gradient(90deg,#C8A96E,#9B7B2E);"></div>
+    <div style="height:4px;background:linear-gradient(90deg,#333330,#1A1917);"></div>
 
     <div style="padding:40px 36px;">
       <!-- Greeting -->
       <h1 style="margin:0 0 8px;font-size:24px;font-weight:600;color:#1A1917;letter-spacing:-0.02em;">
         Welkom, ${firstName}
       </h1>
-      <p style="margin:0 0 28px;font-size:15px;color:#9C9A95;line-height:1.5;">
+      <p style="margin:0 0 28px;font-size:15px;color:#A09D96;line-height:1.5;">
         Je bent uitgenodigd voor MŌVE ${packageName}.
       </p>
 
@@ -194,7 +194,7 @@ function inviteTemplate(params: {
       </table>
 
       <!-- Divider -->
-      <div style="height:1px;background-color:#F0F0ED;margin-bottom:24px;"></div>
+      <div style="height:1px;background-color:#E8E4DC;margin-bottom:24px;"></div>
 
       <!-- What to expect -->
       <p style="margin:0 0 16px;font-size:13px;font-weight:600;color:#1A1917;text-transform:uppercase;letter-spacing:0.08em;">
@@ -204,33 +204,33 @@ function inviteTemplate(params: {
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
         <tr>
           <td width="28" valign="top" style="padding-top:2px;">
-            <span style="color:#C8A96E;font-size:14px;">●</span>
+            <span style="color:#333330;font-size:14px;">●</span>
           </td>
-          <td style="font-size:14px;color:#5C5A55;line-height:1.5;padding-bottom:12px;">
+          <td style="font-size:14px;color:#6B6862;line-height:1.5;padding-bottom:12px;">
             Persoonlijk trainingsschema op maat
           </td>
         </tr>
         <tr>
           <td width="28" valign="top" style="padding-top:2px;">
-            <span style="color:#C8A96E;font-size:14px;">●</span>
+            <span style="color:#333330;font-size:14px;">●</span>
           </td>
-          <td style="font-size:14px;color:#5C5A55;line-height:1.5;padding-bottom:12px;">
+          <td style="font-size:14px;color:#6B6862;line-height:1.5;padding-bottom:12px;">
             Voedingsplan en macro-tracking
           </td>
         </tr>
         <tr>
           <td width="28" valign="top" style="padding-top:2px;">
-            <span style="color:#C8A96E;font-size:14px;">●</span>
+            <span style="color:#333330;font-size:14px;">●</span>
           </td>
-          <td style="font-size:14px;color:#5C5A55;line-height:1.5;padding-bottom:12px;">
+          <td style="font-size:14px;color:#6B6862;line-height:1.5;padding-bottom:12px;">
             Direct contact met je coach via chat
           </td>
         </tr>
         <tr>
           <td width="28" valign="top" style="padding-top:2px;">
-            <span style="color:#C8A96E;font-size:14px;">●</span>
+            <span style="color:#333330;font-size:14px;">●</span>
           </td>
-          <td style="font-size:14px;color:#5C5A55;line-height:1.5;">
+          <td style="font-size:14px;color:#6B6862;line-height:1.5;">
             Voortgang bijhouden met check-ins en foto's
           </td>
         </tr>
@@ -238,10 +238,10 @@ function inviteTemplate(params: {
     </div>
 
     <!-- Bottom strip -->
-    <div style="background-color:#FAFAF8;padding:20px 36px;border-top:1px solid #F0F0ED;">
-      <p style="margin:0;font-size:12px;color:#BAB8B3;line-height:1.5;">
+    <div style="background-color:#FAF8F3;padding:20px 36px;border-top:1px solid #E8E4DC;">
+      <p style="margin:0;font-size:12px;color:#C5C2BC;line-height:1.5;">
         Werkt de knop niet? Kopieer deze link in je browser:<br>
-        <a href="${inviteLink}" style="color:#9B7B2E;text-decoration:none;word-break:break-all;font-size:11px;">${inviteLink}</a>
+        <a href="${inviteLink}" style="color:#1A1917;text-decoration:none;word-break:break-all;font-size:11px;">${inviteLink}</a>
       </p>
     </div>`
 
@@ -273,15 +273,15 @@ function resetTemplate(params: {
         </tr>
       </table>
 
-      <p style="margin:0;font-size:13px;color:#9C9A95;line-height:1.5;">
+      <p style="margin:0;font-size:13px;color:#A09D96;line-height:1.5;">
         Heb je dit niet aangevraagd? Dan kun je deze email negeren. Je wachtwoord blijft ongewijzigd.
       </p>
     </div>
 
-    <div style="background-color:#FAFAF8;padding:20px 36px;border-top:1px solid #F0F0ED;">
-      <p style="margin:0;font-size:12px;color:#BAB8B3;line-height:1.5;">
+    <div style="background-color:#FAF8F3;padding:20px 36px;border-top:1px solid #E8E4DC;">
+      <p style="margin:0;font-size:12px;color:#C5C2BC;line-height:1.5;">
         Werkt de knop niet? Kopieer deze link:<br>
-        <a href="${resetLink}" style="color:#9B7B2E;text-decoration:none;word-break:break-all;font-size:11px;">${resetLink}</a>
+        <a href="${resetLink}" style="color:#1A1917;text-decoration:none;word-break:break-all;font-size:11px;">${resetLink}</a>
       </p>
     </div>`
 

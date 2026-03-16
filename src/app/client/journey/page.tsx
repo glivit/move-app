@@ -108,7 +108,7 @@ function CircularProgress({ value, size = 80, strokeWidth = 6, color = '#3D8B5C'
 
   return (
     <svg width={size} height={size} className="transform -rotate-90">
-      <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#F0EDE8" strokeWidth={strokeWidth} />
+      <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#E5E1D9" strokeWidth={strokeWidth} />
       <circle
         cx={size / 2} cy={size / 2} r={radius} fill="none"
         stroke={color} strokeWidth={strokeWidth} strokeLinecap="round"
@@ -171,14 +171,14 @@ export default function JourneyPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-[1.5px] border-[#9B7B2E] border-t-transparent" />
+        <div className="animate-spin rounded-full h-8 w-8 border-[1.5px] border-[#1A1917] border-t-transparent" />
       </div>
     )
   }
 
   if (!data) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center text-[#9C9A95]">
+      <div className="min-h-[60vh] flex items-center justify-center text-[#A09D96]">
         Er ging iets mis bij het laden.
       </div>
     )
@@ -198,57 +198,57 @@ export default function JourneyPage() {
         >
           Voortgang
         </h1>
-        <p className="text-[14px] text-[#9C9A95] mt-1">Je volledige traject in één oogopslag</p>
+        <p className="text-[14px] text-[#A09D96] mt-1">Je volledige traject in één oogopslag</p>
       </div>
 
       {/* ═══ HEADLINE STATS (animated counters) ══════════════ */}
       <div className="grid grid-cols-2 gap-3">
         {/* Days on program */}
-        <div className="rounded-2xl border border-[#F0F0ED] bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] animate-slide-up" style={{ animationDelay: '50ms', animationFillMode: 'both' }}>
+        <div className="rounded-2xl border border-[#E8E4DC] bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] animate-slide-up" style={{ animationDelay: '50ms', animationFillMode: 'both' }}>
           <div className="flex items-center gap-2 mb-2">
-            <Calendar strokeWidth={1.5} className="w-4 h-4 text-[#9B7B2E]" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#BAB8B3]">Traject</span>
+            <Calendar strokeWidth={1.5} className="w-4 h-4 text-[#1A1917]" />
+            <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#C5C2BC]">Traject</span>
           </div>
           <p className="text-[28px] font-bold text-[#1A1917] tracking-[-0.02em] leading-none">
             <AnimatedNumber value={headline.daysOnProgram} />
           </p>
-          <p className="text-[12px] text-[#9C9A95] mt-1">dagen</p>
+          <p className="text-[12px] text-[#A09D96] mt-1">dagen</p>
         </div>
 
         {/* Streak */}
-        <div className="rounded-2xl border border-[#F0F0ED] bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] animate-slide-up" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
+        <div className="rounded-2xl border border-[#E8E4DC] bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] animate-slide-up" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
           <div className="flex items-center gap-2 mb-2">
             <Flame strokeWidth={1.5} className="w-4 h-4 text-[#C47D15]" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#BAB8B3]">Streak</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#C5C2BC]">Streak</span>
           </div>
           <p className="text-[28px] font-bold text-[#C47D15] tracking-[-0.02em] leading-none">
             <AnimatedNumber value={headline.streak} />
           </p>
-          <p className="text-[12px] text-[#9C9A95] mt-1">dagen actief</p>
+          <p className="text-[12px] text-[#A09D96] mt-1">dagen actief</p>
         </div>
 
         {/* Total workouts */}
-        <div className="rounded-2xl border border-[#F0F0ED] bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] animate-slide-up" style={{ animationDelay: '150ms', animationFillMode: 'both' }}>
+        <div className="rounded-2xl border border-[#E8E4DC] bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] animate-slide-up" style={{ animationDelay: '150ms', animationFillMode: 'both' }}>
           <div className="flex items-center gap-2 mb-2">
             <Dumbbell strokeWidth={1.5} className="w-4 h-4 text-[#3068C4]" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#BAB8B3]">Trainingen</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#C5C2BC]">Trainingen</span>
           </div>
           <p className="text-[28px] font-bold text-[#1A1917] tracking-[-0.02em] leading-none">
             <AnimatedNumber value={headline.totalWorkouts} />
           </p>
-          <p className="text-[12px] text-[#9C9A95] mt-1">totaal voltooid</p>
+          <p className="text-[12px] text-[#A09D96] mt-1">totaal voltooid</p>
         </div>
 
         {/* Total PRs */}
-        <div className="rounded-2xl border border-[#F0F0ED] bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] animate-slide-up" style={{ animationDelay: '200ms', animationFillMode: 'both' }}>
+        <div className="rounded-2xl border border-[#E8E4DC] bg-white p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] animate-slide-up" style={{ animationDelay: '200ms', animationFillMode: 'both' }}>
           <div className="flex items-center gap-2 mb-2">
             <Trophy strokeWidth={1.5} className="w-4 h-4 text-[#7B5EA7]" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#BAB8B3]">Records</span>
+            <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#C5C2BC]">Records</span>
           </div>
           <p className="text-[28px] font-bold text-[#7B5EA7] tracking-[-0.02em] leading-none">
             <AnimatedNumber value={headline.totalPrs} />
           </p>
-          <p className="text-[12px] text-[#9C9A95] mt-1">
+          <p className="text-[12px] text-[#A09D96] mt-1">
             {strength.prsThisMonth > 0 ? `+${strength.prsThisMonth} deze maand` : "persoonlijke records"}
           </p>
         </div>
@@ -257,7 +257,7 @@ export default function JourneyPage() {
       {/* ═══ TRAINING CHART (animated bars) ══════════════════ */}
       <Link
         href="/client/progress"
-        className="block rounded-2xl border border-[#F0F0ED] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-200 group animate-slide-up"
+        className="block rounded-2xl border border-[#E8E4DC] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-200 group animate-slide-up"
         style={{ animationDelay: '250ms', animationFillMode: 'both' }}
       >
         <div className="flex items-center justify-between mb-4">
@@ -265,7 +265,7 @@ export default function JourneyPage() {
             <Activity strokeWidth={1.5} className="w-4 h-4 text-[#3068C4]" />
             <span className="text-[13px] font-semibold text-[#1A1917]">Trainingsfrequentie</span>
           </div>
-          <div className="flex items-center gap-1 text-[12px] font-semibold text-[#9B7B2E] opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-1 text-[12px] font-semibold text-[#1A1917] opacity-0 group-hover:opacity-100 transition-opacity">
             Details <ChevronRight strokeWidth={1.5} className="w-3.5 h-3.5" />
           </div>
         </div>
@@ -276,21 +276,21 @@ export default function JourneyPage() {
             <p className="text-[20px] font-bold text-[#1A1917] tracking-[-0.02em]">
               <AnimatedNumber value={training.workoutsPerWeek} suffix="x" duration={800} />
             </p>
-            <p className="text-[11px] text-[#9C9A95]">per week</p>
+            <p className="text-[11px] text-[#A09D96]">per week</p>
           </div>
-          <div className="w-px bg-[#F0F0ED]" />
+          <div className="w-px bg-[#E8E4DC]" />
           <div>
             <p className="text-[20px] font-bold text-[#1A1917] tracking-[-0.02em]">
               <AnimatedNumber value={training.avgSessionMin} suffix="'" duration={800} />
             </p>
-            <p className="text-[11px] text-[#9C9A95]">gem. sessie</p>
+            <p className="text-[11px] text-[#A09D96]">gem. sessie</p>
           </div>
-          <div className="w-px bg-[#F0F0ED]" />
+          <div className="w-px bg-[#E8E4DC]" />
           <div>
             <p className="text-[20px] font-bold text-[#1A1917] tracking-[-0.02em]">
               <AnimatedNumber value={Math.round(training.totalMinutes / 60)} suffix="u" duration={800} />
             </p>
-            <p className="text-[11px] text-[#9C9A95]">totaal</p>
+            <p className="text-[11px] text-[#A09D96]">totaal</p>
           </div>
         </div>
 
@@ -298,7 +298,7 @@ export default function JourneyPage() {
         <div className="flex items-end gap-1.5 h-16">
           {training.weeklyChart.map((w, i) => (
             <div key={w.week} className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full h-12 bg-[#F5F2ED] rounded-sm overflow-hidden flex items-end">
+              <div className="w-full h-12 bg-[#EEEBE3] rounded-sm overflow-hidden flex items-end">
                 <AnimatedBar
                   value={w.count}
                   maxValue={maxWeeklyWorkout}
@@ -307,7 +307,7 @@ export default function JourneyPage() {
                 />
               </div>
               {(i === 0 || i === training.weeklyChart.length - 1 || i === 5) && (
-                <span className="text-[9px] text-[#BAB8B3]">{w.week}</span>
+                <span className="text-[9px] text-[#C5C2BC]">{w.week}</span>
               )}
             </div>
           ))}
@@ -318,7 +318,7 @@ export default function JourneyPage() {
       {body.weightData.length >= 2 && (
         <Link
           href="/client/progress"
-          className="block rounded-2xl border border-[#F0F0ED] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-200 group animate-slide-up"
+          className="block rounded-2xl border border-[#E8E4DC] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-200 group animate-slide-up"
           style={{ animationDelay: '300ms', animationFillMode: 'both' }}
         >
           <div className="flex items-center justify-between mb-4">
@@ -330,7 +330,7 @@ export default function JourneyPage() {
               )}
               <span className="text-[13px] font-semibold text-[#1A1917]">Gewicht</span>
             </div>
-            <div className="flex items-center gap-1 text-[12px] font-semibold text-[#9B7B2E] opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex items-center gap-1 text-[12px] font-semibold text-[#1A1917] opacity-0 group-hover:opacity-100 transition-opacity">
               Details <ChevronRight strokeWidth={1.5} className="w-3.5 h-3.5" />
             </div>
           </div>
@@ -339,14 +339,14 @@ export default function JourneyPage() {
             <div>
               <p className="text-[28px] font-bold text-[#1A1917] tracking-[-0.02em] leading-none">
                 {body.weightCurrent}
-                <span className="text-[14px] font-medium text-[#9C9A95] ml-1">kg</span>
+                <span className="text-[14px] font-medium text-[#A09D96] ml-1">kg</span>
               </p>
               {body.weightChange !== null && (
                 <p className="text-[13px] mt-1.5 font-semibold" style={{
                   color: body.weightChange <= 0 ? '#3D8B5C' : '#C47D15'
                 }}>
                   {body.weightChange > 0 ? '+' : ''}{body.weightChange} kg
-                  <span className="font-normal text-[#9C9A95] ml-1">totaal</span>
+                  <span className="font-normal text-[#A09D96] ml-1">totaal</span>
                 </p>
               )}
             </div>
@@ -364,7 +364,7 @@ export default function JourneyPage() {
       {strength.recentPrs.length > 0 && (
         <Link
           href="/client/progress"
-          className="block rounded-2xl border border-[#F0F0ED] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-200 group overflow-hidden animate-slide-up"
+          className="block rounded-2xl border border-[#E8E4DC] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-200 group overflow-hidden animate-slide-up"
           style={{ animationDelay: '350ms', animationFillMode: 'both' }}
         >
           <div className="flex items-center justify-between px-5 pt-5 pb-3">
@@ -372,11 +372,11 @@ export default function JourneyPage() {
               <Trophy strokeWidth={1.5} className="w-4 h-4 text-[#7B5EA7]" />
               <span className="text-[13px] font-semibold text-[#1A1917]">Recente records</span>
             </div>
-            <div className="flex items-center gap-1 text-[12px] font-semibold text-[#9B7B2E] opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex items-center gap-1 text-[12px] font-semibold text-[#1A1917] opacity-0 group-hover:opacity-100 transition-opacity">
               Alle <ChevronRight strokeWidth={1.5} className="w-3.5 h-3.5" />
             </div>
           </div>
-          <div className="divide-y divide-[#F0F0ED]">
+          <div className="divide-y divide-[#E8E4DC]">
             {strength.recentPrs.slice(0, 3).map((pr, i) => (
               <div
                 key={pr.id}
@@ -388,7 +388,7 @@ export default function JourneyPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[14px] font-medium text-[#1A1917] truncate">{pr.exercise}</p>
-                  <p className="text-[11px] text-[#9C9A95]">
+                  <p className="text-[11px] text-[#A09D96]">
                     {new Date(pr.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                   </p>
                 </div>
@@ -405,7 +405,7 @@ export default function JourneyPage() {
       {nutrition.compliance !== null && (
         <Link
           href="/client/nutrition"
-          className="block rounded-2xl border border-[#F0F0ED] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-200 group animate-slide-up"
+          className="block rounded-2xl border border-[#E8E4DC] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-200 group animate-slide-up"
           style={{ animationDelay: '400ms', animationFillMode: 'both' }}
         >
           <div className="flex items-center justify-between">
@@ -414,10 +414,10 @@ export default function JourneyPage() {
                 <Apple strokeWidth={1.5} className="w-4 h-4 text-[#3D8B5C]" />
                 <span className="text-[13px] font-semibold text-[#1A1917]">Voedingscompliance</span>
               </div>
-              <p className="text-[13px] text-[#9C9A95]">
+              <p className="text-[13px] text-[#A09D96]">
                 {nutrition.daysTracked} dagen bijgehouden
               </p>
-              <div className="flex items-center gap-1 mt-2 text-[12px] font-semibold text-[#9B7B2E] opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-1 mt-2 text-[12px] font-semibold text-[#1A1917] opacity-0 group-hover:opacity-100 transition-opacity">
                 Bekijk details <ChevronRight strokeWidth={1.5} className="w-3.5 h-3.5" />
               </div>
             </div>
@@ -437,19 +437,19 @@ export default function JourneyPage() {
       {body.hasPhotos && (
         <Link
           href="/client/progress"
-          className="block rounded-2xl border border-[#F0F0ED] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-200 group animate-slide-up"
+          className="block rounded-2xl border border-[#E8E4DC] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all duration-200 group animate-slide-up"
           style={{ animationDelay: '450ms', animationFillMode: 'both' }}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Camera strokeWidth={1.5} className="w-4 h-4 text-[#9B7B2E]" />
+              <Camera strokeWidth={1.5} className="w-4 h-4 text-[#1A1917]" />
               <span className="text-[13px] font-semibold text-[#1A1917]">Progressiefoto's</span>
             </div>
-            <div className="flex items-center gap-1 text-[12px] font-semibold text-[#9B7B2E]">
+            <div className="flex items-center gap-1 text-[12px] font-semibold text-[#1A1917]">
               Vergelijken <ChevronRight strokeWidth={1.5} className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </div>
           </div>
-          <p className="text-[13px] text-[#9C9A95] mt-2">
+          <p className="text-[13px] text-[#A09D96] mt-2">
             {body.photoDates.length} {body.photoDates.length === 1 ? 'meting' : 'metingen'} met foto's
           </p>
         </Link>

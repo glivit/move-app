@@ -89,7 +89,7 @@ export default function NotificationsPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-[1.5px] border-[#9B7B2E] border-t-transparent" />
+        <div className="animate-spin rounded-full h-8 w-8 border-[1.5px] border-[#1A1917] border-t-transparent" />
       </div>
     )
   }
@@ -102,8 +102,8 @@ export default function NotificationsPage() {
     <div className="pb-24 space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3 pt-1">
-        <Link href="/client" className="p-2 -ml-2 rounded-xl hover:bg-[#F0F0ED] transition-colors">
-          <ArrowLeft strokeWidth={1.5} className="w-5 h-5 text-[#5C5A55]" />
+        <Link href="/client" className="p-2 -ml-2 rounded-xl hover:bg-[#E8E4DC] transition-colors">
+          <ArrowLeft strokeWidth={1.5} className="w-5 h-5 text-[#6B6862]" />
         </Link>
         <h1
           className="text-[28px] font-semibold text-[#1A1917] tracking-[-0.03em]"
@@ -116,38 +116,38 @@ export default function NotificationsPage() {
       {/* Empty state */}
       {hasNothing && (
         <div className="text-center py-16">
-          <div className="w-14 h-14 rounded-full bg-[#F5F2ED] flex items-center justify-center mx-auto mb-4">
-            <Megaphone strokeWidth={1.5} className="w-6 h-6 text-[#D1CFC9]" />
+          <div className="w-14 h-14 rounded-full bg-[#EEEBE3] flex items-center justify-center mx-auto mb-4">
+            <Megaphone strokeWidth={1.5} className="w-6 h-6 text-[#CCC7BC]" />
           </div>
-          <p className="text-[15px] text-[#9C9A95]">Geen meldingen</p>
+          <p className="text-[15px] text-[#A09D96]">Geen meldingen</p>
         </div>
       )}
 
       {/* Pending prompts */}
       {prompts.length > 0 && (
         <div className="space-y-3">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#BAB8B3] px-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#C5C2BC] px-1">
             Openstaande vragen
           </p>
           {prompts.map(prompt => (
             <Link
               key={prompt.id}
               href="/client/prompts"
-              className="block rounded-2xl border-2 border-[#C8A96E]/30 bg-gradient-to-br from-[#FFF9F0] to-white p-5 transition-all hover:border-[#C8A96E]/50 hover:shadow-md"
+              className="block rounded-2xl border-2 border-[#333330]/30 bg-gradient-to-br from-[#FFF9F0] to-white p-5 transition-all hover:border-[#333330]/50 hover:shadow-md"
             >
               <div className="flex items-start gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-[#C8A96E]/12 flex items-center justify-center flex-shrink-0">
-                  <FileText strokeWidth={1.5} className="w-5 h-5 text-[#9B7B2E]" />
+                <div className="w-10 h-10 rounded-xl bg-[#333330]/12 flex items-center justify-center flex-shrink-0">
+                  <FileText strokeWidth={1.5} className="w-5 h-5 text-[#1A1917]" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[15px] font-semibold text-[#1A1917] tracking-[-0.01em]">
                     {prompt.question}
                   </p>
-                  <p className="text-[13px] text-[#9B7B2E] font-medium mt-1">
+                  <p className="text-[13px] text-[#1A1917] font-medium mt-1">
                     Tik om te beantwoorden
                   </p>
                 </div>
-                <ChevronRight strokeWidth={1.5} className="w-5 h-5 text-[#C8A96E] flex-shrink-0 mt-2" />
+                <ChevronRight strokeWidth={1.5} className="w-5 h-5 text-[#333330] flex-shrink-0 mt-2" />
               </div>
             </Link>
           ))}
@@ -157,7 +157,7 @@ export default function NotificationsPage() {
       {/* Unread broadcasts */}
       {unreadBroadcasts.length > 0 && (
         <div className="space-y-3">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#BAB8B3] px-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#C5C2BC] px-1">
             Nieuw
           </p>
           {unreadBroadcasts.map(b => (
@@ -173,7 +173,7 @@ export default function NotificationsPage() {
       {/* Read broadcasts */}
       {readBroadcasts.length > 0 && (
         <div className="space-y-3">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#BAB8B3] px-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#C5C2BC] px-1">
             Gelezen
           </p>
           {readBroadcasts.map(b => (
@@ -201,21 +201,21 @@ function BroadcastCard({ broadcast, onTap }: {
       className={`w-full text-left rounded-2xl p-5 transition-all active:scale-[0.98] ${
         isUnread
           ? 'border-2 border-[#3068C4]/25 bg-gradient-to-br from-[#F0F5FF] to-white shadow-sm'
-          : 'border border-[#F0F0ED] bg-white'
+          : 'border border-[#E8E4DC] bg-white'
       }`}
     >
       <div className="flex items-start gap-3.5">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-          isUnread ? 'bg-[#3068C4]/10' : 'bg-[#F5F2ED]'
+          isUnread ? 'bg-[#3068C4]/10' : 'bg-[#EEEBE3]'
         }`}>
           <Megaphone strokeWidth={1.5} className={`w-5 h-5 ${
-            isUnread ? 'text-[#3068C4]' : 'text-[#BAB8B3]'
+            isUnread ? 'text-[#3068C4]' : 'text-[#C5C2BC]'
           }`} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className={`text-[15px] font-semibold tracking-[-0.01em] ${
-              isUnread ? 'text-[#1A1917]' : 'text-[#5C5A55]'
+              isUnread ? 'text-[#1A1917]' : 'text-[#6B6862]'
             }`}>
               {broadcast.title}
             </p>
@@ -224,12 +224,12 @@ function BroadcastCard({ broadcast, onTap }: {
             )}
           </div>
 
-          <p className="text-[14px] text-[#9C9A95] mt-1 line-clamp-2">
+          <p className="text-[14px] text-[#A09D96] mt-1 line-clamp-2">
             {broadcast.content}
           </p>
 
           <div className="flex items-center gap-2 mt-2.5">
-            <p className="text-[12px] text-[#D1CFC9]">
+            <p className="text-[12px] text-[#CCC7BC]">
               {formatDistanceToNow(new Date(broadcast.created_at), { addSuffix: true, locale: nl })}
             </p>
             {broadcast.read && (
@@ -241,7 +241,7 @@ function BroadcastCard({ broadcast, onTap }: {
           </div>
         </div>
         <ChevronRight strokeWidth={1.5} className={`w-5 h-5 flex-shrink-0 mt-2 ${
-          isUnread ? 'text-[#3068C4]' : 'text-[#D1CFC9]'
+          isUnread ? 'text-[#3068C4]' : 'text-[#CCC7BC]'
         }`} />
       </div>
     </button>

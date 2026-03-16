@@ -60,7 +60,7 @@ export default function NotificationsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-[#8B6914]" />
+        <Loader2 className="w-6 h-6 animate-spin text-[#1A1917]" />
       </div>
     )
   }
@@ -84,7 +84,7 @@ export default function NotificationsPage() {
     <div className="space-y-6 pb-20">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#8B6914]">
+        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#1A1917]">
           <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
         </button>
         <h1 className="text-[22px] font-semibold text-[#1A1A18]" style={{ fontFamily: 'var(--font-display)' }}>
@@ -93,7 +93,7 @@ export default function NotificationsPage() {
       </div>
 
       {/* Push Notification Toggle */}
-      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] divide-y divide-[#F0F0ED]">
+      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] divide-y divide-[#E8E4DC]">
         <div className="px-5 py-4 flex items-center justify-between">
           <div>
             <p className="text-[15px] text-[#1A1A18] font-medium">Push meldingen</p>
@@ -106,7 +106,7 @@ export default function NotificationsPage() {
           ) : (
             <button
               onClick={requestPushPermission}
-              className="px-4 py-2 bg-[#8B6914] text-white text-[13px] font-semibold rounded-full"
+              className="px-4 py-2 bg-[#1A1917] text-white text-[13px] font-semibold rounded-full"
             >
               Inschakelen
             </button>
@@ -117,7 +117,7 @@ export default function NotificationsPage() {
       {/* Notification Categories */}
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Training</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] divide-y divide-[#F0F0ED]">
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] divide-y divide-[#E8E4DC]">
           <div className="px-5 py-4 flex items-center justify-between">
             <div>
               <p className="text-[15px] text-[#1A1A18]">Workout herinneringen</p>
@@ -137,7 +137,7 @@ export default function NotificationsPage() {
 
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Coach</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] divide-y divide-[#F0F0ED]">
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] divide-y divide-[#E8E4DC]">
           <div className="px-5 py-4 flex items-center justify-between">
             <div>
               <p className="text-[15px] text-[#1A1A18]">Berichten van coach</p>
@@ -157,7 +157,7 @@ export default function NotificationsPage() {
 
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Voortgang</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] divide-y divide-[#F0F0ED]">
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] divide-y divide-[#E8E4DC]">
           <div className="px-5 py-4 flex items-center justify-between">
             <div>
               <p className="text-[15px] text-[#1A1A18]">Wekelijks overzicht</p>

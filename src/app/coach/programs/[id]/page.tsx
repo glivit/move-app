@@ -487,7 +487,7 @@ export default function ProgramEditorPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#8B6914]" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#1A1917]" />
       </div>
     )
   }
@@ -508,9 +508,9 @@ export default function ProgramEditorPage() {
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       {/* Header */}
-      <div className="bg-white border-b border-[#F0F0ED] sticky top-0 z-10">
+      <div className="bg-white border-b border-[#E8E4DC] sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 py-5">
-          <Link href="/coach/programs" className="inline-flex items-center gap-2 text-[#8B6914] mb-4 hover:text-[#1A1A18] transition-colors">
+          <Link href="/coach/programs" className="inline-flex items-center gap-2 text-[#1A1917] mb-4 hover:text-[#1A1A18] transition-colors">
             <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
             <span className="text-[15px] font-medium">Terug</span>
           </Link>
@@ -540,7 +540,7 @@ export default function ProgramEditorPage() {
       </div>
 
       {/* Day Tabs */}
-      <div className="bg-white border-b border-[#F0F0ED] overflow-x-auto">
+      <div className="bg-white border-b border-[#E8E4DC] overflow-x-auto">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex gap-2 py-4">
             {days.map((day) => (
@@ -549,8 +549,8 @@ export default function ProgramEditorPage() {
                 onClick={() => setActiveDayId(day.id)}
                 className={`px-4 py-2 rounded-full text-[15px] font-medium whitespace-nowrap transition-colors ${
                   activeDayId === day.id
-                    ? 'bg-[#8B6914] text-white'
-                    : 'bg-[#F5F0E8] text-[#8B6914] hover:bg-[#ECEAE3]'
+                    ? 'bg-[#1A1917] text-white'
+                    : 'bg-[#EDEAE4] text-[#1A1917] hover:bg-[#ECEAE3]'
                 }`}
               >
                 {day.name}
@@ -559,7 +559,7 @@ export default function ProgramEditorPage() {
 
             <button
               onClick={handleAddDay}
-              className="px-4 py-2 rounded-full text-[15px] font-medium text-[#8B6914] bg-[#F5F0E8] hover:bg-[#ECEAE3] transition-colors flex items-center gap-1 whitespace-nowrap"
+              className="px-4 py-2 rounded-full text-[15px] font-medium text-[#1A1917] bg-[#EDEAE4] hover:bg-[#ECEAE3] transition-colors flex items-center gap-1 whitespace-nowrap"
             >
               <Plus strokeWidth={1.5} className="w-5 h-5" />
               Dag toevoegen
@@ -573,7 +573,7 @@ export default function ProgramEditorPage() {
         {activeDay && (
           <div>
             {/* Day Details */}
-            <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] p-6 mb-8">
+            <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-6 mb-8">
               <div className="grid grid-cols-3 gap-6">
                 {/* Day Name */}
                 <div>
@@ -586,7 +586,7 @@ export default function ProgramEditorPage() {
                     onChange={(e) =>
                       handleUpdateDayField(activeDay.id, 'name', e.target.value)
                     }
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#F0F0ED] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
                   />
                 </div>
 
@@ -602,7 +602,7 @@ export default function ProgramEditorPage() {
                     onChange={(e) =>
                       handleUpdateDayField(activeDay.id, 'focus', e.target.value || null)
                     }
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#F0F0ED] rounded-2xl text-[15px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
                   />
                 </div>
 
@@ -621,13 +621,13 @@ export default function ProgramEditorPage() {
                         parseInt(e.target.value) || 0
                       )
                     }
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#F0F0ED] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
                   />
                 </div>
               </div>
 
               {/* Delete Day */}
-              <div className="mt-5 pt-5 border-t border-[#F0F0ED]">
+              <div className="mt-5 pt-5 border-t border-[#E8E4DC]">
                 {confirmDeleteDay === activeDay.id ? (
                   <div className="flex items-center gap-3">
                     <p className="text-[13px] text-[#D14343] font-medium flex-1">
@@ -635,7 +635,7 @@ export default function ProgramEditorPage() {
                     </p>
                     <button
                       onClick={() => setConfirmDeleteDay(null)}
-                      className="px-3 py-1.5 rounded-lg text-[12px] font-medium border border-[#F0F0ED] text-[#8E8E93] hover:bg-[#FAFAFA] transition-colors"
+                      className="px-3 py-1.5 rounded-lg text-[12px] font-medium border border-[#E8E4DC] text-[#8E8E93] hover:bg-[#FAFAFA] transition-colors"
                     >
                       Annuleren
                     </button>
@@ -669,7 +669,7 @@ export default function ProgramEditorPage() {
               <h2 className="text-[17px] font-semibold text-[#1A1A18]">Oefeningen</h2>
 
               {activeDay.exercises.length === 0 ? (
-                <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] p-8 text-center">
+                <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-8 text-center">
                   <p className="text-[15px] text-[#8E8E93] mb-4">
                     Voeg oefeningen toe om aan de slag te gaan
                   </p>
@@ -701,10 +701,10 @@ export default function ProgramEditorPage() {
                     >
                       {/* Drop indicator line */}
                       {isDragOver && draggedIndex !== null && draggedIndex > index && (
-                        <div className="absolute -top-1.5 left-0 right-0 h-[3px] bg-[#8B6914] rounded-full z-10" />
+                        <div className="absolute -top-1.5 left-0 right-0 h-[3px] bg-[#1A1917] rounded-full z-10" />
                       )}
                       {isDragOver && draggedIndex !== null && draggedIndex < index && (
-                        <div className="absolute -bottom-1.5 left-0 right-0 h-[3px] bg-[#8B6914] rounded-full z-10" />
+                        <div className="absolute -bottom-1.5 left-0 right-0 h-[3px] bg-[#1A1917] rounded-full z-10" />
                       )}
                       {/* Superset connector line */}
                       {sameGroupAsPrev && (
@@ -714,8 +714,8 @@ export default function ProgramEditorPage() {
                         <div className="absolute top-0 left-4 bottom-0 w-1 rounded-full bg-[#AF52DE]/20" />
                       )}
                       <div className={`bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border p-5 ${
-                        isInSuperset ? 'border-[#AF52DE]/30 ml-3' : 'border-[#F0F0ED]'
-                      } ${isDragOver ? 'border-[#8B6914] shadow-[0_0_0_1px_rgba(139,105,20,0.3)]' : ''}`}>
+                        isInSuperset ? 'border-[#AF52DE]/30 ml-3' : 'border-[#E8E4DC]'
+                      } ${isDragOver ? 'border-[#1A1917] shadow-[0_0_0_1px_rgba(139,105,20,0.3)]' : ''}`}>
                         {isInSuperset && (
                           <div className="mb-2 -mt-1">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-[#AF52DE] bg-[#AF52DE]/10 px-2 py-0.5 rounded-full">
@@ -724,7 +724,7 @@ export default function ProgramEditorPage() {
                           </div>
                         )}
                       {/* Exercise Header */}
-                      <div className="flex items-start gap-3 mb-4 pb-4 border-b border-[#F0F0ED]">
+                      <div className="flex items-start gap-3 mb-4 pb-4 border-b border-[#E8E4DC]">
                         {/* Drag Handle */}
                         <div className="flex-shrink-0 pt-1 cursor-grab active:cursor-grabbing touch-none">
                           <GripVertical strokeWidth={1.5} className="w-5 h-5 text-[#C7C7CC] hover:text-[#8E8E93] transition-colors" />
@@ -742,7 +742,7 @@ export default function ProgramEditorPage() {
                               style={{ mixBlendMode: 'multiply' }}
                             />
                           ) : (
-                            <div className="w-full h-full bg-[#F0F0ED]" />
+                            <div className="w-full h-full bg-[#E8E4DC]" />
                           )}
                         </div>
 
@@ -752,11 +752,11 @@ export default function ProgramEditorPage() {
                             {exercise.name_nl || exercise.name}
                           </h3>
                           <div className="flex gap-2 mt-2">
-                            <span className="text-[11px] bg-[#F5F0E8] text-[#8B6914] px-2 py-0.5 rounded-full">
+                            <span className="text-[11px] bg-[#EDEAE4] text-[#1A1917] px-2 py-0.5 rounded-full">
                               {exercise.body_part}
                             </span>
                             {exercise.equipment && (
-                              <span className="text-[11px] bg-[#F0F0ED] text-[#8E8E93] px-2 py-0.5 rounded-full">
+                              <span className="text-[11px] bg-[#E8E4DC] text-[#8E8E93] px-2 py-0.5 rounded-full">
                                 {exercise.equipment}
                               </span>
                             )}
@@ -783,7 +783,7 @@ export default function ProgramEditorPage() {
                               className={`p-2 rounded-lg transition-colors ${
                                 exercise.superset_group_id
                                   ? 'text-[#AF52DE] bg-[#AF52DE]/10 hover:bg-[#AF52DE]/20'
-                                  : 'text-[#8E8E93] hover:text-[#AF52DE] hover:bg-[#F5F0E8]'
+                                  : 'text-[#8E8E93] hover:text-[#AF52DE] hover:bg-[#EDEAE4]'
                               }`}
                               title={exercise.superset_group_id ? 'Superset opheffen' : 'Superset met vorige'}
                             >
@@ -797,7 +797,7 @@ export default function ProgramEditorPage() {
 
                           <button
                             onClick={() => handleRemoveExercise(exercise.prescription_id)}
-                            className="p-2 text-[#8E8E93] hover:text-red-600 hover:bg-[#F5F0E8] rounded-lg transition-colors"
+                            className="p-2 text-[#8E8E93] hover:text-red-600 hover:bg-[#EDEAE4] rounded-lg transition-colors"
                           >
                             <X strokeWidth={1.5} className="w-5 h-5" />
                           </button>
@@ -822,7 +822,7 @@ export default function ProgramEditorPage() {
                               )
                             }
                             min="1"
-                            className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#F0F0ED] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                            className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
                           />
                         </div>
 
@@ -843,7 +843,7 @@ export default function ProgramEditorPage() {
                                 )
                               }
                               min="1"
-                              className="flex-1 px-3 py-2 bg-[#FAFAFA] border border-[#F0F0ED] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                              className="flex-1 px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
                             />
                             <span className="text-[#8E8E93] px-1 py-2">-</span>
                             <input
@@ -857,7 +857,7 @@ export default function ProgramEditorPage() {
                                 )
                               }
                               min="1"
-                              className="flex-1 px-3 py-2 bg-[#FAFAFA] border border-[#F0F0ED] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                              className="flex-1 px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
                             />
                           </div>
                         </div>
@@ -879,7 +879,7 @@ export default function ProgramEditorPage() {
                             }
                             min="0"
                             step="15"
-                            className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#F0F0ED] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                            className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
                           />
                         </div>
 
@@ -899,7 +899,7 @@ export default function ProgramEditorPage() {
                                 e.target.value || null
                               )
                             }
-                            className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#F0F0ED] rounded-lg text-[13px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                            className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
                           />
                         </div>
                       </div>
@@ -924,7 +924,7 @@ export default function ProgramEditorPage() {
                             }
                             min="0"
                             max="10"
-                            className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#F0F0ED] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                            className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
                           />
                         </div>
 
@@ -944,7 +944,7 @@ export default function ProgramEditorPage() {
                                 e.target.value || null
                               )
                             }
-                            className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#F0F0ED] rounded-lg text-[13px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                            className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
                           />
                         </div>
                       </div>
@@ -965,7 +965,7 @@ export default function ProgramEditorPage() {
                             )
                           }
                           rows={2}
-                          className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#F0F0ED] rounded-lg text-[13px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors resize-none"
+                          className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors resize-none"
                         />
                       </div>
                     </div>
@@ -976,7 +976,7 @@ export default function ProgramEditorPage() {
                   {/* Add Exercise Button */}
                   <button
                     onClick={() => setShowExerciseModal(true)}
-                    className="w-full py-4 border-2 border-dashed border-[#F0F0ED] rounded-2xl text-[15px] font-medium text-[#8B6914] hover:border-[#8B6914] hover:bg-[#F5F0E8] transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-4 border-2 border-dashed border-[#E8E4DC] rounded-2xl text-[15px] font-medium text-[#1A1917] hover:border-[#1A1917] hover:bg-[#EDEAE4] transition-colors flex items-center justify-center gap-2"
                   >
                     <Plus strokeWidth={1.5} className="w-5 h-5" />
                     Oefening toevoegen

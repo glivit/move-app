@@ -67,7 +67,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#8B6914',
+  themeColor: '#1A1917',
   viewportFit: 'cover',
 }
 
@@ -79,7 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="MŌVE" />
-        <meta name="msapplication-TileColor" content="#8B6914" />
+        <meta name="msapplication-TileColor" content="#1A1917" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
       </head>
       <body suppressHydrationWarning className="min-h-screen bg-bg text-text-primary font-body antialiased">

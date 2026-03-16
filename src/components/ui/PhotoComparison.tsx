@@ -64,7 +64,7 @@ export function PhotoComparison({ currentPhotos, previousPhotos }: Props) {
             onClick={() => setActivePosition(key)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               activePosition === key
-                ? 'bg-[#8B6914]/10 text-[#8B6914]'
+                ? 'bg-[#1A1917]/10 text-[#1A1917]'
                 : 'text-[#8E8E93] hover:text-[#1A1A18] hover:bg-[#F5F5F3]'
             }`}
           >
@@ -113,10 +113,10 @@ export function PhotoComparison({ currentPhotos, previousPhotos }: Props) {
             <div className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-[0_2px_12px_rgba(0,0,0,0.2)] flex items-center justify-center">
               <div className="flex items-center gap-0.5">
                 <svg width="6" height="12" viewBox="0 0 6 12" fill="none">
-                  <path d="M5 1L1 6L5 11" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M5 1L1 6L5 11" stroke="#1A1917" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
                 <svg width="6" height="12" viewBox="0 0 6 12" fill="none">
-                  <path d="M1 1L5 6L1 11" stroke="#8B6914" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M1 1L5 6L1 11" stroke="#1A1917" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
             </div>

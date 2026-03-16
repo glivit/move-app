@@ -45,7 +45,7 @@ export function CalorieGauge({ consumed, target, meals }: CalorieGaugeProps) {
           <path
             d={`M ${strokeWidth / 2} ${size / 2} A ${radius} ${radius} 0 0 1 ${size - strokeWidth / 2} ${size / 2}`}
             fill="none"
-            stroke="#F0F0ED"
+            stroke="#E8E4DC"
             strokeWidth={strokeWidth}
             strokeLinecap="round"
           />

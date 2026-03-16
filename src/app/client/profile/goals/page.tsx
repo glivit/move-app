@@ -87,7 +87,7 @@ export default function GoalsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-[#8B6914]" />
+        <Loader2 className="w-6 h-6 animate-spin text-[#1A1917]" />
       </div>
     )
   }
@@ -96,7 +96,7 @@ export default function GoalsPage() {
     <div className="space-y-6 pb-20">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#8B6914]">
+        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#1A1917]">
           <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
         </button>
         <h1 className="text-[22px] font-semibold text-[#1A1A18]" style={{ fontFamily: 'var(--font-display)' }}>
@@ -107,7 +107,7 @@ export default function GoalsPage() {
       {/* Primary Goal */}
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Hoofddoel</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] divide-y divide-[#F0F0ED]">
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] divide-y divide-[#E8E4DC]">
           {GOAL_OPTIONS.map((goal) => (
             <button
               key={goal.id}
@@ -119,7 +119,7 @@ export default function GoalsPage() {
                 <span className="text-[15px] text-[#1A1A18]">{goal.label}</span>
               </div>
               {primaryGoal === goal.id && (
-                <div className="w-6 h-6 rounded-full bg-[#8B6914] flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-[#1A1917] flex items-center justify-center">
                   <Check strokeWidth={2.5} className="w-3.5 h-3.5 text-white" />
                 </div>
               )}
@@ -140,8 +140,8 @@ export default function GoalsPage() {
                 onClick={() => toggleSecondaryGoal(goal.id)}
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
-                    ? 'bg-[#8B6914] text-white'
-                    : 'bg-white border border-[#F0F0ED] text-[#1A1A18] hover:border-[#8B6914]'
+                    ? 'bg-[#1A1917] text-white'
+                    : 'bg-white border border-[#E8E4DC] text-[#1A1A18] hover:border-[#1A1917]'
                 }`}
               >
                 {goal.emoji} {goal.label}
@@ -154,7 +154,7 @@ export default function GoalsPage() {
       {/* Motivation */}
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Motivatie</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] p-5">
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-5">
           <textarea
             value={motivation}
             onChange={(e) => setMotivation(e.target.value)}
@@ -169,7 +169,7 @@ export default function GoalsPage() {
       <button
         onClick={handleSave}
         disabled={saving}
-        className="w-full py-3.5 rounded-2xl bg-[#8B6914] text-white font-semibold text-[15px] hover:bg-[#7A5C12] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-3.5 rounded-2xl bg-[#1A1917] text-white font-semibold text-[15px] hover:bg-[#7A5C12] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {saving ? (
           <Loader2 className="w-5 h-5 animate-spin" />

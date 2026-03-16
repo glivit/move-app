@@ -10,7 +10,7 @@ export default function PrivacyPage() {
     <div className="space-y-6 pb-20">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#8B6914]">
+        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#1A1917]">
           <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
         </button>
         <h1 className="text-[22px] font-semibold text-[#1A1A18]" style={{ fontFamily: 'var(--font-display)' }}>
@@ -19,7 +19,7 @@ export default function PrivacyPage() {
       </div>
 
       {/* Privacy Shield */}
-      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] p-6 flex flex-col items-center text-center">
+      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-6 flex flex-col items-center text-center">
         <div className="w-16 h-16 rounded-full bg-[#34C759]/10 flex items-center justify-center mb-4">
           <Shield strokeWidth={1.5} className="w-8 h-8 text-[#34C759]" />
         </div>
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
       </div>
 
       {/* Sections */}
-      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] divide-y divide-[#F0F0ED]">
+      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] divide-y divide-[#E8E4DC]">
         <div className="px-5 py-5">
           <h3 className="text-[15px] font-semibold text-[#1A1A18] mb-2">Welke gegevens verzamelen we?</h3>
           <p className="text-[14px] text-[#8E8E93] leading-relaxed">
@@ -75,12 +75,12 @@ export default function PrivacyPage() {
       </div>
 
       {/* Contact */}
-      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] p-5">
+      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-5">
         <p className="text-[13px] text-[#8E8E93] text-center">
           Vragen over je privacy? Neem contact op via{' '}
-          <a href="/client/messages" className="text-[#8B6914] font-medium">Berichten</a>
+          <a href="/client/messages" className="text-[#1A1917] font-medium">Berichten</a>
           {' '}of e-mail naar{' '}
-          <span className="text-[#8B6914] font-medium">info@movecoaching.be</span>
+          <span className="text-[#1A1917] font-medium">info@movecoaching.be</span>
         </p>
       </div>
 

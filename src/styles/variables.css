@@ -1,47 +1,47 @@
 :root {
-  /* ━━━ Premium Palette ━━━ Warm, tactile, luxe wellness studio */
+  /* ━━━ MŌVE Editorial Palette ━━━ Aesop-inspired, monochromatic, warm */
 
-  /* Surfaces — layered warmth */
-  --color-bg: #F5F2ED;
-  --color-bg-elevated: #FAF8F5;
+  /* Surfaces — warm cream stone */
+  --color-bg: #EEEBE3;
+  --color-bg-elevated: #F5F2EC;
   --color-bg-dark: #1A1917;
   --color-surface: #FFFFFF;
-  --color-surface-warm: #FDFCFA;
-  --color-surface-muted: #F0EDE8;
+  --color-surface-warm: #FAF8F3;
+  --color-surface-muted: #E5E1D9;
 
-  /* Accent — burnished gold */
-  --color-accent: #9B7B2E;
-  --color-accent-dark: #7A6124;
-  --color-accent-hover: #B08E35;
-  --color-accent-glow: rgba(155, 123, 46, 0.12);
+  /* Accent — editorial charcoal */
+  --color-accent: #1A1917;
+  --color-accent-dark: #111110;
+  --color-accent-hover: #333330;
+  --color-accent-glow: rgba(26, 25, 23, 0.10);
 
   /* Typography — deep warm */
   --color-text-primary: #1A1917;
-  --color-text-secondary: #5C5A55;
-  --color-text-muted: #9C9A95;
-  --color-text-faint: #BAB8B3;
+  --color-text-secondary: #6B6862;
+  --color-text-muted: #A09D96;
+  --color-text-faint: #C5C2BC;
 
-  /* Borders — warm, layered */
-  --color-border: #E6E2DC;
-  --color-border-subtle: #EEEBE6;
-  --color-border-strong: #D9D5CE;
+  /* Borders — warm stone */
+  --color-border: #DDD9D0;
+  --color-border-subtle: #E8E4DC;
+  --color-border-strong: #CCC7BC;
 
-  /* Status — sophisticated, muted */
+  /* Status — muted, sophisticated */
   --color-success: #3D8B5C;
   --color-warning: #C47D15;
   --color-error: #C4372A;
 
   /* Client surfaces */
-  --color-client-bg: #F5F2ED;
+  --color-client-bg: #EEEBE3;
   --color-client-surface: #FFFFFF;
-  --color-client-surface-muted: #F0EDE8;
-  --color-client-border: #E6E2DC;
-  --color-client-border-strong: #D9D5CE;
-  --color-client-text-secondary: #5C5A55;
-  --color-client-text-muted: #9C9A95;
-  --color-accent-light: rgba(155, 123, 46, 0.06);
-  --color-accent-subtle: rgba(155, 123, 46, 0.10);
-  --color-accent-surface: #F7F3EA;
+  --color-client-surface-muted: #E5E1D9;
+  --color-client-border: #DDD9D0;
+  --color-client-border-strong: #CCC7BC;
+  --color-client-text-secondary: #6B6862;
+  --color-client-text-muted: #A09D96;
+  --color-accent-light: rgba(26, 25, 23, 0.04);
+  --color-accent-subtle: rgba(26, 25, 23, 0.08);
+  --color-accent-surface: #EDEAE4;
 
   /* Data visualization */
   --color-data-orange: #C47D15;

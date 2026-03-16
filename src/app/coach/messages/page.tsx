@@ -49,9 +49,9 @@ export default function CoachMessagesPage() {
       <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#FAFAFA' }}>
         <div className="space-y-6 text-center">
           <div className="space-y-3">
-            <div className="h-3 rounded-lg w-48 mx-auto animate-pulse" style={{ backgroundColor: '#F0F0ED' }} />
-            <div className="h-3 rounded-lg w-64 mx-auto animate-pulse" style={{ backgroundColor: '#F0F0ED' }} />
-            <div className="h-3 rounded-lg w-56 mx-auto animate-pulse" style={{ backgroundColor: '#F0F0ED' }} />
+            <div className="h-3 rounded-lg w-48 mx-auto animate-pulse" style={{ backgroundColor: '#E8E4DC' }} />
+            <div className="h-3 rounded-lg w-64 mx-auto animate-pulse" style={{ backgroundColor: '#E8E4DC' }} />
+            <div className="h-3 rounded-lg w-56 mx-auto animate-pulse" style={{ backgroundColor: '#E8E4DC' }} />
           </div>
         </div>
       </div>
@@ -81,12 +81,12 @@ export default function CoachMessagesPage() {
         {/* Left Panel: Conversation List */}
         <div
           className="w-80 border-r flex flex-col overflow-hidden"
-          style={{ borderColor: '#F0F0ED' }}
+          style={{ borderColor: '#E8E4DC' }}
         >
           {/* Header */}
           <div
             className="px-6 py-5 border-b"
-            style={{ borderColor: '#F0F0ED' }}
+            style={{ borderColor: '#E8E4DC' }}
           >
             <h1
               className="text-2xl font-bold"
@@ -107,13 +107,13 @@ export default function CoachMessagesPage() {
             {conversationsLoading ? (
               <div className="p-4 space-y-4">
                 <div className="space-y-3">
-                  <div className="h-4 rounded-lg w-3/4 animate-pulse" style={{ backgroundColor: '#F0F0ED' }} />
+                  <div className="h-4 rounded-lg w-3/4 animate-pulse" style={{ backgroundColor: '#E8E4DC' }} />
                   <div className="space-y-3">
                     {[1, 2, 3].map((i) => (
                       <div
                         key={i}
                         className="h-16 rounded-lg animate-pulse"
-                        style={{ backgroundColor: '#F0F0ED' }}
+                        style={{ backgroundColor: '#E8E4DC' }}
                       />
                     ))}
                   </div>
@@ -142,14 +142,14 @@ export default function CoachMessagesPage() {
               <div className="text-center space-y-3 max-w-sm">
                 <div
                   className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
-                  style={{ backgroundColor: '#F0F0ED' }}
+                  style={{ backgroundColor: '#E8E4DC' }}
                 >
                   <svg
                     className="w-8 h-8"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                    style={{ color: '#8B6914' }}
+                    style={{ color: '#1A1917' }}
                   >
                     <path
                       strokeLinecap="round"
@@ -185,7 +185,7 @@ export default function CoachMessagesPage() {
             {/* Mobile Header */}
             <div
               className="px-4 py-4 border-b"
-              style={{ borderColor: '#F0F0ED' }}
+              style={{ borderColor: '#E8E4DC' }}
             >
               <h1
                 className="text-2xl font-bold"
@@ -204,7 +204,7 @@ export default function CoachMessagesPage() {
                       <div
                         key={i}
                         className="h-16 rounded-lg animate-pulse"
-                        style={{ backgroundColor: '#F0F0ED' }}
+                        style={{ backgroundColor: '#E8E4DC' }}
                       />
                     ))}
                   </div>
@@ -224,12 +224,12 @@ export default function CoachMessagesPage() {
             {/* Mobile Thread Header with Back Button */}
             <div
               className="px-4 py-3 border-b flex items-center gap-3"
-              style={{ borderColor: '#F0F0ED' }}
+              style={{ borderColor: '#E8E4DC' }}
             >
               <button
                 onClick={handleBackToList}
                 className="p-2 rounded-lg transition-colors hover:opacity-75"
-                style={{ backgroundColor: '#F0F0ED', color: '#1A1A18' }}
+                style={{ backgroundColor: '#E8E4DC', color: '#1A1A18' }}
                 aria-label="Terug naar berichten"
               >
                 <ArrowLeft strokeWidth={1.5} className="w-5 h-5" />

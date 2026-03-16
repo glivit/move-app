@@ -214,7 +214,7 @@ export default function SchedulePage() {
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       {/* Header */}
-      <div className="border-b border-[#F0F0ED]">
+      <div className="border-b border-[#E8E4DC]">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="flex justify-between items-start">
             <div>
@@ -228,7 +228,7 @@ export default function SchedulePage() {
             <div className="flex gap-3">
               <Link
                 href="/coach/schedule/availability"
-                className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all hover:opacity-90 text-[14px] border border-[#F0F0ED] bg-white text-[#1A1A18] hover:bg-[#F5F0E8]"
+                className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all hover:opacity-90 text-[14px] border border-[#E8E4DC] bg-white text-[#1A1A18] hover:bg-[#EDEAE4]"
               >
                 <Clock size={18} strokeWidth={1.5} />
                 Beschikbaarheid
@@ -245,7 +245,7 @@ export default function SchedulePage() {
           </div>
 
           {/* Tab switcher */}
-          <div className="flex gap-1 mt-8 p-1 rounded-xl inline-flex" style={{ backgroundColor: '#F0F0ED' }}>
+          <div className="flex gap-1 mt-8 p-1 rounded-xl inline-flex" style={{ backgroundColor: '#E8E4DC' }}>
             <button
               onClick={() => setActiveView('overview')}
               className={`py-2 px-4 rounded-lg text-[13px] font-semibold transition-all ${
@@ -277,7 +277,7 @@ export default function SchedulePage() {
         {showForm && (
           <div
             className="mb-8 p-8 rounded-2xl border"
-            style={{ backgroundColor: 'white', borderColor: '#F0F0ED', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+            style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
           >
             <h2 className="text-[17px] font-display mb-6" style={{ color: '#1A1A18' }}>
               Nieuwe afspraak inplannen
@@ -290,8 +290,8 @@ export default function SchedulePage() {
                     <button
                       key={c.id}
                       onClick={() => setSelectedClient(c)}
-                      className="text-left px-4 py-3 rounded-xl border transition-all hover:border-[#8B6914]"
-                      style={{ borderColor: '#F0F0ED', color: '#1A1A18' }}
+                      className="text-left px-4 py-3 rounded-xl border transition-all hover:border-[#1A1917]"
+                      style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
                     >
                       {c.full_name}
                     </button>
@@ -302,7 +302,7 @@ export default function SchedulePage() {
               <>
                 <p className="text-[13px] mb-4" style={{ color: '#8E8E93' }}>
                   Afspraak voor: <strong style={{ color: '#1A1A18' }}>{selectedClient.full_name}</strong>
-                  <button onClick={() => setSelectedClient(null)} className="ml-2 underline" style={{ color: '#8B6914' }}>wijzig</button>
+                  <button onClick={() => setSelectedClient(null)} className="ml-2 underline" style={{ color: '#1A1917' }}>wijzig</button>
                 </p>
                 <ScheduleCallForm clientId={selectedClient.id} clientName={selectedClient.full_name} onSuccess={() => { fetchAll(); setShowForm(false); setSelectedClient(null); }} />
               </>
@@ -328,7 +328,7 @@ export default function SchedulePage() {
                   <button
                     onClick={() => setWeekOffset(0)}
                     className="text-[12px] font-medium mt-1"
-                    style={{ color: '#8B6914' }}
+                    style={{ color: '#1A1917' }}
                   >
                     Terug naar deze week
                   </button>
@@ -348,7 +348,7 @@ export default function SchedulePage() {
               {weekDates.map((date, i) => (
                 <div
                   key={i}
-                  className={`text-center py-2 rounded-xl ${isToday(date) ? 'bg-[#8B6914] text-white' : ''}`}
+                  className={`text-center py-2 rounded-xl ${isToday(date) ? 'bg-[#1A1917] text-white' : ''}`}
                 >
                   <p className={`text-[11px] font-semibold ${isToday(date) ? 'text-white/80' : 'text-[#8E8E93]'}`}>
                     {DAY_LABELS[i]}
@@ -370,7 +370,7 @@ export default function SchedulePage() {
             ) : clientSchedules.length === 0 ? (
               <div
                 className="text-center py-12 rounded-2xl border"
-                style={{ backgroundColor: 'white', borderColor: '#F0F0ED' }}
+                style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
               >
                 <Calendar size={40} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#C7C7CC' }} />
                 <p className="text-[15px]" style={{ color: '#8E8E93' }}>Geen cliënten gevonden</p>
@@ -419,14 +419,14 @@ export default function SchedulePage() {
                             className="flex items-center justify-center py-3 rounded-xl"
                             style={{
                               backgroundColor: isPreferred
-                                ? isPast ? '#F0F0ED' : '#FFF8ED'
+                                ? isPast ? '#E8E4DC' : '#F5F2EC'
                                 : 'transparent',
                             }}
                           >
                             {hasCall ? (
                               <Video size={14} strokeWidth={1.5} style={{ color: '#007AFF' }} />
                             ) : isPreferred ? (
-                              <Dumbbell size={14} strokeWidth={1.5} style={{ color: isPast ? '#C7C7CC' : '#8B6914', opacity: isPast ? 0.5 : 0.6 }} />
+                              <Dumbbell size={14} strokeWidth={1.5} style={{ color: isPast ? '#C7C7CC' : '#1A1917', opacity: isPast ? 0.5 : 0.6 }} />
                             ) : null}
                           </div>
                         )
@@ -442,7 +442,7 @@ export default function SchedulePage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
                 <div
                   className="p-5 rounded-2xl border"
-                  style={{ backgroundColor: 'white', borderColor: '#F0F0ED', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                  style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#E8FAF0' }}>
@@ -457,7 +457,7 @@ export default function SchedulePage() {
 
                 <div
                   className="p-5 rounded-2xl border"
-                  style={{ backgroundColor: 'white', borderColor: '#F0F0ED', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                  style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFF3E0' }}>
@@ -472,7 +472,7 @@ export default function SchedulePage() {
 
                 <div
                   className="p-5 rounded-2xl border"
-                  style={{ backgroundColor: 'white', borderColor: '#F0F0ED', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                  style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFE5E5' }}>
@@ -497,7 +497,7 @@ export default function SchedulePage() {
             ) : sessions.length === 0 ? (
               <div
                 className="p-12 text-center rounded-2xl border"
-                style={{ backgroundColor: 'white', borderColor: '#F0F0ED', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
               >
                 <Video size={40} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#C7C7CC' }} />
                 <p className="text-[15px]" style={{ color: '#8E8E93' }}>
@@ -510,7 +510,7 @@ export default function SchedulePage() {
                   <div
                     key={session.id}
                     className="p-5 rounded-2xl border flex items-center justify-between"
-                    style={{ backgroundColor: 'white', borderColor: '#F0F0ED', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                    style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#EBF5FF' }}>

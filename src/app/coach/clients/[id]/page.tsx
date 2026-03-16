@@ -82,7 +82,7 @@ export default async function ClientProfilePage({ params }: Props) {
                 className="w-16 h-16 rounded-full object-cover"
               />
             ) : (
-              <span className="text-xl font-semibold" style={{ color: '#8B6914' }}>
+              <span className="text-xl font-semibold" style={{ color: '#1A1917' }}>
                 {initials}
               </span>
             )}

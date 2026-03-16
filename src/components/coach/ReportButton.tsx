@@ -63,16 +63,16 @@ export function ReportButton({ clientId, clientName }: ReportButtonProps) {
     return (
       <button
         onClick={() => setShowOptions(true)}
-        className="inline-flex items-center gap-2 px-4 py-2.5 bg-white rounded-xl border border-[#F0F0ED] text-[14px] font-medium text-[#1A1A18] hover:bg-[#F5F0E8] hover:border-[#8B6914]/30 transition-all shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+        className="inline-flex items-center gap-2 px-4 py-2.5 bg-white rounded-xl border border-[#E8E4DC] text-[14px] font-medium text-[#1A1A18] hover:bg-[#EDEAE4] hover:border-[#1A1917]/30 transition-all shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
       >
-        <FileText size={16} strokeWidth={1.5} className="text-[#8B6914]" />
+        <FileText size={16} strokeWidth={1.5} className="text-[#1A1917]" />
         PDF Rapport
       </button>
     )
   }
 
   return (
-    <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+    <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-[15px] font-semibold text-[#1A1A18]">Voortgangsrapport genereren</h3>
         <button
@@ -100,8 +100,8 @@ export function ReportButton({ clientId, clientName }: ReportButtonProps) {
               onClick={() => setPeriod(opt.value)}
               className={`flex-1 py-2 rounded-lg text-[13px] font-medium transition-all ${
                 period === opt.value
-                  ? 'bg-[#8B6914] text-white'
-                  : 'bg-[#F0F0ED] text-[#8E8E93] hover:text-[#1A1A18]'
+                  ? 'bg-[#1A1917] text-white'
+                  : 'bg-[#E8E4DC] text-[#8E8E93] hover:text-[#1A1A18]'
               }`}
             >
               {opt.label}
@@ -119,7 +119,7 @@ export function ReportButton({ clientId, clientName }: ReportButtonProps) {
           value={coachNotes}
           onChange={(e) => setCoachNotes(e.target.value)}
           placeholder="Wordt onderaan het rapport getoond..."
-          className="w-full px-3 py-2.5 border border-[#F0F0ED] rounded-xl text-[13px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#8B6914] resize-none h-20"
+          className="w-full px-3 py-2.5 border border-[#E8E4DC] rounded-xl text-[13px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
         />
       </div>
 
@@ -128,7 +128,7 @@ export function ReportButton({ clientId, clientName }: ReportButtonProps) {
         <button
           onClick={generateReport}
           disabled={generating}
-          className="flex-1 py-3 px-4 bg-[#8B6914] text-white rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2 hover:bg-[#6F5612] transition-colors disabled:opacity-60"
+          className="flex-1 py-3 px-4 bg-[#1A1917] text-white rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2 hover:bg-[#6F5612] transition-colors disabled:opacity-60"
         >
           {generating ? (
             <>
@@ -144,7 +144,7 @@ export function ReportButton({ clientId, clientName }: ReportButtonProps) {
         </button>
         <button
           onClick={openReportPreview}
-          className="py-3 px-4 bg-[#F0F0ED] text-[#1A1A18] rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2 hover:bg-[#E8E8E5] transition-colors"
+          className="py-3 px-4 bg-[#E8E4DC] text-[#1A1A18] rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2 hover:bg-[#E8E8E5] transition-colors"
         >
           <ExternalLink size={16} strokeWidth={1.5} />
           Preview

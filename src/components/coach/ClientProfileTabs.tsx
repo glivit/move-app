@@ -414,8 +414,8 @@ export function ClientProfileTabs({
     <div className="space-y-3">
       {Array.from({ length: rows }).map((_, i) => (
         <div key={i} className="rounded-2xl p-4 animate-pulse bg-[#FAFAFA]">
-          <div className="h-4 rounded w-1/3 mb-3 bg-[#F0F0ED]" />
-          <div className="h-3 rounded w-2/3 bg-[#F0F0ED]" />
+          <div className="h-4 rounded w-1/3 mb-3 bg-[#E8E4DC]" />
+          <div className="h-3 rounded w-2/3 bg-[#E8E4DC]" />
         </div>
       ))}
     </div>
@@ -424,7 +424,7 @@ export function ClientProfileTabs({
   return (
     <div>
       {/* Tab Navigation */}
-      <div className="border-b border-[#F0F0ED] overflow-x-auto">
+      <div className="border-b border-[#E8E4DC] overflow-x-auto">
         <div className="flex gap-0 min-w-max">
           {tabs.map((tab) => (
             <button
@@ -432,7 +432,7 @@ export function ClientProfileTabs({
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-3 text-[14px] font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'border-[#8B6914] text-text-primary'
+                  ? 'border-[#1A1917] text-text-primary'
                   : 'border-transparent text-client-text-secondary hover:text-text-primary'
               }`}
             >
@@ -455,7 +455,7 @@ export function ClientProfileTabs({
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {latestCheckin.weight_kg && (
-                    <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                    <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                       <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Gewicht</p>
                       <p className="text-2xl font-bold text-text-primary mt-2">
                         {latestCheckin.weight_kg}<span className="text-[12px] text-client-text-secondary ml-1 font-normal">kg</span>
@@ -463,7 +463,7 @@ export function ClientProfileTabs({
                     </div>
                   )}
                   {latestCheckin.body_fat_pct && (
-                    <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                    <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                       <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Vetpercentage</p>
                       <p className="text-2xl font-bold text-text-primary mt-2">
                         {latestCheckin.body_fat_pct}<span className="text-[12px] text-client-text-secondary ml-1 font-normal">%</span>
@@ -471,7 +471,7 @@ export function ClientProfileTabs({
                     </div>
                   )}
                   {latestCheckin.muscle_mass_kg && (
-                    <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                    <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                       <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Spiermassa</p>
                       <p className="text-2xl font-bold text-text-primary mt-2">
                         {latestCheckin.muscle_mass_kg}<span className="text-[12px] text-client-text-secondary ml-1 font-normal">kg</span>
@@ -481,19 +481,19 @@ export function ClientProfileTabs({
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+              <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
                 <p className="text-[14px] text-client-text-secondary">Nog geen check-in data beschikbaar.</p>
               </div>
             )}
 
             {intakeForm && intakeForm.completed && (
-              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-[15px] font-semibold text-text-primary">Intake informatie</h3>
                   <Link
                     href={`/coach/clients/${profile.id}/intake`}
                     className="text-[13px] font-medium flex items-center gap-1 hover:opacity-70 transition-opacity"
-                    style={{ color: '#8B6914' }}
+                    style={{ color: '#1A1917' }}
                   >
                     Volledig formulier
                     <ArrowUpRight className="w-3.5 h-3.5" strokeWidth={2} />
@@ -542,7 +542,7 @@ export function ClientProfileTabs({
               </div>
             )}
 
-            <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+            <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Dagen actief</p>
@@ -565,23 +565,23 @@ export function ClientProfileTabs({
             ) : activeProgram ? (
               <>
                 {/* Active Program Header */}
-                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                   <div className="flex items-start justify-between gap-4 mb-4">
                     <div>
                       <h3 className="text-[17px] font-semibold text-text-primary">{activeProgram.name}</h3>
                       <div className="flex items-center gap-2 mt-2 flex-wrap">
                         {activeProgram.template?.difficulty && (
-                          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-[#F5F0E8] text-[#8B6914]">
+                          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-[#EDEAE4] text-[#1A1917]">
                             {difficultyLabels[activeProgram.template.difficulty] || activeProgram.template.difficulty}
                           </span>
                         )}
                         {activeProgram.template?.duration_weeks && (
-                          <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#F0F0ED] text-[#8E8E93]">
+                          <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#E8E4DC] text-[#8E8E93]">
                             {activeProgram.template.duration_weeks} weken
                           </span>
                         )}
                         {activeProgram.template?.days_per_week && (
-                          <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#F0F0ED] text-[#8E8E93]">
+                          <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#E8E4DC] text-[#8E8E93]">
                             {activeProgram.template.days_per_week} dagen/week
                           </span>
                         )}
@@ -589,7 +589,7 @@ export function ClientProfileTabs({
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Week</p>
-                      <p className="text-2xl font-bold text-[#8B6914]">
+                      <p className="text-2xl font-bold text-[#1A1917]">
                         {activeProgram.current_week}
                         <span className="text-[14px] font-normal text-client-text-secondary">
                           /{activeProgram.template?.duration_weeks || '—'}
@@ -599,7 +599,7 @@ export function ClientProfileTabs({
                   </div>
 
                   {/* Date Info */}
-                  <div className="flex items-center gap-4 text-[13px] text-client-text-secondary pt-3 border-t border-[#F0F0ED]">
+                  <div className="flex items-center gap-4 text-[13px] text-client-text-secondary pt-3 border-t border-[#E8E4DC]">
                     <div className="flex items-center gap-1.5">
                       <Calendar strokeWidth={1.5} className="w-3.5 h-3.5" />
                       <span>Start: {formatDate(activeProgram.start_date)}</span>
@@ -632,15 +632,15 @@ export function ClientProfileTabs({
                       return (
                         <div
                           key={day.id}
-                          className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] overflow-hidden"
+                          className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden"
                         >
                           <button
                             onClick={() => toggleDay(day.id)}
                             className="w-full flex items-center justify-between p-4 hover:bg-[#FAFAFA] transition-colors"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-[#F5F0E8] flex items-center justify-center flex-shrink-0">
-                                <Dumbbell strokeWidth={1.5} className="w-4 h-4 text-[#8B6914]" />
+                              <div className="w-8 h-8 rounded-lg bg-[#EDEAE4] flex items-center justify-center flex-shrink-0">
+                                <Dumbbell strokeWidth={1.5} className="w-4 h-4 text-[#1A1917]" />
                               </div>
                               <div className="text-left">
                                 <h5 className="text-[15px] font-semibold text-text-primary">{day.name}</h5>
@@ -658,11 +658,11 @@ export function ClientProfileTabs({
                           </button>
 
                           {isExpanded && dayExercises.length > 0 && (
-                            <div className="px-4 pb-4 space-y-2 border-t border-[#F0F0ED]">
+                            <div className="px-4 pb-4 space-y-2 border-t border-[#E8E4DC]">
                               {dayExercises.map((ex, i) => (
                                 <div
                                   key={ex.id}
-                                  className="flex items-start gap-3 py-3 border-b border-[#F0F0ED] last:border-b-0"
+                                  className="flex items-start gap-3 py-3 border-b border-[#E8E4DC] last:border-b-0"
                                 >
                                   <span className="text-[12px] font-semibold text-[#8E8E93] w-6 flex-shrink-0 pt-0.5">
                                     {i + 1}.
@@ -694,7 +694,7 @@ export function ClientProfileTabs({
                     </p>
                     <Link
                       href={`/coach/programs/${activeProgram.template_id}`}
-                      className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-semibold text-[#8B6914] hover:underline"
+                      className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-semibold text-[#1A1917] hover:underline"
                     >
                       Template bewerken <ArrowUpRight strokeWidth={1.5} className="w-3.5 h-3.5" />
                     </Link>
@@ -712,14 +712,14 @@ export function ClientProfileTabs({
                         <button
                           key={t.id}
                           onClick={() => handleAssignTemplate(t)}
-                          className="text-[13px] px-3 py-1.5 rounded-xl bg-[#FAFAFA] border border-[#F0F0ED] text-text-primary hover:bg-[#F5F0E8] hover:border-[#ECEAE3] transition-colors"
+                          className="text-[13px] px-3 py-1.5 rounded-xl bg-[#FAFAFA] border border-[#E8E4DC] text-text-primary hover:bg-[#EDEAE4] hover:border-[#ECEAE3] transition-colors"
                         >
                           {t.name}
                         </button>
                       ))}
                     <Link
                       href="/coach/programs"
-                      className="text-[13px] px-3 py-1.5 rounded-xl text-[#8B6914] hover:underline inline-flex items-center gap-1"
+                      className="text-[13px] px-3 py-1.5 rounded-xl text-[#1A1917] hover:underline inline-flex items-center gap-1"
                     >
                       Alle programma's <ChevronRight strokeWidth={1.5} className="w-3.5 h-3.5" />
                     </Link>
@@ -729,7 +729,7 @@ export function ClientProfileTabs({
             ) : (
               /* No Active Program */
               <div className="space-y-5">
-                <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+                <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
                   <Dumbbell strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#8E8E93] opacity-40" />
                   <h3 className="text-[17px] font-semibold text-text-primary mb-1">
                     Geen actief programma
@@ -750,12 +750,12 @@ export function ClientProfileTabs({
                         <button
                           key={t.id}
                           onClick={() => handleAssignTemplate(t)}
-                          className="w-full flex items-center justify-between p-4 bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-shadow text-left"
+                          className="w-full flex items-center justify-between p-4 bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-shadow text-left"
                         >
                           <div>
                             <h5 className="text-[15px] font-semibold text-text-primary">{t.name}</h5>
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#F5F0E8] text-[#8B6914]">
+                              <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#EDEAE4] text-[#1A1917]">
                                 {t.duration_weeks}w · {t.days_per_week}d/w
                               </span>
                               <span className="text-[11px] text-[#8E8E93]">
@@ -763,7 +763,7 @@ export function ClientProfileTabs({
                               </span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-1.5 text-[13px] font-semibold text-[#8B6914] flex-shrink-0">
+                          <div className="flex items-center gap-1.5 text-[13px] font-semibold text-[#1A1917] flex-shrink-0">
                             Toewijzen
                             <Plus strokeWidth={1.5} className="w-4 h-4" />
                           </div>
@@ -772,7 +772,7 @@ export function ClientProfileTabs({
                     </div>
                     <Link
                       href="/coach/programs/new"
-                      className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-medium text-[#8B6914] hover:underline"
+                      className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-medium text-[#1A1917] hover:underline"
                     >
                       <Plus strokeWidth={1.5} className="w-3.5 h-3.5" />
                       Nieuw programma aanmaken
@@ -792,22 +792,22 @@ export function ClientProfileTabs({
             ) : nutritionPlan ? (
               <>
                 {/* Macro Summary */}
-                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-[15px] font-semibold text-text-primary">{nutritionPlan.title}</h3>
                     <Link
                       href={`/coach/clients/${profile.id}/nutrition`}
-                      className="text-[12px] font-medium text-[#8B6914] hover:underline inline-flex items-center gap-1"
+                      className="text-[12px] font-medium text-[#1A1917] hover:underline inline-flex items-center gap-1"
                     >
                       Bewerken <ExternalLink strokeWidth={1.5} className="w-3 h-3" />
                     </Link>
                   </div>
 
                   {/* Calorie Target */}
-                  <div className="bg-[#F5F0E8] rounded-xl p-4 mb-4 text-center">
-                    <p className="text-[12px] text-[#8B6914] uppercase font-medium tracking-wide">Dagelijks doel</p>
-                    <p className="text-3xl font-bold text-[#8B6914] mt-1">{nutritionPlan.calories_target}</p>
-                    <p className="text-[12px] text-[#8B6914]">calorieën</p>
+                  <div className="bg-[#EDEAE4] rounded-xl p-4 mb-4 text-center">
+                    <p className="text-[12px] text-[#1A1917] uppercase font-medium tracking-wide">Dagelijks doel</p>
+                    <p className="text-3xl font-bold text-[#1A1917] mt-1">{nutritionPlan.calories_target}</p>
+                    <p className="text-[12px] text-[#1A1917]">calorieën</p>
                   </div>
 
                   {/* Macros Grid */}
@@ -837,10 +837,10 @@ export function ClientProfileTabs({
                       {nutritionPlan.meals.map((meal: any, i: number) => (
                         <div
                           key={meal.id || i}
-                          className="flex items-center gap-3 p-3 bg-white rounded-xl border border-[#F0F0ED]"
+                          className="flex items-center gap-3 p-3 bg-white rounded-xl border border-[#E8E4DC]"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-[#F5F0E8] flex items-center justify-center flex-shrink-0">
-                            <Apple strokeWidth={1.5} className="w-4 h-4 text-[#8B6914]" />
+                          <div className="w-8 h-8 rounded-lg bg-[#EDEAE4] flex items-center justify-center flex-shrink-0">
+                            <Apple strokeWidth={1.5} className="w-4 h-4 text-[#1A1917]" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-[14px] font-medium text-text-primary">{meal.name}</p>
@@ -867,7 +867,7 @@ export function ClientProfileTabs({
                 )}
               </>
             ) : (
-              <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+              <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
                 <Apple strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#8E8E93] opacity-40" />
                 <h3 className="text-[17px] font-semibold text-text-primary mb-1">Geen voedingsplan</h3>
                 <p className="text-[14px] text-client-text-secondary mb-4">
@@ -875,7 +875,7 @@ export function ClientProfileTabs({
                 </p>
                 <Link
                   href={`/coach/clients/${profile.id}/nutrition`}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#8B6914] text-white rounded-xl text-[14px] font-semibold hover:bg-[#6F5612] transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1A1917] text-white rounded-xl text-[14px] font-semibold hover:bg-[#6F5612] transition-colors"
                 >
                   Voedingsplan aanmaken
                   <Plus strokeWidth={1.5} className="w-4 h-4" />
@@ -888,7 +888,7 @@ export function ClientProfileTabs({
               <div className="flex gap-3">
                 <Link
                   href={`/coach/clients/${profile.id}/nutrition`}
-                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#8B6914] hover:underline"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#1A1917] hover:underline"
                 >
                   Volledig voedingsplan bewerken <ArrowUpRight strokeWidth={1.5} className="w-3.5 h-3.5" />
                 </Link>
@@ -919,7 +919,7 @@ export function ClientProfileTabs({
                     : null
 
                   return (
-                    <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                    <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                       <h3 className="text-[13px] text-client-text-secondary uppercase font-medium tracking-wide mb-4">
                         Evolutie ({progressCheckins.length} metingen)
                       </h3>
@@ -969,8 +969,8 @@ export function ClientProfileTabs({
                 })()}
 
                 {/* Check-in History Table */}
-                <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] overflow-hidden">
-                  <div className="p-4 border-b border-[#F0F0ED]">
+                <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden">
+                  <div className="p-4 border-b border-[#E8E4DC]">
                     <h4 className="text-[13px] text-client-text-secondary uppercase font-medium tracking-wide">
                       Meetgeschiedenis
                     </h4>
@@ -1005,13 +1005,13 @@ export function ClientProfileTabs({
 
                 <Link
                   href={`/coach/clients/${profile.id}/progress`}
-                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#8B6914] hover:underline"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#1A1917] hover:underline"
                 >
                   Uitgebreide grafieken en PR&apos;s bekijken <ArrowUpRight strokeWidth={1.5} className="w-3.5 h-3.5" />
                 </Link>
               </>
             ) : (
-              <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+              <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
                 <TrendingUp strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#8E8E93] opacity-40" />
                 <h3 className="text-[17px] font-semibold text-text-primary mb-1">Nog geen voortgangsdata</h3>
                 <p className="text-[14px] text-client-text-secondary">
@@ -1035,7 +1035,7 @@ export function ClientProfileTabs({
                     <Link
                       key={checkin.id}
                       href={`/coach/check-ins/${checkin.id}`}
-                      className="block p-4 rounded-2xl border border-[#F0F0ED] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:bg-[#FAFAFA] transition-colors"
+                      className="block p-4 rounded-2xl border border-[#E8E4DC] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:bg-[#FAFAFA] transition-colors"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
@@ -1064,7 +1064,7 @@ export function ClientProfileTabs({
                 })}
               </div>
             ) : (
-              <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+              <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
                 <p className="text-[14px] text-client-text-secondary">Geen check-ins beschikbaar.</p>
               </div>
             )}
@@ -1079,7 +1079,7 @@ export function ClientProfileTabs({
             ) : (
               <>
                 {/* Messages Container */}
-                <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] overflow-hidden">
+                <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden">
                   <div className="max-h-[400px] overflow-y-auto p-4 space-y-3">
                     {messages.length === 0 ? (
                       <div className="text-center py-8">
@@ -1097,8 +1097,8 @@ export function ClientProfileTabs({
                             <div
                               className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
                                 isCoach
-                                  ? 'bg-[#8B6914] text-white'
-                                  : 'bg-[#F0F0ED] text-text-primary'
+                                  ? 'bg-[#1A1917] text-white'
+                                  : 'bg-[#E8E4DC] text-text-primary'
                               }`}
                             >
                               <p className="text-[14px] whitespace-pre-wrap">{msg.content}</p>
@@ -1114,7 +1114,7 @@ export function ClientProfileTabs({
                   </div>
 
                   {/* Message Input */}
-                  <div className="p-3 border-t border-[#F0F0ED] flex items-center gap-2">
+                  <div className="p-3 border-t border-[#E8E4DC] flex items-center gap-2">
                     <input
                       type="text"
                       value={newMessage}
@@ -1126,12 +1126,12 @@ export function ClientProfileTabs({
                         }
                       }}
                       placeholder="Typ een bericht..."
-                      className="flex-1 px-4 py-2.5 bg-[#FAFAFA] border border-[#F0F0ED] rounded-xl text-[14px] text-text-primary placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                      className="flex-1 px-4 py-2.5 bg-[#FAFAFA] border border-[#E8E4DC] rounded-xl text-[14px] text-text-primary placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
                     />
                     <button
                       onClick={handleSendMessage}
                       disabled={sendingMessage || !newMessage.trim()}
-                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#8B6914] text-white hover:bg-[#6F5612] transition-colors disabled:opacity-40"
+                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#1A1917] text-white hover:bg-[#6F5612] transition-colors disabled:opacity-40"
                     >
                       <Send strokeWidth={1.5} className="w-4 h-4" />
                     </button>

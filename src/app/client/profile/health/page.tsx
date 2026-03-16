@@ -131,7 +131,7 @@ export default function HealthPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-[#8B6914]" />
+        <Loader2 className="w-6 h-6 animate-spin text-[#1A1917]" />
       </div>
     )
   }
@@ -140,7 +140,7 @@ export default function HealthPage() {
     <div className="space-y-6 pb-20">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#8B6914]">
+        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#1A1917]">
           <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
         </button>
         <h1 className="text-[22px] font-semibold text-[#1A1A18]" style={{ fontFamily: 'var(--font-display)' }}>
@@ -150,7 +150,7 @@ export default function HealthPage() {
 
       {/* Info Banner */}
       <div className="bg-[#FFF3CD] rounded-2xl p-4 flex gap-3">
-        <AlertTriangle strokeWidth={1.5} className="w-5 h-5 text-[#8B6914] flex-shrink-0 mt-0.5" />
+        <AlertTriangle strokeWidth={1.5} className="w-5 h-5 text-[#1A1917] flex-shrink-0 mt-0.5" />
         <p className="text-[13px] text-[#1A1A18]">
           Deze informatie helpt je coach om een veilig en aangepast trainingsprogramma op te stellen. Wees eerlijk en volledig.
         </p>
@@ -169,7 +169,7 @@ export default function HealthPage() {
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
                     ? 'bg-[#FF9500] text-white'
-                    : 'bg-white border border-[#F0F0ED] text-[#1A1A18] hover:border-[#FF9500]'
+                    : 'bg-white border border-[#E8E4DC] text-[#1A1A18] hover:border-[#FF9500]'
                 }`}
               >
                 {part.label}
@@ -192,7 +192,7 @@ export default function HealthPage() {
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
                     ? 'bg-[#FF3B30] text-white'
-                    : 'bg-white border border-[#F0F0ED] text-[#1A1A18] hover:border-[#FF3B30]'
+                    : 'bg-white border border-[#E8E4DC] text-[#1A1A18] hover:border-[#FF3B30]'
                 }`}
               >
                 {limit}
@@ -205,7 +205,7 @@ export default function HealthPage() {
       {/* Activity Level */}
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Huidig activiteitsniveau</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] divide-y divide-[#F0F0ED]">
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] divide-y divide-[#E8E4DC]">
           {[
             { id: 'sedentair', label: 'Sedentair', desc: 'Weinig tot geen beweging' },
             { id: 'licht', label: 'Licht actief', desc: '1-2 keer per week' },
@@ -223,7 +223,7 @@ export default function HealthPage() {
                 <p className="text-[13px] text-[#8E8E93] text-left">{level.desc}</p>
               </div>
               {activityLevel === level.id && (
-                <div className="w-6 h-6 rounded-full bg-[#8B6914] flex items-center justify-center flex-shrink-0">
+                <div className="w-6 h-6 rounded-full bg-[#1A1917] flex items-center justify-center flex-shrink-0">
                   <Check strokeWidth={2.5} className="w-3.5 h-3.5 text-white" />
                 </div>
               )}
@@ -235,7 +235,7 @@ export default function HealthPage() {
       {/* Details */}
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Extra details</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] p-5">
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-5">
           <textarea
             value={details}
             onChange={(e) => setDetails(e.target.value)}
@@ -250,7 +250,7 @@ export default function HealthPage() {
       <button
         onClick={handleSave}
         disabled={saving}
-        className="w-full py-3.5 rounded-2xl bg-[#8B6914] text-white font-semibold text-[15px] hover:bg-[#7A5C12] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-3.5 rounded-2xl bg-[#1A1917] text-white font-semibold text-[15px] hover:bg-[#7A5C12] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {saving ? (
           <Loader2 className="w-5 h-5 animate-spin" />

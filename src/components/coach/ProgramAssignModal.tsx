@@ -133,7 +133,7 @@ export function ProgramAssignModal({
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
           {/* Header */}
-          <div className="p-5 border-b border-[#F0F0ED] flex items-center justify-between">
+          <div className="p-5 border-b border-[#E8E4DC] flex items-center justify-between">
             <h2 className="text-[17px] font-semibold text-[#1A1A18]">
               {success ? 'Gereed!' : 'Programma toewijzen'}
             </h2>
@@ -181,7 +181,7 @@ export function ProgramAssignModal({
                     value={selectedClientId}
                     onChange={(e) => setSelectedClientId(e.target.value)}
                     disabled={loading}
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#F0F0ED] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors disabled:opacity-50"
+                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors disabled:opacity-50"
                   >
                     {loading ? (
                       <option>Laden...</option>
@@ -206,7 +206,7 @@ export function ProgramAssignModal({
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#F0F0ED] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
                   />
                 </div>
 
@@ -219,7 +219,7 @@ export function ProgramAssignModal({
                     type="text"
                     value={programName}
                     onChange={(e) => setProgramName(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#F0F0ED] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
                   />
                 </div>
 
@@ -232,7 +232,7 @@ export function ProgramAssignModal({
                     value={coachNotes}
                     onChange={(e) => setCoachNotes(e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#F0F0ED] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors resize-none"
+                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors resize-none"
                     placeholder="Bijzondere opmerkingen..."
                   />
                 </div>
@@ -245,8 +245,8 @@ export function ProgramAssignModal({
                 )}
 
                 {/* Duration Info */}
-                <div className="p-3 bg-[#F5F0E8] border border-[#ECEAE3] rounded-2xl">
-                  <p className="text-[13px] text-[#8B6914]">
+                <div className="p-3 bg-[#EDEAE4] border border-[#ECEAE3] rounded-2xl">
+                  <p className="text-[13px] text-[#1A1917]">
                     <span className="font-semibold">Duur:</span> {durationWeeks} weken
                   </p>
                 </div>
@@ -256,7 +256,7 @@ export function ProgramAssignModal({
 
           {/* Actions */}
           {!success && (
-            <div className="p-5 border-t border-[#F0F0ED] flex gap-3">
+            <div className="p-5 border-t border-[#E8E4DC] flex gap-3">
               <Button
                 variant="secondary"
                 onClick={onClose}

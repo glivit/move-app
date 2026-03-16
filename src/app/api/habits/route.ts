@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
         name,
         description: description || null,
         icon: icon || '✅',
-        color: color || '#8B6914',
+        color: color || '#1A1917',
         frequency: frequency || 'daily',
         target_value: target_value || null,
         target_unit: target_unit || null,

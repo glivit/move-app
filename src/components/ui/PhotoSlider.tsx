@@ -44,7 +44,7 @@ export function PhotoSlider({
   return (
     <div
       ref={containerRef}
-      className="relative overflow-hidden rounded-2xl cursor-col-resize select-none bg-[#F0F0ED]"
+      className="relative overflow-hidden rounded-2xl cursor-col-resize select-none bg-[#E8E4DC]"
       style={{ height }}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -84,8 +84,8 @@ export function PhotoSlider({
         <div className="w-0.5 h-full bg-white shadow-lg" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M5 3L2 8L5 13" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M11 3L14 8L11 13" stroke="#8B6914" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M5 3L2 8L5 13" stroke="#1A1917" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M11 3L14 8L11 13" stroke="#1A1917" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
       </div>

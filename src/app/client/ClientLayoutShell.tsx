@@ -6,15 +6,15 @@ import { NotificationPermission } from '@/components/notifications/NotificationP
 
 export default function ClientLayoutShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="client-app min-h-screen bg-[#F5F2ED]">
+    <div className="client-app min-h-screen bg-[#EEEBE3]">
       {/* Desktop sidebar */}
       <ClientSidebar />
 
-      {/* Mobile header — frosted glass, premium */}
-      <header className="lg:hidden sticky top-0 z-30 glass-warm border-b border-[#E6E2DC]">
-        <div className="max-w-2xl mx-auto px-5 py-3.5">
+      {/* Mobile header — editorial, clean */}
+      <header className="lg:hidden sticky top-0 z-30 glass-warm border-b border-[#DDD9D0]">
+        <div className="max-w-2xl mx-auto px-6 py-4">
           <h1
-            className="display text-lg font-semibold text-center text-[#1A1917] tracking-[-0.03em]"
+            className="text-[22px] font-semibold text-center text-[#1A1917] tracking-[0.12em] uppercase"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             MŌVE
@@ -22,9 +22,9 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
         </div>
       </header>
 
-      {/* Main content — generous padding */}
+      {/* Main content — generous whitespace */}
       <main className="lg:pl-[280px]">
-        <div className="max-w-3xl mx-auto px-5 py-8 lg:py-10">
+        <div className="max-w-3xl mx-auto px-6 py-8 lg:py-12">
           {children}
         </div>
       </main>

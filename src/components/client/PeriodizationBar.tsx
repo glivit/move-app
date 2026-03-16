@@ -20,7 +20,7 @@ const PHASE_COLORS: Record<string, { color: string; bgColor: string }> = {
   power: { color: '#FF3B30', bgColor: '#FFE5E5' },
   deload: { color: '#34C759', bgColor: '#E8FAF0' },
   peaking: { color: '#FF2D55', bgColor: '#FFE5EC' },
-  maintenance: { color: '#8E8E93', bgColor: '#F0F0ED' },
+  maintenance: { color: '#8E8E93', bgColor: '#E8E4DC' },
 }
 
 export function PeriodizationBar() {

@@ -38,7 +38,7 @@ const POST_TYPE_CONFIG: Record<string, { icon: any; label: string; color: string
   update: { icon: Megaphone, label: 'Update', color: '#007AFF', bg: '#EBF5FF' },
   motivation: { icon: Sparkles, label: 'Motivatie', color: '#FF9500', bg: '#FFF3E0' },
   tip: { icon: Lightbulb, label: 'Tip', color: '#34C759', bg: '#E8FAF0' },
-  achievement: { icon: Trophy, label: 'Prestatie', color: '#8B6914', bg: '#FFF8ED' },
+  achievement: { icon: Trophy, label: 'Prestatie', color: '#1A1917', bg: '#F5F2EC' },
   question: { icon: HelpCircle, label: 'Vraag', color: '#AF52DE', bg: '#F5EEFA' },
 }
 
@@ -156,7 +156,7 @@ export function CommunityFeed({ isCoach = false }: Props) {
       {/* New Post */}
       <div
         className="rounded-2xl p-5 border"
-        style={{ backgroundColor: 'white', borderColor: '#F0F0ED', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+        style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
       >
         <textarea
           value={newPost}
@@ -166,7 +166,7 @@ export function CommunityFeed({ isCoach = false }: Props) {
           className="w-full text-[14px] bg-transparent outline-none resize-none"
           style={{ color: '#1A1A18' }}
         />
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#F0F0ED]">
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#E8E4DC]">
           {/* Post type selector */}
           <div className="flex gap-1.5">
             {Object.entries(POST_TYPE_CONFIG).map(([key, cfg]) => {
@@ -192,7 +192,7 @@ export function CommunityFeed({ isCoach = false }: Props) {
             onClick={createPost}
             disabled={posting || !newPost.trim()}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-semibold text-white transition-all disabled:opacity-40"
-            style={{ backgroundColor: '#8B6914' }}
+            style={{ backgroundColor: '#1A1917' }}
           >
             <Send size={14} strokeWidth={2} />
             {posting ? 'Posten...' : 'Post'}
@@ -204,13 +204,13 @@ export function CommunityFeed({ isCoach = false }: Props) {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-white rounded-2xl animate-pulse border border-[#F0F0ED]" />
+            <div key={i} className="h-32 bg-white rounded-2xl animate-pulse border border-[#E8E4DC]" />
           ))}
         </div>
       ) : posts.length === 0 ? (
         <div
           className="rounded-2xl p-12 text-center border"
-          style={{ backgroundColor: 'white', borderColor: '#F0F0ED' }}
+          style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
         >
           <Megaphone size={32} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#C7C7CC' }} />
           <p className="text-[14px]" style={{ color: '#8E8E93' }}>
@@ -227,11 +227,11 @@ export function CommunityFeed({ isCoach = false }: Props) {
             <div
               key={post.id}
               className="rounded-2xl border overflow-hidden"
-              style={{ backgroundColor: 'white', borderColor: '#F0F0ED', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+              style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
             >
               {/* Pinned indicator */}
               {post.is_pinned && (
-                <div className="flex items-center gap-1.5 px-5 pt-3 text-[11px] font-semibold" style={{ color: '#8B6914' }}>
+                <div className="flex items-center gap-1.5 px-5 pt-3 text-[11px] font-semibold" style={{ color: '#1A1917' }}>
                   <Pin size={10} strokeWidth={2} />
                   Vastgepind
                 </div>
@@ -243,8 +243,8 @@ export function CommunityFeed({ isCoach = false }: Props) {
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-[11px] font-bold"
                     style={{
-                      backgroundColor: post.author?.role === 'coach' ? '#FFF8ED' : '#FAFAFA',
-                      color: post.author?.role === 'coach' ? '#8B6914' : '#8E8E93',
+                      backgroundColor: post.author?.role === 'coach' ? '#F5F2EC' : '#FAFAFA',
+                      color: post.author?.role === 'coach' ? '#1A1917' : '#8E8E93',
                     }}
                   >
                     {post.author?.avatar_url ? (
@@ -259,7 +259,7 @@ export function CommunityFeed({ isCoach = false }: Props) {
                         {post.author?.full_name}
                       </span>
                       {post.author?.role === 'coach' && (
-                        <span className="px-1.5 py-0.5 rounded-md text-[9px] font-bold" style={{ backgroundColor: '#FFF8ED', color: '#8B6914' }}>
+                        <span className="px-1.5 py-0.5 rounded-md text-[9px] font-bold" style={{ backgroundColor: '#F5F2EC', color: '#1A1917' }}>
                           COACH
                         </span>
                       )}
@@ -289,7 +289,7 @@ export function CommunityFeed({ isCoach = false }: Props) {
                 )}
 
                 {/* Actions */}
-                <div className="flex items-center gap-4 pt-3 border-t border-[#F0F0ED]">
+                <div className="flex items-center gap-4 pt-3 border-t border-[#E8E4DC]">
                   <button
                     onClick={() => toggleLike(post.id)}
                     className="flex items-center gap-1.5 text-[12px] font-medium transition-all"
@@ -315,16 +315,16 @@ export function CommunityFeed({ isCoach = false }: Props) {
 
               {/* Comments section */}
               {isExpanded && (
-                <div className="border-t border-[#F0F0ED] bg-[#FAFAFA]">
+                <div className="border-t border-[#E8E4DC] bg-[#FAFAFA]">
                   {/* Existing comments */}
                   {(comments[post.id] || []).map((comment) => (
-                    <div key={comment.id} className="px-5 py-3 border-b border-[#F0F0ED] last:border-b-0">
+                    <div key={comment.id} className="px-5 py-3 border-b border-[#E8E4DC] last:border-b-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-[12px] font-semibold" style={{ color: '#1A1A18' }}>
                           {comment.author?.full_name}
                         </span>
                         {comment.author?.role === 'coach' && (
-                          <span className="px-1 py-0.5 rounded text-[8px] font-bold" style={{ backgroundColor: '#FFF8ED', color: '#8B6914' }}>
+                          <span className="px-1 py-0.5 rounded text-[8px] font-bold" style={{ backgroundColor: '#F5F2EC', color: '#1A1917' }}>
                             COACH
                           </span>
                         )}
@@ -345,14 +345,14 @@ export function CommunityFeed({ isCoach = false }: Props) {
                       onChange={(e) => { setCommentingPostId(post.id); setNewComment(e.target.value) }}
                       onKeyDown={(e) => e.key === 'Enter' && addComment(post.id)}
                       placeholder="Schrijf een reactie..."
-                      className="flex-1 text-[13px] bg-white px-3 py-2 rounded-xl border border-[#F0F0ED] outline-none focus:border-[#8B6914]"
+                      className="flex-1 text-[13px] bg-white px-3 py-2 rounded-xl border border-[#E8E4DC] outline-none focus:border-[#1A1917]"
                       style={{ color: '#1A1A18' }}
                     />
                     <button
                       onClick={() => addComment(post.id)}
                       disabled={!newComment.trim() || commentingPostId !== post.id}
                       className="p-2 rounded-xl transition-all disabled:opacity-30"
-                      style={{ backgroundColor: '#8B6914' }}
+                      style={{ backgroundColor: '#1A1917' }}
                     >
                       <Send size={14} strokeWidth={2} className="text-white" />
                     </button>

@@ -237,7 +237,7 @@ export default function NutritionOverviewPage() {
       <div className="min-h-screen" style={{ backgroundColor: '#FAFAFA' }}>
         <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="flex items-center justify-center h-96">
-            <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#8B6914] border-t-transparent" />
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#1A1917] border-t-transparent" />
           </div>
         </div>
       </div>
@@ -268,19 +268,19 @@ export default function NutritionOverviewPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
             <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide">Cliënten</p>
             <p className="text-2xl font-bold text-[#1A1A18] mt-2">{clients.length}</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
             <p className="text-[12px] text-[#34C759] uppercase font-medium tracking-wide">Met plan</p>
             <p className="text-2xl font-bold text-[#1A1A18] mt-2">{withPlanCount}</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
             <p className="text-[12px] text-[#FF9500] uppercase font-medium tracking-wide">Te bekijken</p>
             <p className="text-2xl font-bold text-[#1A1A18] mt-2">{needsReviewCount}</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
             <p className="text-[12px] text-[#007AFF] uppercase font-medium tracking-wide">Gem. compliance</p>
             <p className="text-2xl font-bold text-[#1A1A18] mt-2">
               {avgCompliance !== null ? `${avgCompliance}%` : '—'}
@@ -292,12 +292,12 @@ export default function NutritionOverviewPage() {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <BookOpen strokeWidth={1.5} className="w-4 h-4 text-[#8B6914]" />
+                <BookOpen strokeWidth={1.5} className="w-4 h-4 text-[#1A1917]" />
                 <h2 className="text-[15px] font-semibold text-[#1A1A18]">Voedingsplan templates</h2>
               </div>
               <Link
                 href="/coach/nutrition/new"
-                className="text-[12px] font-semibold text-[#8B6914] hover:underline"
+                className="text-[12px] font-semibold text-[#1A1917] hover:underline"
               >
                 + Nieuwe template
               </Link>
@@ -309,7 +309,7 @@ export default function NutritionOverviewPage() {
                 return (
                   <div
                     key={template.id}
-                    className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] p-5"
+                    className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-5"
                   >
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div>
@@ -320,7 +320,7 @@ export default function NutritionOverviewPage() {
                       </div>
                       <button
                         onClick={() => setShowAssignModal(template.id)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#8B6914] text-white text-[12px] font-semibold rounded-full hover:bg-[#7A5C12] transition-colors flex-shrink-0"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1A1917] text-white text-[12px] font-semibold rounded-full hover:bg-[#7A5C12] transition-colors flex-shrink-0"
                       >
                         <Copy strokeWidth={1.5} className="w-3.5 h-3.5" />
                         Toewijzen
@@ -329,7 +329,7 @@ export default function NutritionOverviewPage() {
                     {meals.length > 0 && (
                       <div className="flex flex-wrap gap-1.5">
                         {meals.map((meal: any, i: number) => (
-                          <span key={i} className="text-[11px] bg-[#F5F0E8] text-[#8B6914] px-2 py-0.5 rounded-full">
+                          <span key={i} className="text-[11px] bg-[#EDEAE4] text-[#1A1917] px-2 py-0.5 rounded-full">
                             {meal.name}
                           </span>
                         ))}
@@ -346,7 +346,7 @@ export default function NutritionOverviewPage() {
               <p className="text-[12px] text-[#C7C7CC] mb-4">Maak een voedingsplan template aan om snel toe te wijzen aan cliënten</p>
               <Link
                 href="/coach/nutrition/new"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold bg-[#8B6914] text-white hover:bg-[#7A5C12] transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold bg-[#1A1917] text-white hover:bg-[#7A5C12] transition-colors"
               >
                 <Plus size={16} /> Eerste template maken
               </Link>
@@ -358,7 +358,7 @@ export default function NutritionOverviewPage() {
         {showAssignModal && (
           <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowAssignModal(null)}>
             <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
-              <div className="p-5 border-b border-[#F0F0ED]">
+              <div className="p-5 border-b border-[#E8E4DC]">
                 <h3 className="text-[17px] font-semibold text-[#1A1A18]">Voedingsplan toewijzen</h3>
                 <p className="text-[13px] text-[#8E8E93] mt-1">Kies een cliënt om dit plan aan toe te wijzen</p>
               </div>
@@ -371,7 +371,7 @@ export default function NutritionOverviewPage() {
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#FAFAFA] transition-colors text-left disabled:opacity-50"
                   >
                     <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold flex-shrink-0"
-                      style={{ backgroundColor: '#F5F5F3', color: '#8B6914' }}
+                      style={{ backgroundColor: '#F5F5F3', color: '#1A1917' }}
                     >
                       {client.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                     </div>
@@ -382,7 +382,7 @@ export default function NutritionOverviewPage() {
                       </p>
                     </div>
                     {assigning ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-[#8B6914]" />
+                      <Loader2 className="w-4 h-4 animate-spin text-[#1A1917]" />
                     ) : (
                       <Copy strokeWidth={1.5} className="w-4 h-4 text-[#C7C7CC]" />
                     )}
@@ -392,7 +392,7 @@ export default function NutritionOverviewPage() {
                   <p className="text-center text-[14px] text-[#8E8E93] py-8">Nog geen cliënten</p>
                 )}
               </div>
-              <div className="p-3 border-t border-[#F0F0ED]">
+              <div className="p-3 border-t border-[#E8E4DC]">
                 <button
                   onClick={() => setShowAssignModal(null)}
                   className="w-full py-2.5 text-[14px] font-medium text-[#8E8E93] hover:text-[#1A1A18] transition-colors"
@@ -414,7 +414,7 @@ export default function NutritionOverviewPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Zoek cliënt..."
               className="w-full pl-11 pr-4 py-3 rounded-2xl border text-[14px] bg-white"
-              style={{ borderColor: '#F0F0ED', color: '#1A1A18' }}
+              style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
             />
           </div>
           <div className="flex gap-2 flex-wrap">
@@ -429,9 +429,9 @@ export default function NutritionOverviewPage() {
                 onClick={() => setFilter(f.key as any)}
                 className="px-4 py-2.5 rounded-xl text-[13px] font-medium transition-colors border whitespace-nowrap"
                 style={{
-                  backgroundColor: filter === f.key ? '#8B6914' : 'white',
+                  backgroundColor: filter === f.key ? '#1A1917' : 'white',
                   color: filter === f.key ? 'white' : '#8E8E93',
-                  borderColor: filter === f.key ? '#8B6914' : '#F0F0ED',
+                  borderColor: filter === f.key ? '#1A1917' : '#E8E4DC',
                 }}
               >
                 {f.label}
@@ -453,7 +453,7 @@ export default function NutritionOverviewPage() {
         {/* Client List */}
         <div className="space-y-3">
           {filteredClients.length === 0 ? (
-            <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+            <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
               <Apple strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#C7C7CC]" />
               <p className="text-[14px] text-[#8E8E93]">
                 {searchQuery ? 'Geen cliënten gevonden' : 'Nog geen cliënten'}
@@ -469,14 +469,14 @@ export default function NutritionOverviewPage() {
                 <Link
                   key={client.id}
                   href={`/coach/clients/${client.id}/nutrition`}
-                  className="block bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all group"
+                  className="block bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all group"
                 >
                   <div className="p-5">
                     <div className="flex items-center gap-4">
                       {/* Avatar */}
                       <div
                         className="w-11 h-11 rounded-full flex items-center justify-center text-[15px] font-semibold shrink-0"
-                        style={{ backgroundColor: '#F5F5F3', color: '#8B6914' }}
+                        style={{ backgroundColor: '#F5F5F3', color: '#1A1917' }}
                       >
                         {client.full_name
                           .split(' ')
@@ -544,13 +544,13 @@ export default function NutritionOverviewPage() {
                       {/* Arrow */}
                       <ChevronRight
                         strokeWidth={1.5}
-                        className="w-5 h-5 text-[#C7C7CC] group-hover:text-[#8B6914] transition-colors shrink-0"
+                        className="w-5 h-5 text-[#C7C7CC] group-hover:text-[#1A1917] transition-colors shrink-0"
                       />
                     </div>
 
                     {/* Today's compliance strip */}
                     {summary && summary.meals_planned > 0 && (
-                      <div className="mt-4 pt-4 border-t border-[#F0F0ED] flex items-center gap-4 text-[12px]">
+                      <div className="mt-4 pt-4 border-t border-[#E8E4DC] flex items-center gap-4 text-[12px]">
                         <div className="flex items-center gap-1.5">
                           <CheckCircle strokeWidth={1.5} className="w-3.5 h-3.5 text-[#34C759]" />
                           <span className="text-[#8E8E93]">

@@ -88,7 +88,7 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
         }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-[#F0F0ED]">
+        <div className="flex items-center justify-between p-4 border-b border-[#E8E4DC]">
           <h3 className="text-base font-semibold" style={{ color: '#1A1A18' }}>
             Notificatie naar {firstName}
           </h3>
@@ -138,7 +138,7 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
                   key={msg.label}
                   onClick={() => sendNotification(msg.title, msg.message, msg.url)}
                   disabled={sending}
-                  className="w-full text-left p-3 rounded-xl transition-all hover:bg-[#FAFAFA] border border-[#F0F0ED]"
+                  className="w-full text-left p-3 rounded-xl transition-all hover:bg-[#FAFAFA] border border-[#E8E4DC]"
                 >
                   <p className="text-sm font-semibold" style={{ color: '#1A1A18' }}>
                     {msg.label}
@@ -160,7 +160,7 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
                   value={customTitle}
                   onChange={(e) => setCustomTitle(e.target.value)}
                   placeholder="Notificatie titel..."
-                  className="w-full mt-1 p-3 rounded-xl border border-[#F0F0ED] text-sm focus:outline-none focus:border-[#8B6914]"
+                  className="w-full mt-1 p-3 rounded-xl border border-[#E8E4DC] text-sm focus:outline-none focus:border-[#1A1917]"
                   style={{ color: '#1A1A18' }}
                 />
               </div>
@@ -173,7 +173,7 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
                   onChange={(e) => setCustomMessage(e.target.value)}
                   placeholder="Typ je bericht..."
                   rows={3}
-                  className="w-full mt-1 p-3 rounded-xl border border-[#F0F0ED] text-sm focus:outline-none focus:border-[#8B6914] resize-none"
+                  className="w-full mt-1 p-3 rounded-xl border border-[#E8E4DC] text-sm focus:outline-none focus:border-[#1A1917] resize-none"
                   style={{ color: '#1A1A18' }}
                 />
               </div>
@@ -181,7 +181,7 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
                 onClick={() => sendNotification(customTitle, customMessage, '/client')}
                 disabled={sending || !customTitle.trim() || !customMessage.trim()}
                 className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-40"
-                style={{ backgroundColor: '#8B6914' }}
+                style={{ backgroundColor: '#1A1917' }}
               >
                 <span className="flex items-center justify-center gap-2">
                   <Send strokeWidth={1.5} className="w-4 h-4" />

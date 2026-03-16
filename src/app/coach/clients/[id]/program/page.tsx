@@ -335,7 +335,7 @@ export default function ProgramPage() {
                   <div className="flex gap-3">
                     <button
                       onClick={() => setShowStopConfirm(false)}
-                      className="px-4 py-2 rounded-lg text-[13px] font-medium border border-[#F0F0ED] text-[#8E8E93] hover:bg-white transition-colors"
+                      className="px-4 py-2 rounded-lg text-[13px] font-medium border border-[#E8E4DC] text-[#8E8E93] hover:bg-white transition-colors"
                     >
                       Annuleren
                     </button>
@@ -504,7 +504,7 @@ export default function ProgramPage() {
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" onClick={() => setShowSwitchPicker(false)} />
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[80vh] overflow-hidden">
-              <div className="p-5 border-b border-[#F0F0ED] flex items-center justify-between">
+              <div className="p-5 border-b border-[#E8E4DC] flex items-center justify-between">
                 <div>
                   <h2 className="text-[17px] font-semibold text-[#1A1A18]">Ander programma kiezen</h2>
                   <p className="text-[12px] text-[#8E8E93] mt-0.5">Het huidige programma wordt automatisch gestopt</p>
@@ -534,7 +534,7 @@ export default function ProgramPage() {
                         setShowSwitchPicker(false)
                         setShowAssignModal(true)
                       }}
-                      className="w-full flex items-center justify-between p-4 bg-[#FAFAFA] rounded-xl border border-[#F0F0ED] hover:border-[#8B6914] hover:bg-[#FFF8ED] transition-all text-left"
+                      className="w-full flex items-center justify-between p-4 bg-[#FAFAFA] rounded-xl border border-[#E8E4DC] hover:border-[#1A1917] hover:bg-[#F5F2EC] transition-all text-left"
                     >
                       <div>
                         <h5 className="text-[14px] font-semibold text-[#1A1A18]">{t.name}</h5>
@@ -542,10 +542,10 @@ export default function ProgramPage() {
                           {t.duration_weeks}w · {t.days_per_week}d/w · {difficultyLabels[t.difficulty] || t.difficulty}
                         </p>
                         {t.description && (
-                          <p className="text-[11px] text-[#BAB8B3] mt-1 line-clamp-1">{t.description}</p>
+                          <p className="text-[11px] text-[#C5C2BC] mt-1 line-clamp-1">{t.description}</p>
                         )}
                       </div>
-                      <span className="text-[12px] font-semibold text-[#8B6914] shrink-0 ml-3">
+                      <span className="text-[12px] font-semibold text-[#1A1917] shrink-0 ml-3">
                         Selecteer →
                       </span>
                     </button>

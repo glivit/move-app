@@ -95,8 +95,8 @@ export default function ResetPasswordPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="w-8 h-8 border-2 border-[#9B7B2E] border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-[15px] text-[#9C9A95]">Link verifiëren...</p>
+          <div className="w-8 h-8 border-2 border-[#1A1917] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-[15px] text-[#A09D96]">Link verifiëren...</p>
         </div>
       </div>
     )
@@ -148,7 +148,7 @@ export default function ResetPasswordPage() {
             {!hasSession && (
               <button
                 onClick={() => router.push('/')}
-                className="mt-3 text-sm font-medium text-[#8B6914] hover:underline"
+                className="mt-3 text-sm font-medium text-[#1A1917] hover:underline"
               >
                 Terug naar login →
               </button>

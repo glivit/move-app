@@ -377,14 +377,14 @@ export default function CoachClientProgressPage() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 border-b border-[#F0F0ED] overflow-x-auto">
+      <div className="flex gap-1 border-b border-[#E8E4DC] overflow-x-auto">
         {([
-          { id: 'fotos' as TabType, label: "Foto's", color: '#8B6914' },
+          { id: 'fotos' as TabType, label: "Foto's", color: '#1A1917' },
           { id: 'lichaam' as TabType, label: 'Lichaam', color: '#34C759' },
           { id: 'maten' as TabType, label: 'Omtrekmaten', color: '#FF9500' },
           { id: 'kracht' as TabType, label: 'Kracht', color: '#007AFF' },
           { id: 'prs' as TabType, label: "PR's", color: '#AF52DE' },
-          { id: 'compliance' as TabType, label: 'Compliance', color: '#8B6914' },
+          { id: 'compliance' as TabType, label: 'Compliance', color: '#1A1917' },
         ]).map(tab => (
           <button
             key={tab.id}
@@ -413,7 +413,7 @@ export default function CoachClientProgressPage() {
                 className={`px-4 py-2 rounded-xl text-[13px] font-medium transition-all ${
                   photoPosition === pos
                     ? 'bg-[#1A1A18] text-white'
-                    : 'bg-[#FAFAFA] text-[#8E8E93] border border-[#F0F0ED] hover:bg-[#F5F0E8]'
+                    : 'bg-[#FAFAFA] text-[#8E8E93] border border-[#E8E4DC] hover:bg-[#EDEAE4]'
                 }`}
               >
                 {positionLabels[pos]}
@@ -429,7 +429,7 @@ export default function CoachClientProgressPage() {
                   const photoUrl = entry.photos[photoPosition]
                   return (
                     <div key={idx} className="space-y-2">
-                      <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#FAFAFA] border border-[#F0F0ED]">
+                      <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#FAFAFA] border border-[#E8E4DC]">
                         {photoUrl ? (
                           <img src={photoUrl} alt={`${entry.label} ${positionLabels[photoPosition]}`} className="w-full h-full object-cover" />
                         ) : (
@@ -439,7 +439,7 @@ export default function CoachClientProgressPage() {
                           </div>
                         )}
                         {idx === 0 && (
-                          <span className="absolute top-2 left-2 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#8B6914] text-white">
+                          <span className="absolute top-2 left-2 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#1A1917] text-white">
                             Start
                           </span>
                         )}
@@ -460,7 +460,7 @@ export default function CoachClientProgressPage() {
 
               {/* Side by side: Start vs Latest */}
               {photoTimeline.length >= 2 && (
-                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
                   <h3 className="text-[15px] font-semibold text-[#1A1A18] mb-4">Start vs. Nu</h3>
                   <div className="grid grid-cols-2 gap-4">
                     {[photoTimeline[0], photoTimeline[photoTimeline.length - 1]].map((entry, idx) => {
@@ -490,7 +490,7 @@ export default function CoachClientProgressPage() {
               )}
             </>
           ) : (
-            <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+            <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
               <Camera className="w-10 h-10 mx-auto mb-3 text-[#C7C7CC]" strokeWidth={1.5} />
               <p className="text-[#1A1A18] font-semibold mb-1">Nog geen foto's</p>
               <p className="text-[#8E8E93] text-[14px]">Foto's verschijnen na de eerste check-in of onboarding.</p>
@@ -504,15 +504,15 @@ export default function CoachClientProgressPage() {
         <div className="space-y-6">
           {/* Weight Chart */}
           {lichaamData.length > 0 && (
-            <div className="bg-white rounded-2xl p-5 shadow-card border border-[#F0F0ED]">
+            <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
               <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-4">Gewicht</h3>
               <div style={{ height: 250 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={lichaamData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F0F0ED" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DC" />
                     <XAxis dataKey="dateShort" tick={{ fontSize: 12, fill: '#C7C7CC' }} />
                     <YAxis tick={{ fontSize: 12, fill: '#C7C7CC' }} domain={['dataMin - 2', 'dataMax + 2']} />
-                    <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #F0F0ED', borderRadius: '0.75rem' }} />
+                    <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }} />
                     <Line type="monotone" dataKey="weight" name="Gewicht (kg)" stroke="#34C759" strokeWidth={2} dot={{ fill: '#34C759', r: 4 }} activeDot={{ r: 6 }} connectNulls />
                   </LineChart>
                 </ResponsiveContainer>
@@ -522,15 +522,15 @@ export default function CoachClientProgressPage() {
 
           {/* Body Fat Chart */}
           {lichaamData.some(d => d.bodyFat) && (
-            <div className="bg-white rounded-2xl p-5 shadow-card border border-[#F0F0ED]">
+            <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
               <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-4">Vetpercentage</h3>
               <div style={{ height: 250 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={lichaamData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F0F0ED" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DC" />
                     <XAxis dataKey="dateShort" tick={{ fontSize: 12, fill: '#C7C7CC' }} />
                     <YAxis tick={{ fontSize: 12, fill: '#C7C7CC' }} />
-                    <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #F0F0ED', borderRadius: '0.75rem' }} />
+                    <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }} />
                     <Line type="monotone" dataKey="bodyFat" name="Vet (%)" stroke="#AF52DE" strokeWidth={2} dot={{ fill: '#AF52DE', r: 4 }} connectNulls />
                   </LineChart>
                 </ResponsiveContainer>
@@ -540,15 +540,15 @@ export default function CoachClientProgressPage() {
 
           {/* Muscle Mass Chart */}
           {lichaamData.some(d => d.muscle) && (
-            <div className="bg-white rounded-2xl p-5 shadow-card border border-[#F0F0ED]">
+            <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
               <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-4">Spiermassa</h3>
               <div style={{ height: 250 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={lichaamData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F0F0ED" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DC" />
                     <XAxis dataKey="dateShort" tick={{ fontSize: 12, fill: '#C7C7CC' }} />
                     <YAxis tick={{ fontSize: 12, fill: '#C7C7CC' }} />
-                    <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #F0F0ED', borderRadius: '0.75rem' }} />
+                    <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }} />
                     <Line type="monotone" dataKey="muscle" name="Spiermassa (kg)" stroke="#007AFF" strokeWidth={2} dot={{ fill: '#007AFF', r: 4 }} connectNulls />
                   </LineChart>
                 </ResponsiveContainer>
@@ -558,7 +558,7 @@ export default function CoachClientProgressPage() {
 
           {/* Current vs Start summary */}
           {(intakeData?.weight_kg || latest) && (
-            <div className="bg-white rounded-2xl p-5 shadow-card border border-[#F0F0ED]">
+            <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
               <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-4">Start vs. Nu</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
@@ -595,7 +595,7 @@ export default function CoachClientProgressPage() {
       {/* ═══ OMTREKMATEN TAB ═══ */}
       {activeTab === 'maten' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl p-5 shadow-card border border-[#F0F0ED]">
+          <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
             <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-4">Omtrekmaten vergelijking</h3>
 
             {/* Table header */}
@@ -611,7 +611,7 @@ export default function CoachClientProgressPage() {
                       </th>
                     ))}
                     {intakeData && latest && (
-                      <th className="text-right px-3 py-2.5 font-medium text-[#8B6914]">Verschil</th>
+                      <th className="text-right px-3 py-2.5 font-medium text-[#1A1917]">Verschil</th>
                     )}
                   </tr>
                 </thead>
@@ -625,7 +625,7 @@ export default function CoachClientProgressPage() {
                     if (!hasAnyData) return null
 
                     return (
-                      <tr key={key} className="border-t border-[#F0F0ED]">
+                      <tr key={key} className="border-t border-[#E8E4DC]">
                         <td className="px-3 py-2.5 font-medium text-[#1A1A18]">{label}</td>
                         {intakeData && (
                           <td className="px-3 py-2.5 text-right text-[#1A1A18]">
@@ -667,12 +667,12 @@ export default function CoachClientProgressPage() {
       {/* ═══ KRACHT TAB ═══ */}
       {activeTab === 'kracht' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl p-5 shadow-card border border-[#F0F0ED]">
+          <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
             <label className="text-[13px] font-semibold text-[#1A1A18] block mb-3">Selecteer oefening</label>
             <select
               value={selectedExerciseId}
               onChange={(e) => setSelectedExerciseId(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl border border-[#F0F0ED] bg-white text-[15px] focus:outline-none focus:ring-2 focus:ring-[#007AFF]"
+              className="w-full px-4 py-2 rounded-xl border border-[#E8E4DC] bg-white text-[15px] focus:outline-none focus:ring-2 focus:ring-[#007AFF]"
             >
               {exercisesWithData.map(ex => (
                 <option key={ex.id} value={ex.id}>{ex.name_nl || ex.name}</option>
@@ -681,22 +681,22 @@ export default function CoachClientProgressPage() {
           </div>
 
           {krachtData.length > 0 && selectedExercise ? (
-            <div className="bg-white rounded-2xl p-5 shadow-card border border-[#F0F0ED]">
+            <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
               <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-4">{selectedExercise.name_nl || selectedExercise.name}</h3>
               <div style={{ height: 250 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={krachtData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F0F0ED" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DC" />
                     <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#C7C7CC' }} />
                     <YAxis tick={{ fontSize: 12, fill: '#C7C7CC' }} />
-                    <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #F0F0ED', borderRadius: '0.75rem' }} />
+                    <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }} />
                     <Line type="monotone" dataKey="weight" stroke="#007AFF" strokeWidth={2} dot={{ fill: '#007AFF', r: 4 }} activeDot={{ r: 6 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl p-12 shadow-card border border-[#F0F0ED] text-center">
+            <div className="bg-white rounded-2xl p-12 shadow-card border border-[#E8E4DC] text-center">
               <p className="text-[#C7C7CC] text-[15px]">Geen data beschikbaar</p>
             </div>
           )}
@@ -709,7 +709,7 @@ export default function CoachClientProgressPage() {
           {personalRecords.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {personalRecords.map(pr => (
-                <div key={pr.id} className="bg-white rounded-2xl p-5 shadow-card border border-[#F0F0ED] flex items-start gap-4">
+                <div key={pr.id} className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC] flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full bg-[#AF52DE] flex items-center justify-center flex-shrink-0">
                     <Trophy size={20} className="text-white" strokeWidth={1.5} />
                   </div>
@@ -728,7 +728,7 @@ export default function CoachClientProgressPage() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-2xl p-12 shadow-card border border-[#F0F0ED] text-center">
+            <div className="bg-white rounded-2xl p-12 shadow-card border border-[#E8E4DC] text-center">
               <Trophy size={32} className="text-[#C7C7CC] mx-auto mb-4" strokeWidth={1.5} />
               <p className="text-[#1A1A18] font-semibold mb-1">Nog geen PR's</p>
               <p className="text-[#C7C7CC] text-[15px]">PR's verschijnen na gelogde workouts</p>
@@ -740,16 +740,16 @@ export default function CoachClientProgressPage() {
       {/* ═══ COMPLIANCE TAB ═══ */}
       {activeTab === 'compliance' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl p-6 shadow-card border border-[#F0F0ED]">
+          <div className="bg-white rounded-2xl p-6 shadow-card border border-[#E8E4DC]">
             <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-6">Workouts deze maand</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center mb-2">
                 <p className="text-[15px] text-[#8E8E93]">Voltooide workouts</p>
                 <p className="text-[17px] font-semibold text-[#1A1A18]">{complianceData.completed} / {complianceData.total}</p>
               </div>
-              <div className="w-full bg-[#F0F0ED] rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-[#E8E4DC] rounded-full h-2 overflow-hidden">
                 <div
-                  className="bg-[#8B6914] h-full transition-all duration-300"
+                  className="bg-[#1A1917] h-full transition-all duration-300"
                   style={{ width: `${complianceData.total > 0 ? (complianceData.completed / complianceData.total) * 100 : 0}%` }}
                 />
               </div>

@@ -24,8 +24,8 @@ const notifConfig: Record<NotificationType, { icon: React.ReactNode; bg: string 
     bg: 'bg-[#3068C4]/8',
   },
   prompt: {
-    icon: <FileText className="w-4 h-4 text-[#9B7B2E]" />,
-    bg: 'bg-[#C8A96E]/10',
+    icon: <FileText className="w-4 h-4 text-[#1A1917]" />,
+    bg: 'bg-[#333330]/10',
   },
   message: {
     icon: <MessageCircle className="w-4 h-4 text-[#3068C4]" />,
@@ -142,10 +142,10 @@ export function NotificationCenter() {
       {/* Bell */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-xl hover:bg-[#F5F2ED] transition-colors"
+        className="relative p-2 rounded-xl hover:bg-[#EEEBE3] transition-colors"
         aria-label="Meldingen"
       >
-        <Bell strokeWidth={1.5} className="w-6 h-6 text-[#5C5A55]" />
+        <Bell strokeWidth={1.5} className="w-6 h-6 text-[#6B6862]" />
         {count > 0 && (
           <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-[20px] rounded-full bg-[#FF3B30] flex items-center justify-center px-1">
             <span className="text-[11px] font-bold text-white leading-none">
@@ -161,13 +161,13 @@ export function NotificationCenter() {
           className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl overflow-hidden z-50"
           style={{
             boxShadow: '0 4px 24px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.06)',
-            border: '1px solid #F0F0ED',
+            border: '1px solid #E8E4DC',
           }}
         >
-          <div className="px-4 py-3 border-b border-[#F0F0ED] flex items-center justify-between">
+          <div className="px-4 py-3 border-b border-[#E8E4DC] flex items-center justify-between">
             <h3 className="text-[15px] font-semibold text-[#1A1917] tracking-[-0.01em]">Meldingen</h3>
             {count > 0 && (
-              <span className="text-[12px] font-medium text-[#9B7B2E] bg-[#9B7B2E]/8 px-2 py-0.5 rounded-full">
+              <span className="text-[12px] font-medium text-[#1A1917] bg-[#1A1917]/8 px-2 py-0.5 rounded-full">
                 {count}
               </span>
             )}
@@ -176,8 +176,8 @@ export function NotificationCenter() {
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
               <div className="p-8 text-center">
-                <Bell strokeWidth={1.5} className="w-8 h-8 text-[#D1CFC9] mx-auto mb-2" />
-                <p className="text-[14px] text-[#9C9A95]">Geen meldingen</p>
+                <Bell strokeWidth={1.5} className="w-8 h-8 text-[#CCC7BC] mx-auto mb-2" />
+                <p className="text-[14px] text-[#A09D96]">Geen meldingen</p>
               </div>
             ) : (
               notifications.map((n) => (
@@ -185,15 +185,15 @@ export function NotificationCenter() {
                   key={n.id}
                   href={n.url}
                   onClick={() => setIsOpen(false)}
-                  className="flex items-start gap-3 px-4 py-3.5 border-b border-[#F0F0ED]/60 hover:bg-[#F5F2ED]/50 transition-colors"
+                  className="flex items-start gap-3 px-4 py-3.5 border-b border-[#E8E4DC]/60 hover:bg-[#EEEBE3]/50 transition-colors"
                 >
                   <div className={`flex-shrink-0 mt-0.5 w-8 h-8 rounded-full flex items-center justify-center ${notifConfig[n.type].bg}`}>
                     {notifConfig[n.type].icon}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[14px] font-medium text-[#1A1917] tracking-[-0.01em]">{n.title}</p>
-                    <p className="text-[13px] text-[#9C9A95] line-clamp-2 mt-0.5">{n.description}</p>
-                    <p className="text-[12px] text-[#D1CFC9] mt-1">
+                    <p className="text-[13px] text-[#A09D96] line-clamp-2 mt-0.5">{n.description}</p>
+                    <p className="text-[12px] text-[#CCC7BC] mt-1">
                       {formatDistanceToNow(new Date(n.timestamp), { addSuffix: true, locale: nl })}
                     </p>
                   </div>
@@ -207,7 +207,7 @@ export function NotificationCenter() {
             <Link
               href="/client/notifications"
               onClick={() => setIsOpen(false)}
-              className="block text-center text-[13px] font-medium text-[#9B7B2E] py-3 border-t border-[#F0F0ED] hover:bg-[#F5F2ED]/50 transition-colors"
+              className="block text-center text-[13px] font-medium text-[#1A1917] py-3 border-t border-[#E8E4DC] hover:bg-[#EEEBE3]/50 transition-colors"
             >
               Alle meldingen bekijken
             </Link>

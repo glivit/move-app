@@ -110,7 +110,7 @@ function formatTimer(seconds: number): string {
 
 export default function ActiveWorkoutPageWrapper() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#111110] flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#C8A96E] border-t-transparent rounded-full animate-spin" /></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[#111110] flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#333330] border-t-transparent rounded-full animate-spin" /></div>}>
       <ActiveWorkoutPage />
     </Suspense>
   )
@@ -383,7 +383,7 @@ function ActiveWorkoutPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#111110] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#C8A96E] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#333330] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -399,14 +399,14 @@ function ActiveWorkoutPage() {
               const delay = Math.random() * 0.6
               const dur = 1.5 + Math.random() * 1
               const size = 6 + Math.random() * 6
-              const colors = ['#C8A96E', '#FF9500', '#34C759', '#FF3B30', '#007AFF', '#FFD700']
+              const colors = ['#333330', '#FF9500', '#34C759', '#FF3B30', '#007AFF', '#FFD700']
               return (
                 <div key={i} style={{ position: 'absolute', left: `${left}%`, top: '-10px', width: `${size}px`, height: `${size * 0.6}px`, backgroundColor: colors[i % colors.length], borderRadius: '2px', transform: `rotate(${Math.random() * 360}deg)`, animation: `confettiFall ${dur}s ease-in ${delay}s forwards`, opacity: 0 }} />
               )
             })}
           </div>
           <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[61] animate-bounce-in">
-            <div className="bg-[#C8A96E] text-[#111110] rounded-2xl px-5 py-3 shadow-[0_8px_24px_rgba(200,169,110,0.4)] flex items-center gap-2">
+            <div className="bg-[#333330] text-[#111110] rounded-2xl px-5 py-3 shadow-[0_8px_24px_rgba(200,169,110,0.4)] flex items-center gap-2">
               <span className="text-2xl">🏆</span>
               <div>
                 <p className="text-[13px] font-bold uppercase tracking-wide">Nieuw PR!</p>
@@ -444,7 +444,7 @@ function ActiveWorkoutPage() {
           </button>
 
           <div className="flex items-center gap-2">
-            <Clock size={16} className="text-[#C8A96E]" />
+            <Clock size={16} className="text-[#333330]" />
             <span className="text-[17px] font-semibold text-white tabular-nums">{formatTimer(workoutSeconds)}</span>
           </div>
 
@@ -453,7 +453,7 @@ function ActiveWorkoutPage() {
             className={`px-4 py-2 rounded-xl font-semibold text-[14px] transition-all ${
               allDone
                 ? 'bg-[#34C759] text-white shadow-[0_2px_12px_rgba(52,199,89,0.3)]'
-                : 'bg-[#C8A96E] text-[#111110]'
+                : 'bg-[#333330] text-[#111110]'
             }`}
           >
             Afronden
@@ -462,7 +462,7 @@ function ActiveWorkoutPage() {
 
         {/* Overall progress bar */}
         <div className="h-[2px] bg-[#2A2A28]">
-          <div className="h-full bg-[#C8A96E] transition-all duration-500" style={{ width: `${totalSets > 0 ? (completedTotal / totalSets) * 100 : 0}%` }} />
+          <div className="h-full bg-[#333330] transition-all duration-500" style={{ width: `${totalSets > 0 ? (completedTotal / totalSets) * 100 : 0}%` }} />
         </div>
       </header>
 
@@ -490,7 +490,7 @@ function ActiveWorkoutPage() {
                     <h3 className="text-[15px] font-semibold text-white leading-tight">
                       {exerciseData.name_nl || exerciseData.name}
                     </h3>
-                    <Info size={14} className="text-[#C8A96E] flex-shrink-0" />
+                    <Info size={14} className="text-[#333330] flex-shrink-0" />
                   </button>
                   <span className="text-[12px] text-[#666] font-medium ml-2">
                     {exCompleted}/{exSets.length}
@@ -523,8 +523,8 @@ function ActiveWorkoutPage() {
                     />
                   </div>
                   {exerciseData.coach_tips && (
-                    <div className="bg-[#C8A96E]/10 rounded-xl p-3">
-                      <p className="text-[11px] font-semibold text-[#C8A96E] uppercase tracking-wider mb-1">Coach tips</p>
+                    <div className="bg-[#333330]/10 rounded-xl p-3">
+                      <p className="text-[11px] font-semibold text-[#333330] uppercase tracking-wider mb-1">Coach tips</p>
                       <p className="text-[13px] text-[#CCCAC5] leading-relaxed">{exerciseData.coach_tips}</p>
                     </div>
                   )}
@@ -586,13 +586,13 @@ function ActiveWorkoutPage() {
                           <div className="flex items-center gap-2 px-1 py-1.5">
                             <div className="flex-1 h-[6px] bg-[#2A2A28] rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-[#C8A96E] rounded-full transition-all duration-1000 ease-linear"
+                                className="h-full bg-[#333330] rounded-full transition-all duration-1000 ease-linear"
                                 style={{ width: `${((activeRestTimer.total - activeRestTimer.seconds) / activeRestTimer.total) * 100}%` }}
                               />
                             </div>
                             <button
                               onClick={() => setActiveRestTimer(null)}
-                              className="text-[12px] font-semibold text-[#C8A96E] tabular-nums min-w-[44px] text-right"
+                              className="text-[12px] font-semibold text-[#333330] tabular-nums min-w-[44px] text-right"
                             >
                               {formatTimer(activeRestTimer.seconds)}
                             </button>
@@ -606,7 +606,7 @@ function ActiveWorkoutPage() {
                 {/* Add set button */}
                 <button
                   onClick={() => addSet(ex.id)}
-                  className="w-full mt-2 py-2 flex items-center justify-center gap-1.5 text-[13px] font-medium text-[#C8A96E] hover:bg-[#C8A96E]/10 rounded-xl transition-colors touch-manipulation"
+                  className="w-full mt-2 py-2 flex items-center justify-center gap-1.5 text-[13px] font-medium text-[#333330] hover:bg-[#333330]/10 rounded-xl transition-colors touch-manipulation"
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   <Plus size={14} strokeWidth={2.5} />
@@ -632,7 +632,7 @@ function ActiveWorkoutPage() {
         <div className="mt-2 space-y-2">
           <button
             onClick={() => router.push(`/client/workout/active?dayId=${dayId}&programId=${programId}&addExercise=1`)}
-            className="w-full py-3.5 bg-[#C8A96E] text-[#111110] rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2"
+            className="w-full py-3.5 bg-[#333330] text-[#111110] rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2"
           >
             <Plus size={16} strokeWidth={2.5} />
             Oefening toevoegen
@@ -742,7 +742,7 @@ function SetRow({
         onChange={(e) => handleWeightChange(e.target.value)}
         placeholder={prefilledWeight ? `${prefilledWeight}` : '—'}
         disabled={set.completed}
-        className="w-[72px] px-2 py-2 bg-[#222220] border border-[#333] rounded-lg text-[14px] text-center font-semibold text-white disabled:opacity-40 focus:border-[#C8A96E] focus:ring-1 focus:ring-[#C8A96E]/30 transition-all placeholder:text-[#444] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        className="w-[72px] px-2 py-2 bg-[#222220] border border-[#333] rounded-lg text-[14px] text-center font-semibold text-white disabled:opacity-40 focus:border-[#333330] focus:ring-1 focus:ring-[#333330]/30 transition-all placeholder:text-[#444] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />
 
       {/* Reps input */}
@@ -754,7 +754,7 @@ function SetRow({
         onChange={(e) => handleRepsChange(e.target.value)}
         placeholder={set.prescribed_reps?.toString() || '—'}
         disabled={set.completed}
-        className="w-[64px] px-2 py-2 bg-[#222220] border border-[#333] rounded-lg text-[14px] text-center font-semibold text-white disabled:opacity-40 focus:border-[#C8A96E] focus:ring-1 focus:ring-[#C8A96E]/30 transition-all placeholder:text-[#444] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        className="w-[64px] px-2 py-2 bg-[#222220] border border-[#333] rounded-lg text-[14px] text-center font-semibold text-white disabled:opacity-40 focus:border-[#333330] focus:ring-1 focus:ring-[#333330]/30 transition-all placeholder:text-[#444] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />
 
       {/* Check button */}

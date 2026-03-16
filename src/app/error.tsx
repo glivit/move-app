@@ -10,8 +10,8 @@ interface ErrorPageProps {
 
 export default function ErrorPage({ error, reset }: ErrorPageProps) {
   return (
-    <div className="min-h-screen bg-[#F5F2ED] flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] p-8 space-y-6">
+    <div className="min-h-screen bg-[#EEEBE3] flex items-center justify-center px-4">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-8 space-y-6">
         <div className="flex justify-center">
           <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-red-600">
@@ -26,7 +26,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
           <h1 className="text-2xl font-semibold text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
             Er ging iets mis
           </h1>
-          <p className="text-[14px] text-[#9C9A95]">
+          <p className="text-[14px] text-[#A09D96]">
             {error.message || 'Er is een onverwachte fout opgetreden. Probeer het alstublieft opnieuw.'}
           </p>
         </div>
@@ -39,7 +39,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
             Opnieuw proberen
           </button>
           <a href="/" className="block">
-            <button className="w-full py-3 rounded-xl border border-[#E6E2DC] text-[#5C5A55] text-[14px] font-semibold hover:bg-[#F5F2ED] transition-colors">
+            <button className="w-full py-3 rounded-xl border border-[#DDD9D0] text-[#6B6862] text-[14px] font-semibold hover:bg-[#EEEBE3] transition-colors">
               Terug naar homepagina
             </button>
           </a>

@@ -47,7 +47,7 @@ export default async function IntakeFormPage({ params }: Props) {
           <ArrowLeft strokeWidth={1.5} className="w-4 h-4" />
           <span className="text-sm font-medium">Terug naar {profile.full_name}</span>
         </Link>
-        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] text-center">
+        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
           <p className="text-[#8E8E93]">Geen intake formulier beschikbaar voor deze cliënt.</p>
         </div>
       </div>
@@ -80,10 +80,10 @@ export default async function IntakeFormPage({ params }: Props) {
   }
 
   const Section = ({ icon: Icon, title, children }: { icon: any; title: string; children: React.ReactNode }) => (
-    <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+    <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
       <div className="flex items-center gap-3 mb-5">
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#F5F0E8' }}>
-          <Icon className="w-5 h-5" strokeWidth={1.5} style={{ color: '#8B6914' }} />
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#EDEAE4' }}>
+          <Icon className="w-5 h-5" strokeWidth={1.5} style={{ color: '#1A1917' }} />
         </div>
         <h2 className="text-[17px] font-semibold" style={{ color: '#1A1A18' }}>{title}</h2>
       </div>
@@ -142,7 +142,7 @@ export default async function IntakeFormPage({ params }: Props) {
               <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#8E8E93' }}>Secundaire doelen</p>
               <div className="flex flex-wrap gap-2 mt-2">
                 {i.secondary_goals.map((g: string) => (
-                  <span key={g} className="text-[13px] px-3 py-1.5 rounded-full" style={{ backgroundColor: '#F5F0E8', color: '#8B6914' }}>
+                  <span key={g} className="text-[13px] px-3 py-1.5 rounded-full" style={{ backgroundColor: '#EDEAE4', color: '#1A1917' }}>
                     {g}
                   </span>
                 ))}
@@ -163,7 +163,7 @@ export default async function IntakeFormPage({ params }: Props) {
               <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#8E8E93' }}>Voorkeursdagen</p>
               <div className="flex flex-wrap gap-2 mt-2">
                 {i.preferred_training_days.map((d: string) => (
-                  <span key={d} className="text-[13px] px-3 py-1.5 rounded-full" style={{ backgroundColor: '#F5F0E8', color: '#8B6914' }}>
+                  <span key={d} className="text-[13px] px-3 py-1.5 rounded-full" style={{ backgroundColor: '#EDEAE4', color: '#1A1917' }}>
                     {d}
                   </span>
                 ))}
@@ -204,7 +204,7 @@ export default async function IntakeFormPage({ params }: Props) {
                       key={n}
                       className="w-8 h-8 rounded-lg flex items-center justify-center text-[13px] font-medium"
                       style={{
-                        backgroundColor: n <= i.stress_level ? '#8B6914' : '#F5F0E8',
+                        backgroundColor: n <= i.stress_level ? '#1A1917' : '#EDEAE4',
                         color: n <= i.stress_level ? 'white' : '#8E8E93',
                       }}
                     >

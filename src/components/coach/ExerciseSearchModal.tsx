@@ -74,7 +74,7 @@ export function ExerciseSearchModal({ isOpen, onClose, onSelect }: ExerciseSearc
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[80vh] flex flex-col">
           {/* Header */}
-          <div className="p-5 border-b border-[#F0F0ED] flex items-center justify-between">
+          <div className="p-5 border-b border-[#E8E4DC] flex items-center justify-between">
             <h2 className="text-[17px] font-semibold text-[#1A1A18]">Oefening toevoegen</h2>
             <button
               onClick={onClose}
@@ -85,7 +85,7 @@ export function ExerciseSearchModal({ isOpen, onClose, onSelect }: ExerciseSearc
           </div>
 
           {/* Search Input */}
-          <div className="p-5 border-b border-[#F0F0ED]">
+          <div className="p-5 border-b border-[#E8E4DC]">
             <div className="relative">
               <Search
                 strokeWidth={1.5}
@@ -96,7 +96,7 @@ export function ExerciseSearchModal({ isOpen, onClose, onSelect }: ExerciseSearc
                 placeholder="Zoeken..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-[#FAFAFA] border border-[#F0F0ED] rounded-2xl text-[15px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                className="w-full pl-12 pr-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
               />
             </div>
           </div>
@@ -129,7 +129,7 @@ export function ExerciseSearchModal({ isOpen, onClose, onSelect }: ExerciseSearc
                   onClose()
                   setSearchQuery('')
                 }}
-                className="w-full px-5 py-4 border-b border-[#F0F0ED] hover:bg-[#FAFAFA] transition-colors flex items-start gap-3 text-left group"
+                className="w-full px-5 py-4 border-b border-[#E8E4DC] hover:bg-[#FAFAFA] transition-colors flex items-start gap-3 text-left group"
               >
                 {/* Mini GIF */}
                 <div className="w-8 h-8 rounded-lg bg-[#FAFAFA] flex-shrink-0 overflow-hidden flex items-center justify-center">
@@ -141,7 +141,7 @@ export function ExerciseSearchModal({ isOpen, onClose, onSelect }: ExerciseSearc
                       style={{ mixBlendMode: 'multiply' }}
                     />
                   ) : (
-                    <div className="w-full h-full bg-[#F0F0ED]" />
+                    <div className="w-full h-full bg-[#E8E4DC]" />
                   )}
                 </div>
 
@@ -151,11 +151,11 @@ export function ExerciseSearchModal({ isOpen, onClose, onSelect }: ExerciseSearc
                     {exercise.name_nl || exercise.name}
                   </p>
                   <div className="flex gap-2 mt-1.5">
-                    <span className="text-[11px] bg-[#F5F0E8] text-[#8B6914] px-2 py-0.5 rounded-full">
+                    <span className="text-[11px] bg-[#EDEAE4] text-[#1A1917] px-2 py-0.5 rounded-full">
                       {exercise.body_part}
                     </span>
                     {exercise.equipment && (
-                      <span className="text-[11px] bg-[#F0F0ED] text-[#8E8E93] px-2 py-0.5 rounded-full">
+                      <span className="text-[11px] bg-[#E8E4DC] text-[#8E8E93] px-2 py-0.5 rounded-full">
                         {exercise.equipment}
                       </span>
                     )}

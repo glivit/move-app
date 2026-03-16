@@ -89,7 +89,7 @@ export function CheckInReviewForm({ checkinId, existingNotes, isReviewed, review
           color: '#1A1A18',
         }}
         onFocus={(e) => {
-          e.currentTarget.style.borderColor = '#8B6914'
+          e.currentTarget.style.borderColor = '#1A1917'
           e.currentTarget.style.boxShadow = '0 0 0 3px rgba(200, 169, 110, 0.1)'
         }}
         onBlur={(e) => {

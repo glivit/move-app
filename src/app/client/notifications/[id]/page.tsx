@@ -74,7 +74,7 @@ export default function BroadcastDetailPage() {
   if (loading) {
     return (
       <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-[1.5px] border-[#9B7B2E] border-t-transparent" />
+        <div className="animate-spin rounded-full h-8 w-8 border-[1.5px] border-[#1A1917] border-t-transparent" />
       </div>
     )
   }
@@ -82,10 +82,10 @@ export default function BroadcastDetailPage() {
   if (!broadcast) {
     return (
       <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center gap-4">
-        <p className="text-[15px] text-[#9C9A95]">Melding niet gevonden</p>
+        <p className="text-[15px] text-[#A09D96]">Melding niet gevonden</p>
         <button
           onClick={handleClose}
-          className="text-[14px] font-medium text-[#9B7B2E] underline underline-offset-2"
+          className="text-[14px] font-medium text-[#1A1917] underline underline-offset-2"
         >
           Terug naar meldingen
         </button>
@@ -99,7 +99,7 @@ export default function BroadcastDetailPage() {
       style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       {/* Top bar with close button */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-[#F0F0ED]">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-[#E8E4DC]">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#3068C4]/10 flex items-center justify-center">
             <Megaphone strokeWidth={1.5} className="w-5 h-5 text-[#3068C4]" />
@@ -108,17 +108,17 @@ export default function BroadcastDetailPage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#3068C4]">
               Bericht van je coach
             </p>
-            <p className="text-[12px] text-[#9C9A95]">
+            <p className="text-[12px] text-[#A09D96]">
               {format(new Date(broadcast.created_at), 'd MMMM yyyy · HH:mm', { locale: nl })}
             </p>
           </div>
         </div>
         <button
           onClick={handleClose}
-          className="w-10 h-10 rounded-full bg-[#F5F2ED] flex items-center justify-center hover:bg-[#EBE8E2] transition-colors"
+          className="w-10 h-10 rounded-full bg-[#EEEBE3] flex items-center justify-center hover:bg-[#EBE8E2] transition-colors"
           aria-label="Sluiten"
         >
-          <X strokeWidth={1.5} className="w-5 h-5 text-[#5C5A55]" />
+          <X strokeWidth={1.5} className="w-5 h-5 text-[#6B6862]" />
         </button>
       </div>
 
@@ -137,7 +137,7 @@ export default function BroadcastDetailPage() {
       </div>
 
       {/* Bottom bar */}
-      <div className="px-6 py-5 border-t border-[#F0F0ED]">
+      <div className="px-6 py-5 border-t border-[#E8E4DC]">
         <button
           onClick={handleClose}
           className="w-full py-3.5 rounded-2xl bg-[#1A1917] text-white text-[15px] font-semibold tracking-[-0.01em] transition-all active:scale-[0.98]"

@@ -15,7 +15,7 @@ export default function GlobalError({
             <h1 style={{ fontSize: '24px', fontWeight: 600, color: '#1A1917', marginBottom: '8px' }}>
               Er ging iets mis
             </h1>
-            <p style={{ fontSize: '14px', color: '#9C9A95', marginBottom: '24px' }}>
+            <p style={{ fontSize: '14px', color: '#A09D96', marginBottom: '24px' }}>
               Er is een onverwachte fout opgetreden.
             </p>
             <button

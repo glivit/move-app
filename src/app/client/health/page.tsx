@@ -265,7 +265,7 @@ export default function HealthPage() {
                   onClick={() => updateField('sleep_quality', todayData.sleep_quality === opt.value ? undefined : opt.value)}
                   className="flex-1 py-2 rounded-xl text-center text-[11px] font-semibold border transition-all"
                   style={{
-                    borderColor: todayData.sleep_quality === opt.value ? opt.color : '#F0F0ED',
+                    borderColor: todayData.sleep_quality === opt.value ? opt.color : '#E8E4DC',
                     backgroundColor: todayData.sleep_quality === opt.value ? `${opt.color}15` : 'white',
                     color: todayData.sleep_quality === opt.value ? opt.color : '#8E8E93',
                   }}
@@ -378,8 +378,8 @@ export default function HealthPage() {
               onChange={(e) => updateField('notes', e.target.value)}
               rows={2}
               placeholder="Hoe voel je je vandaag?"
-              className="w-full mt-1 p-3 rounded-xl border text-[13px] resize-none focus:outline-none focus:border-[#8B6914]"
-              style={{ borderColor: '#F0F0ED', color: '#1A1A18' }}
+              className="w-full mt-1 p-3 rounded-xl border text-[13px] resize-none focus:outline-none focus:border-[#1A1917]"
+              style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
             />
           </div>
         </div>
@@ -389,7 +389,7 @@ export default function HealthPage() {
           onClick={saveMetrics}
           disabled={saving}
           className="w-full mt-4 py-3 rounded-xl text-[14px] font-semibold text-white transition-all disabled:opacity-50"
-          style={{ backgroundColor: saved ? '#34C759' : '#8B6914' }}
+          style={{ backgroundColor: saved ? '#34C759' : '#1A1917' }}
         >
           <span className="flex items-center justify-center gap-2">
             <Save size={16} strokeWidth={2} />

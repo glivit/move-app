@@ -137,7 +137,7 @@ export default function ResourcesPage() {
               onClick={() => setSelectedCategory(cat)}
               className="px-4 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all"
               style={{
-                backgroundColor: selectedCategory === cat ? '#8B6914' : 'white',
+                backgroundColor: selectedCategory === cat ? '#1A1917' : 'white',
                 color: selectedCategory === cat ? 'white' : '#8E8E93',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
               }}
@@ -191,15 +191,15 @@ export default function ResourcesPage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="h-2" style={{ backgroundColor: CATEGORY_COLORS[resource.category] || '#8B6914' }} />
+                    <div className="h-2" style={{ backgroundColor: CATEGORY_COLORS[resource.category] || '#1A1917' }} />
                   )}
                   <div className="p-5">
                     <div className="flex items-center gap-2 mb-2">
                       <span
                         className="px-2 py-0.5 rounded-md text-[11px] font-semibold"
                         style={{
-                          backgroundColor: CATEGORY_BG[resource.category] || '#FFF8ED',
-                          color: CATEGORY_COLORS[resource.category] || '#8B6914',
+                          backgroundColor: CATEGORY_BG[resource.category] || '#F5F2EC',
+                          color: CATEGORY_COLORS[resource.category] || '#1A1917',
                         }}
                       >
                         {resource.category}
@@ -244,15 +244,15 @@ export default function ResourcesPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="h-1.5" style={{ backgroundColor: CATEGORY_COLORS[resource.category] || '#8B6914' }} />
+                  <div className="h-1.5" style={{ backgroundColor: CATEGORY_COLORS[resource.category] || '#1A1917' }} />
                 )}
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-1.5">
                     <span
                       className="px-2 py-0.5 rounded-md text-[10px] font-semibold"
                       style={{
-                        backgroundColor: CATEGORY_BG[resource.category] || '#FFF8ED',
-                        color: CATEGORY_COLORS[resource.category] || '#8B6914',
+                        backgroundColor: CATEGORY_BG[resource.category] || '#F5F2EC',
+                        color: CATEGORY_COLORS[resource.category] || '#1A1917',
                       }}
                     >
                       {resource.category}
@@ -308,8 +308,8 @@ export default function ResourcesPage() {
                 <span
                   className="px-2.5 py-1 rounded-lg text-[11px] font-semibold"
                   style={{
-                    backgroundColor: CATEGORY_BG[selectedResource.category] || '#FFF8ED',
-                    color: CATEGORY_COLORS[selectedResource.category] || '#8B6914',
+                    backgroundColor: CATEGORY_BG[selectedResource.category] || '#F5F2EC',
+                    color: CATEGORY_COLORS[selectedResource.category] || '#1A1917',
                   }}
                 >
                   {selectedResource.category}
@@ -339,7 +339,7 @@ export default function ResourcesPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 rounded-xl text-[13px] font-semibold transition-all"
-                  style={{ backgroundColor: '#FFF8ED', color: '#8B6914' }}
+                  style={{ backgroundColor: '#F5F2EC', color: '#1A1917' }}
                 >
                   Bekijk externe link
                   <ChevronRight size={14} strokeWidth={2} />

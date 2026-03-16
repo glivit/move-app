@@ -95,7 +95,7 @@ export default function NewProgramPage() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/coach/programs" className="inline-flex items-center gap-2 text-[#8B6914] mb-6 hover:text-[#1A1A18] transition-colors">
+          <Link href="/coach/programs" className="inline-flex items-center gap-2 text-[#1A1917] mb-6 hover:text-[#1A1A18] transition-colors">
             <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
             <span className="text-[15px] font-medium">Terug</span>
           </Link>
@@ -110,7 +110,7 @@ export default function NewProgramPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] p-6">
+          <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-6">
             {/* Name */}
             <div className="mb-6">
               <label htmlFor="name" className="block text-[13px] font-medium text-[#8E8E93] mb-2">
@@ -123,7 +123,7 @@ export default function NewProgramPage() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="bijv. Fullbody Strength"
-                className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#F0F0ED] rounded-2xl text-[15px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
               />
             </div>
 
@@ -142,7 +142,7 @@ export default function NewProgramPage() {
                 onChange={handleChange}
                 placeholder="Beschrijf het doel en focus van dit programma..."
                 rows={4}
-                className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#F0F0ED] rounded-2xl text-[15px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors resize-none"
+                className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors resize-none"
               />
             </div>
 
@@ -162,7 +162,7 @@ export default function NewProgramPage() {
                   min="1"
                   value={formData.duration_weeks}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#F0F0ED] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                  className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
                 />
               </div>
 
@@ -180,7 +180,7 @@ export default function NewProgramPage() {
                   min="1"
                   value={formData.days_per_week}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#F0F0ED] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                  className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
                 />
               </div>
             </div>
@@ -198,7 +198,7 @@ export default function NewProgramPage() {
                 name="difficulty"
                 value={formData.difficulty}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#F0F0ED] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
               >
                 <option value="beginner">Beginner</option>
                 <option value="intermediate">Intermediate</option>
@@ -218,7 +218,7 @@ export default function NewProgramPage() {
                 value={formData.tags}
                 onChange={handleChange}
                 placeholder="Voer tags in gescheiden door komma's (bijv. 'Bulk, Hypertrophy')"
-                className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#F0F0ED] rounded-2xl text-[15px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:bg-white transition-colors"
+                className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
               />
             </div>
           </div>
@@ -240,7 +240,7 @@ export default function NewProgramPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-[#8B6914] text-white px-6 py-3 rounded-2xl font-medium text-[15px] hover:bg-[#6d5410] focus:outline-none focus:ring-2 focus:ring-[#8B6914] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors inline-flex items-center justify-center"
+              className="flex-1 bg-[#1A1917] text-white px-6 py-3 rounded-2xl font-medium text-[15px] hover:bg-[#6d5410] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors inline-flex items-center justify-center"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
               {loading ? 'Maken...' : 'Programma maken'}

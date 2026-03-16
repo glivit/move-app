@@ -154,7 +154,7 @@ export default function ResourcesPage() {
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       {/* Header */}
-      <div className="border-b border-[#F0F0ED]">
+      <div className="border-b border-[#E8E4DC]">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="flex justify-between items-start">
             <div>
@@ -190,7 +190,7 @@ export default function ResourcesPage() {
               <p className="text-[11px]" style={{ color: '#8E8E93' }}>Video&apos;s</p>
             </div>
             <div className="text-center">
-              <p className="text-[20px] font-bold" style={{ color: '#8B6914' }}>{stats.featured}</p>
+              <p className="text-[20px] font-bold" style={{ color: '#1A1917' }}>{stats.featured}</p>
               <p className="text-[11px]" style={{ color: '#8E8E93' }}>Uitgelicht</p>
             </div>
           </div>
@@ -200,7 +200,7 @@ export default function ResourcesPage() {
       <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Search & Filter */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="flex-1 flex items-center gap-2 px-4 py-2.5 bg-white rounded-xl border border-[#F0F0ED]">
+          <div className="flex-1 flex items-center gap-2 px-4 py-2.5 bg-white rounded-xl border border-[#E8E4DC]">
             <Search size={16} strokeWidth={1.5} style={{ color: '#C7C7CC' }} />
             <input
               type="text"
@@ -211,7 +211,7 @@ export default function ResourcesPage() {
               style={{ color: '#1A1A18' }}
             />
           </div>
-          <div className="flex gap-1 p-1 bg-[#F0F0ED] rounded-xl">
+          <div className="flex gap-1 p-1 bg-[#E8E4DC] rounded-xl">
             {[
               { key: 'all', label: 'Alles' },
               { key: 'article', label: 'Artikelen' },
@@ -235,7 +235,7 @@ export default function ResourcesPage() {
         {showForm && (
           <div
             className="mb-8 p-8 rounded-2xl border"
-            style={{ backgroundColor: 'white', borderColor: '#F0F0ED', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+            style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
           >
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-[17px] font-display" style={{ color: '#1A1A18' }}>
@@ -260,7 +260,7 @@ export default function ResourcesPage() {
                         onClick={() => setFormData({ ...formData, content_type: key })}
                         className="flex items-center gap-2 py-2.5 px-3 rounded-xl border text-[12px] font-semibold transition-all"
                         style={{
-                          borderColor: formData.content_type === key ? cfg.color : '#F0F0ED',
+                          borderColor: formData.content_type === key ? cfg.color : '#E8E4DC',
                           color: formData.content_type === key ? cfg.color : '#8E8E93',
                           backgroundColor: formData.content_type === key ? `${cfg.color}10` : 'white',
                         }}
@@ -281,8 +281,8 @@ export default function ResourcesPage() {
                     required
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full mt-1 px-4 py-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#8B6914]"
-                    style={{ borderColor: '#F0F0ED', color: '#1A1A18' }}
+                    className="w-full mt-1 px-4 py-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#1A1917]"
+                    style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
                   />
                 </div>
                 <div>
@@ -290,8 +290,8 @@ export default function ResourcesPage() {
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full mt-1 px-4 py-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#8B6914]"
-                    style={{ borderColor: '#F0F0ED', color: '#1A1A18' }}
+                    className="w-full mt-1 px-4 py-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#1A1917]"
+                    style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
                   >
                     {Object.keys(categoryColors).map((cat) => (
                       <option key={cat} value={cat}>{cat}</option>
@@ -307,8 +307,8 @@ export default function ResourcesPage() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={2}
-                  className="w-full mt-1 px-4 py-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#8B6914] resize-none"
-                  style={{ borderColor: '#F0F0ED', color: '#1A1A18' }}
+                  className="w-full mt-1 px-4 py-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#1A1917] resize-none"
+                  style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
                 />
               </div>
 
@@ -324,8 +324,8 @@ export default function ResourcesPage() {
                       value={formData.video_url}
                       onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
                       placeholder="https://youtube.com/watch?v=..."
-                      className="w-full mt-1 px-4 py-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#8B6914]"
-                      style={{ borderColor: '#F0F0ED', color: '#1A1A18' }}
+                      className="w-full mt-1 px-4 py-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#1A1917]"
+                      style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
                     />
                   </div>
                   <div>
@@ -336,8 +336,8 @@ export default function ResourcesPage() {
                       type="number"
                       value={formData.duration_minutes || ''}
                       onChange={(e) => setFormData({ ...formData, duration_minutes: parseInt(e.target.value) || 0 })}
-                      className="w-full mt-1 px-4 py-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#8B6914]"
-                      style={{ borderColor: '#F0F0ED', color: '#1A1A18' }}
+                      className="w-full mt-1 px-4 py-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#1A1917]"
+                      style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
                     />
                   </div>
                 </div>
@@ -350,8 +350,8 @@ export default function ResourcesPage() {
                     type="url"
                     value={formData.url}
                     onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                    className="w-full mt-1 px-4 py-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#8B6914]"
-                    style={{ borderColor: '#F0F0ED', color: '#1A1A18' }}
+                    className="w-full mt-1 px-4 py-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#1A1917]"
+                    style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
                   />
                 </div>
                 <div>
@@ -360,8 +360,8 @@ export default function ResourcesPage() {
                     type="url"
                     value={formData.thumbnail_url}
                     onChange={(e) => setFormData({ ...formData, thumbnail_url: e.target.value })}
-                    className="w-full mt-1 px-4 py-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#8B6914]"
-                    style={{ borderColor: '#F0F0ED', color: '#1A1A18' }}
+                    className="w-full mt-1 px-4 py-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#1A1917]"
+                    style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
                   />
                 </div>
               </div>
@@ -373,8 +373,8 @@ export default function ResourcesPage() {
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                   rows={5}
-                  className="w-full mt-1 px-4 py-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#8B6914] resize-none"
-                  style={{ borderColor: '#F0F0ED', color: '#1A1A18' }}
+                  className="w-full mt-1 px-4 py-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#1A1917] resize-none"
+                  style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
                 />
               </div>
 
@@ -384,7 +384,7 @@ export default function ResourcesPage() {
                   type="checkbox"
                   checked={formData.is_featured}
                   onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
-                  className="w-4 h-4 rounded accent-[#8B6914]"
+                  className="w-4 h-4 rounded accent-[#1A1917]"
                 />
                 <span className="text-[13px] font-medium" style={{ color: '#1A1A18' }}>
                   Uitgelicht (bovenaan voor cliënten)
@@ -396,14 +396,14 @@ export default function ResourcesPage() {
                   type="button"
                   onClick={resetForm}
                   className="px-5 py-2.5 rounded-xl text-[13px] font-medium border transition-all"
-                  style={{ borderColor: '#F0F0ED', color: '#1A1A18' }}
+                  style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
                 >
                   Annuleren
                 </button>
                 <button
                   type="submit"
                   className="px-5 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-all hover:opacity-90"
-                  style={{ backgroundColor: '#8B6914' }}
+                  style={{ backgroundColor: '#1A1917' }}
                 >
                   {editingId ? 'Opslaan' : 'Publiceren'}
                 </button>
@@ -416,13 +416,13 @@ export default function ResourcesPage() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 bg-white rounded-2xl animate-pulse border border-[#F0F0ED]" />
+              <div key={i} className="h-48 bg-white rounded-2xl animate-pulse border border-[#E8E4DC]" />
             ))}
           </div>
         ) : filteredResources.length === 0 ? (
           <div
             className="p-12 text-center rounded-2xl border"
-            style={{ backgroundColor: 'white', borderColor: '#F0F0ED' }}
+            style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
           >
             <FileText size={40} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#C7C7CC' }} />
             <p className="text-[15px]" style={{ color: '#8E8E93' }}>
@@ -432,7 +432,7 @@ export default function ResourcesPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredResources.map((resource) => {
-              const catColor = categoryColors[resource.category] || { color: '#8B6914', bg: '#FFF8ED' }
+              const catColor = categoryColors[resource.category] || { color: '#1A1917', bg: '#F5F2EC' }
               const typeConfig = contentTypeConfig[resource.content_type] || contentTypeConfig.article
               const TypeIcon = typeConfig.icon
 
@@ -440,11 +440,11 @@ export default function ResourcesPage() {
                 <div
                   key={resource.id}
                   className="rounded-2xl border overflow-hidden group"
-                  style={{ backgroundColor: 'white', borderColor: '#F0F0ED', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                  style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
                 >
                   {/* Thumbnail / Type indicator */}
                   {resource.thumbnail_url ? (
-                    <div className="relative aspect-video bg-[#F0F0ED] overflow-hidden">
+                    <div className="relative aspect-video bg-[#E8E4DC] overflow-hidden">
                       <img src={resource.thumbnail_url} alt="" className="w-full h-full object-cover" />
                       {resource.content_type === 'video' && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
@@ -475,7 +475,7 @@ export default function ResourcesPage() {
                         {typeConfig.label}
                       </span>
                       {resource.is_featured && (
-                        <Star size={10} strokeWidth={2} style={{ color: '#8B6914' }} fill="#8B6914" />
+                        <Star size={10} strokeWidth={2} style={{ color: '#1A1917' }} fill="#1A1917" />
                       )}
                       {resource.duration_minutes ? (
                         <span className="text-[10px]" style={{ color: '#C7C7CC' }}>
@@ -505,15 +505,15 @@ export default function ResourcesPage() {
                           title={resource.is_featured ? 'Verwijder uitgelicht' : 'Maak uitgelicht'}
                         >
                           <Star size={14} strokeWidth={1.5}
-                            style={{ color: resource.is_featured ? '#8B6914' : '#C7C7CC' }}
-                            fill={resource.is_featured ? '#8B6914' : 'none'}
+                            style={{ color: resource.is_featured ? '#1A1917' : '#C7C7CC' }}
+                            fill={resource.is_featured ? '#1A1917' : 'none'}
                           />
                         </button>
                         <button
                           onClick={() => handleEdit(resource)}
                           className="p-1.5 rounded-lg hover:bg-[#FAFAFA] transition-all"
                         >
-                          <Edit2 size={14} strokeWidth={1.5} style={{ color: '#8B6914' }} />
+                          <Edit2 size={14} strokeWidth={1.5} style={{ color: '#1A1917' }} />
                         </button>
                         <button
                           onClick={() => handleDelete(resource.id)}

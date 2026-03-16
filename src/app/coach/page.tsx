@@ -64,8 +64,8 @@ export default async function CoachDashboard() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#F5F2ED] px-5 py-10 flex items-center justify-center">
-        <p className="text-[#5C5A55]">Niet ingelogd</p>
+      <div className="min-h-screen bg-[#EEEBE3] px-5 py-10 flex items-center justify-center">
+        <p className="text-[#6B6862]">Niet ingelogd</p>
       </div>
     )
   }
@@ -104,7 +104,7 @@ export default async function CoachDashboard() {
 
   const feedbackSessions = (feedbackData || []).filter((s: any) => s.difficulty_rating || s.feedback_text || s.mood_rating)
   const difficultyLabels: Record<number, string> = { 1: 'Te makkelijk', 2: 'Makkelijk', 3: 'Perfect', 4: 'Zwaar', 5: 'Te zwaar' }
-  const difficultyColors: Record<number, string> = { 1: 'text-[#3068C4]', 2: 'text-[#3D8B5C]', 3: 'text-[#9B7B2E]', 4: 'text-[#C47D15]', 5: 'text-[#C4372A]' }
+  const difficultyColors: Record<number, string> = { 1: 'text-[#3068C4]', 2: 'text-[#3D8B5C]', 3: 'text-[#1A1917]', 4: 'text-[#C47D15]', 5: 'text-[#C4372A]' }
 
   const greeting = getGreeting()
   const dateFormatted = formatDateDutch(new Date())
@@ -122,7 +122,7 @@ export default async function CoachDashboard() {
         <h1 className="text-[40px] font-semibold text-[#1A1917] tracking-[-0.03em] leading-[1.1]" style={{ fontFamily: 'var(--font-display)' }}>
           {greeting}, Glenn
         </h1>
-        <p className="mt-2.5 text-[15px] text-[#9C9A95] tracking-[-0.01em]">{dateFormatted}</p>
+        <p className="mt-2.5 text-[15px] text-[#A09D96] tracking-[-0.01em]">{dateFormatted}</p>
       </div>
 
       {/* KPI Cards */}
@@ -132,7 +132,7 @@ export default async function CoachDashboard() {
             <div className={`card-elevated p-6 cursor-pointer group animate-gentle-rise stagger-${i + 1}`} style={{ animationFillMode: 'both' }}>
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-[11px] font-bold text-[#BAB8B3] mb-3 uppercase tracking-[0.08em]">{card.label}</p>
+                  <p className="text-[11px] font-bold text-[#C5C2BC] mb-3 uppercase tracking-[0.08em]">{card.label}</p>
                   <p className="text-[34px] font-semibold text-[#1A1917] tracking-[-0.03em] leading-none">{card.value}</p>
                 </div>
                 <div className={`w-12 h-12 rounded-2xl ${card.iconBg} flex items-center justify-center flex-shrink-0`}>
@@ -146,11 +146,11 @@ export default async function CoachDashboard() {
         <div className="card-elevated p-6 animate-gentle-rise stagger-4" style={{ animationFillMode: 'both' }}>
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-[11px] font-bold text-[#BAB8B3] mb-3 uppercase tracking-[0.08em]">MRR</p>
+              <p className="text-[11px] font-bold text-[#C5C2BC] mb-3 uppercase tracking-[0.08em]">MRR</p>
               <p className="text-[34px] font-semibold text-[#1A1917] tracking-[-0.03em] leading-none">€{(mrr / 1000).toFixed(1)}k</p>
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#9B7B2E]/12 to-[#9B7B2E]/5 flex items-center justify-center flex-shrink-0">
-              <TrendingUp className="w-[22px] h-[22px] text-[#9B7B2E]" strokeWidth={1.5} />
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#1A1917]/12 to-[#1A1917]/5 flex items-center justify-center flex-shrink-0">
+              <TrendingUp className="w-[22px] h-[22px] text-[#1A1917]" strokeWidth={1.5} />
             </div>
           </div>
         </div>
@@ -165,21 +165,21 @@ export default async function CoachDashboard() {
           <div className="space-y-5">
             {recentCheckinsFormatted.length > 0 && (
               <div className="card-tactile overflow-hidden">
-                <div className="px-6 py-4 border-b border-[#EEEBE6] flex items-center gap-2.5">
+                <div className="px-6 py-4 border-b border-[#E8E4DC] flex items-center gap-2.5">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#C47D15] shadow-[0_0_6px_rgba(196,125,21,0.3)]" />
                   <p className="text-[14px] font-semibold text-[#1A1917]">Check-ins</p>
-                  <span className="text-[12px] text-[#9C9A95] ml-auto font-medium">{recentCheckinsFormatted.length} openstaand</span>
+                  <span className="text-[12px] text-[#A09D96] ml-auto font-medium">{recentCheckinsFormatted.length} openstaand</span>
                 </div>
                 {recentCheckinsFormatted.map((checkin, index) => (
                   <Link key={checkin.id} href={`/coach/check-ins/${checkin.id}`}
-                    className={`flex items-center justify-between px-6 py-4 hover:bg-[#FAF8F5] transition-all duration-[280ms] group ${index !== recentCheckinsFormatted.length - 1 ? 'border-b border-[#EEEBE6]' : ''}`}>
+                    className={`flex items-center justify-between px-6 py-4 hover:bg-[#FAF8F5] transition-all duration-[280ms] group ${index !== recentCheckinsFormatted.length - 1 ? 'border-b border-[#E8E4DC]' : ''}`}>
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <p className="text-[15px] font-medium text-[#1A1917] truncate">{checkin.clientName}</p>
                       <PackageBadge tier={checkin.packageTier} size="sm" />
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-[13px] text-[#BAB8B3]">{checkin.timeSince}</span>
-                      <ChevronRight className="w-4 h-4 text-[#BAB8B3] group-hover:text-[#9B7B2E] group-hover:translate-x-0.5 transition-all duration-[280ms]" strokeWidth={1.5} />
+                      <span className="text-[13px] text-[#C5C2BC]">{checkin.timeSince}</span>
+                      <ChevronRight className="w-4 h-4 text-[#C5C2BC] group-hover:text-[#1A1917] group-hover:translate-x-0.5 transition-all duration-[280ms]" strokeWidth={1.5} />
                     </div>
                   </Link>
                 ))}
@@ -188,21 +188,21 @@ export default async function CoachDashboard() {
 
             {recentMessagesFormatted.length > 0 && (
               <div className="card-tactile overflow-hidden">
-                <div className="px-6 py-4 border-b border-[#EEEBE6] flex items-center gap-2.5">
+                <div className="px-6 py-4 border-b border-[#E8E4DC] flex items-center gap-2.5">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#3068C4] shadow-[0_0_6px_rgba(48,104,196,0.3)]" />
                   <p className="text-[14px] font-semibold text-[#1A1917]">Berichten</p>
-                  <span className="text-[12px] text-[#9C9A95] ml-auto font-medium">{recentMessagesFormatted.length} ongelezen</span>
+                  <span className="text-[12px] text-[#A09D96] ml-auto font-medium">{recentMessagesFormatted.length} ongelezen</span>
                 </div>
                 {recentMessagesFormatted.map((message, index) => (
                   <Link key={message.id} href="/coach/messages"
-                    className={`flex items-center justify-between px-6 py-4 hover:bg-[#FAF8F5] transition-all duration-[280ms] group ${index !== recentMessagesFormatted.length - 1 ? 'border-b border-[#EEEBE6]' : ''}`}>
+                    className={`flex items-center justify-between px-6 py-4 hover:bg-[#FAF8F5] transition-all duration-[280ms] group ${index !== recentMessagesFormatted.length - 1 ? 'border-b border-[#E8E4DC]' : ''}`}>
                     <div className="flex-1 min-w-0">
                       <p className="text-[15px] font-medium text-[#1A1917]">{message.clientName}</p>
-                      <p className="text-[13px] text-[#9C9A95] truncate mt-0.5">{message.preview}</p>
+                      <p className="text-[13px] text-[#A09D96] truncate mt-0.5">{message.preview}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-[13px] text-[#BAB8B3]">{message.timeSince}</span>
-                      <ChevronRight className="w-4 h-4 text-[#BAB8B3] group-hover:text-[#9B7B2E] group-hover:translate-x-0.5 transition-all duration-[280ms]" strokeWidth={1.5} />
+                      <span className="text-[13px] text-[#C5C2BC]">{message.timeSince}</span>
+                      <ChevronRight className="w-4 h-4 text-[#C5C2BC] group-hover:text-[#1A1917] group-hover:translate-x-0.5 transition-all duration-[280ms]" strokeWidth={1.5} />
                     </div>
                   </Link>
                 ))}
@@ -211,24 +211,24 @@ export default async function CoachDashboard() {
 
             {feedbackSessions.length > 0 && (
               <div className="card-tactile overflow-hidden">
-                <div className="px-6 py-4 border-b border-[#EEEBE6] flex items-center gap-2.5">
+                <div className="px-6 py-4 border-b border-[#E8E4DC] flex items-center gap-2.5">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#7B5EA7] shadow-[0_0_6px_rgba(123,94,167,0.3)]" />
                   <p className="text-[14px] font-semibold text-[#1A1917]">Workout Feedback</p>
-                  <span className="text-[12px] text-[#9C9A95] ml-auto font-medium">{feedbackSessions.length} nieuw</span>
+                  <span className="text-[12px] text-[#A09D96] ml-auto font-medium">{feedbackSessions.length} nieuw</span>
                 </div>
                 {feedbackSessions.map((session: any, index: number) => (
                   <Link key={session.id} href={`/coach/clients/${session.client_id}`}
-                    className={`flex items-center justify-between px-6 py-4 hover:bg-[#FAF8F5] transition-all duration-[280ms] group ${index !== feedbackSessions.length - 1 ? 'border-b border-[#EEEBE6]' : ''}`}>
+                    className={`flex items-center justify-between px-6 py-4 hover:bg-[#FAF8F5] transition-all duration-[280ms] group ${index !== feedbackSessions.length - 1 ? 'border-b border-[#E8E4DC]' : ''}`}>
                     <div className="flex-1 min-w-0">
                       <p className="text-[15px] font-medium text-[#1A1917]">{session.profiles?.full_name || 'Client'}</p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        {session.difficulty_rating && <span className={`text-[12px] font-medium ${difficultyColors[session.difficulty_rating] || 'text-[#9C9A95]'}`}>{difficultyLabels[session.difficulty_rating]}</span>}
-                        {session.feedback_text && <span className="text-[12px] text-[#9C9A95] truncate max-w-[200px]">{session.feedback_text.substring(0, 40)}{session.feedback_text.length > 40 ? '...' : ''}</span>}
+                        {session.difficulty_rating && <span className={`text-[12px] font-medium ${difficultyColors[session.difficulty_rating] || 'text-[#A09D96]'}`}>{difficultyLabels[session.difficulty_rating]}</span>}
+                        {session.feedback_text && <span className="text-[12px] text-[#A09D96] truncate max-w-[200px]">{session.feedback_text.substring(0, 40)}{session.feedback_text.length > 40 ? '...' : ''}</span>}
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-[13px] text-[#BAB8B3]">{session.completed_at ? timeSince(session.completed_at) : ''}</span>
-                      <ChevronRight className="w-4 h-4 text-[#BAB8B3] group-hover:text-[#9B7B2E] group-hover:translate-x-0.5 transition-all duration-[280ms]" strokeWidth={1.5} />
+                      <span className="text-[13px] text-[#C5C2BC]">{session.completed_at ? timeSince(session.completed_at) : ''}</span>
+                      <ChevronRight className="w-4 h-4 text-[#C5C2BC] group-hover:text-[#1A1917] group-hover:translate-x-0.5 transition-all duration-[280ms]" strokeWidth={1.5} />
                     </div>
                   </Link>
                 ))}
@@ -245,7 +245,7 @@ export default async function CoachDashboard() {
             <CheckCircle2 className="w-7 h-7 text-[#3D8B5C]" strokeWidth={1.5} />
           </div>
           <h3 className="text-[18px] font-semibold text-[#1A1917] mb-1.5">Alles is in orde</h3>
-          <p className="text-[14px] text-[#9C9A95]">Geen actie vereist op dit moment.</p>
+          <p className="text-[14px] text-[#A09D96]">Geen actie vereist op dit moment.</p>
         </div>
       )}
 
@@ -267,15 +267,15 @@ export default async function CoachDashboard() {
               <div className="card-tactile p-5 cursor-pointer group">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#F7F3EA] to-[#F0EDE8] flex items-center justify-center" style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.5)' }}>
-                      <action.icon className="w-[22px] h-[22px] text-[#9B7B2E]" strokeWidth={1.5} />
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#EDEAE4] to-[#E5E1D9] flex items-center justify-center" style={{ boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.5)' }}>
+                      <action.icon className="w-[22px] h-[22px] text-[#1A1917]" strokeWidth={1.5} />
                     </div>
                     <div>
                       <span className="text-[15px] font-medium text-[#1A1917] block">{action.label}</span>
-                      <span className="text-[12px] text-[#9C9A95] mt-0.5 block">{action.desc}</span>
+                      <span className="text-[12px] text-[#A09D96] mt-0.5 block">{action.desc}</span>
                     </div>
                   </div>
-                  <ArrowUpRight className="w-4 h-4 text-[#BAB8B3] group-hover:text-[#9B7B2E] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all duration-[280ms]" strokeWidth={1.5} />
+                  <ArrowUpRight className="w-4 h-4 text-[#C5C2BC] group-hover:text-[#1A1917] group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all duration-[280ms]" strokeWidth={1.5} />
                 </div>
               </div>
             </Link>

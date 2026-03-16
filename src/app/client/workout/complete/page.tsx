@@ -43,7 +43,7 @@ interface ExerciseGroup {
 
 export default function WorkoutCompletePageWrapper() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#8B6914] border-t-transparent rounded-full animate-spin" /></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#1A1917] border-t-transparent rounded-full animate-spin" /></div>}>
       <WorkoutCompletePage />
     </Suspense>
   )
@@ -66,7 +66,7 @@ function WorkoutCompletePage() {
 
   // ─── Confetti (hook BEFORE any conditional returns) ───────
   const spawnConfetti = useCallback(() => {
-    const colors = ['#FF9500', '#8B6914', '#34C759', '#007AFF', '#FF3B30', '#AF52DE', '#FFCC00']
+    const colors = ['#FF9500', '#1A1917', '#34C759', '#007AFF', '#FF3B30', '#AF52DE', '#FFCC00']
     const container = document.body
     for (let i = 0; i < 40; i++) {
       const el = document.createElement('div')
@@ -209,8 +209,8 @@ function WorkoutCompletePage() {
     return (
       <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
         <div className="animate-pulse">
-          <div className="w-32 h-32 bg-[#F0F0ED] rounded-2xl mb-4" />
-          <div className="w-24 h-4 bg-[#F0F0ED] rounded mx-auto" />
+          <div className="w-32 h-32 bg-[#E8E4DC] rounded-2xl mb-4" />
+          <div className="w-24 h-4 bg-[#E8E4DC] rounded mx-auto" />
         </div>
       </div>
     )
@@ -250,7 +250,7 @@ function WorkoutCompletePage() {
   const difficultyOptions = [
     { value: 1, label: 'Te makkelijk', color: '#007AFF', bg: '#007AFF' },
     { value: 2, label: 'Makkelijk', color: '#34C759', bg: '#34C759' },
-    { value: 3, label: 'Perfect', color: '#8B6914', bg: '#8B6914' },
+    { value: 3, label: 'Perfect', color: '#1A1917', bg: '#1A1917' },
     { value: 4, label: 'Zwaar', color: '#FF9500', bg: '#FF9500' },
     { value: 5, label: 'Te zwaar', color: '#FF3B30', bg: '#FF3B30' },
   ]
@@ -262,7 +262,7 @@ function WorkoutCompletePage() {
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       {/* Celebratory header */}
-      <header className="bg-white border-b border-[#F0F0ED] pt-6">
+      <header className="bg-white border-b border-[#E8E4DC] pt-6">
         <div className="max-w-2xl mx-auto px-4 text-center pb-8">
           <div className="text-6xl mb-4">🎉</div>
           <h1 className="font-display text-3xl font-semibold text-[#1A1A18]">
@@ -277,15 +277,15 @@ function WorkoutCompletePage() {
       <main className="max-w-2xl mx-auto px-4 py-6 pb-32">
         {/* Stats grid */}
         <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
             <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-2">Duur</p>
             <p className="text-3xl font-bold text-[#1A1A18]">{minutes}m {secs}s</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED]">
+          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
             <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-2">Sets</p>
             <p className="text-3xl font-bold text-[#1A1A18]">{totalSets}</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] col-span-2">
+          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] col-span-2">
             <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-2">Totaal volume</p>
             <p className="text-3xl font-bold text-[#1A1A18]">{totalVolume.toLocaleString('nl-BE')} kg</p>
           </div>
@@ -303,7 +303,7 @@ function WorkoutCompletePage() {
         </div>
 
         {/* Section: Mood */}
-        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] mb-4">
+        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] mb-4">
           <p className="text-[13px] text-[#8E8E93] uppercase font-medium tracking-wide mb-4">
             Hoe voelde je je?
           </p>
@@ -314,8 +314,8 @@ function WorkoutCompletePage() {
                 onClick={() => setMoodRating(mood.value)}
                 className={`flex-1 aspect-square rounded-xl flex flex-col items-center justify-center gap-1 transition-all border-2 ${
                   moodRating === mood.value
-                    ? 'border-[#8B6914] bg-[#F5F0E8]'
-                    : 'border-transparent hover:bg-[#F0F0ED]'
+                    ? 'border-[#1A1917] bg-[#EDEAE4]'
+                    : 'border-transparent hover:bg-[#E8E4DC]'
                 }`}
               >
                 <span className="text-2xl">{mood.emoji}</span>
@@ -326,7 +326,7 @@ function WorkoutCompletePage() {
         </div>
 
         {/* Section: Difficulty */}
-        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] mb-4">
+        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] mb-4">
           <p className="text-[13px] text-[#8E8E93] uppercase font-medium tracking-wide mb-4">
             Moeilijkheidsgraad
           </p>
@@ -338,7 +338,7 @@ function WorkoutCompletePage() {
                 className={`flex-1 py-2.5 px-1 rounded-xl text-center transition-all border-2 ${
                   difficultyRating === opt.value
                     ? 'text-white'
-                    : 'border-transparent bg-[#F0F0ED] text-[#8E8E93] hover:bg-[#E8E8E5]'
+                    : 'border-transparent bg-[#E8E4DC] text-[#8E8E93] hover:bg-[#E8E8E5]'
                 }`}
                 style={
                   difficultyRating === opt.value
@@ -354,7 +354,7 @@ function WorkoutCompletePage() {
 
         {/* Section: Pain / Discomfort per exercise */}
         {exerciseGroups.length > 0 && (
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] mb-4">
+          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] mb-4">
             <div className="flex items-center justify-between mb-4">
               <p className="text-[13px] text-[#8E8E93] uppercase font-medium tracking-wide">
                 Pijn of ongemak?
@@ -367,7 +367,7 @@ function WorkoutCompletePage() {
             </div>
             <div className="space-y-2">
               {exerciseGroups.map((group) => (
-                <div key={group.exerciseId} className="rounded-xl border border-[#F0F0ED] overflow-hidden">
+                <div key={group.exerciseId} className="rounded-xl border border-[#E8E4DC] overflow-hidden">
                   <button
                     onClick={() => {
                       togglePain(group.exerciseId)
@@ -378,7 +378,7 @@ function WorkoutCompletePage() {
                       }
                     }}
                     className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${
-                      group.painFlag ? 'bg-[#FF3B30]/5' : 'hover:bg-[#F0F0ED]/50'
+                      group.painFlag ? 'bg-[#FF3B30]/5' : 'hover:bg-[#E8E4DC]/50'
                     }`}
                   >
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
@@ -419,7 +419,7 @@ function WorkoutCompletePage() {
         )}
 
         {/* Section: Feedback for coach */}
-        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] mb-4">
+        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] mb-4">
           <label className="block">
             <p className="text-[13px] text-[#8E8E93] uppercase font-medium tracking-wide mb-3">
               Feedback voor je coach
@@ -431,13 +431,13 @@ function WorkoutCompletePage() {
               value={feedbackText}
               onChange={(e) => setFeedbackText(e.target.value)}
               placeholder="bijv. &quot;Meer core oefeningen&quot;, &quot;Hip thrusts zijn te zwaar&quot;..."
-              className="w-full px-4 py-3 border border-[#F0F0ED] rounded-xl text-[14px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#8B6914] resize-none h-20"
+              className="w-full px-4 py-3 border border-[#E8E4DC] rounded-xl text-[14px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
             />
           </label>
         </div>
 
         {/* Section: Notes */}
-        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] mb-6">
+        <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] mb-6">
           <label className="block">
             <p className="text-[13px] text-[#8E8E93] uppercase font-medium tracking-wide mb-3">
               Notities (optioneel)
@@ -446,7 +446,7 @@ function WorkoutCompletePage() {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Hoe ging het? Extra opmerkingen..."
-              className="w-full px-4 py-3 border border-[#F0F0ED] rounded-xl text-[14px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#8B6914] resize-none h-20"
+              className="w-full px-4 py-3 border border-[#E8E4DC] rounded-xl text-[14px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
             />
           </label>
         </div>
@@ -455,7 +455,7 @@ function WorkoutCompletePage() {
         <button
           onClick={handleComplete}
           disabled={saving}
-          className="w-full py-4 px-4 bg-[#8B6914] text-white rounded-xl font-semibold text-[16px] flex items-center justify-center gap-2 hover:bg-[#6F5612] transition-colors disabled:opacity-60"
+          className="w-full py-4 px-4 bg-[#1A1917] text-white rounded-xl font-semibold text-[16px] flex items-center justify-center gap-2 hover:bg-[#6F5612] transition-colors disabled:opacity-60"
         >
           {saving ? 'Opslaan...' : 'Opslaan & Afsluiten'}
           <ChevronRight size={20} strokeWidth={1.5} />

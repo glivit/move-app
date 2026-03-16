@@ -115,7 +115,7 @@ export function PromptConfiguration({
             <Button
               type="submit"
               style={{
-                backgroundColor: '#8B6914',
+                backgroundColor: '#1A1917',
                 color: '#fff',
               }}
             >
@@ -152,7 +152,7 @@ export function PromptConfiguration({
                 onClick={() => onToggleActive(prompt.id, prompt.is_active)}
                 className="px-3 py-2 rounded-lg text-sm font-medium transition-colors"
                 style={{
-                  backgroundColor: prompt.is_active ? '#8B6914' : '#e0e0e0',
+                  backgroundColor: prompt.is_active ? '#1A1917' : '#e0e0e0',
                   color: prompt.is_active ? '#fff' : '#999',
                 }}
               >

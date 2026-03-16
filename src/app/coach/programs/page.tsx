@@ -101,7 +101,7 @@ export default function ProgramsPage() {
                   type="checkbox"
                   checked={showArchived}
                   onChange={(e) => setShowArchived(e.target.checked)}
-                  className="w-4 h-4 rounded border border-[#D0D0CC] text-[#8B6914]"
+                  className="w-4 h-4 rounded border border-[#D0D0CC] text-[#1A1917]"
                 />
                 <span className="text-[15px] text-[#8E8E93]">Gearchiveerde tonen</span>
               </label>
@@ -122,17 +122,17 @@ export default function ProgramsPage() {
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] p-6 animate-pulse"
+                className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-6 animate-pulse"
               >
-                <div className="h-6 bg-[#F0F0ED] rounded w-3/4 mb-3" />
-                <div className="h-4 bg-[#F0F0ED] rounded w-full mb-4" />
+                <div className="h-6 bg-[#E8E4DC] rounded w-3/4 mb-3" />
+                <div className="h-4 bg-[#E8E4DC] rounded w-full mb-4" />
                 <div className="flex gap-2 mb-4">
-                  <div className="h-6 bg-[#F0F0ED] rounded-full w-20" />
-                  <div className="h-6 bg-[#F0F0ED] rounded-full w-24" />
+                  <div className="h-6 bg-[#E8E4DC] rounded-full w-20" />
+                  <div className="h-6 bg-[#E8E4DC] rounded-full w-24" />
                 </div>
                 <div className="space-y-2">
-                  <div className="h-3 bg-[#F0F0ED] rounded w-1/2" />
-                  <div className="h-3 bg-[#F0F0ED] rounded w-2/3" />
+                  <div className="h-3 bg-[#E8E4DC] rounded w-1/2" />
+                  <div className="h-3 bg-[#E8E4DC] rounded w-2/3" />
                 </div>
               </div>
             ))}
@@ -154,7 +154,7 @@ export default function ProgramsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {programs.map((program) => (
               <Link key={program.id} href={`/coach/programs/${program.id}`}>
-                <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0ED] p-6 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-shadow cursor-pointer h-full flex flex-col">
+                <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-6 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-shadow cursor-pointer h-full flex flex-col">
                   {/* Header with Archive Button */}
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
@@ -175,7 +175,7 @@ export default function ProgramsPage() {
                         e.stopPropagation()
                         handleArchiveToggle(program)
                       }}
-                      className="p-2 text-[#8E8E93] hover:text-[#1A1A18] hover:bg-[#F5F0E8] rounded-lg transition-colors ml-2 flex-shrink-0"
+                      className="p-2 text-[#8E8E93] hover:text-[#1A1A18] hover:bg-[#EDEAE4] rounded-lg transition-colors ml-2 flex-shrink-0"
                       title={program.is_archived ? 'Archivering opheffen' : 'Archiveren'}
                     >
                       {program.is_archived ? (
@@ -198,10 +198,10 @@ export default function ProgramsPage() {
                     </span>
 
                     {/* Duration and Frequency */}
-                    <span className="text-[11px] bg-[#F5F0E8] text-[#8B6914] font-medium px-2.5 py-1 rounded-full">
+                    <span className="text-[11px] bg-[#EDEAE4] text-[#1A1917] font-medium px-2.5 py-1 rounded-full">
                       {program.duration_weeks}w
                     </span>
-                    <span className="text-[11px] bg-[#F5F0E8] text-[#8B6914] font-medium px-2.5 py-1 rounded-full">
+                    <span className="text-[11px] bg-[#EDEAE4] text-[#1A1917] font-medium px-2.5 py-1 rounded-full">
                       {program.days_per_week}d/w
                     </span>
                   </div>
@@ -212,7 +212,7 @@ export default function ProgramsPage() {
                       {program.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="text-[11px] bg-[#F0F0ED] text-[#8E8E93] px-2.5 py-1 rounded-full"
+                          className="text-[11px] bg-[#E8E4DC] text-[#8E8E93] px-2.5 py-1 rounded-full"
                         >
                           {tag}
                         </span>
