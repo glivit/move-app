@@ -1,7 +1,9 @@
 /**
  * Cron: Video Session Reminders
- * Runs every 15 minutes via Vercel Cron
- * Sends email reminders 24h and 1h before scheduled video sessions
+ * Runs daily at 07:00 via Vercel Cron (Hobby plan = max 1/day)
+ * Sends email reminders for:
+ *   - Sessions scheduled TODAY  → "vandaag" reminder
+ *   - Sessions scheduled TOMORROW → "morgen" reminder
  */
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
@@ -21,111 +23,122 @@ export async function GET(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
     const now = new Date()
 
-    // Find sessions in two windows:
-    // 1) 24h reminder: sessions 23h45m — 24h15m from now
-    // 2) 1h reminder: sessions 45m — 1h15m from now
-    const windows = [
-      {
-        type: '24h' as const,
-        from: new Date(now.getTime() + 23 * 60 * 60 * 1000 + 45 * 60 * 1000),
-        to: new Date(now.getTime() + 24 * 60 * 60 * 1000 + 15 * 60 * 1000),
-        subject: 'Video sessie morgen — MŌVE',
-        preheader: 'Je hebt morgen een video sessie met je coach',
-        heading: 'Video sessie morgen',
-        bodyFn: (time: string, date: string) =>
-          `Je hebt morgen een video sessie gepland om <strong>${time}</strong> (${date}). Zorg dat je op tijd klaar bent en een rustige plek hebt.`,
-      },
-      {
-        type: '1h' as const,
-        from: new Date(now.getTime() + 45 * 60 * 1000),
-        to: new Date(now.getTime() + 75 * 60 * 1000),
-        subject: 'Video sessie over 1 uur — MŌVE',
-        preheader: 'Je video sessie begint over 1 uur',
-        heading: 'Over 1 uur begint je sessie',
-        bodyFn: (time: string, date: string) =>
-          `Je video sessie met je coach start om <strong>${time}</strong>. Klik hieronder om deel te nemen wanneer het zover is.`,
-      },
-    ]
+    // Calculate today and tomorrow boundaries in UTC
+    // We use a wide window: from now until end of tomorrow
+    const todayStart = new Date(now)
+    todayStart.setHours(0, 0, 0, 0)
+
+    const tomorrowEnd = new Date(todayStart)
+    tomorrowEnd.setDate(tomorrowEnd.getDate() + 2) // end of tomorrow
+
+    // Find all scheduled sessions from now through end of tomorrow
+    const { data: sessions, error: sessionsError } = await supabase
+      .from('video_sessions')
+      .select('id, client_id, scheduled_at, duration_minutes, daily_room_url')
+      .eq('status', 'scheduled')
+      .gte('scheduled_at', now.toISOString())
+      .lt('scheduled_at', tomorrowEnd.toISOString())
+
+    if (sessionsError) {
+      return NextResponse.json({ error: sessionsError.message }, { status: 500 })
+    }
+
+    if (!sessions || sessions.length === 0) {
+      return NextResponse.json({ ok: true, sent: 0, message: 'No upcoming sessions' })
+    }
+
+    // Check which reminders were already sent
+    const sessionIds = sessions.map(s => s.id)
+    const { data: existingReminders } = await supabase
+      .from('video_session_reminders')
+      .select('video_session_id, reminder_type')
+      .in('video_session_id', sessionIds)
+
+    const sentSet = new Set(
+      (existingReminders || []).map(r => `${r.video_session_id}:${r.reminder_type}`)
+    )
 
     let totalSent = 0
     const errors: string[] = []
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://movestudio.be'
 
-    for (const window of windows) {
-      // Find upcoming sessions in this time window
-      const { data: sessions, error: sessionsError } = await supabase
-        .from('video_sessions')
-        .select('id, client_id, scheduled_at, duration_minutes, daily_room_url')
-        .eq('status', 'scheduled')
-        .gte('scheduled_at', window.from.toISOString())
-        .lte('scheduled_at', window.to.toISOString())
+    for (const session of sessions) {
+      const scheduledDate = new Date(session.scheduled_at)
+      const isToday = scheduledDate.toDateString() === now.toDateString()
 
-      if (sessionsError) {
-        errors.push(`Query error (${window.type}): ${sessionsError.message}`)
+      const tomorrow = new Date(now)
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      const isTomorrow = scheduledDate.toDateString() === tomorrow.toDateString()
+
+      // Determine reminder type
+      let reminderType: string
+      let subject: string
+      let preheader: string
+      let heading: string
+      let bodyText: (time: string, date: string) => string
+
+      if (isToday) {
+        reminderType = 'today'
+        subject = 'Video sessie vandaag — MŌVE'
+        preheader = 'Je hebt vandaag een video sessie met je coach'
+        heading = 'Vandaag: video sessie'
+        bodyText = (time, date) =>
+          `Je hebt vandaag een video sessie om <strong>${time}</strong>. Zorg dat je op tijd klaar bent en een rustige plek hebt.`
+      } else if (isTomorrow) {
+        reminderType = 'tomorrow'
+        subject = 'Video sessie morgen — MŌVE'
+        preheader = 'Je hebt morgen een video sessie met je coach'
+        heading = 'Morgen: video sessie'
+        bodyText = (time, date) =>
+          `Je hebt morgen (${date}) een video sessie om <strong>${time}</strong>. Zorg dat je op tijd klaar bent en een rustige plek hebt.`
+      } else {
         continue
       }
 
-      if (!sessions || sessions.length === 0) continue
+      // Skip if already sent
+      if (sentSet.has(`${session.id}:${reminderType}`)) continue
 
-      // Check which ones already received a reminder of this type
-      const sessionIds = sessions.map(s => s.id)
-      const { data: existingReminders } = await supabase
-        .from('video_session_reminders')
-        .select('video_session_id')
-        .in('video_session_id', sessionIds)
-        .eq('reminder_type', window.type)
+      // Get client profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, email')
+        .eq('id', session.client_id)
+        .single()
 
-      const alreadySent = new Set(existingReminders?.map(r => r.video_session_id) || [])
+      if (!profile?.email) continue
 
-      for (const session of sessions) {
-        if (alreadySent.has(session.id)) continue
+      const time = scheduledDate.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })
+      const date = scheduledDate.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })
+      const firstName = profile.full_name?.split(' ')[0] || ''
 
-        // Get client profile and email
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('full_name, email')
-          .eq('id', session.client_id)
-          .single()
+      try {
+        await sendNotificationEmail({
+          to: profile.email,
+          subject,
+          preheader,
+          heading: `${heading}${firstName ? `, ${firstName}` : ''}`,
+          body: bodyText(time, date),
+          ctaText: 'Naar video sessie',
+          ctaUrl: `${appUrl}/client/video/${session.id}`,
+        })
 
-        if (!profile?.email) continue
+        await supabase.from('video_session_reminders').insert({
+          video_session_id: session.id,
+          reminder_type: reminderType,
+          sent_at: new Date().toISOString(),
+          status: 'sent',
+        })
 
-        const scheduledDate = new Date(session.scheduled_at)
-        const time = scheduledDate.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })
-        const date = scheduledDate.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })
-        const firstName = profile.full_name?.split(' ')[0] || ''
+        totalSent++
+      } catch (emailErr: any) {
+        errors.push(`Email failed for ${session.id}: ${emailErr.message}`)
 
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://movestudio.be'
-
-        try {
-          await sendNotificationEmail({
-            to: profile.email,
-            subject: window.subject,
-            preheader: window.preheader,
-            heading: `${window.heading}${firstName ? `, ${firstName}` : ''}`,
-            body: window.bodyFn(time, date),
-            ctaText: 'Naar video sessie',
-            ctaUrl: `${appUrl}/client/video/${session.id}`,
-          })
-
-          // Log reminder as sent
-          await supabase.from('video_session_reminders').insert({
-            video_session_id: session.id,
-            reminder_type: window.type,
-            sent_at: new Date().toISOString(),
-            status: 'sent',
-          })
-
-          totalSent++
-        } catch (emailErr: any) {
-          errors.push(`Email failed for ${session.id}: ${emailErr.message}`)
-
-          // Log as failed
-          await supabase.from('video_session_reminders').insert({
-            video_session_id: session.id,
-            reminder_type: window.type,
-            sent_at: new Date().toISOString(),
-            status: 'failed',
-          })
-        }
+        await supabase.from('video_session_reminders').insert({
+          video_session_id: session.id,
+          reminder_type: reminderType,
+          sent_at: new Date().toISOString(),
+          status: 'failed',
+        })
       }
     }
 

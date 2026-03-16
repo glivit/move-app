@@ -4,7 +4,7 @@
 CREATE TABLE IF NOT EXISTS video_session_reminders (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   video_session_id UUID NOT NULL REFERENCES video_sessions(id) ON DELETE CASCADE,
-  reminder_type TEXT NOT NULL CHECK (reminder_type IN ('24h', '1h')),
+  reminder_type TEXT NOT NULL CHECK (reminder_type IN ('today', 'tomorrow')),
   sent_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   status TEXT NOT NULL DEFAULT 'sent' CHECK (status IN ('sent', 'failed')),
   created_at TIMESTAMPTZ DEFAULT now(),
