@@ -282,6 +282,16 @@ export async function GET(request: NextRequest) {
           label: nextTrainingDay.label,
         } : null,
         isRestDay: !todayTemplateDay,
+        // All scheduled training days (day_number → name) for calendar
+        scheduleDays: (program?.program_template_days || []).map((d: any) => ({
+          dayNumber: d.day_number,
+          name: d.name,
+          focus: d.focus,
+        })),
+        // Recent completed workout dates for calendar dots
+        completedDates: (weekWorkouts || [])
+          .filter((w: any) => w.completed_at)
+          .map((w: any) => w.completed_at?.split('T')[0]),
       },
 
       nutrition: nutritionPlan ? {

@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import {
   Flame, Dumbbell, Trophy, TrendingDown, TrendingUp,
-  Camera, Apple, ChevronRight,
-  Calendar, Activity, BarChart3, Ruler
+  ChevronRight,
+  Calendar, BarChart3, Ruler
 } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
@@ -76,50 +76,6 @@ function AnimatedNumber({ value, duration = 1200, suffix = '' }: { value: number
   }, [value, duration])
 
   return <span>{display}{suffix}</span>
-}
-
-// ─── Animated Bar ───────────────────────────────────────────
-
-function AnimatedBar({ value, maxValue, delay, color }: { value: number; maxValue: number; delay: number; color: string }) {
-  const [width, setWidth] = useState(0)
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setWidth(maxValue > 0 ? (value / maxValue) * 100 : 0)
-    }, delay)
-    return () => clearTimeout(timer)
-  }, [value, maxValue, delay])
-
-  return (
-    <div className="h-full transition-all duration-700 ease-out" style={{ width: `${width}%`, backgroundColor: color }} />
-  )
-}
-
-// ─── Circular Progress ──────────────────────────────────────
-
-function CircularProgress({ value, size = 72, strokeWidth = 5, color = '#3D8B5C' }: { value: number; size?: number; strokeWidth?: number; color?: string }) {
-  const [progress, setProgress] = useState(0)
-  const radius = (size - strokeWidth) / 2
-  const circumference = 2 * Math.PI * radius
-
-  useEffect(() => {
-    const timer = setTimeout(() => setProgress(value), 300)
-    return () => clearTimeout(timer)
-  }, [value])
-
-  const offset = circumference - (progress / 100) * circumference
-
-  return (
-    <svg width={size} height={size} className="transform -rotate-90">
-      <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#E5E1D9" strokeWidth={strokeWidth} />
-      <circle
-        cx={size / 2} cy={size / 2} r={radius} fill="none"
-        stroke={color} strokeWidth={strokeWidth} strokeLinecap="round"
-        strokeDasharray={circumference} strokeDashoffset={offset}
-        className="transition-all duration-1000 ease-out"
-      />
-    </svg>
-  )
 }
 
 // ─── Mini Sparkline ─────────────────────────────────────────
@@ -329,36 +285,6 @@ export default function ProgressPage() {
         </div>
       )}
 
-      {/* ═══ TRAININGSFREQUENTIE ═════════════════════════════ */}
-      <div className="border border-[#E8E4DC] bg-white p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <Activity strokeWidth={1.5} className="w-4 h-4 text-[#1A1917]" />
-          <span className="text-[13px] font-semibold text-[#1A1917]">Trainingsfrequentie</span>
-        </div>
-
-        <div className="flex gap-8">
-          <div>
-            <p className="text-[20px] font-bold text-[#1A1917]">
-              <AnimatedNumber value={training.workoutsPerWeek} suffix="x" duration={800} />
-            </p>
-            <p className="text-[11px] text-[#A09D96]">per week</p>
-          </div>
-          <div className="w-px bg-[#E8E4DC]" />
-          <div>
-            <p className="text-[20px] font-bold text-[#1A1917]">
-              <AnimatedNumber value={training.avgSessionMin} suffix="'" duration={800} />
-            </p>
-            <p className="text-[11px] text-[#A09D96]">gem. sessie</p>
-          </div>
-          <div className="w-px bg-[#E8E4DC]" />
-          <div>
-            <p className="text-[20px] font-bold text-[#1A1917]">
-              <AnimatedNumber value={Math.round(training.totalMinutes / 60)} suffix="u" duration={800} />
-            </p>
-            <p className="text-[11px] text-[#A09D96]">totaal</p>
-          </div>
-        </div>
-      </div>
 
       {/* ═══ GEWICHT SPARKLINE ════════════════════════════════ */}
       {body.weightData.length >= 2 && (
@@ -437,33 +363,6 @@ export default function ProgressPage() {
         </Link>
       )}
 
-      {/* ═══ VOEDING COMPLIANCE ══════════════════════════════ */}
-      {nutrition.compliance !== null && (
-        <Link
-          href="/client/nutrition"
-          className="block border border-[#E8E4DC] bg-white p-5 hover:bg-[#FAF8F3] transition-colors group"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Apple strokeWidth={1.5} className="w-4 h-4 text-[#3D8B5C]" />
-                <span className="text-[13px] font-semibold text-[#1A1917]">Voedingscompliance</span>
-              </div>
-              <p className="text-[13px] text-[#A09D96]">
-                {nutrition.daysTracked} dagen bijgehouden
-              </p>
-            </div>
-            <div className="relative">
-              <CircularProgress value={nutrition.compliance} size={72} color={nutrition.compliance >= 80 ? '#3D8B5C' : nutrition.compliance >= 50 ? '#C47D15' : '#E85D4A'} />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-[16px] font-bold text-[#1A1917]">
-                  <AnimatedNumber value={nutrition.compliance} suffix="%" duration={1000} />
-                </span>
-              </div>
-            </div>
-          </div>
-        </Link>
-      )}
 
       {/* ═══ QUICK LINKS — editorial grid ═══════════════════ */}
       <div className="grid grid-cols-2 border border-[#E8E4DC]">

@@ -6,7 +6,7 @@ import {
   Dumbbell, CheckCircle, ChevronRight, Apple, Video,
   MessageSquare, Calendar, ArrowRight, ShieldCheck,
   Flame, TrendingDown, TrendingUp, Activity,
-  ClipboardList, AlertCircle
+  ClipboardList, AlertCircle, ChevronLeft
 } from 'lucide-react'
 import { NotificationCenter } from '@/components/client/NotificationCenter'
 
@@ -36,6 +36,8 @@ interface DashboardData {
       label: string
     } | null
     isRestDay: boolean
+    scheduleDays: Array<{ dayNumber: number; name: string; focus: string | null }>
+    completedDates: string[]
   }
   nutrition: {
     meals: Array<{
@@ -87,6 +89,121 @@ function getGreeting() {
 
 function formatDate(date: Date) {
   return date.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })
+}
+
+// ─── Week Calendar ──────────────────────────────────────────
+
+function WeekCalendar({ scheduleDays, completedDates }: {
+  scheduleDays: Array<{ dayNumber: number; name: string; focus: string | null }>
+  completedDates: string[]
+}) {
+  const [selectedDay, setSelectedDay] = useState<number | null>(null)
+  const today = new Date()
+  const todayDow = today.getDay() === 0 ? 7 : today.getDay() // 1=ma, 7=zo
+  const dayLabels = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']
+
+  // Build 14 days from today
+  const days = Array.from({ length: 14 }, (_, i) => {
+    const d = new Date(today)
+    d.setDate(today.getDate() + i)
+    const dow = d.getDay() === 0 ? 7 : d.getDay()
+    const dateStr = d.toISOString().split('T')[0]
+    const scheduled = scheduleDays.find(s => s.dayNumber === dow)
+    const completed = completedDates.includes(dateStr)
+    return {
+      date: d,
+      dateStr,
+      dayOfMonth: d.getDate(),
+      dayLabel: dayLabels[dow - 1],
+      dow,
+      scheduled,
+      completed,
+      isToday: i === 0,
+    }
+  })
+
+  const selectedInfo = selectedDay !== null ? days[selectedDay] : null
+
+  return (
+    <div className="bg-white border border-[#E8E4DC] animate-slide-up" style={{ animationDelay: '240ms' }}>
+      <div className="px-5 pt-5 pb-3">
+        <div className="flex items-center gap-2 mb-4">
+          <Calendar size={16} strokeWidth={1.5} className="text-[#1A1917]" />
+          <span className="text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.06em]">Schema</span>
+        </div>
+
+        {/* Day pills — scrollable row */}
+        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+          {days.map((day, i) => {
+            const isSelected = selectedDay === i
+            const hasTraining = !!day.scheduled
+            return (
+              <button
+                key={day.dateStr}
+                onClick={() => setSelectedDay(isSelected ? null : i)}
+                className={`flex flex-col items-center min-w-[42px] py-2 px-1 transition-all shrink-0 ${
+                  isSelected
+                    ? 'bg-[#1A1917] text-white'
+                    : day.isToday
+                      ? 'bg-[#F5F2EC]'
+                      : ''
+                }`}
+              >
+                <span className={`text-[10px] font-semibold uppercase ${
+                  isSelected ? 'text-white/70' : 'text-[#A09D96]'
+                }`}>
+                  {day.dayLabel}
+                </span>
+                <span className={`text-[16px] font-bold mt-0.5 ${
+                  isSelected ? 'text-white' : 'text-[#1A1917]'
+                }`}>
+                  {day.dayOfMonth}
+                </span>
+                {/* Indicator dot */}
+                <div className="h-1.5 mt-1">
+                  {day.completed ? (
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#34C759]" />
+                  ) : hasTraining ? (
+                    <div className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white/50' : 'bg-[#1A1917]'}`} />
+                  ) : null}
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Selected day detail */}
+      {selectedInfo && (
+        <div className="px-5 py-4 border-t border-[#F0EDE8]">
+          {selectedInfo.scheduled ? (
+            <Link
+              href="/client/workout"
+              className="flex items-center justify-between group"
+            >
+              <div>
+                <p className="text-[14px] font-semibold text-[#1A1917]">
+                  {selectedInfo.scheduled.name}
+                </p>
+                {selectedInfo.scheduled.focus && (
+                  <p className="text-[12px] text-[#A09D96] mt-0.5">
+                    {selectedInfo.scheduled.focus}
+                  </p>
+                )}
+              </div>
+              {selectedInfo.completed ? (
+                <CheckCircle strokeWidth={1.5} className="w-5 h-5 text-[#34C759] shrink-0" />
+              ) : (
+                <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:text-[#1A1917] transition-colors shrink-0" />
+              )}
+            </Link>
+          ) : (
+            <p className="text-[14px] text-[#A09D96]">Rustdag</p>
+          )}
+        </div>
+      )}
+    </div>
+  )
 }
 
 // ─── Component ──────────────────────────────────────────────
@@ -436,6 +553,14 @@ export default function ClientDashboard() {
             <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC]" />
           </Link>
         </div>
+      )}
+
+      {/* ═══ WEEKKALENDER ══════════════════════════════════ */}
+      {training.scheduleDays && training.scheduleDays.length > 0 && (
+        <WeekCalendar
+          scheduleDays={training.scheduleDays}
+          completedDates={training.completedDates || []}
+        />
       )}
 
       <div className="h-px bg-[#E8E4DC] mb-2" />

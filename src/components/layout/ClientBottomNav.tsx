@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Home, TrendingUp, Plus, MessageCircle, User, X, ClipboardCheck, Send, Dumbbell, ShieldCheck, Calendar } from 'lucide-react'
+import { Home, TrendingUp, Plus, MessageCircle, User, X, ClipboardCheck, Dumbbell, Apple, Video } from 'lucide-react'
 
 const navItems = [
   { href: '/client', label: 'Home', icon: Home },
@@ -14,10 +14,10 @@ const navItems = [
 ]
 
 const quickActions = [
-  { href: '/client/check-in', label: 'Check-in', icon: ClipboardCheck },
-  { href: '/client/accountability', label: 'Dag check', icon: ShieldCheck },
+  { href: '/client/nutrition', label: 'Dieet', icon: Apple },
   { href: '/client/workout', label: 'Workout', icon: Dumbbell },
-  { href: '/client/booking', label: 'Sessie', icon: Calendar },
+  { href: '/client/weekly-check-in', label: 'Check-in', icon: ClipboardCheck },
+  { href: '/client/booking', label: 'Videocall', icon: Video },
 ]
 
 export function ClientBottomNav() {
