@@ -262,7 +262,7 @@ export default function ClientMessagesPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col h-[calc(100vh-80px)] bg-[#EEEBE3]">
+      <div className="flex flex-col h-[calc(100dvh-140px)] bg-[#EEEBE3]">
         <div className="px-4 py-4 border-b border-[#E8E4DC]">
           <div className="animate-pulse space-y-2">
             <div className="h-5 bg-[#F0EDE8] rounded w-32" />
@@ -281,7 +281,7 @@ export default function ClientMessagesPage() {
 
   if (!currentUserId || !coachId) {
     return (
-      <div className="flex flex-col h-[calc(100vh-80px)] bg-[#EEEBE3] items-center justify-center">
+      <div className="flex flex-col h-[calc(100dvh-140px)] bg-[#EEEBE3] items-center justify-center">
         <MessageCircle size={48} className="text-[#C5C2BC] mb-4" />
         <p className="text-[#C5C2BC]">
           {!currentUserId ? 'Niet aangemeld' : 'Coach niet beschikbaar'}
@@ -294,7 +294,7 @@ export default function ClientMessagesPage() {
   const dateKeys = Object.keys(groupedMessages)
 
   return (
-    <div className="flex flex-col h-[calc(100vh-80px)] bg-[#EEEBE3] -mx-4 -mt-4">
+    <div className="flex flex-col h-[calc(100dvh-140px)] bg-[#EEEBE3] -mx-4 -mt-4">
       {/* Header */}
       <div className="px-4 py-4 border-b border-[#E8E4DC]">
         <h1 className="text-lg font-semibold text-[#1A1917]">{coachName}</h1>

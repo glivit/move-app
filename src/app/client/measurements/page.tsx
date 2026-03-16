@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { Camera, Scale, Ruler, Plus, ChevronLeft, ChevronRight } from 'lucide-react'
+import { SubPageHeader } from '@/components/layout/SubPageHeader'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -172,16 +173,11 @@ export default function MeasurementsPage() {
   return (
     <div className="pb-24">
 
-      {/* ═══ HEADER ══════════════════════════════════════════ */}
-      <div className="pt-1 mb-6">
-        <p className="text-label mb-2">Lichamelijk</p>
-        <div className="flex items-center justify-between">
-          <h1
-            className="text-[32px] font-semibold text-[#1A1917] tracking-[-0.03em] leading-tight"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            Metingen
-          </h1>
+      <SubPageHeader
+        overline="Lichamelijk"
+        title="Metingen"
+        backHref="/client/progress"
+        action={
           <button
             onClick={() => router.push('/client/check-in')}
             className="flex items-center gap-1.5 px-4 py-2 bg-[#1A1917] text-white text-[12px] font-semibold uppercase tracking-[0.08em]"
@@ -189,8 +185,8 @@ export default function MeasurementsPage() {
             <Plus size={14} strokeWidth={2} />
             Meting
           </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* ═══ TAB BAR ═════════════════════════════════════════ */}
       <div className="flex border-b border-[#E8E4DC] mb-6">

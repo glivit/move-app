@@ -79,18 +79,18 @@ export async function GET(request: NextRequest) {
 
       if (isToday) {
         reminderType = 'today'
-        subject = 'Video sessie vandaag — MŌVE'
-        preheader = 'Je hebt vandaag een video sessie met je coach'
-        heading = 'Vandaag: video sessie'
+        subject = 'Videocall vandaag — MŌVE'
+        preheader = 'Je hebt vandaag een videocall met je coach'
+        heading = 'Vandaag: videocall'
         bodyText = (time, date) =>
-          `Je hebt vandaag een video sessie om <strong>${time}</strong>. Zorg dat je op tijd klaar bent en een rustige plek hebt.`
+          `Je hebt vandaag een videocall om <strong>${time}</strong>. Zorg dat je op tijd klaar bent en een rustige plek hebt.`
       } else if (isTomorrow) {
         reminderType = 'tomorrow'
-        subject = 'Video sessie morgen — MŌVE'
-        preheader = 'Je hebt morgen een video sessie met je coach'
-        heading = 'Morgen: video sessie'
+        subject = 'Videocall morgen — MŌVE'
+        preheader = 'Je hebt morgen een videocall met je coach'
+        heading = 'Morgen: videocall'
         bodyText = (time, date) =>
-          `Je hebt morgen (${date}) een video sessie om <strong>${time}</strong>. Zorg dat je op tijd klaar bent en een rustige plek hebt.`
+          `Je hebt morgen (${date}) een videocall om <strong>${time}</strong>. Zorg dat je op tijd klaar bent en een rustige plek hebt.`
       } else {
         continue
       }
@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
           preheader,
           heading: `${heading}${firstName ? `, ${firstName}` : ''}`,
           body: bodyText(time, date),
-          ctaText: 'Naar video sessie',
+          ctaText: 'Naar videocall',
           ctaUrl: `${appUrl}/client/video/${session.id}`,
         })
 

@@ -125,10 +125,7 @@ export default function ProfilePage() {
           )}
         </div>
 
-        <h1
-          className="text-[24px] font-semibold text-[#1A1917] tracking-[-0.02em]"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
+        <h1 className="text-editorial-h2 text-[#1A1917]">
           {profile?.full_name || 'Profiel'}
         </h1>
         <p className="text-[13px] text-[#A09D96] mt-1">

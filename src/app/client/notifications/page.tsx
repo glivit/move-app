@@ -105,10 +105,7 @@ export default function NotificationsPage() {
         <Link href="/client" className="p-2 -ml-2 rounded-xl hover:bg-[#E8E4DC] transition-colors">
           <ArrowLeft strokeWidth={1.5} className="w-5 h-5 text-[#6B6862]" />
         </Link>
-        <h1
-          className="text-[28px] font-semibold text-[#1A1917] tracking-[-0.03em]"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
+        <h1 className="text-editorial-h2 text-[#1A1917]">
           Meldingen
         </h1>
       </div>

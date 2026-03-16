@@ -78,7 +78,7 @@ export default function ClientVideoPage() {
     const end = new Date(start.getTime() + session.duration_minutes * 60000)
     return {
       title: 'MŌVE Video Call met je coach',
-      description: 'Video coaching sessie via MŌVE Studio.\\nOpen de app om deel te nemen.',
+      description: 'Videocall met je coach via MŌVE Studio.\\nOpen de app om deel te nemen.',
       startDate: start,
       endDate: end,
       location: 'MŌVE Studio (online)',
@@ -115,7 +115,7 @@ export default function ClientVideoPage() {
           Video Calls
         </h1>
         <p className="text-[13px] text-[#8E8E93] mb-8">
-          Je geplande sessies met je coach
+          Je geplande videocalls met je coach
         </p>
 
         {/* Upcoming Sessions */}
@@ -204,7 +204,7 @@ export default function ClientVideoPage() {
         {past.length > 0 && (
           <div>
             <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-3">
-              Eerdere sessies
+              Eerdere videocalls
             </p>
             <div className="space-y-2">
               {past.map((session) => (
@@ -242,7 +242,7 @@ export default function ClientVideoPage() {
               Geen video calls gepland
             </h2>
             <p className="text-[13px] text-[#8E8E93] max-w-xs mx-auto">
-              Je coach plant video sessies in wanneer nodig. Je ziet ze hier verschijnen.
+              Je coach plant videocalls in wanneer nodig. Je ziet ze hier verschijnen.
             </p>
           </div>
         )}

@@ -124,10 +124,7 @@ export default function BroadcastDetailPage() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-6 py-8">
-        <h1
-          className="text-[24px] font-semibold text-[#1A1917] tracking-[-0.03em] leading-tight"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
+        <h1 className="text-editorial-h2 text-[#1A1917]">
           {broadcast.title}
         </h1>
 

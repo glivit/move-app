@@ -245,12 +245,7 @@ export default function ProgressPage() {
       {/* ═══ HEADER ══════════════════════════════════════════ */}
       <div className="pt-1 mb-1">
         <p className="text-label mb-2">Jouw traject</p>
-        <h1
-          className="text-[32px] font-semibold text-[#1A1917] tracking-[-0.03em] leading-tight"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          Voortgang
-        </h1>
+        <h1 className="text-editorial-h2 text-[#1A1917]">Voortgang</h1>
       </div>
 
       {/* ═══ HEADLINE STATS ══════════════════════════════════ */}
@@ -480,7 +475,7 @@ export default function ProgressPage() {
           <span className="text-[14px] font-semibold text-[#1A1917]">Statistieken</span>
         </Link>
         <Link
-          href="/client/workout/history"
+          href="/client/exercises"
           className="flex flex-col items-start p-5 border-b border-[#E8E4DC] bg-white hover:bg-[#FAF8F3] transition-colors"
         >
           <Dumbbell size={20} strokeWidth={1.5} className="text-[#A09D96] mb-3" />

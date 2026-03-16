@@ -143,7 +143,7 @@ export default function HealthPage() {
         <button onClick={() => router.back()} className="p-2 -ml-2 text-[#1A1917]">
           <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
         </button>
-        <h1 className="text-[22px] font-semibold text-[#1A1A18]" style={{ fontFamily: 'var(--font-display)' }}>
+        <h1 className="text-editorial-h2 text-[#1A1917]">
           Blessures & beperkingen
         </h1>
       </div>

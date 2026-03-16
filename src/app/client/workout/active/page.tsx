@@ -9,8 +9,107 @@ import {
   Plus,
   Clock,
   Info,
+  ChevronDown,
 } from 'lucide-react'
 import { ExerciseMedia } from '@/components/ExerciseMedia'
+
+// ─── Exercise Info Panel — large GIF + collapsible text ────
+
+function ExerciseInfoPanel({ exerciseData }: { exerciseData: Exercise }) {
+  const [showTips, setShowTips] = useState(false)
+  const [showInstructions, setShowInstructions] = useState(false)
+  const [imgLoaded, setImgLoaded] = useState(false)
+  const [imgError, setImgError] = useState(false)
+
+  const hasGif = exerciseData.gif_url && !imgError
+
+  return (
+    <div className="px-5 pb-3 space-y-3">
+      {/* Large GIF display */}
+      <div className="overflow-hidden bg-[#F8F6F2] relative" style={{ maxHeight: '50vh' }}>
+        {hasGif ? (
+          <>
+            {!imgLoaded && (
+              <div className="aspect-[4/3] flex items-center justify-center">
+                <div className="w-8 h-8 border-[1.5px] border-[#DDD9D0] border-t-[#1A1917] rounded-full animate-spin" />
+              </div>
+            )}
+            <img
+              src={exerciseData.gif_url!}
+              alt={exerciseData.name_nl || exerciseData.name}
+              loading="eager"
+              onLoad={() => setImgLoaded(true)}
+              onError={() => setImgError(true)}
+              className="w-full object-contain transition-opacity duration-500"
+              style={{
+                maxHeight: '50vh',
+                opacity: imgLoaded ? 1 : 0,
+                mixBlendMode: 'multiply',
+                filter: 'saturate(0.3) contrast(0.95)',
+              }}
+            />
+          </>
+        ) : (
+          <div className="aspect-[4/3] flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-[12px] text-[#C5C2BC]">{exerciseData.target_muscle}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Equipment + muscle labels */}
+      <div className="flex items-center gap-2">
+        {exerciseData.equipment && (
+          <span className="text-[11px] font-semibold text-[#B0ADA6] bg-[#44413D] px-2.5 py-1">
+            {exerciseData.equipment}
+          </span>
+        )}
+        {exerciseData.target_muscle && (
+          <span className="text-[11px] font-semibold text-[#B0ADA6] bg-[#44413D] px-2.5 py-1">
+            {exerciseData.target_muscle}
+          </span>
+        )}
+      </div>
+
+      {/* Collapsible: Coach tips */}
+      {exerciseData.coach_tips && (
+        <div className="border border-[#44413D]">
+          <button
+            onClick={() => setShowTips(!showTips)}
+            className="w-full flex items-center justify-between p-3"
+          >
+            <p className="text-[11px] font-semibold text-[#9A9690] uppercase tracking-[0.08em]">Coach tips</p>
+            <ChevronDown size={14} className={`text-[#9A9690] transition-transform ${showTips ? 'rotate-180' : ''}`} />
+          </button>
+          {showTips && (
+            <div className="px-3 pb-3 -mt-1">
+              <p className="text-[13px] text-[#B0ADA6] leading-relaxed">{exerciseData.coach_tips}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Collapsible: Instructions */}
+      {exerciseData.instructions && (
+        <div className="border border-[#44413D]">
+          <button
+            onClick={() => setShowInstructions(!showInstructions)}
+            className="w-full flex items-center justify-between p-3"
+          >
+            <p className="text-[11px] font-semibold text-[#9A9690] uppercase tracking-[0.08em]">Uitvoering</p>
+            <ChevronDown size={14} className={`text-[#9A9690] transition-transform ${showInstructions ? 'rotate-180' : ''}`} />
+          </button>
+          {showInstructions && (
+            <div className="px-3 pb-3 -mt-1">
+              <p className="text-[13px] text-[#B0ADA6] leading-relaxed whitespace-pre-wrap">{exerciseData.instructions}</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
 
 interface Exercise {
   id: string
@@ -108,8 +207,8 @@ function formatTimer(seconds: number): string {
 export default function ActiveWorkoutPageWrapper() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#111110] flex items-center justify-center">
-        <div className="w-6 h-6 border-[1.5px] border-[#333] border-t-white/40 rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#2A2824] flex items-center justify-center">
+        <div className="w-6 h-6 border-[1.5px] border-[#5A5650] border-t-white/40 rounded-full animate-spin" />
       </div>
     }>
       <ActiveWorkoutPage />
@@ -383,14 +482,14 @@ function ActiveWorkoutPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#111110] flex items-center justify-center">
-        <div className="w-6 h-6 border-[1.5px] border-[#333] border-t-white/40 rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#2A2824] flex items-center justify-center">
+        <div className="w-6 h-6 border-[1.5px] border-[#5A5650] border-t-white/40 rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="fixed inset-0 bg-[#111110] z-50 overflow-y-auto pt-safe">
+    <div className="fixed inset-0 bg-[#2A2824] z-50 overflow-y-auto pt-safe">
       {/* PR Celebration */}
       {prCelebration && (
         <>
@@ -407,7 +506,7 @@ function ActiveWorkoutPage() {
             })}
           </div>
           <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[61] animate-bounce-in">
-            <div className="bg-white text-[#111110] px-6 py-3 flex items-center gap-3">
+            <div className="bg-white text-[#2A2824] px-6 py-3 flex items-center gap-3">
               <span className="text-2xl">🏆</span>
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[0.12em]">Nieuw PR</p>
@@ -422,18 +521,18 @@ function ActiveWorkoutPage() {
       {/* Close confirmation — editorial bottom sheet */}
       {closeConfirm && (
         <div className="fixed inset-0 bg-black/50 z-[70] flex items-end">
-          <div className="w-full bg-[#1A1917] p-6 animate-slide-up">
+          <div className="w-full bg-[#353330] p-6 animate-slide-up">
             <h3
               className="text-[20px] font-semibold text-white tracking-[-0.02em] mb-2"
               style={{ fontFamily: 'var(--font-display)' }}
             >
               Training afsluiten?
             </h3>
-            <p className="text-[14px] text-[#8A8A8A] mb-6">Je voortgang wordt opgeslagen.</p>
+            <p className="text-[14px] text-[#B0ADA6] mb-6">Je voortgang wordt opgeslagen.</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setCloseConfirm(false)}
-                className="flex-1 bg-[#2A2A28] text-white py-3.5 font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors hover:bg-[#333]"
+                className="flex-1 bg-[#44413D] text-white py-3.5 font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors hover:bg-[#4A4740]"
               >
                 Doorgaan
               </button>
@@ -449,18 +548,18 @@ function ActiveWorkoutPage() {
       )}
 
       {/* ═══ TOP BAR — editorial, minimal ═══════════════════ */}
-      <header className="sticky top-0 bg-[#111110]/95 backdrop-blur-xl z-40">
+      <header className="sticky top-0 bg-[#2A2824]/95 backdrop-blur-xl z-40">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <button
             onClick={() => setCloseConfirm(true)}
-            className="w-10 h-10 flex items-center justify-center hover:bg-white/5 transition-colors touch-manipulation"
+            className="w-10 h-10 flex items-center justify-center hover:bg-white/10 transition-colors touch-manipulation"
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
-            <X size={20} strokeWidth={1.5} className="text-[#8A8A8A]" />
+            <X size={20} strokeWidth={1.5} className="text-[#B0ADA6]" />
           </button>
 
           <div className="flex items-center gap-2">
-            <Clock size={14} strokeWidth={1.5} className="text-[#555]" />
+            <Clock size={14} strokeWidth={1.5} className="text-[#9A9690]" />
             <span className="text-[16px] font-semibold text-white tabular-nums tracking-[-0.02em]">
               {formatTimer(workoutSeconds)}
             </span>
@@ -470,8 +569,8 @@ function ActiveWorkoutPage() {
             onClick={handleFinish}
             className={`px-5 h-10 font-semibold text-[12px] uppercase tracking-[0.08em] transition-all ${
               allDone
-                ? 'bg-white text-[#111110]'
-                : 'bg-[#2A2A28] text-[#8A8A8A]'
+                ? 'bg-white text-[#2A2824]'
+                : 'bg-[#44413D] text-[#B0ADA6]'
             }`}
           >
             Klaar
@@ -479,7 +578,7 @@ function ActiveWorkoutPage() {
         </div>
 
         {/* Progress line */}
-        <div className="h-[1px] bg-[#2A2A28]">
+        <div className="h-[1px] bg-[#44413D]">
           <div
             className="h-full bg-white transition-all duration-500"
             style={{ width: `${totalSets > 0 ? (completedTotal / totalSets) * 100 : 0}%` }}
@@ -503,8 +602,8 @@ function ActiveWorkoutPage() {
               key={ex.id}
               className={`border transition-all ${
                 exDone
-                  ? 'border-white/10 bg-white/[0.03]'
-                  : 'border-[#2A2A28] bg-[#1A1A18]'
+                  ? 'border-[#555249] bg-[#3A3835]'
+                  : 'border-[#44413D] bg-[#353330]'
               }`}
             >
               {/* Exercise header */}
@@ -522,15 +621,15 @@ function ActiveWorkoutPage() {
                     >
                       {exerciseData.name_nl || exerciseData.name}
                     </h3>
-                    <Info size={13} strokeWidth={1.5} className="text-[#555] flex-shrink-0" />
+                    <Info size={13} strokeWidth={1.5} className="text-[#9A9690] flex-shrink-0" />
                   </button>
-                  <span className="text-[12px] text-[#555] font-medium tabular-nums ml-2">
+                  <span className="text-[12px] text-[#9A9690] font-medium tabular-nums ml-2">
                     {exCompleted}/{exSets.length}
                   </span>
                 </div>
 
                 {/* Meta */}
-                <div className="flex items-center gap-2 text-[11px] text-[#555] uppercase tracking-[0.06em]">
+                <div className="flex items-center gap-2 text-[11px] text-[#9A9690] uppercase tracking-[0.06em]">
                   <span>{ex.sets}×{ex.reps_min}{ex.reps_max !== ex.reps_min ? `-${ex.reps_max}` : ''}</span>
                   {ex.rest_seconds > 0 && <><span>·</span><span>{ex.rest_seconds}s rust</span></>}
                   {ex.tempo && <><span>·</span><span>{ex.tempo}</span></>}
@@ -538,35 +637,9 @@ function ActiveWorkoutPage() {
                 </div>
               </div>
 
-              {/* Expanded: exercise media + tips */}
+              {/* Expanded: large GIF + collapsible tips */}
               {isExpanded && (
-                <div className="px-5 pb-3 space-y-3">
-                  <div className="overflow-hidden">
-                    <ExerciseMedia
-                      name={exerciseData.name}
-                      nameNl={exerciseData.name_nl}
-                      bodyPart={exerciseData.body_part || 'chest'}
-                      targetMuscle={exerciseData.target_muscle}
-                      equipment={exerciseData.equipment}
-                      gifUrl={exerciseData.gif_url}
-                      videoUrl={exerciseData.video_url}
-                      variant="compact"
-                      showLabels={false}
-                    />
-                  </div>
-                  {exerciseData.coach_tips && (
-                    <div className="border border-[#2A2A28] p-3">
-                      <p className="text-[11px] font-semibold text-[#555] uppercase tracking-[0.08em] mb-1">Coach</p>
-                      <p className="text-[13px] text-[#AAA] leading-relaxed">{exerciseData.coach_tips}</p>
-                    </div>
-                  )}
-                  {exerciseData.instructions && (
-                    <div className="border border-[#2A2A28] p-3">
-                      <p className="text-[11px] font-semibold text-[#555] uppercase tracking-[0.08em] mb-1">Uitvoering</p>
-                      <p className="text-[13px] text-[#AAA] leading-relaxed whitespace-pre-wrap">{exerciseData.instructions}</p>
-                    </div>
-                  )}
-                </div>
+                <ExerciseInfoPanel exerciseData={exerciseData} />
               )}
 
               {/* Notes */}
@@ -576,7 +649,7 @@ function ActiveWorkoutPage() {
                   value={exerciseNotes[ex.id] || ''}
                   onChange={(e) => setExerciseNotes(prev => ({ ...prev, [ex.id]: e.target.value }))}
                   placeholder="Notities..."
-                  className="w-full px-0 py-1 bg-transparent text-[12px] text-[#666] placeholder-[#333] border-none focus:outline-none focus:text-[#AAA]"
+                  className="w-full px-0 py-1 bg-transparent text-[12px] text-[#AAA69E] placeholder-[#5A5650] border-none focus:outline-none focus:text-[#AAA]"
                 />
               </div>
 
@@ -584,10 +657,10 @@ function ActiveWorkoutPage() {
               <div className="px-5 pb-4">
                 {/* Header */}
                 <div className="flex items-center gap-2 mb-2 px-1">
-                  <span className="text-[10px] font-bold text-[#444] uppercase tracking-[0.1em] w-[32px]">Set</span>
-                  <span className="text-[10px] font-bold text-[#444] uppercase tracking-[0.1em] flex-1 text-center">Vorige</span>
-                  <span className="text-[10px] font-bold text-[#444] uppercase tracking-[0.1em] w-[72px] text-center">KG</span>
-                  <span className="text-[10px] font-bold text-[#444] uppercase tracking-[0.1em] w-[64px] text-center">Reps</span>
+                  <span className="text-[10px] font-bold text-[#8A8682] uppercase tracking-[0.1em] w-[32px]">Set</span>
+                  <span className="text-[10px] font-bold text-[#8A8682] uppercase tracking-[0.1em] flex-1 text-center">Vorige</span>
+                  <span className="text-[10px] font-bold text-[#8A8682] uppercase tracking-[0.1em] w-[72px] text-center">KG</span>
+                  <span className="text-[10px] font-bold text-[#8A8682] uppercase tracking-[0.1em] w-[64px] text-center">Reps</span>
                   <span className="w-[36px]" />
                 </div>
 
@@ -616,7 +689,7 @@ function ActiveWorkoutPage() {
                         {/* Inline rest timer */}
                         {isRestActive && activeRestTimer && (
                           <div className="flex items-center gap-2 px-1 py-1.5">
-                            <div className="flex-1 h-[2px] bg-[#2A2A28] overflow-hidden">
+                            <div className="flex-1 h-[2px] bg-[#44413D] overflow-hidden">
                               <div
                                 className="h-full bg-white transition-all duration-1000 ease-linear"
                                 style={{ width: `${((activeRestTimer.total - activeRestTimer.seconds) / activeRestTimer.total) * 100}%` }}
@@ -638,7 +711,7 @@ function ActiveWorkoutPage() {
                 {/* Add set */}
                 <button
                   onClick={() => addSet(ex.id)}
-                  className="w-full mt-3 py-2.5 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#666] uppercase tracking-[0.06em] hover:bg-white/5 transition-colors touch-manipulation"
+                  className="w-full mt-3 py-2.5 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#AAA69E] uppercase tracking-[0.06em] hover:bg-white/10 transition-colors touch-manipulation"
                   style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   <Plus size={13} strokeWidth={2} />
@@ -653,7 +726,7 @@ function ActiveWorkoutPage() {
         {allDone && (
           <button
             onClick={handleFinish}
-            className="w-full py-4 bg-white text-[#111110] font-bold text-[14px] uppercase tracking-[0.08em] flex items-center justify-center gap-2 hover:bg-[#F0EDE8] transition-all"
+            className="w-full py-4 bg-white text-[#2A2824] font-bold text-[14px] uppercase tracking-[0.08em] flex items-center justify-center gap-2 hover:bg-[#F0EDE8] transition-all"
           >
             <Check size={18} strokeWidth={2.5} />
             Workout afronden
@@ -664,7 +737,7 @@ function ActiveWorkoutPage() {
         <div className="mt-2 space-y-2">
           <button
             onClick={() => router.push(`/client/workout/active?dayId=${dayId}&programId=${programId}&addExercise=1`)}
-            className="w-full py-3.5 bg-[#2A2A28] text-white font-semibold text-[13px] uppercase tracking-[0.06em] flex items-center justify-center gap-2 hover:bg-[#333] transition-colors"
+            className="w-full py-3.5 bg-[#44413D] text-white font-semibold text-[13px] uppercase tracking-[0.06em] flex items-center justify-center gap-2 hover:bg-[#4A4740] transition-colors"
           >
             <Plus size={14} strokeWidth={2} />
             Oefening toevoegen
@@ -681,18 +754,18 @@ function ActiveWorkoutPage() {
         {/* Discard confirmation */}
         {showDiscardConfirm && (
           <div className="fixed inset-0 bg-black/50 z-[70] flex items-end">
-            <div className="w-full bg-[#1A1917] p-6 animate-slide-up">
+            <div className="w-full bg-[#353330] p-6 animate-slide-up">
               <h3
                 className="text-[20px] font-semibold text-white tracking-[-0.02em] mb-2"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 Workout verwijderen?
               </h3>
-              <p className="text-[14px] text-[#8A8A8A] mb-6">Alle voortgang wordt permanent verwijderd.</p>
+              <p className="text-[14px] text-[#B0ADA6] mb-6">Alle voortgang wordt permanent verwijderd.</p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowDiscardConfirm(false)}
-                  className="flex-1 bg-[#2A2A28] text-white py-3.5 font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-[#333] transition-colors"
+                  className="flex-1 bg-[#44413D] text-white py-3.5 font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-[#4A4740] transition-colors"
                 >
                   Annuleer
                 </button>
@@ -770,13 +843,13 @@ function SetRow({
     <div className={`flex items-center gap-2 px-1 py-1.5 transition-all ${set.completed ? 'opacity-40' : ''}`}>
       {/* Set number */}
       <span className={`text-[13px] font-bold tabular-nums w-[32px] ${
-        set.completed ? 'text-white' : 'text-[#555]'
+        set.completed ? 'text-white' : 'text-[#9A9690]'
       }`}>
         {index + 1}
       </span>
 
       {/* Previous */}
-      <span className="flex-1 text-[12px] text-[#444] text-center truncate tabular-nums">
+      <span className="flex-1 text-[12px] text-[#8A8682] text-center truncate tabular-nums">
         {prevLabel}
       </span>
 
@@ -790,7 +863,7 @@ function SetRow({
         onChange={(e) => handleWeightChange(e.target.value)}
         placeholder={prefilledWeight ? `${prefilledWeight}` : '—'}
         disabled={set.completed}
-        className="w-[72px] px-2 py-2.5 bg-[#1A1A18] border border-[#2A2A28] text-[14px] text-center font-semibold text-white tabular-nums disabled:opacity-40 focus:border-white/30 focus:outline-none transition-all placeholder:text-[#333] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        className="w-[72px] px-2 py-2.5 bg-[#353330] border border-[#44413D] text-[14px] text-center font-semibold text-white tabular-nums disabled:opacity-40 focus:border-white/30 focus:outline-none transition-all placeholder:text-[#5A5650] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />
 
       {/* Reps input */}
@@ -802,7 +875,7 @@ function SetRow({
         onChange={(e) => handleRepsChange(e.target.value)}
         placeholder={set.prescribed_reps?.toString() || '—'}
         disabled={set.completed}
-        className="w-[64px] px-2 py-2.5 bg-[#1A1A18] border border-[#2A2A28] text-[14px] text-center font-semibold text-white tabular-nums disabled:opacity-40 focus:border-white/30 focus:outline-none transition-all placeholder:text-[#333] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        className="w-[64px] px-2 py-2.5 bg-[#353330] border border-[#44413D] text-[14px] text-center font-semibold text-white tabular-nums disabled:opacity-40 focus:border-white/30 focus:outline-none transition-all placeholder:text-[#5A5650] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />
 
       {/* Check button */}
@@ -811,8 +884,8 @@ function SetRow({
         disabled={set.completed}
         className={`w-[36px] h-[36px] flex items-center justify-center flex-shrink-0 transition-all touch-manipulation ${
           set.completed
-            ? 'bg-white text-[#111110]'
-            : 'bg-[#2A2A28] text-[#555] hover:bg-[#333] active:scale-95'
+            ? 'bg-white text-[#2A2824]'
+            : 'bg-[#44413D] text-[#9A9690] hover:bg-[#4A4740] active:scale-95'
         }`}
         style={{ WebkitTapHighlightColor: 'transparent' }}
       >
