@@ -410,6 +410,12 @@ export default function ClientDashboard() {
         </Link>
       )}
 
+      {/* ═══ WEEKKALENDER ══════════════════════════════════ */}
+      <WeekCalendar
+        scheduleDays={training.scheduleDays || []}
+        completedDates={training.completedDates || []}
+      />
+
       {/* ═══ TRAINING — editorial card ═══════════════════ */}
       <Link
         href="/client/workout"
@@ -553,14 +559,6 @@ export default function ClientDashboard() {
             <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC]" />
           </Link>
         </div>
-      )}
-
-      {/* ═══ WEEKKALENDER ══════════════════════════════════ */}
-      {training.scheduleDays && training.scheduleDays.length > 0 && (
-        <WeekCalendar
-          scheduleDays={training.scheduleDays}
-          completedDates={training.completedDates || []}
-        />
       )}
 
       <div className="h-px bg-[#E8E4DC] mb-2" />
