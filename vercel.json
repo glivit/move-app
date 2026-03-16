@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/accountability",
       "schedule": "0 20 * * *"
+    },
+    {
+      "path": "/api/cron/video-reminders",
+      "schedule": "*/15 * * * *"
     }
   ]
 }

@@ -3,11 +3,11 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Home, LineChart, Plus, MessageCircle, User, X, ClipboardCheck, Send, Dumbbell, ShieldCheck, Calendar } from 'lucide-react'
+import { Home, TrendingUp, Plus, MessageCircle, User, X, ClipboardCheck, Send, Dumbbell, ShieldCheck, Calendar } from 'lucide-react'
 
 const navItems = [
   { href: '/client', label: 'Home', icon: Home },
-  { href: '/client/journey', label: 'Reis', icon: LineChart },
+  { href: '/client/progress', label: 'Progress', icon: TrendingUp },
   { href: '#add', label: '', icon: Plus, isCenter: true },
   { href: '/client/messages', label: 'Chat', icon: MessageCircle },
   { href: '/client/profile', label: 'Ik', icon: User },
