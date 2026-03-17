@@ -19,7 +19,6 @@ export async function GET(request: NextRequest) {
     try {
       adminClient = createAdminClient()
     } catch {
-      // Fallback to regular client if no service role key
       adminClient = supabase
     }
 
@@ -34,7 +33,7 @@ export async function GET(request: NextRequest) {
       .single()
 
     if (programError || !activeProgram) {
-      return NextResponse.json({ program: null, days: [] })
+      return NextResponse.json({ program: null, days: [], schedule: {} })
     }
 
     // Get template days
@@ -75,16 +74,29 @@ export async function GET(request: NextRequest) {
       .gte('started_at', weekStart.toISOString())
       .lte('started_at', new Date().toISOString())
 
-    // Count unique completed days (not duplicate sessions)
     const uniqueCompletedDays = new Set(
       (completedSessions || []).map(s => s.template_day_id)
     )
     const workoutsThisWeek = uniqueCompletedDays.size
 
+    // Schedule: map of weekday -> template_day_id
+    const schedule = (activeProgram.schedule as Record<string, string>) || {}
+
+    // Determine today's scheduled workout
+    // ISO weekday: 1=Mon, 7=Sun. JS getDay: 0=Sun, 1=Mon...6=Sat
+    const jsDay = today.getDay()
+    const isoDay = jsDay === 0 ? 7 : jsDay
+    const todayDayId = schedule[String(isoDay)] || null
+    const todayDay = todayDayId ? days.find(d => d.id === todayDayId) || null : null
+    const todayCompleted = todayDayId ? uniqueCompletedDays.has(todayDayId) : false
+
     return NextResponse.json({
       program: activeProgram,
       days,
       workoutsThisWeek,
+      schedule,
+      todayDay,
+      todayCompleted,
     })
   } catch (error) {
     console.error('Error fetching client program:', error)

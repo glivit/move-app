@@ -33,10 +33,12 @@ interface CompletedWorkout {
 interface PlannedDay {
   id: string
   name: string
-  day_of_week: number
   focus_area: string
   estimated_duration: number
 }
+
+// Schedule: weekday (ISO: 1=Mon..7=Sun) -> template_day_id
+type Schedule = Record<string, string>
 
 interface VideoSession {
   id: string
@@ -86,6 +88,7 @@ export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [completedWorkouts, setCompletedWorkouts] = useState<CompletedWorkout[]>([])
   const [plannedDays, setPlannedDays] = useState<PlannedDay[]>([])
+  const [schedule, setSchedule] = useState<Schedule>({})
   const [videoSessions, setVideoSessions] = useState<VideoSession[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -114,18 +117,28 @@ export default function CalendarPage() {
 
         if (workouts) setCompletedWorkouts(workouts as any[])
 
-        // Current program planned days
+        // Current program + schedule
         const { data: program } = await supabase
           .from('client_programs')
-          .select('id, program_templates(id, template_days(id, name, day_of_week, focus_area, estimated_duration))')
+          .select('id, schedule, program_templates(id, template_days:program_template_days(id, name, focus, estimated_duration_min))')
           .eq('client_id', user.id)
-          .eq('status', 'active')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false })
+          .limit(1)
           .single()
 
         if (program) {
           const template = (program as any).program_templates
           if (template?.template_days) {
-            setPlannedDays(template.template_days as PlannedDay[])
+            setPlannedDays(template.template_days.map((d: any) => ({
+              id: d.id,
+              name: d.name,
+              focus_area: d.focus || '',
+              estimated_duration: d.estimated_duration_min || 60,
+            })))
+          }
+          if (program.schedule) {
+            setSchedule(program.schedule as Schedule)
           }
         }
 
@@ -169,9 +182,11 @@ export default function CalendarPage() {
 
   // Selected date data
   const selectedDateKey = selectedDate.toISOString().slice(0, 10)
-  const selectedDayOfWeek = selectedDate.getDay()
+  const jsDay = selectedDate.getDay()
+  const isoDay = jsDay === 0 ? 7 : jsDay // Convert JS Sun=0 to ISO Sun=7
   const selectedDayData = dayDataMap[selectedDateKey] || { completed: [], videoSessions: [] }
-  const plannedForDay = plannedDays.find(d => d.day_of_week === selectedDayOfWeek)
+  const scheduledDayId = schedule[String(isoDay)]
+  const plannedForDay = scheduledDayId ? plannedDays.find(d => d.id === scheduledDayId) : undefined
   const hasCompleted = selectedDayData.completed.length > 0
   const hasVideo = selectedDayData.videoSessions.length > 0
   const isFutureOrToday = selectedDate >= new Date(new Date().toISOString().slice(0, 10))
@@ -272,8 +287,9 @@ export default function CalendarPage() {
             const hasVid = dayData?.videoSessions?.length > 0
             const isSelected = isSameDay(date, selectedDate)
             const today = isToday(date)
-            const dayOfWeek = date.getDay()
-            const hasPlanned = plannedDays.some(d => d.day_of_week === dayOfWeek) && !hasWorkout && date >= new Date(new Date().toISOString().slice(0, 10))
+            const dayJsWeekday = date.getDay()
+            const dayIsoWeekday = dayJsWeekday === 0 ? 7 : dayJsWeekday
+            const hasPlanned = !!schedule[String(dayIsoWeekday)] && !hasWorkout && date >= new Date(new Date().toISOString().slice(0, 10))
 
             return (
               <button
@@ -445,7 +461,7 @@ export default function CalendarPage() {
               <div className="flex-1">
                 <p className="text-[14px] font-semibold text-[#1A1917]">{plannedForDay.name}</p>
                 <p className="text-[12px] text-[#A09D96] mt-0.5">
-                  {plannedForDay.focus_area} · ~{plannedForDay.estimated_duration} min
+                  {plannedForDay.focus_area ? `${plannedForDay.focus_area} · ` : ''}~{plannedForDay.estimated_duration} min
                 </p>
               </div>
               {isToday(selectedDate) && (
