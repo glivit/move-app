@@ -647,9 +647,10 @@ export function ClientProfileTabs({
                     const hasPain = session.pain_reported
 
                     return (
-                      <div
+                      <Link
                         key={session.id}
-                        className="flex items-center gap-3 p-3.5 bg-white rounded-2xl border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+                        href={`/coach/clients/${profile.id}/workout/${session.id}`}
+                        className="flex items-center gap-3 p-3.5 bg-white rounded-2xl border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:bg-[#FAFAFA] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all"
                       >
                         <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
                           isCompleted ? 'bg-green-50' : 'bg-orange-50'
@@ -683,8 +684,9 @@ export function ClientProfileTabs({
                           {hasFeedback && !session.coach_seen && (
                             <div className="w-2 h-2 rounded-full bg-[var(--color-pop)]" title="Feedback niet bekeken" />
                           )}
+                          <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#C7C7CC]" />
                         </div>
-                      </div>
+                      </Link>
                     )
                   })}
                 </div>
@@ -1121,7 +1123,7 @@ export function ClientProfileTabs({
                         const sessionDate = new Date(session.started_at)
 
                         return (
-                          <div key={session.id} className="flex items-center gap-3 px-4 py-3">
+                          <Link key={session.id} href={`/coach/clients/${profile.id}/workout/${session.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-[#FAFAFA] transition-colors">
                             <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isCompleted ? 'bg-green-500' : 'bg-orange-400'}`} />
                             <div className="flex-1 min-w-0">
                               <p className="text-[13px] font-medium text-text-primary truncate">
@@ -1141,8 +1143,9 @@ export function ClientProfileTabs({
                               <span className="w-16 text-right">
                                 {sessionDate.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                               </span>
+                              <ChevronRight strokeWidth={1.5} className="w-3.5 h-3.5 text-[#C7C7CC]" />
                             </div>
-                          </div>
+                          </Link>
                         )
                       })}
                     </div>
