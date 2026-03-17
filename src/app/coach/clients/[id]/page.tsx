@@ -45,6 +45,13 @@ export default async function ClientProfilePage({ params }: Props) {
     .eq('client_id', id)
     .single()
 
+  // Count completed workouts
+  const { count: workoutCount } = await supabase
+    .from('workout_sessions')
+    .select('*', { count: 'exact', head: true })
+    .eq('client_id', id)
+    .not('completed_at', 'is', null)
+
   // Calculate days active
   const startDate = profile.start_date ? new Date(profile.start_date) : null
   const today = new Date()
@@ -124,7 +131,7 @@ export default async function ClientProfilePage({ params }: Props) {
         </div>
 
         {/* Quick Stats Row */}
-        <div className="grid grid-cols-3 gap-4 mt-8">
+        <div className="grid grid-cols-4 gap-4 mt-8">
           {/* Last Check-in */}
           <div
             className="p-4 rounded-lg"
@@ -148,6 +155,19 @@ export default async function ClientProfilePage({ params }: Props) {
             </p>
             <p className="text-lg font-semibold mt-1" style={{ color: '#1A1A18' }}>
               {checkinCount || 0}
+            </p>
+          </div>
+
+          {/* Workouts Completed */}
+          <div
+            className="p-4 rounded-lg"
+            style={{ backgroundColor: '#FAFAFA' }}
+          >
+            <p className="text-xs font-medium" style={{ color: '#8E8E93' }}>
+              WORKOUTS
+            </p>
+            <p className="text-lg font-semibold mt-1" style={{ color: '#1A1A18' }}>
+              {workoutCount || 0}
             </p>
           </div>
 

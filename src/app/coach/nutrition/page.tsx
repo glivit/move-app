@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
-import { Apple, ChevronRight, Search, Eye, CheckCircle, AlertCircle, Droplets, Copy, BookOpen, Users, Loader2, Plus } from 'lucide-react'
+import { Apple, ChevronRight, Search, Eye, CheckCircle, AlertCircle, Droplets, Copy, BookOpen, Users, Loader2, Plus, Pencil } from 'lucide-react'
 
 interface DailySummary {
   client_id: string
@@ -318,13 +318,22 @@ export default function NutritionOverviewPage() {
                           {template.calories_target} kcal · {template.protein_g}g eiwit · {template.carbs_g}g koolh · {template.fat_g}g vet
                         </p>
                       </div>
-                      <button
-                        onClick={() => setShowAssignModal(template.id)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1A1917] text-white text-[12px] font-semibold rounded-full hover:bg-[#7A5C12] transition-colors flex-shrink-0"
-                      >
-                        <Copy strokeWidth={1.5} className="w-3.5 h-3.5" />
-                        Toewijzen
-                      </button>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <Link
+                          href={`/coach/nutrition/${template.id}/edit`}
+                          className="flex items-center gap-1.5 px-3 py-1.5 border border-[#E8E4DC] text-[#1A1917] text-[12px] font-semibold rounded-full hover:bg-[#F5F2EC] transition-colors"
+                        >
+                          <Pencil strokeWidth={1.5} className="w-3.5 h-3.5" />
+                          Bewerken
+                        </Link>
+                        <button
+                          onClick={() => setShowAssignModal(template.id)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1A1917] text-white text-[12px] font-semibold rounded-full hover:bg-[#7A5C12] transition-colors"
+                        >
+                          <Copy strokeWidth={1.5} className="w-3.5 h-3.5" />
+                          Toewijzen
+                        </button>
+                      </div>
                     </div>
                     {meals.length > 0 && (
                       <div className="flex flex-wrap gap-1.5">

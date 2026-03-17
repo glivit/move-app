@@ -6,7 +6,7 @@ import Link from 'next/link'
 import {
   CheckCircle2, Clock, ExternalLink, MessageSquare, TrendingUp,
   Apple, Dumbbell, Heart, ChevronDown, ChevronRight, Send,
-  Calendar, Scale, Ruler, Plus, ArrowUpRight
+  Calendar, Scale, Ruler, Plus, ArrowUpRight, Activity, AlertTriangle
 } from 'lucide-react'
 import { ClientHealthSummary } from '@/components/coach/ClientHealthSummary'
 import { ProgramAssignModal } from '@/components/coach/ProgramAssignModal'
@@ -82,6 +82,22 @@ interface ProgramTemplate {
   difficulty: string
 }
 
+interface WorkoutSession {
+  id: string
+  client_id: string
+  client_program_id: string | null
+  template_day_id: string | null
+  started_at: string
+  completed_at: string | null
+  duration_minutes: number | null
+  difficulty_rating: number | null
+  feedback_text: string | null
+  pain_reported: boolean | null
+  pain_notes: string | null
+  coach_seen: boolean | null
+  template_day?: { name: string; focus: string | null }
+}
+
 interface ConversationMessage {
   id: string
   sender_id: string
@@ -149,6 +165,11 @@ export function ClientProfileTabs({
   const [newMessage, setNewMessage] = useState('')
   const [sendingMessage, setSendingMessage] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Workout sessions state
+  const [workoutSessions, setWorkoutSessions] = useState<WorkoutSession[]>([])
+  const [loadingWorkouts, setLoadingWorkouts] = useState(false)
+  const [workoutsLoaded, setWorkoutsLoaded] = useState(false)
 
   const supabase = createClient()
 
@@ -321,12 +342,44 @@ export function ClientProfileTabs({
     }
   }, [profile.id, messagesLoaded, supabase])
 
+  // ─── Load Workout Sessions ──────────────────────────────────────
+
+  const loadWorkoutData = useCallback(async () => {
+    if (workoutsLoaded) return
+    setLoadingWorkouts(true)
+    try {
+      const threeMonthsAgo = new Date()
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
+
+      const { data } = await supabase
+        .from('workout_sessions')
+        .select('id, client_id, client_program_id, template_day_id, started_at, completed_at, duration_minutes, difficulty_rating, feedback_text, pain_reported, pain_notes, coach_seen, program_template_days(name, focus)')
+        .eq('client_id', profile.id)
+        .gte('started_at', threeMonthsAgo.toISOString())
+        .order('started_at', { ascending: false })
+        .limit(30)
+
+      if (data) {
+        setWorkoutSessions(data.map((s: any) => ({
+          ...s,
+          template_day: s.program_template_days || undefined,
+        })))
+      }
+    } catch (error) {
+      console.error('Error loading workouts:', error)
+    } finally {
+      setLoadingWorkouts(false)
+      setWorkoutsLoaded(true)
+    }
+  }, [profile.id, workoutsLoaded, supabase])
+
   // ─── Tab Change Handler ──────────────────────────────────────
 
   useEffect(() => {
+    if (activeTab === 'overview') loadWorkoutData()
     if (activeTab === 'program') loadProgramData()
     if (activeTab === 'nutrition') loadNutritionData()
-    if (activeTab === 'progress') loadProgressData()
+    if (activeTab === 'progress') { loadProgressData(); loadWorkoutData() }
     if (activeTab === 'messages') loadMessagesData()
     if (activeTab === 'checkins' && checkins.length === 0) {
       setLoadingCheckins(true)
@@ -341,7 +394,7 @@ export function ClientProfileTabs({
           setLoadingCheckins(false)
         })
     }
-  }, [activeTab, profile.id, checkins.length, loadProgramData, loadNutritionData, loadProgressData, loadMessagesData, supabase])
+  }, [activeTab, profile.id, checkins.length, loadProgramData, loadNutritionData, loadProgressData, loadMessagesData, loadWorkoutData, supabase])
 
   // Scroll messages to bottom
   useEffect(() => {
@@ -543,7 +596,7 @@ export function ClientProfileTabs({
             )}
 
             <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div>
                   <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Dagen actief</p>
                   <p className="text-2xl font-bold text-text-primary mt-2">{daysActive}</p>
@@ -552,8 +605,74 @@ export function ClientProfileTabs({
                   <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Totaal check-ins</p>
                   <p className="text-2xl font-bold text-text-primary mt-2">{checkinCount}</p>
                 </div>
+                <div>
+                  <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Workouts</p>
+                  <p className="text-2xl font-bold text-text-primary mt-2">
+                    {loadingWorkouts ? '…' : workoutSessions.filter(w => w.completed_at).length}
+                  </p>
+                </div>
               </div>
             </div>
+
+            {/* Recent Workouts */}
+            {loadingWorkouts ? (
+              <Skeleton rows={2} />
+            ) : workoutSessions.length > 0 ? (
+              <div>
+                <h3 className="text-[13px] text-client-text-secondary uppercase font-medium tracking-wide mb-3">
+                  Recente trainingen
+                </h3>
+                <div className="space-y-2">
+                  {workoutSessions.slice(0, 5).map((session) => {
+                    const isCompleted = !!session.completed_at
+                    const sessionDate = new Date(session.started_at)
+                    const hasFeedback = session.difficulty_rating || session.feedback_text
+                    const hasPain = session.pain_reported
+
+                    return (
+                      <div
+                        key={session.id}
+                        className="flex items-center gap-3 p-3.5 bg-white rounded-2xl border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+                      >
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                          isCompleted ? 'bg-green-50' : 'bg-orange-50'
+                        }`}>
+                          {isCompleted ? (
+                            <CheckCircle2 strokeWidth={1.5} className="w-4.5 h-4.5 text-green-600" />
+                          ) : (
+                            <Clock strokeWidth={1.5} className="w-4.5 h-4.5 text-orange-500" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[14px] font-medium text-text-primary truncate">
+                            {session.template_day?.name || 'Training'}
+                          </p>
+                          <div className="flex items-center gap-2 mt-0.5 text-[12px] text-client-text-secondary">
+                            <span>{sessionDate.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}</span>
+                            {session.duration_minutes && (
+                              <span>· {session.duration_minutes} min</span>
+                            )}
+                            {session.difficulty_rating && (
+                              <span>· Moeilijkheid {session.difficulty_rating}/5</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          {hasPain && (
+                            <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center" title="Pijn gemeld">
+                              <AlertTriangle strokeWidth={1.5} className="w-3.5 h-3.5 text-red-500" />
+                            </div>
+                          )}
+                          {hasFeedback && !session.coach_seen && (
+                            <div className="w-2 h-2 rounded-full bg-[var(--color-pop)]" title="Feedback niet bekeken" />
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            ) : null}
           </div>
         )}
 
@@ -968,6 +1087,51 @@ export function ClientProfileTabs({
                   )
                 })()}
 
+                {/* Workout History */}
+                {workoutSessions.length > 0 && (
+                  <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden">
+                    <div className="p-4 border-b border-[#E8E4DC] flex items-center justify-between">
+                      <h4 className="text-[13px] text-client-text-secondary uppercase font-medium tracking-wide">
+                        Trainingsgeschiedenis
+                      </h4>
+                      <span className="text-[12px] text-client-text-secondary">
+                        {workoutSessions.filter(w => w.completed_at).length} afgerond
+                      </span>
+                    </div>
+                    <div className="divide-y divide-[#E8E4DC]">
+                      {workoutSessions.slice(0, 10).map((session) => {
+                        const isCompleted = !!session.completed_at
+                        const sessionDate = new Date(session.started_at)
+
+                        return (
+                          <div key={session.id} className="flex items-center gap-3 px-4 py-3">
+                            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isCompleted ? 'bg-green-500' : 'bg-orange-400'}`} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[13px] font-medium text-text-primary truncate">
+                                {session.template_day?.name || 'Training'}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-3 text-[12px] text-client-text-secondary flex-shrink-0">
+                              {session.duration_minutes && (
+                                <span>{session.duration_minutes} min</span>
+                              )}
+                              {session.difficulty_rating && (
+                                <span className="font-medium">{session.difficulty_rating}/5</span>
+                              )}
+                              {session.pain_reported && (
+                                <AlertTriangle strokeWidth={1.5} className="w-3.5 h-3.5 text-red-500" />
+                              )}
+                              <span className="w-16 text-right">
+                                {sessionDate.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
+                              </span>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {/* Check-in History Table */}
                 <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden">
                   <div className="p-4 border-b border-[#E8E4DC]">
@@ -1011,12 +1175,54 @@ export function ClientProfileTabs({
                 </Link>
               </>
             ) : (
-              <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
-                <TrendingUp strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#8E8E93] opacity-40" />
-                <h3 className="text-[17px] font-semibold text-text-primary mb-1">Nog geen voortgangsdata</h3>
-                <p className="text-[14px] text-client-text-secondary">
-                  Data verschijnt hier zodra er check-ins zijn ingediend.
-                </p>
+              <div className="space-y-4">
+                {/* Show workouts even without check-ins */}
+                {workoutSessions.length > 0 && (
+                  <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden">
+                    <div className="p-4 border-b border-[#E8E4DC] flex items-center justify-between">
+                      <h4 className="text-[13px] text-client-text-secondary uppercase font-medium tracking-wide">
+                        Trainingsgeschiedenis
+                      </h4>
+                      <span className="text-[12px] text-client-text-secondary">
+                        {workoutSessions.filter(w => w.completed_at).length} afgerond
+                      </span>
+                    </div>
+                    <div className="divide-y divide-[#E8E4DC]">
+                      {workoutSessions.slice(0, 10).map((session) => {
+                        const isCompleted = !!session.completed_at
+                        const sessionDate = new Date(session.started_at)
+                        return (
+                          <div key={session.id} className="flex items-center gap-3 px-4 py-3">
+                            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isCompleted ? 'bg-green-500' : 'bg-orange-400'}`} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[13px] font-medium text-text-primary truncate">
+                                {session.template_day?.name || 'Training'}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-3 text-[12px] text-client-text-secondary flex-shrink-0">
+                              {session.duration_minutes && <span>{session.duration_minutes} min</span>}
+                              {session.difficulty_rating && <span className="font-medium">{session.difficulty_rating}/5</span>}
+                              {session.pain_reported && <AlertTriangle strokeWidth={1.5} className="w-3.5 h-3.5 text-red-500" />}
+                              <span className="w-16 text-right">
+                                {sessionDate.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
+                              </span>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {workoutSessions.length === 0 && (
+                  <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
+                    <TrendingUp strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#8E8E93] opacity-40" />
+                    <h3 className="text-[17px] font-semibold text-text-primary mb-1">Nog geen voortgangsdata</h3>
+                    <p className="text-[14px] text-client-text-secondary">
+                      Data verschijnt hier zodra er trainingen of check-ins zijn ingediend.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
