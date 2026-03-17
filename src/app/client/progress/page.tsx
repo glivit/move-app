@@ -119,11 +119,16 @@ export default function ProgressPage() {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
 
+        // Limit to last 12 weeks for chart data
+        const twelveWeeksAgo = new Date()
+        twelveWeeksAgo.setDate(twelveWeeksAgo.getDate() - 12 * 7)
+
         const { data: sessions } = await supabase
           .from('workout_sessions')
           .select('id, started_at, completed_at, duration_seconds, workout_sets(weight_kg, actual_reps)')
           .eq('client_id', user.id)
           .not('completed_at', 'is', null)
+          .gte('started_at', twelveWeeksAgo.toISOString())
           .order('started_at', { ascending: false })
 
         if (sessions) {

@@ -13,6 +13,7 @@ import {
   Search,
 } from 'lucide-react'
 import { ExerciseMedia } from '@/components/ExerciseMedia'
+import { notifyWorkoutBarChanged } from '@/components/workout/ActiveWorkoutBar'
 
 // ─── Exercise Info Panel — large GIF + collapsible text ────
 
@@ -634,13 +635,14 @@ function ActiveWorkoutPage() {
         programId,
         startedAt: session.started_at,
       }))
+      notifyWorkoutBarChanged()
     } catch { /* ok */ }
     router.push('/client')
   }
 
   const confirmClose = () => {
     clearWorkoutState()
-    try { localStorage.removeItem('move_minimized_workout') } catch { /* ok */ }
+    try { localStorage.removeItem('move_minimized_workout'); notifyWorkoutBarChanged() } catch { /* ok */ }
     router.push('/client/workout')
   }
 
@@ -653,7 +655,7 @@ function ActiveWorkoutPage() {
       await supabase.from('workout_sessions').delete().eq('id', session.id)
     } catch (err) { console.error('Discard error:', err) }
     clearWorkoutState()
-    try { localStorage.removeItem('move_minimized_workout') } catch { /* ok */ }
+    try { localStorage.removeItem('move_minimized_workout'); notifyWorkoutBarChanged() } catch { /* ok */ }
     router.push('/client/workout')
   }
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { Clock, Dumbbell, X } from 'lucide-react'
 
@@ -19,6 +19,14 @@ function formatTimer(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
+// Custom event name for same-tab communication (storage events only fire cross-tab)
+const WORKOUT_CHANGED_EVENT = 'move_workout_changed'
+
+/** Dispatch this from anywhere to notify the bar of a change */
+export function notifyWorkoutBarChanged() {
+  window.dispatchEvent(new Event(WORKOUT_CHANGED_EVENT))
+}
+
 export function ActiveWorkoutBar() {
   const router = useRouter()
   const pathname = usePathname()
@@ -29,33 +37,41 @@ export function ActiveWorkoutBar() {
   const isOnActiveWorkout = pathname?.startsWith('/client/workout/active')
   const isOnCompleteWorkout = pathname?.startsWith('/client/workout/complete')
 
-  useEffect(() => {
-    const check = () => {
-      try {
-        const raw = localStorage.getItem('move_minimized_workout')
-        if (raw) {
-          const data = JSON.parse(raw) as MinimizedWorkout
-          setMinimized(data)
-        } else {
-          setMinimized(null)
-        }
-      } catch {
+  const check = useCallback(() => {
+    try {
+      const raw = localStorage.getItem('move_minimized_workout')
+      if (raw) {
+        const data = JSON.parse(raw) as MinimizedWorkout
+        setMinimized(data)
+      } else {
         setMinimized(null)
       }
-    }
-
-    check()
-    // Check periodically for changes from other tabs/components
-    const interval = setInterval(check, 2000)
-    // Also listen for storage events from other tabs
-    window.addEventListener('storage', check)
-    return () => {
-      clearInterval(interval)
-      window.removeEventListener('storage', check)
+    } catch {
+      setMinimized(null)
     }
   }, [])
 
-  // Timer
+  useEffect(() => {
+    // Check once on mount
+    check()
+
+    // Listen for cross-tab storage events
+    window.addEventListener('storage', check)
+    // Listen for same-tab custom events
+    window.addEventListener(WORKOUT_CHANGED_EVENT, check)
+
+    return () => {
+      window.removeEventListener('storage', check)
+      window.removeEventListener(WORKOUT_CHANGED_EVENT, check)
+    }
+  }, [check])
+
+  // Also re-check when navigating (pathname changes)
+  useEffect(() => {
+    check()
+  }, [pathname, check])
+
+  // Timer — only runs when minimized is set
   useEffect(() => {
     if (!minimized) return
     const start = new Date(minimized.startedAt).getTime()
@@ -88,12 +104,12 @@ export function ActiveWorkoutBar() {
             onClick={handleResume}
             className="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#353330]"
           >
-            {/* Pulsing indicator */}
+            {/* Indicator (no infinite animation) */}
             <div className="relative flex-shrink-0">
               <div className="w-10 h-10 bg-[var(--color-pop)] rounded-xl flex items-center justify-center">
                 <Dumbbell size={18} strokeWidth={2} className="text-white" />
               </div>
-              <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[var(--color-pop)] rounded-full animate-pulse-subtle" />
+              <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[var(--color-pop)] rounded-full" />
             </div>
 
             <div className="flex-1 min-w-0">

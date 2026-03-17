@@ -96,7 +96,10 @@ export default function CalendarPage() {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
 
-        // Completed workouts WITH exercise details
+        // Completed workouts WITH exercise details — limit to last 3 months
+        const threeMonthsAgo = new Date()
+        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
+
         const { data: workouts } = await supabase
           .from('workout_sessions')
           .select(`
@@ -106,6 +109,7 @@ export default function CalendarPage() {
           `)
           .eq('client_id', user.id)
           .not('completed_at', 'is', null)
+          .gte('started_at', threeMonthsAgo.toISOString())
           .order('started_at', { ascending: false })
 
         if (workouts) setCompletedWorkouts(workouts as any[])
@@ -125,12 +129,13 @@ export default function CalendarPage() {
           }
         }
 
-        // Video sessions
+        // Video sessions — limit to last 3 months
         const { data: videos } = await supabase
           .from('video_sessions')
           .select('id, scheduled_at, duration_minutes, status')
           .eq('client_id', user.id)
           .not('status', 'eq', 'cancelled')
+          .gte('scheduled_at', threeMonthsAgo.toISOString())
           .order('scheduled_at', { ascending: false })
 
         if (videos) setVideoSessions(videos as VideoSession[])

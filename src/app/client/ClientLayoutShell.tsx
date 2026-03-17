@@ -12,7 +12,7 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
       <ClientSidebar />
 
       {/* Mobile header — thin, editorial */}
-      <header className="lg:hidden sticky top-0 z-30 bg-[#EEEBE3]/90 backdrop-blur-lg border-b border-[#E8E4DC]">
+      <header className="lg:hidden sticky top-0 z-30 bg-[#EEEBE3] border-b border-[#E8E4DC]">
         <div className="max-w-2xl mx-auto px-6 h-12 flex items-center justify-center">
           <span
             className="text-[15px] font-semibold tracking-[0.2em] uppercase text-[#1A1917]"

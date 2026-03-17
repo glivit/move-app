@@ -128,12 +128,16 @@ export default function StatsPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      // Sessions
+      // Sessions — limit to last 6 months for performance
+      const sixMonthsAgo = new Date()
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+
       const { data: sessions } = await supabase
         .from('workout_sessions')
         .select('id, started_at, completed_at, duration_seconds')
         .eq('client_id', user.id)
         .not('completed_at', 'is', null)
+        .gte('started_at', sixMonthsAgo.toISOString())
         .order('started_at', { ascending: true })
 
       if (sessions) {
