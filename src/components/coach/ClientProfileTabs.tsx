@@ -351,15 +351,32 @@ export function ClientProfileTabs({
       const threeMonthsAgo = new Date()
       threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('workout_sessions')
-        .select('id, client_id, client_program_id, template_day_id, started_at, completed_at, duration_minutes, difficulty_rating, feedback_text, pain_reported, pain_notes, coach_seen, program_template_days(name, focus)')
+        .select('*, program_template_days(name, focus)')
         .eq('client_id', profile.id)
         .gte('started_at', threeMonthsAgo.toISOString())
         .order('started_at', { ascending: false })
         .limit(30)
 
-      if (data) {
+      if (error) {
+        // Fallback: query without join if program_template_days join fails
+        console.warn('Workout query with join failed, trying without:', error.message)
+        const { data: fallbackData } = await supabase
+          .from('workout_sessions')
+          .select('*')
+          .eq('client_id', profile.id)
+          .gte('started_at', threeMonthsAgo.toISOString())
+          .order('started_at', { ascending: false })
+          .limit(30)
+
+        if (fallbackData) {
+          setWorkoutSessions(fallbackData.map((s: any) => ({
+            ...s,
+            template_day: undefined,
+          })))
+        }
+      } else if (data) {
         setWorkoutSessions(data.map((s: any) => ({
           ...s,
           template_day: s.program_template_days || undefined,
