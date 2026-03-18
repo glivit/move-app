@@ -147,6 +147,26 @@ export async function POST(request: NextRequest) {
       // The push notification already went out
     }
 
+    // Trigger AI feedback (delayed, non-blocking)
+    // Wait 3 minutes before sending AI feedback to give coach a chance to respond manually
+    if (process.env.ANTHROPIC_API_KEY) {
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : 'http://localhost:3000'
+
+      setTimeout(async () => {
+        try {
+          await fetch(`${baseUrl}/api/ai-feedback`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId: session.id }),
+          })
+        } catch (e) {
+          console.error('[AI Feedback] Delayed trigger failed:', e)
+        }
+      }, 3 * 60 * 1000) // 3 minutes delay
+    }
+
     return NextResponse.json({
       success: true,
       sessionId: session.id,
