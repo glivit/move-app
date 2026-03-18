@@ -128,6 +128,66 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // ─── NUTRITION NUDGES ──────────────────────────────────────
+    // Check all clients with an active nutrition plan who haven't logged any meals today
+
+    const { data: allClients } = await supabase
+      .from('profiles')
+      .select('id, full_name')
+      .eq('role', 'client')
+
+    if (allClients) {
+      const todayStr = now.toISOString().split('T')[0]
+      const todayStart = new Date()
+      todayStart.setHours(0, 0, 0, 0)
+
+      for (const client of allClients) {
+        // Check if client has an active nutrition plan
+        const { data: plan } = await supabase
+          .from('nutrition_plans')
+          .select('id')
+          .eq('client_id', client.id)
+          .eq('is_active', true)
+          .limit(1)
+          .maybeSingle()
+
+        if (!plan) continue // No active plan
+
+        // Check if they logged any meals today
+        const { data: todayLogs } = await supabase
+          .from('nutrition_logs')
+          .select('id')
+          .eq('client_id', client.id)
+          .eq('date', todayStr)
+          .eq('completed', true)
+          .limit(1)
+
+        if (todayLogs && todayLogs.length > 0) continue // Already logged
+
+        // Check we haven't already messaged today
+        const { data: todayMsgs } = await supabase
+          .from('messages')
+          .select('id')
+          .eq('sender_id', coachId)
+          .eq('receiver_id', client.id)
+          .gte('created_at', todayStart.toISOString())
+          .limit(1)
+
+        if (todayMsgs && todayMsgs.length > 0) continue
+
+        const context: NudgeContext = {
+          clientName: client.full_name || 'Client',
+          type: 'missed_nutrition',
+        }
+
+        const nudge = await generateNudge(context)
+        if (nudge) {
+          const sent = await sendAIMessage(coachId, client.id, nudge, `nudge-nutrition-${client.id}`)
+          results.push({ clientId: client.id, type: 'missed_nutrition', sent })
+        }
+      }
+    }
+
     return NextResponse.json({ success: true, results, count: results.length })
   } catch (error) {
     console.error('[AI Nudges] Error:', error)

@@ -26,31 +26,31 @@ export default async function ClientProfilePage({ params }: Props) {
 
   if (!profile) notFound()
 
-  const { data: latestCheckin } = await supabase
-    .from('checkins')
-    .select('*')
-    .eq('client_id', id)
-    .order('date', { ascending: false })
-    .limit(1)
-    .single()
-
-  const { count: checkinCount } = await supabase
-    .from('checkins')
-    .select('*', { count: 'exact', head: true })
-    .eq('client_id', id)
-
-  const { data: intakeForm } = await supabase
-    .from('intake_forms')
-    .select('*')
-    .eq('client_id', id)
-    .single()
-
-  // Count completed workouts
-  const { count: workoutCount } = await supabase
-    .from('workout_sessions')
-    .select('*', { count: 'exact', head: true })
-    .eq('client_id', id)
-    .not('completed_at', 'is', null)
+  // Parallel fetch all secondary data
+  const [
+    { data: latestCheckin },
+    { count: checkinCount },
+    { data: intakeForm },
+    { count: workoutCount },
+  ] = await Promise.all([
+    supabase.from('checkins')
+      .select('*')
+      .eq('client_id', id)
+      .order('date', { ascending: false })
+      .limit(1)
+      .single(),
+    supabase.from('checkins')
+      .select('id', { count: 'exact', head: true })
+      .eq('client_id', id),
+    supabase.from('intake_forms')
+      .select('*')
+      .eq('client_id', id)
+      .single(),
+    supabase.from('workout_sessions')
+      .select('id', { count: 'exact', head: true })
+      .eq('client_id', id)
+      .not('completed_at', 'is', null),
+  ])
 
   // Calculate days active
   const startDate = profile.start_date ? new Date(profile.start_date) : null

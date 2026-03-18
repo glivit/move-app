@@ -29,22 +29,22 @@ export default async function CoachActivityFeedPage() {
   const twoWeeksAgo = new Date()
   twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
 
-  // Load recent completed workouts with client info
-  const { data: workouts } = await supabase
-    .from('workout_sessions')
-    .select('*, profiles!workout_sessions_client_id_fkey(id, full_name, avatar_url), program_template_days(name, focus)')
-    .not('completed_at', 'is', null)
-    .gte('completed_at', twoWeeksAgo.toISOString())
-    .order('completed_at', { ascending: false })
-    .limit(50)
-
-  // Load recent check-ins
-  const { data: checkins } = await supabase
-    .from('checkins')
-    .select('id, client_id, date, weight_kg, coach_reviewed, profiles!checkins_client_id_fkey(full_name)')
-    .gte('date', twoWeeksAgo.toISOString().split('T')[0])
-    .order('date', { ascending: false })
-    .limit(20)
+  // Load workouts and check-ins in parallel
+  const [{ data: workouts }, { data: checkins }] = await Promise.all([
+    supabase
+      .from('workout_sessions')
+      .select('id, client_id, completed_at, duration_seconds, mood_rating, difficulty_rating, feedback_text, pain_reported, coach_seen, profiles!workout_sessions_client_id_fkey(full_name), program_template_days(name)')
+      .not('completed_at', 'is', null)
+      .gte('completed_at', twoWeeksAgo.toISOString())
+      .order('completed_at', { ascending: false })
+      .limit(50),
+    supabase
+      .from('checkins')
+      .select('id, client_id, date, weight_kg, coach_reviewed, profiles!checkins_client_id_fkey(full_name)')
+      .gte('date', twoWeeksAgo.toISOString().split('T')[0])
+      .order('date', { ascending: false })
+      .limit(20),
+  ])
 
   // Combine into a unified activity feed
   type ActivityItem = {

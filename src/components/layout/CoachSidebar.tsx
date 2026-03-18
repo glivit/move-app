@@ -7,9 +7,8 @@ import {
   BookOpen, Radio, CreditCard, FileText, Dumbbell, ClipboardList,
   Menu, X, LogOut, MoreVertical, Calendar, Apple, UsersRound, ShieldCheck, Activity, Bot
 } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { signOut } from '@/lib/auth'
-import { createClient } from '@/lib/supabase'
 
 const mainNavItems = [
   { href: '/coach', label: 'Dashboard', icon: LayoutDashboard },
@@ -58,44 +57,26 @@ export function CoachSidebar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [badges, setBadges] = useState<Record<string, number>>({})
+  const badgesFetched = useRef(false)
 
-  // Load badge counts
+  // Load badge counts via lightweight API (not direct Supabase queries)
   useEffect(() => {
-    const loadBadges = async () => {
-      try {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
-
-        const [
-          { count: unseenWorkouts },
-          { count: unreadMessages },
-          { count: pendingCheckins },
-        ] = await Promise.all([
-          supabase.from('workout_sessions').select('*', { count: 'exact', head: true })
-            .not('completed_at', 'is', null).eq('coach_seen', false),
-          supabase.from('messages').select('*', { count: 'exact', head: true })
-            .eq('receiver_id', user.id).is('read_at', null),
-          supabase.from('checkins').select('*', { count: 'exact', head: true })
-            .eq('coach_reviewed', false),
-        ])
-
-        setBadges({
-          '/coach': (unseenWorkouts || 0) + (unreadMessages || 0) + (pendingCheckins || 0),
-          '/coach/clients': unseenWorkouts || 0,
-          '/coach/check-ins': pendingCheckins || 0,
-          '/coach/messages': unreadMessages || 0,
-        })
-      } catch (e) {
-        // Silent fail
-      }
+    const loadBadges = () => {
+      fetch('/api/coach-badges')
+        .then(r => r.ok ? r.json() : {})
+        .then(data => setBadges(data))
+        .catch(() => {})
     }
 
-    loadBadges()
-    // Refresh every 60 seconds
-    const interval = setInterval(loadBadges, 60000)
+    // Only fetch on first mount and then every 2 minutes
+    if (!badgesFetched.current) {
+      loadBadges()
+      badgesFetched.current = true
+    }
+
+    const interval = setInterval(loadBadges, 120000)
     return () => clearInterval(interval)
-  }, [pathname])
+  }, [])
 
   const handleSignOut = async () => {
     await signOut()
