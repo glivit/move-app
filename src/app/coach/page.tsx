@@ -127,31 +127,31 @@ export default async function CoachDashboard() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {kpiCards.map((card, i) => (
           <Link key={card.href} href={card.href}>
-            <div className={`card-elevated p-6 cursor-pointer group animate-gentle-rise stagger-${i + 1}`} style={{ animationFillMode: 'both' }}>
+            <div className={`card-elevated p-5 cursor-pointer group animate-gentle-rise stagger-${i + 1}`} style={{ animationFillMode: 'both' }}>
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-[11px] font-bold text-[#C5C2BC] mb-3 uppercase tracking-[0.08em]">{card.label}</p>
-                  <p className="text-[34px] font-semibold text-[#1A1917] tracking-[-0.03em] leading-none">{card.value}</p>
+                  <p className="text-[28px] font-semibold text-[#1A1917] tracking-[-0.03em] leading-none">{card.value}</p>
                 </div>
-                <div className={`w-12 h-12 rounded-2xl ${card.iconBg} flex items-center justify-center flex-shrink-0`}>
-                  <card.icon className={`w-[22px] h-[22px] ${card.iconColor}`} strokeWidth={1.5} />
+                <div className={`w-10 h-10 rounded-xl ${card.iconBg} flex items-center justify-center flex-shrink-0`}>
+                  <card.icon className={`w-[18px] h-[18px] ${card.iconColor}`} strokeWidth={1.5} />
                 </div>
               </div>
             </div>
           </Link>
         ))}
 
-        <div className="card-elevated p-6 animate-gentle-rise stagger-4" style={{ animationFillMode: 'both' }}>
+        <div className="card-elevated p-5 animate-gentle-rise stagger-5" style={{ animationFillMode: 'both' }}>
           <div className="flex items-start justify-between">
             <div>
               <p className="text-[11px] font-bold text-[#C5C2BC] mb-3 uppercase tracking-[0.08em]">MRR</p>
-              <p className="text-[34px] font-semibold text-[#1A1917] tracking-[-0.03em] leading-none">€{(mrr / 1000).toFixed(1)}k</p>
+              <p className="text-[28px] font-semibold text-[#1A1917] tracking-[-0.03em] leading-none">€{(mrr / 1000).toFixed(1)}k</p>
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#1A1917]/12 to-[#1A1917]/5 flex items-center justify-center flex-shrink-0">
-              <TrendingUp className="w-[22px] h-[22px] text-[#1A1917]" strokeWidth={1.5} />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1A1917]/12 to-[#1A1917]/5 flex items-center justify-center flex-shrink-0">
+              <TrendingUp className="w-[18px] h-[18px] text-[#1A1917]" strokeWidth={1.5} />
             </div>
           </div>
         </div>

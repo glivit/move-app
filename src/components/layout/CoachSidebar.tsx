@@ -57,26 +57,28 @@ export function CoachSidebar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [badges, setBadges] = useState<Record<string, number>>({})
-  const badgesFetched = useRef(false)
+  const lastFetch = useRef(0)
 
-  // Load badge counts via lightweight API (not direct Supabase queries)
+  // Load badge counts via lightweight API
   useEffect(() => {
     const loadBadges = () => {
       fetch('/api/coach-badges')
         .then(r => r.ok ? r.json() : {})
         .then(data => setBadges(data))
         .catch(() => {})
+      lastFetch.current = Date.now()
     }
 
-    // Only fetch on first mount and then every 2 minutes
-    if (!badgesFetched.current) {
+    // Fetch on mount + when navigating (but debounce to max once per 10 seconds)
+    const timeSinceLast = Date.now() - lastFetch.current
+    if (timeSinceLast > 10000) {
       loadBadges()
-      badgesFetched.current = true
     }
 
+    // Background refresh every 2 minutes
     const interval = setInterval(loadBadges, 120000)
     return () => clearInterval(interval)
-  }, [])
+  }, [pathname])
 
   const handleSignOut = async () => {
     await signOut()

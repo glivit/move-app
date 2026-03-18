@@ -30,10 +30,11 @@ export default async function CoachActivityFeedPage() {
   twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14)
 
   // Load workouts and check-ins in parallel
-  const [{ data: workouts }, { data: checkins }] = await Promise.all([
+  // Use select('*') for workouts to avoid column-not-exist errors
+  const [{ data: workouts, error: workoutsError }, { data: checkins }] = await Promise.all([
     supabase
       .from('workout_sessions')
-      .select('id, client_id, completed_at, duration_seconds, mood_rating, difficulty_rating, feedback_text, pain_reported, coach_seen, profiles!workout_sessions_client_id_fkey(full_name), program_template_days(name)')
+      .select('*, profiles!workout_sessions_client_id_fkey(full_name), program_template_days(name)')
       .not('completed_at', 'is', null)
       .gte('completed_at', twoWeeksAgo.toISOString())
       .order('completed_at', { ascending: false })
@@ -45,6 +46,20 @@ export default async function CoachActivityFeedPage() {
       .order('date', { ascending: false })
       .limit(20),
   ])
+
+  // Fallback: if FK join fails, try without join
+  let workoutData = workouts
+  if (workoutsError) {
+    console.error('Activity workouts query error:', workoutsError.message)
+    const { data: fallback } = await supabase
+      .from('workout_sessions')
+      .select('*')
+      .not('completed_at', 'is', null)
+      .gte('completed_at', twoWeeksAgo.toISOString())
+      .order('completed_at', { ascending: false })
+      .limit(50)
+    workoutData = fallback
+  }
 
   // Combine into a unified activity feed
   type ActivityItem = {
@@ -60,9 +75,11 @@ export default async function CoachActivityFeedPage() {
   const activities: ActivityItem[] = []
 
   // Add workouts
-  for (const w of workouts || []) {
-    const profile = (w as any).profiles
-    const dayInfo = (w as any).program_template_days
+  for (const w of workoutData || []) {
+    const rawProfile = (w as any).profiles
+    const profile = Array.isArray(rawProfile) ? rawProfile[0] : rawProfile
+    const rawDay = (w as any).program_template_days
+    const dayInfo = Array.isArray(rawDay) ? rawDay[0] : rawDay
 
     activities.push({
       id: `w-${w.id}`,
@@ -70,22 +87,23 @@ export default async function CoachActivityFeedPage() {
       clientId: w.client_id,
       clientName: profile?.full_name || 'Client',
       timestamp: w.completed_at!,
-      reviewed: w.coach_seen || false,
+      reviewed: (w as any).coach_seen || false,
       data: {
         sessionId: w.id,
         dayName: dayInfo?.name || 'Training',
-        durationSeconds: w.duration_seconds,
-        moodRating: w.mood_rating,
-        difficultyRating: w.difficulty_rating,
-        feedbackText: w.feedback_text,
-        painReported: w.pain_reported,
+        durationSeconds: (w as any).duration_seconds,
+        moodRating: (w as any).mood_rating,
+        difficultyRating: (w as any).difficulty_rating,
+        feedbackText: (w as any).feedback_text,
+        painReported: (w as any).pain_reported,
       },
     })
   }
 
   // Add check-ins
   for (const c of checkins || []) {
-    const profile = (c as any).profiles
+    const rawProfile = (c as any).profiles
+    const profile = Array.isArray(rawProfile) ? rawProfile[0] : rawProfile
     activities.push({
       id: `c-${c.id}`,
       type: 'checkin',

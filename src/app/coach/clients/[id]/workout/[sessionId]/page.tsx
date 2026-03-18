@@ -91,46 +91,75 @@ export default function CoachWorkoutDetailPage() {
         const { data: authData } = await supabase.auth.getUser()
         if (authData.user) setCoachId(authData.user.id)
 
-        // Load session
-        const { data: sessionData } = await supabase
-          .from('workout_sessions')
-          .select('*, program_template_days(name, focus)')
-          .eq('id', sessionId)
-          .single()
+        // Load session + client name + auth in parallel
+        const [{ data: sessionData, error: sessionError }, { data: profile }] = await Promise.all([
+          supabase
+            .from('workout_sessions')
+            .select('*, program_template_days(name, focus)')
+            .eq('id', sessionId)
+            .single(),
+          supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', clientId)
+            .single(),
+        ])
 
-        if (!sessionData) {
+        // Fallback if join fails
+        let session = sessionData
+        if (sessionError) {
+          const { data: fallback } = await supabase
+            .from('workout_sessions')
+            .select('*')
+            .eq('id', sessionId)
+            .single()
+          session = fallback
+        }
+
+        if (!session) {
           router.push(`/coach/clients/${clientId}`)
           return
         }
 
-        setSession({
-          ...sessionData,
-          template_day: (sessionData as any).program_template_days || undefined,
-        })
-
-        // Load client name
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('full_name')
-          .eq('id', clientId)
-          .single()
-
         if (profile) setClientName(profile.full_name)
 
+        const rawDay = (session as any).program_template_days
+        const templateDay = Array.isArray(rawDay) ? rawDay[0] : rawDay
+
+        setSession({
+          ...session,
+          template_day: templateDay || undefined,
+        })
+
+
+
         // Load sets with exercise info
-        const { data: setsData } = await supabase
+        const { data: setsData, error: setsError } = await supabase
           .from('workout_sets')
           .select('*, exercises(name, name_nl, target_muscle, body_part)')
           .eq('workout_session_id', sessionId)
           .order('set_number', { ascending: true })
 
-        if (setsData && setsData.length > 0) {
+        // Fallback without join if it fails
+        let sets = setsData
+        if (setsError) {
+          console.warn('Sets join failed, trying without:', setsError.message)
+          const { data: fallback } = await supabase
+            .from('workout_sets')
+            .select('*')
+            .eq('workout_session_id', sessionId)
+            .order('set_number', { ascending: true })
+          sets = fallback
+        }
+
+        if (sets && sets.length > 0) {
           // Group by exercise
           const grouped: Record<string, GroupedExercise> = {}
 
-          setsData.forEach((set: any) => {
+          sets.forEach((set: any) => {
             const exId = set.exercise_id
-            const ex = set.exercises
+            const rawEx = set.exercises
+            const ex = Array.isArray(rawEx) ? rawEx[0] : rawEx
 
             if (!grouped[exId]) {
               grouped[exId] = {
