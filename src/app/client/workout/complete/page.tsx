@@ -178,6 +178,14 @@ function WorkoutCompletePage() {
             .eq('exercise_id', g.exerciseId)
         )
       if (painUpdates.length > 0) await Promise.all(painUpdates)
+
+      // Notify coach about completed workout (fire & forget)
+      fetch('/api/workout-complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId }),
+      }).catch(() => {}) // Don't block navigation on notification failure
+
       router.push('/client/workout')
     } catch (error) {
       console.error('Error completing workout:', error)

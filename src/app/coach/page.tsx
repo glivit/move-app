@@ -110,6 +110,7 @@ export default async function CoachDashboard() {
   const dateFormatted = formatDateDutch(new Date())
 
   const kpiCards = [
+    { href: '/coach/activity', label: 'Workouts', value: feedbackSessions.length, icon: Dumbbell, iconBg: 'bg-gradient-to-br from-[#7B5EA7]/10 to-[#7B5EA7]/5', iconColor: 'text-[#7B5EA7]' },
     { href: '/coach/check-ins', label: 'Te reviewen', value: pendingCheckinsCount ?? 0, icon: ClipboardCheck, iconBg: 'bg-gradient-to-br from-[#C47D15]/10 to-[#C47D15]/5', iconColor: 'text-[#C47D15]' },
     { href: '/coach/messages', label: 'Ongelezen', value: unreadMessagesCount ?? 0, icon: MessageSquare, iconBg: 'bg-gradient-to-br from-[#3068C4]/10 to-[#3068C4]/5', iconColor: 'text-[#3068C4]' },
     { href: '/coach/clients', label: 'Cliënten', value: activeClientsCount ?? 0, icon: Users, iconBg: 'bg-gradient-to-br from-[#3D8B5C]/10 to-[#3D8B5C]/5', iconColor: 'text-[#3D8B5C]' },
@@ -217,7 +218,7 @@ export default async function CoachDashboard() {
                   <span className="text-[12px] text-[#A09D96] ml-auto font-medium">{feedbackSessions.length} nieuw</span>
                 </div>
                 {feedbackSessions.map((session: any, index: number) => (
-                  <Link key={session.id} href={`/coach/clients/${session.client_id}`}
+                  <Link key={session.id} href={`/coach/clients/${session.client_id}/workout/${session.id}`}
                     className={`flex items-center justify-between px-6 py-4 hover:bg-[#FAF8F5] transition-all duration-[280ms] group ${index !== feedbackSessions.length - 1 ? 'border-b border-[#E8E4DC]' : ''}`}>
                     <div className="flex-1 min-w-0">
                       <p className="text-[15px] font-medium text-[#1A1917]">{session.profiles?.full_name || 'Client'}</p>

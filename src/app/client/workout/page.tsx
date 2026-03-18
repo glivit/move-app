@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Dumbbell, ArrowRight, Clock, Flame, Play, CheckCircle2, Calendar } from 'lucide-react'
+import { Dumbbell, ArrowRight, Clock, Flame, Play, CheckCircle2, Calendar, MessageSquare } from 'lucide-react'
+import { createClient } from '@/lib/supabase'
 
 interface ClientProgram {
   id: string
@@ -52,6 +53,7 @@ export default function WorkoutOverviewPage() {
   const [schedule, setSchedule] = useState<Record<string, string>>({})
   const [todayDay, setTodayDay] = useState<TemplateDay | null>(null)
   const [todayCompleted, setTodayCompleted] = useState(false)
+  const [coachFeedback, setCoachFeedback] = useState<{ content: string; created_at: string } | null>(null)
 
   useEffect(() => {
     const loadData = async () => {
@@ -75,6 +77,32 @@ export default function WorkoutOverviewPage() {
           setSchedule(data.schedule || {})
           setTodayDay(data.todayDay || null)
           setTodayCompleted(data.todayCompleted || false)
+        }
+
+        // Load recent coach feedback (messages from coach within last 48h)
+        try {
+          const supabase = createClient()
+          const { data: { user } } = await supabase.auth.getUser()
+          if (user) {
+            const twoDaysAgo = new Date()
+            twoDaysAgo.setHours(twoDaysAgo.getHours() - 48)
+
+            const { data: msgs } = await supabase
+              .from('messages')
+              .select('content, created_at, sender_id')
+              .eq('receiver_id', user.id)
+              .neq('sender_id', user.id)
+              .eq('message_type', 'text')
+              .gte('created_at', twoDaysAgo.toISOString())
+              .order('created_at', { ascending: false })
+              .limit(1)
+
+            if (msgs && msgs.length > 0) {
+              setCoachFeedback(msgs[0])
+            }
+          }
+        } catch (e) {
+          // Silent - feedback is optional
         }
       } catch (error) {
         console.error('Error loading program:', error)
@@ -203,6 +231,32 @@ export default function WorkoutOverviewPage() {
             <div>
               <p className="text-[14px] font-semibold text-[#1A1917]">Training voltooid</p>
               <p className="text-[12px] text-[#A09D96]">{todayDay.name} — goed gedaan!</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Coach Feedback */}
+      {coachFeedback && (
+        <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-5 mb-5 border-l-4 border-[var(--color-pop)]">
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center flex-shrink-0">
+              <MessageSquare size={16} strokeWidth={1.5} className="text-[var(--color-pop)]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <p className="text-[12px] font-bold text-[var(--color-pop)] uppercase tracking-[0.06em]">Glenn</p>
+                <span className="text-[11px] text-[#CCC7BC]">
+                  {(() => {
+                    const diff = Date.now() - new Date(coachFeedback.created_at).getTime()
+                    const hours = Math.floor(diff / 3600000)
+                    if (hours < 1) return 'zojuist'
+                    if (hours < 24) return `${hours}u geleden`
+                    return `${Math.floor(hours / 24)}d geleden`
+                  })()}
+                </span>
+              </div>
+              <p className="text-[14px] text-[#1A1917] leading-relaxed">{coachFeedback.content}</p>
             </div>
           </div>
         </div>

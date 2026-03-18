@@ -1,0 +1,167 @@
+import { createAdminClient } from '@/lib/supabase-admin'
+import { sendPushToUser } from '@/lib/push-server'
+import { NextRequest, NextResponse } from 'next/server'
+
+export const dynamic = 'force-dynamic'
+
+/**
+ * POST /api/workout-complete
+ * Called when a client completes their workout
+ *
+ * Request: { sessionId: string }
+ *
+ * Actions:
+ * 1. Load workout session with client profile, template day, and sets
+ * 2. Calculate stats: duration, total volume, PR count, set count
+ * 3. Find coach (single-coach app)
+ * 4. Send push notification to coach
+ * 5. Create system message with workout summary
+ * 6. Return success
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
+    const { sessionId } = body
+
+    if (!sessionId) {
+      return NextResponse.json({ error: 'sessionId is required' }, { status: 400 })
+    }
+
+    const supabase = createAdminClient()
+
+    // Load workout session with client profile, template day, and sets
+    const { data: session, error: sessionError } = await supabase
+      .from('workout_sessions')
+      .select(`
+        id,
+        client_id,
+        started_at,
+        completed_at,
+        duration_seconds,
+        template_day_id,
+        mood_rating,
+        difficulty_rating,
+        feedback_text,
+        profiles!workout_sessions_client_id_fkey(id, full_name),
+        program_template_days(id, name),
+        workout_sets(
+          id,
+          weight_kg,
+          actual_reps,
+          is_pr
+        )
+      `)
+      .eq('id', sessionId)
+      .single()
+
+    if (sessionError || !session) {
+      return NextResponse.json(
+        { error: 'Workout session not found' },
+        { status: 404 }
+      )
+    }
+
+    // Calculate stats
+    const durationMin = Math.round((session.duration_seconds || 0) / 60)
+    const sets = session.workout_sets || []
+    const totalSets = sets.length
+
+    // Calculate total volume (sum of weight × reps for completed sets)
+    const totalVolume = sets.reduce((sum: number, set: any) => {
+      const weight = set.weight_kg || 0
+      const reps = set.actual_reps || 0
+      return sum + weight * reps
+    }, 0)
+
+    // Count PRs (personal records)
+    const prCount = sets.filter((set: any) => set.is_pr).length
+
+    // Get client name and profile
+    const clientProfile = Array.isArray(session.profiles) ? session.profiles[0] : session.profiles
+    const clientId = session.client_id
+    const clientName = (clientProfile as any)?.full_name || 'Client'
+    const templateDay = Array.isArray(session.program_template_days) ? session.program_template_days[0] : session.program_template_days
+    const dayName = (templateDay as any)?.name || 'Workout'
+
+    // Find the coach (single-coach app)
+    const { data: coaches, error: coachError } = await supabase
+      .from('profiles')
+      .select('id, full_name')
+      .eq('role', 'coach')
+      .limit(1)
+
+    if (coachError || !coaches || coaches.length === 0) {
+      console.error('No coach found:', coachError)
+      return NextResponse.json(
+        { error: 'Coach not found' },
+        { status: 500 }
+      )
+    }
+
+    const coach = coaches[0]
+    const coachId = coach.id
+
+    // Build push notification
+    const firstName = clientName.split(' ')[0]
+    const pushTitle = `💪 ${firstName} heeft getraind`
+    const pushBody = `${dayName} — ${durationMin} min · ${totalSets} sets · ${prCount} PR${prCount === 1 ? '' : "'s"}`
+    const pushUrl = `/coach/clients/${clientId}/workout/${sessionId}`
+
+    // Send push notification to coach
+    await sendPushToUser(coachId, {
+      title: pushTitle,
+      body: pushBody,
+      url: pushUrl,
+      tag: `workout-complete-${sessionId}`,
+    })
+
+    // Create system message with workout summary
+    const messageContent = {
+      sessionId: session.id,
+      dayName: dayName,
+      durationMin: durationMin,
+      totalSets: totalSets,
+      totalVolume: totalVolume,
+      prCount: prCount,
+      moodRating: session.mood_rating || null,
+      difficultyRating: session.difficulty_rating || null,
+      feedbackText: session.feedback_text || null,
+      completedAt: session.completed_at,
+    }
+
+    const { error: messageError } = await supabase
+      .from('messages')
+      .insert({
+        sender_id: clientId,
+        receiver_id: coachId,
+        content: JSON.stringify(messageContent),
+        message_type: 'workout_complete',
+        file_url: null,
+        read_at: null,
+        created_at: new Date().toISOString(),
+      })
+
+    if (messageError) {
+      console.error('Error creating workout complete message:', messageError)
+      // Don't fail the entire request if message creation fails
+      // The push notification already went out
+    }
+
+    return NextResponse.json({
+      success: true,
+      sessionId: session.id,
+      stats: {
+        durationMin,
+        totalVolume,
+        prCount,
+        totalSets,
+      },
+    })
+  } catch (error) {
+    console.error('Error in workout-complete API:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}

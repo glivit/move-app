@@ -5,13 +5,15 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Users, ClipboardCheck, MessageSquare,
   BookOpen, Radio, CreditCard, FileText, Dumbbell, ClipboardList,
-  Menu, X, LogOut, MoreVertical, Calendar, Apple, UsersRound, ShieldCheck
+  Menu, X, LogOut, MoreVertical, Calendar, Apple, UsersRound, ShieldCheck, Activity
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { signOut } from '@/lib/auth'
+import { createClient } from '@/lib/supabase'
 
 const mainNavItems = [
   { href: '/coach', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/coach/activity', label: 'Activiteit', icon: Activity },
   { href: '/coach/clients', label: 'Cliënten', icon: Users },
   { href: '/coach/exercises', label: 'Oefeningen', icon: Dumbbell },
   { href: '/coach/programs', label: "Programma's", icon: ClipboardList },
@@ -54,6 +56,45 @@ export function CoachSidebar() {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [badges, setBadges] = useState<Record<string, number>>({})
+
+  // Load badge counts
+  useEffect(() => {
+    const loadBadges = async () => {
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+
+        const [
+          { count: unseenWorkouts },
+          { count: unreadMessages },
+          { count: pendingCheckins },
+        ] = await Promise.all([
+          supabase.from('workout_sessions').select('*', { count: 'exact', head: true })
+            .not('completed_at', 'is', null).eq('coach_seen', false),
+          supabase.from('messages').select('*', { count: 'exact', head: true })
+            .eq('receiver_id', user.id).is('read_at', null),
+          supabase.from('checkins').select('*', { count: 'exact', head: true })
+            .eq('coach_reviewed', false),
+        ])
+
+        setBadges({
+          '/coach': (unseenWorkouts || 0) + (unreadMessages || 0) + (pendingCheckins || 0),
+          '/coach/clients': unseenWorkouts || 0,
+          '/coach/check-ins': pendingCheckins || 0,
+          '/coach/messages': unreadMessages || 0,
+        })
+      } catch (e) {
+        // Silent fail
+      }
+    }
+
+    loadBadges()
+    // Refresh every 60 seconds
+    const interval = setInterval(loadBadges, 60000)
+    return () => clearInterval(interval)
+  }, [pathname])
 
   const handleSignOut = async () => {
     await signOut()
@@ -68,6 +109,7 @@ export function CoachSidebar() {
   const NavItem = ({ item, onClick }: { item: any; onClick?: () => void }) => {
     const Icon = item.icon
     const active = isActive(item.href)
+    const badgeCount = badges[item.href] || 0
 
     return (
       <Link
@@ -89,6 +131,11 @@ export function CoachSidebar() {
           strokeWidth={active ? 1.7 : 1.5}
         />
         <span className="tracking-[-0.01em]">{item.label}</span>
+        {badgeCount > 0 && !active && (
+          <span className="ml-auto min-w-[20px] h-5 flex items-center justify-center rounded-full bg-[#D46A3A] text-white text-[11px] font-bold px-1.5">
+            {badgeCount > 9 ? '9+' : badgeCount}
+          </span>
+        )}
         {active && (
           <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#1A1917] shadow-[0_0_4px_rgba(26,25,23,0.4)]" />
         )}

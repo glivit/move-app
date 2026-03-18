@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
+import { sendPushToClient } from '@/lib/push-notifications'
 import {
   ArrowLeft, Clock, Dumbbell, CheckCircle2, AlertTriangle,
-  TrendingUp, Trophy, Loader2, MessageSquare
+  TrendingUp, Trophy, Loader2, MessageSquare, Send
 } from 'lucide-react'
 
 interface WorkoutSet {
@@ -59,6 +60,13 @@ interface GroupedExercise {
   hasPR: boolean
 }
 
+interface CoachMessage {
+  id: string
+  sender_id: string
+  content: string
+  created_at: string
+}
+
 export default function CoachWorkoutDetailPage() {
   const params = useParams()
   const router = useRouter()
@@ -70,10 +78,19 @@ export default function CoachWorkoutDetailPage() {
   const [exercises, setExercises] = useState<GroupedExercise[]>([])
   const [clientName, setClientName] = useState('')
   const [loading, setLoading] = useState(true)
+  const [feedbackText, setFeedbackText] = useState('')
+  const [sendingFeedback, setSendingFeedback] = useState(false)
+  const [feedbackSent, setFeedbackSent] = useState(false)
+  const [coachMessages, setCoachMessages] = useState<CoachMessage[]>([])
+  const [coachId, setCoachId] = useState<string | null>(null)
 
   useEffect(() => {
     async function load() {
       try {
+        // Get current coach ID
+        const { data: authData } = await supabase.auth.getUser()
+        if (authData.user) setCoachId(authData.user.id)
+
         // Load session
         const { data: sessionData } = await supabase
           .from('workout_sessions')
@@ -151,6 +168,28 @@ export default function CoachWorkoutDetailPage() {
           setExercises(Object.values(grouped))
         }
 
+        // Load existing coach messages about this session
+        if (authData.user) {
+          const sessionCompletedAt = sessionData.completed_at
+            ? new Date(sessionData.completed_at).getTime()
+            : new Date(sessionData.started_at).getTime()
+          const oneHourBefore = new Date(sessionCompletedAt - 60 * 60 * 1000).toISOString()
+          const oneHourAfter = new Date(sessionCompletedAt + 60 * 60 * 1000).toISOString()
+
+          const { data: messagesData } = await supabase
+            .from('messages')
+            .select('id, sender_id, content, created_at')
+            .eq('sender_id', authData.user.id)
+            .eq('receiver_id', clientId)
+            .gte('created_at', oneHourBefore)
+            .lte('created_at', oneHourAfter)
+            .order('created_at', { ascending: false })
+
+          if (messagesData) {
+            setCoachMessages(messagesData as CoachMessage[])
+          }
+        }
+
         // Mark as coach_seen
         await supabase
           .from('workout_sessions')
@@ -166,6 +205,63 @@ export default function CoachWorkoutDetailPage() {
 
     load()
   }, [sessionId, clientId, supabase, router])
+
+  const handleSendFeedback = async () => {
+    if (!feedbackText.trim() || !coachId) return
+
+    setSendingFeedback(true)
+    try {
+      // Insert message
+      const { error: msgError } = await supabase.from('messages').insert({
+        sender_id: coachId,
+        receiver_id: clientId,
+        content: feedbackText,
+        message_type: 'text',
+      })
+
+      if (msgError) throw msgError
+
+      // Send push notification
+      const previewText = feedbackText.substring(0, 80)
+      sendPushToClient(clientId, 'Glenn heeft je training bekeken', previewText, '/client/messages')
+
+      // Update session
+      await supabase
+        .from('workout_sessions')
+        .update({ coach_seen: true })
+        .eq('id', sessionId)
+
+      // Show success state
+      setFeedbackSent(true)
+      setFeedbackText('')
+
+      // Reload messages
+      const { data: messagesData } = await supabase
+        .from('messages')
+        .select('id, sender_id, content, created_at')
+        .eq('sender_id', coachId)
+        .eq('receiver_id', clientId)
+        .order('created_at', { ascending: false })
+
+      if (messagesData) {
+        setCoachMessages(messagesData as CoachMessage[])
+      }
+
+      // Clear success message after 2 seconds
+      setTimeout(() => setFeedbackSent(false), 2000)
+    } catch (error) {
+      console.error('Error sending feedback:', error)
+    } finally {
+      setSendingFeedback(false)
+    }
+  }
+
+  const quickReplies = [
+    'Sterk gedaan! 💪',
+    'Goed volume, volgende week gaan we zwaarder',
+    'Probeer meer rust tussen je sets',
+    'Mooie progressie, keep going!',
+  ]
 
   if (loading) {
     return (
@@ -426,6 +522,74 @@ export default function CoachWorkoutDetailPage() {
           <p className="text-[14px] text-[#8E8E93]">Geen oefeningen gelogd voor deze sessie.</p>
         </div>
       )}
+
+      {/* Quick Feedback Section */}
+      <div className="bg-white rounded-2xl border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-5 space-y-4">
+        <h2 className="text-[13px] text-[#8E8E93] uppercase font-semibold tracking-wide">
+          Feedback naar {clientName?.split(' ')[0] || 'cliënt'}
+        </h2>
+
+        {/* Existing Messages */}
+        {coachMessages.length > 0 && (
+          <div className="space-y-2 pb-4 border-b border-[#E8E4DC]">
+            {coachMessages.map((msg) => (
+              <div key={msg.id} className="bg-[#FAFAFA] rounded-xl p-3">
+                <p className="text-[13px] text-[#1A1917] whitespace-pre-wrap">{msg.content}</p>
+                <p className="text-[11px] text-[#8E8E93] mt-1">
+                  {new Date(msg.created_at).toLocaleDateString('nl-BE', {
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Quick Reply Buttons */}
+        <div className="flex flex-wrap gap-2">
+          {quickReplies.map((reply) => (
+            <button
+              key={reply}
+              onClick={() => setFeedbackText(reply)}
+              className="px-3 py-1.5 rounded-full bg-[#EDEAE4] hover:bg-[#E0DCD2] transition-colors text-[13px] font-medium text-[#1A1917]"
+            >
+              {reply}
+            </button>
+          ))}
+        </div>
+
+        {/* Feedback Input */}
+        {feedbackSent ? (
+          <div className="flex items-center justify-center py-4">
+            <p className="text-[14px] font-medium text-green-600">Feedback verstuurd ✓</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <textarea
+              value={feedbackText}
+              onChange={(e) => setFeedbackText(e.target.value)}
+              placeholder="Typ je feedback hier..."
+              className="w-full p-3 rounded-lg border border-[#E8E4DC] text-[14px] text-[#1A1917] placeholder:text-[#8E8E93] focus:outline-none focus:ring-1 focus:ring-[#D46A3A] resize-none"
+              rows={3}
+            />
+            <button
+              onClick={handleSendFeedback}
+              disabled={!feedbackText.trim() || sendingFeedback}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-[var(--color-pop)] hover:bg-[#C85A2A] disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-white font-semibold text-[14px]"
+            >
+              {sendingFeedback ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
+              Verstuur feedback
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
