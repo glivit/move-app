@@ -622,10 +622,12 @@ function ActiveWorkoutPage() {
   const handleFinish = async () => {
     if (!session) return
 
-    // Save any unsaved sets that have data (weight or reps filled in but not yet completed)
+    // Flush ALL sets with data to DB before navigating to complete page
     try {
       const supabase = createClient()
-      const unsavedSets: Array<{
+
+      // Collect all sets that have any data (weight or reps)
+      const allSetsToSave: Array<{
         workout_session_id: string
         exercise_id: string
         set_number: number
@@ -642,11 +644,10 @@ function ActiveWorkoutPage() {
         const actualExerciseId = exerciseRef?.exercise_id || templateExId
 
         for (const s of exerciseSets) {
-          // Skip already saved (has real UUID, not temp-) and skip empty sets
-          if (s.completed && !s.id.startsWith('temp-')) continue
+          // Skip sets with no data at all
           if (!s.weight_kg && !s.actual_reps) continue
 
-          unsavedSets.push({
+          allSetsToSave.push({
             workout_session_id: session.id,
             exercise_id: actualExerciseId,
             set_number: s.set_number,
@@ -660,14 +661,14 @@ function ActiveWorkoutPage() {
         }
       }
 
-      if (unsavedSets.length > 0) {
-        // Insert sets that don't exist yet (skip already-saved ones)
-        for (const s of unsavedSets) {
-          await supabase.from('workout_sets').insert(s)
-        }
+      if (allSetsToSave.length > 0) {
+        // Delete all existing sets for this session, then bulk insert fresh
+        await supabase.from('workout_sets').delete().eq('workout_session_id', session.id)
+        const { error } = await supabase.from('workout_sets').insert(allSetsToSave)
+        if (error) console.error('Error bulk-saving sets:', error)
       }
     } catch (err) {
-      console.error('Error saving remaining sets:', err)
+      console.error('Error saving sets on finish:', err)
     }
 
     clearWorkoutState()

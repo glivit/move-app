@@ -100,9 +100,75 @@ function WorkoutCompletePage() {
 
         if (sessionData) {
           const sd = sessionData as unknown as WorkoutSessionComplete
-          setSession(sd)
+          let workoutSets = sd.workout_sets || []
+
+          // RESCUE: If no sets in DB, recover from localStorage and save them
+          if (workoutSets.length === 0) {
+            try {
+              const raw = localStorage.getItem('move_active_workout')
+              if (raw) {
+                const saved = JSON.parse(raw)
+                if (saved.sessionId === sessionId && saved.sets) {
+                  // Map template exercise IDs to real exercise IDs
+                  const templateExIds = Object.keys(saved.sets)
+                  const { data: templateExercises } = await supabase
+                    .from('program_template_exercises')
+                    .select('id, exercise_id')
+                    .in('id', templateExIds)
+
+                  const idMap: Record<string, string> = {}
+                  for (const te of templateExercises || []) {
+                    idMap[te.id] = te.exercise_id
+                  }
+
+                  const setsToInsert: any[] = []
+                  for (const [templateExId, exSets] of Object.entries(saved.sets)) {
+                    const realExId = idMap[templateExId] || templateExId
+                    for (const s of exSets as any[]) {
+                      if (!s.weight_kg && !s.actual_reps) continue
+                      setsToInsert.push({
+                        workout_session_id: sessionId,
+                        exercise_id: realExId,
+                        set_number: s.set_number,
+                        prescribed_reps: s.prescribed_reps || null,
+                        actual_reps: s.actual_reps,
+                        weight_kg: s.weight_kg,
+                        is_warmup: s.is_warmup || false,
+                        completed: true,
+                        is_pr: s.is_pr || false,
+                      })
+                    }
+                  }
+
+                  if (setsToInsert.length > 0) {
+                    const { error: insertErr } = await supabase.from('workout_sets').insert(setsToInsert)
+                    if (!insertErr) {
+                      // Reload with fresh data
+                      const { data: refreshed } = await supabase
+                        .from('workout_sessions')
+                        .select('*, workout_sets(*, exercises(id, name, name_nl))')
+                        .eq('id', sessionId)
+                        .single()
+                      if (refreshed) {
+                        workoutSets = (refreshed as any).workout_sets || []
+                      }
+                    }
+                  }
+                }
+              }
+            } catch (e) {
+              console.error('Recovery from localStorage failed:', e)
+            }
+            // Clean up
+            try {
+              localStorage.removeItem('move_active_workout')
+              localStorage.removeItem('move_minimized_workout')
+            } catch { /* ok */ }
+          }
+
+          setSession({ ...sd, workout_sets: workoutSets })
           const groups: Record<string, ExerciseGroup> = {}
-          for (const set of sd.workout_sets || []) {
+          for (const set of workoutSets) {
             const exId = set.exercise_id
             if (!groups[exId]) {
               groups[exId] = {
