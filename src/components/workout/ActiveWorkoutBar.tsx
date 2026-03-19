@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { Clock, Dumbbell, X } from 'lucide-react'
+import { Play, Square, X } from 'lucide-react'
+import { createClient } from '@/lib/supabase'
 
 interface MinimizedWorkout {
   sessionId: string
@@ -19,10 +20,8 @@ function formatTimer(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
-// Custom event name for same-tab communication (storage events only fire cross-tab)
 const WORKOUT_CHANGED_EVENT = 'move_workout_changed'
 
-/** Dispatch this from anywhere to notify the bar of a change */
 export function notifyWorkoutBarChanged() {
   window.dispatchEvent(new Event(WORKOUT_CHANGED_EVENT))
 }
@@ -32,8 +31,9 @@ export function ActiveWorkoutBar() {
   const pathname = usePathname()
   const [minimized, setMinimized] = useState<MinimizedWorkout | null>(null)
   const [seconds, setSeconds] = useState(0)
+  const [showStopSheet, setShowStopSheet] = useState(false)
+  const [stopping, setStopping] = useState(false)
 
-  // Don't show on the active workout page itself
   const isOnActiveWorkout = pathname?.startsWith('/client/workout/active')
   const isOnCompleteWorkout = pathname?.startsWith('/client/workout/complete')
 
@@ -42,6 +42,14 @@ export function ActiveWorkoutBar() {
       const raw = localStorage.getItem('move_minimized_workout')
       if (raw) {
         const data = JSON.parse(raw) as MinimizedWorkout
+        // Auto-expire workouts older than 6 hours
+        const hours = (Date.now() - new Date(data.startedAt).getTime()) / 3600000
+        if (hours > 6) {
+          localStorage.removeItem('move_minimized_workout')
+          localStorage.removeItem('move_active_workout')
+          setMinimized(null)
+          return
+        }
         setMinimized(data)
       } else {
         setMinimized(null)
@@ -52,26 +60,17 @@ export function ActiveWorkoutBar() {
   }, [])
 
   useEffect(() => {
-    // Check once on mount
     check()
-
-    // Listen for cross-tab storage events
     window.addEventListener('storage', check)
-    // Listen for same-tab custom events
     window.addEventListener(WORKOUT_CHANGED_EVENT, check)
-
     return () => {
       window.removeEventListener('storage', check)
       window.removeEventListener(WORKOUT_CHANGED_EVENT, check)
     }
   }, [check])
 
-  // Also re-check when navigating (pathname changes)
-  useEffect(() => {
-    check()
-  }, [pathname, check])
+  useEffect(() => { check() }, [pathname, check])
 
-  // Timer — only runs when minimized is set
   useEffect(() => {
     if (!minimized) return
     const start = new Date(minimized.startedAt).getTime()
@@ -82,52 +81,149 @@ export function ActiveWorkoutBar() {
     return () => clearInterval(interval)
   }, [minimized])
 
+  const clearState = () => {
+    try {
+      localStorage.removeItem('move_minimized_workout')
+      localStorage.removeItem('move_active_workout')
+      notifyWorkoutBarChanged()
+    } catch { /* ok */ }
+    setMinimized(null)
+  }
+
   const handleResume = () => {
     if (!minimized) return
     router.push(`/client/workout/active?dayId=${minimized.dayId}&programId=${minimized.programId}`)
   }
 
-  const handleDismiss = () => {
-    try { localStorage.removeItem('move_minimized_workout') } catch { /* ok */ }
-    setMinimized(null)
+  const handleFinish = () => {
+    if (!minimized) return
+    const sid = minimized.sessionId
+    clearState()
+    router.push(`/client/workout/complete?sessionId=${sid}`)
+  }
+
+  const handleDiscard = async () => {
+    if (!minimized) return
+    setStopping(true)
+    try {
+      const supabase = createClient()
+      await supabase.from('workout_sets').delete().eq('workout_session_id', minimized.sessionId)
+      await supabase.from('workout_sessions').delete().eq('id', minimized.sessionId)
+    } catch (err) {
+      console.error('Discard error:', err)
+    }
+    clearState()
+    setStopping(false)
+    setShowStopSheet(false)
   }
 
   if (!minimized || isOnActiveWorkout || isOnCompleteWorkout) return null
 
-  return (
-    <div className="fixed bottom-20 left-4 right-4 z-40 lg:left-[296px] animate-slide-up">
-      <div className="max-w-lg mx-auto">
-        <div
-          className="bg-[#2A2824] rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.3)] border border-[#44413D] overflow-hidden"
-        >
-          <button
-            onClick={handleResume}
-            className="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#353330]"
-          >
-            {/* Indicator (no infinite animation) */}
-            <div className="relative flex-shrink-0">
-              <div className="w-10 h-10 bg-[var(--color-pop)] rounded-xl flex items-center justify-center">
-                <Dumbbell size={18} strokeWidth={2} className="text-white" />
-              </div>
-              <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[var(--color-pop)] rounded-full" />
-            </div>
+  const isStale = seconds > 7200
 
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-semibold text-white">Workout actief</p>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <Clock size={11} strokeWidth={2} className="text-[var(--color-pop)]" />
-                <span className="text-[13px] font-semibold text-[var(--color-pop)] tabular-nums">
+  return (
+    <>
+      {/* Compact bar */}
+      <div className="fixed bottom-20 left-4 right-4 z-40 lg:left-[296px] animate-slide-up">
+        <div className="max-w-lg mx-auto">
+          <div className="bg-[#1A1917] rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.25)] overflow-hidden">
+            <div className="flex items-center gap-2.5 px-3.5 py-2.5">
+              {/* Timer */}
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isStale ? 'bg-[#FF9500]' : 'bg-[var(--color-pop)]'}`} />
+                <span className={`text-[14px] font-bold tabular-nums ${isStale ? 'text-[#FF9500]' : 'text-white'}`}>
                   {formatTimer(seconds)}
                 </span>
+                {isStale && (
+                  <span className="text-[10px] text-[#FF9500] font-medium">Vergeten?</span>
+                )}
               </div>
-            </div>
 
-            <span className="text-[11px] font-semibold text-white uppercase tracking-[0.08em] bg-[var(--color-pop)] px-3 py-1.5 rounded-lg flex-shrink-0">
-              Hervat
-            </span>
-          </button>
+              {/* Stop button */}
+              <button
+                onClick={() => setShowStopSheet(true)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+              >
+                <Square size={13} strokeWidth={2.5} className="text-[#FF3B30]" />
+              </button>
+
+              {/* Finish button */}
+              <button
+                onClick={handleFinish}
+                className="px-3 py-1.5 rounded-lg bg-[#3D8B5C] text-white text-[11px] font-bold uppercase tracking-[0.04em] hover:bg-[#357A51] transition-colors"
+              >
+                Afronden
+              </button>
+
+              {/* Resume button */}
+              <button
+                onClick={handleResume}
+                className="px-3 py-1.5 rounded-lg bg-[var(--color-pop)] text-white text-[11px] font-bold uppercase tracking-[0.04em] hover:bg-[#C45E30] transition-colors flex items-center gap-1"
+              >
+                <Play size={10} strokeWidth={3} fill="white" />
+                Hervat
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Stop/Discard bottom sheet */}
+      {showStopSheet && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-end" onClick={() => setShowStopSheet(false)}>
+          <div className="w-full bg-white rounded-t-2xl shadow-xl animate-slide-up pb-safe" onClick={e => e.stopPropagation()}>
+            <div className="w-10 h-1 bg-[#DDD9D0] rounded-full mx-auto mt-3" />
+            <div className="p-6">
+              <h3 className="text-[18px] font-semibold text-[#1A1917] mb-1" style={{ fontFamily: 'var(--font-display)' }}>
+                Workout stoppen?
+              </h3>
+              <p className="text-[13px] text-[#A09D96] mb-5">
+                Kies wat je wilt doen met deze sessie.
+              </p>
+              <div className="space-y-2.5">
+                {/* Option 1: Finish properly */}
+                <button
+                  onClick={handleFinish}
+                  className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#3D8B5C]/8 hover:bg-[#3D8B5C]/15 transition-colors text-left"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-[#3D8B5C] flex items-center justify-center flex-shrink-0">
+                    <Play size={16} strokeWidth={2.5} fill="white" className="text-white" />
+                  </div>
+                  <div>
+                    <p className="text-[14px] font-semibold text-[#1A1917]">Afronden & feedback</p>
+                    <p className="text-[12px] text-[#A09D96]">Sla op en geef je coach feedback</p>
+                  </div>
+                </button>
+
+                {/* Option 2: Discard */}
+                <button
+                  onClick={handleDiscard}
+                  disabled={stopping}
+                  className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#FF3B30]/5 hover:bg-[#FF3B30]/10 transition-colors text-left disabled:opacity-50"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-[#FF3B30] flex items-center justify-center flex-shrink-0">
+                    <X size={16} strokeWidth={2.5} className="text-white" />
+                  </div>
+                  <div>
+                    <p className="text-[14px] font-semibold text-[#FF3B30]">
+                      {stopping ? 'Verwijderen...' : 'Verwijderen'}
+                    </p>
+                    <p className="text-[12px] text-[#A09D96]">Wis deze sessie volledig</p>
+                  </div>
+                </button>
+
+                {/* Cancel */}
+                <button
+                  onClick={() => setShowStopSheet(false)}
+                  className="w-full py-3.5 text-center text-[14px] font-medium text-[#A09D96]"
+                >
+                  Annuleren
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
