@@ -5,8 +5,7 @@ export const dynamic = 'force-dynamic'
 
 /**
  * GET /api/coach-badges
- * Returns badge counts for the coach sidebar. Single lightweight endpoint
- * instead of 3 separate Supabase queries from the client.
+ * Returns badge counts for the coach sidebar.
  */
 export async function GET() {
   try {
@@ -15,22 +14,29 @@ export async function GET() {
     if (!user) return NextResponse.json({})
 
     const [unseenWorkouts, unreadMessages, pendingCheckins] = await Promise.all([
+      // coach_seen can be false OR null (if migration 005 wasn't run)
       supabase.from('workout_sessions').select('id', { count: 'exact', head: true })
-        .not('completed_at', 'is', null).eq('coach_seen', false),
+        .not('completed_at', 'is', null)
+        .or('coach_seen.eq.false,coach_seen.is.null'),
       supabase.from('messages').select('id', { count: 'exact', head: true })
         .eq('receiver_id', user.id).is('read_at', null),
       supabase.from('checkins').select('id', { count: 'exact', head: true })
         .eq('coach_reviewed', false),
     ])
 
+    const workoutCount = unseenWorkouts.count || 0
+    const messageCount = unreadMessages.count || 0
+    const checkinCount = pendingCheckins.count || 0
+
     return NextResponse.json({
-      '/coach': (unseenWorkouts.count || 0) + (unreadMessages.count || 0) + (pendingCheckins.count || 0),
-      '/coach/activity': unseenWorkouts.count || 0,
-      '/coach/clients': unseenWorkouts.count || 0,
-      '/coach/check-ins': pendingCheckins.count || 0,
-      '/coach/messages': unreadMessages.count || 0,
+      '/coach': workoutCount + messageCount + checkinCount,
+      '/coach/activity': workoutCount,
+      '/coach/clients': workoutCount,
+      '/coach/check-ins': checkinCount,
+      '/coach/messages': messageCount,
     })
-  } catch {
+  } catch (e) {
+    console.error('[coach-badges] Error:', e)
     return NextResponse.json({})
   }
 }

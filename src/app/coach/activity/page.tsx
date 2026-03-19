@@ -87,7 +87,7 @@ export default async function CoachActivityFeedPage() {
       clientId: w.client_id,
       clientName: profile?.full_name || 'Client',
       timestamp: w.completed_at!,
-      reviewed: (w as any).coach_seen || false,
+      reviewed: (w as any).coach_seen === true,
       data: {
         sessionId: w.id,
         dayName: dayInfo?.name || 'Training',

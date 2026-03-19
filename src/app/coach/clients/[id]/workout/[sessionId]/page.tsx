@@ -219,11 +219,12 @@ export default function CoachWorkoutDetailPage() {
           }
         }
 
-        // Mark as coach_seen
-        await supabase
-          .from('workout_sessions')
-          .update({ coach_seen: true })
-          .eq('id', sessionId)
+        // Mark as coach_seen via server API (bypasses RLS)
+        fetch('/api/coach-seen', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId }),
+        }).catch(() => {})
 
       } catch (error) {
         console.error('Error loading workout:', error)
@@ -254,11 +255,12 @@ export default function CoachWorkoutDetailPage() {
       const previewText = feedbackText.substring(0, 80)
       sendPushToClient(clientId, 'Glenn heeft je training bekeken', previewText, '/client/messages')
 
-      // Update session
-      await supabase
-        .from('workout_sessions')
-        .update({ coach_seen: true })
-        .eq('id', sessionId)
+      // Update session via server API (bypasses RLS)
+      await fetch('/api/coach-seen', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId }),
+      })
 
       // Show success state
       setFeedbackSent(true)
