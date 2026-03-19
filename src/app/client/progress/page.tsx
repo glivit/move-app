@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
+import { PhotoComparison } from '@/components/client/PhotoComparison'
 import {
   Dumbbell, Trophy, TrendingDown, TrendingUp,
   ChevronRight,
@@ -105,6 +106,7 @@ export default function ProgressPage() {
   const [data, setData] = useState<ProgressData | null>(null)
   const [weeklyStats, setWeeklyStats] = useState<WeeklyStats[]>([])
   const [chartMode, setChartMode] = useState<ChartMode>('duration')
+  const [milestones, setMilestones] = useState<Array<{ type: string; title: string; icon: string; description: string; achieved_at: string }>>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -114,10 +116,27 @@ export default function ProgressPage() {
         const res = await fetch('/api/progress')
         if (res.ok) setData(await res.json())
 
-        // Load weekly chart data (from profile)
+        // Load weekly chart data + milestones
         const supabase = createClient()
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
+
+        // Load milestones
+        const { data: milestonesData } = await supabase
+          .from('milestones')
+          .select('type, title, icon, description, achieved_at')
+          .eq('client_id', user.id)
+          .order('achieved_at', { ascending: false })
+
+        if (milestonesData) {
+          setMilestones(milestonesData)
+          // Mark unseen as seen
+          supabase.from('milestones')
+            .update({ seen_by_client: true })
+            .eq('client_id', user.id)
+            .eq('seen_by_client', false)
+            .then(() => {})
+        }
 
         // Limit to last 12 weeks for chart data
         const twelveWeeksAgo = new Date()
@@ -237,6 +256,24 @@ export default function ProgressPage() {
         </div>
       </div>
 
+      {/* ═══ MILESTONES ═══════════════════════════════════════ */}
+      {milestones.length > 0 && (
+        <div className="mb-10">
+          <p className="text-label mb-4">Achievements</p>
+          <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+            {milestones.map((m) => (
+              <div
+                key={m.type}
+                className="flex-shrink-0 w-20 bg-white rounded-2xl p-3 text-center shadow-[var(--shadow-card)]"
+              >
+                <span className="text-[28px] block">{m.icon}</span>
+                <p className="text-[10px] font-bold text-[#1A1917] mt-1.5 leading-tight">{m.title}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ═══ 12 WEEK ACTIVITY CHART ══════════════════════════ */}
       {weeklyStats.length > 0 && (
         <div className="bg-white rounded-2xl p-7 mb-10 shadow-[var(--shadow-card)]">
@@ -353,6 +390,11 @@ export default function ProgressPage() {
         </Link>
       )}
 
+
+      {/* ═══ BEFORE/AFTER PHOTOS ═════════════════════════════ */}
+      <div className="mt-10 mb-10">
+        <PhotoComparison />
+      </div>
 
       {/* ═══ QUICK LINKS — editorial grid ═══════════════════ */}
       <div className="grid grid-cols-2 gap-3 mt-10">

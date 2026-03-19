@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase-admin'
 import { sendPushToUser } from '@/lib/push-server'
+import { checkAndAwardMilestones } from '@/lib/milestones'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -146,6 +147,9 @@ export async function POST(request: NextRequest) {
       // Don't fail the entire request if message creation fails
       // The push notification already went out
     }
+
+    // Check milestones (non-blocking)
+    checkAndAwardMilestones(clientId).catch(e => console.error('[Milestones]', e))
 
     // Trigger AI feedback (delayed, non-blocking)
     // Wait 3 minutes before sending AI feedback to give coach a chance to respond manually

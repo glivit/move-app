@@ -3,51 +3,29 @@
 ## Migraties (Supabase SQL Editor)
 Voer deze uit in volgorde:
 
-1. `supabase/migrations/20260316_equipment_brand_column.sql` — equipment_brand kolom op exercises
-2. `supabase/migrations/20260316_technogym_basicfit_seed.sql` — 60 Technogym machines
-3. `supabase/migrations/20260317_program_schedule.sql` — schedule JSONB op client_programs + program_templates
-4. `supabase/migrations/20260318_workout_notification_system.sql` — message_type uitbreiding + performance indexes
+1. ✅ `ALL_PENDING_MIGRATIONS.sql` — al uitgevoerd (equipment_brand, schedule, message_type, indexes)
+2. ✅ `20260316_technogym_basicfit_seed.sql` — al uitgevoerd
+3. **NIEUW** `supabase/migrations/20260319_milestones.sql` — Milestones/achievements tabel
 
-## Environment Variables (Vercel Dashboard)
-Voeg toe:
-```
-ANTHROPIC_API_KEY=sk-ant-...
-```
+## Environment Variables
+- ✅ `ANTHROPIC_API_KEY` — al toegevoegd
 
-## Vercel Cron Jobs (vercel.json)
-Voeg toe aan `crons` array:
-```json
-{
-  "path": "/api/cron/ai-nudges",
-  "schedule": "0 20 * * *"
-},
-{
-  "path": "/api/cron/weekly-report",
-  "schedule": "0 8 * * 1"
-},
-{
-  "path": "/api/cron/smart-suggestions",
-  "schedule": "0 19 * * 0"
-}
-```
-- `ai-nudges`: Elke dag 20:00 — missed workout + missed nutrition nudges
-- `weekly-report`: Elke maandag 08:00 — weekoverzicht per cliënt met AI-gegenereerd bericht
-- `smart-suggestions`: Elke zondag 19:00 — analyse en programma-suggesties voor coach
+## Vercel Cron Jobs
+- ✅ Al geconfigureerd in vercel.json
 
 ## Git Deploy
 ```bash
 git add -A
-git commit -m "feat: complete interactive coaching engine — AI agent, notifications, accountability, weekly reports"
+git commit -m "feat: milestones, photo comparison, coach_seen fix, workout bar redesign"
 git push origin main
 ```
 
-## Na deploy testen
-1. Log in als client, start workout, voltooi, check of coach push notification krijgt
-2. Check coach dashboard — workout feedback sectie linkt naar detail pagina
-3. Open workout detail → stuur feedback → check of client push krijgt
-4. Test AI agent via /coach/ai-settings → "Test jouw AI agent"
-5. Check /coach/activity feed — alle recente workouts en check-ins zichtbaar
-6. Check sidebar badges tellen correct (terracotta badges)
-7. Test voedingstemplate bewerken via /coach/nutrition
-8. Verifieer client workout pagina toont coach feedback card
-9. Test cron endpoints handmatig: `/api/cron/ai-nudges`, `/api/cron/weekly-report`, `/api/cron/smart-suggestions`
+## Na deploy: migratie uitvoeren
+Plak `supabase/migrations/20260319_milestones.sql` in Supabase SQL Editor en run.
+
+## Testen
+1. Coach badges gaan nu omlaag na workout bekijken (coach_seen fix via /api/coach-seen)
+2. Workout bar heeft Stop/Afronden/Hervat knoppen + auto-expire na 6 uur
+3. Milestones verschijnen op client progress pagina na workout completion
+4. Before/After foto vergelijking op progress pagina (als er 2+ check-ins met foto's zijn)
+5. Activity feed toont nu workouts + check-ins correct
