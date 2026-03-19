@@ -80,10 +80,10 @@ export default async function CoachDashboard() {
     { data: feedbackData },
   ] = await Promise.all([
     supabase.from('checkins').select('id', { count: 'exact', head: true }).eq('coach_reviewed', false),
-    supabase.from('messages').select('id', { count: 'exact', head: true }).eq('receiver_id', user.id).is('read_at', null),
+    supabase.from('messages').select('id', { count: 'exact', head: true }).eq('receiver_id', user.id).is('read_at', null).in('message_type', ['text', 'image', 'video', 'file']),
     supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'client'),
     supabase.from('checkins').select(`id, date, coach_reviewed, client_id, profiles!checkins_client_id_fkey(full_name, package)`).eq('coach_reviewed', false).order('date', { ascending: false }).limit(5),
-    supabase.from('messages').select(`id, content, created_at, sender_id, read_at, profiles!messages_sender_id_fkey(full_name)`).eq('receiver_id', user.id).is('read_at', null).order('created_at', { ascending: false }).limit(5),
+    supabase.from('messages').select(`id, content, created_at, sender_id, read_at, profiles!messages_sender_id_fkey(full_name)`).eq('receiver_id', user.id).is('read_at', null).in('message_type', ['text', 'image', 'video', 'file']).order('created_at', { ascending: false }).limit(5),
     supabase.from('profiles').select('id, package').eq('role', 'client'),
     supabase.from('workout_sessions').select(`id, client_id, completed_at, difficulty_rating, feedback_text, mood_rating, profiles!workout_sessions_client_id_fkey(full_name)`).not('completed_at', 'is', null).or('coach_seen.eq.false,coach_seen.is.null').order('completed_at', { ascending: false }).limit(5),
   ])

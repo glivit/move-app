@@ -35,6 +35,7 @@ export function useMessageSubscription(userId: string, otherUserId: string) {
         .or(
           `and(sender_id.eq.${userId},receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},receiver_id.eq.${userId})`
         )
+        .in('message_type', ['text', 'image', 'video', 'file'])
         .order('created_at', { ascending: true })
 
       if (data) setMessages(data as Message[])
@@ -63,8 +64,9 @@ export function useMessageSubscription(userId: string, otherUserId: string) {
         (payload) => {
           const msg = payload.new as Message
           const isRelevant =
-            (msg.sender_id === userId && msg.receiver_id === otherUserId) ||
-            (msg.sender_id === otherUserId && msg.receiver_id === userId)
+            ((msg.sender_id === userId && msg.receiver_id === otherUserId) ||
+            (msg.sender_id === otherUserId && msg.receiver_id === userId)) &&
+            ['text', 'image', 'video', 'file'].includes(msg.message_type)
           if (isRelevant) {
             setMessages((prev) => {
               // Avoid duplicates (optimistic + realtime)
@@ -184,11 +186,12 @@ export function useConversationList(coachId: string) {
   const refresh = useCallback(async () => {
     const supabase = createClient()
 
-    // Get all messages involving the coach
+    // Get all chat messages involving the coach (exclude system/workout messages)
     const { data: messages } = await supabase
       .from('messages')
       .select('*')
       .or(`sender_id.eq.${coachId},receiver_id.eq.${coachId}`)
+      .in('message_type', ['text', 'image', 'video', 'file'])
       .order('created_at', { ascending: false })
 
     if (!messages) {

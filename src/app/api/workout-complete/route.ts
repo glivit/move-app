@@ -116,37 +116,8 @@ export async function POST(request: NextRequest) {
       tag: `workout-complete-${sessionId}`,
     })
 
-    // Create system message with workout summary
-    const messageContent = {
-      sessionId: session.id,
-      dayName: dayName,
-      durationMin: durationMin,
-      totalSets: totalSets,
-      totalVolume: totalVolume,
-      prCount: prCount,
-      moodRating: session.mood_rating || null,
-      difficultyRating: session.difficulty_rating || null,
-      feedbackText: session.feedback_text || null,
-      completedAt: session.completed_at,
-    }
-
-    const { error: messageError } = await supabase
-      .from('messages')
-      .insert({
-        sender_id: clientId,
-        receiver_id: coachId,
-        content: JSON.stringify(messageContent),
-        message_type: 'workout_complete',
-        file_url: null,
-        read_at: null,
-        created_at: new Date().toISOString(),
-      })
-
-    if (messageError) {
-      console.error('Error creating workout complete message:', messageError)
-      // Don't fail the entire request if message creation fails
-      // The push notification already went out
-    }
+    // Note: No chat message created — push notification to coach is sufficient.
+    // Workout data is accessible via /coach/activity and workout detail page.
 
     // Check milestones (non-blocking)
     checkAndAwardMilestones(clientId).catch(e => console.error('[Milestones]', e))

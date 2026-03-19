@@ -19,7 +19,7 @@ export async function GET() {
         .not('completed_at', 'is', null)
         .or('coach_seen.eq.false,coach_seen.is.null'),
       supabase.from('messages').select('id', { count: 'exact', head: true })
-        .eq('receiver_id', user.id).is('read_at', null),
+        .eq('receiver_id', user.id).is('read_at', null).in('message_type', ['text', 'image', 'video', 'file']),
       supabase.from('checkins').select('id', { count: 'exact', head: true })
         .eq('coach_reviewed', false),
     ])
