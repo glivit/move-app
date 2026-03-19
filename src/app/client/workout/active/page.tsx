@@ -639,11 +639,18 @@ function ActiveWorkoutPage() {
         is_pr: boolean
       }> = []
 
+      console.log('[handleFinish] sets state keys:', Object.keys(sets))
+      console.log('[handleFinish] exercises count:', exercises.length)
+      console.log('[handleFinish] exercises IDs:', exercises.map(e => ({ id: e.id, exercise_id: e.exercise_id })))
+
       for (const [templateExId, exerciseSets] of Object.entries(sets)) {
         const exerciseRef = exercises.find(e => e.id === templateExId)
         const actualExerciseId = exerciseRef?.exercise_id || templateExId
 
+        console.log(`[handleFinish] templateExId=${templateExId}, exerciseRef found=${!!exerciseRef}, actualExId=${actualExerciseId}, setsCount=${exerciseSets.length}`)
+
         for (const s of exerciseSets) {
+          console.log(`[handleFinish]   set ${s.set_number}: weight=${s.weight_kg}, reps=${s.actual_reps}, completed=${s.completed}, id=${s.id}`)
           // Skip sets with no data at all
           if (!s.weight_kg && !s.actual_reps) continue
 
@@ -661,11 +668,18 @@ function ActiveWorkoutPage() {
         }
       }
 
+      console.log('[handleFinish] Total sets to save:', allSetsToSave.length)
+
       if (allSetsToSave.length > 0) {
         // Delete all existing sets for this session, then bulk insert fresh
-        await supabase.from('workout_sets').delete().eq('workout_session_id', session.id)
-        const { error } = await supabase.from('workout_sets').insert(allSetsToSave)
-        if (error) console.error('Error bulk-saving sets:', error)
+        const { error: deleteError } = await supabase.from('workout_sets').delete().eq('workout_session_id', session.id)
+        if (deleteError) console.error('[handleFinish] Delete error:', deleteError)
+
+        const { data: inserted, error: insertError } = await supabase.from('workout_sets').insert(allSetsToSave).select()
+        if (insertError) console.error('[handleFinish] Insert error:', insertError)
+        else console.log('[handleFinish] Successfully inserted:', inserted?.length, 'sets')
+      } else {
+        console.warn('[handleFinish] NO sets to save! All weight_kg and actual_reps are null/0')
       }
     } catch (err) {
       console.error('Error saving sets on finish:', err)
