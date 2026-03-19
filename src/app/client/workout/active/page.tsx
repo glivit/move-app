@@ -619,9 +619,59 @@ function ActiveWorkoutPage() {
     setShowExercisePicker(false)
   }
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
+    if (!session) return
+
+    // Save any unsaved sets that have data (weight or reps filled in but not yet completed)
+    try {
+      const supabase = createClient()
+      const unsavedSets: Array<{
+        workout_session_id: string
+        exercise_id: string
+        set_number: number
+        prescribed_reps: number | null
+        actual_reps: number | null
+        weight_kg: number | null
+        is_warmup: boolean
+        completed: boolean
+        is_pr: boolean
+      }> = []
+
+      for (const [templateExId, exerciseSets] of Object.entries(sets)) {
+        const exerciseRef = exercises.find(e => e.id === templateExId)
+        const actualExerciseId = exerciseRef?.exercise_id || templateExId
+
+        for (const s of exerciseSets) {
+          // Skip already saved (has real UUID, not temp-) and skip empty sets
+          if (s.completed && !s.id.startsWith('temp-')) continue
+          if (!s.weight_kg && !s.actual_reps) continue
+
+          unsavedSets.push({
+            workout_session_id: session.id,
+            exercise_id: actualExerciseId,
+            set_number: s.set_number,
+            prescribed_reps: s.prescribed_reps,
+            actual_reps: s.actual_reps,
+            weight_kg: s.weight_kg,
+            is_warmup: s.is_warmup,
+            completed: true,
+            is_pr: s.is_pr,
+          })
+        }
+      }
+
+      if (unsavedSets.length > 0) {
+        // Insert sets that don't exist yet (skip already-saved ones)
+        for (const s of unsavedSets) {
+          await supabase.from('workout_sets').insert(s)
+        }
+      }
+    } catch (err) {
+      console.error('Error saving remaining sets:', err)
+    }
+
     clearWorkoutState()
-    router.push(`/client/workout/complete?sessionId=${session?.id}`)
+    router.push(`/client/workout/complete?sessionId=${session.id}`)
   }
 
   // --- Minimize workout (persistent bar) ---
