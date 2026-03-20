@@ -69,14 +69,16 @@ export async function POST(request: NextRequest) {
     // Update the session with completion data
     const updateData: Record<string, any> = {
       completed_at: completedAt || new Date().toISOString(),
-      duration_seconds: durationSeconds || null,
-      mood_rating: moodRating || null,
-      notes: notes || null,
+      duration_seconds: durationSeconds ?? null,
+      mood_rating: moodRating ?? null,
+      notes: notes ?? null,
     }
 
     // Only include these if the columns exist (added in migration 005)
-    if (difficultyRating !== undefined) updateData.difficulty_rating = difficultyRating || null
-    if (feedbackText !== undefined) updateData.feedback_text = feedbackText || null
+    if (difficultyRating !== undefined) updateData.difficulty_rating = difficultyRating ?? null
+    if (feedbackText !== undefined) updateData.feedback_text = feedbackText ?? null
+
+    console.log('[workout-finish] Updating session', sessionId, 'with:', JSON.stringify(updateData))
 
     const { error: updateError } = await admin
       .from('workout_sessions')

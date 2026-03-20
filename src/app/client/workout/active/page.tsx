@@ -363,6 +363,8 @@ function ActiveWorkoutPage() {
   const [exerciseNotes, setExerciseNotes] = useState<Record<string, string>>({})
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
   const [showExercisePicker, setShowExercisePicker] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   // Refs for auto-save
   const setsRef = useRef(sets)
@@ -519,50 +521,46 @@ function ActiveWorkoutPage() {
     loadData()
   }, [dayId, programId, router])
 
-  // --- Complete a set ---
+  // --- Complete a set (update local state + optimistic UI) ---
   const completeSet = useCallback(async (exerciseId: string, setIndex: number) => {
-    const supabase = createClient()
     const setData = sets[exerciseId]?.[setIndex]
     if (!setData || !session) return
 
     try {
       const exerciseRef = exercises.find(e => e.id === exerciseId)
-      const actualExerciseId = exerciseRef?.exercise_id || exerciseId
 
+      // PR detection: simple client-side check (server also checks via trigger)
       let isPR = false
       if (setData.weight_kg && setData.weight_kg > 0 && !setData.is_warmup) {
-        const { data: previousBest } = await supabase
-          .from('workout_sets').select('weight_kg')
-          .eq('exercise_id', actualExerciseId).eq('completed', true).eq('is_warmup', false)
-          .order('weight_kg', { ascending: false }).limit(1)
-        if (!previousBest?.length || (setData.weight_kg > (previousBest[0].weight_kg || 0))) isPR = true
+        try {
+          const supabase = createClient()
+          const { data: previousBest } = await supabase
+            .from('workout_sets').select('weight_kg')
+            .eq('exercise_id', exerciseRef?.exercise_id || exerciseId).eq('completed', true).eq('is_warmup', false)
+            .order('weight_kg', { ascending: false }).limit(1)
+          if (!previousBest?.length || (setData.weight_kg > (previousBest[0].weight_kg || 0))) isPR = true
+        } catch { /* PR check is non-critical */ }
       }
 
-      const { data: insertedSet } = await supabase
-        .from('workout_sets')
-        .insert({ workout_session_id: session.id, exercise_id: actualExerciseId, set_number: setIndex + 1, prescribed_reps: setData.prescribed_reps, actual_reps: setData.actual_reps, weight_kg: setData.weight_kg, is_warmup: setData.is_warmup, completed: true, is_pr: isPR })
-        .select().single()
+      // Update local state immediately (optimistic)
+      const updatedSets = { ...sets }
+      updatedSets[exerciseId] = [...updatedSets[exerciseId]]
+      updatedSets[exerciseId][setIndex] = { ...setData, completed: true, is_pr: isPR }
 
-      if (insertedSet) {
-        const updatedSets = { ...sets }
-        updatedSets[exerciseId] = [...updatedSets[exerciseId]]
-        updatedSets[exerciseId][setIndex] = { ...setData, id: insertedSet.id, completed: true, is_pr: isPR }
-
-        if (setData.weight_kg && setIndex + 1 < updatedSets[exerciseId].length && !updatedSets[exerciseId][setIndex + 1].completed) {
-          if (!updatedSets[exerciseId][setIndex + 1].weight_kg) {
-            updatedSets[exerciseId][setIndex + 1] = { ...updatedSets[exerciseId][setIndex + 1], weight_kg: setData.weight_kg }
-          }
+      if (setData.weight_kg && setIndex + 1 < updatedSets[exerciseId].length && !updatedSets[exerciseId][setIndex + 1].completed) {
+        if (!updatedSets[exerciseId][setIndex + 1].weight_kg) {
+          updatedSets[exerciseId][setIndex + 1] = { ...updatedSets[exerciseId][setIndex + 1], weight_kg: setData.weight_kg }
         }
-        setSets(updatedSets)
+      }
+      setSets(updatedSets)
 
-        if (isPR && exerciseRef) {
-          setPrCelebration(exerciseRef.exercises?.name_nl || exerciseRef.exercises?.name || 'Oefening')
-          setTimeout(() => setPrCelebration(null), 3000)
-        }
+      if (isPR && exerciseRef) {
+        setPrCelebration(exerciseRef.exercises?.name_nl || exerciseRef.exercises?.name || 'Oefening')
+        setTimeout(() => setPrCelebration(null), 3000)
+      }
 
-        if (exerciseRef && exerciseRef.rest_seconds > 0) {
-          setActiveRestTimer({ exerciseId, setIndex, seconds: exerciseRef.rest_seconds, total: exerciseRef.rest_seconds })
-        }
+      if (exerciseRef && exerciseRef.rest_seconds > 0) {
+        setActiveRestTimer({ exerciseId, setIndex, seconds: exerciseRef.rest_seconds, total: exerciseRef.rest_seconds })
       }
     } catch (error) { console.error('Error completing set:', error) }
   }, [sets, session, exercises])
@@ -620,60 +618,99 @@ function ActiveWorkoutPage() {
   }
 
   const handleFinish = async () => {
-    if (!session) return
+    if (!session || saving) return
+    setSaving(true)
+    setSaveError(null)
 
-    // Save all sets via server route (uses admin client to bypass RLS)
-    try {
-      const allSetsToSave: Array<{
-        exercise_id: string
-        set_number: number
-        prescribed_reps: number | null
-        actual_reps: number | null
-        weight_kg: number | null
-        is_warmup: boolean
-        completed: boolean
-        is_pr: boolean
-      }> = []
+    // Collect all sets with data from React state
+    const allSetsToSave: Array<{
+      exercise_id: string
+      set_number: number
+      prescribed_reps: number | null
+      actual_reps: number | null
+      weight_kg: number | null
+      is_warmup: boolean
+      completed: boolean
+      is_pr: boolean
+    }> = []
 
-      for (const [templateExId, exerciseSets] of Object.entries(sets)) {
-        const exerciseRef = exercises.find(e => e.id === templateExId)
-        const actualExerciseId = exerciseRef?.exercise_id || templateExId
+    for (const [templateExId, exerciseSets] of Object.entries(sets)) {
+      const exerciseRef = exercises.find(e => e.id === templateExId)
+      const actualExerciseId = exerciseRef?.exercise_id || templateExId
 
-        for (const s of exerciseSets) {
-          // Skip sets with no data at all
-          if (!s.weight_kg && !s.actual_reps) continue
+      for (const s of exerciseSets) {
+        // Skip sets with no data at all
+        if (!s.weight_kg && !s.actual_reps) continue
 
-          allSetsToSave.push({
-            exercise_id: actualExerciseId,
-            set_number: s.set_number,
-            prescribed_reps: s.prescribed_reps,
-            actual_reps: s.actual_reps,
-            weight_kg: s.weight_kg,
-            is_warmup: s.is_warmup,
-            completed: true,
-            is_pr: s.is_pr,
-          })
-        }
+        allSetsToSave.push({
+          exercise_id: actualExerciseId,
+          set_number: s.set_number,
+          prescribed_reps: s.prescribed_reps,
+          actual_reps: s.actual_reps,
+          weight_kg: s.weight_kg,
+          is_warmup: s.is_warmup,
+          completed: true,
+          is_pr: s.is_pr,
+        })
       }
+    }
 
-      if (allSetsToSave.length > 0) {
+    console.log('[handleFinish] Sets to save:', allSetsToSave.length, JSON.stringify(allSetsToSave))
+
+    // Try server route first (admin client, bypasses RLS)
+    let saved = false
+
+    if (allSetsToSave.length > 0) {
+      try {
         const res = await fetch('/api/workout-save', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sessionId: session.id, sets: allSetsToSave }),
         })
         const result = await res.json()
-        if (!res.ok) {
-          console.error('[handleFinish] Server save failed:', result)
+        if (res.ok && result.success) {
+          console.log('[handleFinish] Server save OK:', result.savedCount, 'sets')
+          saved = true
         } else {
-          console.log('[handleFinish] Saved', result.savedCount, 'sets via server')
+          console.error('[handleFinish] Server save failed:', res.status, result)
+        }
+      } catch (err) {
+        console.error('[handleFinish] Server route error:', err)
+      }
+
+      // Fallback: if server route failed, try direct Supabase with browser client
+      if (!saved) {
+        console.warn('[handleFinish] Falling back to direct Supabase write...')
+        try {
+          const supabase = createClient()
+          const { error: delErr } = await supabase.from('workout_sets').delete().eq('workout_session_id', session.id)
+          if (delErr) console.error('[handleFinish] Fallback delete error:', delErr)
+
+          const insertRows = allSetsToSave.map(s => ({ ...s, workout_session_id: session.id }))
+          const { data: inserted, error: insErr } = await supabase.from('workout_sets').insert(insertRows).select()
+          if (insErr) {
+            console.error('[handleFinish] Fallback insert error:', insErr)
+          } else {
+            console.log('[handleFinish] Fallback saved:', inserted?.length, 'sets')
+            saved = true
+          }
+        } catch (fbErr) {
+          console.error('[handleFinish] Fallback error:', fbErr)
         }
       }
-    } catch (err) {
-      console.error('[handleFinish] Error saving sets:', err)
+    } else {
+      // No sets to save, that's fine
+      saved = true
+    }
+
+    if (!saved) {
+      setSaving(false)
+      setSaveError('Workout opslaan mislukt. Probeer opnieuw.')
+      return // DON'T navigate — keep data in state + localStorage
     }
 
     clearWorkoutState()
+    try { localStorage.removeItem('move_minimized_workout'); notifyWorkoutBarChanged() } catch { /* ok */ }
     router.push(`/client/workout/complete?sessionId=${session.id}`)
   }
 
@@ -812,13 +849,16 @@ function ActiveWorkoutPage() {
 
           <button
             onClick={handleFinish}
+            disabled={saving}
             className={`px-5 h-10 rounded-xl font-semibold text-[12px] uppercase tracking-[0.08em] transition-all ${
-              allDone
-                ? 'bg-[var(--color-pop)] text-white shadow-lg shadow-[var(--color-pop)]/20'
-                : 'bg-[#E5E1D9] text-[#A09D96]'
+              saving
+                ? 'bg-[#CCC7BC] text-[#A09D96] cursor-wait'
+                : allDone
+                  ? 'bg-[var(--color-pop)] text-white shadow-lg shadow-[var(--color-pop)]/20'
+                  : 'bg-[#E5E1D9] text-[#A09D96]'
             }`}
           >
-            Klaar
+            {saving ? 'Opslaan...' : 'Klaar'}
           </button>
         </div>
 
@@ -969,14 +1009,35 @@ function ActiveWorkoutPage() {
           )
         })}
 
+        {/* Save error message */}
+        {saveError && (
+          <div className="w-full px-4 py-3 bg-[#FF3B30]/10 border border-[#FF3B30]/20 rounded-xl text-center">
+            <p className="text-[#FF3B30] text-[13px] font-medium">{saveError}</p>
+          </div>
+        )}
+
         {/* Finish CTA */}
         {allDone && (
           <button
             onClick={handleFinish}
-            className="w-full py-4 bg-[var(--color-pop)] text-white rounded-2xl font-bold text-[14px] uppercase tracking-[0.08em] flex items-center justify-center gap-2 shadow-lg shadow-[var(--color-pop)]/20 hover:shadow-[var(--color-pop)]/30 transition-all"
+            disabled={saving}
+            className={`w-full py-4 rounded-2xl font-bold text-[14px] uppercase tracking-[0.08em] flex items-center justify-center gap-2 transition-all ${
+              saving
+                ? 'bg-[#CCC7BC] text-[#A09D96] cursor-wait'
+                : 'bg-[var(--color-pop)] text-white shadow-lg shadow-[var(--color-pop)]/20 hover:shadow-[var(--color-pop)]/30'
+            }`}
           >
-            <Check size={18} strokeWidth={2.5} />
-            Workout afronden
+            {saving ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                Opslaan...
+              </>
+            ) : (
+              <>
+                <Check size={18} strokeWidth={2.5} />
+                Workout afronden
+              </>
+            )}
           </button>
         )}
 
