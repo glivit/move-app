@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    // Tree-shake unused exports from heavy packages
+    optimizePackageImports: ['lucide-react', 'recharts'],
+  },
 };
 
 export default nextConfig;

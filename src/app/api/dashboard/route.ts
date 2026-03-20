@@ -16,6 +16,9 @@ export async function GET(request: NextRequest) {
     const now = new Date().toISOString()
 
     // ── All parallel fetches ──────────────────────────────
+    const monthStart = new Date()
+    monthStart.setDate(1)
+
     const [
       profileRes,
       programRes,
@@ -31,6 +34,8 @@ export async function GET(request: NextRequest) {
       broadcastsRes,
       intakeRes,
       lastCheckinRes,
+      streakResult,
+      weightEntriesRes,
     ] = await Promise.all([
       // Profile (include intake_completed for onboarding)
       supabase.from('profiles').select('id, full_name, role, package, start_date, intake_completed')
@@ -70,7 +75,7 @@ export async function GET(request: NextRequest) {
       // Next video call — only truly future, not completed or cancelled
       supabase.from('video_sessions').select('id, scheduled_at, duration_minutes')
         .eq('client_id', user.id).in('status', ['scheduled'])
-        .gte('scheduled_at', new Date(Date.now() - 60 * 60 * 1000).toISOString()) // allow 1h past start
+        .gte('scheduled_at', new Date(Date.now() - 60 * 60 * 1000).toISOString())
         .order('scheduled_at').limit(1),
 
       // Today's accountability check
@@ -98,6 +103,15 @@ export async function GET(request: NextRequest) {
         .order('date', { ascending: false })
         .limit(1)
         .single(),
+
+      // Streak (was sequential before — now parallel)
+      computeStreak(supabase, user.id),
+
+      // Weight change this month (was sequential before — now parallel)
+      supabase.from('health_metrics').select('value, measured_at')
+        .eq('client_id', user.id).eq('metric_type', 'weight')
+        .gte('measured_at', monthStart.toISOString())
+        .order('measured_at'),
     ])
 
     // ── Compute derived data ──────────────────────────────
@@ -139,8 +153,8 @@ export async function GET(request: NextRequest) {
     // Today's workout completed?
     const todayWorkoutDone = todayWorkouts.some((w: any) => w.completed_at)
 
-    // Streak: consecutive days with a completed workout or rest day compliance
-    const streak = await computeStreak(supabase, user.id)
+    // Streak (fetched in parallel above)
+    const streak = streakResult
 
     // Meals from nutrition plan — ensure each meal has a unique ID
     const planMeals = (nutritionPlan as any)?.meals || []
@@ -165,17 +179,8 @@ export async function GET(request: NextRequest) {
     const mealsCompleted = mealStatus.filter((m: any) => m.completed).length
     const mealsTotal = mealStatus.length
 
-    // Weight change this month (from check-ins)
-    const monthStart = new Date()
-    monthStart.setDate(1)
-    const { data: weightEntries } = await supabase
-      .from('health_metrics')
-      .select('value, measured_at')
-      .eq('client_id', user.id)
-      .eq('metric_type', 'weight')
-      .gte('measured_at', monthStart.toISOString())
-      .order('measured_at')
-
+    // Weight change this month (fetched in parallel above)
+    const weightEntries = weightEntriesRes.data
     let weightChangeMonth: number | null = null
     if (weightEntries && weightEntries.length >= 2) {
       weightChangeMonth = +(weightEntries[weightEntries.length - 1].value - weightEntries[0].value).toFixed(1)

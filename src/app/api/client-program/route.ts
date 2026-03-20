@@ -43,21 +43,16 @@ export async function GET(request: NextRequest) {
       .eq('template_id', activeProgram.template_id)
       .order('sort_order', { ascending: true })
 
-    // Get exercise counts for each day
-    const days = []
-    if (templateDays) {
-      for (const day of templateDays) {
+    // Get exercise counts for each day — all in parallel
+    const days = templateDays ? await Promise.all(
+      templateDays.map(async (day: any) => {
         const { count } = await adminClient
           .from('program_template_exercises')
           .select('*', { count: 'exact', head: true })
           .eq('template_day_id', day.id)
-
-        days.push({
-          ...day,
-          exercise_count: count || 0,
-        })
-      }
-    }
+        return { ...day, exercise_count: count || 0 }
+      })
+    ) : []
 
     // Get completed workouts for this week (only count completed, unique per day)
     const today = new Date()

@@ -5,9 +5,8 @@ import { OfflineIndicator } from '@/components/OfflineIndicator'
 import { InstallPrompt } from '@/components/InstallPrompt'
 import './globals.css'
 
-// Force all routes to be dynamically rendered — prevents prerender errors
-// with client components that use Supabase auth (Next.js 16 compatibility)
-export const dynamic = 'force-dynamic'
+// NOTE: removed global force-dynamic — each route should set its own caching
+// strategy. Client pages are 'use client' + useEffect so they don't need this.
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
