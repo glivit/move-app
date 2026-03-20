@@ -120,104 +120,82 @@ export default function CoachClientProgressPage() {
     async function load() {
       const supabase = createClient()
 
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('id, full_name')
-        .eq('id', clientId)
-        .single()
+      // ── Phase 1: Fire ALL independent queries in parallel ──
+      const [
+        { data: profileData },
+        { data: intakeFormData },
+        { data: checkinsData },
+        { data: sessionsData },
+        { data: exercisesData },
+        { data: prsData },
+      ] = await Promise.all([
+        supabase.from('profiles').select('id, full_name').eq('id', clientId).single(),
+        supabase.from('intake_forms').select('*').eq('client_id', clientId).single(),
+        supabase.from('checkins').select('*').eq('client_id', clientId).order('date', { ascending: true }),
+        supabase.from('workout_sessions').select('*').eq('client_id', clientId).order('started_at', { ascending: true }),
+        supabase.from('exercises').select('*'),
+        supabase.from('personal_records').select('*, exercises(id, name, name_nl)').eq('client_id', clientId).order('achieved_at', { ascending: false }),
+      ])
 
       if (profileData) setProfile(profileData)
-
-      // Fetch intake form data
-      const { data: intakeFormData } = await supabase
-        .from('intake_forms')
-        .select('*')
-        .eq('client_id', clientId)
-        .single()
-
       if (intakeFormData) setIntakeData(intakeFormData as any)
+      if (exercisesData) setExercises(exercisesData)
+      if (prsData) setPersonalRecords(prsData as PersonalRecord[])
 
-      // Fetch checkins
-      const { data: checkinsData } = await supabase
-        .from('checkins')
-        .select('*')
-        .eq('client_id', clientId)
-        .order('date', { ascending: true })
+      // ── Phase 2: Dependent queries in parallel ──
+      // Sets depend on sessions; signed URLs depend on checkins + intake
+      const setsPromise = (sessionsData && sessionsData.length > 0)
+        ? supabase
+            .from('workout_sets')
+            .select('*')
+            .in('workout_session_id', sessionsData.map((s: any) => s.id))
+        : Promise.resolve({ data: null })
 
+      // Collect all photo URLs that need signing
+      const allUrls: string[] = []
+      const collectUrl = (url: string | null) => {
+        if (url && !allUrls.includes(url)) allUrls.push(url)
+      }
+      if (intakeFormData) {
+        const ifd = intakeFormData as any
+        collectUrl(ifd.photo_front_url)
+        collectUrl(ifd.photo_back_url)
+        collectUrl(ifd.photo_left_url)
+        collectUrl(ifd.photo_right_url)
+      }
       if (checkinsData) {
-        setCheckins(checkinsData)
-
-        // Generate signed URLs for all photos
-        const allUrls: string[] = []
-        const urlMap: Record<string, string> = {}
-
-        // Collect all photo URLs that need signing
-        const collectUrl = (url: string | null) => {
-          if (url && !allUrls.includes(url)) allUrls.push(url)
-        }
-
-        // Intake photos
-        if (intakeFormData) {
-          const ifd = intakeFormData as any
-          collectUrl(ifd.photo_front_url)
-          collectUrl(ifd.photo_back_url)
-          collectUrl(ifd.photo_left_url)
-          collectUrl(ifd.photo_right_url)
-        }
-
-        // Check-in photos
-        checkinsData.forEach(c => {
+        checkinsData.forEach((c: any) => {
           collectUrl(c.photo_front_url)
           collectUrl(c.photo_back_url)
           collectUrl(c.photo_left_url)
           collectUrl(c.photo_right_url)
         })
-
-        // Sign all URLs
-        for (const url of allUrls) {
-          const match = url.match(/\/storage\/v1\/object\/public\/checkin-photos\/(.+)$/)
-          if (match) {
-            const { data: signedData } = await supabase.storage
-              .from('checkin-photos')
-              .createSignedUrl(match[1], 3600)
-            if (signedData?.signedUrl) {
-              urlMap[url] = signedData.signedUrl
-            }
-          }
-        }
-        setSignedUrls(urlMap)
       }
 
-      // Fetch workout sessions + sets
-      const { data: sessionsData } = await supabase
-        .from('workout_sessions')
-        .select('*')
-        .eq('client_id', clientId)
-        .order('started_at', { ascending: true })
-
-      if (sessionsData) {
-        setWorkoutSessions(sessionsData)
-        if (sessionsData.length > 0) {
-          const sessionIds = sessionsData.map(s => s.id)
-          const { data: setsData } = await supabase
-            .from('workout_sets')
-            .select('*')
-            .in('workout_session_id', sessionIds)
-          if (setsData) setWorkoutSets(setsData)
+      // Sign all URLs in parallel (instead of sequential for loop)
+      const signPromises = allUrls.map(async (url) => {
+        const match = url.match(/\/storage\/v1\/object\/public\/checkin-photos\/(.+)$/)
+        if (match) {
+          const { data: signedData } = await supabase.storage
+            .from('checkin-photos')
+            .createSignedUrl(match[1], 3600)
+          if (signedData?.signedUrl) return [url, signedData.signedUrl] as const
         }
+        return null
+      })
+
+      const [setsResult, ...signResults] = await Promise.all([setsPromise, ...signPromises])
+
+      // Apply results
+      if (sessionsData) setWorkoutSessions(sessionsData)
+      if (setsResult.data) setWorkoutSets(setsResult.data)
+      if (checkinsData) setCheckins(checkinsData)
+
+      const urlMap: Record<string, string> = {}
+      for (const result of signResults) {
+        if (result) urlMap[result[0]] = result[1]
       }
-
-      // Fetch exercises
-      const { data: exercisesData } = await supabase.from('exercises').select('*')
-      if (exercisesData) setExercises(exercisesData)
-
-      // Fetch personal records
-      const { data: prsData } = await supabase
-        .from('personal_records')
-        .select('*, exercises(id, name, name_nl)')
-        .eq('client_id', clientId)
-        .order('achieved_at', { ascending: false })
-      if (prsData) setPersonalRecords(prsData as PersonalRecord[])
+      setSignedUrls(urlMap)
 
       setLoading(false)
     }

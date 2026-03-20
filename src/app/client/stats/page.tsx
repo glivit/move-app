@@ -132,6 +132,13 @@ export default function StatsPage() {
       const sixMonthsAgo = new Date()
       sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
 
+      // PRs don't depend on sessions — start in parallel
+      const prsPromise = supabase
+        .from('personal_records')
+        .select('id, exercise_id, record_type, value, achieved_at, exercises(name, name_nl, body_part, target_muscle)')
+        .eq('client_id', user.id)
+        .order('achieved_at', { ascending: false })
+
       const { data: sessions } = await supabase
         .from('workout_sessions')
         .select('id, started_at, completed_at, duration_seconds')
@@ -169,13 +176,8 @@ export default function StatsPage() {
         }
       }
 
-      // PRs
-      const { data: prs } = await supabase
-        .from('personal_records')
-        .select('id, exercise_id, record_type, value, achieved_at, exercises(name, name_nl, body_part, target_muscle)')
-        .eq('client_id', user.id)
-        .order('achieved_at', { ascending: false })
-
+      // Await PRs (was running in parallel with sessions chain)
+      const { data: prs } = await prsPromise
       if (prs) setPersonalRecords(prs as any[])
 
       setLoading(false)
