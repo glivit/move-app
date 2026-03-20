@@ -622,13 +622,9 @@ function ActiveWorkoutPage() {
   const handleFinish = async () => {
     if (!session) return
 
-    // Flush ALL sets with data to DB before navigating to complete page
+    // Save all sets via server route (uses admin client to bypass RLS)
     try {
-      const supabase = createClient()
-
-      // Collect all sets that have any data (weight or reps)
       const allSetsToSave: Array<{
-        workout_session_id: string
         exercise_id: string
         set_number: number
         prescribed_reps: number | null
@@ -639,23 +635,15 @@ function ActiveWorkoutPage() {
         is_pr: boolean
       }> = []
 
-      console.log('[handleFinish] sets state keys:', Object.keys(sets))
-      console.log('[handleFinish] exercises count:', exercises.length)
-      console.log('[handleFinish] exercises IDs:', exercises.map(e => ({ id: e.id, exercise_id: e.exercise_id })))
-
       for (const [templateExId, exerciseSets] of Object.entries(sets)) {
         const exerciseRef = exercises.find(e => e.id === templateExId)
         const actualExerciseId = exerciseRef?.exercise_id || templateExId
 
-        console.log(`[handleFinish] templateExId=${templateExId}, exerciseRef found=${!!exerciseRef}, actualExId=${actualExerciseId}, setsCount=${exerciseSets.length}`)
-
         for (const s of exerciseSets) {
-          console.log(`[handleFinish]   set ${s.set_number}: weight=${s.weight_kg}, reps=${s.actual_reps}, completed=${s.completed}, id=${s.id}`)
           // Skip sets with no data at all
           if (!s.weight_kg && !s.actual_reps) continue
 
           allSetsToSave.push({
-            workout_session_id: session.id,
             exercise_id: actualExerciseId,
             set_number: s.set_number,
             prescribed_reps: s.prescribed_reps,
@@ -668,21 +656,21 @@ function ActiveWorkoutPage() {
         }
       }
 
-      console.log('[handleFinish] Total sets to save:', allSetsToSave.length)
-
       if (allSetsToSave.length > 0) {
-        // Delete all existing sets for this session, then bulk insert fresh
-        const { error: deleteError } = await supabase.from('workout_sets').delete().eq('workout_session_id', session.id)
-        if (deleteError) console.error('[handleFinish] Delete error:', deleteError)
-
-        const { data: inserted, error: insertError } = await supabase.from('workout_sets').insert(allSetsToSave).select()
-        if (insertError) console.error('[handleFinish] Insert error:', insertError)
-        else console.log('[handleFinish] Successfully inserted:', inserted?.length, 'sets')
-      } else {
-        console.warn('[handleFinish] NO sets to save! All weight_kg and actual_reps are null/0')
+        const res = await fetch('/api/workout-save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: session.id, sets: allSetsToSave }),
+        })
+        const result = await res.json()
+        if (!res.ok) {
+          console.error('[handleFinish] Server save failed:', result)
+        } else {
+          console.log('[handleFinish] Saved', result.savedCount, 'sets via server')
+        }
       }
     } catch (err) {
-      console.error('Error saving sets on finish:', err)
+      console.error('[handleFinish] Error saving sets:', err)
     }
 
     clearWorkoutState()

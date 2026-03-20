@@ -217,40 +217,37 @@ function WorkoutCompletePage() {
     if (!session) return
     try {
       setSaving(true)
-      const supabase = createClient()
       const startTime = new Date(session.started_at)
       const endTime = new Date()
       const durationSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000)
 
-      await supabase
-        .from('workout_sessions')
-        .update({
-          completed_at: endTime.toISOString(),
-          duration_seconds: durationSeconds,
-          mood_rating: moodRating,
-          difficulty_rating: difficultyRating,
-          notes: notes || null,
-          feedback_text: feedbackText || null,
-        })
-        .eq('id', sessionId)
-
-      const painUpdates = exerciseGroups
+      // Collect pain data
+      const painData = exerciseGroups
         .filter(g => g.painFlag)
-        .map(g =>
-          supabase
-            .from('workout_sets')
-            .update({ pain_flag: true, pain_notes: g.painNotes || null })
-            .eq('workout_session_id', sessionId)
-            .eq('exercise_id', g.exerciseId)
-        )
-      if (painUpdates.length > 0) await Promise.all(painUpdates)
+        .map(g => ({ exerciseId: g.exerciseId, painNotes: g.painNotes || null }))
 
-      // Notify coach about completed workout (fire & forget)
-      fetch('/api/workout-complete', {
+      // Use server route (admin client) for reliable write
+      const res = await fetch('/api/workout-finish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId }),
-      }).catch(() => {}) // Don't block navigation on notification failure
+        body: JSON.stringify({
+          sessionId,
+          completedAt: endTime.toISOString(),
+          durationSeconds,
+          moodRating: moodRating || null,
+          difficultyRating: difficultyRating || null,
+          notes: notes || null,
+          feedbackText: feedbackText || null,
+          painData: painData.length > 0 ? painData : null,
+        }),
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        console.error('[handleComplete] Server error:', err)
+        setSaving(false)
+        return
+      }
 
       router.push('/client/workout')
     } catch (error) {
