@@ -657,14 +657,23 @@ function ActiveWorkoutPage() {
 
     console.log('[handleFinish] Sets to save:', allSetsToSave.length, JSON.stringify(allSetsToSave))
 
-    // Try server route first (admin client, bypasses RLS)
+    // Get the user's access token to pass to server route
+    const supabase = createClient()
+    const { data: { session: authSession } } = await supabase.auth.getSession()
+    const accessToken = authSession?.access_token
+
     let saved = false
+    let lastError = ''
 
     if (allSetsToSave.length > 0) {
+      // Try server route (admin client, bypasses RLS)
       try {
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+        if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`
+
         const res = await fetch('/api/workout-save', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify({ sessionId: session.id, sets: allSetsToSave }),
         })
         const result = await res.json()
@@ -672,41 +681,46 @@ function ActiveWorkoutPage() {
           console.log('[handleFinish] Server save OK:', result.savedCount, 'sets')
           saved = true
         } else {
-          console.error('[handleFinish] Server save failed:', res.status, result)
+          lastError = `Server ${res.status}: ${result.error || 'unknown'} ${result.details || ''}`
+          console.error('[handleFinish] Server save failed:', lastError)
         }
-      } catch (err) {
+      } catch (err: any) {
+        lastError = `Fetch error: ${err?.message || err}`
         console.error('[handleFinish] Server route error:', err)
       }
 
-      // Fallback: if server route failed, try direct Supabase with browser client
+      // Fallback: direct Supabase browser client
       if (!saved) {
         console.warn('[handleFinish] Falling back to direct Supabase write...')
         try {
-          const supabase = createClient()
           const { error: delErr } = await supabase.from('workout_sets').delete().eq('workout_session_id', session.id)
-          if (delErr) console.error('[handleFinish] Fallback delete error:', delErr)
+          if (delErr) {
+            lastError = `Fallback delete: ${delErr.message}`
+            console.error('[handleFinish] Fallback delete error:', delErr)
+          }
 
           const insertRows = allSetsToSave.map(s => ({ ...s, workout_session_id: session.id }))
           const { data: inserted, error: insErr } = await supabase.from('workout_sets').insert(insertRows).select()
           if (insErr) {
+            lastError = `Fallback insert: ${insErr.message}`
             console.error('[handleFinish] Fallback insert error:', insErr)
           } else {
             console.log('[handleFinish] Fallback saved:', inserted?.length, 'sets')
             saved = true
           }
-        } catch (fbErr) {
+        } catch (fbErr: any) {
+          lastError = `Fallback error: ${fbErr?.message || fbErr}`
           console.error('[handleFinish] Fallback error:', fbErr)
         }
       }
     } else {
-      // No sets to save, that's fine
       saved = true
     }
 
     if (!saved) {
       setSaving(false)
-      setSaveError('Workout opslaan mislukt. Probeer opnieuw.')
-      return // DON'T navigate — keep data in state + localStorage
+      setSaveError(`Opslaan mislukt: ${lastError}`)
+      return
     }
 
     clearWorkoutState()

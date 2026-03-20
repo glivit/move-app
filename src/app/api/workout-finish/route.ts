@@ -24,11 +24,30 @@ export const dynamic = 'force-dynamic'
  */
 export async function POST(request: NextRequest) {
   try {
-    // Verify the user is authenticated
-    const supabase = await createServerSupabaseClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const admin = createAdminClient()
 
-    if (!user) {
+    // Auth: try Authorization header first, fall back to cookies
+    let userId: string | null = null
+
+    const authHeader = request.headers.get('authorization')
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.slice(7)
+      const { data: { user }, error } = await admin.auth.getUser(token)
+      if (error) console.error('[workout-finish] Token auth error:', error.message)
+      if (user) userId = user.id
+    }
+
+    if (!userId) {
+      try {
+        const supabase = await createServerSupabaseClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) userId = user.id
+      } catch (e: any) {
+        console.error('[workout-finish] Cookie auth error:', e?.message)
+      }
+    }
+
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -48,8 +67,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'sessionId is required' }, { status: 400 })
     }
 
-    const admin = createAdminClient()
-
     // Verify the session belongs to this user
     const { data: session, error: sessionError } = await admin
       .from('workout_sessions')
@@ -62,7 +79,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
     }
 
-    if (session.client_id !== user.id) {
+    if (session.client_id !== userId) {
       return NextResponse.json({ error: 'Not your session' }, { status: 403 })
     }
 

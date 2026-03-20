@@ -1,4 +1,3 @@
-import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -7,26 +6,43 @@ export const dynamic = 'force-dynamic'
 /**
  * POST /api/workout-save
  * Saves workout sets using admin client (bypasses RLS).
- * Called from the active workout page when finishing a workout.
+ * Auth: accepts Bearer token in Authorization header OR Supabase cookies.
  */
 export async function POST(request: NextRequest) {
   console.log('[workout-save] === Request received ===')
 
   try {
-    // Verify the user is authenticated
-    const supabase = await createServerSupabaseClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const admin = createAdminClient()
 
-    if (authError) {
-      console.error('[workout-save] Auth error:', authError.message)
+    // Auth: try Authorization header first, fall back to cookies
+    let userId: string | null = null
+
+    const authHeader = request.headers.get('authorization')
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.slice(7)
+      const { data: { user }, error } = await admin.auth.getUser(token)
+      if (error) console.error('[workout-save] Token auth error:', error.message)
+      if (user) userId = user.id
     }
 
-    if (!user) {
-      console.error('[workout-save] No authenticated user')
+    // Fallback: try cookie-based auth
+    if (!userId) {
+      try {
+        const { createServerSupabaseClient } = await import('@/lib/supabase-server')
+        const supabase = await createServerSupabaseClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) userId = user.id
+      } catch (e: any) {
+        console.error('[workout-save] Cookie auth error:', e?.message)
+      }
+    }
+
+    if (!userId) {
+      console.error('[workout-save] No authenticated user (tried token + cookies)')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    console.log('[workout-save] User authenticated:', user.id)
+    console.log('[workout-save] User authenticated:', userId)
 
     const body = await request.json()
     const { sessionId, sets } = body
@@ -36,8 +52,6 @@ export async function POST(request: NextRequest) {
     if (!sessionId) {
       return NextResponse.json({ error: 'sessionId is required' }, { status: 400 })
     }
-
-    const admin = createAdminClient()
 
     // Verify the session belongs to this user
     const { data: session, error: sessionError } = await admin
@@ -51,8 +65,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Session not found', details: sessionError?.message }, { status: 404 })
     }
 
-    if (session.client_id !== user.id) {
-      console.error('[workout-save] Session belongs to', session.client_id, 'not', user.id)
+    if (session.client_id !== userId) {
+      console.error('[workout-save] Session belongs to', session.client_id, 'not', userId)
       return NextResponse.json({ error: 'Not your session' }, { status: 403 })
     }
 
@@ -71,7 +85,7 @@ export async function POST(request: NextRequest) {
 
     console.log('[workout-save] Old sets deleted')
 
-    // Insert new sets (if any)
+    // Insert new sets
     if (sets && sets.length > 0) {
       const setsToInsert = sets.map((s: any) => ({
         workout_session_id: sessionId,
@@ -85,7 +99,7 @@ export async function POST(request: NextRequest) {
         is_pr: s.is_pr ?? false,
       }))
 
-      console.log('[workout-save] Inserting', setsToInsert.length, 'sets:', JSON.stringify(setsToInsert.slice(0, 2)))
+      console.log('[workout-save] Inserting', setsToInsert.length, 'sets. First:', JSON.stringify(setsToInsert[0]))
 
       const { data: inserted, error: insertError } = await admin
         .from('workout_sets')
@@ -93,7 +107,7 @@ export async function POST(request: NextRequest) {
         .select('id')
 
       if (insertError) {
-        console.error('[workout-save] Insert error:', insertError.message, insertError.details, insertError.hint)
+        console.error('[workout-save] INSERT ERROR:', insertError.message, insertError.details, insertError.hint)
         return NextResponse.json({
           error: 'Failed to save sets',
           details: insertError.message,
@@ -101,7 +115,7 @@ export async function POST(request: NextRequest) {
         }, { status: 500 })
       }
 
-      console.log('[workout-save] SUCCESS: Saved', inserted?.length ?? 0, 'sets for session', sessionId)
+      console.log('[workout-save] SUCCESS:', inserted?.length ?? 0, 'sets saved for session', sessionId)
 
       return NextResponse.json({
         success: true,
@@ -109,10 +123,10 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    console.log('[workout-save] No sets to save (empty array)')
+    console.log('[workout-save] No sets to save')
     return NextResponse.json({ success: true, savedCount: 0 })
   } catch (error: any) {
-    console.error('[workout-save] Unexpected error:', error?.message ?? error)
+    console.error('[workout-save] UNEXPECTED ERROR:', error?.message ?? error)
     return NextResponse.json({ error: 'Internal server error', details: error?.message }, { status: 500 })
   }
 }

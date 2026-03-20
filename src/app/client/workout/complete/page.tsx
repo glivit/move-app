@@ -217,6 +217,7 @@ function WorkoutCompletePage() {
     if (!session) return
     try {
       setSaving(true)
+      const supabase = createClient()
       const startTime = new Date(session.started_at)
       const endTime = new Date()
       const durationSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000)
@@ -226,16 +227,23 @@ function WorkoutCompletePage() {
         .filter(g => g.painFlag)
         .map(g => ({ exerciseId: g.exerciseId, painNotes: g.painNotes || null }))
 
+      // Get auth token to pass to server route
+      const { data: { session: authSession } } = await supabase.auth.getSession()
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (authSession?.access_token) {
+        headers['Authorization'] = `Bearer ${authSession.access_token}`
+      }
+
       // Use server route (admin client) for reliable write
       const res = await fetch('/api/workout-finish', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           sessionId,
           completedAt: endTime.toISOString(),
           durationSeconds,
-          moodRating: moodRating || null,
-          difficultyRating: difficultyRating || null,
+          moodRating: moodRating ?? null,
+          difficultyRating: difficultyRating ?? null,
           notes: notes || null,
           feedbackText: feedbackText || null,
           painData: painData.length > 0 ? painData : null,
@@ -245,8 +253,36 @@ function WorkoutCompletePage() {
       if (!res.ok) {
         const err = await res.json()
         console.error('[handleComplete] Server error:', err)
-        setSaving(false)
-        return
+
+        // Fallback: try direct Supabase write
+        console.warn('[handleComplete] Falling back to direct write...')
+        await supabase
+          .from('workout_sessions')
+          .update({
+            completed_at: endTime.toISOString(),
+            duration_seconds: durationSeconds,
+            mood_rating: moodRating ?? null,
+            difficulty_rating: difficultyRating ?? null,
+            notes: notes || null,
+            feedback_text: feedbackText || null,
+          })
+          .eq('id', sessionId)
+
+        // Pain updates via browser client
+        for (const pain of painData) {
+          await supabase
+            .from('workout_sets')
+            .update({ pain_flag: true, pain_notes: pain.painNotes })
+            .eq('workout_session_id', sessionId)
+            .eq('exercise_id', pain.exerciseId)
+        }
+
+        // Fire & forget notification
+        fetch('/api/workout-complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId }),
+        }).catch(() => {})
       }
 
       router.push('/client/workout')
