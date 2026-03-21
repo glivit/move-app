@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic'
-
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { ClientsListView } from './ClientsListView'
 import type { Profile } from '@/types'

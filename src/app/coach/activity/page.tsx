@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic'
-
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import Link from 'next/link'
 import {

@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic'
-
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
 import { Card } from '@/components/ui/Card'

@@ -261,7 +261,7 @@ export async function GET(request: NextRequest) {
 
     // ── Response ──────────────────────────────────────────
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       profile: profile ? {
         firstName: profile.full_name?.split(' ')[0] || '',
         startDate: profile.start_date,
@@ -341,6 +341,10 @@ export async function GET(request: NextRequest) {
         (accountabilityPending ? 1 : 0) +
         unreadBroadcastCount,
     })
+
+    // Allow browser to cache for 15s, serve stale for 60s while revalidating
+    response.headers.set('Cache-Control', 'private, max-age=15, stale-while-revalidate=60')
+    return response
   } catch (err) {
     console.error('Dashboard API error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

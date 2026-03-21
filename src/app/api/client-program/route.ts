@@ -36,12 +36,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ program: null, days: [], schedule: {} })
     }
 
-    // Get template days
-    const { data: templateDays } = await adminClient
-      .from('program_template_days')
-      .select('*')
-      .eq('template_id', activeProgram.template_id)
-      .order('sort_order', { ascending: true })
+    // Get template days + completed workouts in parallel
+    const today = new Date()
+    const weekStart = new Date(today)
+    weekStart.setDate(today.getDate() - today.getDay())
+    weekStart.setHours(0, 0, 0, 0)
+
+    const [templateDaysRes, completedSessionsRes] = await Promise.all([
+      adminClient
+        .from('program_template_days')
+        .select('*')
+        .eq('template_id', activeProgram.template_id)
+        .order('sort_order', { ascending: true }),
+      adminClient
+        .from('workout_sessions')
+        .select('template_day_id')
+        .eq('client_id', user.id)
+        .eq('client_program_id', activeProgram.id)
+        .not('completed_at', 'is', null)
+        .gte('started_at', weekStart.toISOString())
+        .lte('started_at', new Date().toISOString()),
+    ])
+
+    const templateDays = templateDaysRes.data
+    const completedSessions = completedSessionsRes.data
 
     // Get exercise counts for each day — all in parallel
     const days = templateDays ? await Promise.all(
@@ -53,21 +71,6 @@ export async function GET(request: NextRequest) {
         return { ...day, exercise_count: count || 0 }
       })
     ) : []
-
-    // Get completed workouts for this week (only count completed, unique per day)
-    const today = new Date()
-    const weekStart = new Date(today)
-    weekStart.setDate(today.getDate() - today.getDay())
-    weekStart.setHours(0, 0, 0, 0)
-
-    const { data: completedSessions } = await adminClient
-      .from('workout_sessions')
-      .select('template_day_id')
-      .eq('client_id', user.id)
-      .eq('client_program_id', activeProgram.id)
-      .not('completed_at', 'is', null)
-      .gte('started_at', weekStart.toISOString())
-      .lte('started_at', new Date().toISOString())
 
     const uniqueCompletedDays = new Set(
       (completedSessions || []).map(s => s.template_day_id)
@@ -85,7 +88,7 @@ export async function GET(request: NextRequest) {
     const todayDay = todayDayId ? days.find(d => d.id === todayDayId) || null : null
     const todayCompleted = todayDayId ? uniqueCompletedDays.has(todayDayId) : false
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       program: activeProgram,
       days,
       workoutsThisWeek,
@@ -93,6 +96,8 @@ export async function GET(request: NextRequest) {
       todayDay,
       todayCompleted,
     })
+    response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')
+    return response
   } catch (error) {
     console.error('Error fetching client program:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

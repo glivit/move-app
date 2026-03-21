@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic'
-
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, Target, Dumbbell, Heart, Apple, Moon, Ruler, Camera, ImageOff } from 'lucide-react'

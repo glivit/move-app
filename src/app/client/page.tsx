@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, memo } from 'react'
 import Link from 'next/link'
 import {
   CheckCircle, ChevronRight, Video,
@@ -8,6 +8,7 @@ import {
   Flame, TrendingDown, TrendingUp, Activity,
 } from 'lucide-react'
 import { NotificationCenter } from '@/components/client/NotificationCenter'
+import { cachedFetch, invalidateCache } from '@/lib/fetcher'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -92,7 +93,7 @@ function formatDate(date: Date) {
 
 // ─── Week Calendar — clean dot style ────────────────────────
 
-function WeekCalendar({ scheduleDays, completedDates }: {
+const WeekCalendar = memo(function WeekCalendar({ scheduleDays, completedDates }: {
   scheduleDays: Array<{ dayNumber: number; name: string; focus: string | null }>
   completedDates: string[]
 }) {
@@ -195,7 +196,7 @@ function WeekCalendar({ scheduleDays, completedDates }: {
       )}
     </div>
   )
-}
+})
 
 // ─── Component ──────────────────────────────────────────────
 
@@ -212,11 +213,8 @@ export default function ClientDashboard() {
 
   async function loadDashboard() {
     try {
-      const res = await fetch('/api/dashboard')
-      if (res.ok) {
-        const d = await res.json()
-        setData(d)
-      }
+      const d = await cachedFetch<DashboardData>('/api/dashboard', { maxAge: 30_000 })
+      setData(d)
     } catch (err) {
       console.error('Dashboard load error:', err)
     } finally {

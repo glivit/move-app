@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic'
-
 import ResetPasswordPage from './ResetPasswordClient'
 
 export default function Page() {

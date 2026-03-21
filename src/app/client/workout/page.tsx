@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Dumbbell, ArrowRight, Clock, Flame, Play, CheckCircle2, Calendar, MessageSquare } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
+import { cachedFetch } from '@/lib/fetcher'
 
 interface ClientProgram {
   id: string
@@ -58,17 +59,7 @@ export default function WorkoutOverviewPage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const res = await fetch('/api/client-program')
-        if (!res.ok) {
-          if (res.status === 401) {
-            router.push('/auth/login')
-            return
-          }
-          setLoading(false)
-          return
-        }
-
-        const data = await res.json()
+        const data = await cachedFetch('/api/client-program', { maxAge: 30_000 })
 
         if (data.program) {
           setProgram(data.program)
