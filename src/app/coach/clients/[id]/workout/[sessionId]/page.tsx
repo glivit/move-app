@@ -60,6 +60,13 @@ interface GroupedExercise {
   hasPR: boolean
 }
 
+interface PreviousSessionData {
+  session_date: string
+  sets: { set_number: number; weight_kg: number | null; actual_reps: number | null }[]
+  best_weight: number | null
+  total_volume: number
+}
+
 interface CoachMessage {
   id: string
   sender_id: string
@@ -83,6 +90,7 @@ export default function CoachWorkoutDetailPage() {
   const [feedbackSent, setFeedbackSent] = useState(false)
   const [coachMessages, setCoachMessages] = useState<CoachMessage[]>([])
   const [coachId, setCoachId] = useState<string | null>(null)
+  const [exerciseHistory, setExerciseHistory] = useState<Record<string, PreviousSessionData[]>>({})
 
   useEffect(() => {
     async function load() {
@@ -194,7 +202,63 @@ export default function CoachWorkoutDetailPage() {
             if (set.is_pr) grouped[exId].hasPR = true
           })
 
-          setExercises(Object.values(grouped))
+          const groupedExercises = Object.values(grouped)
+          setExercises(groupedExercises)
+
+          // Fetch last 3 previous sessions to show exercise history
+          const exerciseIds = groupedExercises.map(e => e.exercise_id)
+          if (exerciseIds.length > 0) {
+            const { data: prevSessions } = await supabase
+              .from('workout_sessions')
+              .select('id, started_at')
+              .eq('client_id', clientId)
+              .neq('id', sessionId)
+              .not('completed_at', 'is', null)
+              .order('started_at', { ascending: false })
+              .limit(3)
+
+            if (prevSessions && prevSessions.length > 0) {
+              const prevSessionIds = prevSessions.map(s => s.id)
+              const { data: prevSets } = await supabase
+                .from('workout_sets')
+                .select('workout_session_id, exercise_id, set_number, weight_kg, actual_reps, completed')
+                .in('workout_session_id', prevSessionIds)
+                .in('exercise_id', exerciseIds)
+                .eq('completed', true)
+                .order('set_number', { ascending: true })
+
+              if (prevSets) {
+                const history: Record<string, PreviousSessionData[]> = {}
+                const sessionDateMap: Record<string, string> = {}
+                for (const ps of prevSessions) sessionDateMap[ps.id] = ps.started_at
+
+                for (const exId of exerciseIds) {
+                  const exHistory: PreviousSessionData[] = []
+                  for (const ps of prevSessions) {
+                    const setsForExInSession = prevSets.filter(
+                      s => s.exercise_id === exId && s.workout_session_id === ps.id
+                    )
+                    if (setsForExInSession.length > 0) {
+                      const bestWeight = Math.max(...setsForExInSession.map(s => s.weight_kg || 0))
+                      const totalVol = setsForExInSession.reduce((sum, s) => sum + (s.weight_kg || 0) * (s.actual_reps || 0), 0)
+                      exHistory.push({
+                        session_date: sessionDateMap[ps.id],
+                        sets: setsForExInSession.map(s => ({
+                          set_number: s.set_number,
+                          weight_kg: s.weight_kg,
+                          actual_reps: s.actual_reps,
+                        })),
+                        best_weight: bestWeight > 0 ? bestWeight : null,
+                        total_volume: totalVol,
+                      })
+                    }
+                  }
+                  if (exHistory.length > 0) history[exId] = exHistory
+                }
+                setExerciseHistory(history)
+              }
+            }
+          }
         }
 
         // Load existing coach messages about this session
@@ -542,6 +606,38 @@ export default function CoachWorkoutDetailPage() {
                   <span className="font-semibold text-[#1A1917]">
                     {ex.bestSet.weight} kg × {ex.bestSet.reps}
                   </span>
+                </div>
+              )}
+
+              {/* Previous 3 sessions history */}
+              {exerciseHistory[ex.exercise_id] && exerciseHistory[ex.exercise_id].length > 0 && (
+                <div className="px-5 py-3 border-t border-[#E8E4DC] bg-[#F8F7F4]">
+                  <p className="text-[10px] font-semibold text-[#8E8E93] uppercase tracking-wide mb-2">
+                    Vorige {exerciseHistory[ex.exercise_id].length} training{exerciseHistory[ex.exercise_id].length > 1 ? 'en' : ''}
+                  </p>
+                  <div className="space-y-1.5">
+                    {exerciseHistory[ex.exercise_id].map((prev, i) => {
+                      const date = new Date(prev.session_date)
+                      const dateLabel = date.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })
+                      const setsStr = prev.sets.map(s => `${s.weight_kg ?? 0}×${s.actual_reps ?? 0}`).join('  ')
+                      const currentBest = ex.bestSet?.weight ?? 0
+                      const trend = prev.best_weight != null && currentBest > 0
+                        ? currentBest > prev.best_weight ? 'up' : currentBest < prev.best_weight ? 'down' : 'same'
+                        : null
+
+                      return (
+                        <div key={i} className="flex items-center gap-2 text-[12px]">
+                          <span className="text-[#8E8E93] font-medium w-[52px] flex-shrink-0">{dateLabel}</span>
+                          <span className="text-[#1A1917] tabular-nums font-medium flex-1 truncate">{setsStr}</span>
+                          {prev.best_weight != null && (
+                            <span className="text-[#8E8E93] tabular-nums flex-shrink-0">{prev.best_weight} kg</span>
+                          )}
+                          {trend === 'up' && <TrendingUp strokeWidth={2} className="w-3 h-3 text-green-500 flex-shrink-0" />}
+                          {trend === 'down' && <TrendingUp strokeWidth={2} className="w-3 h-3 text-red-400 flex-shrink-0 rotate-180" />}
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
               )}
             </div>

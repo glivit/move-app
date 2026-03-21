@@ -521,49 +521,46 @@ function ActiveWorkoutPage() {
     loadData()
   }, [dayId, programId, router])
 
-  // --- Complete a set (update local state + optimistic UI) ---
-  const completeSet = useCallback(async (exerciseId: string, setIndex: number) => {
-    const setData = sets[exerciseId]?.[setIndex]
-    if (!setData || !session) return
+  // --- Complete a set: PR check + rest timer (state is already updated by SetRow) ---
+  const completeSet = useCallback(async (exerciseId: string, setIndex: number, weight: number | null) => {
+    if (!session) return
 
     try {
       const exerciseRef = exercises.find(e => e.id === exerciseId)
 
       // PR detection: simple client-side check (server also checks via trigger)
       let isPR = false
-      if (setData.weight_kg && setData.weight_kg > 0 && !setData.is_warmup) {
+      if (weight && weight > 0) {
         try {
           const supabase = createClient()
           const { data: previousBest } = await supabase
             .from('workout_sets').select('weight_kg')
             .eq('exercise_id', exerciseRef?.exercise_id || exerciseId).eq('completed', true).eq('is_warmup', false)
             .order('weight_kg', { ascending: false }).limit(1)
-          if (!previousBest?.length || (setData.weight_kg > (previousBest[0].weight_kg || 0))) isPR = true
+          if (!previousBest?.length || (weight > (previousBest[0].weight_kg || 0))) isPR = true
         } catch { /* PR check is non-critical */ }
       }
 
-      // Update local state immediately (optimistic)
-      const updatedSets = { ...sets }
-      updatedSets[exerciseId] = [...updatedSets[exerciseId]]
-      updatedSets[exerciseId][setIndex] = { ...setData, completed: true, is_pr: isPR }
+      // Only update is_pr flag — use functional updater to not overwrite reps/weight
+      if (isPR) {
+        setSets(prev => {
+          const updated = { ...prev }
+          updated[exerciseId] = [...(updated[exerciseId] || [])]
+          updated[exerciseId][setIndex] = { ...updated[exerciseId][setIndex], is_pr: true }
+          return updated
+        })
 
-      if (setData.weight_kg && setIndex + 1 < updatedSets[exerciseId].length && !updatedSets[exerciseId][setIndex + 1].completed) {
-        if (!updatedSets[exerciseId][setIndex + 1].weight_kg) {
-          updatedSets[exerciseId][setIndex + 1] = { ...updatedSets[exerciseId][setIndex + 1], weight_kg: setData.weight_kg }
+        if (exerciseRef) {
+          setPrCelebration(exerciseRef.exercises?.name_nl || exerciseRef.exercises?.name || 'Oefening')
+          setTimeout(() => setPrCelebration(null), 3000)
         }
-      }
-      setSets(updatedSets)
-
-      if (isPR && exerciseRef) {
-        setPrCelebration(exerciseRef.exercises?.name_nl || exerciseRef.exercises?.name || 'Oefening')
-        setTimeout(() => setPrCelebration(null), 3000)
       }
 
       if (exerciseRef && exerciseRef.rest_seconds > 0) {
         setActiveRestTimer({ exerciseId, setIndex, seconds: exerciseRef.rest_seconds, total: exerciseRef.rest_seconds })
       }
     } catch (error) { console.error('Error completing set:', error) }
-  }, [sets, session, exercises])
+  }, [session, exercises])
 
   // --- Add extra set ---
   const addSet = (exerciseId: string) => {
@@ -868,8 +865,8 @@ function ActiveWorkoutPage() {
               saving
                 ? 'bg-[#CCC7BC] text-[#A09D96] cursor-wait'
                 : allDone
-                  ? 'bg-[var(--color-pop)] text-white shadow-lg shadow-[var(--color-pop)]/20'
-                  : 'bg-[#E5E1D9] text-[#A09D96]'
+                  ? 'bg-[#34C759] text-white shadow-lg shadow-[#34C759]/30'
+                  : 'bg-[#34C759] text-white shadow-md shadow-[#34C759]/20'
             }`}
           >
             {saving ? 'Opslaan...' : 'Klaar'}
@@ -982,7 +979,7 @@ function ActiveWorkoutPage() {
                           prevLabel={prevLabel}
                           prefilledWeight={prefilledWeight}
                           prevSet={prevSet}
-                          onComplete={() => completeSet(ex.id, idx)}
+                          onComplete={(weight: number | null) => completeSet(ex.id, idx, weight)}
                           exerciseId={ex.id}
                           setSets={setSets}
                           exSets={exSets}
@@ -1038,7 +1035,7 @@ function ActiveWorkoutPage() {
             className={`w-full py-4 rounded-2xl font-bold text-[14px] uppercase tracking-[0.08em] flex items-center justify-center gap-2 transition-all ${
               saving
                 ? 'bg-[#CCC7BC] text-[#A09D96] cursor-wait'
-                : 'bg-[var(--color-pop)] text-white shadow-lg shadow-[var(--color-pop)]/20 hover:shadow-[var(--color-pop)]/30'
+                : 'bg-[#34C759] text-white shadow-lg shadow-[#34C759]/30 hover:shadow-[#34C759]/40'
             }`}
           >
             {saving ? (
@@ -1115,7 +1112,7 @@ function SetRow({
   prevLabel: string
   prefilledWeight: number | null
   prevSet?: PreviousSet
-  onComplete: () => void
+  onComplete: (weight: number | null) => void
   exerciseId: string
   setSets: React.Dispatch<React.SetStateAction<Record<string, SetData[]>>>
   exSets: SetData[]
@@ -1149,6 +1146,13 @@ function SetRow({
   }
 
   const handleCompleteClick = () => {
+    if (set.completed) {
+      // Uncheck: toggle back to incomplete
+      const updatedSets = [...exSets]
+      updatedSets[index] = { ...set, completed: false, is_pr: false }
+      setSets((prev: Record<string, SetData[]>) => ({ ...prev, [exerciseId]: updatedSets }))
+      return
+    }
     const finalWeight = weight ? parseFloat(weight) : null
     const finalReps = reps ? parseInt(reps) : set.prescribed_reps
     const updatedSets = [...exSets]
@@ -1157,7 +1161,7 @@ function SetRow({
       updatedSets[index + 1] = { ...updatedSets[index + 1], weight_kg: finalWeight }
     }
     setSets((prev: Record<string, SetData[]>) => ({ ...prev, [exerciseId]: updatedSets }))
-    onComplete()
+    onComplete(finalWeight)
   }
 
   return (
@@ -1199,13 +1203,12 @@ function SetRow({
         className="w-[64px] px-2 py-2.5 bg-[#F5F2EC] border border-[#E5E1D9] rounded-lg text-[14px] text-center font-semibold text-[#1A1917] tabular-nums disabled:opacity-40 focus:border-[var(--color-pop)] focus:outline-none transition-all placeholder:text-[#CCC7BC] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />
 
-      {/* Check button */}
+      {/* Check button — tap again to undo */}
       <button
         onClick={handleCompleteClick}
-        disabled={set.completed}
         className={`w-[36px] h-[36px] flex items-center justify-center flex-shrink-0 rounded-lg transition-all touch-manipulation ${
           set.completed
-            ? 'bg-[var(--color-pop)] text-white'
+            ? 'bg-[var(--color-pop)] text-white active:scale-95'
             : 'bg-[#F5F2EC] text-[#CCC7BC] hover:bg-[#E5E1D9] active:scale-95'
         }`}
         style={{ WebkitTapHighlightColor: 'transparent' }}

@@ -10,7 +10,8 @@ interface Props {
 
 const quickMessages = [
   { label: 'Training herinnering', title: 'Tijd om te trainen!', message: 'Hey {name}, vergeet je training vandaag niet! Ga ervoor 💪', url: '/client/workout' },
-  { label: 'Check-in herinnering', title: 'Wekelijkse check-in', message: 'Hey {name}, het is weer tijd voor je wekelijkse check-in. Hoe gaat het?', url: '/client/check-in' },
+  { label: 'Wekelijkse check-in', title: 'Wekelijkse check-in', message: 'Hey {name}, het is weer tijd voor je wekelijkse check-in. Vul je gewicht en energie-levels in!', url: '/client/weekly-check-in', notificationType: 'weekly_checkin_request' },
+  { label: 'Maandelijkse check-in', title: 'Maandelijkse check-in', message: 'Hey {name}, tijd voor je maandelijkse check-in! Neem je foto\'s en metingen op.', url: '/client/check-in', notificationType: 'monthly_checkin_request' },
   { label: 'Nieuw programma', title: 'Nieuw programma klaar!', message: 'Hey {name}, je nieuwe trainingsprogramma staat klaar. Bekijk het nu!', url: '/client/workout' },
   { label: 'Motivatie', title: 'Keep going! 🔥', message: 'Hey {name}, je doet het geweldig. Blijf zo doorgaan!', url: '/client' },
 ]
@@ -26,7 +27,7 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
 
   const firstName = clientName.split(' ')[0]
 
-  const sendNotification = async (title: string, message: string, url: string) => {
+  const sendNotification = async (title: string, message: string, url: string, notificationType?: string) => {
     setSending(true)
     setError(null)
     try {
@@ -38,6 +39,9 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
           title,
           message: message.replace('{name}', firstName),
           url,
+          // Save as in-app notification for check-in requests
+          save_notification: !!notificationType,
+          notification_type: notificationType,
         }),
       })
 
@@ -136,7 +140,7 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
               {quickMessages.map((msg) => (
                 <button
                   key={msg.label}
-                  onClick={() => sendNotification(msg.title, msg.message, msg.url)}
+                  onClick={() => sendNotification(msg.title, msg.message, msg.url, (msg as any).notificationType)}
                   disabled={sending}
                   className="w-full text-left p-3 rounded-xl transition-all hover:bg-[#FAFAFA] border border-[#E8E4DC]"
                 >
