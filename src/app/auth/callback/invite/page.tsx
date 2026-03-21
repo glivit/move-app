@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 
@@ -15,6 +15,18 @@ import { createClient } from '@/lib/supabase'
  * This page handles BOTH flows and always redirects to /auth/set-password
  */
 export default function InviteCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#1A1917] border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <InviteCallbackContent />
+    </Suspense>
+  )
+}
+
+function InviteCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [error, setError] = useState<string | null>(null)
