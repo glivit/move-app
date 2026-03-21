@@ -639,12 +639,17 @@ function ActiveWorkoutPage() {
         // Skip sets with no data at all
         if (!s.weight_kg && !s.actual_reps) continue
 
+        // Clamp values to safe DB ranges: weight_kg NUMERIC(6,2) max 9999.99, reps INTEGER
+        const safeWeight = s.weight_kg != null ? Math.min(Math.max(0, Number(s.weight_kg) || 0), 9999.99) : null
+        const safeReps = s.actual_reps != null ? Math.min(Math.max(0, Math.round(Number(s.actual_reps) || 0)), 9999) : null
+        const safePrescribed = s.prescribed_reps != null ? Math.min(Math.max(0, Math.round(Number(s.prescribed_reps) || 0)), 9999) : null
+
         allSetsToSave.push({
           exercise_id: actualExerciseId,
           set_number: s.set_number,
-          prescribed_reps: s.prescribed_reps,
-          actual_reps: s.actual_reps,
-          weight_kg: s.weight_kg,
+          prescribed_reps: safePrescribed,
+          actual_reps: safeReps,
+          weight_kg: safeWeight === 0 && s.weight_kg == null ? null : safeWeight,
           is_warmup: s.is_warmup,
           completed: true,
           is_pr: s.is_pr,

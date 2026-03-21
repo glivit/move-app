@@ -87,13 +87,20 @@ export async function POST(request: NextRequest) {
 
     // Insert new sets
     if (sets && sets.length > 0) {
+      // Clamp values to safe DB ranges: weight_kg NUMERIC(6,2), reps INTEGER
+      const clampNum = (v: any, max: number) => {
+        const n = Number(v)
+        if (v == null || isNaN(n) || !isFinite(n)) return null
+        return Math.min(Math.max(0, n), max)
+      }
+
       const setsToInsert = sets.map((s: any) => ({
         workout_session_id: sessionId,
         exercise_id: s.exercise_id,
-        set_number: s.set_number,
-        prescribed_reps: s.prescribed_reps ?? null,
-        actual_reps: s.actual_reps ?? null,
-        weight_kg: s.weight_kg ?? null,
+        set_number: Math.min(Math.max(1, Number(s.set_number) || 1), 99),
+        prescribed_reps: clampNum(s.prescribed_reps, 9999),
+        actual_reps: clampNum(s.actual_reps, 9999),
+        weight_kg: clampNum(s.weight_kg, 9999.99),
         is_warmup: s.is_warmup ?? false,
         completed: s.completed !== false,
         is_pr: s.is_pr ?? false,
