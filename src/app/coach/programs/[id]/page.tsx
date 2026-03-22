@@ -14,6 +14,7 @@ import {
   Link2,
   Unlink,
   Trash2,
+  Copy,
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { ExerciseSearchModal } from '@/components/coach/ExerciseSearchModal'
@@ -78,6 +79,7 @@ export default function ProgramEditorPage() {
   const [editingFieldId, setEditingFieldId] = useState<string | null>(null)
   const [confirmDeleteDay, setConfirmDeleteDay] = useState<string | null>(null)
   const [deletingDay, setDeletingDay] = useState(false)
+  const [duplicatingDay, setDuplicatingDay] = useState(false)
 
   const templateId = params.id
 
@@ -260,6 +262,107 @@ export default function ProgramEditorPage() {
       console.error('Failed to remove day:', error)
     } finally {
       setDeletingDay(false)
+    }
+  }
+
+  const handleDuplicateDay = async (dayId: string) => {
+    const sourceDayData = days.find((d) => d.id === dayId)
+    if (!sourceDayData) return
+
+    setDuplicatingDay(true)
+    try {
+      const newDayNumber = Math.max(0, ...days.map((d) => d.day_number)) + 1
+      const newSortOrder = Math.max(0, ...days.map((d) => d.sort_order)) + 1
+
+      // 1. Create the new day
+      const { data: newDayRow, error: dayError } = await supabase
+        .from('program_template_days')
+        .insert({
+          template_id: templateId,
+          day_number: newDayNumber,
+          name: `${sourceDayData.name} (kopie)`,
+          focus: sourceDayData.focus,
+          estimated_duration_min: sourceDayData.estimated_duration_min,
+          sort_order: newSortOrder,
+        })
+        .select()
+        .single()
+
+      if (dayError || !newDayRow) throw dayError
+
+      // 2. Duplicate all exercises
+      let newExercises: ExerciseWithPrescription[] = []
+      if (sourceDayData.exercises.length > 0) {
+        const exerciseInserts = sourceDayData.exercises.map((ex) => ({
+          template_day_id: newDayRow.id,
+          exercise_id: ex.id,
+          sets: ex.sets,
+          reps_min: ex.reps_min,
+          reps_max: ex.reps_max,
+          rest_seconds: ex.rest_seconds,
+          tempo: ex.tempo,
+          rpe_target: ex.rpe_target,
+          weight_suggestion: ex.weight_suggestion,
+          notes: ex.notes,
+          sort_order: ex.sort_order,
+          superset_group_id: null, // Reset superset links for new day
+        }))
+
+        const { data: insertedExercises, error: exError } = await supabase
+          .from('program_template_exercises')
+          .insert(exerciseInserts)
+          .select('*, exercises(*)')
+
+        if (exError) throw exError
+
+        if (insertedExercises) {
+          newExercises = insertedExercises.map((row: any) => {
+            const exerciseData = Array.isArray(row.exercises) ? row.exercises[0] : row.exercises
+            return {
+            ...exerciseData,
+            prescription_id: row.id,
+            sets: row.sets,
+            reps_min: row.reps_min,
+            reps_max: row.reps_max,
+            rest_seconds: row.rest_seconds,
+            tempo: row.tempo,
+            rpe_target: row.rpe_target,
+            weight_suggestion: row.weight_suggestion,
+            notes: row.notes,
+            sort_order: row.sort_order,
+            superset_group_id: row.superset_group_id,
+          }})
+        }
+      }
+
+      // 3. Build the new day object and add to state
+      const newDay: ProgramDay = {
+        id: newDayRow.id,
+        day_number: newDayRow.day_number,
+        name: newDayRow.name,
+        focus: newDayRow.focus,
+        estimated_duration_min: newDayRow.estimated_duration_min,
+        sort_order: newDayRow.sort_order,
+        exercises: newExercises,
+      }
+
+      setDays([...days, newDay])
+      setActiveDayId(newDay.id)
+
+      // 4. Update days_per_week
+      if (program) {
+        const newCount = days.length + 1
+        setProgram({ ...program, days_per_week: newCount })
+        await supabase
+          .from('program_templates')
+          .update({ days_per_week: newCount })
+          .eq('id', templateId)
+      }
+    } catch (error) {
+      console.error('Failed to duplicate day:', error)
+      alert('Kon dag niet dupliceren. Probeer opnieuw.')
+    } finally {
+      setDuplicatingDay(false)
     }
   }
 
@@ -626,7 +729,7 @@ export default function ProgramEditorPage() {
                 </div>
               </div>
 
-              {/* Delete Day */}
+              {/* Day Actions: Duplicate & Delete */}
               <div className="mt-5 pt-5 border-t border-[#E8E4DC]">
                 {confirmDeleteDay === activeDay.id ? (
                   <div className="flex items-center gap-3">
@@ -653,13 +756,27 @@ export default function ProgramEditorPage() {
                     </button>
                   </div>
                 ) : (
-                  <button
-                    onClick={() => setConfirmDeleteDay(activeDay.id)}
-                    className="inline-flex items-center gap-1.5 text-[12px] font-medium text-[#D14343] hover:underline"
-                  >
-                    <Trash2 strokeWidth={1.5} className="w-3.5 h-3.5" />
-                    Dag verwijderen
-                  </button>
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={() => handleDuplicateDay(activeDay.id)}
+                      disabled={duplicatingDay}
+                      className="inline-flex items-center gap-1.5 text-[12px] font-medium text-[#1A1917] hover:underline disabled:opacity-50"
+                    >
+                      {duplicatingDay ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Copy strokeWidth={1.5} className="w-3.5 h-3.5" />
+                      )}
+                      Dag dupliceren
+                    </button>
+                    <button
+                      onClick={() => setConfirmDeleteDay(activeDay.id)}
+                      className="inline-flex items-center gap-1.5 text-[12px] font-medium text-[#D14343] hover:underline"
+                    >
+                      <Trash2 strokeWidth={1.5} className="w-3.5 h-3.5" />
+                      Dag verwijderen
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
