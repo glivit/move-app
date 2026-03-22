@@ -6,7 +6,8 @@ import Link from 'next/link'
 import {
   CheckCircle2, Clock, ExternalLink, MessageSquare, TrendingUp,
   Apple, Dumbbell, Heart, ChevronDown, ChevronRight, Send,
-  Calendar, Scale, Ruler, Plus, ArrowUpRight, Activity, AlertTriangle
+  Calendar, Scale, Ruler, Plus, ArrowUpRight, Activity, AlertTriangle,
+  StopCircle, Trash2, Loader2
 } from 'lucide-react'
 import { ClientHealthSummary } from '@/components/coach/ClientHealthSummary'
 import { ProgramAssignModal } from '@/components/coach/ProgramAssignModal'
@@ -146,6 +147,8 @@ export function ClientProfileTabs({
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null)
   const [selectedTemplateName, setSelectedTemplateName] = useState('')
   const [selectedTemplateDuration, setSelectedTemplateDuration] = useState(8)
+  const [stoppingProgram, setStoppingProgram] = useState(false)
+  const [showStopConfirm, setShowStopConfirm] = useState(false)
 
   // Nutrition state
   const [nutritionPlan, setNutritionPlan] = useState<NutritionPlan | null>(null)
@@ -426,6 +429,29 @@ export function ClientProfileTabs({
     setExpandedDays((prev) =>
       prev.includes(dayId) ? prev.filter((d) => d !== dayId) : [...prev, dayId]
     )
+  }
+
+  const handleStopProgram = async () => {
+    if (!activeProgram) return
+    setStoppingProgram(true)
+    try {
+      const { error } = await supabase
+        .from('client_programs')
+        .update({ is_active: false })
+        .eq('id', activeProgram.id)
+
+      if (error) throw error
+
+      setActiveProgram(null)
+      setTemplateDays([])
+      setExercisesByDay({})
+      setShowStopConfirm(false)
+    } catch (err) {
+      console.error('Stop program error:', err)
+      alert('Kon programma niet stoppen. Probeer opnieuw.')
+    } finally {
+      setStoppingProgram(false)
+    }
   }
 
   const handleAssignTemplate = (template: ProgramTemplate) => {
@@ -755,6 +781,48 @@ export function ClientProfileTabs({
                       {activeProgram.coach_notes}
                     </p>
                   )}
+
+                  {/* Stop Program Button */}
+                  <div className="mt-4 pt-3 border-t border-[#E8E4DC]">
+                    {!showStopConfirm ? (
+                      <button
+                        onClick={() => setShowStopConfirm(true)}
+                        className="flex items-center gap-1.5 text-[12px] font-medium text-[#C4372A] hover:text-[#A02B1F] transition-colors"
+                      >
+                        <StopCircle strokeWidth={1.5} className="w-3.5 h-3.5" />
+                        Programma stoppen
+                      </button>
+                    ) : (
+                      <div className="bg-[#FFF5F5] rounded-xl p-3 border border-[#F5D5D5]">
+                        <p className="text-[13px] text-[#1A1917] font-medium mb-1">
+                          Programma stoppen?
+                        </p>
+                        <p className="text-[12px] text-[#6B6862] mb-3">
+                          De trainingshistorie blijft bewaard. Je kunt altijd een nieuw programma toewijzen.
+                        </p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={handleStopProgram}
+                            disabled={stoppingProgram}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold bg-[#C4372A] text-white rounded-lg hover:bg-[#A02B1F] disabled:opacity-50 transition-colors"
+                          >
+                            {stoppingProgram ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Trash2 strokeWidth={1.5} className="w-3.5 h-3.5" />
+                            )}
+                            Ja, stoppen
+                          </button>
+                          <button
+                            onClick={() => setShowStopConfirm(false)}
+                            className="px-3 py-1.5 text-[12px] font-medium text-[#6B6862] bg-white rounded-lg border border-[#E8E4DC] hover:bg-[#FAFAFA] transition-colors"
+                          >
+                            Annuleren
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Training Days */}
