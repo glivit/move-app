@@ -4,6 +4,7 @@ import { ClientBottomNav } from '@/components/layout/ClientBottomNav'
 import { ClientSidebar } from '@/components/layout/ClientSidebar'
 import { NotificationPermission } from '@/components/notifications/NotificationPermission'
 import { ActiveWorkoutBar } from '@/components/workout/ActiveWorkoutBar'
+import { SyncStatusIndicator } from '@/components/ui/SyncStatusIndicator'
 
 export default function ClientLayoutShell({ children }: { children: React.ReactNode }) {
   return (
@@ -38,6 +39,9 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
 
       {/* Push notification permission prompt */}
       <NotificationPermission />
+
+      {/* Offline sync status indicator */}
+      <SyncStatusIndicator />
 
       {/* Spacer for bottom nav on mobile */}
       <div className="lg:hidden h-20" />

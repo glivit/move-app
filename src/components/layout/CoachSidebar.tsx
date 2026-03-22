@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Users, ClipboardCheck, MessageSquare,
   BookOpen, Radio, CreditCard, FileText, Dumbbell, ClipboardList,
-  Menu, X, LogOut, MoreVertical, Calendar, Apple, UsersRound, ShieldCheck, Activity, Bot
+  Menu, X, LogOut, MoreVertical, Calendar, Apple, UsersRound, ShieldCheck, Activity, Bot, Zap
 } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { signOut } from '@/lib/auth'
@@ -24,6 +24,7 @@ const mainNavItems = [
 ]
 
 const secondaryNavItems = [
+  { href: '/coach/automations', label: 'Automatisering', icon: Zap },
   { href: '/coach/ai-settings', label: 'AI Agent', icon: Bot },
   { href: '/coach/prompts', label: 'Prompts', icon: FileText },
   { href: '/coach/broadcasts', label: 'Broadcasts', icon: Radio },
@@ -45,6 +46,7 @@ const mobileMenuItems = [
   { href: '/coach/nutrition', label: 'Voeding', icon: Apple },
   { href: '/coach/accountability', label: 'Accountability', icon: ShieldCheck },
   { href: '/coach/community', label: 'Community', icon: UsersRound },
+  { href: '/coach/automations', label: 'Automatisering', icon: Zap },
   { href: '/coach/prompts', label: 'Prompts', icon: FileText },
   { href: '/coach/broadcasts', label: 'Broadcasts', icon: Radio },
   { href: '/coach/resources', label: 'Kennisbank', icon: BookOpen },

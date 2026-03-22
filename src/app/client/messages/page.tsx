@@ -209,8 +209,9 @@ export default function ClientMessagesPage() {
     scrollToBottom()
   }, [messages, scrollToBottom])
 
-  const handleSendMessage = async (content: string) => {
-    if (!currentUserId || !coachId || !content.trim()) return
+  const handleSendMessage = async (content: string, messageType: string = 'text', fileUrl?: string) => {
+    if (!currentUserId || !coachId) return
+    if (!content.trim() && !fileUrl) return
 
     setSending(true)
 
@@ -223,8 +224,8 @@ export default function ClientMessagesPage() {
         sender_id: currentUserId,
         receiver_id: coachId,
         content,
-        message_type: 'text',
-        file_url: null,
+        message_type: messageType,
+        file_url: fileUrl || null,
         read_at: null,
         created_at: new Date().toISOString(),
       }
@@ -238,7 +239,8 @@ export default function ClientMessagesPage() {
           sender_id: currentUserId,
           receiver_id: coachId,
           content,
-          message_type: 'text',
+          message_type: messageType,
+          file_url: fileUrl || null,
         })
         .select()
         .single()

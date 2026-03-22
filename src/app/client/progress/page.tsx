@@ -7,7 +7,7 @@ import { PhotoComparison } from '@/components/client/PhotoComparison'
 import {
   Dumbbell, Trophy, TrendingDown, TrendingUp,
   ChevronRight,
-  Calendar, BarChart3, Ruler
+  Calendar, BarChart3, Ruler, FileText
 } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
@@ -394,6 +394,13 @@ export default function ProgressPage() {
       {/* ═══ BEFORE/AFTER PHOTOS ═════════════════════════════ */}
       <div className="mt-10 mb-10">
         <PhotoComparison />
+        <Link
+          href="/client/progress/photos"
+          className="flex items-center justify-center gap-2 mt-3 py-2.5 text-[13px] font-medium text-[var(--color-pop)] hover:underline"
+        >
+          Uitgebreide foto vergelijking met slider
+          <ChevronRight size={14} />
+        </Link>
       </div>
 
       {/* ═══ QUICK LINKS — editorial grid ═══════════════════ */}
@@ -433,6 +440,16 @@ export default function ProgressPage() {
             <Calendar size={18} strokeWidth={1.5} className="text-[var(--color-pop)]" />
           </div>
           <span className="text-[14px] font-semibold text-[#1A1917]">Kalender</span>
+        </Link>
+        <Link
+          href="/client/progress-report"
+          className="flex flex-col items-start p-6 bg-white rounded-2xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow col-span-2"
+        >
+          <div className="w-10 h-10 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center mb-4">
+            <FileText size={18} strokeWidth={1.5} className="text-[var(--color-pop)]" />
+          </div>
+          <span className="text-[14px] font-semibold text-[#1A1917]">Voortgangsrapport</span>
+          <span className="text-[12px] text-[#6B6862] mt-1">Bekijk en deel je volledige voortgang</span>
         </Link>
       </div>
     </div>

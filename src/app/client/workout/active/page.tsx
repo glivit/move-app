@@ -329,6 +329,128 @@ function ExercisePickerModal({
   )
 }
 
+// ─── Form Check Modal ────────────────────────────────────────
+
+function FormCheckModal({ exerciseName, onClose }: { exerciseName: string; onClose: () => void }) {
+  const [uploading, setUploading] = useState(false)
+  const [sent, setSent] = useState(false)
+  const [note, setNote] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploading(true)
+    try {
+      const supabase = createClient()
+
+      // Upload video
+      const fileExt = file.name.split('.').pop() || 'mp4'
+      const fileName = `formcheck-${Date.now()}.${fileExt}`
+      const { error: uploadError } = await supabase.storage
+        .from('message-attachments')
+        .upload(fileName, file)
+
+      if (uploadError) throw uploadError
+
+      const { data: publicUrl } = supabase.storage
+        .from('message-attachments')
+        .getPublicUrl(fileName)
+
+      // Get current user and coach
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Niet ingelogd')
+
+      const { data: coaches } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('role', 'coach')
+        .limit(1)
+
+      if (!coaches || coaches.length === 0) throw new Error('Coach niet gevonden')
+
+      // Send as message
+      const content = `📹 Form check: ${exerciseName}${note ? `\n${note}` : ''}`
+      await supabase.from('messages').insert({
+        sender_id: user.id,
+        receiver_id: coaches[0].id,
+        content,
+        message_type: 'video',
+        file_url: publicUrl.publicUrl,
+      })
+
+      setSent(true)
+      setTimeout(onClose, 1500)
+    } catch (err) {
+      console.error('Form check upload fout:', err)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-[70] flex items-end justify-center">
+      <div className="w-full max-w-lg bg-white rounded-t-2xl p-6 animate-slide-up">
+        <h3 className="text-[18px] font-semibold text-[#1A1917] mb-1" style={{ fontFamily: 'var(--font-display)' }}>
+          Form Check
+        </h3>
+        <p className="text-[13px] text-[#A09D96] mb-5">
+          Neem een video op van je {exerciseName} en stuur deze naar je coach voor feedback.
+        </p>
+
+        {sent ? (
+          <div className="text-center py-6">
+            <div className="text-[32px] mb-2">✅</div>
+            <p className="text-[15px] font-semibold text-[#1A1917]">Verstuurd naar je coach!</p>
+          </div>
+        ) : (
+          <>
+            <input
+              type="text"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Optioneel: vraag of opmerking..."
+              className="w-full px-4 py-3 rounded-xl bg-[#F5F2EC] text-[14px] text-[#1A1917] placeholder-[#CCC7BC] mb-4 focus:outline-none"
+            />
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="video/*"
+              capture="environment"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="w-full py-4 rounded-2xl font-bold text-[14px] uppercase tracking-[0.08em] bg-[var(--color-pop)] text-white flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {uploading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Uploaden...
+                </>
+              ) : (
+                '📹 Video opnemen'
+              )}
+            </button>
+
+            <button
+              onClick={onClose}
+              className="w-full py-3 mt-2 text-[14px] text-[#A09D96] font-medium"
+            >
+              Annuleren
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ─── Main Wrapper ──────────────────────────────────────────
 
 export default function ActiveWorkoutPageWrapper() {
@@ -365,6 +487,7 @@ function ActiveWorkoutPage() {
   const [showExercisePicker, setShowExercisePicker] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [formCheckExercise, setFormCheckExercise] = useState<{ id: string; name: string } | null>(null)
 
   // Refs for auto-save
   const setsRef = useRef(sets)
@@ -725,6 +848,15 @@ function ActiveWorkoutPage() {
       return
     }
 
+    // Auto-update estimated 1RMs based on this session's performance
+    try {
+      fetch('/api/update-1rm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: session.id }),
+      }).catch(() => { /* best-effort */ })
+    } catch { /* ignore */ }
+
     clearWorkoutState()
     try { localStorage.removeItem('move_minimized_workout'); notifyWorkoutBarChanged() } catch { /* ok */ }
     router.push(`/client/workout/complete?sessionId=${session.id}`)
@@ -842,6 +974,14 @@ function ActiveWorkoutPage() {
         <ExercisePickerModal
           onSelect={handleAddExercise}
           onClose={() => setShowExercisePicker(false)}
+        />
+      )}
+
+      {/* Form Check Modal */}
+      {formCheckExercise && (
+        <FormCheckModal
+          exerciseName={formCheckExercise.name}
+          onClose={() => setFormCheckExercise(null)}
         />
       )}
 
@@ -1011,15 +1151,27 @@ function ActiveWorkoutPage() {
                   })}
                 </div>
 
-                {/* Add set */}
-                <button
-                  onClick={() => addSet(ex.id)}
-                  className="w-full mt-3 py-2.5 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#A09D96] uppercase tracking-[0.06em] rounded-xl hover:bg-[#F5F2EC] transition-colors touch-manipulation"
-                  style={{ WebkitTapHighlightColor: 'transparent' }}
-                >
-                  <Plus size={13} strokeWidth={2} />
-                  Set toevoegen
-                </button>
+                {/* Add set + Form check */}
+                <div className="flex gap-2 mt-3">
+                  <button
+                    onClick={() => addSet(ex.id)}
+                    className="flex-1 py-2.5 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#A09D96] uppercase tracking-[0.06em] rounded-xl hover:bg-[#F5F2EC] transition-colors touch-manipulation"
+                    style={{ WebkitTapHighlightColor: 'transparent' }}
+                  >
+                    <Plus size={13} strokeWidth={2} />
+                    Set toevoegen
+                  </button>
+                  <button
+                    onClick={() => {
+                      const name = exerciseData.name_nl || exerciseData.name
+                      setFormCheckExercise({ id: ex.exercise_id, name })
+                    }}
+                    className="py-2.5 px-4 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[var(--color-pop)] uppercase tracking-[0.06em] rounded-xl hover:bg-[var(--color-pop-light)] transition-colors touch-manipulation"
+                    style={{ WebkitTapHighlightColor: 'transparent' }}
+                  >
+                    📹 Form check
+                  </button>
+                </div>
               </div>
             </div>
           )
