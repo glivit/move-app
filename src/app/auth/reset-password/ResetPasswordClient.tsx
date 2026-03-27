@@ -24,23 +24,47 @@ export default function ResetPasswordPage() {
     const type = searchParams.get('type')
 
     async function verifyAndInit() {
-      // If we have a token_hash, verify it first to create a session
+      // First check if we already have a valid session (e.g. from a previous tab)
+      const { data: { user: existingUser } } = await supabase.auth.getUser()
+      if (existingUser) {
+        setHasSession(true)
+        setVerifying(false)
+        return
+      }
+
+      // If we have a token_hash, verify it to create a session
       if (tokenHash) {
-        const { error: otpError } = await supabase.auth.verifyOtp({
+        const { data, error: otpError } = await supabase.auth.verifyOtp({
           token_hash: tokenHash,
           type: (type as 'recovery' | 'email') || 'recovery',
         })
 
         if (otpError) {
-          console.error('[ResetPassword] verifyOtp error:', otpError)
+          console.error('[ResetPassword] verifyOtp error:', otpError.message)
+
+          // Try one more time — sometimes there's a race condition
+          const { data: { user: retryUser } } = await supabase.auth.getUser()
+          if (retryUser) {
+            setHasSession(true)
+            setVerifying(false)
+            return
+          }
+
           setHasSession(false)
           setError('Je reset-link is verlopen of al gebruikt. Vraag een nieuwe aan via de login pagina.')
           setVerifying(false)
           return
         }
+
+        // verifyOtp succeeded — session should be active
+        if (data?.user) {
+          setHasSession(true)
+          setVerifying(false)
+          return
+        }
       }
 
-      // Check for a valid session
+      // Final fallback: check session
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         setHasSession(true)

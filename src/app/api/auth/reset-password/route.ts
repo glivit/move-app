@@ -24,10 +24,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true })
   }
 
-  // Extract token_hash from Supabase's action_link and build our OWN direct link.
-  // This bypasses Supabase's redirect (implicit flow / hash fragments get lost).
-  const actionUrl = new URL(linkData.properties.action_link)
-  const tokenHash = actionUrl.searchParams.get('token')
+  // Use hashed_token directly from generateLink response (most reliable).
+  // Fallback: parse from action_link URL if hashed_token is missing.
+  let tokenHash = linkData.properties.hashed_token
+  if (!tokenHash) {
+    const actionUrl = new URL(linkData.properties.action_link)
+    tokenHash = actionUrl.searchParams.get('token_hash') || actionUrl.searchParams.get('token')
+  }
+
+  if (!tokenHash) {
+    console.error('Reset: could not extract token hash from generateLink response')
+    return NextResponse.json({ success: true })
+  }
+
   const resetLink = `${appUrl}/auth/reset-password?token_hash=${tokenHash}&type=recovery`
 
   // Get user name for personalization
