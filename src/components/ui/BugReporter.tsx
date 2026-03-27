@@ -24,19 +24,10 @@ export function BugReporter() {
     let cancelled = false
     async function check() {
       try {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user || cancelled) return
-
-        // Get the first 15 user IDs ordered by created_at
-        const { data: earlyUsers } = await supabase
-          .from('profiles')
-          .select('id')
-          .order('created_at', { ascending: true })
-          .limit(15)
-
+        const res = await fetch('/api/is-test-user')
         if (cancelled) return
-        const ids = (earlyUsers || []).map((u: any) => u.id)
-        setIsTestUser(ids.includes(user.id))
+        const { isTestUser: result } = await res.json()
+        setIsTestUser(result === true)
       } catch {
         // silently fail — widget just won't show
       } finally {
