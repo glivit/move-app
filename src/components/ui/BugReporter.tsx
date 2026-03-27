@@ -12,8 +12,6 @@ export function BugReporter() {
   const supabase = createClient()
   const formRef = useRef<HTMLDivElement>(null)
 
-  const [isTestUser, setIsTestUser] = useState(false)
-  const [checked, setChecked] = useState(false)
   const [phase, setPhase] = useState<Phase>('idle')
   const [description, setDescription] = useState('')
   const [clickPos, setClickPos] = useState<{ x: number; y: number } | null>(null)
