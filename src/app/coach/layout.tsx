@@ -1,4 +1,5 @@
 import { CoachSidebar } from '@/components/layout/CoachSidebar'
+import { BugReporter } from '@/components/ui/BugReporter'
 
 export default function CoachLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -9,6 +10,7 @@ export default function CoachLayout({ children }: { children: React.ReactNode })
           {children}
         </div>
       </main>
+      <BugReporter />
       <div className="lg:hidden h-20" />
     </div>
   )

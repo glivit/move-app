@@ -5,6 +5,7 @@ import { ClientSidebar } from '@/components/layout/ClientSidebar'
 import { NotificationPermission } from '@/components/notifications/NotificationPermission'
 import { ActiveWorkoutBar } from '@/components/workout/ActiveWorkoutBar'
 import { SyncStatusIndicator } from '@/components/ui/SyncStatusIndicator'
+import { BugReporter } from '@/components/ui/BugReporter'
 
 export default function ClientLayoutShell({ children }: { children: React.ReactNode }) {
   return (
@@ -42,6 +43,9 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
 
       {/* Offline sync status indicator */}
       <SyncStatusIndicator />
+
+      {/* Bug reporter for test users */}
+      <BugReporter />
 
       {/* Spacer for bottom nav on mobile */}
       <div className="lg:hidden h-20" />
