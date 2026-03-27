@@ -17,25 +17,6 @@ export function BugReporter() {
   const [clickPos, setClickPos] = useState<{ x: number; y: number } | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  // Check once if current user is among the first 15
-  useEffect(() => {
-    let cancelled = false
-    async function check() {
-      try {
-        const res = await fetch('/api/is-test-user')
-        if (cancelled) return
-        const { isTestUser: result } = await res.json()
-        setIsTestUser(result === true)
-      } catch {
-        // silently fail — widget just won't show
-      } finally {
-        if (!cancelled) setChecked(true)
-      }
-    }
-    check()
-    return () => { cancelled = true }
-  }, [])
-
   // Handle click-on-screen for bug location picking
   const handleScreenClick = useCallback((e: MouseEvent) => {
     // Ignore clicks on the bug reporter itself
@@ -114,9 +95,6 @@ export function BugReporter() {
     setDescription('')
     setClickPos(null)
   }
-
-  // Don't render until checked, or if not a test user
-  if (!checked || !isTestUser) return null
 
   return (
     <>
