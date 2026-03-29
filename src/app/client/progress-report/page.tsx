@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase'
 import {
   AreaChart,
   Area,
@@ -83,7 +83,7 @@ interface WeeklyData {
 }
 
 export default function ProgressReportPage() {
-  const supabase = createClientComponentClient()
+  const supabase = createClient()
   const reportRef = useRef<HTMLDivElement>(null)
 
   const [selectedPeriod, setSelectedPeriod] = useState<'weeks4' | 'weeks8' | 'weeks12' | 'alltime'>('weeks4')

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase'
 import {
   AreaChart,
   Area,
@@ -92,7 +92,7 @@ export default function ExerciseProgressionPage() {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const supabase = createClientComponentClient()
+        const supabase = createClient()
 
         // Get current user
         const {
