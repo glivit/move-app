@@ -163,7 +163,7 @@ export default function ProgressReportPage() {
         const userPrs = (prsData || []).filter(
           (pr: any) => pr.workout_sessions?.client_id === user.id
         )
-        setPrs(userPrs as PRData[])
+        setPrs(userPrs as unknown as PRData[])
 
         // Fetch weight checkins
         const { data: checkinsData, error: checkinsError } = await supabase
@@ -237,7 +237,7 @@ export default function ProgressReportPage() {
 
   const weightChange =
     checkins.length >= 2
-      ? (checkins[checkins.length - 1].weight - checkins[0].weight).toFixed(1)
+      ? parseFloat((checkins[checkins.length - 1].weight - checkins[0].weight).toFixed(1))
       : null
 
   function getDaysDifference(date1: string, date2: Date): number {
@@ -414,7 +414,7 @@ Bekijk mijn voortgang in Move!`
                 <span className="text-sm font-medium text-[#6B6862]">Gewichtsverandering</span>
                 <Scale className="w-5 h-5 text-[#D4682A]" />
               </div>
-              <p className={`text-3xl font-bold ${weightChange ? (parseFloat(weightChange) < 0 ? 'text-green-600' : 'text-[#1A1917]') : 'text-[#6B6862]'}`}>
+              <p className={`text-3xl font-bold ${weightChange ? (weightChange < 0 ? 'text-green-600' : 'text-[#1A1917]') : 'text-[#6B6862]'}`}>
                 {weightChange ? `${weightChange > 0 ? '+' : ''}${weightChange}kg` : '—'}
               </p>
             </div>
@@ -550,7 +550,7 @@ Bekijk mijn voortgang in Move!`
                 <Check className="w-5 h-5" />
                 Gekopieerd!
               </>
-            ) : navigator.share ? (
+            ) : typeof navigator !== 'undefined' && typeof navigator.share === 'function' ? (
               <>
                 <Share2 className="w-5 h-5" />
                 Deel je resultaten

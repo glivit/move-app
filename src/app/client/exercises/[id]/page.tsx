@@ -36,6 +36,7 @@ interface WorkoutSet {
   reps: number
   exercise_id: string
   workout_sessions: {
+    id: string
     client_id: string
     started_at: string
     completed_at: string
@@ -247,12 +248,13 @@ export default function ExerciseProgressionPage() {
     })
 
     // Use the record with highest weight, or if same weight, highest reps
+    const bestAtWeight = maxRepsAtWeight as WorkoutSet | null
     const prSet =
       maxWeightPR.weight > maxRepsOverall.weight ||
       (maxWeightPR.weight === maxRepsOverall.weight &&
-        maxRepsAtWeight &&
-        maxRepsAtWeight.reps >= maxWeightPR.reps)
-        ? maxRepsAtWeight || maxWeightPR
+        bestAtWeight &&
+        bestAtWeight.reps >= maxWeightPR.reps)
+        ? bestAtWeight || maxWeightPR
         : maxRepsOverall
 
     return {
@@ -297,9 +299,9 @@ export default function ExerciseProgressionPage() {
       })
       .sort((a, b) => {
         const dateA = sessionMap
-          .get(a.sessionId)?.[0]?.workout_sessions.started_at
+          .get(a.sessionId)?.[0]?.workout_sessions.started_at || ''
         const dateB = sessionMap
-          .get(b.sessionId)?.[0]?.workout_sessions.started_at
+          .get(b.sessionId)?.[0]?.workout_sessions.started_at || ''
         return new Date(dateB).getTime() - new Date(dateA).getTime()
       })
       .slice(0, 10)

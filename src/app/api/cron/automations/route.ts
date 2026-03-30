@@ -193,11 +193,11 @@ async function evaluateTrigger(
         const d = new Date(s.started_at)
         return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
       })
-      const uniqueDates = [...new Set(dates)]
+      const uniqueDates = [...new Set(dates)] as string[]
 
       for (let i = 1; i < uniqueDates.length; i++) {
-        const prev = new Date(uniqueDates[i - 1])
-        const curr = new Date(uniqueDates[i])
+        const prev = new Date(uniqueDates[i - 1] as string)
+        const curr = new Date(uniqueDates[i] as string)
         const diffDays = Math.abs((prev.getTime() - curr.getTime()) / (1000 * 60 * 60 * 24))
         if (diffDays <= 1.5) {
           streak++
