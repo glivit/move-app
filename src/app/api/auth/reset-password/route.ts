@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   let tokenHash = linkData.properties.hashed_token
   if (!tokenHash) {
     const actionUrl = new URL(linkData.properties.action_link)
-    tokenHash = actionUrl.searchParams.get('token_hash') || actionUrl.searchParams.get('token')
+    tokenHash = actionUrl.searchParams.get('token_hash') || actionUrl.searchParams.get('token') || ''
   }
 
   if (!tokenHash) {
