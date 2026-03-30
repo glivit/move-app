@@ -55,13 +55,41 @@ export async function middleware(request: NextRequest) {
     if (pathname.startsWith('/client') && cachedRole !== 'client') {
       return NextResponse.redirect(new URL('/coach', request.url))
     }
+
+    // Client onboarding gate: redirect to /onboarding if intake not completed
+    if (
+      cachedRole === 'client' &&
+      pathname.startsWith('/client') &&
+      request.cookies.get('move_intake')?.value !== '1'
+    ) {
+      // Check DB for intake_completed (only if no cookie yet)
+      const { data: intakeCheck } = await supabase
+        .from('profiles')
+        .select('intake_completed')
+        .eq('id', user.id)
+        .single()
+
+      if (intakeCheck?.intake_completed) {
+        // Set cookie so we don't check again
+        supabaseResponse.cookies.set('move_intake', '1', {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 86400, // 24 hours
+          path: '/',
+        })
+      } else {
+        return NextResponse.redirect(new URL('/onboarding', request.url))
+      }
+    }
+
     return supabaseResponse
   }
 
   // No cached role — fetch from DB (only happens once per session)
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, intake_completed')
     .eq('id', user.id)
     .single()
 
@@ -84,6 +112,26 @@ export async function middleware(request: NextRequest) {
 
   if (pathname.startsWith('/client') && profile.role !== 'client') {
     return NextResponse.redirect(new URL('/coach', request.url))
+  }
+
+  // Client onboarding gate: redirect to /onboarding if intake not completed
+  if (
+    profile.role === 'client' &&
+    pathname.startsWith('/client') &&
+    !profile.intake_completed
+  ) {
+    return NextResponse.redirect(new URL('/onboarding', request.url))
+  }
+
+  // Cache intake_completed for clients
+  if (profile.role === 'client' && profile.intake_completed) {
+    supabaseResponse.cookies.set('move_intake', '1', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 86400,
+      path: '/',
+    })
   }
 
   return supabaseResponse
