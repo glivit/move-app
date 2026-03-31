@@ -406,10 +406,7 @@ function LoginPageInner() {
                   <button
                     type="submit"
                     disabled={resetLoading}
-                    className="w-full bg-[#1A1917] text-white rounded-2xl py-4 font-medium text-[15px] tracking-wide
-                      hover:bg-[#333330] active:scale-[0.98]
-                      disabled:opacity-60 disabled:cursor-not-allowed
-                      transition-all duration-200 flex items-center justify-center gap-2"
+                    className="w-full bg-[#1A1917] text-white rounded-2xl py-4 font-medium text-[15px] tracking-wide hover:bg-[#333330] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
                   >
                     {resetLoading ? (
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -480,10 +477,7 @@ function LoginPageInner() {
                     <button
                       type="submit"
                       disabled={formLoading}
-                      className="group w-full bg-[#1A1917] text-white rounded-2xl py-4 font-medium text-[15px] tracking-wide
-                        hover:bg-[#333330] active:scale-[0.98]
-                        disabled:opacity-60 disabled:cursor-not-allowed
-                        transition-all duration-200 flex items-center justify-center gap-2.5 relative overflow-hidden"
+                      className="group w-full bg-[#1A1917] text-white rounded-2xl py-4 font-medium text-[15px] tracking-wide hover:bg-[#333330] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2.5 relative overflow-hidden"
                     >
                       {formLoading ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -525,11 +519,7 @@ function LoginPageInner() {
                   <button
                     onClick={() => handleOAuthLogin('google')}
                     disabled={oauthLoading !== null}
-                    className="flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-2xl
-                      bg-white border border-[#DDD9D0] hover:border-[#A09D96] hover:shadow-sm
-                      active:scale-[0.98]
-                      disabled:opacity-60 disabled:cursor-not-allowed
-                      transition-all duration-200"
+                    className="flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-2xl bg-white border border-[#DDD9D0] hover:border-[#A09D96] hover:shadow-sm active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
                   >
                     {oauthLoading === 'google' ? (
                       <div className="w-4 h-4 border-2 border-[#1A1917]/20 border-t-[#1A1917] rounded-full animate-spin" />
@@ -549,11 +539,7 @@ function LoginPageInner() {
                   <button
                     onClick={() => handleOAuthLogin('apple')}
                     disabled={oauthLoading !== null}
-                    className="flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-2xl
-                      bg-[#1A1917] text-white hover:bg-[#333330]
-                      active:scale-[0.98]
-                      disabled:opacity-60 disabled:cursor-not-allowed
-                      transition-all duration-200"
+                    className="flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-2xl bg-[#1A1917] text-white hover:bg-[#333330] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
                   >
                     {oauthLoading === 'apple' ? (
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

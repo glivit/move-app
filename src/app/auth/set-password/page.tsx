@@ -251,9 +251,7 @@ function SetPasswordContent() {
             <div style={{ animation: 'reveal-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both' }}>
               <button
                 onClick={() => router.push('/client')}
-                className="group w-full bg-[#1A1917] text-white rounded-2xl py-4 font-medium text-[15px] tracking-wide
-                  hover:bg-[#333330] active:scale-[0.98]
-                  transition-all duration-200 flex items-center justify-center gap-2.5"
+                className="group w-full bg-[#1A1917] text-white rounded-2xl py-4 font-medium text-[15px] tracking-wide hover:bg-[#333330] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2.5"
               >
                 Ga naar mijn dashboard
                 <svg
@@ -420,10 +418,7 @@ function SetPasswordContent() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="group w-full bg-[#1A1917] text-white rounded-2xl py-4 font-medium text-[15px] tracking-wide
-                      hover:bg-[#333330] active:scale-[0.98]
-                      disabled:opacity-60 disabled:cursor-not-allowed
-                      transition-all duration-200 flex items-center justify-center gap-2.5"
+                    className="group w-full bg-[#1A1917] text-white rounded-2xl py-4 font-medium text-[15px] tracking-wide hover:bg-[#333330] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2.5"
                   >
                     {loading ? (
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
