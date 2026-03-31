@@ -921,7 +921,7 @@ function ActiveWorkoutPage() {
               const delay = Math.random() * 0.6
               const dur = 1.5 + Math.random() * 1
               const size = 6 + Math.random() * 6
-              const colors = ['#D46A3A', '#1A1917', '#3D8B5C', '#FF3B30', '#007AFF', '#FFD700']
+              const colors = ['#D46A3A', '#1A1917', '#3D8B5C', '#C4372A', '#6B6862', '#E5E1D9']
               return (
                 <div key={i} style={{ position: 'absolute', left: `${left}%`, top: '-10px', width: `${size}px`, height: `${size * 0.6}px`, backgroundColor: colors[i % colors.length], borderRadius: '2px', transform: `rotate(${Math.random() * 360}deg)`, animation: `confettiFall ${dur}s ease-in ${delay}s forwards`, opacity: 0 }} />
               )
@@ -960,7 +960,7 @@ function ActiveWorkoutPage() {
               </button>
               <button
                 onClick={confirmClose}
-                className="flex-1 bg-[#FF3B30] text-white py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors hover:bg-[#E5352B]"
+                className="flex-1 bg-[#C4372A] text-white py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors hover:bg-[#A82D22]"
               >
                 Afsluiten
               </button>
@@ -996,9 +996,9 @@ function ActiveWorkoutPage() {
             <X size={20} strokeWidth={1.5} className="text-[#6B6862]" />
           </button>
 
-          <div className="flex items-center gap-2 bg-white px-3.5 py-1.5 rounded-xl shadow-sm">
-            <Clock size={14} strokeWidth={1.5} className="text-[var(--color-pop)]" />
-            <span className="text-[15px] font-semibold text-[#1A1917] tabular-nums tracking-[-0.02em]">
+          <div className="flex items-center gap-2 bg-white px-4 py-1.5 rounded-xl shadow-sm">
+            <Clock size={14} strokeWidth={1.5} className="text-[#D46A3A]" />
+            <span className="stat-number text-[20px] text-[#1A1917]">
               {formatTimer(workoutSeconds)}
             </span>
           </div>
@@ -1010,8 +1010,8 @@ function ActiveWorkoutPage() {
               saving
                 ? 'bg-[#CCC7BC] text-[#A09D96] cursor-wait'
                 : allDone
-                  ? 'bg-[#34C759] text-white shadow-lg shadow-[#34C759]/30'
-                  : 'bg-[#34C759] text-white shadow-md shadow-[#34C759]/20'
+                  ? 'bg-[#D46A3A] text-white shadow-lg shadow-[#D46A3A]/30'
+                  : 'bg-[#D46A3A] text-white shadow-md shadow-[#D46A3A]/20'
             }`}
           >
             {saving ? 'Opslaan...' : 'Klaar'}
@@ -1041,14 +1041,14 @@ function ActiveWorkoutPage() {
           return (
             <div
               key={ex.id}
-              className={`rounded-2xl transition-all ${
+              className={`rounded-2xl transition-all border ${
                 exDone
-                  ? 'bg-white/60 shadow-sm'
-                  : 'bg-white shadow-[var(--shadow-card)]'
+                  ? 'bg-white/60 border-[#E8E4DC]/50'
+                  : 'bg-white border-[#E8E4DC]'
               }`}
             >
-              {/* Exercise header */}
-              <div className="px-5 pt-4 pb-2">
+              {/* Exercise header — sticky on scroll */}
+              <div className="px-5 pt-4 pb-2 sticky top-14 bg-white/95 backdrop-blur-sm z-10 rounded-t-2xl">
                 <div className="flex items-center justify-between mb-1">
                   <button
                     onClick={() => setExpandedExercise(isExpanded ? null : ex.id)}
@@ -1101,7 +1101,7 @@ function ActiveWorkoutPage() {
                 {/* Header */}
                 <div className="flex items-center gap-2 mb-2 px-1">
                   <span className="text-[10px] font-bold text-[#A09D96] uppercase tracking-[0.1em] w-[32px]">Set</span>
-                  <span className="text-[10px] font-bold text-[#A09D96] uppercase tracking-[0.1em] flex-1 text-center">Vorige</span>
+                  <span className="text-[10px] font-bold text-[#C5C2BC] uppercase tracking-[0.1em] flex-1 text-center">Vorige</span>
                   <span className="text-[10px] font-bold text-[#A09D96] uppercase tracking-[0.1em] w-[72px] text-center">KG</span>
                   <span className="text-[10px] font-bold text-[#A09D96] uppercase tracking-[0.1em] w-[64px] text-center">Reps</span>
                   <span className="w-[36px]" />
@@ -1140,7 +1140,7 @@ function ActiveWorkoutPage() {
                             </div>
                             <button
                               onClick={() => setActiveRestTimer(null)}
-                              className="text-[12px] font-semibold text-[var(--color-pop)] tabular-nums min-w-[44px] text-right"
+                              className="stat-number text-[16px] text-[#D46A3A] min-w-[44px] text-right"
                             >
                               {formatTimer(activeRestTimer.seconds)}
                             </button>
@@ -1179,8 +1179,8 @@ function ActiveWorkoutPage() {
 
         {/* Save error message */}
         {saveError && (
-          <div className="w-full px-4 py-3 bg-[#FF3B30]/10 border border-[#FF3B30]/20 rounded-xl text-center">
-            <p className="text-[#FF3B30] text-[13px] font-medium">{saveError}</p>
+          <div className="w-full px-4 py-3 bg-[#C4372A]/10 border border-[#C4372A]/20 rounded-xl text-center">
+            <p className="text-[#C4372A] text-[13px] font-medium">{saveError}</p>
           </div>
         )}
 
@@ -1192,7 +1192,7 @@ function ActiveWorkoutPage() {
             className={`w-full py-4 rounded-2xl font-bold text-[14px] uppercase tracking-[0.08em] flex items-center justify-center gap-2 transition-all ${
               saving
                 ? 'bg-[#CCC7BC] text-[#A09D96] cursor-wait'
-                : 'bg-[#34C759] text-white shadow-lg shadow-[#34C759]/30 hover:shadow-[#34C759]/40'
+                : 'bg-[#D46A3A] text-white shadow-lg shadow-[#D46A3A]/30 hover:shadow-[#D46A3A]/40'
             }`}
           >
             {saving ? (
@@ -1221,7 +1221,7 @@ function ActiveWorkoutPage() {
 
           <button
             onClick={() => setShowDiscardConfirm(true)}
-            className="w-full py-3 rounded-xl text-[#FF3B30] text-[13px] font-medium hover:bg-[#FF3B30]/5 transition-colors"
+            className="w-full py-3 rounded-xl text-[#C4372A] text-[13px] font-medium hover:bg-[#C4372A]/5 transition-colors"
           >
             Workout verwijderen
           </button>
@@ -1247,7 +1247,7 @@ function ActiveWorkoutPage() {
                 </button>
                 <button
                   onClick={discardWorkout}
-                  className="flex-1 bg-[#FF3B30] text-white py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-[#E5352B] transition-colors"
+                  className="flex-1 bg-[#C4372A] text-white py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-[#A82D22] transition-colors"
                 >
                   Verwijderen
                 </button>
@@ -1322,7 +1322,7 @@ function SetRow({
   }
 
   return (
-    <div className={`flex items-center gap-2 px-1 py-1.5 transition-all ${set.completed ? 'opacity-40' : ''}`}>
+    <div className={`flex items-center gap-2 px-1 py-1.5 rounded-lg transition-all ${set.completed ? 'opacity-40 animate-row-success' : ''}`}>
       {/* Set number */}
       <span className={`text-[13px] font-bold tabular-nums w-[32px] ${
         set.completed ? 'text-[#1A1917]' : 'text-[#A09D96]'
@@ -1331,7 +1331,7 @@ function SetRow({
       </span>
 
       {/* Previous */}
-      <span className="flex-1 text-[12px] text-[#CCC7BC] text-center truncate tabular-nums">
+      <span className="flex-1 text-[11px] text-[#C5C2BC] text-center truncate tabular-nums">
         {prevLabel}
       </span>
 
@@ -1365,7 +1365,7 @@ function SetRow({
         onClick={handleCompleteClick}
         className={`w-[36px] h-[36px] flex items-center justify-center flex-shrink-0 rounded-lg transition-all touch-manipulation ${
           set.completed
-            ? 'bg-[var(--color-pop)] text-white active:scale-95'
+            ? 'bg-[#3D8B5C] text-white active:scale-95 animate-check-bounce'
             : 'bg-[#F5F2EC] text-[#CCC7BC] hover:bg-[#E5E1D9] active:scale-95'
         }`}
         style={{ WebkitTapHighlightColor: 'transparent' }}

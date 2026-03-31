@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import { ArrowRight, AlertTriangle, ChevronDown, ChevronUp, Trophy, Timer, Layers, BarChart3 } from 'lucide-react'
+import { ArrowRight, AlertTriangle, ChevronDown, ChevronUp, Trophy } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -39,6 +39,35 @@ interface ExerciseGroup {
   painNotes: string
 }
 
+// ─── Animated Counter (Cormorant serif) ─────────────────────
+
+function AnimatedStat({ value, suffix = '' }: { value: number | string; suffix?: string }) {
+  const numValue = typeof value === 'number' ? value : parseFloat(value) || 0
+  const [display, setDisplay] = useState(0)
+
+  useEffect(() => {
+    if (numValue === 0) { setDisplay(0); return }
+    const startTime = performance.now()
+    const isDecimal = !Number.isInteger(numValue)
+
+    function animate(currentTime: number) {
+      const elapsed = currentTime - startTime
+      const progress = Math.min(elapsed / 800, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      const current = eased * numValue
+      setDisplay(isDecimal ? +current.toFixed(1) : Math.round(current))
+      if (progress < 1) requestAnimationFrame(animate)
+    }
+    requestAnimationFrame(animate)
+  }, [numValue])
+
+  return (
+    <span className="stat-number text-[40px] text-[#1A1917]">
+      {display}{suffix}
+    </span>
+  )
+}
+
 // ─── Component ──────────────────────────────────────────────
 
 export default function WorkoutCompletePageWrapper() {
@@ -68,22 +97,23 @@ function WorkoutCompletePage() {
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
-  // ─── Confetti ───────
+  // ─── Subtle confetti (3-5 particles, 2s) ───────
   const spawnConfetti = useCallback(() => {
-    const colors = ['#D46A3A', '#E8E4DC', '#3D8B5C', '#007AFF', '#FFD700', '#AF52DE', '#FF9500']
+    const colors = ['#D46A3A', '#3D8B5C', '#E8E4DC']
     const container = document.body
-    for (let i = 0; i < 40; i++) {
+    const count = 3 + Math.floor(Math.random() * 3) // 3-5 particles
+    for (let i = 0; i < count; i++) {
       const el = document.createElement('div')
       el.className = 'confetti-particle'
-      el.style.left = `${Math.random() * 100}vw`
-      el.style.width = `${6 + Math.random() * 8}px`
-      el.style.height = `${6 + Math.random() * 8}px`
+      el.style.left = `${30 + Math.random() * 40}vw`
+      el.style.width = `${5 + Math.random() * 5}px`
+      el.style.height = `${5 + Math.random() * 5}px`
       el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
-      el.style.borderRadius = '2px'
-      el.style.animationDelay = `${Math.random() * 1.5}s`
-      el.style.animationDuration = `${2 + Math.random() * 2}s`
+      el.style.borderRadius = '50%'
+      el.style.animationDelay = `${Math.random() * 0.4}s`
+      el.style.animationDuration = `${1.5 + Math.random() * 0.5}s`
       container.appendChild(el)
-      setTimeout(() => el.remove(), 5000)
+      setTimeout(() => el.remove(), 3000)
     }
   }, [])
 
@@ -109,7 +139,6 @@ function WorkoutCompletePage() {
               if (raw) {
                 const saved = JSON.parse(raw)
                 if (saved.sessionId === sessionId && saved.sets) {
-                  // Map template exercise IDs to real exercise IDs
                   const templateExIds = Object.keys(saved.sets)
                   const { data: templateExercises } = await supabase
                     .from('program_template_exercises')
@@ -143,7 +172,6 @@ function WorkoutCompletePage() {
                   if (setsToInsert.length > 0) {
                     const { error: insertErr } = await supabase.from('workout_sets').insert(setsToInsert)
                     if (!insertErr) {
-                      // Reload with fresh data
                       const { data: refreshed } = await supabase
                         .from('workout_sessions')
                         .select('*, workout_sets(*, exercises(id, name, name_nl))')
@@ -159,7 +187,6 @@ function WorkoutCompletePage() {
             } catch (e) {
               console.error('Recovery from localStorage failed:', e)
             }
-            // Clean up
             try {
               localStorage.removeItem('move_active_workout')
               localStorage.removeItem('move_minimized_workout')
@@ -222,19 +249,16 @@ function WorkoutCompletePage() {
       const endTime = new Date()
       const durationSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000)
 
-      // Collect pain data
       const painData = exerciseGroups
         .filter(g => g.painFlag)
         .map(g => ({ exerciseId: g.exerciseId, painNotes: g.painNotes || null }))
 
-      // Get auth token to pass to server route
       const { data: { session: authSession } } = await supabase.auth.getSession()
       const headers: Record<string, string> = { 'Content-Type': 'application/json' }
       if (authSession?.access_token) {
         headers['Authorization'] = `Bearer ${authSession.access_token}`
       }
 
-      // Use server route (admin client) for reliable write
       const res = await fetch('/api/workout-finish', {
         method: 'POST',
         headers,
@@ -251,10 +275,7 @@ function WorkoutCompletePage() {
       })
 
       if (!res.ok) {
-        const err = await res.json()
-        console.error('[handleComplete] Server error:', err)
-
-        // Fallback: try direct Supabase write
+        console.error('[handleComplete] Server error:', await res.json())
         console.warn('[handleComplete] Falling back to direct write...')
         await supabase
           .from('workout_sessions')
@@ -268,7 +289,6 @@ function WorkoutCompletePage() {
           })
           .eq('id', sessionId)
 
-        // Pain updates via browser client
         for (const pain of painData) {
           await supabase
             .from('workout_sets')
@@ -277,7 +297,6 @@ function WorkoutCompletePage() {
             .eq('exercise_id', pain.exerciseId)
         }
 
-        // Fire & forget notification
         fetch('/api/workout-complete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -315,20 +334,13 @@ function WorkoutCompletePage() {
   const endTime = new Date()
   const minutes = Math.floor((endTime.getTime() - startTime.getTime()) / 1000 / 60)
 
-  const moodEmojis = [
-    { value: 1, emoji: '😫', label: 'Slecht' },
-    { value: 2, emoji: '😐', label: 'Matig' },
-    { value: 3, emoji: '😊', label: 'Goed' },
-    { value: 4, emoji: '💪', label: 'Sterk' },
-    { value: 5, emoji: '🔥', label: 'Top' },
-  ]
-
-  const difficultyOptions = [
-    { value: 1, label: 'Makkelijk' },
-    { value: 2, label: 'Goed' },
-    { value: 3, label: 'Perfect' },
-    { value: 4, label: 'Zwaar' },
-    { value: 5, label: 'Te zwaar' },
+  // Text chips instead of emojis
+  const moodOptions = [
+    { value: 1, label: 'Zwaar' },
+    { value: 2, label: 'Oké' },
+    { value: 3, label: 'Goed' },
+    { value: 4, label: 'Sterk' },
+    { value: 5, label: 'Top' },
   ]
 
   const painCount = exerciseGroups.filter(g => g.painFlag).length
@@ -337,141 +349,141 @@ function WorkoutCompletePage() {
     <div className="min-h-screen bg-[#EEEBE3]">
 
       {/* ═══ HEADER — celebration ═══════════════════ */}
-      <div className="pt-16 pb-8 text-center">
+      <div className="pt-16 pb-6 text-center animate-fade-in">
         <p className="text-label mb-4">Voltooid</p>
-        <h1 className="text-editorial-h1 text-[#1A1917]">
+        <h1
+          className="text-[40px] leading-[1.08] tracking-[-0.03em] text-[#1A1917]"
+          style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
+        >
           Goed gedaan
         </h1>
         {prsCount > 0 && (
-          <div className="mt-4 inline-flex items-center gap-2 bg-[var(--color-pop-light)] px-4 py-2 rounded-xl">
-            <Trophy size={16} strokeWidth={2} className="text-[var(--color-pop)]" />
-            <span className="text-[14px] font-semibold text-[var(--color-pop)]">
+          <div className="mt-4 inline-flex items-center gap-2 bg-[rgba(212,106,58,0.1)] px-4 py-2 rounded-xl animate-scale-in">
+            <Trophy size={16} strokeWidth={2} className="text-[#D46A3A]" />
+            <span className="text-[14px] font-semibold text-[#D46A3A]">
               {prsCount} {prsCount === 1 ? 'nieuw record' : 'nieuwe records'}
             </span>
           </div>
         )}
       </div>
 
-      {/* ═══ STATS — editorial cards ═══════════════ */}
-      <div className="max-w-lg mx-auto px-4 mb-8">
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4 text-center">
-            <div className="w-8 h-8 bg-[var(--color-pop-light)] rounded-lg flex items-center justify-center mx-auto mb-2">
-              <Timer size={16} strokeWidth={2} className="text-[var(--color-pop)]" />
-            </div>
-            <p className="text-[24px] font-bold text-[#1A1917] tabular-nums">{minutes}</p>
-            <p className="text-label mt-0.5">Minuten</p>
+      {/* ═══ STATS — Cormorant numbers, no cards ════ */}
+      <div className="max-w-lg mx-auto px-4 mb-10">
+        <div className="flex items-center justify-center gap-8 animate-count-up">
+          <div className="text-center">
+            <AnimatedStat value={minutes} />
+            <p className="text-label mt-1">Minuten</p>
           </div>
-          <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4 text-center">
-            <div className="w-8 h-8 bg-[#F0EDE8] rounded-lg flex items-center justify-center mx-auto mb-2">
-              <Layers size={16} strokeWidth={2} className="text-[#6B6862]" />
-            </div>
-            <p className="text-[24px] font-bold text-[#1A1917] tabular-nums">{totalSets}</p>
-            <p className="text-label mt-0.5">Sets</p>
+          <div className="w-px h-10 bg-[#E5E1D9]" />
+          <div className="text-center">
+            <AnimatedStat value={totalSets} />
+            <p className="text-label mt-1">Sets</p>
           </div>
-          <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4 text-center">
-            <div className="w-8 h-8 bg-[#F0EDE8] rounded-lg flex items-center justify-center mx-auto mb-2">
-              <BarChart3 size={16} strokeWidth={2} className="text-[#6B6862]" />
-            </div>
-            <p className="text-[24px] font-bold text-[#1A1917] tabular-nums">
-              {totalVolume > 1000 ? `${(totalVolume / 1000).toFixed(1)}t` : `${totalVolume}`}
-            </p>
-            <p className="text-label mt-0.5">Volume</p>
+          <div className="w-px h-10 bg-[#E5E1D9]" />
+          <div className="text-center">
+            <AnimatedStat
+              value={totalVolume > 1000 ? +(totalVolume / 1000).toFixed(1) : totalVolume}
+              suffix={totalVolume > 1000 ? 't' : ''}
+            />
+            <p className="text-label mt-1">Volume</p>
           </div>
         </div>
       </div>
 
-      <main className="max-w-lg mx-auto px-4 pb-32 space-y-6">
+      <main className="max-w-lg mx-auto px-4 pb-32 space-y-4">
 
-        {/* ═══ GEVOEL — mood picker ══════════════════ */}
-        <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-5">
+        {/* ═══ GEVOEL — text chips, no emojis ═══════ */}
+        <div className="card-v2 p-6 animate-slide-up" style={{ animationDelay: '120ms' }}>
           <p className="text-label mb-4">Hoe voelde je je?</p>
           <div className="flex gap-2">
-            {moodEmojis.map((mood) => (
+            {moodOptions.map((mood) => (
               <button
                 key={mood.value}
                 onClick={() => setMoodRating(mood.value)}
-                className={`flex-1 py-3.5 flex flex-col items-center gap-1.5 transition-all rounded-xl ${
+                className={`flex-1 py-3 text-center rounded-xl text-[13px] font-semibold transition-all ${
                   moodRating === mood.value
-                    ? 'bg-[var(--color-pop-light)] ring-2 ring-[var(--color-pop)]'
-                    : 'bg-[#F5F2EC] hover:bg-[#F0EDE8]'
+                    ? 'bg-[#1A1917] text-white'
+                    : 'bg-[#F5F2EC] text-[#6B6862] hover:bg-[#F0EDE8]'
                 }`}
               >
-                <span className="text-[22px]">{mood.emoji}</span>
-                <span className="text-[10px] text-[#A09D96] font-medium uppercase tracking-[0.04em]">{mood.label}</span>
+                {mood.label}
               </button>
             ))}
           </div>
         </div>
 
-        {/* ═══ MOEILIJKHEID ════════════════════════ */}
-        <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-5">
+        {/* ═══ MOEILIJKHEID — numbered 1-5 ══════════ */}
+        <div className="card-v2 p-6 animate-slide-up" style={{ animationDelay: '180ms' }}>
           <p className="text-label mb-4">Moeilijkheidsgraad</p>
           <div className="flex gap-2">
-            {difficultyOptions.map((opt) => (
+            {[1, 2, 3, 4, 5].map((level) => (
               <button
-                key={opt.value}
-                onClick={() => setDifficultyRating(opt.value)}
-                className={`flex-1 py-3 text-center transition-all text-[12px] font-semibold uppercase tracking-[0.04em] rounded-xl ${
-                  difficultyRating === opt.value
-                    ? 'bg-[#1A1917] text-white'
-                    : 'bg-[#F5F2EC] text-[#A09D96] hover:bg-[#F0EDE8]'
+                key={level}
+                onClick={() => setDifficultyRating(level)}
+                className={`flex-1 py-3 text-center rounded-xl transition-all ${
+                  difficultyRating === level
+                    ? 'bg-[#D46A3A] text-white'
+                    : 'bg-[#F5F2EC] text-[#6B6862] hover:bg-[#F0EDE8]'
                 }`}
               >
-                {opt.label}
+                <span className="stat-number text-[20px]">{level}</span>
               </button>
             ))}
+          </div>
+          <div className="flex justify-between mt-2 px-1">
+            <span className="text-[10px] text-[#C5C2BC]">Makkelijk</span>
+            <span className="text-[10px] text-[#C5C2BC]">Te zwaar</span>
           </div>
         </div>
 
         {/* ═══ PIJN PER OEFENING ══════════════════ */}
         {exerciseGroups.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] overflow-hidden">
-            <div className="flex items-center justify-between p-5 pb-3">
+          <div className="card-v2 overflow-hidden animate-slide-up" style={{ animationDelay: '240ms' }}>
+            <div className="flex items-center justify-between p-6 pb-3">
               <p className="text-label">Pijn of ongemak?</p>
               {painCount > 0 && (
-                <span className="text-[11px] font-semibold text-[#FF3B30] bg-[#FF3B30]/8 px-2.5 py-1 rounded-lg">
+                <span className="text-[11px] font-semibold text-[#C4372A] bg-[rgba(196,55,42,0.06)] px-2.5 py-1 rounded-lg">
                   {painCount} oefening{painCount !== 1 ? 'en' : ''}
                 </span>
               )}
             </div>
-            <div className="px-5 pb-5">
-              <div className="rounded-xl overflow-hidden border border-[#F0EDE8]">
+            <div className="px-6 pb-6">
+              <div className="rounded-xl overflow-hidden border border-[#E8E4DC]">
                 {exerciseGroups.map((group, i) => (
-                  <div key={group.exerciseId} className={i > 0 ? 'border-t border-[#F0EDE8]' : ''}>
+                  <div key={group.exerciseId} className={i > 0 ? 'border-t border-[#E8E4DC]' : ''}>
                     <button
                       onClick={() => {
                         togglePain(group.exerciseId)
                         setExpandedExercise(!group.painFlag ? group.exerciseId : null)
                       }}
                       className={`w-full flex items-center gap-3 px-4 py-3.5 transition-colors ${
-                        group.painFlag ? 'bg-[#FF3B30]/5' : 'hover:bg-[#FAF8F3]'
+                        group.painFlag ? 'bg-[rgba(196,55,42,0.04)]' : 'hover:bg-[#FAF8F3]'
                       }`}
                     >
                       <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                        group.painFlag ? 'border-[#FF3B30] bg-[#FF3B30]' : 'border-[#DDD9D0]'
+                        group.painFlag ? 'border-[#C4372A] bg-[#C4372A]' : 'border-[#DDD9D0]'
                       }`}>
                         {group.painFlag && <AlertTriangle size={10} strokeWidth={2.5} className="text-white" />}
                       </div>
                       <span className={`text-[14px] font-medium flex-1 text-left ${
-                        group.painFlag ? 'text-[#FF3B30]' : 'text-[#1A1917]'
+                        group.painFlag ? 'text-[#C4372A]' : 'text-[#1A1917]'
                       }`}>
                         {group.name}
                       </span>
                       <span className="text-[12px] text-[#CCC7BC]">{group.sets.length} sets</span>
                       {group.painFlag && (
                         expandedExercise === group.exerciseId
-                          ? <ChevronUp size={14} className="text-[#FF3B30]" />
-                          : <ChevronDown size={14} className="text-[#FF3B30]" />
+                          ? <ChevronUp size={14} className="text-[#C4372A]" />
+                          : <ChevronDown size={14} className="text-[#C4372A]" />
                       )}
                     </button>
                     {group.painFlag && expandedExercise === group.exerciseId && (
-                      <div className="px-4 pb-4 bg-[#FF3B30]/5">
+                      <div className="px-4 pb-4 bg-[rgba(196,55,42,0.04)]">
                         <textarea
                           value={group.painNotes}
                           onChange={(e) => setPainNotes(group.exerciseId, e.target.value)}
                           placeholder="Waar voelde je pijn? (bijv. linkerschouder, onderrug...)"
-                          className="w-full px-4 py-3 border border-[#FF3B30]/20 rounded-xl text-[13px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#FF3B30]/40 resize-none h-16 bg-white"
+                          className="w-full px-4 py-3 border border-[#E8E4DC] rounded-xl text-[13px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#C4372A]/40 resize-none h-16 bg-white"
                         />
                       </div>
                     )}
@@ -483,41 +495,50 @@ function WorkoutCompletePage() {
         )}
 
         {/* ═══ FEEDBACK VOOR COACH ════════════════ */}
-        <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-5">
-          <p className="text-label mb-2">Feedback voor je coach</p>
-          <p className="text-[12px] text-[#CCC7BC] mb-3">Welke oefeningen wil je meer of minder?</p>
+        <div className="card-v2 p-6 animate-slide-up" style={{ animationDelay: '300ms' }}>
+          <p className="text-label mb-3">Feedback voor je coach</p>
           <textarea
             value={feedbackText}
             onChange={(e) => setFeedbackText(e.target.value)}
-            placeholder="bijv. &quot;Meer core oefeningen&quot;, &quot;Hip thrusts zijn te zwaar&quot;..."
-            className="w-full px-4 py-3 border border-[#F0EDE8] rounded-xl bg-[#FAF8F3] text-[14px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
+            placeholder="Welke oefeningen wil je meer of minder?"
+            className="w-full px-4 py-3 border border-[#E8E4DC] rounded-xl bg-[#FAF8F3] text-[14px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
           />
         </div>
 
         {/* ═══ NOTITIES ═══════════════════════════ */}
-        <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-5">
-          <p className="text-label mb-3">Notities <span className="font-normal text-[#C5C2BC]">(optioneel)</span></p>
+        <div className="card-v2 p-6 animate-slide-up" style={{ animationDelay: '360ms' }}>
+          <p className="text-label mb-3">
+            Notities <span className="font-normal text-[#C5C2BC]">(optioneel)</span>
+          </p>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Hoe ging het? Extra opmerkingen..."
-            className="w-full px-4 py-3 border border-[#F0EDE8] rounded-xl bg-[#FAF8F3] text-[14px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
+            className="w-full px-4 py-3 border border-[#E8E4DC] rounded-xl bg-[#FAF8F3] text-[14px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
           />
         </div>
 
         {/* ═══ OPSLAAN CTA ════════════════════════ */}
-        <button
-          onClick={handleComplete}
-          disabled={saving}
-          className="btn-pop w-full flex items-center justify-center gap-2 disabled:opacity-50"
-        >
-          {saving ? 'Opslaan...' : 'Opslaan & afsluiten'}
-          <ArrowRight size={16} strokeWidth={2} />
-        </button>
+        <div className="animate-slide-up" style={{ animationDelay: '420ms' }}>
+          <button
+            onClick={handleComplete}
+            disabled={saving}
+            className="btn-pop w-full flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {saving ? (
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              <>
+                Opslaan & afsluiten
+                <ArrowRight size={16} strokeWidth={2} />
+              </>
+            )}
+          </button>
 
-        <p className="text-center text-[12px] text-[#CCC7BC]">
-          Je coach ziet deze feedback bij de volgende aanpassing
-        </p>
+          <p className="text-center text-[12px] text-[#C5C2BC] mt-3">
+            Je coach ziet deze feedback bij de volgende aanpassing
+          </p>
+        </div>
       </main>
     </div>
   )

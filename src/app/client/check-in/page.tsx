@@ -181,22 +181,24 @@ export default function CheckInPage() {
   if (submitted) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4 py-8">
-        <div className="bg-white p-8 max-w-sm w-full text-center space-y-6 rounded-2xl shadow-[var(--shadow-card)]">
+        <div className="card-v2 p-8 max-w-sm w-full text-center space-y-6">
           <div className="flex justify-center">
-            <div className="w-24 h-24 bg-[#E8F5E9] flex items-center justify-center animate-[scale-in_0.5s_ease-out]">
-              <CheckCircle className="h-12 w-12 text-[#34C759]" strokeWidth={1.5} />
+            <div className="w-20 h-20 rounded-full bg-[rgba(61,139,92,0.08)] flex items-center justify-center animate-scale-in">
+              <CheckCircle className="h-10 w-10 text-[#3D8B5C]" strokeWidth={1.5} />
             </div>
           </div>
           <div className="space-y-2">
-            <h2 className="text-editorial-h2 text-[#1A1917]">Check-in ingediend!</h2>
-            <p className="text-[#A09D96] text-sm leading-relaxed">
-              Je coach bekijkt je resultaten binnen 24 uur. Je krijgt een melding zodra de review klaar is.
+            <h2
+              className="text-[28px] leading-[1.15] tracking-[-0.02em] text-[#1A1917]"
+              style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
+            >
+              Check-in ingediend
+            </h2>
+            <p className="text-[14px] text-[#6B6862] leading-relaxed">
+              Je coach bekijkt je resultaten binnen 24 uur.
             </p>
           </div>
-          <button
-            onClick={() => router.push('/client')}
-            className="w-full bg-[#1A1917] text-white py-3.5 font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[#2A2A28] rounded-xl"
-          >
+          <button onClick={() => router.push('/client')} className="btn-pop w-full py-4 text-[13px]">
             Terug naar dashboard
           </button>
         </div>
@@ -207,20 +209,22 @@ export default function CheckInPage() {
   if (!canSubmit) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4 py-8">
-        <div className="bg-white p-8 max-w-sm w-full text-center space-y-6 rounded-2xl shadow-[var(--shadow-card)]">
+        <div className="card-v2 p-8 max-w-sm w-full text-center space-y-6">
           <div className="flex justify-center">
-            <div className="w-20 h-20 bg-[#FFF3E0] flex items-center justify-center">
-              <Calendar className="h-10 w-10 text-[#FF9800]" strokeWidth={1.5} />
+            <div className="w-20 h-20 rounded-full bg-[rgba(196,125,21,0.08)] flex items-center justify-center">
+              <Calendar className="h-10 w-10 text-[#C47D15]" strokeWidth={1.5} />
             </div>
           </div>
           <div className="space-y-2">
-            <h2 className="text-editorial-h2 text-[#1A1917]">Check-in</h2>
-            <p className="text-[#A09D96] text-sm leading-relaxed">{windowMessage}</p>
+            <h2
+              className="text-[28px] leading-[1.15] tracking-[-0.02em] text-[#1A1917]"
+              style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
+            >
+              Check-in
+            </h2>
+            <p className="text-[14px] text-[#6B6862] leading-relaxed">{windowMessage}</p>
           </div>
-          <button
-            onClick={() => router.push('/client')}
-            className="w-full bg-[#1A1917] text-white py-3.5 font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[#2A2A28] rounded-xl"
-          >
+          <button onClick={() => router.push('/client')} className="btn-primary w-full py-4 text-[13px]">
             Terug naar dashboard
           </button>
         </div>
@@ -230,84 +234,50 @@ export default function CheckInPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-editorial-h2 text-[#1A1917]">Maandelijkse check-in</h1>
-        <p className="text-[#A09D96] mt-2">Stap {currentStep + 1} van {steps.length}</p>
+      {/* Header — Cormorant serif */}
+      <div className="animate-fade-in">
+        <p className="text-label mb-3">Stap {currentStep + 1} van {steps.length}</p>
+        <h1
+          className="text-[32px] leading-[1.12] tracking-[-0.025em] text-[#1A1917]"
+          style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
+        >
+          {steps[currentStep].title}
+        </h1>
+        <p className="text-[14px] text-[#6B6862] mt-1">{steps[currentStep].description}</p>
       </div>
 
-      {/* Progress Bar with Icons */}
-      <div className="space-y-6">
-        {/* Gradient progress bar */}
-        <div className="relative h-1 bg-[#F0F0F0] rounded-full overflow-hidden">
+      {/* Progress bar — clean thin bar */}
+      <div className="w-full h-[3px] bg-[#E5E1D9] rounded-full overflow-hidden">
+        <div
+          className="h-full bg-[#D46A3A] rounded-full transition-all duration-500 animate-progress-fill"
+          style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+        />
+      </div>
+
+      {/* Step dots */}
+      <div className="flex justify-center gap-3">
+        {steps.map((_, i) => (
           <div
-            className="h-full bg-gradient-to-r from-[#FF6B9D] via-[#FFC97F] to-[#FF6B9D] transition-all duration-500"
-            style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+            key={i}
+            className={`w-2.5 h-2.5 rounded-full transition-all ${
+              i < currentStep
+                ? 'bg-[#3D8B5C]'
+                : i === currentStep
+                  ? 'bg-[#D46A3A] scale-125'
+                  : 'bg-[#E5E1D9]'
+            }`}
           />
-        </div>
-
-        {/* Step indicators */}
-        <div className="flex justify-between items-center">
-          {steps.map((step, i) => {
-            const Icon = step.icon
-            const isCompleted = i < currentStep
-            const isCurrent = i === currentStep
-            const isFuture = i > currentStep
-
-            return (
-              <div key={i} className="flex flex-col items-center gap-2">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
-                    isCompleted
-                      ? 'bg-[#34C759]'
-                      : isCurrent
-                      ? 'bg-[#1A1A18]'
-                      : 'bg-[#F0F0F0] border-2 border-[#E0E0E0]'
-                  }`}
-                >
-                  {isCompleted ? (
-                    <CheckCircle className="w-5 h-5 text-white" strokeWidth={2} />
-                  ) : (
-                    <Icon
-                      className={`w-5 h-5 ${
-                        isCurrent ? 'text-white' : 'text-[#999]'
-                      }`}
-                      strokeWidth={1.5}
-                    />
-                  )}
-                </div>
-                <span className={`text-xs font-medium text-center ${
-                  isCurrent ? 'text-[#1A1A18]' : 'text-[#999]'
-                }`}>
-                  {step.title}
-                </span>
-              </div>
-            )
-          })}
-        </div>
+        ))}
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 px-4 py-3">
-          <p className="text-sm text-red-700">{error}</p>
+        <div className="bg-[rgba(196,55,42,0.06)] border border-[rgba(196,55,42,0.1)] rounded-xl px-4 py-3">
+          <p className="text-[13px] text-[#C4372A]">{error}</p>
         </div>
       )}
 
-      {/* Step Header with Icon and Description */}
-      <div className="space-y-4">
-        <div className="flex items-start gap-4">
-          <div className="w-14 h-14 bg-[#F5F5F5] flex items-center justify-center flex-shrink-0">
-            {(() => { const Icon = steps[currentStep].icon; return Icon ? <Icon className="w-7 h-7 text-[#1A1917]" strokeWidth={1.5} /> : null })()}
-          </div>
-          <div>
-            <h2 className="text-editorial-h3 text-[#1A1917]">{steps[currentStep].title}</h2>
-            <p className="text-[#A09D96] text-sm mt-1">{steps[currentStep].description}</p>
-          </div>
-        </div>
-      </div>
-
       {/* Step content */}
-      <div className="bg-white p-6 transition-all duration-300 rounded-2xl shadow-[var(--shadow-card)]">
+      <div className="card-v2 p-6 transition-all duration-300 animate-slide-up">
         {currentStep === 0 && (
           <PhotoUploadStep
             photos={data.photos}
@@ -342,7 +312,7 @@ export default function CheckInPage() {
         {currentStep > 0 && (
           <button
             onClick={() => setCurrentStep(currentStep - 1)}
-            className="flex-1 px-6 py-3.5 text-[#C5C2BC] font-medium uppercase tracking-wider hover:bg-[#F5F5F5] transition-all duration-300 rounded-xl shadow-[var(--shadow-card)]"
+            className="flex-1 px-6 py-4 text-[#6B6862] font-semibold text-[13px] uppercase tracking-[0.06em] border border-[#E8E4DC] rounded-2xl hover:border-[#CCC7BC] transition-all"
           >
             Vorige
           </button>
@@ -350,7 +320,7 @@ export default function CheckInPage() {
         {currentStep < steps.length - 1 ? (
           <button
             onClick={() => setCurrentStep(currentStep + 1)}
-            className="flex-1 bg-[#1A1917] text-white py-3.5 font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[#2A2A28] rounded-xl"
+            className="flex-1 btn-pop py-4 text-[13px]"
           >
             Volgende
           </button>
@@ -358,9 +328,11 @@ export default function CheckInPage() {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="flex-1 bg-[#1A1917] text-white py-3.5 font-medium uppercase tracking-wider transition-all duration-300 hover:bg-[#2A2A28] disabled:opacity-50 rounded-xl"
+            className="flex-1 btn-pop py-4 text-[13px] disabled:opacity-50"
           >
-            {submitting ? 'Bezig met indienen...' : 'Check-in indienen'}
+            {submitting ? (
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
+            ) : 'Check-in indienen'}
           </button>
         )}
       </div>

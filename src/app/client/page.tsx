@@ -1,14 +1,13 @@
 'use client'
 
-import { useEffect, useState, useCallback, memo } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
-  CheckCircle, ChevronRight, Video,
-  MessageSquare, Calendar, ArrowRight, ShieldCheck,
-  Flame, TrendingDown, TrendingUp, Activity,
+  CheckCircle, ChevronRight, ArrowRight,
+  MessageSquare, Video, Calendar, ShieldCheck,
 } from 'lucide-react'
 import { NotificationCenter } from '@/components/client/NotificationCenter'
-import { cachedFetch, invalidateCache } from '@/lib/fetcher'
+import { cachedFetch } from '@/lib/fetcher'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -80,133 +79,42 @@ interface DashboardData {
 
 // ─── Helpers ────────────────────────────────────────────────
 
-function getGreeting() {
-  const hour = new Date().getHours()
-  if (hour < 12) return 'Goedemorgen'
-  if (hour < 17) return 'Goedemiddag'
-  return 'Goedenavond'
-}
-
-function formatDate(date: Date) {
-  return date.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })
-}
-
-// ─── Week Calendar — clean dot style ────────────────────────
-
-const WeekCalendar = memo(function WeekCalendar({ scheduleDays, completedDates }: {
-  scheduleDays: Array<{ dayNumber: number; name: string; focus: string | null }>
-  completedDates: string[]
-}) {
-  const [selectedDay, setSelectedDay] = useState<number | null>(null)
+function getWeekDots(scheduleDays: Array<{ dayNumber: number }>, completedDates: string[]) {
   const today = new Date()
-  const dayLabels = ['M', 'D', 'W', 'D', 'V', 'Z', 'Z']
+  const todayDow = today.getDay() === 0 ? 7 : today.getDay()
+  const todayStr = today.toISOString().split('T')[0]
+  const labels = ['M', 'D', 'W', 'D', 'V', 'Z', 'Z']
 
-  // Build 7 days from today (current week view)
-  const days = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(today)
-    d.setDate(today.getDate() + i)
-    const dow = d.getDay() === 0 ? 7 : d.getDay()
+  // Start from Monday of current week
+  const monday = new Date(today)
+  monday.setDate(today.getDate() - (todayDow - 1))
+
+  return labels.map((label, i) => {
+    const dow = i + 1 // 1=Monday
+    const d = new Date(monday)
+    d.setDate(monday.getDate() + i)
     const dateStr = d.toISOString().split('T')[0]
-    const scheduled = scheduleDays.find(s => s.dayNumber === dow)
+    const isToday = dateStr === todayStr
+    const isPast = d < today && !isToday
+    const hasTraining = scheduleDays.some(s => s.dayNumber === dow)
     const completed = completedDates.includes(dateStr)
-    return {
-      date: d,
-      dateStr,
-      dayOfMonth: d.getDate(),
-      dayLabel: dayLabels[dow - 1],
-      dow,
-      scheduled,
-      completed,
-      isToday: i === 0,
-    }
+
+    return { label, dow, dateStr, isToday, isPast, hasTraining, completed }
   })
+}
 
-  const selectedInfo = selectedDay !== null ? days[selectedDay] : null
-
-  return (
-    <div className="animate-slide-up mb-10" style={{ animationDelay: '120ms' }}>
-      {/* Day circles row */}
-      <div className="flex justify-between items-center px-2 mb-3">
-        {days.map((day, i) => {
-          const isSelected = selectedDay === i
-          const hasTraining = !!day.scheduled
-          return (
-            <button
-              key={day.dateStr}
-              onClick={() => setSelectedDay(isSelected ? null : i)}
-              className="flex flex-col items-center gap-1.5"
-            >
-              <span className="text-[11px] font-semibold text-[#A09D96] uppercase">
-                {day.dayLabel}
-              </span>
-              <div className={`w-10 h-10 flex items-center justify-center rounded-full transition-all ${
-                isSelected
-                  ? 'bg-[var(--color-pop)] shadow-[0_2px_8px_rgba(212,106,58,0.3)]'
-                  : day.isToday
-                    ? 'bg-white shadow-[var(--shadow-card)]'
-                    : ''
-              }`}>
-                <span className={`text-[15px] font-bold ${
-                  isSelected ? 'text-white' : 'text-[#1A1917]'
-                }`}>
-                  {day.dayOfMonth}
-                </span>
-              </div>
-              {/* Status dot */}
-              <div className="h-[6px]">
-                {day.completed ? (
-                  <div className="w-[6px] h-[6px] rounded-full bg-[#3D8B5C]" />
-                ) : hasTraining ? (
-                  <div className="w-[6px] h-[6px] rounded-full bg-[var(--color-pop)]" />
-                ) : null}
-              </div>
-            </button>
-          )
-        })}
-      </div>
-
-      {/* Selected day detail — slides in */}
-      {selectedInfo && (
-        <div className="bg-white rounded-2xl p-5 mt-2 shadow-[var(--shadow-card)] animate-fade-in">
-          {selectedInfo.scheduled ? (
-            <Link
-              href="/client/workout"
-              className="flex items-center justify-between group"
-            >
-              <div>
-                <p className="text-[15px] font-semibold text-[#1A1917]">
-                  {selectedInfo.scheduled.name}
-                </p>
-                {selectedInfo.scheduled.focus && (
-                  <p className="text-[13px] text-[#A09D96] mt-1">
-                    {selectedInfo.scheduled.focus}
-                  </p>
-                )}
-              </div>
-              {selectedInfo.completed ? (
-                <CheckCircle strokeWidth={1.5} className="w-5 h-5 text-[#3D8B5C] shrink-0" />
-              ) : (
-                <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:text-[#1A1917] transition-colors shrink-0" />
-              )}
-            </Link>
-          ) : (
-            <p className="text-[15px] text-[#A09D96]">Rustdag</p>
-          )}
-        </div>
-      )}
-    </div>
-  )
-})
+function getCaloriesConsumed(nutrition: DashboardData['nutrition']) {
+  if (!nutrition) return 0
+  return nutrition.meals
+    .filter(m => m.completed)
+    .reduce((sum, m) => sum + m.items.reduce((s, i) => s + i.calories, 0), 0)
+}
 
 // ─── Component ──────────────────────────────────────────────
 
 export default function ClientDashboard() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [togglingMeal, setTogglingMeal] = useState<string | null>(null)
-
-  const today = new Date().toISOString().split('T')[0]
-
   useEffect(() => {
     loadDashboard()
   }, [])
@@ -221,59 +129,6 @@ export default function ClientDashboard() {
       setLoading(false)
     }
   }
-
-  const toggleMeal = useCallback(async (mealId: string, mealName: string, currentCompleted: boolean) => {
-    if (!data?.nutrition) return
-    setTogglingMeal(mealId)
-
-    setData(prev => {
-      if (!prev?.nutrition) return prev
-      return {
-        ...prev,
-        nutrition: {
-          ...prev.nutrition,
-          meals: prev.nutrition.meals.map(m =>
-            m.id === mealId ? { ...m, completed: !currentCompleted } : m
-          ),
-          mealsCompleted: currentCompleted
-            ? prev.nutrition.mealsCompleted - 1
-            : prev.nutrition.mealsCompleted + 1,
-        },
-      }
-    })
-
-    try {
-      await fetch('/api/nutrition-log', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          plan_id: data.nutrition.planId,
-          date: today,
-          meal_id: mealId,
-          meal_name: mealName,
-          completed: !currentCompleted,
-        }),
-      })
-    } catch {
-      setData(prev => {
-        if (!prev?.nutrition) return prev
-        return {
-          ...prev,
-          nutrition: {
-            ...prev.nutrition,
-            meals: prev.nutrition.meals.map(m =>
-              m.id === mealId ? { ...m, completed: currentCompleted } : m
-            ),
-            mealsCompleted: currentCompleted
-              ? prev.nutrition.mealsCompleted + 1
-              : prev.nutrition.mealsCompleted - 1,
-          },
-        }
-      })
-    } finally {
-      setTogglingMeal(null)
-    }
-  }, [data, today])
 
   // ─── Loading ─────────────────────────────────────────────
 
@@ -295,97 +150,100 @@ export default function ClientDashboard() {
 
   const { training, nutrition, actions, momentum, onboarding } = data
   const firstName = data.profile?.firstName || ''
-  const hasActions = actions.accountabilityPending || actions.pendingPrompt || actions.checkInDue !== null
   const showOnboarding = onboarding && !onboarding.complete
+  const weekDots = getWeekDots(training.scheduleDays || [], training.completedDates || [])
+
+  // Determine if this is day 1 (no workouts completed ever, no streak)
+  const isDay1 = momentum.streakDays === 0 && momentum.workoutsThisWeek === 0 && !training.completedDates?.length
+
+  // Calories for compact bar
+  const caloriesConsumed = getCaloriesConsumed(nutrition)
+  const caloriesTarget = nutrition?.targets?.calories || 0
+
+  // Smart today: determine the ONE primary action
+  const getPrimaryAction = () => {
+    if (showOnboarding) return 'onboarding' as const
+    if (training.today && !training.today.completed) return 'training' as const
+    if (training.today?.completed) return 'done' as const
+    if (actions.checkInDue?.overdue) return 'checkin' as const
+    return 'rest' as const
+  }
+  const primaryAction = getPrimaryAction()
 
   // ─── Render ─────────────────────────────────────────────
 
   return (
     <div className="pb-28">
 
-      {/* ═══ EDITORIAL HEADER ═══════════════════════════════ */}
-      <div className="animate-fade-in mb-12">
+      {/* ═══ HERO — Name with period, one truth ════════════ */}
+      <div className="animate-fade-in mb-2">
         <div className="flex items-start justify-between">
           <div>
-            <span className="text-label">{formatDate(new Date())}</span>
-            <h1 className="text-editorial-h1 text-[#1A1917] mt-4">
-              {getGreeting()},
-            </h1>
-            <h1 className="text-editorial-h1 text-[#1A1917]">
+            <h1
+              className="text-[48px] leading-[1.05] tracking-[-0.035em] text-[#1A1917]"
+              style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
+            >
               {firstName}.
             </h1>
           </div>
-          <div className="mt-5">
+          <div className="mt-2">
             <NotificationCenter />
           </div>
         </div>
       </div>
 
-      {/* ═══ MOMENTUM — playful stat pills ═════════════════ */}
-      <div className="flex gap-3 mb-12 animate-fade-in" style={{ animationDelay: '60ms' }}>
-        <div className="flex-1 bg-white rounded-2xl p-5 shadow-[var(--shadow-card)]">
-          <p className="text-[32px] font-bold text-[var(--color-pop)] leading-none tracking-tight">
-            {momentum.streakDays}
-          </p>
-          <p className="text-[12px] text-[#A09D96] mt-2 font-medium">dagen streak</p>
-        </div>
-        <div className="flex-1 bg-white rounded-2xl p-5 shadow-[var(--shadow-card)]">
-          <p className="text-[32px] font-bold text-[#1A1917] leading-none tracking-tight">
-            {momentum.workoutsThisWeek}
-          </p>
-          <p className="text-[12px] text-[#A09D96] mt-2 font-medium">deze week</p>
-        </div>
-        {momentum.weightChangeMonth !== null && (
-          <div className="flex-1 bg-white rounded-2xl p-5 shadow-[var(--shadow-card)]">
-            <p className="text-[32px] font-bold leading-none tracking-tight" style={{
-              color: momentum.weightChangeMonth <= 0 ? '#3D8B5C' : '#C47D15'
-            }}>
-              {momentum.weightChangeMonth > 0 ? '+' : ''}{momentum.weightChangeMonth}
-            </p>
-            <p className="text-[12px] text-[#A09D96] mt-2 font-medium">kg deze maand</p>
+      {/* ═══ WEEK DOTS — M D W D V Z Z ════════════════════ */}
+      <div
+        className="flex items-center justify-between px-1 mb-10 animate-fade-in"
+        style={{ animationDelay: '60ms' }}
+      >
+        {weekDots.map((dot, i) => (
+          <div key={i} className="flex flex-col items-center gap-2">
+            <span className="text-[11px] font-semibold text-[#A09D96] uppercase tracking-wide">
+              {dot.label}
+            </span>
+            <div className="relative flex items-center justify-center w-7 h-7">
+              {dot.completed ? (
+                /* Completed: filled green dot with check */
+                <div className="w-7 h-7 rounded-full bg-[#3D8B5C] flex items-center justify-center">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M2.5 6L5 8.5L9.5 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+              ) : dot.isToday ? (
+                /* Today: terracotta filled dot */
+                <div className="w-7 h-7 rounded-full bg-[#D46A3A] flex items-center justify-center">
+                  <div className="w-2 h-2 rounded-full bg-white" />
+                </div>
+              ) : dot.hasTraining ? (
+                /* Scheduled training: outlined dot */
+                <div className="w-7 h-7 rounded-full border-[1.5px] border-[#CCC7BC]" />
+              ) : (
+                /* Rest / no activity: tiny faint dot */
+                <div className="w-[6px] h-[6px] rounded-full bg-[#E5E1D9]" />
+              )}
+            </div>
           </div>
-        )}
+        ))}
       </div>
 
-      {/* ═══ URGENTE BADGES ═════════════════════════════════ */}
-      {(actions.unreadMessages > 0 || actions.nextVideoCall) && (
-        <div className="flex gap-3 mb-10 animate-fade-in" style={{ animationDelay: '90ms' }}>
-          {actions.unreadMessages > 0 && (
-            <Link href="/client/messages" className="flex items-center gap-2.5 px-5 py-3 bg-white rounded-xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
-              <MessageSquare strokeWidth={1.5} className="w-4 h-4 text-[var(--color-pop)]" />
-              <span className="text-[13px] font-semibold text-[#1A1917]">{actions.unreadMessages} {actions.unreadMessages === 1 ? 'bericht' : 'berichten'}</span>
-            </Link>
-          )}
-          {actions.nextVideoCall && (
-            <Link href={`/client/video/${actions.nextVideoCall.id}`} className="flex items-center gap-2.5 px-5 py-3 bg-white rounded-xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow">
-              <Video strokeWidth={1.5} className="w-4 h-4 text-[var(--color-pop)]" />
-              <span className="text-[13px] font-semibold text-[#1A1917]">
-                Videocall {new Date(actions.nextVideoCall.scheduled_at).toLocaleDateString('nl-BE', { weekday: 'short', day: 'numeric' })}
-              </span>
-            </Link>
-          )}
-        </div>
-      )}
-
-      {/* ═══ ONBOARDING ════════════════════════════════════ */}
+      {/* ═══ ONBOARDING CTA ══════════════════════════════ */}
       {showOnboarding && (
         <Link
           href="/onboarding"
-          className="block bg-[#1A1917] rounded-2xl p-7 mb-10 animate-slide-up group"
+          className="block card-v2-interactive p-7 mb-6 animate-slide-up group"
           style={{ animationDelay: '100ms' }}
         >
-          <div className="flex items-center justify-between mb-5">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#A09D96]">
-              Profiel voltooien
-            </span>
-            <ArrowRight strokeWidth={1.5} className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-label">Profiel voltooien</span>
+            <ArrowRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:translate-x-1 group-hover:text-[#1A1917] transition-all" />
           </div>
-          <p className="text-[17px] font-semibold text-white mb-5">
+          <p className="text-[16px] font-semibold text-[#1A1917] mb-5">
             Vul je intake formulier in zodat je coach je programma kan opstellen
           </p>
-          <div className="w-full h-[3px] bg-white/20 rounded-full overflow-hidden">
+          <div className="w-full h-[3px] bg-[#E5E1D9] rounded-full overflow-hidden">
             <div
-              className="h-full bg-white transition-all duration-500"
+              className="h-full bg-[#1A1917] rounded-full animate-progress-fill"
               style={{ width: `${(onboarding.currentStep / onboarding.totalSteps) * 100}%` }}
             />
           </div>
@@ -395,204 +253,279 @@ export default function ClientDashboard() {
         </Link>
       )}
 
-      {/* ═══ WEEKKALENDER ══════════════════════════════════ */}
-      <WeekCalendar
-        scheduleDays={training.scheduleDays || []}
-        completedDates={training.completedDates || []}
-      />
-
-      {/* ═══ TRAINING — editorial card ═══════════════════ */}
-      <Link
-        href="/client/workout"
-        className="block bg-white rounded-2xl p-7 mb-3 shadow-[var(--shadow-card)] group animate-slide-up hover:shadow-[var(--shadow-card-hover)] transition-shadow"
-        style={{ animationDelay: '150ms' }}
-      >
-        {training.today ? (
-          <div>
-            <div className="flex items-center justify-between mb-5">
-              <span className="text-label">
-                {training.today.completed ? 'Voltooid' : 'Training vandaag'}
-              </span>
-              {training.today.completed ? (
-                <CheckCircle strokeWidth={1.5} className="w-5 h-5 text-[#3D8B5C]" />
-              ) : (
-                <ArrowRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:translate-x-1 group-hover:text-[#1A1917] transition-all" />
-              )}
-            </div>
-
-            <h2 className="text-editorial-h3 text-[#1A1917] mb-3">
-              {training.today.name}
-            </h2>
-
-            <p className="text-[14px] text-[#6B6862]">
-              {training.today.focus && <>{training.today.focus} · </>}
-              ±{training.today.durationMin} min
-              {training.today.exerciseCount && <> · {training.today.exerciseCount} oefeningen</>}
-            </p>
-
-            {!training.today.completed && (
-              <div className="mt-7">
-                <span className="btn-pop inline-flex">
-                  Start workout
-                </span>
-              </div>
-            )}
-
-            {training.today.completed && training.next && (
-              <p className="text-[13px] text-[#A09D96] mt-5">
-                Volgende: {training.next.name} {training.next.label}
-              </p>
-            )}
-          </div>
-        ) : (
-          <div>
-            <div className="flex items-center justify-between mb-5">
-              <span className="text-label">Training</span>
-            </div>
-            <h2 className="text-editorial-h3 text-[#A09D96]">
-              Rustdag
-            </h2>
-            {training.next && (
-              <p className="text-[14px] text-[#6B6862] mt-3">
-                Volgende training: {training.next.name} {training.next.label}
-              </p>
-            )}
-          </div>
-        )}
-      </Link>
-
-      {/* ═══ VOEDING — editorial checklist ════════════════ */}
-      {nutrition && nutrition.mealsTotal > 0 && (
-        <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] animate-slide-up mb-3 overflow-hidden" style={{ animationDelay: '210ms' }}>
-          {/* Header */}
-          <div className="px-7 pt-7 pb-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-label">Voeding</span>
-              <span className="text-[14px] font-semibold" style={{
-                color: nutrition.mealsCompleted === nutrition.mealsTotal && nutrition.mealsTotal > 0 ? '#3D8B5C' : '#A09D96'
-              }}>
-                {nutrition.mealsCompleted}/{nutrition.mealsTotal}
-              </span>
-            </div>
-
-            {/* Progress line */}
-            <div className="w-full h-[3px] bg-[#E5E1D9] rounded-full mt-3">
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{
-                  width: `${nutrition.mealsTotal > 0 ? (nutrition.mealsCompleted / nutrition.mealsTotal) * 100 : 0}%`,
-                  backgroundColor: nutrition.mealsCompleted === nutrition.mealsTotal ? '#3D8B5C' : 'var(--color-pop)',
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Meals */}
-          {nutrition.meals.map((meal) => (
-            <div key={meal.id} className="border-t border-[#F0EDE8]">
-              <button
-                onClick={() => toggleMeal(meal.id, meal.name, meal.completed)}
-                disabled={togglingMeal === meal.id}
-                className="w-full flex items-center gap-4 px-7 py-4.5 hover:bg-[#FAF8F3] transition-colors text-left"
-              >
-                {/* Custom checkbox */}
-                <div
-                  className="w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-all duration-200"
-                  style={{
-                    backgroundColor: meal.completed ? '#3D8B5C' : 'transparent',
-                    borderColor: meal.completed ? '#3D8B5C' : '#CCC7BC',
-                  }}
-                >
-                  {meal.completed && (
-                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                      <path d="M2.5 6L5 8.5L9.5 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  )}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <span className={`text-[14px] font-medium transition-all ${
-                    meal.completed ? 'text-[#A09D96] line-through' : 'text-[#1A1917]'
-                  }`}>
-                    {meal.name}
-                  </span>
-
-                  {meal.items && meal.items.length > 0 && !meal.completed && (
-                    <p className="text-[12px] text-[#A09D96] mt-0.5 truncate">
-                      {meal.items.map(i => i.name).join(', ')}
-                    </p>
-                  )}
-                </div>
-
-                {meal.time && (
-                  <span className="text-[11px] text-[#C5C2BC] shrink-0">{meal.time}</span>
-                )}
-              </button>
-            </div>
-          ))}
-
-          {/* Link */}
-          <Link
-            href="/client/nutrition"
-            className="flex items-center justify-between px-7 py-4 border-t border-[#F0EDE8] hover:bg-[#FAF8F3] transition-colors"
+      {/* ═══ EMPTY STATE — Day 1 warm welcome ════════════ */}
+      {isDay1 && !showOnboarding && (
+        <div className="card-v2 p-8 mb-6 animate-slide-up text-center" style={{ animationDelay: '120ms' }}>
+          <p
+            className="text-[28px] leading-[1.15] tracking-[-0.02em] text-[#1A1917] mb-3"
+            style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
           >
-            <span className="text-[13px] font-medium text-[#6B6862]">Bekijk voedingsplan</span>
-            <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC]" />
+            Welkom bij MŌVE
+          </p>
+          <p className="text-[15px] text-[#6B6862] mb-6 max-w-[280px] mx-auto">
+            Je coach bereidt je programma voor. Binnenkort verschijnt hier je eerste training.
+          </p>
+          <Link href="/client/messages" className="btn-pop inline-flex text-[13px]">
+            Stuur je coach een bericht
           </Link>
         </div>
       )}
 
-      {/* ═══ ACTIES — editorial action cards ═══════════════ */}
-      {hasActions && (
-        <div className="animate-slide-up mt-3" style={{ animationDelay: '270ms' }}>
-          {actions.pendingPrompt && (
-            <Link href="/client/prompts" className="flex items-center gap-4 bg-white rounded-2xl px-7 py-6 mb-3 shadow-[var(--shadow-card)] group hover:shadow-[var(--shadow-card-hover)] transition-shadow">
-              <div className="w-10 h-10 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center shrink-0">
-                <MessageSquare strokeWidth={1.5} className="w-5 h-5 text-[var(--color-pop)]" />
+      {/* ═══ SMART TODAY CARD — the ONE action ═══════════ */}
+      {!isDay1 && !showOnboarding && (
+        <div className="animate-slide-up" style={{ animationDelay: '120ms' }}>
+
+          {/* Training today — not yet done */}
+          {primaryAction === 'training' && training.today && (
+            <Link
+              href="/client/workout"
+              className="block card-v2-interactive p-7 mb-3 group"
+            >
+              <div className="flex items-center justify-between mb-5">
+                <span className="text-label">Training vandaag</span>
+                <ArrowRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:translate-x-1 group-hover:text-[#1A1917] transition-all" />
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-[14px] font-semibold text-[#1A1917]">Wekelijkse reflectie</p>
-                {actions.pendingPrompt.question && (
-                  <p className="text-[12px] text-[#A09D96] mt-0.5 truncate">{actions.pendingPrompt.question}</p>
-                )}
+
+              <h2
+                className="text-[25px] leading-[1.2] tracking-[-0.02em] text-[#1A1917] mb-3"
+                style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
+              >
+                {training.today.name}
+              </h2>
+
+              <p className="text-[14px] text-[#6B6862]">
+                {training.today.focus && <>{training.today.focus} · </>}
+                ±{training.today.durationMin} min
+                {training.today.exerciseCount && <> · {training.today.exerciseCount} oefeningen</>}
+              </p>
+
+              <div className="mt-7">
+                <span className="btn-pop inline-flex text-[13px]">
+                  Start workout
+                </span>
               </div>
-              <ArrowRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:translate-x-1 group-hover:text-[#1A1917] transition-all shrink-0" />
             </Link>
           )}
 
-          {actions.accountabilityPending && (
-            <Link href="/client/accountability" className="flex items-center gap-4 bg-white rounded-2xl px-7 py-6 mb-3 shadow-[var(--shadow-card)] group hover:shadow-[var(--shadow-card-hover)] transition-shadow">
-              <div className="w-10 h-10 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center shrink-0">
-                <ShieldCheck strokeWidth={1.5} className="w-5 h-5 text-[var(--color-pop)]" />
+          {/* Training done — show completion */}
+          {primaryAction === 'done' && training.today && (
+            <div className="card-v2 p-7 mb-3">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-label">Training voltooid</span>
+                <CheckCircle strokeWidth={1.5} className="w-5 h-5 text-[#3D8B5C]" />
               </div>
-              <div className="flex-1">
-                <p className="text-[14px] font-semibold text-[#1A1917]">Dagelijkse check</p>
-                <p className="text-[12px] text-[#A09D96] mt-0.5">Laat weten hoe je dag was</p>
-              </div>
-              <ArrowRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:translate-x-1 group-hover:text-[#1A1917] transition-all shrink-0" />
-            </Link>
-          )}
 
-          {actions.checkInDue !== null && (
-            <Link href="/client/check-in" className="flex items-center gap-4 bg-white rounded-2xl px-7 py-6 shadow-[var(--shadow-card)] group hover:shadow-[var(--shadow-card-hover)] transition-shadow">
-              <div className="w-10 h-10 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center shrink-0">
-                <Calendar strokeWidth={1.5} className="w-5 h-5 text-[var(--color-pop)]" />
-              </div>
-              <div className="flex-1">
-                <p className="text-[14px] font-semibold text-[#1A1917]">Maandelijkse meting</p>
-                <p className="text-[12px] text-[#A09D96] mt-0.5">
-                  {actions.checkInDue.overdue
-                    ? 'Nu invullen'
-                    : actions.checkInDue.daysUntil === 0
-                      ? 'Vandaag'
-                      : `Nog ${actions.checkInDue.daysUntil} ${actions.checkInDue.daysUntil === 1 ? 'dag' : 'dagen'}`}
+              <h2
+                className="text-[25px] leading-[1.2] tracking-[-0.02em] text-[#1A1917] mb-1"
+                style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
+              >
+                {training.today.name}
+              </h2>
+
+              {momentum.streakDays > 1 && (
+                <p className="text-[14px] text-[#6B6862] mt-2">
+                  <span className="stat-number text-[18px] text-[#D46A3A]">{momentum.streakDays}</span>
+                  {' '}dagen op rij
                 </p>
+              )}
+            </div>
+          )}
+
+          {/* Rest day */}
+          {primaryAction === 'rest' && (
+            <div className="card-v2 p-7 mb-3">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-label">Vandaag</span>
               </div>
-              <ArrowRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:translate-x-1 group-hover:text-[#1A1917] transition-all shrink-0" />
+              <h2
+                className="text-[25px] leading-[1.2] tracking-[-0.02em] text-[#A09D96]"
+                style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
+              >
+                Rustdag
+              </h2>
+              {training.next && (
+                <p className="text-[14px] text-[#6B6862] mt-3">
+                  Volgende: {training.next.name} {training.next.label}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Check-in overdue */}
+          {primaryAction === 'checkin' && (
+            <Link
+              href="/client/check-in"
+              className="block card-v2-interactive p-7 mb-3 group"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-label">Check-in</span>
+                <ArrowRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:translate-x-1 group-hover:text-[#1A1917] transition-all" />
+              </div>
+              <h2
+                className="text-[25px] leading-[1.2] tracking-[-0.02em] text-[#1A1917]"
+                style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
+              >
+                Tijd voor je maandelijkse meting
+              </h2>
+              <p className="text-[14px] text-[#6B6862] mt-2">
+                Gewicht, foto, en hoe je je voelt
+              </p>
+            </Link>
+          )}
+
+          {/* ═══ "MORGEN" PREVIEW ═══════════════════════ */}
+          {training.next && primaryAction !== 'rest' && (
+            <Link
+              href="/client/workout"
+              className="flex items-center justify-between px-7 py-4 card-v2-interactive mb-3 group"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-[13px] font-medium text-[#A09D96]">Morgen</span>
+                <span className="text-[14px] font-medium text-[#1A1917]">
+                  {training.next.name}
+                </span>
+              </div>
+              <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:text-[#1A1917] transition-colors" />
             </Link>
           )}
         </div>
       )}
+
+      {/* ═══ VOEDING COMPACT — one line + thin bar ═══════ */}
+      {nutrition && nutrition.mealsTotal > 0 && (
+        <Link
+          href="/client/nutrition"
+          className="block card-v2-interactive px-7 py-5 mb-3 animate-slide-up group"
+          style={{ animationDelay: '180ms' }}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <span className="text-label">Voeding</span>
+              {caloriesTarget > 0 && (
+                <span className="text-[14px] text-[#6B6862]">
+                  <span className="stat-number text-[16px] text-[#1A1917]">{caloriesConsumed}</span>
+                  {' '}/ {caloriesTarget} kcal
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[13px] font-medium text-[#A09D96]">
+                {nutrition.mealsCompleted}/{nutrition.mealsTotal}
+              </span>
+              <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:text-[#1A1917] transition-colors" />
+            </div>
+          </div>
+
+          {/* Thin progress bar */}
+          <div className="w-full h-[3px] bg-[#E5E1D9] rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full animate-progress-fill"
+              style={{
+                width: `${nutrition.mealsTotal > 0 ? (nutrition.mealsCompleted / nutrition.mealsTotal) * 100 : 0}%`,
+                backgroundColor: nutrition.mealsCompleted === nutrition.mealsTotal && nutrition.mealsTotal > 0
+                  ? '#3D8B5C'
+                  : '#D46A3A',
+              }}
+            />
+          </div>
+        </Link>
+      )}
+
+      {/* ═══ CONTEXTUAL NUDGES — only when relevant ══════ */}
+      <div className="space-y-3 animate-slide-up" style={{ animationDelay: '240ms' }}>
+        {/* Unread messages */}
+        {actions.unreadMessages > 0 && (
+          <Link
+            href="/client/messages"
+            className="flex items-center gap-4 card-v2-interactive px-7 py-5 group"
+          >
+            <div className="w-9 h-9 rounded-xl bg-[rgba(212,106,58,0.08)] flex items-center justify-center shrink-0">
+              <MessageSquare strokeWidth={1.5} className="w-[18px] h-[18px] text-[#D46A3A]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[14px] font-medium text-[#1A1917]">
+                {actions.unreadMessages} {actions.unreadMessages === 1 ? 'nieuw bericht' : 'nieuwe berichten'}
+              </p>
+            </div>
+            <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:text-[#1A1917] transition-colors shrink-0" />
+          </Link>
+        )}
+
+        {/* Video call */}
+        {actions.nextVideoCall && (
+          <Link
+            href={`/client/video/${actions.nextVideoCall.id}`}
+            className="flex items-center gap-4 card-v2-interactive px-7 py-5 group"
+          >
+            <div className="w-9 h-9 rounded-xl bg-[rgba(212,106,58,0.08)] flex items-center justify-center shrink-0">
+              <Video strokeWidth={1.5} className="w-[18px] h-[18px] text-[#D46A3A]" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[14px] font-medium text-[#1A1917]">
+                Videocall {new Date(actions.nextVideoCall.scheduled_at).toLocaleDateString('nl-BE', { weekday: 'short', day: 'numeric', month: 'short' })}
+              </p>
+            </div>
+            <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:text-[#1A1917] transition-colors shrink-0" />
+          </Link>
+        )}
+
+        {/* Pending prompt */}
+        {actions.pendingPrompt && (
+          <Link
+            href="/client/prompts"
+            className="flex items-center gap-4 card-v2-interactive px-7 py-5 group"
+          >
+            <div className="w-9 h-9 rounded-xl bg-[rgba(212,106,58,0.08)] flex items-center justify-center shrink-0">
+              <MessageSquare strokeWidth={1.5} className="w-[18px] h-[18px] text-[#D46A3A]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[14px] font-medium text-[#1A1917]">Wekelijkse reflectie</p>
+              {actions.pendingPrompt.question && (
+                <p className="text-[12px] text-[#A09D96] mt-0.5 truncate">{actions.pendingPrompt.question}</p>
+              )}
+            </div>
+            <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:text-[#1A1917] transition-colors shrink-0" />
+          </Link>
+        )}
+
+        {/* Accountability */}
+        {actions.accountabilityPending && (
+          <Link
+            href="/client/accountability"
+            className="flex items-center gap-4 card-v2-interactive px-7 py-5 group"
+          >
+            <div className="w-9 h-9 rounded-xl bg-[rgba(212,106,58,0.08)] flex items-center justify-center shrink-0">
+              <ShieldCheck strokeWidth={1.5} className="w-[18px] h-[18px] text-[#D46A3A]" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[14px] font-medium text-[#1A1917]">Dagelijkse check</p>
+              <p className="text-[12px] text-[#A09D96] mt-0.5">Laat weten hoe je dag was</p>
+            </div>
+            <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:text-[#1A1917] transition-colors shrink-0" />
+          </Link>
+        )}
+
+        {/* Check-in due (non-overdue — overdue is primary card) */}
+        {actions.checkInDue !== null && !actions.checkInDue.overdue && (
+          <Link
+            href="/client/check-in"
+            className="flex items-center gap-4 card-v2-interactive px-7 py-5 group"
+          >
+            <div className="w-9 h-9 rounded-xl bg-[rgba(212,106,58,0.08)] flex items-center justify-center shrink-0">
+              <Calendar strokeWidth={1.5} className="w-[18px] h-[18px] text-[#D46A3A]" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[14px] font-medium text-[#1A1917]">Maandelijkse meting</p>
+              <p className="text-[12px] text-[#A09D96] mt-0.5">
+                {actions.checkInDue.daysUntil === 0
+                  ? 'Vandaag'
+                  : `Nog ${actions.checkInDue.daysUntil} ${actions.checkInDue.daysUntil === 1 ? 'dag' : 'dagen'}`}
+              </p>
+            </div>
+            <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#CCC7BC] group-hover:text-[#1A1917] transition-colors shrink-0" />
+          </Link>
+        )}
+      </div>
 
     </div>
   )

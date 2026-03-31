@@ -309,19 +309,25 @@ export default function ClientMessagesPage() {
         className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
       >
         {messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center space-y-3">
-              <MessageCircle
-                size={48}
-                className="text-[#C5C2BC] mx-auto"
-                strokeWidth={1.5}
-              />
-              <p className="text-[#1A1917] font-medium">
-                Start een gesprek met je coach
-              </p>
-              <p className="text-xs text-[#C5C2BC]">
-                Je coach zal je snel beantwoorden
-              </p>
+          <div className="flex items-center justify-center h-full animate-fade-in">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-[rgba(212,106,58,0.08)] flex items-center justify-center mx-auto">
+                <MessageCircle
+                  className="w-7 h-7 text-[#D46A3A]"
+                  strokeWidth={1.5}
+                />
+              </div>
+              <div className="space-y-1">
+                <p
+                  className="text-[22px] leading-[1.2] tracking-[-0.01em] text-[#1A1917]"
+                  style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
+                >
+                  Stuur je coach een bericht
+                </p>
+                <p className="text-[13px] text-[#A09D96]">
+                  Reactie binnen 24 uur
+                </p>
+              </div>
             </div>
           </div>
         ) : (

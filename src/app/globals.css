@@ -24,10 +24,13 @@
   --color-accent-subtle: rgba(26, 25, 23, 0.08);
   --color-accent-surface: #EDEAE4;
 
-  /* Pop accent — warm terracotta for active indicators */
+  /* Pop accent — warm terracotta for active indicators & CTAs */
   --color-pop: #D46A3A;
   --color-pop-light: rgba(212, 106, 58, 0.12);
   --color-pop-muted: rgba(212, 106, 58, 0.25);
+
+  /* Streak — warm red for completed day indicators */
+  --color-streak: #E05A3A;
 
   /* Typography */
   --color-text-primary: #1A1917;
@@ -133,21 +136,93 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- * EDITORIAL COMPONENT SYSTEM
+ * V2 DESIGN SYSTEM — "Less but better"
+ * Cards: border-only (no shadows except modals)
+ * Numbers: always Cormorant Garamond serif
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-/* Card — soft, rounded white surface with warm shadow */
-.card-editorial {
-  background: #FFFFFF;
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  transition: box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1);
+/* Stat numbers — serif for premium feel (streak, weight, reps, timer) */
+.stat-number {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
 }
-.card-editorial:hover {
-  box-shadow: var(--shadow-card-hover);
+.stat-number-hero {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 72px;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+}
+.stat-number-lg {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 40px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.stat-number-md {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: -0.025em;
+  line-height: 1;
 }
 
-/* Card — bordered, subtle, rounded */
+/* Card v2 — border-only, no shadow, clean */
+.card-v2 {
+  background: #FFFFFF;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-2xl);
+  transition: border-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-v2:hover {
+  border-color: var(--color-border-strong);
+}
+.card-v2:active {
+  transform: scale(0.98);
+}
+
+/* Card interactive — for tappable elements */
+.card-v2-interactive {
+  background: #FFFFFF;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-2xl);
+  cursor: pointer;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-v2-interactive:hover {
+  border-color: var(--color-border-strong);
+}
+.card-v2-interactive:active {
+  transform: scale(0.98);
+  transition-duration: 100ms;
+}
+
+/* Card flat — no border, just white on cream (for quiet sections) */
+.card-v2-flat {
+  background: #FFFFFF;
+  border-radius: var(--radius-2xl);
+}
+
+/* Elevated — ONLY for modals, sheets, floating elements */
+.card-elevated-v2 {
+  background: #FFFFFF;
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-elevated);
+}
+
+/* Backward compat — old card classes now map to v2 */
+.card-editorial {
+  background: #FFFFFF;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-card);
+  transition: border-color 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-editorial:hover {
+  border-color: var(--color-border-strong);
+}
 .card-bordered {
   background: #FFFFFF;
   border: 1px solid var(--color-border-subtle);
@@ -157,8 +232,6 @@ h1, h2, h3, h4, h5, h6 {
 .card-bordered:hover {
   border-color: var(--color-border-strong);
 }
-
-/* Card — old tactile style (backward compat) */
 .card-tactile {
   background: #FFFFFF;
   border: 1px solid var(--color-border-subtle);
@@ -168,21 +241,11 @@ h1, h2, h3, h4, h5, h6 {
 .card-tactile:hover {
   border-color: var(--color-border-strong);
 }
-
 .card-elevated {
   background: #FFFFFF;
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
   transition: border-color 300ms cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-}
-.card-elevated::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  pointer-events: none;
 }
 .card-elevated:hover {
   border-color: var(--color-border-strong);
@@ -504,6 +567,54 @@ a, button {
   pointer-events: none;
   animation: confetti-fall 3s ease-in forwards;
 }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * V2 ANIMATIONS — number counters, page transitions
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes check-bounce {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  70% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+@keyframes progress-fill {
+  from { width: 0; }
+}
+
+@keyframes row-success {
+  0% { background-color: transparent; }
+  50% { background-color: rgba(61, 139, 92, 0.08); }
+  100% { background-color: rgba(61, 139, 92, 0.04); }
+}
+
+.animate-count-up {
+  animation: count-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-check-bounce {
+  animation: check-bounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-progress-fill {
+  animation: progress-fill 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.animate-row-success {
+  animation: row-success 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Stagger delays extended for longer lists */
+.stagger-7 { animation-delay: 360ms; }
+.stagger-8 { animation-delay: 420ms; }
+.stagger-9 { animation-delay: 480ms; }
+.stagger-10 { animation-delay: 540ms; }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  * EDITORIAL INPUTS

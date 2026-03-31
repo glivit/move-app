@@ -1,14 +1,10 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { PhotoComparison } from '@/components/client/PhotoComparison'
-import {
-  Dumbbell, Trophy, TrendingDown, TrendingUp,
-  ChevronRight,
-  Calendar, BarChart3, Ruler, FileText
-} from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -57,7 +53,9 @@ type ChartMode = 'duration' | 'volume' | 'sets'
 
 // ─── Animated Counter ───────────────────────────────────────
 
-function AnimatedNumber({ value, duration = 1200, suffix = '' }: { value: number; duration?: number; suffix?: string }) {
+function AnimatedNumber({ value, duration = 1000, suffix = '', prefix = '' }: {
+  value: number; duration?: number; suffix?: string; prefix?: string
+}) {
   const [display, setDisplay] = useState(0)
 
   useEffect(() => {
@@ -76,12 +74,14 @@ function AnimatedNumber({ value, duration = 1200, suffix = '' }: { value: number
     requestAnimationFrame(animate)
   }, [value, duration])
 
-  return <span>{display}{suffix}</span>
+  return <span>{prefix}{display}{suffix}</span>
 }
 
-// ─── Mini Sparkline ─────────────────────────────────────────
+// ─── Sparkline ──────────────────────────────────────────────
 
-function Sparkline({ data, color, height = 40, width = 120 }: { data: number[]; color: string; height?: number; width?: number }) {
+function Sparkline({ data, color, height = 48, width = 140 }: {
+  data: number[]; color: string; height?: number; width?: number
+}) {
   if (data.length < 2) return null
   const max = Math.max(...data)
   const min = Math.min(...data)
@@ -106,39 +106,19 @@ export default function ProgressPage() {
   const [data, setData] = useState<ProgressData | null>(null)
   const [weeklyStats, setWeeklyStats] = useState<WeeklyStats[]>([])
   const [chartMode, setChartMode] = useState<ChartMode>('duration')
-  const [milestones, setMilestones] = useState<Array<{ type: string; title: string; icon: string; description: string; achieved_at: string }>>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
       try {
-        // Load journey/progress data
         const res = await fetch('/api/progress')
         if (res.ok) setData(await res.json())
 
-        // Load weekly chart data + milestones
         const supabase = createClient()
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
 
-        // Load milestones
-        const { data: milestonesData } = await supabase
-          .from('milestones')
-          .select('type, title, icon, description, achieved_at')
-          .eq('client_id', user.id)
-          .order('achieved_at', { ascending: false })
-
-        if (milestonesData) {
-          setMilestones(milestonesData)
-          // Mark unseen as seen
-          supabase.from('milestones')
-            .update({ seen_by_client: true })
-            .eq('client_id', user.id)
-            .eq('seen_by_client', false)
-            .then(() => {})
-        }
-
-        // Limit to last 12 weeks for chart data
+        // Weekly chart data (last 12 weeks)
         const twelveWeeksAgo = new Date()
         twelveWeeksAgo.setDate(twelveWeeksAgo.getDate() - 12 * 7)
 
@@ -201,13 +181,53 @@ export default function ProgressPage() {
 
   if (!data) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center text-[#A09D96] text-[14px]">
-        Er ging iets mis bij het laden.
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center">
+          <p
+            className="text-[28px] leading-[1.15] tracking-[-0.02em] text-[#1A1917] mb-3"
+            style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
+          >
+            Nog geen data
+          </p>
+          <p className="text-[15px] text-[#6B6862] max-w-[260px] mx-auto">
+            Start je eerste workout en je voortgang verschijnt hier.
+          </p>
+        </div>
       </div>
     )
   }
 
-  const { headline, training, body, strength, nutrition } = data
+  const { headline, body, strength } = data
+
+  // Determine the hero number: most motivating metric
+  const getHeroNumber = () => {
+    if (headline.streak >= 3) {
+      return { value: headline.streak, suffix: '', label: 'dagen streak' }
+    }
+    if (body.weightChange !== null && Math.abs(body.weightChange) >= 0.5) {
+      return {
+        value: Math.abs(body.weightChange),
+        suffix: ' kg',
+        prefix: body.weightChange < 0 ? '-' : '+',
+        label: body.weightChange < 0 ? 'afgevallen' : 'aangekomen',
+      }
+    }
+    if (headline.totalWorkouts > 0) {
+      return { value: headline.totalWorkouts, suffix: '', label: 'workouts voltooid' }
+    }
+    return { value: headline.daysOnProgram, suffix: '', label: 'dagen actief' }
+  }
+
+  const hero = getHeroNumber()
+
+  // Supporting stats text
+  const supportingParts: string[] = []
+  if (headline.daysOnProgram > 0) supportingParts.push(`${headline.daysOnProgram} dagen actief`)
+  if (headline.totalWorkouts > 0 && hero.label !== 'workouts voltooid') {
+    supportingParts.push(`${headline.totalWorkouts} workouts`)
+  }
+  if (headline.totalPrs > 0) supportingParts.push(`${headline.totalPrs} records`)
+  const supportingText = supportingParts.join(' · ')
 
   // Chart data
   const chartData = weeklyStats.map(w => {
@@ -222,64 +242,32 @@ export default function ProgressPage() {
   return (
     <div className="pb-28">
 
-      {/* ═══ HEADER ══════════════════════════════════════════ */}
-      <div className="mb-10">
-        <p className="text-label mb-2">Jouw traject</p>
-        <h1 className="text-editorial-h2 text-[#1A1917]">Voortgang</h1>
+      {/* ═══ HERO — ONE dynamic number ═════════════════════ */}
+      <div className="mb-3 animate-fade-in">
+        <p className="text-label mb-4">Voortgang</p>
+        <p className="stat-number-hero text-[#1A1917] animate-count-up">
+          <AnimatedNumber
+            value={hero.value}
+            prefix={'prefix' in hero ? hero.prefix : ''}
+            suffix={hero.suffix}
+          />
+        </p>
+        <p className="text-[16px] text-[#6B6862] mt-2">{hero.label}</p>
       </div>
 
-      {/* ═══ HEADLINE STATS ══════════════════════════════════ */}
-      <div className="grid grid-cols-4 gap-3 mb-12">
-        <div className="bg-white rounded-2xl p-4 text-center shadow-[var(--shadow-card)]">
-          <p className="text-[26px] font-bold text-[#1A1917] leading-none">
-            <AnimatedNumber value={headline.daysOnProgram} />
-          </p>
-          <p className="text-[11px] text-[#A09D96] mt-2 font-medium">Dagen</p>
-        </div>
-        <div className="bg-white rounded-2xl p-4 text-center shadow-[var(--shadow-card)]">
-          <p className="text-[26px] font-bold text-[var(--color-pop)] leading-none">
-            <AnimatedNumber value={headline.streak} />
-          </p>
-          <p className="text-[11px] text-[#A09D96] mt-2 font-medium">Streak</p>
-        </div>
-        <div className="bg-white rounded-2xl p-4 text-center shadow-[var(--shadow-card)]">
-          <p className="text-[26px] font-bold text-[#1A1917] leading-none">
-            <AnimatedNumber value={headline.totalWorkouts} />
-          </p>
-          <p className="text-[11px] text-[#A09D96] mt-2 font-medium">Workouts</p>
-        </div>
-        <div className="bg-white rounded-2xl p-4 text-center shadow-[var(--shadow-card)]">
-          <p className="text-[26px] font-bold text-[#7B5EA7] leading-none">
-            <AnimatedNumber value={headline.totalPrs} />
-          </p>
-          <p className="text-[11px] text-[#A09D96] mt-2 font-medium">Records</p>
-        </div>
-      </div>
-
-      {/* ═══ MILESTONES ═══════════════════════════════════════ */}
-      {milestones.length > 0 && (
-        <div className="mb-10">
-          <p className="text-label mb-4">Achievements</p>
-          <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-            {milestones.map((m) => (
-              <div
-                key={m.type}
-                className="flex-shrink-0 w-20 bg-white rounded-2xl p-3 text-center shadow-[var(--shadow-card)]"
-              >
-                <span className="text-[28px] block">{m.icon}</span>
-                <p className="text-[10px] font-bold text-[#1A1917] mt-1.5 leading-tight">{m.title}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* Supporting stats as text */}
+      {supportingText && (
+        <p className="text-[14px] text-[#A09D96] mb-10 animate-fade-in" style={{ animationDelay: '60ms' }}>
+          {supportingText}
+        </p>
       )}
 
-      {/* ═══ 12 WEEK ACTIVITY CHART ══════════════════════════ */}
+      {/* ═══ 12 WEEK CHART — full-width, clean ════════════ */}
       {weeklyStats.length > 0 && (
-        <div className="bg-white rounded-2xl p-7 mb-10 shadow-[var(--shadow-card)]">
+        <div className="card-v2 p-7 mb-6 animate-slide-up" style={{ animationDelay: '120ms' }}>
           <div className="flex items-baseline justify-between mb-6">
             <div>
-              <span className="text-[32px] font-bold text-[var(--color-pop)] leading-none">{thisWeekVal}</span>
+              <span className="stat-number text-[32px] text-[#1A1917]">{thisWeekVal}</span>
               <span className="text-[14px] text-[#A09D96] ml-2">{chartLabel} deze week</span>
             </div>
             <span className="text-[12px] text-[#C5C2BC]">12 weken</span>
@@ -291,7 +279,7 @@ export default function ProgressPage() {
               <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
                 <div
                   className={`w-full rounded-t-md transition-all ${
-                    i === chartData.length - 1 ? 'bg-[var(--color-pop)]' : 'bg-[#E5E1D9]'
+                    i === chartData.length - 1 ? 'bg-[#D46A3A]' : 'bg-[#E5E1D9]'
                   }`}
                   style={{ height: `${Math.max((val / maxVal) * 100, 3)}%` }}
                 />
@@ -308,7 +296,7 @@ export default function ProgressPage() {
             ))}
           </div>
 
-          {/* Mode toggles */}
+          {/* Mode tabs */}
           <div className="flex gap-1">
             {(['duration', 'volume', 'sets'] as ChartMode[]).map(mode => (
               <button
@@ -327,22 +315,22 @@ export default function ProgressPage() {
         </div>
       )}
 
-
-      {/* ═══ GEWICHT SPARKLINE ════════════════════════════════ */}
+      {/* ═══ GEWICHT — sparkline card ═════════════════════ */}
       {body.weightData.length >= 2 && (
         <Link
           href="/client/measurements"
-          className="block bg-white rounded-2xl p-7 mb-3 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow group"
+          className="block card-v2-interactive p-7 mb-6 group animate-slide-up"
+          style={{ animationDelay: '180ms' }}
         >
           <div className="flex items-center justify-between mb-5">
             <span className="text-label">Gewicht</span>
-            <ChevronRight size={16} strokeWidth={1.5} className="text-[#CCC7BC] group-hover:translate-x-0.5 transition-transform" />
+            <ChevronRight size={16} strokeWidth={1.5} className="text-[#CCC7BC] group-hover:text-[#1A1917] transition-colors" />
           </div>
 
           <div className="flex items-end justify-between">
             <div>
-              <p className="text-[32px] font-bold text-[#1A1917] tracking-[-0.02em] leading-none">
-                {body.weightCurrent}
+              <p className="leading-none">
+                <span className="stat-number text-[32px] text-[#1A1917]">{body.weightCurrent}</span>
                 <span className="text-[14px] font-medium text-[#A09D96] ml-1">kg</span>
               </p>
               {body.weightChange !== null && (
@@ -357,101 +345,58 @@ export default function ProgressPage() {
             <Sparkline
               data={body.weightData.map(w => w.weight)}
               color={body.weightChange !== null && body.weightChange <= 0 ? '#3D8B5C' : '#C47D15'}
-              width={140}
-              height={50}
             />
           </div>
         </Link>
       )}
 
-      {/* ═══ RECENTE PR'S ════════════════════════════════════ */}
+      {/* ═══ RECORDS — top 3 inline ══════════════════════ */}
       {strength.recentPrs.length > 0 && (
-        <Link
-          href="/client/stats"
-          className="block bg-white rounded-2xl overflow-hidden shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow group mb-3"
-        >
-          <div className="flex items-center justify-between px-7 pt-7 pb-4">
+        <div className="card-v2 overflow-hidden mb-6 animate-slide-up" style={{ animationDelay: '240ms' }}>
+          <div className="flex items-center justify-between px-7 pt-6 pb-4">
             <span className="text-label">Recente records</span>
-            <ChevronRight size={16} strokeWidth={1.5} className="text-[#CCC7BC] group-hover:translate-x-0.5 transition-transform" />
+            {strength.totalPrs > 3 && (
+              <Link
+                href="/client/stats"
+                className="text-[13px] font-medium text-[#D46A3A] hover:opacity-70 transition-opacity"
+              >
+                Bekijk alles
+              </Link>
+            )}
           </div>
           {strength.recentPrs.slice(0, 3).map((pr) => (
-            <div key={pr.id} className="flex items-center gap-4 px-7 py-4 border-t border-[#F0EDE8]">
+            <div key={pr.id} className="flex items-center gap-4 px-7 py-4 border-t border-[#E8E4DC]">
               <div className="flex-1 min-w-0">
                 <p className="text-[14px] font-medium text-[#1A1917] truncate">{pr.exercise}</p>
                 <p className="text-[11px] text-[#A09D96] mt-0.5">
                   {new Date(pr.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                 </p>
               </div>
-              <span className="text-[16px] font-bold text-[#7B5EA7]">
-                {pr.value} {pr.type === 'weight' ? 'kg' : pr.type === 'reps' ? 'reps' : 'kg'}
+              <span className="stat-number text-[18px] text-[#1A1917]">
+                {pr.value}
+                <span className="text-[12px] font-medium text-[#A09D96] ml-1">
+                  {pr.type === 'weight' ? 'kg' : pr.type === 'reps' ? 'reps' : 'kg'}
+                </span>
               </span>
             </div>
           ))}
-        </Link>
+        </div>
       )}
 
+      {/* ═══ PHOTO COMPARISON — prominent CTA ════════════ */}
+      {body.hasPhotos && (
+        <div className="mb-6 animate-slide-up" style={{ animationDelay: '300ms' }}>
+          <PhotoComparison />
+          <Link
+            href="/client/progress/photos"
+            className="flex items-center justify-center gap-2 mt-3 py-2 text-[13px] font-medium text-[#D46A3A] hover:opacity-70 transition-opacity"
+          >
+            Foto vergelijking bekijken
+            <ChevronRight size={14} />
+          </Link>
+        </div>
+      )}
 
-      {/* ═══ BEFORE/AFTER PHOTOS ═════════════════════════════ */}
-      <div className="mt-10 mb-10">
-        <PhotoComparison />
-        <Link
-          href="/client/progress/photos"
-          className="flex items-center justify-center gap-2 mt-3 py-2.5 text-[13px] font-medium text-[var(--color-pop)] hover:underline"
-        >
-          Uitgebreide foto vergelijking met slider
-          <ChevronRight size={14} />
-        </Link>
-      </div>
-
-      {/* ═══ QUICK LINKS — editorial grid ═══════════════════ */}
-      <div className="grid grid-cols-2 gap-3 mt-10">
-        <Link
-          href="/client/stats"
-          className="flex flex-col items-start p-6 bg-white rounded-2xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow"
-        >
-          <div className="w-10 h-10 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center mb-4">
-            <BarChart3 size={18} strokeWidth={1.5} className="text-[var(--color-pop)]" />
-          </div>
-          <span className="text-[14px] font-semibold text-[#1A1917]">Statistieken</span>
-        </Link>
-        <Link
-          href="/client/exercises"
-          className="flex flex-col items-start p-6 bg-white rounded-2xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow"
-        >
-          <div className="w-10 h-10 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center mb-4">
-            <Dumbbell size={18} strokeWidth={1.5} className="text-[var(--color-pop)]" />
-          </div>
-          <span className="text-[14px] font-semibold text-[#1A1917]">Oefeningen</span>
-        </Link>
-        <Link
-          href="/client/measurements"
-          className="flex flex-col items-start p-6 bg-white rounded-2xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow"
-        >
-          <div className="w-10 h-10 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center mb-4">
-            <Ruler size={18} strokeWidth={1.5} className="text-[var(--color-pop)]" />
-          </div>
-          <span className="text-[14px] font-semibold text-[#1A1917]">Metingen</span>
-        </Link>
-        <Link
-          href="/client/calendar"
-          className="flex flex-col items-start p-6 bg-white rounded-2xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow"
-        >
-          <div className="w-10 h-10 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center mb-4">
-            <Calendar size={18} strokeWidth={1.5} className="text-[var(--color-pop)]" />
-          </div>
-          <span className="text-[14px] font-semibold text-[#1A1917]">Kalender</span>
-        </Link>
-        <Link
-          href="/client/progress-report"
-          className="flex flex-col items-start p-6 bg-white rounded-2xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow col-span-2"
-        >
-          <div className="w-10 h-10 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center mb-4">
-            <FileText size={18} strokeWidth={1.5} className="text-[var(--color-pop)]" />
-          </div>
-          <span className="text-[14px] font-semibold text-[#1A1917]">Voortgangsrapport</span>
-          <span className="text-[12px] text-[#6B6862] mt-1">Bekijk en deel je volledige voortgang</span>
-        </Link>
-      </div>
     </div>
   )
 }

@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase'
 import { SubPageHeader } from '@/components/layout/SubPageHeader'
 import {
   ChevronLeft, ChevronRight, Dumbbell, Video,
-  Clock, Play, ArrowLeft, ArrowRight
+  Clock, Play, X
 } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
@@ -37,7 +37,6 @@ interface PlannedDay {
   estimated_duration: number
 }
 
-// Schedule: weekday (ISO: 1=Mon..7=Sun) -> template_day_id
 type Schedule = Record<string, string>
 
 interface VideoSession {
@@ -49,7 +48,7 @@ interface VideoSession {
 
 // ─── Helpers ────────────────────────────────────────────────
 
-const DAYS_NL = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']
+const DAYS_NL = ['M', 'D', 'W', 'D', 'V', 'Z', 'Z']
 const MONTHS_NL = ['Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni', 'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December']
 
 function isSameDay(a: Date, b: Date) {
@@ -70,8 +69,7 @@ function getFirstDayOfMonth(year: number, month: number) {
 }
 
 function formatDuration(seconds: number) {
-  const m = Math.floor(seconds / 60)
-  return `${m} min`
+  return `${Math.floor(seconds / 60)} min`
 }
 
 function formatVolume(sets: WorkoutSet[]) {
@@ -85,7 +83,7 @@ export default function CalendarPage() {
   const router = useRouter()
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [completedWorkouts, setCompletedWorkouts] = useState<CompletedWorkout[]>([])
   const [plannedDays, setPlannedDays] = useState<PlannedDay[]>([])
   const [schedule, setSchedule] = useState<Schedule>({})
@@ -99,7 +97,6 @@ export default function CalendarPage() {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
 
-        // Completed workouts WITH exercise details — limit to last 3 months
         const threeMonthsAgo = new Date()
         threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
 
@@ -117,7 +114,6 @@ export default function CalendarPage() {
 
         if (workouts) setCompletedWorkouts(workouts as any[])
 
-        // Current program + schedule
         const { data: program } = await supabase
           .from('client_programs')
           .select('id, schedule, program_templates(id, template_days:program_template_days(id, name, focus, estimated_duration_min))')
@@ -131,18 +127,13 @@ export default function CalendarPage() {
           const template = (program as any).program_templates
           if (template?.template_days) {
             setPlannedDays(template.template_days.map((d: any) => ({
-              id: d.id,
-              name: d.name,
-              focus_area: d.focus || '',
+              id: d.id, name: d.name, focus_area: d.focus || '',
               estimated_duration: d.estimated_duration_min || 60,
             })))
           }
-          if (program.schedule) {
-            setSchedule(program.schedule as Schedule)
-          }
+          if (program.schedule) setSchedule(program.schedule as Schedule)
         }
 
-        // Video sessions — limit to last 3 months
         const { data: videos } = await supabase
           .from('video_sessions')
           .select('id, scheduled_at, duration_minutes, status')
@@ -161,35 +152,31 @@ export default function CalendarPage() {
     load()
   }, [])
 
-  // Build day data map
   const dayDataMap = useMemo(() => {
     const map: Record<string, { completed: CompletedWorkout[]; videoSessions: VideoSession[] }> = {}
-
     for (const w of completedWorkouts) {
       const dateKey = new Date(w.started_at).toISOString().slice(0, 10)
       if (!map[dateKey]) map[dateKey] = { completed: [], videoSessions: [] }
       map[dateKey].completed.push(w)
     }
-
     for (const v of videoSessions) {
       const dateKey = new Date(v.scheduled_at).toISOString().slice(0, 10)
       if (!map[dateKey]) map[dateKey] = { completed: [], videoSessions: [] }
       map[dateKey].videoSessions.push(v)
     }
-
     return map
   }, [completedWorkouts, videoSessions])
 
-  // Selected date data
-  const selectedDateKey = selectedDate.toISOString().slice(0, 10)
-  const jsDay = selectedDate.getDay()
-  const isoDay = jsDay === 0 ? 7 : jsDay // Convert JS Sun=0 to ISO Sun=7
-  const selectedDayData = dayDataMap[selectedDateKey] || { completed: [], videoSessions: [] }
+  // Selected date detail
+  const selectedDateKey = selectedDate?.toISOString().slice(0, 10) || ''
+  const selectedDayData = selectedDate ? (dayDataMap[selectedDateKey] || { completed: [], videoSessions: [] }) : null
+  const jsDay = selectedDate?.getDay() ?? 0
+  const isoDay = jsDay === 0 ? 7 : jsDay
   const scheduledDayId = schedule[String(isoDay)]
   const plannedForDay = scheduledDayId ? plannedDays.find(d => d.id === scheduledDayId) : undefined
-  const hasCompleted = selectedDayData.completed.length > 0
-  const hasVideo = selectedDayData.videoSessions.length > 0
-  const isFutureOrToday = selectedDate >= new Date(new Date().toISOString().slice(0, 10))
+  const hasCompleted = (selectedDayData?.completed.length || 0) > 0
+  const hasVideo = (selectedDayData?.videoSessions.length || 0) > 0
+  const isFutureOrToday = selectedDate ? selectedDate >= new Date(new Date().toISOString().slice(0, 10)) : false
 
   // Calendar grid
   const daysInMonth = getDaysInMonth(currentYear, currentMonth)
@@ -204,28 +191,6 @@ export default function CalendarPage() {
     else setCurrentMonth(currentMonth + 1)
   }
 
-  // Day navigation
-  const prevDay = () => {
-    const d = new Date(selectedDate)
-    d.setDate(d.getDate() - 1)
-    setSelectedDate(d)
-    // Auto-switch month if needed
-    if (d.getMonth() !== currentMonth || d.getFullYear() !== currentYear) {
-      setCurrentMonth(d.getMonth())
-      setCurrentYear(d.getFullYear())
-    }
-  }
-  const nextDay = () => {
-    const d = new Date(selectedDate)
-    d.setDate(d.getDate() + 1)
-    setSelectedDate(d)
-    if (d.getMonth() !== currentMonth || d.getFullYear() !== currentYear) {
-      setCurrentMonth(d.getMonth())
-      setCurrentYear(d.getFullYear())
-    }
-  }
-
-  // Group exercises by name for a workout
   function groupExercises(sets: WorkoutSet[]) {
     const groups: Record<string, { name: string; muscle: string; sets: WorkoutSet[]; hasPr: boolean }> = {}
     for (const s of sets) {
@@ -248,34 +213,39 @@ export default function CalendarPage() {
 
   return (
     <div className="pb-24">
-      <SubPageHeader overline="Overzicht" title="Kalender" backHref="/client/progress" />
+      <SubPageHeader overline="Overzicht" title="" backHref="/client/progress" />
 
-      {/* ═══ MONTH NAV ═══════════════════════════════════════ */}
-      <div className="flex items-center justify-between mb-4">
+      {/* ═══ MONTH NAME — Cormorant 40px ═══════════════════ */}
+      <div className="flex items-center justify-between mb-8 animate-fade-in">
         <button onClick={prevMonth} className="w-10 h-10 flex items-center justify-center text-[#A09D96] hover:text-[#1A1917] transition-colors">
           <ChevronLeft size={20} strokeWidth={1.5} />
         </button>
-        <p className="text-[16px] font-semibold text-[#1A1917]">
-          {MONTHS_NL[currentMonth]} {currentYear}
-        </p>
+        <h1
+          className="text-[40px] leading-[1.08] tracking-[-0.03em] text-[#1A1917]"
+          style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
+        >
+          {MONTHS_NL[currentMonth]}
+        </h1>
         <button onClick={nextMonth} className="w-10 h-10 flex items-center justify-center text-[#A09D96] hover:text-[#1A1917] transition-colors">
           <ChevronRight size={20} strokeWidth={1.5} />
         </button>
       </div>
 
-      {/* ═══ CALENDAR GRID ═══════════════════════════════════ */}
-      <div className="mb-6">
-        <div className="grid grid-cols-7 mb-2">
-          {DAYS_NL.map(d => (
-            <div key={d} className="text-center text-[10px] font-bold uppercase tracking-[0.1em] text-[#C5C2BC] py-1">
+      {/* ═══ DOT GRID CALENDAR ═════════════════════════════ */}
+      <div className="mb-6 animate-fade-in" style={{ animationDelay: '60ms' }}>
+        {/* Day labels */}
+        <div className="grid grid-cols-7 mb-3">
+          {DAYS_NL.map((d, i) => (
+            <div key={i} className="text-center text-[11px] font-semibold uppercase tracking-wide text-[#C5C2BC]">
               {d}
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-7">
+        {/* Dot grid */}
+        <div className="grid grid-cols-7 gap-y-2">
           {Array.from({ length: firstDay }).map((_, i) => (
-            <div key={`empty-${i}`} className="aspect-square" />
+            <div key={`e-${i}`} className="flex justify-center py-2" />
           ))}
 
           {Array.from({ length: daysInMonth }).map((_, i) => {
@@ -284,9 +254,8 @@ export default function CalendarPage() {
             const dateKey = date.toISOString().slice(0, 10)
             const dayData = dayDataMap[dateKey]
             const hasWorkout = dayData?.completed?.length > 0
-            const hasVid = dayData?.videoSessions?.length > 0
-            const isSelected = isSameDay(date, selectedDate)
             const today = isToday(date)
+            const isSelected = selectedDate ? isSameDay(date, selectedDate) : false
             const dayJsWeekday = date.getDay()
             const dayIsoWeekday = dayJsWeekday === 0 ? 7 : dayJsWeekday
             const hasPlanned = !!schedule[String(dayIsoWeekday)] && !hasWorkout && date >= new Date(new Date().toISOString().slice(0, 10))
@@ -294,196 +263,212 @@ export default function CalendarPage() {
             return (
               <button
                 key={day}
-                onClick={() => setSelectedDate(date)}
-                className={`aspect-square flex flex-col items-center justify-center relative transition-all ${
-                  isSelected
-                    ? 'bg-[#1A1917] text-white'
-                    : today
-                      ? 'bg-[#E5E1D9]'
-                      : 'hover:bg-[#F5F2EC]'
-                }`}
+                onClick={() => setSelectedDate(isSelected ? null : date)}
+                className="flex justify-center py-2"
               >
-                <span className={`text-[14px] tabular-nums ${
-                  isSelected ? 'font-bold text-white' : today ? 'font-bold text-[#1A1917]' : 'text-[#1A1917]'
-                }`}>
-                  {day}
-                </span>
-                <div className="flex gap-0.5 mt-0.5">
-                  {hasWorkout && <div className={`w-1.5 h-1.5 ${isSelected ? 'bg-white' : 'bg-[#3D8B5C]'}`} />}
-                  {hasVid && <div className={`w-1.5 h-1.5 ${isSelected ? 'bg-white/60' : 'bg-[#3068C4]'}`} />}
-                  {hasPlanned && !hasWorkout && <div className={`w-1.5 h-1.5 ${isSelected ? 'bg-white/40' : 'bg-[#DDD9D0]'}`} />}
+                <div className={`
+                  w-8 h-8 rounded-full flex items-center justify-center transition-all
+                  ${isSelected
+                    ? 'bg-[#1A1917] scale-110'
+                    : hasWorkout
+                      ? 'bg-[#3D8B5C]'
+                      : today
+                        ? 'bg-[#D46A3A]'
+                        : hasPlanned
+                          ? 'border-[1.5px] border-[#CCC7BC]'
+                          : 'bg-transparent'
+                  }
+                `}>
+                  {/* Show day number only for today, selected, or completed */}
+                  {(isSelected || today || hasWorkout) ? (
+                    <span className={`text-[12px] font-semibold tabular-nums ${
+                      isSelected || hasWorkout || today ? 'text-white' : 'text-[#1A1917]'
+                    }`}>
+                      {day}
+                    </span>
+                  ) : hasPlanned ? (
+                    /* Outlined circle for planned — no number */
+                    null
+                  ) : (
+                    /* Empty/rest: tiny faint dot */
+                    <div className="w-[5px] h-[5px] rounded-full bg-[#E5E1D9]" />
+                  )}
                 </div>
               </button>
             )
           })}
         </div>
 
-        <div className="flex items-center justify-center gap-5 mt-3">
+        {/* Legend */}
+        <div className="flex items-center justify-center gap-5 mt-4">
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 bg-[#3D8B5C]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#3D8B5C]" />
             <span className="text-[10px] text-[#A09D96]">Voltooid</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 bg-[#3068C4]" />
-            <span className="text-[10px] text-[#A09D96]">Video</span>
+            <div className="w-2.5 h-2.5 rounded-full bg-[#D46A3A]" />
+            <span className="text-[10px] text-[#A09D96]">Vandaag</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 bg-[#DDD9D0]" />
+            <div className="w-2.5 h-2.5 rounded-full border-[1.5px] border-[#CCC7BC]" />
             <span className="text-[10px] text-[#A09D96]">Gepland</span>
           </div>
         </div>
       </div>
 
-      {/* ═══ DAY NAVIGATION ════════════════════════════════════ */}
-      <div className="border-t border-[#F0EDE8] pt-5">
-        <div className="flex items-center justify-between mb-4">
-          <button onClick={prevDay} className="w-9 h-9 flex items-center justify-center text-[#A09D96] hover:text-[#1A1917] transition-colors">
-            <ArrowLeft size={18} strokeWidth={1.5} />
-          </button>
-          <div className="text-center">
-            <p className="text-[15px] font-semibold text-[#1A1917]">
-              {selectedDate.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}
-            </p>
-            {isToday(selectedDate) && (
-              <span className="text-[11px] text-[#3D8B5C] font-semibold uppercase tracking-[0.08em]">Vandaag</span>
-            )}
-          </div>
-          <button onClick={nextDay} className="w-9 h-9 flex items-center justify-center text-[#A09D96] hover:text-[#1A1917] transition-colors">
-            <ArrowRight size={18} strokeWidth={1.5} />
-          </button>
-        </div>
+      {/* ═══ DETAIL SLIDE-UP PANEL ═════════════════════════ */}
+      {selectedDate && selectedDayData && (
+        <div className="animate-slide-up">
+          <div className="card-v2 overflow-hidden">
+            {/* Panel header */}
+            <div className="flex items-center justify-between px-6 pt-5 pb-3">
+              <p className="text-[15px] font-semibold text-[#1A1917]">
+                {selectedDate.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}
+              </p>
+              <button
+                onClick={() => setSelectedDate(null)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F5F2EC] transition-colors"
+              >
+                <X size={16} strokeWidth={1.5} className="text-[#A09D96]" />
+              </button>
+            </div>
 
-        {/* Completed workouts — with exercise details */}
-        {selectedDayData.completed.map(w => {
-          const templateName = Array.isArray(w.program_template_days)
-            ? w.program_template_days[0]?.name
-            : w.program_template_days?.name
-          const exercises = groupExercises(w.workout_sets || [])
+            {/* Completed workouts */}
+            {selectedDayData.completed.map(w => {
+              const templateName = Array.isArray(w.program_template_days)
+                ? w.program_template_days[0]?.name
+                : w.program_template_days?.name
+              const exercises = groupExercises(w.workout_sets || [])
 
-          return (
-            <div key={w.id} className="bg-white rounded-2xl shadow-[var(--shadow-card)] mb-3 overflow-hidden">
-              {/* Workout header */}
-              <div className="flex items-center gap-3 p-4">
-                <div className="w-10 h-10 bg-[#3D8B5C]/10 flex items-center justify-center shrink-0">
-                  <Dumbbell size={18} strokeWidth={1.5} className="text-[#3D8B5C]" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-[14px] font-semibold text-[#1A1917]">
-                    {templateName || 'Workout voltooid'}
-                  </p>
-                  <div className="flex items-center gap-3 mt-0.5">
-                    {w.duration_seconds && (
-                      <span className="text-[12px] text-[#A09D96] flex items-center gap-1">
-                        <Clock size={11} strokeWidth={1.5} />
-                        {formatDuration(w.duration_seconds)}
-                      </span>
-                    )}
-                    {w.workout_sets?.length > 0 && (
-                      <span className="text-[12px] text-[#A09D96]">
-                        {formatVolume(w.workout_sets)} volume
-                      </span>
-                    )}
-                    {w.mood_rating && (
-                      <span className="text-[12px]">
-                        {['', '😫', '😐', '😊', '💪', '🔥'][w.mood_rating] || ''}
-                      </span>
-                    )}
+              return (
+                <div key={w.id}>
+                  <div className="flex items-center gap-3 px-6 py-3 border-t border-[#E8E4DC]">
+                    <div className="w-9 h-9 rounded-xl bg-[rgba(61,139,92,0.08)] flex items-center justify-center shrink-0">
+                      <Dumbbell size={16} strokeWidth={1.5} className="text-[#3D8B5C]" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-[14px] font-medium text-[#1A1917]">
+                        {templateName || 'Workout voltooid'}
+                      </p>
+                      <div className="flex items-center gap-3 mt-0.5">
+                        {w.duration_seconds && (
+                          <span className="text-[12px] text-[#A09D96] flex items-center gap-1">
+                            <Clock size={11} strokeWidth={1.5} />
+                            {formatDuration(w.duration_seconds)}
+                          </span>
+                        )}
+                        {w.workout_sets?.length > 0 && (
+                          <span className="text-[12px] text-[#A09D96]">
+                            {formatVolume(w.workout_sets)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Exercise breakdown */}
-              {exercises.length > 0 && (
-                <div className="border-t border-[#F0EDE8] divide-y divide-[#F0EDE8]">
-                  {exercises.map((ex, i) => {
+                  {exercises.length > 0 && exercises.map((ex, i) => {
                     const bestSet = ex.sets.reduce((best, s) =>
                       (s.weight_kg || 0) > (best.weight_kg || 0) ? s : best
                     , ex.sets[0])
 
                     return (
-                      <div key={i} className="flex items-center gap-3 px-4 py-2.5">
+                      <div key={i} className="flex items-center gap-3 px-6 py-2.5 border-t border-[#E8E4DC]/50">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
                             <p className="text-[13px] font-medium text-[#1A1917] truncate">{ex.name}</p>
                             {ex.hasPr && (
-                              <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-[#7B5EA7] bg-[#7B5EA7]/10 px-1.5 py-0.5">PR</span>
+                              <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-[#D46A3A] bg-[rgba(212,106,58,0.08)] px-1.5 py-0.5 rounded">PR</span>
                             )}
                           </div>
-                          <p className="text-[11px] text-[#C5C2BC]">{ex.muscle}</p>
                         </div>
-                        <div className="text-right shrink-0">
-                          <p className="text-[13px] font-semibold text-[#1A1917] tabular-nums">
-                            {bestSet.weight_kg || 0} kg × {bestSet.actual_reps || 0}
-                          </p>
-                          <p className="text-[10px] text-[#C5C2BC]">{ex.sets.length} sets</p>
-                        </div>
+                        <span className="stat-number text-[14px] text-[#1A1917]">
+                          {bestSet.weight_kg || 0}<span className="text-[11px] text-[#A09D96] font-normal ml-0.5">kg</span>
+                          <span className="text-[#C5C2BC] mx-1 font-normal">×</span>
+                          {bestSet.actual_reps || 0}
+                        </span>
                       </div>
                     )
                   })}
                 </div>
-              )}
-            </div>
-          )
-        })}
+              )
+            })}
 
-        {/* Video sessions */}
-        {selectedDayData.videoSessions.map(v => (
-          <div key={v.id} className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4 mb-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#3068C4]/10 flex items-center justify-center shrink-0">
-                <Video size={18} strokeWidth={1.5} className="text-[#3068C4]" />
+            {/* Video sessions */}
+            {selectedDayData.videoSessions.map(v => (
+              <div key={v.id} className="flex items-center gap-3 px-6 py-3 border-t border-[#E8E4DC]">
+                <div className="w-9 h-9 rounded-xl bg-[rgba(48,104,196,0.08)] flex items-center justify-center shrink-0">
+                  <Video size={16} strokeWidth={1.5} className="text-[#3068C4]" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-[14px] font-medium text-[#1A1917]">Videocall</p>
+                  <p className="text-[12px] text-[#A09D96] mt-0.5">
+                    {new Date(v.scheduled_at).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })} · {v.duration_minutes} min
+                  </p>
+                </div>
+                {v.status === 'scheduled' && (
+                  <button
+                    onClick={() => router.push(`/client/video/${v.id}`)}
+                    className="px-3 py-1.5 bg-[#3068C4] text-white text-[11px] font-semibold uppercase tracking-[0.06em] rounded-xl"
+                  >
+                    Join
+                  </button>
+                )}
               </div>
-              <div className="flex-1">
-                <p className="text-[14px] font-semibold text-[#1A1917]">Videocall</p>
-                <p className="text-[12px] text-[#A09D96] mt-0.5">
-                  {new Date(v.scheduled_at).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })} · {v.duration_minutes} min
-                </p>
-              </div>
-              {v.status === 'scheduled' && (
-                <button
-                  onClick={() => router.push(`/client/video/${v.id}`)}
-                  className="px-3 py-1.5 bg-[#3068C4] text-white text-[11px] font-semibold uppercase tracking-[0.06em] rounded-xl"
-                >
-                  Join
-                </button>
-              )}
-            </div>
-          </div>
-        ))}
+            ))}
 
-        {/* Planned workout */}
-        {!hasCompleted && plannedForDay && isFutureOrToday && (
-          <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4 mb-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#E5E1D9] flex items-center justify-center shrink-0">
-                <Dumbbell size={18} strokeWidth={1.5} className="text-[#A09D96]" />
+            {/* Planned workout */}
+            {!hasCompleted && plannedForDay && isFutureOrToday && (
+              <div className="flex items-center gap-3 px-6 py-3 border-t border-[#E8E4DC]">
+                <div className="w-9 h-9 rounded-xl bg-[#F0EDE8] flex items-center justify-center shrink-0">
+                  <Dumbbell size={16} strokeWidth={1.5} className="text-[#A09D96]" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-[14px] font-medium text-[#1A1917]">{plannedForDay.name}</p>
+                  <p className="text-[12px] text-[#A09D96] mt-0.5">
+                    {plannedForDay.focus_area ? `${plannedForDay.focus_area} · ` : ''}~{plannedForDay.estimated_duration} min
+                  </p>
+                </div>
+                {selectedDate && isToday(selectedDate) && (
+                  <button
+                    onClick={() => router.push('/client/workout')}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-[#D46A3A] text-white text-[11px] font-semibold uppercase tracking-[0.06em] rounded-xl"
+                  >
+                    <Play size={12} strokeWidth={2} />
+                    Start
+                  </button>
+                )}
               </div>
-              <div className="flex-1">
-                <p className="text-[14px] font-semibold text-[#1A1917]">{plannedForDay.name}</p>
-                <p className="text-[12px] text-[#A09D96] mt-0.5">
-                  {plannedForDay.focus_area ? `${plannedForDay.focus_area} · ` : ''}~{plannedForDay.estimated_duration} min
-                </p>
-              </div>
-              {isToday(selectedDate) && (
-                <button
-                  onClick={() => router.push('/client/workout')}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-[#1A1917] text-white text-[11px] font-semibold uppercase tracking-[0.06em] rounded-xl"
-                >
-                  <Play size={12} strokeWidth={2} />
-                  Start
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+            )}
 
-        {/* Empty state */}
-        {!hasCompleted && !hasVideo && (!plannedForDay || !isFutureOrToday) && (
-          <div className="text-center py-8">
-            <p className="text-[14px] text-[#C5C2BC]">Geen activiteit op deze dag</p>
+            {/* Empty */}
+            {!hasCompleted && !hasVideo && (!plannedForDay || !isFutureOrToday) && (
+              <div className="text-center py-6 border-t border-[#E8E4DC]">
+                <p className="text-[14px] text-[#C5C2BC]">Geen activiteit</p>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Empty state — no selected date */}
+      {!selectedDate && completedWorkouts.length === 0 && (
+        <div className="text-center py-10 animate-fade-in" style={{ animationDelay: '120ms' }}>
+          <p
+            className="text-[22px] leading-[1.2] tracking-[-0.01em] text-[#1A1917] mb-2"
+            style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
+          >
+            Je eerste workout staat klaar
+          </p>
+          <p className="text-[13px] text-[#A09D96]">
+            Na je workout verschijnt deze hier
+          </p>
+        </div>
+      )}
+      {!selectedDate && completedWorkouts.length > 0 && (
+        <div className="text-center py-8 animate-fade-in" style={{ animationDelay: '120ms' }}>
+          <p className="text-[14px] text-[#C5C2BC]">Tik op een dag voor details</p>
+        </div>
+      )}
     </div>
   )
 }

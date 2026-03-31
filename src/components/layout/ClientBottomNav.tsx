@@ -40,17 +40,17 @@ export function ClientBottomNav() {
             onClick={() => setShowQuickAdd(false)}
           />
           <div className="absolute bottom-28 left-0 right-0 px-6 animate-slide-up">
-            <div className="bg-white p-2 max-w-sm mx-auto">
-              {quickActions.map((action, i) => {
+            <div className="bg-white rounded-2xl border border-[#E8E4DC] p-2 max-w-sm mx-auto">
+              {quickActions.map((action) => {
                 const Icon = action.icon
                 return (
                   <Link
                     key={action.href}
                     href={action.href}
                     onClick={() => setShowQuickAdd(false)}
-                    className="flex items-center gap-3 px-4 py-3.5 hover:bg-[#F5F2EC] transition-colors"
+                    className="flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-[#F5F2EC] transition-colors"
                   >
-                    <Icon className="w-5 h-5 text-[#1A1917]" strokeWidth={1.5} />
+                    <Icon className="w-5 h-5 text-[#1A1917]" strokeWidth={1.25} />
                     <span className="text-[14px] font-medium text-[#1A1917]">{action.label}</span>
                   </Link>
                 )
@@ -75,7 +75,7 @@ export function ClientBottomNav() {
                   className="relative"
                 >
                   <div className={`
-                    w-10 h-10 flex items-center justify-center
+                    w-10 h-10 rounded-xl flex items-center justify-center
                     transition-all duration-250
                     ${showQuickAdd
                       ? 'bg-[#6B6862] rotate-45'
@@ -98,10 +98,10 @@ export function ClientBottomNav() {
                 className={`
                   flex flex-col items-center justify-center gap-0.5 min-w-[48px] py-1
                   transition-all duration-250
-                  ${active ? 'text-[#1A1917]' : 'text-[#C5C2BC]'}
+                  ${active ? 'text-[#D46A3A]' : 'text-[#C5C2BC]'}
                 `}
               >
-                <Icon className="w-[20px] h-[20px]" strokeWidth={active ? 2 : 1.5} />
+                <Icon className="w-[20px] h-[20px]" strokeWidth={active ? 1.75 : 1.25} />
                 <span className="text-[10px] font-semibold tracking-[0.02em]">{item.label}</span>
               </Link>
             )
