@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Cormorant_Garamond, DM_Sans, DM_Mono } from 'next/font/google'
+import { Manrope, DM_Sans, DM_Mono } from 'next/font/google'
 import { ServiceWorkerInit } from '@/components/ServiceWorkerInit'
 import { OfflineIndicator } from '@/components/OfflineIndicator'
 import { InstallPrompt } from '@/components/InstallPrompt'
@@ -8,9 +8,9 @@ import './globals.css'
 // NOTE: removed global force-dynamic — each route should set its own caching
 // strategy. Client pages are 'use client' + useEffect so they don't need this.
 
-const cormorant = Cormorant_Garamond({
+const manrope = Manrope({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['300', '400', '500', '600', '700', '800'],
   variable: '--font-display',
   display: 'swap',
 })
