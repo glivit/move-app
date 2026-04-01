@@ -92,7 +92,7 @@ function SuccessSweep({ active, userName }: { active: boolean; userName: string 
         }}
       >
         <h2
-          className="text-[38px] font-semibold tracking-tight text-[#EEEBE3]"
+          className="text-[38px] font-bold tracking-tight text-[#EEEBE3]"
           style={{
             fontFamily: 'var(--font-display)',
             opacity: active ? 1 : 0,
@@ -257,7 +257,7 @@ function LoginPageInner() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#EEEBE3]">
-        <h1 className="text-7xl font-semibold tracking-tight text-[#1A1917] animate-fade-in" style={{ fontFamily: 'var(--font-display)' }}>
+        <h1 className="text-7xl font-bold tracking-tight text-[#1A1917] animate-fade-in" style={{ fontFamily: 'var(--font-display)' }}>
           MŌVE
         </h1>
       </div>
@@ -293,7 +293,7 @@ function LoginPageInner() {
 
           {/* ─── Logo section ─── */}
           <div className="pt-[140px] pb-2" style={{ opacity: mounted ? 1 : 0, transition: 'opacity 0.6s 0.1s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-            <h1 className="text-[64px] font-semibold leading-none tracking-[-2px] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
+            <h1 className="text-[64px] font-bold leading-none tracking-[-2px] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
               MŌVE
             </h1>
             <p className="mt-2 text-[15px] font-light tracking-[0.2px] text-[#A09D96]" style={{ fontFamily: 'var(--font-body)' }}>
@@ -489,7 +489,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="flex min-h-screen items-center justify-center bg-[#EEEBE3]">
-        <h1 className="text-7xl font-semibold tracking-tight text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
+        <h1 className="text-7xl font-bold tracking-tight text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
           MŌVE
         </h1>
       </div>
