@@ -136,16 +136,7 @@ export function FeedbackWidget() {
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
                   placeholder="Schrijf hier je feedback..."
-                  className="
-                    w-full px-4 py-3 rounded-lg
-                    bg-surface border border-border
-                    text-text-primary placeholder:text-text-muted
-                    transition-colors duration-[var(--transition-fast)]
-                    focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent
-                    disabled:opacity-50 disabled:cursor-not-allowed
-                    resize-none
-                    min-h-[120px] md:min-h-[150px]
-                  "
+                  className="w-full px-4 py-3 rounded-lg bg-surface border border-border text-text-primary placeholder:text-text-muted transition-colors duration-[var(--transition-fast)] focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed resize-none min-h-[120px] md:min-h-[150px]"
                   disabled={isSubmitting}
                 />
 

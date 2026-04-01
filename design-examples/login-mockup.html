@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MŌVE Login — Design Mockup v2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #1a1917;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'DM Sans', sans-serif;
+    padding: 40px 20px;
+  }
+
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: #EEEBE3;
+    border-radius: 48px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.4), inset 0 0 0 3px #333;
+  }
+
+  .phone::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 126px;
+    height: 36px;
+    background: #1a1917;
+    border-radius: 20px;
+    z-index: 100;
+  }
+
+  .status-bar {
+    position: absolute;
+    top: 16px;
+    left: 36px;
+    right: 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 99;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1A1917;
+    transition: color 0.3s;
+  }
+
+  .status-bar .time { font-size: 15px; font-weight: 600; }
+
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0 36px;
+    overflow: hidden;
+  }
+
+  /* ─── SPLASH ─── */
+  .splash {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    animation: splashIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .splash h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 72px;
+    font-weight: 600;
+    color: #1A1917;
+    letter-spacing: -2px;
+  }
+
+  /* ─── LOGIN ─── */
+  .login-screen {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+    padding-top: 80px;
+  }
+
+  .login-screen.active { display: flex; }
+
+  .logo-section {
+    padding-top: 40px;
+    padding-bottom: 8px;
+    opacity: 0;
+    animation: fadeIn 0.6s 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .logo-section h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 64px;
+    font-weight: 600;
+    color: #1A1917;
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+
+  .logo-section p {
+    font-size: 15px;
+    color: #A09D96;
+    margin-top: 8px;
+    font-weight: 300;
+    letter-spacing: 0.2px;
+  }
+
+  .form-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding-top: 48px;
+  }
+
+  /* Underline input */
+  .field {
+    position: relative;
+    padding: 24px 0 12px;
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  .field:nth-child(1) { animation: slideUp 0.5s 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  .field:nth-child(2) { animation: slideUp 0.5s 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+  .field input {
+    width: 100%;
+    border: none;
+    border-bottom: 1.5px solid #D5D1C9;
+    background: transparent;
+    padding: 8px 0 12px;
+    font-size: 16px;
+    font-family: 'DM Sans', sans-serif;
+    color: #1A1917;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+
+  .field input:focus { border-bottom-color: #1A1917; }
+  .field input::placeholder { color: transparent; }
+
+  .field label {
+    position: absolute;
+    left: 0;
+    top: 32px;
+    font-size: 15px;
+    color: #A09D96;
+    pointer-events: none;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .field input:focus ~ label,
+  .field input:not(:placeholder-shown) ~ label {
+    top: 16px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #A09D96;
+    font-weight: 500;
+  }
+
+  .field input:focus ~ label { color: #1A1917; }
+
+  .field .line {
+    position: absolute;
+    bottom: 12px;
+    left: 0;
+    width: 0;
+    height: 1.5px;
+    background: #1A1917;
+    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .field input:focus ~ .line { width: 100%; }
+
+  .password-toggle {
+    position: absolute;
+    right: 0;
+    top: 32px;
+    background: none;
+    border: none;
+    color: #A09D96;
+    cursor: pointer;
+    padding: 8px;
+    transition: color 0.2s;
+  }
+
+  .password-toggle:hover { color: #1A1917; }
+
+  .forgot-link {
+    opacity: 0;
+    animation: slideUp 0.5s 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    text-align: right;
+    padding-top: 12px;
+  }
+
+  .forgot-link a {
+    font-size: 13px;
+    color: #A09D96;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .forgot-link a:hover { color: #1A1917; }
+
+  /* Login button */
+  .login-btn {
+    margin-top: 40px;
+    width: 100%;
+    background: #1A1917;
+    color: #EEEBE3;
+    border: none;
+    padding: 18px 24px;
+    border-radius: 16px;
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(12px);
+    animation: slideUp 0.5s 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login-btn:hover {
+    background: #333330;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(26,25,23,0.15);
+  }
+
+  .login-btn:active { transform: scale(0.98); }
+
+  .login-btn .arrow { transition: transform 0.3s; }
+  .login-btn:hover .arrow { transform: translateX(3px); }
+
+  .login-btn .spinner {
+    display: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(238,235,227,0.3);
+    border-top-color: #EEEBE3;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  /* Success checkmark in button */
+  .login-btn .check {
+    display: none;
+    opacity: 0;
+  }
+
+  .login-btn.success {
+    background: #3D8B5C;
+    pointer-events: none;
+  }
+
+  .login-btn.success .check {
+    display: block;
+    animation: checkPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  /* Bottom section */
+  .bottom-section {
+    padding-bottom: 48px;
+    padding-top: 32px;
+    opacity: 0;
+    animation: fadeIn 0.5s 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .oauth-row {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .oauth-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1.5px solid #D5D1C9;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+
+  .oauth-btn:hover { border-color: #A09D96; background: rgba(255,255,255,0.5); }
+  .oauth-btn:active { transform: scale(0.95); }
+
+  .oauth-btn.apple { background: #1A1917; border-color: #1A1917; }
+  .oauth-btn.apple:hover { background: #333330; border-color: #333330; }
+
+  .contact-text { text-align: center; font-size: 13px; color: #A09D96; }
+  .contact-text a { color: #1A1917; text-decoration: none; font-weight: 500; }
+  .contact-text a:hover { opacity: 0.6; }
+
+  /* Error */
+  .error-msg {
+    display: none;
+    padding: 14px 16px;
+    background: rgba(196, 55, 42, 0.06);
+    border: 1px solid rgba(196, 55, 42, 0.12);
+    border-radius: 12px;
+    font-size: 13px;
+    color: #C4372A;
+    margin-top: 8px;
+    animation: shakeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .error-msg.visible { display: block; }
+
+  /* ─── SUCCESS TRANSITION OVERLAY ─── */
+  .success-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 90;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .success-overlay .sweep {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0;
+    background: #1A1917;
+    border-radius: 0;
+  }
+
+  .success-overlay .sweep.active {
+    animation: sweepUp 0.7s 0.3s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  }
+
+  .success-overlay .welcome {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    gap: 12px;
+  }
+
+  .success-overlay .welcome.active {
+    animation: fadeIn 0.5s 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .success-overlay .welcome h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px;
+    font-weight: 600;
+    color: #EEEBE3;
+    letter-spacing: -1px;
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  .success-overlay .welcome h2.active {
+    animation: slideUp 0.6s 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .success-overlay .welcome p {
+    font-size: 14px;
+    color: rgba(238,235,227,0.5);
+    opacity: 0;
+  }
+
+  .success-overlay .welcome p.active {
+    animation: fadeIn 0.5s 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Subtle loading dots on welcome screen */
+  .loading-dots {
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+  }
+
+  .loading-dots.active {
+    animation: fadeIn 0.4s 1.5s forwards;
+  }
+
+  .loading-dots span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(238,235,227,0.3);
+  }
+
+  .loading-dots span:nth-child(1) { animation: dotPulse 1.2s 1.6s ease-in-out infinite; }
+  .loading-dots span:nth-child(2) { animation: dotPulse 1.2s 1.8s ease-in-out infinite; }
+  .loading-dots span:nth-child(3) { animation: dotPulse 1.2s 2.0s ease-in-out infinite; }
+
+  /* ─── DASHBOARD PREVIEW (after sweep) ─── */
+  .dashboard-preview {
+    position: absolute;
+    inset: 0;
+    z-index: 95;
+    background: #EEEBE3;
+    opacity: 0;
+    pointer-events: none;
+    padding: 72px 24px 40px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dashboard-preview.active {
+    animation: dashReveal 0.8s 2.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .dash-header {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  .dash-header.active {
+    animation: slideUp 0.5s 3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .dash-greeting {
+    font-size: 14px;
+    color: #A09D96;
+    margin-bottom: 4px;
+  }
+
+  .dash-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 600;
+    color: #1A1917;
+    letter-spacing: -1px;
+    line-height: 1.1;
+  }
+
+  .dash-card {
+    margin-top: 28px;
+    background: white;
+    border-radius: 20px;
+    padding: 28px 24px;
+    border: 1px solid #E8E4DC;
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  .dash-card:nth-child(2) { animation: none; }
+  .dash-card:nth-child(3) { animation: none; }
+
+  .dash-card.active:nth-child(2) {
+    animation: slideUp 0.5s 3.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .dash-card.active:nth-child(3) {
+    animation: slideUp 0.5s 3.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .dash-card-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #A09D96;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .dash-card-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 600;
+    color: #1A1917;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  .dash-card-sub {
+    font-size: 13px;
+    color: #A09D96;
+    margin-top: 6px;
+  }
+
+  .dash-streak-dots {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .dash-streak-dots span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #E8E4DC;
+  }
+
+  .dash-streak-dots span.filled { background: #1A1917; }
+  .dash-streak-dots span.accent { background: #D46A3A; }
+
+  /* ─── RESET STATE ─── */
+  .reset-screen {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+    padding-top: 80px;
+  }
+
+  .reset-screen.active { display: flex; }
+
+  .reset-screen .logo-section { animation: fadeIn 0.4s 0.05s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  .reset-screen .field { animation: slideUp 0.5s 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  .reset-screen .login-btn { animation: slideUp 0.5s 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+  .back-link {
+    text-align: center;
+    margin-top: 20px;
+    opacity: 0;
+    animation: fadeIn 0.5s 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .back-link a { font-size: 13px; color: #A09D96; text-decoration: none; cursor: pointer; transition: color 0.2s; }
+  .back-link a:hover { color: #1A1917; }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes splashIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes shakeIn {
+    0% { opacity: 0; transform: translateX(-8px); }
+    40% { transform: translateX(4px); }
+    70% { transform: translateX(-2px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes checkPop {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes sweepUp {
+    from { height: 0; }
+    to { height: 100%; }
+  }
+
+  @keyframes dotPulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.3); }
+  }
+
+  @keyframes dashReveal {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  /* ─── CONTROLS ─── */
+  .controls {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 200;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .ctrl-btn {
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: 1px solid #444;
+    background: #222;
+    color: #ddd;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .ctrl-btn:hover { background: #333; color: #fff; }
+  .ctrl-btn.active { background: #D46A3A; border-color: #D46A3A; color: #fff; }
+  .ctrl-btn.success-btn { border-color: #3D8B5C; }
+  .ctrl-btn.success-btn.active { background: #3D8B5C; border-color: #3D8B5C; }
+</style>
+</head>
+<body>
+
+<div class="phone" id="phone">
+  <div class="status-bar" id="status-bar">
+    <span class="time">9:41</span>
+    <span>
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1" opacity="0.3"/><rect x="4.5" y="2" width="3" height="10" rx="1" opacity="0.5"/><rect x="9" y="0.5" width="3" height="11.5" rx="1" opacity="0.7"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+    </span>
+  </div>
+
+  <!-- SPLASH -->
+  <div class="screen splash" id="splash-screen">
+    <h1>MŌVE</h1>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="screen login-screen" id="login-screen">
+    <div class="logo-section">
+      <h1>MŌVE</h1>
+      <p>Log in op je account</p>
+    </div>
+
+    <div class="form-section">
+      <div class="field">
+        <input type="email" id="email" placeholder=" " autocomplete="email">
+        <label for="email">E-mailadres</label>
+        <div class="line"></div>
+      </div>
+
+      <div class="field">
+        <input type="password" id="password" placeholder=" " autocomplete="current-password">
+        <label for="password">Wachtwoord</label>
+        <div class="line"></div>
+        <button class="password-toggle" onclick="togglePassword()" aria-label="Toon wachtwoord">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+
+      <div class="error-msg" id="error-msg">
+        Ongeldige inloggegevens. Probeer opnieuw.
+      </div>
+
+      <div class="forgot-link">
+        <a href="#" onclick="showReset(); return false;">Wachtwoord vergeten?</a>
+      </div>
+
+      <button class="login-btn" id="login-btn" onclick="simulateLogin()">
+        <span class="btn-text">Inloggen</span>
+        <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <div class="spinner"></div>
+        <svg class="check" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </button>
+    </div>
+
+    <div class="bottom-section">
+      <div class="oauth-row">
+        <button class="oauth-btn google" title="Log in met Google">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+        </button>
+        <button class="oauth-btn apple" title="Log in met Apple">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+            <path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.18 0-.36-.02-.53-.06-.01-.18-.04-.56-.04-.95 0-1.05.546-2.22 1.223-2.98.34-.38.77-.73 1.275-.98.51-.26 1.003-.41 1.48-.44.02.25.04.5.04.75zm4.035 12.15c-.04.01-2.098.81-2.098 3.33 0 2.97 2.602 4.02 2.682 4.04-.02.07-.41 1.44-1.378 2.85-.858 1.24-1.756 2.48-3.172 2.48-1.396 0-1.852-.83-3.449-.83-1.558 0-2.134.85-3.43.85-1.296 0-2.174-1.15-3.172-2.57C5.04 22.1 4.05 19.23 4.05 16.5c0-4.24 2.77-6.49 5.498-6.49 1.417 0 2.597.93 3.49.93.853 0 2.18-.99 3.796-.99.614 0 2.822.18 4.282 1.38-.11.07-2.556 1.49-2.556 4.45v-.17z"/>
+          </svg>
+        </button>
+      </div>
+      <p class="contact-text">
+        Nog geen account? <a href="mailto:contact@movecoaching.be">Neem contact op</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- RESET PASSWORD -->
+  <div class="screen reset-screen" id="reset-screen">
+    <div class="logo-section">
+      <h1>MŌVE</h1>
+      <p>Vul je e-mail in voor een reset-link</p>
+    </div>
+
+    <div class="form-section">
+      <div class="field">
+        <input type="email" id="reset-email" placeholder=" " autocomplete="email">
+        <label for="reset-email">E-mailadres</label>
+        <div class="line"></div>
+      </div>
+
+      <button class="login-btn" onclick="simulateReset()">
+        <span class="btn-text">Verstuur reset-link</span>
+        <div class="spinner"></div>
+        <svg class="check" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </button>
+
+      <div class="back-link">
+        <a onclick="showLogin()">Terug naar inloggen</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS TRANSITION OVERLAY -->
+  <div class="success-overlay" id="success-overlay">
+    <div class="sweep" id="sweep"></div>
+    <div class="welcome" id="welcome">
+      <h2 id="welcome-title">Welkom, Glenn</h2>
+      <p id="welcome-sub">Even geduld...</p>
+      <div class="loading-dots" id="loading-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD PREVIEW -->
+  <div class="dashboard-preview" id="dashboard-preview">
+    <div class="dash-header" id="dash-header">
+      <div class="dash-greeting">Goedemorgen</div>
+      <div class="dash-name">Glenn</div>
+    </div>
+
+    <div class="dash-card" id="dash-card-1">
+      <div class="dash-card-label">Vandaag</div>
+      <div class="dash-card-value">Upper body</div>
+      <div class="dash-card-sub">8 oefeningen &middot; ~45 min</div>
+    </div>
+
+    <div class="dash-card" id="dash-card-2">
+      <div class="dash-card-label">Streak</div>
+      <div class="dash-card-value" style="font-size: 56px;">7</div>
+      <div class="dash-card-sub">weken op rij</div>
+      <div class="dash-streak-dots">
+        <span class="filled"></span>
+        <span class="filled"></span>
+        <span class="filled"></span>
+        <span class="filled"></span>
+        <span class="filled"></span>
+        <span class="filled"></span>
+        <span class="accent"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTROLS -->
+<div class="controls">
+  <button class="ctrl-btn active" id="btn-splash" onclick="showSplash()">Splash</button>
+  <button class="ctrl-btn" id="btn-login" onclick="showLogin()">Login</button>
+  <button class="ctrl-btn" id="btn-error" onclick="showError()">Error</button>
+  <button class="ctrl-btn" id="btn-reset" onclick="showReset()">Reset</button>
+  <button class="ctrl-btn success-btn" id="btn-success" onclick="showSuccessFlow()">Login success</button>
+</div>
+
+<script>
+  let autoTimer = setTimeout(() => showLogin(), 1800);
+
+  function setActive(id) {
+    document.querySelectorAll('.ctrl-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function resetAll() {
+    clearTimeout(autoTimer);
+    // Hide all screens
+    document.getElementById('splash-screen').style.display = 'none';
+    document.getElementById('login-screen').classList.remove('active');
+    document.getElementById('reset-screen').classList.remove('active');
+    document.getElementById('error-msg').classList.remove('visible');
+    document.getElementById('dashboard-preview').classList.remove('active');
+    document.getElementById('dashboard-preview').style.opacity = '0';
+
+    // Reset success overlay
+    const sweep = document.getElementById('sweep');
+    const welcome = document.getElementById('welcome');
+    const welcomeTitle = document.getElementById('welcome-title');
+    const welcomeSub = document.getElementById('welcome-sub');
+    const dots = document.getElementById('loading-dots');
+    sweep.classList.remove('active');
+    sweep.style.height = '0';
+    welcome.classList.remove('active');
+    welcomeTitle.classList.remove('active');
+    welcomeSub.classList.remove('active');
+    dots.classList.remove('active');
+
+    // Reset dashboard items
+    document.getElementById('dash-header').classList.remove('active');
+    document.getElementById('dash-card-1').classList.remove('active');
+    document.getElementById('dash-card-2').classList.remove('active');
+
+    // Reset login button
+    const btn = document.getElementById('login-btn');
+    btn.classList.remove('success');
+    const text = btn.querySelector('.btn-text');
+    const arrow = btn.querySelector('.arrow');
+    const spinner = btn.querySelector('.spinner');
+    text.style.display = '';
+    arrow.style.display = '';
+    spinner.style.display = 'none';
+
+    // Reset status bar color
+    document.getElementById('status-bar').style.color = '#1A1917';
+
+    // Clear inputs
+    document.getElementById('email').value = '';
+    document.getElementById('password').value = '';
+  }
+
+  function showSplash() {
+    resetAll();
+    const splash = document.getElementById('splash-screen');
+    splash.style.display = 'flex';
+    splash.style.animation = 'none';
+    splash.offsetHeight;
+    splash.style.animation = 'splashIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both';
+    setActive('btn-splash');
+    autoTimer = setTimeout(() => showLogin(), 1800);
+  }
+
+  function showLogin() {
+    resetAll();
+    const screen = document.getElementById('login-screen');
+    screen.classList.add('active');
+    screen.querySelectorAll('.field, .login-btn, .forgot-link, .bottom-section, .logo-section').forEach(el => {
+      el.style.animation = 'none';
+      el.style.opacity = '';
+      el.style.transform = '';
+      el.offsetHeight;
+      el.style.animation = '';
+    });
+    setActive('btn-login');
+  }
+
+  function showError() {
+    resetAll();
+    const screen = document.getElementById('login-screen');
+    screen.classList.add('active');
+    screen.querySelectorAll('.field, .login-btn, .forgot-link, .bottom-section, .logo-section').forEach(el => {
+      el.style.animation = 'none';
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+    });
+    document.getElementById('email').value = 'glenn@example.com';
+    document.getElementById('password').value = 'wrongpassword';
+    setTimeout(() => {
+      document.getElementById('error-msg').classList.add('visible');
+    }, 200);
+    setActive('btn-error');
+  }
+
+  function showReset() {
+    resetAll();
+    const screen = document.getElementById('reset-screen');
+    screen.classList.add('active');
+    screen.querySelectorAll('.field, .login-btn, .back-link, .logo-section').forEach(el => {
+      el.style.animation = 'none';
+      el.offsetHeight;
+      el.style.animation = '';
+    });
+    setActive('btn-reset');
+  }
+
+  function showSuccessFlow() {
+    resetAll();
+    setActive('btn-success');
+
+    // Show login screen filled in, no animations
+    const screen = document.getElementById('login-screen');
+    screen.classList.add('active');
+    screen.querySelectorAll('.field, .login-btn, .forgot-link, .bottom-section, .logo-section').forEach(el => {
+      el.style.animation = 'none';
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+    });
+    document.getElementById('email').value = 'glenn@movecoaching.be';
+    document.getElementById('password').value = 'mypassword123';
+
+    const btn = document.getElementById('login-btn');
+    const text = btn.querySelector('.btn-text');
+    const arrow = btn.querySelector('.arrow');
+    const spinner = btn.querySelector('.spinner');
+
+    // Step 1: Show spinner (300ms delay to feel like a click)
+    setTimeout(() => {
+      text.style.display = 'none';
+      arrow.style.display = 'none';
+      spinner.style.display = 'block';
+    }, 400);
+
+    // Step 2: Show checkmark + green (after "loading")
+    setTimeout(() => {
+      spinner.style.display = 'none';
+      btn.classList.add('success');
+    }, 1400);
+
+    // Step 3: Start the dark sweep from bottom
+    setTimeout(() => {
+      document.getElementById('sweep').classList.add('active');
+      // Fade status bar to white
+      document.getElementById('status-bar').style.color = '#EEEBE3';
+    }, 1800);
+
+    // Step 4: Show welcome text
+    setTimeout(() => {
+      document.getElementById('welcome').classList.add('active');
+      document.getElementById('welcome-title').classList.add('active');
+      document.getElementById('welcome-sub').classList.add('active');
+      document.getElementById('loading-dots').classList.add('active');
+    }, 2000);
+
+    // Step 5: Reveal dashboard
+    setTimeout(() => {
+      const dash = document.getElementById('dashboard-preview');
+      dash.classList.add('active');
+      document.getElementById('status-bar').style.color = '#1A1917';
+    }, 3200);
+
+    // Step 6: Animate dashboard content
+    setTimeout(() => {
+      document.getElementById('dash-header').classList.add('active');
+      document.getElementById('dash-card-1').classList.add('active');
+      document.getElementById('dash-card-2').classList.add('active');
+    }, 3200);
+  }
+
+  function simulateLogin() {
+    const btn = document.getElementById('login-btn');
+    const text = btn.querySelector('.btn-text');
+    const arrow = btn.querySelector('.arrow');
+    const spinner = btn.querySelector('.spinner');
+
+    text.style.display = 'none';
+    arrow.style.display = 'none';
+    spinner.style.display = 'block';
+
+    setTimeout(() => {
+      spinner.style.display = 'none';
+      text.style.display = '';
+      arrow.style.display = '';
+      document.getElementById('error-msg').classList.add('visible');
+    }, 1500);
+  }
+
+  function simulateReset() {
+    const btn = document.querySelector('#reset-screen .login-btn');
+    const text = btn.querySelector('.btn-text');
+    const spinner = btn.querySelector('.spinner');
+
+    text.style.display = 'none';
+    spinner.style.display = 'block';
+
+    setTimeout(() => {
+      spinner.style.display = 'none';
+      btn.classList.add('success');
+    }, 1500);
+  }
+
+  function togglePassword() {
+    const pw = document.getElementById('password');
+    pw.type = pw.type === 'password' ? 'text' : 'password';
+  }
+</script>
+
+</body>
+</html>
