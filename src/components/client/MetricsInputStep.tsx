@@ -29,15 +29,15 @@ export function MetricsInputStep({ metrics, onChange }: Props) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div>
-        <h3 className="font-display font-semibold text-lg">InBody metingen</h3>
+        <h3 className="font-semibold text-[20px]">InBody metingen</h3>
         <p className="text-sm text-text-secondary mt-1">
           Voer je InBody resultaten in. Gebruik komma als decimaalteken.
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-6">
         {fields.map(({ key, label, unit, placeholder }) => (
           <div key={key}>
             <Input

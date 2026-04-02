@@ -135,7 +135,7 @@ export default function HealthPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div><h1 className="page-title">Gezondheid</h1></div>
+        <div><h1 className="page-title-sm">Gezondheid</h1></div>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => <div key={i} className="h-24 bg-[#F0F0EE] rounded-2xl animate-shimmer" />)}
         </div>

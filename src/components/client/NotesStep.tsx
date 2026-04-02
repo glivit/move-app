@@ -34,13 +34,13 @@ function ScoreSlider({ label, value, onChange }: { label: string; value: number 
 
 export function NotesStep({ notes, moodScore, energyScore, sleepScore, onChange }: Props) {
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div>
-        <h3 className="font-display font-semibold text-lg">Hoe voel je je?</h3>
+        <h3 className="font-semibold text-[20px]">Hoe voel je je?</h3>
         <p className="text-sm text-text-secondary mt-1">Optioneel — deel wat je wilt.</p>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
         <ScoreSlider label="Stemming" value={moodScore} onChange={(v) => onChange({ mood_score: v })} />
         <ScoreSlider label="Energie" value={energyScore} onChange={(v) => onChange({ energy_score: v })} />
         <ScoreSlider label="Slaap" value={sleepScore} onChange={(v) => onChange({ sleep_score: v })} />

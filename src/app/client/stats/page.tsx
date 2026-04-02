@@ -371,7 +371,7 @@ export default function StatsPage() {
   return (
     <div className="pb-24">
       {/* Hero Section */}
-      <div className="mb-10 animate-slide-up">
+      <div className="mb-14 animate-slide-up">
         <p className="text-label mb-3">Training</p>
         <p className="stat-number-hero text-[#1A1917]">
           <AnimatedNumber value={Math.round(totalVolume / 1000)} suffix=" ton" />
@@ -380,7 +380,7 @@ export default function StatsPage() {
       </div>
 
       {/* Tab bar */}
-      <div className="flex mb-5 animate-slide-up stagger-2">
+      <div className="flex mb-8 animate-slide-up stagger-2">
         {tabs.map(tab => (
           <button
             key={tab.id}
@@ -388,7 +388,7 @@ export default function StatsPage() {
             className={`flex-1 py-3 text-[13px] font-semibold uppercase tracking-[0.06em] transition-all border-b-2 text-center ${
               activeTab === tab.id
                 ? 'border-[#1A1917] text-[#1A1917]'
-                : 'border-transparent text-[#C0C0C0] hover:bg-[#FAFAF8]'
+                : 'border-transparent text-[#C0C0C0] hover:opacity-60'
             }`}
           >
             {tab.label}
@@ -397,7 +397,7 @@ export default function StatsPage() {
       </div>
 
       {/* Controls: time range + grouping */}
-      <div className="flex items-center justify-between mb-5 animate-slide-up stagger-3">
+      <div className="flex items-center justify-between mb-8 animate-slide-up stagger-3">
         <div className="flex gap-1">
           {(['4w', '8w', '12w', 'all'] as TimeRange[]).map(r => (
             <button
@@ -434,7 +434,7 @@ export default function StatsPage() {
 
       {/* Exercise selector when groupBy = oefening */}
       {groupBy === 'oefening' && (
-        <div className="relative mb-5">
+        <div className="relative mb-8">
           <select
             value={selectedExercise || ''}
             onChange={(e) => setSelectedExercise(e.target.value || null)}
@@ -453,7 +453,7 @@ export default function StatsPage() {
 
       {/* Spiergroep filter pills when groupBy = spiergroep */}
       {groupBy === 'spiergroep' && (
-        <div className="flex gap-1 mb-5 overflow-x-auto pb-1 -mx-4 px-4">
+        <div className="flex gap-1 mb-12 overflow-x-auto pb-1 -mx-4 px-4">
           <button
             onClick={() => setSelectedGroup(null)}
             className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 ${
@@ -481,7 +481,7 @@ export default function StatsPage() {
       {activeTab === 'kracht' && (
         <div className="animate-slide-up stagger-4">
           {krachtData.length > 0 ? (
-            <div className="bg-white rounded-2xl border border-[#F0F0EE] p-4 hover:bg-[#FAFAF8] transition-colors">
+            <div className="border-t border-[#F0F0EE] pt-8 mt-12">
               <p className="text-label mb-3">Max gewicht per week (kg)</p>
               <ResponsiveContainer width="100%" height={220}>
                 {groupBy === 'spiergroep' ? (
@@ -517,7 +517,7 @@ export default function StatsPage() {
       {activeTab === 'volume' && (
         <div className="animate-slide-up stagger-4">
           {volumeData.length > 0 ? (
-            <div className="bg-white rounded-2xl border border-[#F0F0EE] p-4 hover:bg-[#FAFAF8] transition-colors">
+            <div className="border-t border-[#F0F0EE] pt-8 mt-12">
               <p className="text-label mb-3">
                 Volume per week {groupBy === 'spiergroep' ? '(ton)' : '(kg)'}
               </p>
@@ -560,32 +560,31 @@ export default function StatsPage() {
               <p className="text-[14px] text-[#C0C0C0]">Geen records in deze periode</p>
             </div>
           ) : (
-            <div className="space-y-2">
-              {filteredPrs.map(pr => {
+            <div className="border-t border-[#F0F0EE] mt-12">
+              {filteredPrs.map((pr, idx) => {
                 const ex = pr.exercise as any
                 const exName = ex?.name_nl || ex?.name || 'Onbekend'
                 const group = ex ? getMuscleGroup(ex.target_muscle) : 'Overig'
+                const isLast = idx === filteredPrs.length - 1
 
                 return (
-                  <div key={pr.id} className="bg-white rounded-2xl border border-[#F0F0EE] p-4 hover:bg-[#FAFAF8] transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 flex items-center justify-center shrink-0" style={{ backgroundColor: `${GROUP_COLORS[group] || '#ACACAC'}15` }}>
-                        <Trophy size={16} strokeWidth={1.5} style={{ color: GROUP_COLORS[group] || '#ACACAC' }} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[14px] font-semibold text-[#1A1917] truncate">{exName}</p>
-                        <p className="text-[11px] text-[#ACACAC]">
-                          {group} · {new Date(pr.achieved_at).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })}
-                        </p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <p className="text-[18px] font-bold text-[#1A1917] tabular-nums">
-                          {pr.value}
-                        </p>
-                        <p className="text-[10px] text-[#ACACAC]">
-                          {pr.record_type === 'weight' ? 'kg' : pr.record_type === 'reps' ? 'reps' : pr.record_type}
-                        </p>
-                      </div>
+                  <div key={pr.id} className={`flex items-center gap-3 py-4 ${!isLast ? 'border-b border-[#F0F0EE]' : ''}`}>
+                    <div className="w-9 h-9 flex items-center justify-center shrink-0" style={{ backgroundColor: `${GROUP_COLORS[group] || '#ACACAC'}15` }}>
+                      <Trophy size={16} strokeWidth={1.5} style={{ color: GROUP_COLORS[group] || '#ACACAC' }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[14px] font-semibold text-[#1A1917] truncate">{exName}</p>
+                      <p className="text-[11px] text-[#ACACAC]">
+                        {group} · {new Date(pr.achieved_at).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-[18px] font-bold text-[#1A1917] tabular-nums">
+                        {pr.value}
+                      </p>
+                      <p className="text-[10px] text-[#ACACAC]">
+                        {pr.record_type === 'weight' ? 'kg' : pr.record_type === 'reps' ? 'reps' : pr.record_type}
+                      </p>
                     </div>
                   </div>
                 )

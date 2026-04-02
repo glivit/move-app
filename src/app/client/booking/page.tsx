@@ -126,7 +126,7 @@ export default function BookingPage() {
       <div className="space-y-6">
         <div className="animate-slide-up">
           <p className="text-label mb-3">Afspraken</p>
-          <h1 className="page-title">Boeken</h1>
+          <h1 className="page-title-sm">Boeken</h1>
         </div>
         <div className="bg-white h-64 rounded-2xl animate-pulse" />
       </div>
@@ -154,7 +154,7 @@ export default function BookingPage() {
     <div className="space-y-6">
       <div className="animate-slide-up">
         <p className="text-label mb-3">Afspraken</p>
-        <h1 className="page-title">Boeken</h1>
+        <h1 className="page-title-sm">Boeken</h1>
       </div>
 
       {slots.length === 0 ? (

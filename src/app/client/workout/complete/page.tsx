@@ -324,7 +324,7 @@ function WorkoutCompletePage() {
   if (!session) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-[14px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>Sessie niet gevonden</p>
+        <p className="text-[14px] text-[#ACACAC]">Sessie niet gevonden</p>
       </div>
     )
   }
@@ -350,11 +350,8 @@ function WorkoutCompletePage() {
     <div className="pb-28">
 
       {/* ── Header — celebration ── */}
-      <div className="pt-8 pb-2 text-center mb-8">
-        <p
-          className="text-[12px] font-medium text-[#3D8B5C] uppercase tracking-[1.5px] mb-4"
-          style={{ fontFamily: 'var(--font-body)' }}
-        >
+      <div className="pt-8 pb-2 text-center mb-14">
+        <p className="text-[12px] font-medium text-[#3D8B5C] uppercase tracking-[1.5px] mb-4">
           Voltooid
         </p>
         <h1 className="text-editorial-h1">
@@ -363,10 +360,7 @@ function WorkoutCompletePage() {
         {prsCount > 0 && (
           <div className="mt-4 inline-flex items-center gap-2">
             <Trophy size={16} strokeWidth={2} className="text-[#D46A3A]" />
-            <span
-              className="text-[14px] font-semibold text-[#D46A3A]"
-              style={{ fontFamily: 'var(--font-body)' }}
-            >
+            <span className="text-[14px] font-semibold text-[#D46A3A]">
               {prsCount} {prsCount === 1 ? 'nieuw record' : 'nieuwe records'}
             </span>
           </div>
@@ -374,38 +368,27 @@ function WorkoutCompletePage() {
       </div>
 
       {/* ── Stats row ── */}
-      <div className="flex items-center justify-center gap-8 mb-12">
-        <div className="text-center">
+      <div className="border-t border-[#F0F0EE] pt-8 mt-12">
+        <div className="flex items-center justify-between py-5 border-b border-[#F0F0EE]">
+          <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px]">Minuten</p>
           <AnimatedStat value={minutes} />
-          <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mt-1" style={{ fontFamily: 'var(--font-body)' }}>
-            Minuten
-          </p>
         </div>
-        <div className="w-px h-10 bg-[#F0F0EE]" />
-        <div className="text-center">
+        <div className="flex items-center justify-between py-5 border-b border-[#F0F0EE]">
+          <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px]">Sets</p>
           <AnimatedStat value={totalSets} />
-          <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mt-1" style={{ fontFamily: 'var(--font-body)' }}>
-            Sets
-          </p>
         </div>
-        <div className="w-px h-10 bg-[#F0F0EE]" />
-        <div className="text-center">
+        <div className="flex items-center justify-between py-5">
+          <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px]">Volume</p>
           <AnimatedStat
             value={totalVolume > 1000 ? +(totalVolume / 1000).toFixed(1) : totalVolume}
             suffix={totalVolume > 1000 ? 't' : ''}
           />
-          <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mt-1" style={{ fontFamily: 'var(--font-body)' }}>
-            Volume
-          </p>
         </div>
       </div>
 
       {/* ── Gevoel ── */}
-      <div className="border-t border-[#F0F0EE] pt-6 mb-8">
-        <p
-          className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-4"
-          style={{ fontFamily: 'var(--font-body)' }}
-        >
+      <div className="border-t border-[#F0F0EE] pt-8 mt-12 mb-8">
+        <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-4">
           Hoe voelde je je?
         </p>
         <div className="flex gap-2">
@@ -418,7 +401,6 @@ function WorkoutCompletePage() {
                   ? 'bg-[#1A1917] text-white'
                   : 'border border-[#F0F0EE] text-[#ACACAC] hover:border-[#C0C0C0]'
               }`}
-              style={{ fontFamily: 'var(--font-body)' }}
             >
               {m.label}
             </button>
@@ -427,11 +409,8 @@ function WorkoutCompletePage() {
       </div>
 
       {/* ── Moeilijkheid ── */}
-      <div className="border-t border-[#F0F0EE] pt-6 mb-8">
-        <p
-          className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-4"
-          style={{ fontFamily: 'var(--font-body)' }}
-        >
+      <div className="border-t border-[#F0F0EE] pt-8 mt-12 mb-8">
+        <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-4">
           Moeilijkheidsgraad
         </p>
         <div className="flex gap-2">
@@ -452,23 +431,20 @@ function WorkoutCompletePage() {
           ))}
         </div>
         <div className="flex justify-between mt-2 px-1">
-          <span className="text-[10px] text-[#D5D5D5]" style={{ fontFamily: 'var(--font-body)' }}>Makkelijk</span>
-          <span className="text-[10px] text-[#D5D5D5]" style={{ fontFamily: 'var(--font-body)' }}>Te zwaar</span>
+          <span className="text-[10px] text-[#D5D5D5]">Makkelijk</span>
+          <span className="text-[10px] text-[#D5D5D5]">Te zwaar</span>
         </div>
       </div>
 
       {/* ── Pijn per oefening ── */}
       {exerciseGroups.length > 0 && (
-        <div className="border-t border-[#F0F0EE] pt-6 mb-8">
+        <div className="border-t border-[#F0F0EE] pt-8 mt-12 mb-8">
           <div className="flex items-center justify-between mb-4">
-            <p
-              className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px]"
-              style={{ fontFamily: 'var(--font-body)' }}
-            >
+            <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px]">
               Pijn of ongemak?
             </p>
             {painCount > 0 && (
-              <span className="text-[11px] font-medium text-[#C4372A]" style={{ fontFamily: 'var(--font-body)' }}>
+              <span className="text-[11px] font-medium text-[#C4372A]">
                 {painCount} oefening{painCount !== 1 ? 'en' : ''}
               </span>
             )}
@@ -492,11 +468,10 @@ function WorkoutCompletePage() {
                   className={`text-[14px] font-medium flex-1 text-left ${
                     group.painFlag ? 'text-[#C4372A]' : 'text-[#1A1917]'
                   }`}
-                  style={{ fontFamily: 'var(--font-body)' }}
                 >
                   {group.name}
                 </span>
-                <span className="text-[12px] text-[#C0C0C0]" style={{ fontFamily: 'var(--font-body)' }}>
+                <span className="text-[12px] text-[#C0C0C0]">
                   {group.sets.length} sets
                 </span>
                 {group.painFlag && (
@@ -512,7 +487,6 @@ function WorkoutCompletePage() {
                     onChange={(e) => setPainNotes(group.exerciseId, e.target.value)}
                     placeholder="Waar voelde je pijn? (bijv. linkerschouder, onderrug...)"
                     className="w-full px-4 py-3 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:border-[#C4372A]/40 resize-none h-16 bg-white"
-                    style={{ fontFamily: 'var(--font-body)' }}
                   />
                 </div>
               )}
@@ -522,11 +496,8 @@ function WorkoutCompletePage() {
       )}
 
       {/* ── Feedback voor coach ── */}
-      <div className="border-t border-[#F0F0EE] pt-6 mb-8">
-        <p
-          className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-3"
-          style={{ fontFamily: 'var(--font-body)' }}
-        >
+      <div className="border-t border-[#F0F0EE] pt-8 mt-12 mb-8">
+        <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-3">
           Feedback voor je coach
         </p>
         <textarea
@@ -534,16 +505,12 @@ function WorkoutCompletePage() {
           onChange={(e) => setFeedbackText(e.target.value)}
           placeholder="Welke oefeningen wil je meer of minder?"
           className="w-full px-4 py-3 border border-[#F0F0EE] rounded-xl text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917] resize-none h-20 bg-white"
-          style={{ fontFamily: 'var(--font-body)' }}
         />
       </div>
 
       {/* ── Notities ── */}
-      <div className="border-t border-[#F0F0EE] pt-6 mb-10">
-        <p
-          className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-3"
-          style={{ fontFamily: 'var(--font-body)' }}
-        >
+      <div className="border-t border-[#F0F0EE] pt-8 mt-12 mb-10">
+        <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-3">
           Notities <span className="normal-case tracking-normal text-[#D5D5D5]">(optioneel)</span>
         </p>
         <textarea
@@ -551,7 +518,6 @@ function WorkoutCompletePage() {
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Hoe ging het? Extra opmerkingen..."
           className="w-full px-4 py-3 border border-[#F0F0EE] rounded-xl text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917] resize-none h-20 bg-white"
-          style={{ fontFamily: 'var(--font-body)' }}
         />
       </div>
 
@@ -571,7 +537,7 @@ function WorkoutCompletePage() {
         )}
       </button>
 
-      <p className="text-center text-[12px] text-[#D5D5D5] mt-3" style={{ fontFamily: 'var(--font-body)' }}>
+      <p className="text-center text-[12px] text-[#D5D5D5] mt-3">
         Je coach ziet deze feedback bij de volgende aanpassing
       </p>
     </div>

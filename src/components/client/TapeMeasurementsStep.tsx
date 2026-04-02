@@ -21,15 +21,15 @@ const fields = [
 
 export function TapeMeasurementsStep({ measurements, onChange }: Props) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div>
-        <h3 className="font-display font-semibold text-lg">Omtrekmaten</h3>
+        <h3 className="font-semibold text-[20px]">Omtrekmaten</h3>
         <p className="text-sm text-text-secondary mt-1">
           Meet alle omtrekken in centimeters met een meetlint.
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-6">
         {fields.map(({ key, label }) => (
           <Input
             key={key}

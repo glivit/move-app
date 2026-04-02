@@ -125,7 +125,7 @@ export default function ProfilePage() {
           )}
         </div>
 
-        <h1 className="page-title">
+        <h1 className="page-title-sm">
           {profile?.full_name || 'Profiel'}
         </h1>
         <p className="text-[13px] text-[#ACACAC] mt-1">

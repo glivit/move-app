@@ -110,9 +110,9 @@ export function PhotoUploadStep({ photos, onChange }: Props) {
   const completedCount = Object.values(photos).filter(Boolean).length
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div>
-        <h3 className="font-[family-name:var(--font-display)] font-semibold text-lg text-[#1A1917]">Foto&apos;s</h3>
+        <h3 className="font-semibold text-[20px] text-[#1A1917]">Foto&apos;s</h3>
         <p className="text-[13px] text-[#A09D96] mt-1">
           Nuchter, zelfde ondergoed, zelfde locatie, ochtendlicht
         </p>

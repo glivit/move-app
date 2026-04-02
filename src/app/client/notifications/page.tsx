@@ -107,7 +107,7 @@ export default function NotificationsPage() {
         </Link>
         <div>
           <p className="text-label mb-1">Inbox</p>
-          <h1 className="page-title">
+          <h1 className="page-title-sm">
             Notificaties
           </h1>
         </div>

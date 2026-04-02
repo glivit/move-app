@@ -92,7 +92,7 @@ export default function AccountabilityPage() {
       <div className="space-y-6">
         <div className="mb-8 animate-slide-up">
           <p className="text-label mb-3">Dagelijks</p>
-          <h1 className="page-title">
+          <h1 className="page-title-sm">
             Check
           </h1>
         </div>
@@ -111,7 +111,7 @@ export default function AccountabilityPage() {
       <div className="space-y-6">
         <div className="mb-8 animate-slide-up">
           <p className="text-label mb-3">Dagelijks</p>
-          <h1 className="page-title">
+          <h1 className="page-title-sm">
             Check
           </h1>
         </div>
@@ -132,7 +132,7 @@ export default function AccountabilityPage() {
       <div className="space-y-6">
         <div className="mb-8 animate-slide-up">
           <p className="text-label mb-3">Dagelijks</p>
-          <h1 className="page-title">
+          <h1 className="page-title-sm">
             Check
           </h1>
         </div>
@@ -164,7 +164,7 @@ export default function AccountabilityPage() {
     <div className="space-y-6">
       <div className="mb-8 animate-slide-up">
         <p className="text-label mb-3">Dagelijks</p>
-        <h1 className="page-title">
+        <h1 className="page-title-sm">
           Check
         </h1>
       </div>

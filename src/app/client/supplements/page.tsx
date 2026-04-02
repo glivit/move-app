@@ -164,7 +164,7 @@ export default function SupplementsPage() {
   return (
     <div className="space-y-6">
       {/* Hero section with stats */}
-      <div className="mb-10 animate-slide-up">
+      <div className="mb-14 animate-slide-up">
         <p className="text-label mb-3">Supplementen</p>
         <p className="stat-number-hero text-[#1A1917]">
           {totalCount > 0 ? Math.round((loggedCount / totalCount) * 100) : 0}<span className="text-[36px]">%</span>
@@ -192,7 +192,7 @@ export default function SupplementsPage() {
               onChange={(e) => setName(e.target.value)}
               placeholder="bijv. Creatine, Vitamine D, Omega-3..."
               required
-              className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl bg-[#F8F8F6] text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
+              className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl bg-white text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
             />
           </div>
 
@@ -203,7 +203,7 @@ export default function SupplementsPage() {
               value={dosage}
               onChange={(e) => setDosage(e.target.value)}
               placeholder="bijv. 5g, 2000 IU, 1 capsule..."
-              className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl bg-[#F8F8F6] text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
+              className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl bg-white text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
             />
           </div>
 
@@ -213,7 +213,7 @@ export default function SupplementsPage() {
               <select
                 value={frequency}
                 onChange={(e) => setFrequency(e.target.value)}
-                className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl bg-[#F8F8F6] text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917]"
+                className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl bg-white text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917]"
               >
                 {FREQUENCY_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -225,7 +225,7 @@ export default function SupplementsPage() {
               <select
                 value={timeOfDay}
                 onChange={(e) => setTimeOfDay(e.target.value)}
-                className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl bg-[#F8F8F6] text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917]"
+                className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl bg-white text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917]"
               >
                 {TIME_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -247,64 +247,61 @@ export default function SupplementsPage() {
 
       {/* Supplement list grouped by time */}
       {grouped.length > 0 ? (
-        <div className="space-y-6">
+        <div className="space-y-0">
           {grouped.map((group, groupIndex) => {
             const GroupIcon = group.icon
             return (
               <div key={group.value} className="animate-slide-up" style={{ animationDelay: `${60 + groupIndex * 60}ms` }}>
-                <div className="flex items-center gap-2 mb-3">
-                  <GroupIcon className="w-4 h-4 text-[#ACACAC]" strokeWidth={1.5} />
-                  <h3 className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.12em]">{group.label}</h3>
-                </div>
-                <div className="space-y-2">
-                  {group.items.map(supplement => {
+                <div className="border-t border-[#F0F0EE] pt-6 mt-10 first:border-t-0 first:pt-0 first:mt-0">
+                  <div className="flex items-center gap-2 mb-4">
+                    <GroupIcon className="w-4 h-4 text-[#ACACAC]" strokeWidth={1.5} />
+                    <h3 className="text-label text-[#ACACAC]">{group.label}</h3>
+                  </div>
+                  {group.items.map((supplement, itemIndex) => {
                     const logged = isLoggedToday(supplement.id)
                     const toggling = togglingId === supplement.id
+                    const isLastItem = itemIndex === group.items.length - 1
                     return (
                       <div
                         key={supplement.id}
-                        className={`bg-white p-4 rounded-2xl border transition-colors ${
-                          logged ? 'border-[#3D8B5C]/20 hover:bg-[#FAFAF8]' : 'border-[#F0F0EE] hover:bg-[#FAFAF8]'
-                        }`}
+                        className={`flex items-center gap-3 py-4 ${!isLastItem ? 'border-b border-[#F0F0EE]' : ''} hover:opacity-60 transition-opacity`}
                       >
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={() => toggleLog(supplement.id)}
-                            disabled={toggling}
-                            className="w-8 h-8 border-2 flex items-center justify-center shrink-0 transition-all rounded-md"
-                            style={{
-                              borderColor: logged ? '#3D8B5C' : '#F0F0EE',
-                              backgroundColor: logged ? '#3D8B5C' : 'transparent',
-                            }}
-                          >
-                            {toggling ? (
-                              <Loader2 className="w-4 h-4 animate-spin text-[#ACACAC]" />
-                            ) : logged ? (
-                              <Check className="w-4 h-4 text-white" strokeWidth={2.5} />
-                            ) : null}
-                          </button>
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-[15px] font-semibold ${logged ? 'text-[#ACACAC] line-through' : 'text-[#1A1917]'}`}>
-                              {supplement.name}
-                            </p>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              {supplement.dosage && (
-                                <span className="text-[12px] text-[#ACACAC]">{supplement.dosage}</span>
-                              )}
-                              <span className="text-[12px] text-[#C0C0C0]">{supplement.frequency}</span>
-                            </div>
+                        <button
+                          onClick={() => toggleLog(supplement.id)}
+                          disabled={toggling}
+                          className="w-8 h-8 border-2 flex items-center justify-center shrink-0 transition-all rounded-md"
+                          style={{
+                            borderColor: logged ? '#3D8B5C' : '#F0F0EE',
+                            backgroundColor: logged ? '#3D8B5C' : 'transparent',
+                          }}
+                        >
+                          {toggling ? (
+                            <Loader2 className="w-4 h-4 animate-spin text-[#ACACAC]" />
+                          ) : logged ? (
+                            <Check className="w-4 h-4 text-white" strokeWidth={2.5} />
+                          ) : null}
+                        </button>
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-[15px] font-semibold ${logged ? 'text-[#ACACAC] line-through' : 'text-[#1A1917]'}`}>
+                            {supplement.name}
+                          </p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            {supplement.dosage && (
+                              <span className="text-[12px] text-[#ACACAC]">{supplement.dosage}</span>
+                            )}
+                            <span className="text-[12px] text-[#C0C0C0]">{supplement.frequency}</span>
                           </div>
-                          <button
-                            onClick={() => {
-                              if (confirm(`${supplement.name} verwijderen?`)) {
-                                deactivate(supplement.id)
-                              }
-                            }}
-                            className="p-2 text-[#C0C0C0] hover:text-[#C4372A] transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" strokeWidth={1.5} />
-                          </button>
                         </div>
+                        <button
+                          onClick={() => {
+                            if (confirm(`${supplement.name} verwijderen?`)) {
+                              deactivate(supplement.id)
+                            }
+                          }}
+                          className="p-2 text-[#C0C0C0] hover:text-[#C4372A] transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" strokeWidth={1.5} />
+                        </button>
                       </div>
                     )
                   })}

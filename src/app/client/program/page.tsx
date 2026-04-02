@@ -211,7 +211,7 @@ export default function ClientProgramPage() {
           <p className="text-[14px] text-[#ACACAC]">
             {completedCount} van {currentDayExercises.length} voltooid
           </p>
-          <div className="w-24 h-[3px] bg-[#F0F0EE] rounded-full overflow-hidden">
+          <div className="w-24 h-[2px] bg-[#F0F0EE] rounded-full overflow-hidden">
             <div
               className="h-full bg-[#3D8B5C] rounded-full transition-all"
               style={{
@@ -222,9 +222,9 @@ export default function ClientProgramPage() {
         </div>
       )}
 
-      {/* Day Title */}
-      <div className="animate-slide-up stagger-4">
-        <h2 className="text-[20px] font-semibold text-[#1A1917]">
+      {/* Day Title Hero */}
+      <div className="mt-12 animate-slide-up stagger-4">
+        <h2 className="page-title">
           {currentDay?.name}
         </h2>
       </div>
@@ -243,11 +243,11 @@ export default function ClientProgramPage() {
         </div>
       ) : (
         /* Exercises List */
-        <div className="space-y-3">
+        <div className="divide-y divide-[#F0F0EE]">
           {currentDayExercises.map((exercise, index) => (
             <div
               key={`${activeDay}-${exercise.name}`}
-              className="animate-slide-up"
+              className="py-5 animate-slide-up"
               style={{ animationDelay: `${260 + index * 40}ms` }}
             >
               <ExerciseCard
@@ -265,7 +265,7 @@ export default function ClientProgramPage() {
 
       {/* Coach Notes */}
       {program.coach_notes && (
-        <div className="rounded-2xl p-5 border animate-slide-up" style={{ animationDelay: `${isRestDay ? '300ms' : 260 + currentDayExercises.length * 40 + 40}ms`, backgroundColor: 'rgba(212,106,58,0.04)', borderColor: 'rgba(212,106,58,0.12)' }}>
+        <div className="mt-12 mb-12 pl-4 border-l-2 border-[#D46A3A] animate-slide-up" style={{ animationDelay: `${isRestDay ? '300ms' : 260 + currentDayExercises.length * 40 + 40}ms` }}>
           <p className="text-[13px] text-[#1A1917] font-medium mb-2">
             Coach notities
           </p>

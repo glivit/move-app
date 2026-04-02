@@ -107,7 +107,7 @@ export default function ResourcesPage() {
       {/* Hero Section */}
       <div className="animate-slide-up">
         <p className="text-label mb-3">Kennisbank</p>
-        <h1 className="page-title">Resources</h1>
+        <h1 className="page-title-sm">Resources</h1>
       </div>
 
       {/* Search */}

@@ -246,7 +246,7 @@ export default function CheckInPage() {
       </div>
 
       {/* Step dots */}
-      <div className="flex justify-center gap-3 animate-slide-up stagger-2">
+      <div className="flex justify-center gap-3 animate-slide-up stagger-2 mb-12">
         {steps.map((_, i) => (
           <div
             key={i}
@@ -268,7 +268,7 @@ export default function CheckInPage() {
       )}
 
       {/* Step content */}
-      <div className="bg-white rounded-2xl border border-[#F0F0EE] p-6 transition-all duration-300 animate-slide-up">
+      <div className="transition-all duration-300 animate-slide-up">
         {currentStep === 0 && (
           <PhotoUploadStep
             photos={data.photos}
@@ -299,7 +299,7 @@ export default function CheckInPage() {
       </div>
 
       {/* Navigation */}
-      <div className="flex gap-3">
+      <div className="flex gap-3 mt-12">
         {currentStep > 0 && (
           <button
             onClick={() => setCurrentStep(currentStep - 1)}

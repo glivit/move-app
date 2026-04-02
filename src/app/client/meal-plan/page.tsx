@@ -188,7 +188,7 @@ export default function ClientMealPlanPage() {
   return (
     <div className="space-y-6">
       <div className="animate-slide-up">
-        <h1 className="page-title">Voeding</h1>
+        <h1 className="page-title-sm">Voeding</h1>
         <p className="text-sm text-client-text-secondary mt-1">
           {mealPlan.title}
         </p>

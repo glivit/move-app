@@ -193,10 +193,10 @@ export default function ClientDashboard() {
       <div className="animate-fade-in">
         <div className="flex items-start justify-between">
           <div>
-            <p className="mb-1 text-[13px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="mb-1 text-[13px] text-[#ACACAC]">
               {getGreeting()}
             </p>
-            <h1 className="page-title">
+            <h1 className="page-title-sm">
               {firstName}
             </h1>
           </div>
@@ -210,7 +210,7 @@ export default function ClientDashboard() {
       <div className="mt-9 mb-12 flex items-center justify-between animate-fade-in" style={{ animationDelay: '80ms' }}>
         {weekDots.map((dot, i) => (
           <div key={i} className="flex flex-col items-center gap-2.5">
-            <span className="text-[11px] font-medium uppercase tracking-[0.5px] text-[#C8C8C8]" style={{ fontFamily: 'var(--font-body)' }}>
+            <span className="text-[11px] font-medium uppercase tracking-[0.5px] text-[#C8C8C8]">
               {dot.label}
             </span>
             {dot.completed ? (
@@ -233,7 +233,7 @@ export default function ClientDashboard() {
       {/* ═══ ONBOARDING ═══════════════════════════════════ */}
       {showOnboarding && (
         <Link href="/onboarding" className="mb-8 block animate-slide-up stagger-3">
-          <p className="mb-3 text-[12px] font-medium uppercase tracking-[1.5px] text-[#B0B0B0]" style={{ fontFamily: 'var(--font-body)' }}>
+          <p className="mb-3 eyebrow">
             Profiel voltooien
           </p>
           <p className="section-title mb-6">
@@ -242,7 +242,7 @@ export default function ClientDashboard() {
           <div className="mb-2 h-[2px] w-full overflow-hidden rounded-full bg-[#F0F0EE]">
             <div className="h-full rounded-full bg-[#1A1917]" style={{ width: `${(onboarding.currentStep / onboarding.totalSteps) * 100}%`, transition: 'width 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }} />
           </div>
-          <span className="text-[12px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>{onboarding.currentStep} van {onboarding.totalSteps}</span>
+          <span className="text-[12px] text-[#ACACAC]">{onboarding.currentStep} van {onboarding.totalSteps}</span>
         </Link>
       )}
 
@@ -252,10 +252,10 @@ export default function ClientDashboard() {
           <p className="page-title mb-3">
             Welkom bij MŌVE
           </p>
-          <p className="mb-8 max-w-[280px] text-[14px] leading-[1.5] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
+          <p className="mb-8 max-w-[280px] text-[14px] leading-[1.5] text-[#ACACAC]">
             Je coach bereidt je programma voor. Binnenkort verschijnt hier je eerste training.
           </p>
-          <Link href="/client/messages" className="inline-flex items-center gap-2 text-[14px] font-medium text-[#D46A3A] transition-opacity hover:opacity-70" style={{ fontFamily: 'var(--font-body)' }}>
+          <Link href="/client/messages" className="inline-flex items-center gap-2 text-[14px] font-medium text-[#D46A3A] transition-opacity hover:opacity-70">
             Stuur je coach een bericht
             <ArrowRight className="h-4 w-4" strokeWidth={1.5} />
           </Link>
@@ -264,22 +264,22 @@ export default function ClientDashboard() {
 
       {/* ═══ HERO SECTION — no card, bold typography ═══════ */}
       {!isDay1 && !showOnboarding && (
-        <div className="mb-12 animate-slide-up" style={{ animationDelay: '140ms' }}>
+        <div className="mb-14 animate-slide-up" style={{ animationDelay: '140ms' }}>
 
           {/* Training today — the hero */}
           {primaryAction === 'training' && training.today && (
             <div>
-              <p className="mb-3.5 text-[12px] font-medium uppercase tracking-[1.5px] text-[#B0B0B0]" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="mb-3.5 eyebrow">
                 Training vandaag
               </p>
               <h2 className="text-editorial-h1 mb-3">
                 {training.today.name}
               </h2>
-              <p className="text-[14px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="text-[14px] text-[#ACACAC]">
                 {training.today.exerciseCount && <>{training.today.exerciseCount} oefeningen · </>}
                 ~{training.today.durationMin} min
               </p>
-              <Link href="/client/workout" className="mt-9 inline-flex items-center gap-2.5 rounded-2xl bg-[#1A1917] px-8 py-4 text-[15px] font-medium text-white transition-all duration-250 hover:bg-[#333] hover:gap-3.5 hover:-translate-y-px active:scale-[0.97] group" style={{ fontFamily: 'var(--font-body)' }}>
+              <Link href="/client/workout" className="mt-9 inline-flex items-center gap-2.5 rounded-2xl bg-[#1A1917] px-8 py-4 text-[15px] font-medium text-white transition-all duration-250 hover:bg-[#333] hover:gap-3.5 hover:-translate-y-px active:scale-[0.97] group">
                 Start workout
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-250 group-hover:translate-x-0.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
               </Link>
@@ -295,7 +295,7 @@ export default function ClientDashboard() {
               <h2 className="section-title mb-1">
                 {training.today.name}
               </h2>
-              <p className="text-[13px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="text-[13px] text-[#ACACAC]">
                 {training.today.exerciseCount && <>{training.today.exerciseCount} oefeningen · </>}
                 ~{training.today.durationMin} min
               </p>
@@ -305,7 +305,7 @@ export default function ClientDashboard() {
                   <span className="stat-number-hero text-[#1A1917]">
                     {momentum.streakDays}
                   </span>
-                  <p className="mt-2 text-[16px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)', fontWeight: 300 }}>
+                  <p className="mt-2 text-[16px] text-[#ACACAC]" style={{ fontWeight: 300 }}>
                     {momentum.streakDays === 1 ? 'week op rij' : 'weken op rij'}
                   </p>
                   {momentum.streakDays > 1 && (
@@ -315,7 +315,7 @@ export default function ClientDashboard() {
                       ))}
                     </div>
                   )}
-                  <p className="mt-5 text-[14px] leading-[1.5] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
+                  <p className="mt-5 text-[14px] leading-[1.5] text-[#ACACAC]">
                     Blijf doorgaan, je record is {Math.max(momentum.streakDays + 3, 10)} weken op rij.
                   </p>
                 </div>
@@ -326,14 +326,14 @@ export default function ClientDashboard() {
           {/* Rest day — a whisper */}
           {primaryAction === 'rest' && (
             <div className="py-5">
-              <p className="mb-3 text-[12px] font-medium uppercase tracking-[1.5px] text-[#C8C8C8]" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="mb-3 eyebrow">
                 Vandaag
               </p>
               <h2 className="text-editorial-hero text-[#D8D8D8]" style={{ fontWeight: 200 }}>
                 Rustdag
               </h2>
               {training.next && (
-                <p className="mt-5 text-[14px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
+                <p className="mt-5 text-[14px] text-[#ACACAC]">
                   Volgende: <span className="font-medium text-[#1A1917]">{training.next.name}</span> {training.next.label}
                 </p>
               )}
@@ -343,14 +343,14 @@ export default function ClientDashboard() {
           {/* Check-in overdue */}
           {primaryAction === 'checkin' && (
             <div>
-              <p className="mb-3.5 text-[12px] font-medium uppercase tracking-[1.5px] text-[#B0B0B0]" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="mb-3.5 eyebrow">
                 Check-in
               </p>
               <h2 className="text-editorial-h1 mb-3">
                 Tijd voor je meting
               </h2>
-              <p className="text-[14px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>Gewicht, foto, en hoe je je voelt</p>
-              <Link href="/client/check-in" className="mt-9 inline-flex items-center gap-2.5 rounded-2xl bg-[#1A1917] px-8 py-4 text-[15px] font-medium text-white transition-all duration-250 hover:bg-[#333] active:scale-[0.97] group" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="text-[14px] text-[#ACACAC]">Gewicht, foto, en hoe je je voelt</p>
+              <Link href="/client/check-in" className="mt-9 inline-flex items-center gap-2.5 rounded-2xl bg-[#1A1917] px-8 py-4 text-[15px] font-medium text-white transition-all duration-250 hover:bg-[#333] active:scale-[0.97] group">
                 Start check-in
                 <ArrowRight className="h-[18px] w-[18px] transition-transform duration-250 group-hover:translate-x-0.5" strokeWidth={2} />
               </Link>
@@ -364,10 +364,10 @@ export default function ClientDashboard() {
 
         {/* Tomorrow */}
         {!isDay1 && !showOnboarding && training.next && primaryAction !== 'rest' && (
-          <Link href="/client/workout" className="flex items-center justify-between border-t border-[#F0F0EE] py-[18px] group">
+          <Link href="/client/workout" className="flex items-center justify-between border-t border-[#F0F0EE] py-[18px] group transition-opacity hover:opacity-60">
             <div className="flex items-center gap-3">
-              <span className="text-[13px] text-[#C0C0C0]" style={{ fontFamily: 'var(--font-body)' }}>Morgen</span>
-              <span className="text-[14px] font-medium text-[#1A1917]" style={{ fontFamily: 'var(--font-body)' }}>{training.next.name}</span>
+              <span className="text-[13px] text-[#C0C0C0]">Morgen</span>
+              <span className="text-[14px] font-medium text-[#1A1917]">{training.next.name}</span>
             </div>
             <ChevronRight strokeWidth={1.5} className="h-4 w-4 text-[#D5D5D5] transition-colors group-hover:text-[#1A1917]" />
           </Link>
@@ -375,16 +375,16 @@ export default function ClientDashboard() {
 
         {/* Nutrition */}
         {nutrition && nutrition.mealsTotal > 0 && (
-          <Link href="/client/nutrition" className="block border-t border-[#F0F0EE] py-[18px] group">
+          <Link href="/client/nutrition" className="block border-t border-[#F0F0EE] py-[18px] group transition-opacity hover:opacity-60">
             <div className="mb-3 flex items-baseline justify-between">
               <div className="flex items-baseline gap-1.5">
                 {caloriesTarget > 0 ? (
                   <>
                     <span className="section-title">{formatNumber(caloriesConsumed)}</span>
-                    <span className="text-[13px] text-[#C0C0C0]" style={{ fontFamily: 'var(--font-body)' }}>/ {formatNumber(caloriesTarget)} kcal</span>
+                    <span className="text-[13px] text-[#C0C0C0]">/ {formatNumber(caloriesTarget)} kcal</span>
                   </>
                 ) : (
-                  <span className="text-[14px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>{nutrition.mealsCompleted} van {nutrition.mealsTotal} maaltijden</span>
+                  <span className="text-[14px] text-[#ACACAC]">{nutrition.mealsCompleted} van {nutrition.mealsTotal} maaltijden</span>
                 )}
               </div>
               <ChevronRight strokeWidth={1.5} className="h-4 w-4 text-[#D5D5D5] transition-colors group-hover:text-[#1A1917]" />
@@ -397,11 +397,11 @@ export default function ClientDashboard() {
 
         {/* Nudges */}
         {nudges.map((nudge, i) => (
-          <Link key={i} href={nudge.href} className="flex items-center gap-3 border-t border-[#F0F0EE] py-4 group">
+          <Link key={i} href={nudge.href} className="flex items-center gap-3 border-t border-[#F0F0EE] py-4 group transition-opacity hover:opacity-60">
             <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#D46A3A]" />
             <div className="min-w-0 flex-1">
-              <p className="text-[14px] font-medium text-[#1A1917]" style={{ fontFamily: 'var(--font-body)' }}>{nudge.text}</p>
-              {nudge.sub && <p className="mt-0.5 truncate text-[12px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>{nudge.sub}</p>}
+              <p className="text-[14px] font-medium text-[#1A1917]">{nudge.text}</p>
+              {nudge.sub && <p className="mt-0.5 truncate text-[12px] text-[#ACACAC]">{nudge.sub}</p>}
             </div>
             <ChevronRight strokeWidth={1.5} className="h-4 w-4 shrink-0 text-[#D5D5D5] transition-colors group-hover:text-[#1A1917]" />
           </Link>
