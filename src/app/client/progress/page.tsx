@@ -174,7 +174,7 @@ export default function ProgressPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-6 h-6 border-[1.5px] border-[#CCC7BC] border-t-[#1A1917] rounded-full animate-spin" />
+        <div className="w-6 h-6 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
       </div>
     )
   }
@@ -189,7 +189,7 @@ export default function ProgressPage() {
           >
             Nog geen data
           </p>
-          <p className="text-[15px] text-[#6B6862] max-w-[260px] mx-auto">
+          <p className="text-[15px] text-[#ACACAC] max-w-[260px] mx-auto">
             Start je eerste workout en je voortgang verschijnt hier.
           </p>
         </div>
@@ -252,12 +252,12 @@ export default function ProgressPage() {
             suffix={hero.suffix}
           />
         </p>
-        <p className="text-[16px] text-[#6B6862] mt-2">{hero.label}</p>
+        <p className="text-[16px] text-[#ACACAC] mt-2">{hero.label}</p>
       </div>
 
       {/* Supporting stats as text */}
       {supportingText && (
-        <p className="text-[14px] text-[#A09D96] mb-10 animate-fade-in" style={{ animationDelay: '60ms' }}>
+        <p className="text-[14px] text-[#ACACAC] mb-10 animate-fade-in" style={{ animationDelay: '60ms' }}>
           {supportingText}
         </p>
       )}
@@ -268,9 +268,9 @@ export default function ProgressPage() {
           <div className="flex items-baseline justify-between mb-6">
             <div>
               <span className="stat-number text-[32px] text-[#1A1917]">{thisWeekVal}</span>
-              <span className="text-[14px] text-[#A09D96] ml-2">{chartLabel} deze week</span>
+              <span className="text-[14px] text-[#ACACAC] ml-2">{chartLabel} deze week</span>
             </div>
-            <span className="text-[12px] text-[#C5C2BC]">12 weken</span>
+            <span className="text-[12px] text-[#C0C0C0]">12 weken</span>
           </div>
 
           {/* Bars */}
@@ -279,7 +279,7 @@ export default function ProgressPage() {
               <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
                 <div
                   className={`w-full rounded-t-md transition-all ${
-                    i === chartData.length - 1 ? 'bg-[#D46A3A]' : 'bg-[#E5E1D9]'
+                    i === chartData.length - 1 ? 'bg-[#D46A3A]' : 'bg-[#F0F0EE]'
                   }`}
                   style={{ height: `${Math.max((val / maxVal) * 100, 3)}%` }}
                 />
@@ -291,7 +291,7 @@ export default function ProgressPage() {
           <div className="flex gap-[3px] mb-6">
             {weeklyStats.map((w, i) => (
               <div key={i} className="flex-1 text-center">
-                {i % 4 === 0 && <span className="text-[9px] text-[#C5C2BC]">{w.week}</span>}
+                {i % 4 === 0 && <span className="text-[9px] text-[#C0C0C0]">{w.week}</span>}
               </div>
             ))}
           </div>
@@ -305,7 +305,7 @@ export default function ProgressPage() {
                 className={`px-4 py-2.5 rounded-lg text-[12px] font-semibold uppercase tracking-[0.06em] transition-all ${
                   chartMode === mode
                     ? 'bg-[#1A1917] text-white'
-                    : 'text-[#A09D96] hover:text-[#1A1917]'
+                    : 'text-[#ACACAC] hover:text-[#1A1917]'
                 }`}
               >
                 {mode === 'duration' ? 'Duur' : mode === 'volume' ? 'Volume' : 'Sets'}
@@ -324,21 +324,21 @@ export default function ProgressPage() {
         >
           <div className="flex items-center justify-between mb-5">
             <span className="text-label">Gewicht</span>
-            <ChevronRight size={16} strokeWidth={1.5} className="text-[#CCC7BC] group-hover:text-[#1A1917] transition-colors" />
+            <ChevronRight size={16} strokeWidth={1.5} className="text-[#C0C0C0] group-hover:text-[#1A1917] transition-colors" />
           </div>
 
           <div className="flex items-end justify-between">
             <div>
               <p className="leading-none">
                 <span className="stat-number text-[32px] text-[#1A1917]">{body.weightCurrent}</span>
-                <span className="text-[14px] font-medium text-[#A09D96] ml-1">kg</span>
+                <span className="text-[14px] font-medium text-[#ACACAC] ml-1">kg</span>
               </p>
               {body.weightChange !== null && (
                 <p className="text-[13px] mt-2 font-semibold" style={{
                   color: body.weightChange <= 0 ? '#3D8B5C' : '#C47D15'
                 }}>
                   {body.weightChange > 0 ? '+' : ''}{body.weightChange} kg
-                  <span className="font-normal text-[#A09D96] ml-1">totaal</span>
+                  <span className="font-normal text-[#ACACAC] ml-1">totaal</span>
                 </p>
               )}
             </div>
@@ -365,16 +365,16 @@ export default function ProgressPage() {
             )}
           </div>
           {strength.recentPrs.slice(0, 3).map((pr) => (
-            <div key={pr.id} className="flex items-center gap-4 px-7 py-4 border-t border-[#E8E4DC]">
+            <div key={pr.id} className="flex items-center gap-4 px-7 py-4 border-t border-[#F0F0EE]">
               <div className="flex-1 min-w-0">
                 <p className="text-[14px] font-medium text-[#1A1917] truncate">{pr.exercise}</p>
-                <p className="text-[11px] text-[#A09D96] mt-0.5">
+                <p className="text-[11px] text-[#ACACAC] mt-0.5">
                   {new Date(pr.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                 </p>
               </div>
               <span className="stat-number text-[18px] text-[#1A1917]">
                 {pr.value}
-                <span className="text-[12px] font-medium text-[#A09D96] ml-1">
+                <span className="text-[12px] font-medium text-[#ACACAC] ml-1">
                   {pr.type === 'weight' ? 'kg' : pr.type === 'reps' ? 'reps' : 'kg'}
                 </span>
               </span>

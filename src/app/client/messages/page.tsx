@@ -264,17 +264,17 @@ export default function ClientMessagesPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col h-[calc(100dvh-140px)] bg-[#EEEBE3]">
-        <div className="px-4 py-4 border-b border-[#E8E4DC]">
+      <div className="flex flex-col h-[calc(100dvh-140px)] bg-[#FFFFFF]">
+        <div className="px-4 py-4 border-b border-[#F0F0EE]">
           <div className="animate-pulse space-y-2">
-            <div className="h-5 bg-[#F0EDE8] rounded w-32" />
-            <div className="h-3 bg-[#F0EDE8] rounded w-24" />
+            <div className="h-5 bg-[#F0F0EE] rounded w-32" />
+            <div className="h-3 bg-[#F0F0EE] rounded w-24" />
           </div>
         </div>
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-pulse space-y-3">
-            <div className="h-3 bg-[#F0EDE8] rounded w-48 mx-auto" />
-            <div className="h-3 bg-[#F0EDE8] rounded w-64 mx-auto" />
+            <div className="h-3 bg-[#F0F0EE] rounded w-48 mx-auto" />
+            <div className="h-3 bg-[#F0F0EE] rounded w-64 mx-auto" />
           </div>
         </div>
       </div>
@@ -283,9 +283,9 @@ export default function ClientMessagesPage() {
 
   if (!currentUserId || !coachId) {
     return (
-      <div className="flex flex-col h-[calc(100dvh-140px)] bg-[#EEEBE3] items-center justify-center">
-        <MessageCircle size={48} className="text-[#C5C2BC] mb-4" />
-        <p className="text-[#C5C2BC]">
+      <div className="flex flex-col h-[calc(100dvh-140px)] bg-[#FFFFFF] items-center justify-center">
+        <MessageCircle size={48} className="text-[#C0C0C0] mb-4" />
+        <p className="text-[#C0C0C0]">
           {!currentUserId ? 'Niet aangemeld' : 'Coach niet beschikbaar'}
         </p>
       </div>
@@ -296,11 +296,11 @@ export default function ClientMessagesPage() {
   const dateKeys = Object.keys(groupedMessages)
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-140px)] bg-[#EEEBE3] -mx-4 -mt-4">
+    <div className="flex flex-col h-[calc(100dvh-140px)] bg-[#FFFFFF] -mx-4 -mt-4">
       {/* Header */}
-      <div className="px-4 py-4 border-b border-[#E8E4DC]">
+      <div className="px-4 py-4 border-b border-[#F0F0EE]">
         <h1 className="text-lg font-semibold text-[#1A1917]">{coachName}</h1>
-        <p className="text-xs text-[#C5C2BC] mt-0.5">Je coach</p>
+        <p className="text-xs text-[#C0C0C0] mt-0.5">Je coach</p>
       </div>
 
       {/* Messages */}
@@ -324,7 +324,7 @@ export default function ClientMessagesPage() {
                 >
                   Stuur je coach een bericht
                 </p>
-                <p className="text-[13px] text-[#A09D96]">
+                <p className="text-[13px] text-[#ACACAC]">
                   Reactie binnen 24 uur
                 </p>
               </div>
@@ -336,11 +336,11 @@ export default function ClientMessagesPage() {
               <div key={dateKey} className="space-y-3">
                 {/* Date separator */}
                 <div className="flex items-center gap-3 py-2">
-                  <div className="flex-1 h-px bg-[#E8E4DC]" />
-                  <span className="text-xs text-[#C5C2BC] font-medium px-2">
+                  <div className="flex-1 h-px bg-[#F0F0EE]" />
+                  <span className="text-xs text-[#C0C0C0] font-medium px-2">
                     {dateKey}
                   </span>
-                  <div className="flex-1 h-px bg-[#E8E4DC]" />
+                  <div className="flex-1 h-px bg-[#F0F0EE]" />
                 </div>
 
                 {/* Messages for this date */}

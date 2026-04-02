@@ -107,7 +107,7 @@ export default function WeeklyCheckInPage() {
       <div className="space-y-6">
         <SubPageHeader overline="Wekelijks" title="Check-in" backHref="/client" />
         <div className="flex justify-center py-20">
-          <div className="w-6 h-6 border-[1.5px] border-[#CCC7BC] border-t-[#1A1917] rounded-full animate-spin" />
+          <div className="w-6 h-6 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
         </div>
       </div>
     )
@@ -118,12 +118,12 @@ export default function WeeklyCheckInPage() {
     return (
       <div className="space-y-6">
         <SubPageHeader overline="Wekelijks" title="Check-in" backHref="/client" />
-        <div className="bg-white p-8 border border-[#E8E4DC] text-center">
+        <div className="bg-white p-8 border border-[#F0F0EE] text-center">
           <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#34C759] mx-auto mb-3" />
           <p className="font-semibold text-[#1A1917] text-lg">
             {submitted ? 'Check-in verstuurd!' : 'Al ingediend deze week'}
           </p>
-          <p className="text-[14px] text-[#A09D96] mt-2">
+          <p className="text-[14px] text-[#ACACAC] mt-2">
             {submitted
               ? 'Goed bezig! Je coach kan je voortgang bekijken.'
               : 'Je hebt deze week al een check-in gedaan. Volgende week weer!'}
@@ -141,7 +141,7 @@ export default function WeeklyCheckInPage() {
       <SubPageHeader overline="Wekelijks" title="Check-in" backHref="/client" />
 
       {/* ─── GEWICHT ─────────────────────────────────────── */}
-      <div className="bg-white border border-[#E8E4DC] p-5">
+      <div className="bg-white border border-[#F0F0EE] p-5">
         <div className="flex items-center gap-2 mb-4">
           <Scale size={18} strokeWidth={1.5} className="text-[#1A1917]" />
           <span className="text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.06em]">Gewicht</span>
@@ -155,14 +155,14 @@ export default function WeeklyCheckInPage() {
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
               placeholder="0.0"
-              className="w-full text-[32px] font-bold text-[#1A1917] bg-transparent border-b-2 border-[#E8E4DC] focus:border-[#1A1917] outline-none pb-1 transition-colors placeholder-[#DDD9D0]"
+              className="w-full text-[32px] font-bold text-[#1A1917] bg-transparent border-b-2 border-[#F0F0EE] focus:border-[#1A1917] outline-none pb-1 transition-colors placeholder-[#D5D5D5]"
             />
           </div>
-          <span className="text-[16px] text-[#A09D96] font-medium pb-2">kg</span>
+          <span className="text-[16px] text-[#ACACAC] font-medium pb-2">kg</span>
         </div>
 
         {lastWeight && (
-          <p className="text-[13px] text-[#A09D96] mt-2">
+          <p className="text-[13px] text-[#ACACAC] mt-2">
             Vorige: {lastWeight} kg
             {weightDiff !== null && weightDiff !== 0 && (
               <span className={`ml-2 font-semibold ${weightDiff < 0 ? 'text-[#3D8B5C]' : 'text-[#C47D15]'}`}>
@@ -174,11 +174,11 @@ export default function WeeklyCheckInPage() {
       </div>
 
       {/* ─── FOTO ────────────────────────────────────────── */}
-      <div className="bg-white border border-[#E8E4DC] p-5">
+      <div className="bg-white border border-[#F0F0EE] p-5">
         <div className="flex items-center gap-2 mb-4">
           <Camera size={18} strokeWidth={1.5} className="text-[#1A1917]" />
           <span className="text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.06em]">Foto vooraanzicht</span>
-          <span className="text-[11px] text-[#A09D96] ml-auto">optioneel</span>
+          <span className="text-[11px] text-[#ACACAC] ml-auto">optioneel</span>
         </div>
 
         <input
@@ -192,7 +192,7 @@ export default function WeeklyCheckInPage() {
 
         {photoPreview ? (
           <div className="relative">
-            <img src={photoPreview} alt="Preview" className="w-full max-h-[300px] object-cover border border-[#E8E4DC]" />
+            <img src={photoPreview} alt="Preview" className="w-full max-h-[300px] object-cover border border-[#F0F0EE]" />
             <button
               onClick={() => { setPhoto(null); setPhotoPreview(null) }}
               className="absolute top-2 right-2 w-8 h-8 bg-[#1A1917]/70 text-white flex items-center justify-center text-[14px]"
@@ -203,16 +203,16 @@ export default function WeeklyCheckInPage() {
         ) : (
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full py-8 border-2 border-dashed border-[#E8E4DC] hover:border-[#CCC7BC] transition-colors flex flex-col items-center gap-2"
+            className="w-full py-8 border-2 border-dashed border-[#F0F0EE] hover:border-[#C0C0C0] transition-colors flex flex-col items-center gap-2"
           >
-            <Camera size={24} strokeWidth={1.5} className="text-[#A09D96]" />
-            <span className="text-[13px] text-[#A09D96]">Tik om foto te nemen</span>
+            <Camera size={24} strokeWidth={1.5} className="text-[#ACACAC]" />
+            <span className="text-[13px] text-[#ACACAC]">Tik om foto te nemen</span>
           </button>
         )}
       </div>
 
       {/* ─── HOE GAAT HET ────────────────────────────────── */}
-      <div className="bg-white border border-[#E8E4DC] p-5 space-y-6">
+      <div className="bg-white border border-[#F0F0EE] p-5 space-y-6">
         <span className="text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.06em]">
           Hoe was je week?
         </span>
@@ -243,17 +243,17 @@ export default function WeeklyCheckInPage() {
       </div>
 
       {/* ─── NOTITIES ────────────────────────────────────── */}
-      <div className="bg-white border border-[#E8E4DC] p-5">
+      <div className="bg-white border border-[#F0F0EE] p-5">
         <label className="block text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.06em] mb-3">
           Iets te melden?
-          <span className="text-[11px] text-[#A09D96] ml-2 normal-case tracking-normal font-normal">optioneel</span>
+          <span className="text-[11px] text-[#ACACAC] ml-2 normal-case tracking-normal font-normal">optioneel</span>
         </label>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Hoe voel je je? Pijnklachten? Vragen voor je coach?"
           rows={3}
-          className="w-full px-3 py-2.5 bg-[#FAF8F3] border border-[#E8E4DC] text-[14px] placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none"
+          className="w-full px-3 py-2.5 bg-[#F8F8F6] border border-[#F0F0EE] text-[14px] placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917] resize-none"
         />
       </div>
 
@@ -292,7 +292,7 @@ function RatingRow({ label, value, onChange, labels }: {
       <div className="flex items-center justify-between mb-2.5">
         <span className="text-[14px] text-[#1A1917]">{label}</span>
         {value > 0 && (
-          <span className="text-[12px] text-[#A09D96]">{labels[value - 1]}</span>
+          <span className="text-[12px] text-[#ACACAC]">{labels[value - 1]}</span>
         )}
       </div>
       <div className="flex gap-2">
@@ -303,7 +303,7 @@ function RatingRow({ label, value, onChange, labels }: {
             className={`flex-1 py-2.5 text-[14px] font-semibold transition-all ${
               n <= value
                 ? 'bg-[#1A1917] text-white'
-                : 'bg-[#F5F2EC] text-[#A09D96] hover:bg-[#EBE8E1]'
+                : 'bg-[#F8F8F6] text-[#ACACAC] hover:bg-[#F0F0EE]'
             }`}
           >
             {n}

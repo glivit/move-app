@@ -194,7 +194,7 @@ export default function CheckInPage() {
             >
               Check-in ingediend
             </h2>
-            <p className="text-[14px] text-[#6B6862] leading-relaxed">
+            <p className="text-[14px] text-[#ACACAC] leading-relaxed">
               Je coach bekijkt je resultaten binnen 24 uur.
             </p>
           </div>
@@ -222,7 +222,7 @@ export default function CheckInPage() {
             >
               Check-in
             </h2>
-            <p className="text-[14px] text-[#6B6862] leading-relaxed">{windowMessage}</p>
+            <p className="text-[14px] text-[#ACACAC] leading-relaxed">{windowMessage}</p>
           </div>
           <button onClick={() => router.push('/client')} className="btn-primary w-full py-4 text-[13px]">
             Terug naar dashboard
@@ -243,11 +243,11 @@ export default function CheckInPage() {
         >
           {steps[currentStep].title}
         </h1>
-        <p className="text-[14px] text-[#6B6862] mt-1">{steps[currentStep].description}</p>
+        <p className="text-[14px] text-[#ACACAC] mt-1">{steps[currentStep].description}</p>
       </div>
 
       {/* Progress bar — clean thin bar */}
-      <div className="w-full h-[3px] bg-[#E5E1D9] rounded-full overflow-hidden">
+      <div className="w-full h-[3px] bg-[#F0F0EE] rounded-full overflow-hidden">
         <div
           className="h-full bg-[#D46A3A] rounded-full transition-all duration-500 animate-progress-fill"
           style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
@@ -264,7 +264,7 @@ export default function CheckInPage() {
                 ? 'bg-[#3D8B5C]'
                 : i === currentStep
                   ? 'bg-[#D46A3A] scale-125'
-                  : 'bg-[#E5E1D9]'
+                  : 'bg-[#F0F0EE]'
             }`}
           />
         ))}
@@ -312,7 +312,7 @@ export default function CheckInPage() {
         {currentStep > 0 && (
           <button
             onClick={() => setCurrentStep(currentStep - 1)}
-            className="flex-1 px-6 py-4 text-[#6B6862] font-semibold text-[13px] uppercase tracking-[0.06em] border border-[#E8E4DC] rounded-2xl hover:border-[#CCC7BC] transition-all"
+            className="flex-1 px-6 py-4 text-[#ACACAC] font-semibold text-[13px] uppercase tracking-[0.06em] border border-[#F0F0EE] rounded-2xl hover:border-[#C0C0C0] transition-all"
           >
             Vorige
           </button>

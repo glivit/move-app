@@ -94,7 +94,7 @@ export default function AccountabilityPage() {
         <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
         <div className="space-y-3">
           {[1, 2].map(i => (
-            <div key={i} className="h-32 bg-[#F0EDE8] animate-pulse rounded-2xl shadow-[var(--shadow-card)]" />
+            <div key={i} className="h-32 bg-[#F0F0EE] animate-pulse rounded-2xl" />
           ))}
         </div>
       </div>
@@ -106,10 +106,10 @@ export default function AccountabilityPage() {
     return (
       <div className="space-y-6">
         <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
-        <div className="bg-white p-8 rounded-2xl shadow-[var(--shadow-card)] text-center">
+        <div className="bg-white p-8 rounded-2xl shadow-none text-center">
           <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#34C759] mx-auto mb-3" />
           <p className="font-semibold text-[#1A1917] text-lg">Alles op schema!</p>
-          <p className="text-[14px] text-[#A09D96] mt-2">
+          <p className="text-[14px] text-[#ACACAC] mt-2">
             Je hebt vandaag alles gedaan. Ga zo door!
           </p>
         </div>
@@ -122,10 +122,10 @@ export default function AccountabilityPage() {
     return (
       <div className="space-y-6">
         <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
-        <div className="bg-white p-8 rounded-2xl shadow-[var(--shadow-card)] text-center">
+        <div className="bg-white p-8 rounded-2xl shadow-none text-center">
           <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#34C759] mx-auto mb-3" />
           <p className="font-semibold text-[#1A1917] text-lg">Bedankt voor je feedback!</p>
-          <p className="text-[14px] text-[#A09D96] mt-2">
+          <p className="text-[14px] text-[#ACACAC] mt-2">
             Je coach bekijkt dit en helpt je op schema te blijven.
           </p>
         </div>
@@ -149,14 +149,14 @@ export default function AccountabilityPage() {
   return (
     <div className="space-y-6">
       <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
-      <p className="text-[14px] text-[#A09D96] -mt-4">
+      <p className="text-[14px] text-[#ACACAC] -mt-4">
         Even terugblikken op je dag
       </p>
 
       {/* Status cards */}
       <div className="space-y-3">
         {/* Workout status */}
-        <div className={`p-5 border rounded-2xl shadow-[var(--shadow-card)] ${
+        <div className={`p-5 border rounded-2xl ${
           log.workout_completed
             ? 'bg-[#F0FDF4] border-[#BBF7D0]'
             : 'bg-[#FFF7ED] border-[#FED7AA]'
@@ -171,7 +171,7 @@ export default function AccountabilityPage() {
             </div>
             <div>
               <p className="font-semibold text-[#1A1917]">Training</p>
-              <p className="text-[13px] text-[#A09D96]">
+              <p className="text-[13px] text-[#ACACAC]">
                 {log.workout_completed ? 'Voltooid vandaag' : 'Niet voltooid vandaag'}
               </p>
             </div>
@@ -187,14 +187,14 @@ export default function AccountabilityPage() {
                 onChange={(e) => setWorkoutReason(e.target.value)}
                 placeholder="Bijv. drukke werkdag, niet lekker gevoeld, reisdag..."
                 rows={3}
-                className="w-full px-3 py-2 bg-white border border-[#E8E4DC] text-[14px] placeholder-[#A09D96] focus:outline-none focus:border-[#1A1917] resize-none rounded-xl"
+                className="w-full px-3 py-2 bg-white border border-[#F0F0EE] text-[14px] placeholder-[#ACACAC] focus:outline-none focus:border-[#1A1917] resize-none rounded-xl"
               />
             </div>
           )}
         </div>
 
         {/* Nutrition status */}
-        <div className={`p-5 border rounded-2xl shadow-[var(--shadow-card)] ${
+        <div className={`p-5 border rounded-2xl ${
           log.nutrition_logged
             ? 'bg-[#F0FDF4] border-[#BBF7D0]'
             : 'bg-[#FFF7ED] border-[#FED7AA]'
@@ -209,7 +209,7 @@ export default function AccountabilityPage() {
             </div>
             <div className="flex-1">
               <p className="font-semibold text-[#1A1917]">Voeding</p>
-              <p className="text-[13px] text-[#A09D96]">
+              <p className="text-[13px] text-[#ACACAC]">
                 {nutritionStatusText}
               </p>
             </div>
@@ -240,7 +240,7 @@ export default function AccountabilityPage() {
                 onChange={(e) => setNutritionReason(e.target.value)}
                 placeholder="Bijv. uit eten geweest, vergeten, weekend..."
                 rows={3}
-                className="w-full px-3 py-2 bg-white border border-[#E8E4DC] text-[14px] placeholder-[#A09D96] focus:outline-none focus:border-[#1A1917] resize-none rounded-xl"
+                className="w-full px-3 py-2 bg-white border border-[#F0F0EE] text-[14px] placeholder-[#ACACAC] focus:outline-none focus:border-[#1A1917] resize-none rounded-xl"
               />
             </div>
           )}

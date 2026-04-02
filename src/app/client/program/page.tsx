@@ -175,7 +175,7 @@ export default function ClientProgramPage() {
       {/* Header */}
       <div>
         <h1 className="text-editorial-h2 text-[#1A1917]">Training</h1>
-        <p className="text-[14px] text-[#A09D96] mt-1">
+        <p className="text-[14px] text-[#ACACAC] mt-1">
           {program.title}
         </p>
       </div>

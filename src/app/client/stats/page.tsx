@@ -68,7 +68,7 @@ const GROUP_COLORS: Record<string, string> = {
   'Armen': '#3D8B5C',
   'Benen': '#7B5EA7',
   'Core': '#B8447A',
-  'Overig': '#A09D96',
+  'Overig': '#ACACAC',
 }
 
 function getMuscleGroup(target: string): string {
@@ -335,7 +335,7 @@ export default function StatsPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-6 h-6 border-[1.5px] border-[#CCC7BC] border-t-[#1A1917] rounded-full animate-spin" />
+        <div className="w-6 h-6 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
       </div>
     )
   }
@@ -345,7 +345,7 @@ export default function StatsPage() {
       <SubPageHeader overline="Training" title="Statistieken" backHref="/client/progress" />
 
       {/* Tab bar */}
-      <div className="flex border-b border-[#F0EDE8] mb-5">
+      <div className="flex border-b border-[#F0F0EE] mb-5">
         {tabs.map(tab => (
           <button
             key={tab.id}
@@ -353,7 +353,7 @@ export default function StatsPage() {
             className={`flex-1 py-3 text-[13px] font-semibold uppercase tracking-[0.06em] transition-all border-b-2 text-center ${
               activeTab === tab.id
                 ? 'border-[#1A1917] text-[#1A1917]'
-                : 'border-transparent text-[#C5C2BC] hover:text-[#A09D96]'
+                : 'border-transparent text-[#C0C0C0] hover:text-[#ACACAC]'
             }`}
           >
             {tab.label}
@@ -369,7 +369,7 @@ export default function StatsPage() {
               key={r}
               onClick={() => setTimeRange(r)}
               className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] transition-all ${
-                timeRange === r ? 'bg-[#1A1917] text-white' : 'text-[#A09D96] hover:text-[#1A1917]'
+                timeRange === r ? 'bg-[#1A1917] text-white' : 'text-[#ACACAC] hover:text-[#1A1917]'
               }`}
             >
               {r === 'all' ? 'Alles' : r}
@@ -381,7 +381,7 @@ export default function StatsPage() {
           <button
             onClick={() => { setGroupBy('spiergroep'); setSelectedExercise(null) }}
             className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] transition-all ${
-              groupBy === 'spiergroep' ? 'bg-[#1A1917] text-white' : 'text-[#A09D96] hover:text-[#1A1917]'
+              groupBy === 'spiergroep' ? 'bg-[#1A1917] text-white' : 'text-[#ACACAC] hover:text-[#1A1917]'
             }`}
           >
             Spiergroep
@@ -389,7 +389,7 @@ export default function StatsPage() {
           <button
             onClick={() => setGroupBy('oefening')}
             className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] transition-all ${
-              groupBy === 'oefening' ? 'bg-[#1A1917] text-white' : 'text-[#A09D96] hover:text-[#1A1917]'
+              groupBy === 'oefening' ? 'bg-[#1A1917] text-white' : 'text-[#ACACAC] hover:text-[#1A1917]'
             }`}
           >
             Oefening
@@ -403,7 +403,7 @@ export default function StatsPage() {
           <select
             value={selectedExercise || ''}
             onChange={(e) => setSelectedExercise(e.target.value || null)}
-            className="w-full py-2.5 px-4 bg-white border border-[#E8E4DC] text-[14px] text-[#1A1917] appearance-none pr-10 focus:border-[#1A1917] outline-none rounded-xl"
+            className="w-full py-2.5 px-4 bg-white border border-[#F0F0EE] text-[14px] text-[#1A1917] appearance-none pr-10 focus:border-[#1A1917] outline-none rounded-xl"
           >
             <option value="">Selecteer een oefening...</option>
             {availableExercises.map(ex => (
@@ -412,7 +412,7 @@ export default function StatsPage() {
               </option>
             ))}
           </select>
-          <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A09D96] pointer-events-none" />
+          <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#ACACAC] pointer-events-none" />
         </div>
       )}
 
@@ -422,7 +422,7 @@ export default function StatsPage() {
           <button
             onClick={() => setSelectedGroup(null)}
             className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 ${
-              !selectedGroup ? 'bg-[#1A1917] text-white' : 'text-[#A09D96]'
+              !selectedGroup ? 'bg-[#1A1917] text-white' : 'text-[#ACACAC]'
             }`}
           >
             Alles
@@ -432,10 +432,10 @@ export default function StatsPage() {
               key={g}
               onClick={() => setSelectedGroup(selectedGroup === g ? null : g)}
               className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 ${
-                selectedGroup === g ? 'bg-[#1A1917] text-white' : 'text-[#A09D96]'
+                selectedGroup === g ? 'bg-[#1A1917] text-white' : 'text-[#ACACAC]'
               }`}
             >
-              <span className="inline-block w-2 h-2 mr-1.5" style={{ backgroundColor: GROUP_COLORS[g] || '#A09D96' }} />
+              <span className="inline-block w-2 h-2 mr-1.5" style={{ backgroundColor: GROUP_COLORS[g] || '#ACACAC' }} />
               {g}
             </button>
           ))}
@@ -446,22 +446,22 @@ export default function StatsPage() {
       {activeTab === 'kracht' && (
         <div>
           {krachtData.length > 0 ? (
-            <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4">
+            <div className="bg-white rounded-2xl shadow-[shadow-lg] p-4">
               <p className="text-label mb-3">Max gewicht per week (kg)</p>
               <ResponsiveContainer width="100%" height={220}>
                 {groupBy === 'spiergroep' ? (
                   <BarChart data={krachtData} barGap={0} barCategoryGap="15%">
-                    <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#C5C2BC' }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 10, fill: '#C5C2BC' }} axisLine={false} tickLine={false} width={35} />
+                    <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#C0C0C0' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: '#C0C0C0' }} axisLine={false} tickLine={false} width={35} />
                     <Tooltip content={<ChartTooltip />} />
                     {(selectedGroup ? [selectedGroup] : availableGroups).map(g => (
-                      <Bar key={g} dataKey={g} stackId="a" fill={GROUP_COLORS[g] || '#A09D96'} />
+                      <Bar key={g} dataKey={g} stackId="a" fill={GROUP_COLORS[g] || '#ACACAC'} />
                     ))}
                   </BarChart>
                 ) : (
                   <AreaChart data={krachtData}>
-                    <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#C5C2BC' }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 10, fill: '#C5C2BC' }} axisLine={false} tickLine={false} width={35} />
+                    <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#C0C0C0' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: '#C0C0C0' }} axisLine={false} tickLine={false} width={35} />
                     <Tooltip content={<ChartTooltip />} />
                     <Area type="monotone" dataKey="gewicht" stroke="#1A1917" fill="#1A1917" fillOpacity={0.1} strokeWidth={2} />
                   </AreaChart>
@@ -469,7 +469,7 @@ export default function StatsPage() {
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="text-center py-12 text-[14px] text-[#C5C2BC]">
+            <div className="text-center py-12 text-[14px] text-[#C0C0C0]">
               {groupBy === 'oefening' && !selectedExercise
                 ? 'Selecteer een oefening om data te zien'
                 : 'Geen data in deze periode'}
@@ -482,24 +482,24 @@ export default function StatsPage() {
       {activeTab === 'volume' && (
         <div>
           {volumeData.length > 0 ? (
-            <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4">
+            <div className="bg-white rounded-2xl shadow-[shadow-lg] p-4">
               <p className="text-label mb-3">
                 Volume per week {groupBy === 'spiergroep' ? '(ton)' : '(kg)'}
               </p>
               <ResponsiveContainer width="100%" height={220}>
                 {groupBy === 'spiergroep' ? (
                   <BarChart data={volumeData} barGap={0} barCategoryGap="15%">
-                    <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#C5C2BC' }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 10, fill: '#C5C2BC' }} axisLine={false} tickLine={false} width={35} />
+                    <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#C0C0C0' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: '#C0C0C0' }} axisLine={false} tickLine={false} width={35} />
                     <Tooltip content={<ChartTooltip />} />
                     {(selectedGroup ? [selectedGroup] : availableGroups).map(g => (
-                      <Bar key={g} dataKey={g} stackId="a" fill={GROUP_COLORS[g] || '#A09D96'} />
+                      <Bar key={g} dataKey={g} stackId="a" fill={GROUP_COLORS[g] || '#ACACAC'} />
                     ))}
                   </BarChart>
                 ) : (
                   <AreaChart data={volumeData}>
-                    <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#C5C2BC' }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 10, fill: '#C5C2BC' }} axisLine={false} tickLine={false} width={35} />
+                    <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#C0C0C0' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: '#C0C0C0' }} axisLine={false} tickLine={false} width={35} />
                     <Tooltip content={<ChartTooltip />} />
                     <Area type="monotone" dataKey="volume" stroke="#1A1917" fill="#1A1917" fillOpacity={0.1} strokeWidth={2} />
                   </AreaChart>
@@ -507,7 +507,7 @@ export default function StatsPage() {
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="text-center py-12 text-[14px] text-[#C5C2BC]">
+            <div className="text-center py-12 text-[14px] text-[#C0C0C0]">
               {groupBy === 'oefening' && !selectedExercise
                 ? 'Selecteer een oefening om data te zien'
                 : 'Geen data in deze periode'}
@@ -521,8 +521,8 @@ export default function StatsPage() {
         <div>
           {filteredPrs.length === 0 ? (
             <div className="text-center py-12">
-              <Trophy size={32} strokeWidth={1} className="text-[#DDD9D0] mx-auto mb-4" />
-              <p className="text-[14px] text-[#C5C2BC]">Geen records in deze periode</p>
+              <Trophy size={32} strokeWidth={1} className="text-[#D5D5D5] mx-auto mb-4" />
+              <p className="text-[14px] text-[#C0C0C0]">Geen records in deze periode</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -532,14 +532,14 @@ export default function StatsPage() {
                 const group = ex ? getMuscleGroup(ex.target_muscle) : 'Overig'
 
                 return (
-                  <div key={pr.id} className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4">
+                  <div key={pr.id} className="bg-white rounded-2xl shadow-[shadow-lg] p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 flex items-center justify-center shrink-0" style={{ backgroundColor: `${GROUP_COLORS[group] || '#A09D96'}15` }}>
-                        <Trophy size={16} strokeWidth={1.5} style={{ color: GROUP_COLORS[group] || '#A09D96' }} />
+                      <div className="w-9 h-9 flex items-center justify-center shrink-0" style={{ backgroundColor: `${GROUP_COLORS[group] || '#ACACAC'}15` }}>
+                        <Trophy size={16} strokeWidth={1.5} style={{ color: GROUP_COLORS[group] || '#ACACAC' }} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[14px] font-semibold text-[#1A1917] truncate">{exName}</p>
-                        <p className="text-[11px] text-[#A09D96]">
+                        <p className="text-[11px] text-[#ACACAC]">
                           {group} · {new Date(pr.achieved_at).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </p>
                       </div>
@@ -547,7 +547,7 @@ export default function StatsPage() {
                         <p className="text-[18px] font-bold text-[#1A1917] tabular-nums">
                           {pr.value}
                         </p>
-                        <p className="text-[10px] text-[#A09D96]">
+                        <p className="text-[10px] text-[#ACACAC]">
                           {pr.record_type === 'weight' ? 'kg' : pr.record_type === 'reps' ? 'reps' : pr.record_type}
                         </p>
                       </div>

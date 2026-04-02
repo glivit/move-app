@@ -156,10 +156,10 @@ export default function PhotoComparisonPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center bg-[#EEEBE3]">
+      <div className="min-h-[80vh] flex items-center justify-center bg-[#FFFFFF]">
         <div className="animate-pulse space-y-3 text-center">
-          <Camera size={48} className="text-[#C5C2BC] mx-auto" />
-          <p className="text-[#A09D96] text-[14px]">Foto's laden...</p>
+          <Camera size={48} className="text-[#C0C0C0] mx-auto" />
+          <p className="text-[#ACACAC] text-[14px]">Foto's laden...</p>
         </div>
       </div>
     )
@@ -167,14 +167,14 @@ export default function PhotoComparisonPage() {
 
   if (photoDates.length < 2) {
     return (
-      <div className="min-h-[80vh] bg-[#EEEBE3] px-4 py-6">
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-[#A09D96] mb-6">
+      <div className="min-h-[80vh] bg-[#FFFFFF] px-4 py-6">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-[#ACACAC] mb-6">
           <ArrowLeft size={18} /> Terug
         </button>
         <div className="text-center py-16">
-          <Camera size={48} className="text-[#C5C2BC] mx-auto mb-3" />
+          <Camera size={48} className="text-[#C0C0C0] mx-auto mb-3" />
           <p className="font-semibold text-[#1A1917] text-lg">Niet genoeg foto's</p>
-          <p className="text-[14px] text-[#A09D96] mt-2">
+          <p className="text-[14px] text-[#ACACAC] mt-2">
             Je hebt minimaal 2 check-ins met foto's nodig om te vergelijken.
           </p>
         </div>
@@ -287,7 +287,7 @@ export default function PhotoComparisonPage() {
             {beforeUrl ? (
               <img src={beforeUrl} alt="Before" className="w-full h-full object-cover" />
             ) : (
-              <div className="flex items-center justify-center h-full"><Camera size={24} className="text-[#6B6862]" /></div>
+              <div className="flex items-center justify-center h-full"><Camera size={24} className="text-[#ACACAC]" /></div>
             )}
             <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 p-2 pt-6">
               <p className="text-[10px] text-white/70 uppercase font-bold">Before</p>
@@ -298,7 +298,7 @@ export default function PhotoComparisonPage() {
             {afterUrl ? (
               <img src={afterUrl} alt="After" className="w-full h-full object-cover" />
             ) : (
-              <div className="flex items-center justify-center h-full"><Camera size={24} className="text-[#6B6862]" /></div>
+              <div className="flex items-center justify-center h-full"><Camera size={24} className="text-[#ACACAC]" /></div>
             )}
             <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 p-2 pt-6">
               <p className="text-[10px] text-white/70 uppercase font-bold">After</p>
@@ -370,13 +370,13 @@ export default function PhotoComparisonPage() {
                   >
                     <div className={`w-4 h-4 rounded-full border-2 transition-all ${
                       isBefore ? 'bg-white border-white scale-125' :
-                      isAfter ? 'bg-[var(--color-pop,#FF6B35)] border-[var(--color-pop,#FF6B35)] scale-125' :
+                      isAfter ? 'bg-[#D46A3A] border-[#D46A3A] scale-125' :
                       isBetween ? 'bg-white/30 border-white/30' :
                       'bg-white/10 border-white/10 hover:bg-white/30'
                     }`} />
                     {(isBefore || isAfter) && (
                       <span className={`absolute -bottom-5 text-[9px] font-bold whitespace-nowrap ${
-                        isBefore ? 'text-white' : 'text-[var(--color-pop,#FF6B35)]'
+                        isBefore ? 'text-white' : 'text-[#D46A3A]'
                       }`}>
                         {pd.label || formatDate(pd.date)}
                       </span>
@@ -400,7 +400,7 @@ export default function PhotoComparisonPage() {
             <button
               onClick={() => setSelecting(selecting === 'after' ? null : 'after')}
               className={`flex-1 py-2 rounded-xl text-[12px] font-semibold transition-colors ${
-                selecting === 'after' ? 'bg-[var(--color-pop,#FF6B35)] text-white' : 'bg-white/10 text-white hover:bg-white/20'
+                selecting === 'after' ? 'bg-[#D46A3A] text-white' : 'bg-white/10 text-white hover:bg-white/20'
               }`}
             >
               After: {formatDate(after.date)}

@@ -338,7 +338,7 @@ export default function ExerciseProgressionPage() {
             className="bg-white rounded-2xl border border-[#E8E4DD] p-6"
             style={{ fontFamily: 'var(--font-display)' }}
           >
-            <p className="text-[#6B6862]">{error}</p>
+            <p className="text-[#ACACAC]">{error}</p>
           </div>
         </div>
       </div>
@@ -366,7 +366,7 @@ export default function ExerciseProgressionPage() {
               {exercise?.name}
             </h1>
             {exercise?.muscle_groups && (
-              <p className="text-[#6B6862] mt-2">
+              <p className="text-[#ACACAC] mt-2">
                 {exercise.muscle_groups.join(', ')}
               </p>
             )}
@@ -388,18 +388,18 @@ export default function ExerciseProgressionPage() {
               </div>
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm text-[#6B6862]">Zwaarste gewicht</p>
+                  <p className="text-sm text-[#ACACAC]">Zwaarste gewicht</p>
                   <p className="text-3xl font-bold text-[#D4682A]">
                     {personalRecords.weight} kg
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-[#6B6862]">Herhalingen op PR</p>
+                  <p className="text-sm text-[#ACACAC]">Herhalingen op PR</p>
                   <p className="text-2xl font-bold text-[#1A1917]">
                     {personalRecords.reps}x
                   </p>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-[#6B6862] pt-2">
+                <div className="flex items-center gap-2 text-sm text-[#ACACAC] pt-2">
                   <Calendar className="w-4 h-4" />
                   {personalRecords.date}
                 </div>
@@ -419,13 +419,13 @@ export default function ExerciseProgressionPage() {
                 </div>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-[#6B6862]">1RM schatting</p>
+                    <p className="text-sm text-[#ACACAC]">1RM schatting</p>
                     <p className="text-3xl font-bold text-[#D4682A]">
                       {chartData[chartData.length - 1].estimated1rm} kg
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-[#6B6862]">Totaal volume</p>
+                    <p className="text-sm text-[#ACACAC]">Totaal volume</p>
                     <p className="text-2xl font-bold text-[#1A1917]">
                       {chartData[chartData.length - 1].volume} kg
                     </p>
@@ -462,10 +462,10 @@ export default function ExerciseProgressionPage() {
                   />
                   <XAxis
                     dataKey="week"
-                    stroke="#6B6862"
+                    stroke="#ACACAC"
                     style={{ fontSize: '12px' }}
                   />
-                  <YAxis stroke="#6B6862" style={{ fontSize: '12px' }} />
+                  <YAxis stroke="#ACACAC" style={{ fontSize: '12px' }} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#1A1917',
@@ -504,10 +504,10 @@ export default function ExerciseProgressionPage() {
                   />
                   <XAxis
                     dataKey="week"
-                    stroke="#6B6862"
+                    stroke="#ACACAC"
                     style={{ fontSize: '12px' }}
                   />
-                  <YAxis stroke="#6B6862" style={{ fontSize: '12px' }} />
+                  <YAxis stroke="#ACACAC" style={{ fontSize: '12px' }} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#1A1917',
@@ -589,7 +589,7 @@ export default function ExerciseProgressionPage() {
                     <p className="font-semibold text-[#1A1917]">
                       {session.date}
                     </p>
-                    <span className="text-sm text-[#6B6862] bg-[#F8F6F2] px-3 py-1 rounded-full">
+                    <span className="text-sm text-[#ACACAC] bg-[#F8F6F2] px-3 py-1 rounded-full">
                       Volume: {session.totalVolume} kg
                     </span>
                   </div>
@@ -615,11 +615,11 @@ export default function ExerciseProgressionPage() {
             className="bg-white rounded-2xl border border-[#E8E4DD] p-12 text-center"
             style={{ fontFamily: 'var(--font-display)' }}
           >
-            <Dumbbell className="w-12 h-12 text-[#6B6862] mx-auto mb-4 opacity-50" />
-            <p className="text-[#6B6862] text-lg">
+            <Dumbbell className="w-12 h-12 text-[#ACACAC] mx-auto mb-4 opacity-50" />
+            <p className="text-[#ACACAC] text-lg">
               Nog geen gegevens beschikbaar voor deze oefening
             </p>
-            <p className="text-sm text-[#6B6862] mt-2">
+            <p className="text-sm text-[#ACACAC] mt-2">
               Voeg deze oefening toe aan je training om progressie bij te houden
             </p>
           </div>

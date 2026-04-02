@@ -184,7 +184,7 @@ export default function ExercisesPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-6 h-6 border-[1.5px] border-[#CCC7BC] border-t-[#1A1917] rounded-full animate-spin" />
+        <div className="w-6 h-6 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
       </div>
     )
   }
@@ -194,7 +194,7 @@ export default function ExercisesPage() {
       <SubPageHeader overline="Training" title="Oefeningen" backHref="/client/progress" />
 
       {/* Summary */}
-      <div className="flex gap-4 mb-6 border-b border-[#F0EDE8] pb-5">
+      <div className="flex gap-4 mb-6 border-b border-[#F0F0EE] pb-5">
         <div className="text-center flex-1">
           <p className="text-[22px] font-bold text-[#1A1917]">{exerciseStats.length}</p>
           <p className="text-label mt-1">Oefeningen</p>
@@ -215,13 +215,13 @@ export default function ExercisesPage() {
 
       {/* Search */}
       <div className="relative mb-4">
-        <Search size={16} strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#C5C2BC]" />
+        <Search size={16} strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#C0C0C0]" />
         <input
           type="text"
           placeholder="Zoek oefening..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-9 pr-4 py-2.5 bg-white border border-[#E8E4DC] text-[14px] text-[#1A1917] placeholder-[#C5C2BC] focus:border-[#1A1917] outline-none rounded-xl"
+          className="w-full pl-9 pr-4 py-2.5 bg-white border border-[#F0F0EE] text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:border-[#1A1917] outline-none rounded-xl"
         />
       </div>
 
@@ -230,7 +230,7 @@ export default function ExercisesPage() {
         <button
           onClick={() => setSelectedGroup(null)}
           className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 transition-all rounded-xl ${
-            !selectedGroup ? 'bg-[#1A1917] text-white' : 'text-[#A09D96] hover:text-[#1A1917]'
+            !selectedGroup ? 'bg-[#1A1917] text-white' : 'text-[#ACACAC] hover:text-[#1A1917]'
           }`}
         >
           Alles
@@ -240,7 +240,7 @@ export default function ExercisesPage() {
             key={group}
             onClick={() => setSelectedGroup(selectedGroup === group ? null : group)}
             className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 transition-all rounded-xl ${
-              selectedGroup === group ? 'bg-[#1A1917] text-white' : 'text-[#A09D96] hover:text-[#1A1917]'
+              selectedGroup === group ? 'bg-[#1A1917] text-white' : 'text-[#ACACAC] hover:text-[#1A1917]'
             }`}
           >
             {group}
@@ -252,13 +252,13 @@ export default function ExercisesPage() {
       <div className="space-y-2">
         {filtered.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-[14px] text-[#C5C2BC]">Geen oefeningen gevonden</p>
+            <p className="text-[14px] text-[#C0C0C0]">Geen oefeningen gevonden</p>
           </div>
         ) : (
           filtered.map(stat => (
             <div
               key={stat.exercise.id}
-              className="bg-white p-4 rounded-2xl shadow-[var(--shadow-card)]"
+              className="bg-white p-4 rounded-2xl "
             >
               <div className="flex items-start gap-3">
                 <div className="flex-1 min-w-0">
@@ -273,34 +273,34 @@ export default function ExercisesPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-[#A09D96] mt-0.5">
+                  <p className="text-[11px] text-[#ACACAC] mt-0.5">
                     {getMuscleGroup(stat.exercise.target_muscle)} · {stat.exercise.target_muscle}
                   </p>
                 </div>
               </div>
 
               {/* Stats row */}
-              <div className="flex gap-4 mt-3 pt-3 border-t border-[#F0EDE8]">
+              <div className="flex gap-4 mt-3 pt-3 border-t border-[#F0F0EE]">
                 <div>
                   <p className="text-[15px] font-bold text-[#1A1917] tabular-nums">{stat.bestWeight} kg</p>
-                  <p className="text-[10px] text-[#C5C2BC]">Beste gewicht</p>
+                  <p className="text-[10px] text-[#C0C0C0]">Beste gewicht</p>
                 </div>
-                <div className="w-px bg-[#F0EDE8]" />
+                <div className="w-px bg-[#F0F0EE]" />
                 <div>
                   <p className="text-[15px] font-bold text-[#1A1917] tabular-nums">{stat.totalSets}</p>
-                  <p className="text-[10px] text-[#C5C2BC]">Sets totaal</p>
+                  <p className="text-[10px] text-[#C0C0C0]">Sets totaal</p>
                 </div>
-                <div className="w-px bg-[#F0EDE8]" />
+                <div className="w-px bg-[#F0F0EE]" />
                 <div>
                   <p className="text-[15px] font-bold text-[#1A1917] tabular-nums">{stat.sessions}x</p>
-                  <p className="text-[10px] text-[#C5C2BC]">Sessies</p>
+                  <p className="text-[10px] text-[#C0C0C0]">Sessies</p>
                 </div>
-                <div className="w-px bg-[#F0EDE8]" />
+                <div className="w-px bg-[#F0F0EE]" />
                 <div>
                   <p className="text-[15px] font-bold text-[#1A1917] tabular-nums">
                     {stat.totalVolume >= 1000 ? `${(stat.totalVolume / 1000).toFixed(1)}t` : `${Math.round(stat.totalVolume)} kg`}
                   </p>
-                  <p className="text-[10px] text-[#C5C2BC]">Volume</p>
+                  <p className="text-[10px] text-[#C0C0C0]">Volume</p>
                 </div>
               </div>
             </div>

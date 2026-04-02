@@ -310,10 +310,10 @@ Bekijk mijn voortgang in Move!`
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8F6F2] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#F8F8F6] flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#D4682A]"></div>
-          <p className="mt-4 text-[#6B6862]">Voortgangsrapport laden...</p>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#D46A3A]"></div>
+          <p className="mt-4 text-[#ACACAC]">Voortgangsrapport laden...</p>
         </div>
       </div>
     )
@@ -321,17 +321,17 @@ Bekijk mijn voortgang in Move!`
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#F8F6F2] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#F8F8F6] flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <h1 className="text-2xl font-bold text-[#1A1917] mb-2">Oops!</h1>
-          <p className="text-[#6B6862]">{error}</p>
+          <p className="text-[#ACACAC]">{error}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F6F2] py-8 px-4">
+    <div className="min-h-screen bg-[#F8F8F6] py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -342,14 +342,14 @@ Bekijk mijn voortgang in Move!`
             >
               Voortgangsrapport
             </h1>
-            <p className="text-[#6B6862]">Volg je vooruitgang en feest je successen</p>
+            <p className="text-[#ACACAC]">Volg je vooruitgang en feest je successen</p>
           </div>
         </div>
 
         {/* Period Selector */}
-        <div className="mb-6 bg-white rounded-2xl border border-[#E8E4DD] p-5">
+        <div className="mb-6 bg-white rounded-2xl border border-[#F0F0EE] p-5">
           <div className="flex items-center gap-2 mb-3">
-            <Calendar className="w-5 h-5 text-[#D4682A]" />
+            <Calendar className="w-5 h-5 text-[#D46A3A]" />
             <span className="font-semibold text-[#1A1917]">Periode</span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -359,8 +359,8 @@ Bekijk mijn voortgang in Move!`
                 onClick={() => setSelectedPeriod(option.key)}
                 className={`py-2 px-3 rounded-lg font-medium transition-all ${
                   selectedPeriod === option.key
-                    ? 'bg-[#D4682A] text-white'
-                    : 'bg-[#F8F6F2] text-[#6B6862] hover:bg-[#EAE7E0]'
+                    ? 'bg-[#D46A3A] text-white'
+                    : 'bg-[#F8F8F6] text-[#ACACAC] hover:bg-[#F0F0EE]'
                 }`}
               >
                 {option.label}
@@ -370,11 +370,11 @@ Bekijk mijn voortgang in Move!`
         </div>
 
         {/* Report Card Container */}
-        <div ref={reportRef} className="bg-white rounded-2xl border border-[#E8E4DD] p-8 mb-6">
+        <div ref={reportRef} className="bg-white rounded-2xl border border-[#F0F0EE] p-8 mb-6">
           {/* Report Header */}
-          <div className="text-center mb-8 pb-6 border-b border-[#E8E4DD]">
+          <div className="text-center mb-8 pb-6 border-b border-[#F0F0EE]">
             <h2 className="text-3xl font-bold text-[#1A1917] mb-1">{clientName}</h2>
-            <p className="text-[#6B6862]">
+            <p className="text-[#ACACAC]">
               {periodLabel} • {reportDate}
             </p>
           </div>
@@ -382,39 +382,39 @@ Bekijk mijn voortgang in Move!`
           {/* Key Metrics */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {/* Total Workouts */}
-            <div className="bg-[#F8F6F2] rounded-xl p-4">
+            <div className="bg-[#F8F8F6] rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[#6B6862]">Totaal workouts</span>
-                <TrendingUp className="w-5 h-5 text-[#D4682A]" />
+                <span className="text-sm font-medium text-[#ACACAC]">Totaal workouts</span>
+                <TrendingUp className="w-5 h-5 text-[#D46A3A]" />
               </div>
               <p className="text-3xl font-bold text-[#1A1917]">{totalWorkouts}</p>
             </div>
 
             {/* Average Per Week */}
-            <div className="bg-[#F8F6F2] rounded-xl p-4">
+            <div className="bg-[#F8F8F6] rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[#6B6862]">Gemiddeld/week</span>
-                <TrendingUp className="w-5 h-5 text-[#D4682A]" />
+                <span className="text-sm font-medium text-[#ACACAC]">Gemiddeld/week</span>
+                <TrendingUp className="w-5 h-5 text-[#D46A3A]" />
               </div>
               <p className="text-3xl font-bold text-[#1A1917]">{averagePerWeek}</p>
             </div>
 
             {/* Current Streak */}
-            <div className="bg-[#F8F6F2] rounded-xl p-4">
+            <div className="bg-[#F8F8F6] rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[#6B6862]">Huidige streak</span>
-                <Flame className="w-5 h-5 text-[#D4682A]" />
+                <span className="text-sm font-medium text-[#ACACAC]">Huidige streak</span>
+                <Flame className="w-5 h-5 text-[#D46A3A]" />
               </div>
               <p className="text-3xl font-bold text-[#1A1917]">{currentStreak}d</p>
             </div>
 
             {/* Weight Change */}
-            <div className="bg-[#F8F6F2] rounded-xl p-4">
+            <div className="bg-[#F8F8F6] rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[#6B6862]">Gewichtsverandering</span>
-                <Scale className="w-5 h-5 text-[#D4682A]" />
+                <span className="text-sm font-medium text-[#ACACAC]">Gewichtsverandering</span>
+                <Scale className="w-5 h-5 text-[#D46A3A]" />
               </div>
-              <p className={`text-3xl font-bold ${weightChange ? (weightChange < 0 ? 'text-green-600' : 'text-[#1A1917]') : 'text-[#6B6862]'}`}>
+              <p className={`text-3xl font-bold ${weightChange ? (weightChange < 0 ? 'text-green-600' : 'text-[#1A1917]') : 'text-[#ACACAC]'}`}>
                 {weightChange ? `${weightChange > 0 ? '+' : ''}${weightChange}kg` : '—'}
               </p>
             </div>
@@ -424,29 +424,29 @@ Bekijk mijn voortgang in Move!`
           {weightChartData.length > 1 && (
             <div className="mb-8">
               <h3 className="text-xl font-bold text-[#1A1917] mb-4">Gewichtsverloop</h3>
-              <div className="bg-[#F8F6F2] rounded-xl p-4 h-80">
+              <div className="bg-[#F8F8F6] rounded-xl p-4 h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={weightChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#D4682A" stopOpacity={0.8} />
-                        <stop offset="95%" stopColor="#D4682A" stopOpacity={0.1} />
+                        <stop offset="5%" stopColor="#D46A3A" stopOpacity={0.8} />
+                        <stop offset="95%" stopColor="#D46A3A" stopOpacity={0.1} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DD" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F0F0EE" />
                     <XAxis
                       dataKey="date"
-                      tick={{ fill: '#6B6862', fontSize: 12 }}
-                      stroke="#E8E4DD"
+                      tick={{ fill: '#ACACAC', fontSize: 12 }}
+                      stroke="#F0F0EE"
                     />
                     <YAxis
-                      tick={{ fill: '#6B6862', fontSize: 12 }}
-                      stroke="#E8E4DD"
+                      tick={{ fill: '#ACACAC', fontSize: 12 }}
+                      stroke="#F0F0EE"
                     />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: '#fff',
-                        border: '1px solid #E8E4DD',
+                        border: '1px solid #F0F0EE',
                         borderRadius: '8px',
                       }}
                       labelStyle={{ color: '#1A1917' }}
@@ -454,7 +454,7 @@ Bekijk mijn voortgang in Move!`
                     <Area
                       type="monotone"
                       dataKey="weight"
-                      stroke="#D4682A"
+                      stroke="#D46A3A"
                       fillOpacity={1}
                       fill="url(#colorWeight)"
                     />
@@ -468,30 +468,30 @@ Bekijk mijn voortgang in Move!`
           {weeklyData.length > 0 && (
             <div className="mb-8">
               <h3 className="text-xl font-bold text-[#1A1917] mb-4">Wekelijkse activiteit</h3>
-              <div className="bg-[#F8F6F2] rounded-xl p-4 h-80">
+              <div className="bg-[#F8F8F6] rounded-xl p-4 h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={weeklyData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DD" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F0F0EE" />
                     <XAxis
                       dataKey="week"
-                      tick={{ fill: '#6B6862', fontSize: 12 }}
-                      stroke="#E8E4DD"
+                      tick={{ fill: '#ACACAC', fontSize: 12 }}
+                      stroke="#F0F0EE"
                     />
                     <YAxis
-                      tick={{ fill: '#6B6862', fontSize: 12 }}
-                      stroke="#E8E4DD"
+                      tick={{ fill: '#ACACAC', fontSize: 12 }}
+                      stroke="#F0F0EE"
                     />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: '#fff',
-                        border: '1px solid #E8E4DD',
+                        border: '1px solid #F0F0EE',
                         borderRadius: '8px',
                       }}
                       labelStyle={{ color: '#1A1917' }}
                     />
                     <Bar
                       dataKey="workouts"
-                      fill="#D4682A"
+                      fill="#D46A3A"
                       radius={[8, 8, 0, 0]}
                     />
                   </BarChart>
@@ -504,26 +504,26 @@ Bekijk mijn voortgang in Move!`
           {prs.length > 0 && (
             <div>
               <h3 className="text-xl font-bold text-[#1A1917] mb-4 flex items-center gap-2">
-                <Trophy className="w-6 h-6 text-[#D4682A]" />
+                <Trophy className="w-6 h-6 text-[#D46A3A]" />
                 Persoonlijke Records
               </h3>
               <div className="space-y-3">
                 {prs.map((pr, index) => (
-                  <div key={pr.id} className="flex items-center justify-between bg-[#F8F6F2] rounded-xl p-4">
+                  <div key={pr.id} className="flex items-center justify-between bg-[#F8F8F6] rounded-xl p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-[#D4682A] text-white flex items-center justify-center font-bold text-sm">
+                      <div className="w-8 h-8 rounded-full bg-[#D46A3A] text-white flex items-center justify-center font-bold text-sm">
                         {index + 1}
                       </div>
                       <div>
                         <p className="font-semibold text-[#1A1917]">{pr.exercises?.name}</p>
-                        <p className="text-sm text-[#6B6862]">
+                        <p className="text-sm text-[#ACACAC]">
                           {new Date(pr.workout_sessions?.started_at).toLocaleDateString('nl-NL')}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
                       <p className="font-bold text-[#1A1917]">{pr.weight_kg} kg</p>
-                      <p className="text-sm text-[#6B6862]">{pr.reps} reps</p>
+                      <p className="text-sm text-[#ACACAC]">{pr.reps} reps</p>
                     </div>
                   </div>
                 ))}
@@ -533,7 +533,7 @@ Bekijk mijn voortgang in Move!`
 
           {prs.length === 0 && weightChartData.length === 0 && weeklyData.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-[#6B6862] mb-2">Nog geen gegevens beschikbaar voor deze periode</p>
+              <p className="text-[#ACACAC] mb-2">Nog geen gegevens beschikbaar voor deze periode</p>
               <p className="text-sm text-[#B5B1AA]">Start met trainingen en loggen van je voortgang</p>
             </div>
           )}
@@ -543,7 +543,7 @@ Bekijk mijn voortgang in Move!`
         <div className="flex gap-4 justify-center">
           <button
             onClick={handleShare}
-            className="flex items-center gap-2 bg-[#D4682A] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#C0591F] transition-colors"
+            className="flex items-center gap-2 bg-[#D46A3A] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#B85730] transition-colors"
           >
             {copied ? (
               <>
@@ -564,7 +564,7 @@ Bekijk mijn voortgang in Move!`
           </button>
           <a
             href="/client/dashboard"
-            className="flex items-center gap-2 bg-[#F8F6F2] text-[#1A1917] px-6 py-3 rounded-xl font-semibold border border-[#E8E4DD] hover:bg-[#EAE7E0] transition-colors"
+            className="flex items-center gap-2 bg-[#F8F8F6] text-[#1A1917] px-6 py-3 rounded-xl font-semibold border border-[#F0F0EE] hover:bg-[#F0F0EE] transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
             Terug naar dashboard

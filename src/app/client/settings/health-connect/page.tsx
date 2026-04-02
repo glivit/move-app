@@ -147,7 +147,7 @@ export default function HealthConnectPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[80vh] bg-[#EEEBE3] px-4 py-6">
+      <div className="min-h-[80vh] bg-[#FFFFFF] px-4 py-6">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-white rounded-xl w-48" />
           <div className="h-24 bg-white rounded-2xl" />
@@ -158,13 +158,13 @@ export default function HealthConnectPage() {
   }
 
   return (
-    <div className="min-h-[80vh] bg-[#EEEBE3] -mx-4 -mt-4 px-4 py-6">
-      <button onClick={() => router.back()} className="flex items-center gap-2 text-[#A09D96] mb-6">
+    <div className="min-h-[80vh] bg-[#FFFFFF] -mx-4 -mt-4 px-4 py-6">
+      <button onClick={() => router.back()} className="flex items-center gap-2 text-[#ACACAC] mb-6">
         <ArrowLeft size={18} /> Terug
       </button>
 
       <h1 className="text-[24px] font-semibold text-[#1A1917] mb-2">Gezondheidsdata</h1>
-      <p className="text-[14px] text-[#A09D96] mb-6">
+      <p className="text-[14px] text-[#ACACAC] mb-6">
         Koppel je wearable om automatisch stappen, slaap en hartslag te synchroniseren.
       </p>
 
@@ -193,9 +193,9 @@ export default function HealthConnectPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-[13px] text-[#A09D96] mt-0.5">{provider.description}</p>
+                  <p className="text-[13px] text-[#ACACAC] mt-0.5">{provider.description}</p>
                   {isConnected && (
-                    <p className="text-[11px] text-[#CCC7BC] mt-1">
+                    <p className="text-[11px] text-[#C0C0C0] mt-1">
                       Laatste sync: {formatLastSync(integration.last_sync_at)}
                     </p>
                   )}
@@ -230,7 +230,7 @@ export default function HealthConnectPage() {
       </div>
 
       <div className="mt-6 p-4 bg-white/50 rounded-2xl">
-        <p className="text-[12px] text-[#A09D96] leading-relaxed">
+        <p className="text-[12px] text-[#ACACAC] leading-relaxed">
           Je data wordt veilig gesynchroniseerd en alleen gedeeld met je coach.
           Je kunt de koppeling op elk moment verbreken. Handmatig ingevoerde data wordt niet overschreven.
         </p>

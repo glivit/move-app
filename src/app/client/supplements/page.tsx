@@ -147,11 +147,11 @@ export default function SupplementsPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-editorial-h2 text-[#1A1917] mb-2">Supplementen</h1>
-          <p className="text-[#A09D96] text-[15px]">Laden...</p>
+          <p className="text-[#ACACAC] text-[15px]">Laden...</p>
         </div>
         <div className="space-y-4">
           {[1, 2].map(i => (
-            <div key={i} className="bg-white h-24 rounded-2xl shadow-[var(--shadow-card)] animate-pulse" />
+            <div key={i} className="bg-white h-24 rounded-2xl shadow-none animate-pulse" />
           ))}
         </div>
       </div>
@@ -164,7 +164,7 @@ export default function SupplementsPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-editorial-h2 text-[#1A1917] mb-2">Supplementen</h1>
-          <p className="text-[#A09D96] text-[15px]">Track je dagelijkse supplementen en medicatie</p>
+          <p className="text-[#ACACAC] text-[15px]">Track je dagelijkse supplementen en medicatie</p>
         </div>
         <button
           onClick={() => setShowAdd(!showAdd)}
@@ -176,7 +176,7 @@ export default function SupplementsPage() {
 
       {/* Daily progress */}
       {totalCount > 0 && (
-        <div className="bg-white p-5 rounded-2xl shadow-[var(--shadow-card)]">
+        <div className="bg-white p-5 rounded-2xl shadow-none">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full flex items-center justify-center"
@@ -188,14 +188,14 @@ export default function SupplementsPage() {
                 <p className="text-[15px] font-semibold text-[#1A1917]">
                   {loggedCount === totalCount ? 'Alles ingenomen!' : `${loggedCount} van ${totalCount} ingenomen`}
                 </p>
-                <p className="text-[12px] text-[#A09D96]">Vandaag</p>
+                <p className="text-[12px] text-[#ACACAC]">Vandaag</p>
               </div>
             </div>
             <span className="text-[20px] font-bold" style={{ color: loggedCount === totalCount ? '#34C759' : '#FF9500' }}>
               {totalCount > 0 ? Math.round((loggedCount / totalCount) * 100) : 0}%
             </span>
           </div>
-          <div className="w-full h-2 bg-[#E8E4DC] overflow-hidden">
+          <div className="w-full h-2 bg-[#F0F0EE] overflow-hidden">
             <div
               className="h-full transition-all duration-500"
               style={{
@@ -209,39 +209,39 @@ export default function SupplementsPage() {
 
       {/* Add form */}
       {showAdd && (
-        <form onSubmit={addSupplement} className="bg-white p-5 rounded-2xl shadow-[var(--shadow-card)] space-y-4">
+        <form onSubmit={addSupplement} className="bg-white p-5 rounded-2xl shadow-none space-y-4">
           <h3 className="text-[15px] font-semibold text-[#1A1917]">Nieuw supplement toevoegen</h3>
 
           <div>
-            <label className="text-[11px] font-semibold text-[#A09D96] uppercase tracking-[0.12em] block mb-1.5">Naam *</label>
+            <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.12em] block mb-1.5">Naam *</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="bijv. Creatine, Vitamine D, Omega-3..."
               required
-              className="w-full px-3 py-2.5 border border-[#F0EDE8] rounded-xl bg-[#FAF8F3] text-[14px] text-[#1A1917] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
+              className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl bg-[#F8F8F6] text-[14px] text-[#1A1917] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
             />
           </div>
 
           <div>
-            <label className="text-[11px] font-semibold text-[#A09D96] uppercase tracking-[0.12em] block mb-1.5">Dosering</label>
+            <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.12em] block mb-1.5">Dosering</label>
             <input
               type="text"
               value={dosage}
               onChange={(e) => setDosage(e.target.value)}
               placeholder="bijv. 5g, 2000 IU, 1 capsule..."
-              className="w-full px-3 py-2.5 border border-[#F0EDE8] rounded-xl bg-[#FAF8F3] text-[14px] text-[#1A1917] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
+              className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl bg-[#F8F8F6] text-[14px] text-[#1A1917] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[11px] font-semibold text-[#A09D96] uppercase tracking-[0.12em] block mb-1.5">Frequentie</label>
+              <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.12em] block mb-1.5">Frequentie</label>
               <select
                 value={frequency}
                 onChange={(e) => setFrequency(e.target.value)}
-                className="w-full px-3 py-2.5 border border-[#F0EDE8] rounded-xl bg-[#FAF8F3] text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917]"
+                className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl bg-[#F8F8F6] text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917]"
               >
                 {FREQUENCY_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -249,11 +249,11 @@ export default function SupplementsPage() {
               </select>
             </div>
             <div>
-              <label className="text-[11px] font-semibold text-[#A09D96] uppercase tracking-[0.12em] block mb-1.5">Tijdstip</label>
+              <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.12em] block mb-1.5">Tijdstip</label>
               <select
                 value={timeOfDay}
                 onChange={(e) => setTimeOfDay(e.target.value)}
-                className="w-full px-3 py-2.5 border border-[#F0EDE8] rounded-xl bg-[#FAF8F3] text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917]"
+                className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl bg-[#F8F8F6] text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917]"
               >
                 {TIME_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -281,8 +281,8 @@ export default function SupplementsPage() {
             return (
               <div key={group.value}>
                 <div className="flex items-center gap-2 mb-3">
-                  <GroupIcon className="w-4 h-4 text-[#A09D96]" strokeWidth={1.5} />
-                  <h3 className="text-[11px] font-semibold text-[#A09D96] uppercase tracking-[0.12em]">{group.label}</h3>
+                  <GroupIcon className="w-4 h-4 text-[#ACACAC]" strokeWidth={1.5} />
+                  <h3 className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.12em]">{group.label}</h3>
                 </div>
                 <div className="space-y-2">
                   {group.items.map(supplement => {
@@ -291,8 +291,8 @@ export default function SupplementsPage() {
                     return (
                       <div
                         key={supplement.id}
-                        className="bg-white p-4 rounded-2xl shadow-[var(--shadow-card)] transition-all"
-                        style={{ borderColor: logged ? '#34C759' : '#E8E4DC' }}
+                        className="bg-white p-4 rounded-2xl shadow-none transition-all"
+                        style={{ borderColor: logged ? '#34C759' : '#F0F0EE' }}
                       >
                         <div className="flex items-center gap-3">
                           <button
@@ -305,18 +305,18 @@ export default function SupplementsPage() {
                             }}
                           >
                             {toggling ? (
-                              <Loader2 className="w-4 h-4 animate-spin text-[#A09D96]" />
+                              <Loader2 className="w-4 h-4 animate-spin text-[#ACACAC]" />
                             ) : logged ? (
                               <Check className="w-4 h-4 text-white" strokeWidth={2.5} />
                             ) : null}
                           </button>
                           <div className="flex-1 min-w-0">
-                            <p className={`text-[15px] font-semibold ${logged ? 'text-[#A09D96] line-through' : 'text-[#1A1917]'}`}>
+                            <p className={`text-[15px] font-semibold ${logged ? 'text-[#ACACAC] line-through' : 'text-[#1A1917]'}`}>
                               {supplement.name}
                             </p>
                             <div className="flex items-center gap-2 mt-0.5">
                               {supplement.dosage && (
-                                <span className="text-[12px] text-[#A09D96]">{supplement.dosage}</span>
+                                <span className="text-[12px] text-[#ACACAC]">{supplement.dosage}</span>
                               )}
                               <span className="text-[12px] text-[#C7C7CC]">{supplement.frequency}</span>
                             </div>
@@ -341,10 +341,10 @@ export default function SupplementsPage() {
           })}
         </div>
       ) : !showAdd ? (
-        <div className="bg-white p-12 rounded-2xl shadow-[var(--shadow-card)] text-center">
+        <div className="bg-white p-12 rounded-2xl shadow-none text-center">
           <Pill strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[#C7C7CC]" />
           <p className="text-[15px] font-semibold text-[#1A1917] mb-2">Nog geen supplementen</p>
-          <p className="text-[13px] text-[#A09D96] mb-4">
+          <p className="text-[13px] text-[#ACACAC] mb-4">
             Voeg je supplementen en medicatie toe om ze dagelijks bij te houden.
           </p>
           <button

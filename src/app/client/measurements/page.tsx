@@ -37,7 +37,7 @@ type Tab = 'fotos' | 'metingen' | 'omtrek'
 // ─── Sparkline ──────────────────────────────────────────────
 
 function MiniChart({ data, color, height = 60 }: { data: { date: string; value: number }[]; color: string; height?: number }) {
-  if (data.length < 2) return <p className="text-[12px] text-[#C5C2BC]">Niet genoeg data</p>
+  if (data.length < 2) return <p className="text-[12px] text-[#C0C0C0]">Niet genoeg data</p>
 
   const width = 280
   const max = Math.max(...data.map(d => d.value))
@@ -86,17 +86,17 @@ function MetricCard({ label, data, unit, color, invertDelta = false }: {
   const deltaPositive = delta !== null ? (invertDelta ? delta < 0 : delta > 0) : null
 
   return (
-    <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-4">
+    <div className="bg-white rounded-2xl shadow-[shadow-lg] p-4">
       <div className="flex items-baseline justify-between mb-3">
         <p className="text-label">{label}</p>
         {delta !== null && (
-          <span className={`text-[12px] font-semibold ${deltaPositive ? 'text-[#3D8B5C]' : delta === 0 ? 'text-[#A09D96]' : 'text-[#E85D4A]'}`}>
+          <span className={`text-[12px] font-semibold ${deltaPositive ? 'text-[#3D8B5C]' : delta === 0 ? 'text-[#ACACAC]' : 'text-[#E85D4A]'}`}>
             {delta > 0 ? '+' : ''}{delta} {unit}
           </span>
         )}
       </div>
       <p className="text-[24px] font-bold text-[#1A1917] mb-3">
-        {current} <span className="text-[14px] font-medium text-[#A09D96]">{unit}</span>
+        {current} <span className="text-[14px] font-medium text-[#ACACAC]">{unit}</span>
       </p>
       <MiniChart data={data} color={color} />
     </div>
@@ -165,7 +165,7 @@ export default function MeasurementsPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-6 h-6 border-[1.5px] border-[#CCC7BC] border-t-[#1A1917] rounded-full animate-spin" />
+        <div className="w-6 h-6 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
       </div>
     )
   }
@@ -189,7 +189,7 @@ export default function MeasurementsPage() {
       />
 
       {/* ═══ TAB BAR ═════════════════════════════════════════ */}
-      <div className="flex border-b border-[#F0EDE8] mb-6">
+      <div className="flex border-b border-[#F0F0EE] mb-6">
         {tabs.map(tab => {
           const Icon = tab.icon
           return (
@@ -199,7 +199,7 @@ export default function MeasurementsPage() {
               className={`flex-1 flex items-center justify-center gap-2 py-3 text-[13px] font-semibold uppercase tracking-[0.06em] transition-all border-b-2 ${
                 activeTab === tab.id
                   ? 'border-[#1A1917] text-[#1A1917]'
-                  : 'border-transparent text-[#C5C2BC] hover:text-[#A09D96]'
+                  : 'border-transparent text-[#C0C0C0] hover:text-[#ACACAC]'
               }`}
             >
               <Icon size={16} strokeWidth={1.5} />
@@ -214,8 +214,8 @@ export default function MeasurementsPage() {
         <div className="space-y-4">
           {photosCheckins.length === 0 ? (
             <div className="text-center py-16">
-              <Camera size={32} strokeWidth={1} className="text-[#DDD9D0] mx-auto mb-4" />
-              <p className="text-[14px] text-[#A09D96] mb-4">Nog geen progressiefoto's</p>
+              <Camera size={32} strokeWidth={1} className="text-[#D5D5D5] mx-auto mb-4" />
+              <p className="text-[14px] text-[#ACACAC] mb-4">Nog geen progressiefoto's</p>
               <button
                 onClick={() => router.push('/client/check-in')}
                 className="px-6 py-3 bg-[#1A1917] text-white text-[13px] font-semibold uppercase tracking-[0.06em] rounded-xl"
@@ -230,7 +230,7 @@ export default function MeasurementsPage() {
                 <button
                   onClick={() => setSelectedPhotoIdx(Math.max(0, selectedPhotoIdx - 1))}
                   disabled={selectedPhotoIdx === 0}
-                  className="w-10 h-10 flex items-center justify-center text-[#A09D96] disabled:text-[#E5E1D9]"
+                  className="w-10 h-10 flex items-center justify-center text-[#ACACAC] disabled:text-[#F0F0EE]"
                 >
                   <ChevronLeft size={20} strokeWidth={1.5} />
                 </button>
@@ -238,14 +238,14 @@ export default function MeasurementsPage() {
                   <p className="text-[16px] font-semibold text-[#1A1917]">
                     {selectedPhoto && new Date(selectedPhoto.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </p>
-                  <p className="text-[12px] text-[#C5C2BC]">
+                  <p className="text-[12px] text-[#C0C0C0]">
                     {selectedPhotoIdx + 1} / {photosCheckins.length}
                   </p>
                 </div>
                 <button
                   onClick={() => setSelectedPhotoIdx(Math.min(photosCheckins.length - 1, selectedPhotoIdx + 1))}
                   disabled={selectedPhotoIdx === photosCheckins.length - 1}
-                  className="w-10 h-10 flex items-center justify-center text-[#A09D96] disabled:text-[#E5E1D9]"
+                  className="w-10 h-10 flex items-center justify-center text-[#ACACAC] disabled:text-[#F0F0EE]"
                 >
                   <ChevronRight size={20} strokeWidth={1.5} />
                 </button>
@@ -260,7 +260,7 @@ export default function MeasurementsPage() {
                     { url: selectedPhoto.photo_left_url, label: 'Links' },
                     { url: selectedPhoto.photo_right_url, label: 'Rechts' },
                   ].map((photo, i) => (
-                    <div key={i} className="aspect-[3/4] bg-[#E5E1D9] relative overflow-hidden">
+                    <div key={i} className="aspect-[3/4] bg-[#F0F0EE] relative overflow-hidden">
                       {photo.url ? (
                         <img
                           src={photo.url}
@@ -269,7 +269,7 @@ export default function MeasurementsPage() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Camera size={20} className="text-[#CCC7BC]" />
+                          <Camera size={20} className="text-[#C0C0C0]" />
                         </div>
                       )}
                       <span className="absolute bottom-2 left-2 text-[10px] font-bold uppercase tracking-[0.1em] text-white bg-black/40 px-2 py-0.5">
@@ -287,7 +287,7 @@ export default function MeasurementsPage() {
                     key={i}
                     onClick={() => setSelectedPhotoIdx(i)}
                     className={`w-2 h-2 transition-all ${
-                      i === selectedPhotoIdx ? 'bg-[#1A1917] scale-125' : 'bg-[#DDD9D0]'
+                      i === selectedPhotoIdx ? 'bg-[#1A1917] scale-125' : 'bg-[#D5D5D5]'
                     }`}
                   />
                 ))}
@@ -302,8 +302,8 @@ export default function MeasurementsPage() {
         <div className="space-y-3">
           {weightData.length === 0 && bodyFatData.length === 0 ? (
             <div className="text-center py-16">
-              <Scale size={32} strokeWidth={1} className="text-[#DDD9D0] mx-auto mb-4" />
-              <p className="text-[14px] text-[#A09D96] mb-4">Nog geen lichaamsmetingen</p>
+              <Scale size={32} strokeWidth={1} className="text-[#D5D5D5] mx-auto mb-4" />
+              <p className="text-[14px] text-[#ACACAC] mb-4">Nog geen lichaamsmetingen</p>
               <button
                 onClick={() => router.push('/client/check-in')}
                 className="px-6 py-3 bg-[#1A1917] text-white text-[13px] font-semibold uppercase tracking-[0.06em] rounded-xl"
@@ -328,8 +328,8 @@ export default function MeasurementsPage() {
         <div className="space-y-3">
           {chestData.length === 0 && waistData.length === 0 ? (
             <div className="text-center py-16">
-              <Ruler size={32} strokeWidth={1} className="text-[#DDD9D0] mx-auto mb-4" />
-              <p className="text-[14px] text-[#A09D96] mb-4">Nog geen omtrekmetingen</p>
+              <Ruler size={32} strokeWidth={1} className="text-[#D5D5D5] mx-auto mb-4" />
+              <p className="text-[14px] text-[#ACACAC] mb-4">Nog geen omtrekmetingen</p>
               <button
                 onClick={() => router.push('/client/check-in')}
                 className="px-6 py-3 bg-[#1A1917] text-white text-[13px] font-semibold uppercase tracking-[0.06em] rounded-xl"

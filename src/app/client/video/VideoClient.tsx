@@ -89,15 +89,15 @@ export default function ClientVideoPage() {
     switch (status) {
       case 'scheduled': return { text: 'Gepland', color: '#007AFF', bg: '#007AFF' }
       case 'in_progress': return { text: 'Bezig', color: '#34C759', bg: '#34C759' }
-      case 'completed': return { text: 'Afgerond', color: '#8E8E93', bg: '#8E8E93' }
+      case 'completed': return { text: 'Afgerond', color: '#ACACAC', bg: '#ACACAC' }
       case 'cancelled': return { text: 'Geannuleerd', color: '#FF3B30', bg: '#FF3B30' }
-      default: return { text: status, color: '#8E8E93', bg: '#8E8E93' }
+      default: return { text: status, color: '#ACACAC', bg: '#ACACAC' }
     }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA]">
+      <div className="min-h-screen bg-[#F8F8F6]">
         <div className="max-w-lg mx-auto px-5 py-8">
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#1A1917] border-t-transparent" />
@@ -108,20 +108,20 @@ export default function ClientVideoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA]">
+    <div className="min-h-screen bg-[#F8F8F6]">
       <div className="max-w-lg mx-auto px-5 py-8 pb-28">
         {/* Header */}
         <h1 className="text-[28px] font-[family-name:var(--font-display)] text-[#1A1A18] mb-1">
           Video Calls
         </h1>
-        <p className="text-[13px] text-[#8E8E93] mb-8">
+        <p className="text-[13px] text-[#ACACAC] mb-8">
           Je geplande videocalls met je coach
         </p>
 
         {/* Upcoming Sessions */}
         {upcoming.length > 0 && (
           <div className="mb-8">
-            <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-3">
+            <p className="text-[12px] text-[#ACACAC] uppercase font-medium tracking-wide mb-3">
               Aankomend
             </p>
             <div className="space-y-3">
@@ -132,7 +132,7 @@ export default function ClientVideoPage() {
                 return (
                   <div
                     key={session.id}
-                    className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]"
+                    className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE]"
                   >
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-center gap-3">
@@ -144,8 +144,8 @@ export default function ClientVideoPage() {
                             {formatDate(session.scheduled_at)}
                           </p>
                           <div className="flex items-center gap-2 mt-0.5">
-                            <Clock strokeWidth={1.5} className="w-3.5 h-3.5 text-[#C7C7CC]" />
-                            <span className="text-[13px] text-[#8E8E93]">
+                            <Clock strokeWidth={1.5} className="w-3.5 h-3.5 text-[#ACACAC]" />
+                            <span className="text-[13px] text-[#ACACAC]">
                               {formatTime(session.scheduled_at)} · {session.duration_minutes} min
                             </span>
                           </div>
@@ -168,7 +168,7 @@ export default function ClientVideoPage() {
                         Nu deelnemen
                       </Link>
                     ) : (
-                      <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#F5F5F3] text-[13px] text-[#8E8E93]">
+                      <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#F5F5F3] text-[13px] text-[#ACACAC]">
                         <Calendar strokeWidth={1.5} className="w-4 h-4" />
                         Je kunt 5 minuten voor de start deelnemen
                       </div>
@@ -180,14 +180,14 @@ export default function ClientVideoPage() {
                         href={getGoogleCalendarUrl(getCalendarEvent(session))}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[#E5E5E5] text-[12px] font-medium text-[#6B6862] hover:bg-[#F5F5F3] transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[#D5D5D5] text-[12px] font-medium text-[#ACACAC] hover:bg-[#F8F8F6] transition-colors"
                       >
                         <ExternalLink strokeWidth={1.5} className="w-3.5 h-3.5" />
                         Google Calendar
                       </a>
                       <button
                         onClick={() => downloadICS(getCalendarEvent(session), `move-call-${session.id.slice(0, 8)}.ics`)}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[#E5E5E5] text-[12px] font-medium text-[#6B6862] hover:bg-[#F5F5F3] transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[#D5D5D5] text-[12px] font-medium text-[#ACACAC] hover:bg-[#F8F8F6] transition-colors"
                       >
                         <Download strokeWidth={1.5} className="w-3.5 h-3.5" />
                         Download .ics
@@ -203,27 +203,27 @@ export default function ClientVideoPage() {
         {/* Past Sessions */}
         {past.length > 0 && (
           <div>
-            <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-3">
+            <p className="text-[12px] text-[#ACACAC] uppercase font-medium tracking-wide mb-3">
               Eerdere videocalls
             </p>
             <div className="space-y-2">
               {past.map((session) => (
                 <div
                   key={session.id}
-                  className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] flex items-center gap-3"
+                  className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] flex items-center gap-3"
                 >
-                  <div className="w-9 h-9 rounded-lg bg-[#F5F5F3] flex items-center justify-center">
-                    <Video strokeWidth={1.5} className="w-4 h-4 text-[#C7C7CC]" />
+                  <div className="w-9 h-9 rounded-lg bg-[#F8F8F6] flex items-center justify-center">
+                    <Video strokeWidth={1.5} className="w-4 h-4 text-[#ACACAC]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[14px] font-medium text-[#1A1A18]">
                       {formatDate(session.scheduled_at)}
                     </p>
-                    <p className="text-[12px] text-[#C7C7CC]">
+                    <p className="text-[12px] text-[#ACACAC]">
                       {formatTime(session.scheduled_at)} · {session.duration_minutes} min
                     </p>
                   </div>
-                  <span className="text-[11px] text-[#C7C7CC]">
+                  <span className="text-[11px] text-[#ACACAC]">
                     {statusLabel(session.status).text}
                   </span>
                 </div>
@@ -234,14 +234,14 @@ export default function ClientVideoPage() {
 
         {/* Empty State */}
         {sessions.length === 0 && (
-          <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
+          <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] text-center">
             <div className="w-16 h-16 rounded-full bg-[#007AFF]/10 flex items-center justify-center mx-auto mb-4">
               <Video strokeWidth={1.5} className="w-8 h-8 text-[#007AFF]" />
             </div>
             <h2 className="text-[17px] font-semibold text-[#1A1A18] mb-2">
               Geen video calls gepland
             </h2>
-            <p className="text-[13px] text-[#8E8E93] max-w-xs mx-auto">
+            <p className="text-[13px] text-[#ACACAC] max-w-xs mx-auto">
               Je coach plant videocalls in wanneer nodig. Je ziet ze hier verschijnen.
             </p>
           </div>

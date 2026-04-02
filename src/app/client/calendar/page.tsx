@@ -206,7 +206,7 @@ export default function CalendarPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-6 h-6 border-[1.5px] border-[#CCC7BC] border-t-[#1A1917] rounded-full animate-spin" />
+        <div className="w-6 h-6 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
       </div>
     )
   }
@@ -217,7 +217,7 @@ export default function CalendarPage() {
 
       {/* ═══ MONTH NAME — Cormorant 40px ═══════════════════ */}
       <div className="flex items-center justify-between mb-8 animate-fade-in">
-        <button onClick={prevMonth} className="w-10 h-10 flex items-center justify-center text-[#A09D96] hover:text-[#1A1917] transition-colors">
+        <button onClick={prevMonth} className="w-10 h-10 flex items-center justify-center text-[#ACACAC] hover:text-[#1A1917] transition-colors">
           <ChevronLeft size={20} strokeWidth={1.5} />
         </button>
         <h1
@@ -226,7 +226,7 @@ export default function CalendarPage() {
         >
           {MONTHS_NL[currentMonth]}
         </h1>
-        <button onClick={nextMonth} className="w-10 h-10 flex items-center justify-center text-[#A09D96] hover:text-[#1A1917] transition-colors">
+        <button onClick={nextMonth} className="w-10 h-10 flex items-center justify-center text-[#ACACAC] hover:text-[#1A1917] transition-colors">
           <ChevronRight size={20} strokeWidth={1.5} />
         </button>
       </div>
@@ -236,7 +236,7 @@ export default function CalendarPage() {
         {/* Day labels */}
         <div className="grid grid-cols-7 mb-3">
           {DAYS_NL.map((d, i) => (
-            <div key={i} className="text-center text-[11px] font-semibold uppercase tracking-wide text-[#C5C2BC]">
+            <div key={i} className="text-center text-[11px] font-semibold uppercase tracking-wide text-[#C0C0C0]">
               {d}
             </div>
           ))}
@@ -275,7 +275,7 @@ export default function CalendarPage() {
                       : today
                         ? 'bg-[#D46A3A]'
                         : hasPlanned
-                          ? 'border-[1.5px] border-[#CCC7BC]'
+                          ? 'border-[1.5px] border-[#C0C0C0]'
                           : 'bg-transparent'
                   }
                 `}>
@@ -291,7 +291,7 @@ export default function CalendarPage() {
                     null
                   ) : (
                     /* Empty/rest: tiny faint dot */
-                    <div className="w-[5px] h-[5px] rounded-full bg-[#E5E1D9]" />
+                    <div className="w-[5px] h-[5px] rounded-full bg-[#F0F0EE]" />
                   )}
                 </div>
               </button>
@@ -303,15 +303,15 @@ export default function CalendarPage() {
         <div className="flex items-center justify-center gap-5 mt-4">
           <div className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full bg-[#3D8B5C]" />
-            <span className="text-[10px] text-[#A09D96]">Voltooid</span>
+            <span className="text-[10px] text-[#ACACAC]">Voltooid</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full bg-[#D46A3A]" />
-            <span className="text-[10px] text-[#A09D96]">Vandaag</span>
+            <span className="text-[10px] text-[#ACACAC]">Vandaag</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full border-[1.5px] border-[#CCC7BC]" />
-            <span className="text-[10px] text-[#A09D96]">Gepland</span>
+            <div className="w-2.5 h-2.5 rounded-full border-[1.5px] border-[#C0C0C0]" />
+            <span className="text-[10px] text-[#ACACAC]">Gepland</span>
           </div>
         </div>
       </div>
@@ -327,9 +327,9 @@ export default function CalendarPage() {
               </p>
               <button
                 onClick={() => setSelectedDate(null)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F5F2EC] transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F8F8F6] transition-colors"
               >
-                <X size={16} strokeWidth={1.5} className="text-[#A09D96]" />
+                <X size={16} strokeWidth={1.5} className="text-[#ACACAC]" />
               </button>
             </div>
 
@@ -342,7 +342,7 @@ export default function CalendarPage() {
 
               return (
                 <div key={w.id}>
-                  <div className="flex items-center gap-3 px-6 py-3 border-t border-[#E8E4DC]">
+                  <div className="flex items-center gap-3 px-6 py-3 border-t border-[#F0F0EE]">
                     <div className="w-9 h-9 rounded-xl bg-[rgba(61,139,92,0.08)] flex items-center justify-center shrink-0">
                       <Dumbbell size={16} strokeWidth={1.5} className="text-[#3D8B5C]" />
                     </div>
@@ -352,13 +352,13 @@ export default function CalendarPage() {
                       </p>
                       <div className="flex items-center gap-3 mt-0.5">
                         {w.duration_seconds && (
-                          <span className="text-[12px] text-[#A09D96] flex items-center gap-1">
+                          <span className="text-[12px] text-[#ACACAC] flex items-center gap-1">
                             <Clock size={11} strokeWidth={1.5} />
                             {formatDuration(w.duration_seconds)}
                           </span>
                         )}
                         {w.workout_sets?.length > 0 && (
-                          <span className="text-[12px] text-[#A09D96]">
+                          <span className="text-[12px] text-[#ACACAC]">
                             {formatVolume(w.workout_sets)}
                           </span>
                         )}
@@ -372,7 +372,7 @@ export default function CalendarPage() {
                     , ex.sets[0])
 
                     return (
-                      <div key={i} className="flex items-center gap-3 px-6 py-2.5 border-t border-[#E8E4DC]/50">
+                      <div key={i} className="flex items-center gap-3 px-6 py-2.5 border-t border-[#F0F0EE]/50">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
                             <p className="text-[13px] font-medium text-[#1A1917] truncate">{ex.name}</p>
@@ -382,8 +382,8 @@ export default function CalendarPage() {
                           </div>
                         </div>
                         <span className="stat-number text-[14px] text-[#1A1917]">
-                          {bestSet.weight_kg || 0}<span className="text-[11px] text-[#A09D96] font-normal ml-0.5">kg</span>
-                          <span className="text-[#C5C2BC] mx-1 font-normal">×</span>
+                          {bestSet.weight_kg || 0}<span className="text-[11px] text-[#ACACAC] font-normal ml-0.5">kg</span>
+                          <span className="text-[#C0C0C0] mx-1 font-normal">×</span>
                           {bestSet.actual_reps || 0}
                         </span>
                       </div>
@@ -395,13 +395,13 @@ export default function CalendarPage() {
 
             {/* Video sessions */}
             {selectedDayData.videoSessions.map(v => (
-              <div key={v.id} className="flex items-center gap-3 px-6 py-3 border-t border-[#E8E4DC]">
+              <div key={v.id} className="flex items-center gap-3 px-6 py-3 border-t border-[#F0F0EE]">
                 <div className="w-9 h-9 rounded-xl bg-[rgba(48,104,196,0.08)] flex items-center justify-center shrink-0">
                   <Video size={16} strokeWidth={1.5} className="text-[#3068C4]" />
                 </div>
                 <div className="flex-1">
                   <p className="text-[14px] font-medium text-[#1A1917]">Videocall</p>
-                  <p className="text-[12px] text-[#A09D96] mt-0.5">
+                  <p className="text-[12px] text-[#ACACAC] mt-0.5">
                     {new Date(v.scheduled_at).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })} · {v.duration_minutes} min
                   </p>
                 </div>
@@ -418,13 +418,13 @@ export default function CalendarPage() {
 
             {/* Planned workout */}
             {!hasCompleted && plannedForDay && isFutureOrToday && (
-              <div className="flex items-center gap-3 px-6 py-3 border-t border-[#E8E4DC]">
-                <div className="w-9 h-9 rounded-xl bg-[#F0EDE8] flex items-center justify-center shrink-0">
-                  <Dumbbell size={16} strokeWidth={1.5} className="text-[#A09D96]" />
+              <div className="flex items-center gap-3 px-6 py-3 border-t border-[#F0F0EE]">
+                <div className="w-9 h-9 rounded-xl bg-[#F0F0EE] flex items-center justify-center shrink-0">
+                  <Dumbbell size={16} strokeWidth={1.5} className="text-[#ACACAC]" />
                 </div>
                 <div className="flex-1">
                   <p className="text-[14px] font-medium text-[#1A1917]">{plannedForDay.name}</p>
-                  <p className="text-[12px] text-[#A09D96] mt-0.5">
+                  <p className="text-[12px] text-[#ACACAC] mt-0.5">
                     {plannedForDay.focus_area ? `${plannedForDay.focus_area} · ` : ''}~{plannedForDay.estimated_duration} min
                   </p>
                 </div>
@@ -442,8 +442,8 @@ export default function CalendarPage() {
 
             {/* Empty */}
             {!hasCompleted && !hasVideo && (!plannedForDay || !isFutureOrToday) && (
-              <div className="text-center py-6 border-t border-[#E8E4DC]">
-                <p className="text-[14px] text-[#C5C2BC]">Geen activiteit</p>
+              <div className="text-center py-6 border-t border-[#F0F0EE]">
+                <p className="text-[14px] text-[#C0C0C0]">Geen activiteit</p>
               </div>
             )}
           </div>
@@ -459,14 +459,14 @@ export default function CalendarPage() {
           >
             Je eerste workout staat klaar
           </p>
-          <p className="text-[13px] text-[#A09D96]">
+          <p className="text-[13px] text-[#ACACAC]">
             Na je workout verschijnt deze hier
           </p>
         </div>
       )}
       {!selectedDate && completedWorkouts.length > 0 && (
         <div className="text-center py-8 animate-fade-in" style={{ animationDelay: '120ms' }}>
-          <p className="text-[14px] text-[#C5C2BC]">Tik op een dag voor details</p>
+          <p className="text-[14px] text-[#C0C0C0]">Tik op een dag voor details</p>
         </div>
       )}
     </div>

@@ -195,7 +195,7 @@ export default function ClientMealPlanPage() {
       </div>
 
       {/* Macro Dashboard */}
-      <div className="bg-white rounded-2xl shadow-clean">
+      <div className="bg-white rounded-2xl">
         <MacroDashboard
           calories={{
             consumed: dayTotals.calories,

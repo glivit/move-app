@@ -112,7 +112,7 @@ export default function DietPage() {
       {/* Diet Type */}
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Dieettype</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] divide-y divide-[#E8E4DC]">
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
           {DIET_TYPES.map((diet) => (
             <button
               key={diet.id}
@@ -146,7 +146,7 @@ export default function DietPage() {
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
                     ? 'bg-[#FF3B30] text-white'
-                    : 'bg-white border border-[#E8E4DC] text-[#1A1A18] hover:border-[#FF3B30]'
+                    : 'bg-white border border-[#F0F0EE] text-[#1A1A18] hover:border-[#FF3B30]'
                 }`}
               >
                 {allergy}
@@ -159,7 +159,7 @@ export default function DietPage() {
       {/* Other */}
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Overige opmerkingen</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-5">
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] p-5">
           <textarea
             value={otherRestrictions}
             onChange={(e) => setOtherRestrictions(e.target.value)}

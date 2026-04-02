@@ -107,13 +107,13 @@ export default function ResourcesPage() {
       {/* Header */}
       <div>
         <h1 className="text-editorial-h2 text-[#1A1917]">Kennisbank</h1>
-        <p className="text-[14px] mt-1" style={{ color: '#A09D96' }}>
+        <p className="text-[14px] mt-1" style={{ color: '#ACACAC' }}>
           Artikelen, video&apos;s en tips van je coach
         </p>
       </div>
 
       {/* Search */}
-      <div className="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-[var(--shadow-card)] bg-white">
+      <div className="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-none bg-white">
         <Search size={18} strokeWidth={1.5} style={{ color: '#C7C7CC' }} />
         <input
           type="text"
@@ -135,8 +135,8 @@ export default function ResourcesPage() {
               className="px-4 py-2 rounded-xl text-[13px] font-semibold uppercase tracking-[0.12em] whitespace-nowrap transition-all border"
               style={{
                 backgroundColor: selectedCategory === cat ? '#1A1917' : 'white',
-                color: selectedCategory === cat ? 'white' : '#A09D96',
-                borderColor: selectedCategory === cat ? '#1A1917' : '#E8E4DC',
+                color: selectedCategory === cat ? 'white' : '#ACACAC',
+                borderColor: selectedCategory === cat ? '#1A1917' : '#F0F0EE',
               }}
             >
               {cat}
@@ -149,13 +149,13 @@ export default function ResourcesPage() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-white rounded-2xl shadow-[var(--shadow-card)] animate-pulse" />
+            <div key={i} className="h-32 bg-white rounded-2xl shadow-none animate-pulse" />
           ))}
         </div>
       ) : filteredResources.length === 0 ? (
-        <div className="p-12 text-center bg-white rounded-2xl shadow-[var(--shadow-card)]">
+        <div className="p-12 text-center bg-white rounded-2xl shadow-none">
           <BookOpen size={40} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#C7C7CC' }} />
-          <p className="text-[14px]" style={{ color: '#A09D96' }}>Geen content gevonden</p>
+          <p className="text-[14px]" style={{ color: '#ACACAC' }}>Geen content gevonden</p>
         </div>
       ) : (
         <>
@@ -166,7 +166,7 @@ export default function ResourcesPage() {
                 <button
                   key={resource.id}
                   onClick={() => { setSelectedResource(resource); trackView(resource.id) }}
-                  className="w-full text-left overflow-hidden transition-all bg-white rounded-2xl shadow-[var(--shadow-card)]"
+                  className="w-full text-left overflow-hidden transition-all bg-white rounded-2xl shadow-none"
                 >
                   {resource.thumbnail_url ? (
                     <div className="relative aspect-[21/9] overflow-hidden">
@@ -191,7 +191,7 @@ export default function ResourcesPage() {
                       <span
                         className="px-2 py-0.5 rounded-md text-[11px] font-semibold"
                         style={{
-                          backgroundColor: CATEGORY_BG[resource.category] || '#F5F2EC',
+                          backgroundColor: CATEGORY_BG[resource.category] || '#F8F8F6',
                           color: CATEGORY_COLORS[resource.category] || '#1A1917',
                         }}
                       >
@@ -207,7 +207,7 @@ export default function ResourcesPage() {
                     <h3 className="text-[16px] font-semibold mb-1" style={{ color: '#1A1A18' }}>
                       {resource.title}
                     </h3>
-                    <p className="text-[13px] line-clamp-2" style={{ color: '#A09D96' }}>
+                    <p className="text-[13px] line-clamp-2" style={{ color: '#ACACAC' }}>
                       {resource.description}
                     </p>
                   </div>
@@ -222,7 +222,7 @@ export default function ResourcesPage() {
               <button
                 key={resource.id}
                 onClick={() => { setSelectedResource(resource); trackView(resource.id) }}
-                className="w-full text-left overflow-hidden transition-all bg-white rounded-2xl shadow-[var(--shadow-card)]"
+                className="w-full text-left overflow-hidden transition-all bg-white rounded-2xl shadow-none"
               >
                 {resource.thumbnail_url ? (
                   <div className="relative aspect-video overflow-hidden">
@@ -243,7 +243,7 @@ export default function ResourcesPage() {
                     <span
                       className="px-2 py-0.5 rounded-md text-[10px] font-semibold"
                       style={{
-                        backgroundColor: CATEGORY_BG[resource.category] || '#F5F2EC',
+                        backgroundColor: CATEGORY_BG[resource.category] || '#F8F8F6',
                         color: CATEGORY_COLORS[resource.category] || '#1A1917',
                       }}
                     >
@@ -267,7 +267,7 @@ export default function ResourcesPage() {
       {selectedResource && (
         <div className="fixed inset-0 z-50 flex items-end lg:items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSelectedResource(null)} />
-          <div className="relative w-full max-w-2xl mx-4 mb-4 lg:mb-0 max-h-[85vh] overflow-y-auto bg-white rounded-2xl shadow-[var(--shadow-card)]">
+          <div className="relative w-full max-w-2xl mx-4 mb-4 lg:mb-0 max-h-[85vh] overflow-y-auto bg-white rounded-2xl shadow-none">
             <button
               onClick={() => setSelectedResource(null)}
               className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center bg-black/20 backdrop-blur-sm"
@@ -297,14 +297,14 @@ export default function ResourcesPage() {
                 <span
                   className="px-2.5 py-1 rounded-lg text-[11px] font-semibold"
                   style={{
-                    backgroundColor: CATEGORY_BG[selectedResource.category] || '#F5F2EC',
+                    backgroundColor: CATEGORY_BG[selectedResource.category] || '#F8F8F6',
                     color: CATEGORY_COLORS[selectedResource.category] || '#1A1917',
                   }}
                 >
                   {selectedResource.category}
                 </span>
                 {selectedResource.duration_minutes ? (
-                  <span className="flex items-center gap-1 text-[11px]" style={{ color: '#A09D96' }}>
+                  <span className="flex items-center gap-1 text-[11px]" style={{ color: '#ACACAC' }}>
                     <Clock size={10} strokeWidth={1.5} />
                     {selectedResource.duration_minutes} min
                   </span>
@@ -314,7 +314,7 @@ export default function ResourcesPage() {
               <h2 className="text-xl font-bold mb-2" style={{ color: '#1A1A18' }}>
                 {selectedResource.title}
               </h2>
-              <p className="text-[14px] mb-4" style={{ color: '#A09D96' }}>
+              <p className="text-[14px] mb-4" style={{ color: '#ACACAC' }}>
                 {selectedResource.description}
               </p>
 
@@ -328,7 +328,7 @@ export default function ResourcesPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 rounded-xl text-[13px] font-semibold uppercase tracking-[0.12em] transition-all border"
-                  style={{ backgroundColor: 'white', color: '#1A1917', borderColor: '#E8E4DC' }}
+                  style={{ backgroundColor: 'white', color: '#1A1917', borderColor: '#F0F0EE' }}
                 >
                   Bekijk externe link
                   <ChevronRight size={14} strokeWidth={2} />

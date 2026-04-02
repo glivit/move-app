@@ -85,8 +85,8 @@ export default function ProfilePage() {
     return (
       <div className="pb-28">
         <div className="flex flex-col items-center py-12">
-          <div className="w-20 h-20 bg-[#E5E1D9] rounded-full animate-pulse" />
-          <div className="h-6 w-40 bg-[#E5E1D9] mt-4 animate-pulse" />
+          <div className="w-20 h-20 bg-[#F0F0EE] rounded-full animate-pulse" />
+          <div className="h-6 w-40 bg-[#F0F0EE] mt-4 animate-pulse" />
         </div>
       </div>
     )
@@ -115,7 +115,7 @@ export default function ProfilePage() {
     <div className="pb-28">
 
       {/* ═══ PROFILE HEADER — editorial, centered ═══════ */}
-      <div className="flex flex-col items-center pt-8 pb-8 border-b border-[#E8E4DC]">
+      <div className="flex flex-col items-center pt-8 pb-8 border-b border-[#F0F0EE]">
         {/* Avatar */}
         <div className="w-20 h-20 rounded-full bg-[#1A1917] text-white flex items-center justify-center text-[22px] font-semibold mb-4 overflow-hidden">
           {profile?.avatar_url ? (
@@ -128,29 +128,29 @@ export default function ProfilePage() {
         <h1 className="text-editorial-h2 text-[#1A1917]">
           {profile?.full_name || 'Profiel'}
         </h1>
-        <p className="text-[13px] text-[#A09D96] mt-1">
+        <p className="text-[13px] text-[#ACACAC] mt-1">
           Lid sinds {formatMemberSince(profile?.created_at || '')}
         </p>
       </div>
 
       {/* ═══ SETTINGS — editorial list ═══════════════════ */}
       {menuSections.map((section, si) => (
-        <div key={si} className={si > 0 ? 'border-t-8 border-[#EEEBE3]' : ''}>
+        <div key={si} className={si > 0 ? 'border-t-8 border-[#FFFFFF]' : ''}>
           {section.items.map((item, i) => {
             const Icon = item.icon
             return (
               <a
                 key={item.href}
                 href={item.href}
-                className={`flex items-center justify-between px-6 py-4 hover:bg-[#FAF8F3] transition-colors ${
-                  i > 0 ? 'border-t border-[#F0EDE8]' : ''
+                className={`flex items-center justify-between px-6 py-4 hover:bg-[#F8F8F6] transition-colors ${
+                  i > 0 ? 'border-t border-[#F0F0EE]' : ''
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Icon size={18} strokeWidth={1.5} className="text-[#A09D96]" />
+                  <Icon size={18} strokeWidth={1.5} className="text-[#ACACAC]" />
                   <span className="text-[14px] text-[#1A1917]">{item.label}</span>
                 </div>
-                <ChevronRight size={16} strokeWidth={1.5} className="text-[#CCC7BC]" />
+                <ChevronRight size={16} strokeWidth={1.5} className="text-[#C0C0C0]" />
               </a>
             )
           })}
@@ -158,10 +158,10 @@ export default function ProfilePage() {
       ))}
 
       {/* Pakket */}
-      <div className="border-t-8 border-[#EEEBE3]">
+      <div className="border-t-8 border-[#FFFFFF]">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <CreditCard size={18} strokeWidth={1.5} className="text-[#A09D96]" />
+            <CreditCard size={18} strokeWidth={1.5} className="text-[#ACACAC]" />
             <span className="text-[14px] text-[#1A1917]">Pakket</span>
           </div>
           <span className="text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.04em]">{profile?.package || 'Standaard'}</span>
@@ -169,7 +169,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Logout */}
-      <div className="border-t-8 border-[#EEEBE3] mb-4">
+      <div className="border-t-8 border-[#FFFFFF] mb-4">
         <button
           onClick={handleLogout}
           disabled={signingOut}
@@ -180,7 +180,7 @@ export default function ProfilePage() {
         </button>
       </div>
 
-      <p className="text-center text-[11px] text-[#C5C2BC] pb-4">MŌVE v1.0</p>
+      <p className="text-center text-[11px] text-[#C0C0C0] pb-4">MŌVE v1.0</p>
     </div>
   )
 }

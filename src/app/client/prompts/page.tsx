@@ -25,7 +25,7 @@ function PromptCardSkeleton() {
   return (
     <div
       className="p-6 border animate-shimmer rounded-2xl"
-      style={{ backgroundColor: '#FFFFFF', borderColor: '#F0EDE8' }}
+      style={{ backgroundColor: '#FFFFFF', borderColor: '#F0F0EE' }}
     >
       <div className="h-6 w-3/4 bg-gray-200 rounded animate-shimmer mb-4" />
       <div className="space-y-3 mb-6">
@@ -65,8 +65,8 @@ function ScoreSelector({
             className="w-10 h-10 font-medium text-sm uppercase tracking-[0.12em] transition-all border rounded-xl"
             style={{
               backgroundColor: value === score ? '#1A1917' : '#FFFFFF',
-              color: value === score ? '#FFFFFF' : '#A09D96',
-              borderColor: value === score ? '#1A1917' : '#E5E5E5',
+              color: value === score ? '#FFFFFF' : '#ACACAC',
+              borderColor: value === score ? '#1A1917' : '#D5D5D5',
             }}
           >
             {score}
@@ -128,7 +128,7 @@ function PromptCard({
   return (
     <div
       className="p-6 overflow-hidden border rounded-2xl"
-      style={{ backgroundColor: '#FFFFFF', borderColor: '#F0EDE8' }}
+      style={{ backgroundColor: '#FFFFFF', borderColor: '#F0F0EE' }}
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Question */}
@@ -148,10 +148,10 @@ function PromptCard({
             rows={4}
             className="w-full px-4 py-3 border focus:outline-none focus:ring-2 transition-all rounded-xl"
             style={{
-              backgroundColor: '#F5F5F3',
+              backgroundColor: '#F8F8F6',
               color: '#1A1A18',
               outlineColor: '#1A1917',
-              borderColor: '#F0EDE8',
+              borderColor: '#F0F0EE',
             }}
           />
         </div>
@@ -329,14 +329,14 @@ export default function ClientPromptsPage() {
   };
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: '#FAFAFA' }}>
+    <div className="min-h-screen p-6" style={{ backgroundColor: '#F8F8F6' }}>
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-editorial-h2 text-[#1A1917]">
             Reflectie vragen
           </h1>
-          <p className="text-[15px]" style={{ color: '#A09D96' }}>
+          <p className="text-[15px]" style={{ color: '#ACACAC' }}>
             Deel je gedachten met je coach
           </p>
         </div>
@@ -380,7 +380,7 @@ export default function ClientPromptsPage() {
             >
               Geen openstaande reflectie vragen
             </p>
-            <p className="text-[13px]" style={{ color: '#A09D96' }}>
+            <p className="text-[13px]" style={{ color: '#ACACAC' }}>
               Je bent helemaal bij met je vragen!
             </p>
           </div>
@@ -443,7 +443,7 @@ export default function ClientPromptsPage() {
                         </p>
                         <p
                           className="text-[14px] mb-4"
-                          style={{ color: '#A09D96' }}
+                          style={{ color: '#ACACAC' }}
                         >
                           {prompt.response}
                         </p>
