@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase'
 import {
   Check, ChevronLeft, ChevronRight, MessageSquare,
-  Pencil, ChevronDown, ChevronUp
+  Pencil, ChevronDown, ChevronUp, ArrowLeftRight
 } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────
@@ -62,6 +62,30 @@ interface DailySummary {
   water_liters: number | null
 }
 
+interface SearchProduct {
+  barcode: string | null
+  name: string
+  brand: string | null
+  image_small: string | null
+  image: string | null
+  serving_size: string | null
+  quantity: string | null
+  source: 'local' | 'openfoodfacts'
+  per100g: {
+    calories: number
+    protein: number
+    carbs: number
+    fat: number
+    fiber: number
+    sugar: number
+    salt: number
+  }
+}
+
+interface SearchResponse {
+  products: SearchProduct[]
+}
+
 // ─── Helpers ────────────────────────────────────────
 
 function calcMacro(food: FoodEntry, key: 'calories' | 'protein' | 'carbs' | 'fat') {
@@ -89,6 +113,288 @@ const MOODS = [
   { key: 'terrible', label: 'Slecht' },
 ]
 
+// ─── Food Search Modal Component ────────────────────
+
+function FoodSearchModal({
+  isOpen,
+  onClose,
+  mode,
+  originalGrams,
+  mealId,
+  foodId,
+  plan,
+  dateStr,
+  logs,
+  setLogs,
+  setSummary,
+}: {
+  isOpen: boolean
+  onClose: () => void
+  mode: 'swap' | 'add'
+  originalGrams?: number
+  mealId: string
+  foodId?: string
+  plan: NutritionPlan | null
+  dateStr: string
+  logs: Map<string, MealLog>
+  setLogs: (logs: Map<string, MealLog>) => void
+  setSummary: (summary: DailySummary | null) => void
+}) {
+  const [query, setQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<SearchProduct[]>([])
+  const [selectedProduct, setSelectedProduct] = useState<SearchProduct | null>(null)
+  const [grams, setGrams] = useState(originalGrams || 100)
+  const [loading, setLoading] = useState(false)
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+
+  useEffect(() => {
+    if (!isOpen) {
+      setQuery('')
+      setSearchResults([])
+      setSelectedProduct(null)
+      setGrams(originalGrams || 100)
+    }
+  }, [isOpen, originalGrams])
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    clearTimeout(debounceTimer.current)
+
+    if (query.trim() === '') {
+      // Show popular products
+      setLoading(true)
+      fetch('/api/food-search?popular=true')
+        .then(r => r.json())
+        .then((data: SearchResponse) => {
+          setSearchResults(data.products || [])
+          setLoading(false)
+        })
+        .catch(err => {
+          console.error('Popular search error:', err)
+          setLoading(false)
+        })
+    } else {
+      // Debounced search
+      debounceTimer.current = setTimeout(() => {
+        setLoading(true)
+        fetch(`/api/food-search?q=${encodeURIComponent(query)}`)
+          .then(r => r.json())
+          .then((data: SearchResponse) => {
+            setSearchResults(data.products || [])
+            setLoading(false)
+          })
+          .catch(err => {
+            console.error('Search error:', err)
+            setLoading(false)
+          })
+      }, 300)
+    }
+
+    return () => clearTimeout(debounceTimer.current)
+  }, [query, isOpen])
+
+  async function handleConfirm() {
+    if (!selectedProduct || !plan) return
+
+    const meal = plan.meals.find(m => m.id === mealId)
+    if (!meal) return
+
+    const existing = logs.get(mealId)
+    const currentFoods = existing?.foods_eaten || meal.foods || []
+
+    let newFoods: FoodEntry[]
+    if (mode === 'swap' && foodId) {
+      newFoods = currentFoods.map(f => {
+        if (f.id === foodId) {
+          return {
+            id: `${selectedProduct.barcode || selectedProduct.name}-${Date.now()}`,
+            name: selectedProduct.name,
+            brand: selectedProduct.brand,
+            image: selectedProduct.image,
+            grams,
+            per100g: {
+              calories: selectedProduct.per100g.calories,
+              protein: selectedProduct.per100g.protein,
+              carbs: selectedProduct.per100g.carbs,
+              fat: selectedProduct.per100g.fat,
+            },
+          }
+        }
+        return f
+      })
+    } else {
+      // add mode
+      newFoods = [
+        ...currentFoods,
+        {
+          id: `${selectedProduct.barcode || selectedProduct.name}-${Date.now()}`,
+          name: selectedProduct.name,
+          brand: selectedProduct.brand,
+          image: selectedProduct.image,
+          grams,
+          per100g: {
+            calories: selectedProduct.per100g.calories,
+            protein: selectedProduct.per100g.protein,
+            carbs: selectedProduct.per100g.carbs,
+            fat: selectedProduct.per100g.fat,
+          },
+        },
+      ]
+    }
+
+    try {
+      const res = await fetch('/api/nutrition-log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan_id: plan.id,
+          date: dateStr,
+          meal_id: mealId,
+          meal_name: meal.name,
+          completed: existing?.completed || false,
+          foods_eaten: newFoods,
+          client_notes: existing?.client_notes || null,
+        }),
+      })
+
+      if (res.ok) {
+        const newLog: MealLog = {
+          meal_id: mealId,
+          meal_name: meal.name,
+          completed: existing?.completed || false,
+          foods_eaten: newFoods,
+          client_notes: existing?.client_notes || null,
+          completed_at: existing?.completed_at || null,
+        }
+        setLogs(new Map(logs.set(mealId, newLog)))
+
+        // Refresh summary
+        const sumRes = await fetch(`/api/nutrition-log?date=${dateStr}`)
+        const sumData = await sumRes.json()
+        if (sumData.summary) setSummary(sumData.summary)
+
+        onClose()
+      }
+    } catch (err) {
+      console.error('Save food error:', err)
+    }
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col">
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-black/30"
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl rounded-b-none flex flex-col max-h-[90vh] z-50">
+        {/* Search input */}
+        <div className="px-4 py-4 border-b border-[#F0F0EE]">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Zoek voedingsmiddel..."
+            autoFocus
+            className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
+            style={{ fontFamily: 'var(--font-body)' }}
+          />
+        </div>
+
+        {/* Results list */}
+        <div className="flex-1 overflow-y-auto">
+          {loading && (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#1A1917] border-t-transparent" />
+            </div>
+          )}
+
+          {!loading && searchResults.length === 0 && query && (
+            <div className="py-8 text-center">
+              <p className="text-[13px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
+                Geen resultaten gevonden
+              </p>
+            </div>
+          )}
+
+          {!loading && searchResults.length > 0 && (
+            <div>
+              {searchResults.map((product, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setSelectedProduct(product)}
+                  className={`w-full px-4 py-3 border-t border-[#F0F0EE] flex flex-col gap-1 transition-colors ${
+                    selectedProduct === product ? 'bg-[rgba(212,106,58,0.06)]' : 'hover:bg-[#FAFAF8]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 justify-between">
+                    <div className="flex-1 text-left min-w-0">
+                      <p className="text-[14px] text-[#1A1917] truncate" style={{ fontFamily: 'var(--font-body)' }}>
+                        {product.name}
+                      </p>
+                      {product.brand && (
+                        <p className="text-[12px] text-[#ACACAC] truncate" style={{ fontFamily: 'var(--font-body)' }}>
+                          {product.brand}
+                        </p>
+                      )}
+                    </div>
+                    {product.source === 'local' && (
+                      <span className="px-2 py-0.5 bg-[#F0F0EE] text-[#ACACAC] rounded text-[10px] font-medium shrink-0" style={{ fontFamily: 'var(--font-body)' }}>
+                        DB
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex gap-2 text-[11px] text-[#C0C0C0]" style={{ fontFamily: 'var(--font-display)' }}>
+                    <span>{Math.round(product.per100g.calories)} kcal</span>
+                    <span>·</span>
+                    <span>P {product.per100g.protein}g</span>
+                    <span>·</span>
+                    <span>K {product.per100g.carbs}g</span>
+                    <span>·</span>
+                    <span>V {product.per100g.fat}g</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Selection and gram input */}
+        {selectedProduct && (
+          <div className="border-t border-[#F0F0EE] px-4 py-4 space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <p className="text-[12px] text-[#ACACAC] mb-1" style={{ fontFamily: 'var(--font-body)' }}>
+                  Hoeveelheid (gram)
+                </p>
+                <input
+                  type="number"
+                  value={grams}
+                  onChange={(e) => setGrams(Math.max(1, parseInt(e.target.value) || 0))}
+                  className="w-full px-3 py-2 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] bg-white focus:outline-none focus:border-[#1A1917]"
+                  style={{ fontFamily: 'var(--font-body)' }}
+                />
+              </div>
+              <button
+                onClick={handleConfirm}
+                className="px-6 py-2.5 bg-[#1A1917] text-white rounded-xl text-[13px] font-medium"
+                style={{ fontFamily: 'var(--font-body)' }}
+              >
+                Bevestigen
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ─── Component ──────────────────────────────────────
 
 export default function ClientNutritionPage() {
@@ -105,6 +411,13 @@ export default function ClientNutritionPage() {
   const [water, setWater] = useState<number>(0)
   const [savingMeal, setSavingMeal] = useState<string | null>(null)
   const [showDailyPanel, setShowDailyPanel] = useState(false)
+  const [foodSearchModal, setFoodSearchModal] = useState<{
+    isOpen: boolean
+    mode: 'swap' | 'add'
+    mealId: string | null
+    foodId?: string
+    originalGrams?: number
+  }>({ isOpen: false, mode: 'add', mealId: null })
 
   const dateStr = selectedDate.toISOString().split('T')[0]
 
@@ -493,8 +806,8 @@ export default function ClientNutritionPage() {
               {isExpanded && (
                 <div className="pl-[42px] pb-4 border-b border-[#F0F0EE]">
                   {foods.map((food) => (
-                    <div key={food.id} className="flex items-center justify-between py-2">
-                      <div className="flex items-center gap-1.5">
+                    <div key={food.id} className="flex items-center justify-between py-2 group">
+                      <div className="flex items-center gap-1.5 flex-1">
                         <span className="text-[13px] text-[#1A1917]" style={{ fontFamily: 'var(--font-body)' }}>
                           {food.name}
                         </span>
@@ -502,11 +815,39 @@ export default function ClientNutritionPage() {
                           {food.grams}g
                         </span>
                       </div>
-                      <span className="text-[12px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
-                        {calcMacro(food, 'calories')} kcal
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[12px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
+                          {calcMacro(food, 'calories')} kcal
+                        </span>
+                        <button
+                          onClick={() => setFoodSearchModal({
+                            isOpen: true,
+                            mode: 'swap',
+                            mealId: meal.id,
+                            foodId: food.id,
+                            originalGrams: food.grams,
+                          })}
+                          className="p-1 text-[#C0C0C0] hover:text-[#1A1917] transition-colors opacity-0 group-hover:opacity-100"
+                        >
+                          <ArrowLeftRight strokeWidth={1.5} className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   ))}
+
+                  {/* Add food button */}
+                  <button
+                    onClick={() => setFoodSearchModal({
+                      isOpen: true,
+                      mode: 'add',
+                      mealId: meal.id,
+                      originalGrams: 100,
+                    })}
+                    className="mt-3 px-3 py-2 text-[13px] text-[#D46A3A] font-medium hover:bg-[rgba(212,106,58,0.06)] rounded-lg transition-colors"
+                    style={{ fontFamily: 'var(--font-body)' }}
+                  >
+                    + Voeg item toe
+                  </button>
 
                   {/* Notes in expanded view */}
                   <div className="mt-2">
@@ -678,6 +1019,21 @@ export default function ClientNutritionPage() {
           </p>
         </div>
       )}
+
+      {/* Food Search Modal */}
+      <FoodSearchModal
+        isOpen={foodSearchModal.isOpen}
+        onClose={() => setFoodSearchModal({ isOpen: false, mode: 'add', mealId: null })}
+        mode={foodSearchModal.mode}
+        originalGrams={foodSearchModal.originalGrams}
+        mealId={foodSearchModal.mealId || ''}
+        foodId={foodSearchModal.foodId}
+        plan={plan}
+        dateStr={dateStr}
+        logs={logs}
+        setLogs={setLogs}
+        setSummary={setSummary}
+      />
     </div>
   )
 }
