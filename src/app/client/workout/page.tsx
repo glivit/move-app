@@ -90,17 +90,11 @@ export default function WorkoutOverviewPage() {
   if (!program) {
     return (
       <div className="pb-28">
-        <h1
-          className="text-[28px] tracking-[-0.5px] leading-[1.1] text-[#1A1917] mb-6"
-          style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
-        >
+        <h1 className="page-title mb-6">
           Training
         </h1>
         <div className="py-16 text-center">
-          <p
-            className="text-[36px] tracking-[-1px] leading-[1.1] text-[#1A1917] mb-3"
-            style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
-          >
+          <p className="text-editorial-h1 mb-3">
             Geen programma
           </p>
           <p className="text-[14px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
@@ -137,10 +131,7 @@ export default function WorkoutOverviewPage() {
       >
         Week {program.current_week}
       </p>
-      <h1
-        className="text-[28px] tracking-[-0.5px] leading-[1.1] text-[#1A1917] mb-8"
-        style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
-      >
+      <h1 className="page-title mb-8">
         {program.name}
       </h1>
 
@@ -156,10 +147,7 @@ export default function WorkoutOverviewPage() {
           >
             Vandaag · {WEEKDAY_LABELS[String(isoToday)] || ''}
           </p>
-          <p
-            className="text-[36px] tracking-[-1px] leading-[1.1] text-[#1A1917] mb-1"
-            style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
-          >
+          <p className="text-editorial-h1 mb-1">
             {todayDay.name}
           </p>
           {todayDay.focus && (
@@ -182,10 +170,7 @@ export default function WorkoutOverviewPage() {
 
             <div className="flex items-center gap-2 bg-[#1A1917] px-5 py-2.5 rounded-xl group-hover:bg-[#333] transition-colors">
               <Play size={14} strokeWidth={2.5} className="text-white" />
-              <span
-                className="text-[12px] font-bold text-white uppercase tracking-[0.06em]"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
+              <span className="text-[12px] font-bold text-white uppercase tracking-[0.06em]">
                 Start
               </span>
             </div>
@@ -216,10 +201,7 @@ export default function WorkoutOverviewPage() {
       {/* No workout today (rest day) */}
       {!todayDay && hasSchedule && (
         <div className="mb-10">
-          <p
-            className="text-[48px] tracking-[-2px] leading-[1] text-[#1A1917]"
-            style={{ fontFamily: 'var(--font-display)', fontWeight: 200 }}
-          >
+          <p className="text-editorial-hero" style={{ fontWeight: 200 }}>
             Rustdag
           </p>
           <p className="text-[14px] text-[#ACACAC] mt-2" style={{ fontFamily: 'var(--font-body)' }}>
@@ -237,10 +219,7 @@ export default function WorkoutOverviewPage() {
           >
             Weekvoortgang
           </p>
-          <p
-            className="text-[20px] tracking-[-0.5px]"
-            style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
-          >
+          <p className="section-title">
             <span className="text-[#1A1917]">{workoutsThisWeek}</span>
             <span className="text-[#C0C0C0]">/{days.length}</span>
           </p>
@@ -273,7 +252,6 @@ export default function WorkoutOverviewPage() {
                             ? 'bg-[#F0F0EE] text-[#1A1917]'
                             : 'text-[#D5D5D5]'
                     }`}
-                    style={{ fontFamily: 'var(--font-display)' }}
                   >
                     {WEEKDAY_SHORT[wd]}
                   </div>
@@ -310,7 +288,6 @@ export default function WorkoutOverviewPage() {
                     ? 'bg-[#D46A3A] text-white'
                     : 'bg-[#F0F0EE] text-[#1A1917] group-hover:bg-[#1A1917] group-hover:text-white'
                 } transition-colors`}
-                style={{ fontFamily: 'var(--font-display)' }}
               >
                 {day.day_number}
               </div>

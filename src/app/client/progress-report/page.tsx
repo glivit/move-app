@@ -336,10 +336,7 @@ Bekijk mijn voortgang in Move!`
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1
-              className="text-4xl font-bold text-[#1A1917] mb-2"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
+            <h1 className="page-title text-4xl mb-2">
               Voortgangsrapport
             </h1>
             <p className="text-[#ACACAC]">Volg je vooruitgang en feest je successen</p>

@@ -140,10 +140,7 @@ export default function WorkoutHistoryPage() {
         </span>
       </button>
 
-      <h1
-        className="text-[28px] tracking-[-0.5px] leading-[1.1] text-[#1A1917] mb-8"
-        style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
-      >
+      <h1 className="page-title mb-8">
         Geschiedenis
       </h1>
 
@@ -285,10 +282,7 @@ export default function WorkoutHistoryPage() {
                               <p className="text-[10px] text-[#C0C0C0] uppercase tracking-[0.06em] mb-0.5" style={{ fontFamily: 'var(--font-body)' }}>
                                 Set {idx + 1}
                               </p>
-                              <p
-                                className="text-[13px] font-medium text-[#1A1917] tabular-nums"
-                                style={{ fontFamily: 'var(--font-display)' }}
-                              >
+                              <p className="text-[13px] font-medium text-[#1A1917] tabular-nums">
                                 {set.weight_kg || '—'} × {set.actual_reps || '—'}
                               </p>
                             </div>
@@ -304,10 +298,7 @@ export default function WorkoutHistoryPage() {
         </div>
       ) : (
         <div className="py-16 text-center">
-          <p
-            className="text-[36px] tracking-[-1px] leading-[1.1] text-[#1A1917] mb-3"
-            style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
-          >
+          <p className="text-editorial-h1 mb-3">
             Nog geen data
           </p>
           <p className="text-[14px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>

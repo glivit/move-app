@@ -196,7 +196,7 @@ export default function ClientDashboard() {
             <p className="mb-1 text-[13px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
               {getGreeting()}
             </p>
-            <h1 className="text-[28px] leading-[1.1] tracking-[-0.5px] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
+            <h1 className="page-title">
               {firstName}
             </h1>
           </div>
@@ -236,7 +236,7 @@ export default function ClientDashboard() {
           <p className="mb-3 text-[12px] font-medium uppercase tracking-[1.5px] text-[#B0B0B0]" style={{ fontFamily: 'var(--font-body)' }}>
             Profiel voltooien
           </p>
-          <p className="mb-6 text-[20px] leading-[1.3] tracking-[-0.3px] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
+          <p className="section-title mb-6">
             Vul je intake formulier in zodat je coach je programma kan opstellen
           </p>
           <div className="mb-2 h-[2px] w-full overflow-hidden rounded-full bg-[#F0F0EE]">
@@ -249,7 +249,7 @@ export default function ClientDashboard() {
       {/* ═══ DAY 1 EMPTY STATE ════════════════════════════ */}
       {isDay1 && !showOnboarding && (
         <div className="mb-12 animate-slide-up py-8 stagger-3">
-          <p className="mb-3 text-[28px] leading-[1.1] tracking-[-0.5px] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
+          <p className="page-title mb-3">
             Welkom bij MŌVE
           </p>
           <p className="mb-8 max-w-[280px] text-[14px] leading-[1.5] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
@@ -272,7 +272,7 @@ export default function ClientDashboard() {
               <p className="mb-3.5 text-[12px] font-medium uppercase tracking-[1.5px] text-[#B0B0B0]" style={{ fontFamily: 'var(--font-body)' }}>
                 Training vandaag
               </p>
-              <h2 className="mb-3 text-[36px] leading-[1.08] tracking-[-1px] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
+              <h2 className="text-editorial-h1 mb-3">
                 {training.today.name}
               </h2>
               <p className="text-[14px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
@@ -292,7 +292,7 @@ export default function ClientDashboard() {
               <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-[#EEFBF0]">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3D8B5C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
               </div>
-              <h2 className="mb-1 text-[20px] leading-[1.2] tracking-[-0.3px] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}>
+              <h2 className="section-title mb-1">
                 {training.today.name}
               </h2>
               <p className="text-[13px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
@@ -302,7 +302,7 @@ export default function ClientDashboard() {
 
               {momentum.streakDays > 0 && (
                 <div className="mt-12 border-t border-[#F0F0EE] pt-12">
-                  <span className="text-[72px] leading-[0.85] tracking-[-3px] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}>
+                  <span className="stat-number-hero text-[#1A1917]">
                     {momentum.streakDays}
                   </span>
                   <p className="mt-2 text-[16px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)', fontWeight: 300 }}>
@@ -329,7 +329,7 @@ export default function ClientDashboard() {
               <p className="mb-3 text-[12px] font-medium uppercase tracking-[1.5px] text-[#C8C8C8]" style={{ fontFamily: 'var(--font-body)' }}>
                 Vandaag
               </p>
-              <h2 className="text-[48px] leading-[1] tracking-[-1.5px] text-[#D8D8D8]" style={{ fontFamily: 'var(--font-display)', fontWeight: 200 }}>
+              <h2 className="text-editorial-hero text-[#D8D8D8]" style={{ fontWeight: 200 }}>
                 Rustdag
               </h2>
               {training.next && (
@@ -346,7 +346,7 @@ export default function ClientDashboard() {
               <p className="mb-3.5 text-[12px] font-medium uppercase tracking-[1.5px] text-[#B0B0B0]" style={{ fontFamily: 'var(--font-body)' }}>
                 Check-in
               </p>
-              <h2 className="mb-3 text-[36px] leading-[1.08] tracking-[-1px] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
+              <h2 className="text-editorial-h1 mb-3">
                 Tijd voor je meting
               </h2>
               <p className="text-[14px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>Gewicht, foto, en hoe je je voelt</p>
@@ -380,7 +380,7 @@ export default function ClientDashboard() {
               <div className="flex items-baseline gap-1.5">
                 {caloriesTarget > 0 ? (
                   <>
-                    <span className="text-[20px] tracking-[-0.5px] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>{formatNumber(caloriesConsumed)}</span>
+                    <span className="section-title">{formatNumber(caloriesConsumed)}</span>
                     <span className="text-[13px] text-[#C0C0C0]" style={{ fontFamily: 'var(--font-body)' }}>/ {formatNumber(caloriesTarget)} kcal</span>
                   </>
                 ) : (

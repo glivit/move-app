@@ -183,10 +183,7 @@ export default function ProgressPage() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
-          <p
-            className="text-[28px] leading-[1.15] tracking-[-0.02em] text-[#1A1917] mb-3"
-            style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
-          >
+          <p className="section-title mb-3">
             Nog geen data
           </p>
           <p className="text-[15px] text-[#ACACAC] max-w-[260px] mx-auto">

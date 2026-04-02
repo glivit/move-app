@@ -182,10 +182,7 @@ export default function ClientProgramPage() {
       {/* Hero Section */}
       <div className="mb-8 animate-slide-up">
         <p className="text-label mb-3 text-[#ACACAC]">Schema</p>
-        <h1
-          className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
+        <h1 className="page-title">
           Training
         </h1>
         {program && (

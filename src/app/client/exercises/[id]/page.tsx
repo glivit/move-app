@@ -334,10 +334,7 @@ export default function ExerciseProgressionPage() {
             <ChevronLeft className="w-5 h-5" />
             Terug
           </button>
-          <div
-            className="bg-white rounded-2xl border border-[#E8E4DD] p-6"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
+          <div className="bg-white rounded-2xl border border-[#E8E4DD] p-6">
             <p className="text-[#ACACAC]">{error}</p>
           </div>
         </div>
@@ -358,10 +355,7 @@ export default function ExerciseProgressionPage() {
             Terug
           </button>
 
-          <div
-            className="bg-white rounded-2xl border border-[#E8E4DD] p-6"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
+          <div className="bg-white rounded-2xl border border-[#E8E4DD] p-6">
             <h1 className="text-4xl font-bold text-[#1A1917]">
               {exercise?.name}
             </h1>
@@ -376,10 +370,7 @@ export default function ExerciseProgressionPage() {
         {/* Personal Records Section */}
         {personalRecords && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div
-              className="bg-white rounded-2xl border border-[#E8E4DD] p-6"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
+            <div className="bg-white rounded-2xl border border-[#E8E4DD] p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Trophy className="w-6 h-6 text-[#D4682A]" />
                 <h2 className="text-xl font-bold text-[#1A1917]">
@@ -407,10 +398,7 @@ export default function ExerciseProgressionPage() {
             </div>
 
             {chartData.length > 0 && (
-              <div
-                className="bg-white rounded-2xl border border-[#E8E4DD] p-6"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
+              <div className="bg-white rounded-2xl border border-[#E8E4DD] p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <TrendingUp className="w-6 h-6 text-[#D4682A]" />
                   <h2 className="text-xl font-bold text-[#1A1917]">
@@ -440,10 +428,7 @@ export default function ExerciseProgressionPage() {
         {chartData.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* 1RM Chart */}
-            <div
-              className="bg-white rounded-2xl border border-[#E8E4DD] p-6"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
+            <div className="bg-white rounded-2xl border border-[#E8E4DD] p-6">
               <h2 className="text-xl font-bold text-[#1A1917] mb-4">
                 1RM Progressie
               </h2>
@@ -488,10 +473,7 @@ export default function ExerciseProgressionPage() {
             </div>
 
             {/* Volume Chart */}
-            <div
-              className="bg-white rounded-2xl border border-[#E8E4DD] p-6"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
+            <div className="bg-white rounded-2xl border border-[#E8E4DD] p-6">
               <h2 className="text-xl font-bold text-[#1A1917] mb-4">
                 Volume Progressie
               </h2>
@@ -533,10 +515,7 @@ export default function ExerciseProgressionPage() {
 
         {/* Progression Suggestions */}
         {suggestions.length > 0 && (
-          <div
-            className="bg-white rounded-2xl border border-[#E8E4DD] p-6"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
+          <div className="bg-white rounded-2xl border border-[#E8E4DD] p-6">
             <div className="flex items-center gap-3 mb-4">
               <Dumbbell className="w-6 h-6 text-[#D4682A]" />
               <h2 className="text-xl font-bold text-[#1A1917]">
@@ -569,10 +548,7 @@ export default function ExerciseProgressionPage() {
 
         {/* Recent Sessions */}
         {recentSessions.length > 0 && (
-          <div
-            className="bg-white rounded-2xl border border-[#E8E4DD] p-6"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
+          <div className="bg-white rounded-2xl border border-[#E8E4DD] p-6">
             <div className="flex items-center gap-3 mb-4">
               <Calendar className="w-6 h-6 text-[#D4682A]" />
               <h2 className="text-xl font-bold text-[#1A1917]">
@@ -611,10 +587,7 @@ export default function ExerciseProgressionPage() {
 
         {/* Empty State */}
         {chartData.length === 0 && (
-          <div
-            className="bg-white rounded-2xl border border-[#E8E4DD] p-12 text-center"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
+          <div className="bg-white rounded-2xl border border-[#E8E4DD] p-12 text-center">
             <Dumbbell className="w-12 h-12 text-[#ACACAC] mx-auto mb-4 opacity-50" />
             <p className="text-[#ACACAC] text-lg">
               Nog geen gegevens beschikbaar voor deze oefening

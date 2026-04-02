@@ -220,10 +220,7 @@ export default function CalendarPage() {
         <button onClick={prevMonth} className="w-10 h-10 flex items-center justify-center text-[#ACACAC] hover:text-[#1A1917] transition-colors">
           <ChevronLeft size={20} strokeWidth={1.5} />
         </button>
-        <h1
-          className="text-[40px] leading-[1.08] tracking-[-0.03em] text-[#1A1917]"
-          style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
-        >
+        <h1 className="text-editorial-h1">
           {MONTHS_NL[currentMonth]}
         </h1>
         <button onClick={nextMonth} className="w-10 h-10 flex items-center justify-center text-[#ACACAC] hover:text-[#1A1917] transition-colors">
@@ -453,10 +450,7 @@ export default function CalendarPage() {
       {/* Empty state — no selected date */}
       {!selectedDate && completedWorkouts.length === 0 && (
         <div className="text-center py-10 animate-fade-in stagger-3">
-          <p
-            className="text-[22px] leading-[1.2] tracking-[-0.01em] text-[#1A1917] mb-2"
-            style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
-          >
+          <p className="section-title mb-2">
             Je eerste workout staat klaar
           </p>
           <p className="text-[13px] text-[#ACACAC]">

@@ -63,8 +63,8 @@ function AnimatedStat({ value, suffix = '' }: { value: number | string; suffix?:
 
   return (
     <span
-      className="text-[40px] tracking-[-1.5px] leading-[0.9] text-[#1A1917]"
-      style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}
+      className="stat-number-lg text-[#1A1917]"
+      style={{ fontWeight: 800, letterSpacing: '-0.06em', lineHeight: 0.9 }}
     >
       {display}{suffix}
     </span>
@@ -357,10 +357,7 @@ function WorkoutCompletePage() {
         >
           Voltooid
         </p>
-        <h1
-          className="text-[40px] tracking-[-1.5px] leading-[1.05] text-[#1A1917]"
-          style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
-        >
+        <h1 className="text-editorial-h1">
           Goed gedaan
         </h1>
         {prsCount > 0 && (
@@ -448,10 +445,7 @@ function WorkoutCompletePage() {
                   : 'border border-[#F0F0EE] text-[#ACACAC] hover:border-[#C0C0C0]'
               }`}
             >
-              <span
-                className="text-[20px]"
-                style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
-              >
+              <span className="section-title">
                 {level}
               </span>
             </button>
@@ -566,7 +560,6 @@ function WorkoutCompletePage() {
         onClick={handleComplete}
         disabled={saving}
         className="w-full py-4 rounded-xl bg-[#1A1917] text-white font-bold text-[14px] uppercase tracking-[0.06em] flex items-center justify-center gap-2 hover:bg-[#333330] transition-colors disabled:opacity-50"
-        style={{ fontFamily: 'var(--font-display)' }}
       >
         {saving ? (
           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

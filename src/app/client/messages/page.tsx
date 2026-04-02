@@ -318,10 +318,7 @@ export default function ClientMessagesPage() {
                 />
               </div>
               <div className="space-y-1">
-                <p
-                  className="text-[22px] leading-[1.2] tracking-[-0.01em] text-[#1A1917]"
-                  style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
-                >
+                <p className="section-title">
                   Stuur je coach een bericht
                 </p>
                 <p className="text-[13px] text-[#ACACAC]">

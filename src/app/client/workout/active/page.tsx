@@ -263,7 +263,7 @@ function ExercisePickerModal({
       <div className="w-full max-h-[85vh] bg-white rounded-t-2xl flex flex-col animate-slide-up">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#F0F0EE]">
-          <h3 className="text-[18px] font-semibold text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
+          <h3 className="text-[18px] font-semibold text-[#1A1917] page-title">
             Oefening toevoegen
           </h3>
           <button
@@ -392,7 +392,7 @@ function FormCheckModal({ exerciseName, onClose }: { exerciseName: string; onClo
   return (
     <div className="fixed inset-0 bg-black/40 z-[70] flex items-end justify-center">
       <div className="w-full max-w-lg bg-white rounded-t-2xl p-6 animate-slide-up">
-        <h3 className="text-[18px] font-semibold text-[#1A1917] mb-1" style={{ fontFamily: 'var(--font-display)' }}>
+        <h3 className="text-[18px] font-semibold text-[#1A1917] mb-1 page-title">
           Form Check
         </h3>
         <p className="text-[13px] text-[#ACACAC] mb-5">
@@ -430,7 +430,7 @@ function FormCheckModal({ exerciseName, onClose }: { exerciseName: string; onClo
             >
               {uploading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
                   Uploaden...
                 </>
               ) : (
@@ -928,7 +928,7 @@ function ActiveWorkoutPage() {
             })}
           </div>
           <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[61] animate-bounce-in">
-            <div className="bg-[#D46A3A] text-white px-6 py-3 rounded-2xl flex items-center gap-3 shadow-lg">
+            <div className="bg-[#D46A3A] text-white px-6 py-3 rounded-2xl flex items-center gap-3 border border-white/20">
               <span className="text-2xl">🏆</span>
               <div>
                 <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/80">Nieuw PR</p>
@@ -945,8 +945,7 @@ function ActiveWorkoutPage() {
         <div className="fixed inset-0 bg-black/30 z-[70] flex items-end">
           <div className="w-full bg-white p-6 rounded-t-2xl shadow-xl animate-slide-up">
             <h3
-              className="text-[20px] font-semibold text-[#1A1917] tracking-[-0.02em] mb-2"
-              style={{ fontFamily: 'var(--font-display)' }}
+              className="text-[20px] font-semibold text-[#1A1917] tracking-[-0.02em] mb-2 page-title"
             >
               Training afsluiten?
             </h3>
@@ -1063,7 +1062,7 @@ function ActiveWorkoutPage() {
                     <Info size={13} strokeWidth={1.5} className="text-[#C0C0C0] flex-shrink-0" />
                   </button>
                   <span className={`text-[12px] font-medium tabular-nums ml-2 px-2 py-0.5 rounded-lg ${
-                    exDone ? 'bg-[rgba(212,106,58,0.08)] text-[#D46A3A]' : 'text-[#ACACAC]'
+                    exDone ? 'bg-[#D46A3A]/10 text-[#D46A3A]' : 'text-[#ACACAC]'
                   }`}>
                     {exCompleted}/{exSets.length}
                   </span>
@@ -1164,7 +1163,7 @@ function ActiveWorkoutPage() {
                       const name = exerciseData.name_nl || exerciseData.name
                       setFormCheckExercise({ id: ex.exercise_id, name })
                     }}
-                    className="py-2.5 px-4 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#D46A3A] uppercase tracking-[0.06em] rounded-xl hover:bg-[rgba(212,106,58,0.08)] transition-colors touch-manipulation"
+                    className="py-2.5 px-4 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#D46A3A] uppercase tracking-[0.06em] rounded-xl hover:bg-[#D46A3A]/10 transition-colors touch-manipulation"
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
                     📹 Form check
@@ -1195,7 +1194,7 @@ function ActiveWorkoutPage() {
           >
             {saving ? (
               <>
-                <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                <div className="w-4 h-4 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
                 Opslaan...
               </>
             ) : (
@@ -1230,8 +1229,7 @@ function ActiveWorkoutPage() {
           <div className="fixed inset-0 bg-black/30 z-[70] flex items-end">
             <div className="w-full bg-white p-6 rounded-t-2xl shadow-xl animate-slide-up">
               <h3
-                className="text-[20px] font-semibold text-[#1A1917] tracking-[-0.02em] mb-2"
-                style={{ fontFamily: 'var(--font-display)' }}
+                className="text-[20px] font-semibold text-[#1A1917] tracking-[-0.02em] mb-2 page-title"
               >
                 Workout verwijderen?
               </h3>

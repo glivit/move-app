@@ -125,7 +125,7 @@ export default function ProfilePage() {
           )}
         </div>
 
-        <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]">
+        <h1 className="page-title">
           {profile?.full_name || 'Profiel'}
         </h1>
         <p className="text-[13px] text-[#ACACAC] mt-1">
@@ -135,31 +135,33 @@ export default function ProfilePage() {
 
       {/* ═══ SETTINGS — editorial list ═══════════════════ */}
       {menuSections.map((section, si) => (
-        <div key={si} className={`${si > 0 ? 'border-t-8 border-[#FFFFFF]' : ''} ${si === 0 ? 'animate-slide-up stagger-3' : si === 1 ? 'animate-slide-up stagger-4' : ''}`}>
-          {section.items.map((item, i) => {
-            const Icon = item.icon
-            return (
-              <a
-                key={item.href}
-                href={item.href}
-                className={`flex items-center justify-between px-6 py-4 hover:bg-[#FAFAF8] transition-colors ${
-                  i > 0 ? 'border-t border-[#F0F0EE]' : ''
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon size={18} strokeWidth={1.5} className="text-[#ACACAC]" />
-                  <span className="text-[14px] text-[#1A1917]">{item.label}</span>
-                </div>
-                <ChevronRight size={16} strokeWidth={1.5} className="text-[#C0C0C0]" />
-              </a>
-            )
-          })}
+        <div key={si} className={`${si > 0 ? 'mt-8' : ''}`}>
+          <div className={`bg-white rounded-2xl border border-[#F0F0EE] overflow-hidden ${si === 0 ? 'animate-slide-up stagger-3' : si === 1 ? 'animate-slide-up stagger-4' : ''}`}>
+            {section.items.map((item, i) => {
+              const Icon = item.icon
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center justify-between px-6 py-4 hover:bg-[#FAFAF8] transition-colors ${
+                    i > 0 ? 'border-t border-[#F0F0EE]' : ''
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon size={18} strokeWidth={1.5} className="text-[#ACACAC]" />
+                    <span className="text-[14px] text-[#1A1917]">{item.label}</span>
+                  </div>
+                  <ChevronRight size={16} strokeWidth={1.5} className="text-[#C0C0C0]" />
+                </a>
+              )
+            })}
+          </div>
         </div>
       ))}
 
       {/* Pakket */}
-      <div className="border-t-8 border-[#FFFFFF] animate-slide-up stagger-5">
-        <div className="flex items-center justify-between px-6 py-4">
+      <div className="mt-8 animate-slide-up stagger-5">
+        <div className="bg-white rounded-2xl border border-[#F0F0EE] flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             <CreditCard size={18} strokeWidth={1.5} className="text-[#ACACAC]" />
             <span className="text-[14px] text-[#1A1917]">Pakket</span>
@@ -169,11 +171,11 @@ export default function ProfilePage() {
       </div>
 
       {/* Logout */}
-      <div className="border-t-8 border-[#FFFFFF] mb-4 animate-slide-up stagger-6">
+      <div className="mt-8 mb-4 animate-slide-up stagger-6">
         <button
           onClick={handleLogout}
           disabled={signingOut}
-          className="w-full px-6 py-4 flex items-center justify-center gap-2 text-[#C4372A] font-semibold text-[14px] hover:bg-[#FFF5F5] transition-colors disabled:opacity-50"
+          className="w-full px-6 py-4 flex items-center justify-center gap-2 text-[#C4372A] font-semibold text-[14px] bg-white rounded-2xl border border-[#F0F0EE] hover:bg-[#FFF5F5] transition-colors disabled:opacity-50"
         >
           <LogOut size={16} strokeWidth={1.5} />
           {signingOut ? 'Afmelden...' : 'Afmelden'}

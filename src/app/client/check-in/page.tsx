@@ -188,10 +188,7 @@ export default function CheckInPage() {
             </div>
           </div>
           <div className="space-y-2">
-            <h2
-              className="text-[28px] leading-[1.15] tracking-[-0.02em] text-[#1A1917]"
-              style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
-            >
+            <h2 className="page-title">
               Check-in ingediend
             </h2>
             <p className="text-[14px] text-[#ACACAC] leading-relaxed">
@@ -216,10 +213,7 @@ export default function CheckInPage() {
             </div>
           </div>
           <div className="space-y-2">
-            <h2
-              className="text-[28px] leading-[1.15] tracking-[-0.02em] text-[#1A1917]"
-              style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
-            >
+            <h2 className="page-title">
               Check-in
             </h2>
             <p className="text-[14px] text-[#ACACAC] leading-relaxed">{windowMessage}</p>
@@ -237,10 +231,7 @@ export default function CheckInPage() {
       {/* Header — Cormorant serif */}
       <div className="animate-fade-in">
         <p className="text-label mb-3">Stap {currentStep + 1} van {steps.length}</p>
-        <h1
-          className="text-[32px] leading-[1.12] tracking-[-0.025em] text-[#1A1917]"
-          style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
-        >
+        <h1 className="text-editorial-h2">
           {steps[currentStep].title}
         </h1>
         <p className="text-[14px] text-[#ACACAC] mt-1">{steps[currentStep].description}</p>

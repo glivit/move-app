@@ -349,7 +349,7 @@ function FoodSearchModal({
                       </span>
                     )}
                   </div>
-                  <div className="flex gap-2 text-[11px] text-[#C0C0C0]" style={{ fontFamily: 'var(--font-display)' }}>
+                  <div className="flex gap-2 text-[11px] text-[#C0C0C0]">
                     <span>{Math.round(product.per100g.calories)} kcal</span>
                     <span>·</span>
                     <span>P {product.per100g.protein}g</span>
@@ -602,17 +602,11 @@ export default function ClientNutritionPage() {
   if (!plan) {
     return (
       <div className="pb-28">
-        <h1
-          className="text-[28px] tracking-[-0.5px] leading-[1.1] text-[#1A1917] mb-6"
-          style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
-        >
+        <h1 className="page-title mb-6">
           Voeding
         </h1>
         <div className="py-16 text-center">
-          <p
-            className="text-[36px] tracking-[-1px] leading-[1.1] text-[#1A1917] mb-3"
-            style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
-          >
+          <p className="text-editorial-h1 mb-3">
             Nog geen plan
           </p>
           <p className="text-[14px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
@@ -665,7 +659,6 @@ export default function ClientNutritionPage() {
         <p
           className="text-[52px] leading-[0.9] tracking-[-2px]"
           style={{
-            fontFamily: 'var(--font-display)',
             fontWeight: 800,
             color: allDone ? '#3D8B5C' : '#1A1917',
           }}
@@ -702,7 +695,6 @@ export default function ClientNutritionPage() {
             <p
               className="text-[18px] tracking-[-0.5px]"
               style={{
-                fontFamily: 'var(--font-display)',
                 fontWeight: 700,
                 color: allDone && macro.actual >= macro.target * 0.9 ? '#3D8B5C' : '#1A1917',
               }}
@@ -792,7 +784,7 @@ export default function ClientNutritionPage() {
                 <div className="shrink-0 text-right">
                   <span
                     className={`text-[14px] ${isCompleted ? 'text-[#C0C0C0]' : 'text-[#1A1917]'}`}
-                    style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
+                    style={{ fontWeight: 600 }}
                   >
                     {mealCal}
                   </span>
