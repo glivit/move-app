@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Dumbbell, UtensilsCrossed, CheckCircle2, Send, Loader2 } from 'lucide-react'
-import { SubPageHeader } from '@/components/layout/SubPageHeader'
 
 interface AccountabilityLog {
   id: string
@@ -91,7 +90,12 @@ export default function AccountabilityPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
+        <div className="mb-8 animate-slide-up">
+          <p className="text-label mb-3">Dagelijks</p>
+          <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
+            Check
+          </h1>
+        </div>
         <div className="space-y-3">
           {[1, 2].map(i => (
             <div key={i} className="h-32 bg-[#F0F0EE] animate-pulse rounded-2xl" />
@@ -105,8 +109,13 @@ export default function AccountabilityPage() {
   if (!log) {
     return (
       <div className="space-y-6">
-        <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
-        <div className="bg-white p-8 rounded-2xl border border-[#F0F0EE] text-center">
+        <div className="mb-8 animate-slide-up">
+          <p className="text-label mb-3">Dagelijks</p>
+          <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
+            Check
+          </h1>
+        </div>
+        <div className="bg-white p-8 rounded-2xl border border-[#F0F0EE] text-center animate-slide-up" style={{ animationDelay: '60ms' }}>
           <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#3D8B5C] mx-auto mb-3" />
           <p className="font-semibold text-[#1A1917] text-lg">Alles op schema!</p>
           <p className="text-[14px] text-[#ACACAC] mt-2">
@@ -121,8 +130,13 @@ export default function AccountabilityPage() {
   if (submitted) {
     return (
       <div className="space-y-6">
-        <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
-        <div className="bg-white p-8 rounded-2xl border border-[#F0F0EE] text-center">
+        <div className="mb-8 animate-slide-up">
+          <p className="text-label mb-3">Dagelijks</p>
+          <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
+            Check
+          </h1>
+        </div>
+        <div className="bg-white p-8 rounded-2xl border border-[#F0F0EE] text-center animate-slide-up" style={{ animationDelay: '60ms' }}>
           <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#3D8B5C] mx-auto mb-3" />
           <p className="font-semibold text-[#1A1917] text-lg">Bedankt voor je feedback!</p>
           <p className="text-[14px] text-[#ACACAC] mt-2">
@@ -148,18 +162,23 @@ export default function AccountabilityPage() {
 
   return (
     <div className="space-y-6">
-      <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
-      <p className="text-[14px] text-[#ACACAC] -mt-4">
+      <div className="mb-8 animate-slide-up">
+        <p className="text-label mb-3">Dagelijks</p>
+        <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
+          Check
+        </h1>
+      </div>
+      <p className="text-[14px] text-[#ACACAC]">
         Even terugblikken op je dag
       </p>
 
       {/* Status cards */}
-      <div className="space-y-3">
+      <div className="space-y-3 animate-slide-up" style={{ animationDelay: '60ms' }}>
         {/* Workout status */}
         <div className={`p-5 border rounded-2xl ${
           log.workout_completed
-            ? 'bg-[#F0FDF4] border-[#BBF7D0]'
-            : 'bg-[#FFF7ED] border-[#FED7AA]'
+            ? 'bg-white border-[#3D8B5C]/20'
+            : 'bg-white border-[#C47D15]/20'
         }`}>
           <div className="flex items-center gap-3 mb-2">
             <div className={`w-10 h-10 flex items-center justify-center ${
@@ -196,8 +215,8 @@ export default function AccountabilityPage() {
         {/* Nutrition status */}
         <div className={`p-5 border rounded-2xl ${
           log.nutrition_logged
-            ? 'bg-[#F0FDF4] border-[#BBF7D0]'
-            : 'bg-[#FFF7ED] border-[#FED7AA]'
+            ? 'bg-white border-[#3D8B5C]/20'
+            : 'bg-white border-[#C47D15]/20'
         }`}>
           <div className="flex items-center gap-3 mb-2">
             <div className={`w-10 h-10 flex items-center justify-center ${
@@ -218,7 +237,7 @@ export default function AccountabilityPage() {
           {/* Meal progress bar when partially complete */}
           {hasMealProgress && !log.nutrition_logged && log.meals_completed! > 0 && (
             <div className="mt-2 mb-3">
-              <div className="h-2 bg-[#FED7AA]/50 overflow-hidden">
+              <div className="h-2 bg-[#F0F0EE] overflow-hidden">
                 <div
                   className="h-full bg-[#C47D15] transition-all"
                   style={{ width: `${(log.meals_completed! / log.meals_total!) * 100}%` }}
@@ -256,7 +275,8 @@ export default function AccountabilityPage() {
       <button
         onClick={handleSubmit}
         disabled={submitting}
-        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#1A1917] text-white font-semibold uppercase tracking-wider text-[15px] hover:bg-[#2A2A28] transition-colors disabled:opacity-50 rounded-xl"
+        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#1A1917] text-white font-semibold uppercase tracking-wider text-[15px] hover:bg-[#333330] transition-colors disabled:opacity-50 rounded-xl animate-slide-up"
+        style={{ animationDelay: '120ms' }}
       >
         {submitting ? (
           <>

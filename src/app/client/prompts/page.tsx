@@ -346,7 +346,7 @@ export default function ClientPromptsPage() {
           <div
             className="p-4 mb-6 flex items-center gap-3 border"
             style={{
-              backgroundColor: '#F0FDF4',
+              backgroundColor: 'rgba(61,139,92,0.06)',
               borderColor: '#22C55E',
             }}
           >

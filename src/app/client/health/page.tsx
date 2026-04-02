@@ -135,9 +135,9 @@ export default function HealthPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div><h1 className="text-editorial-h2 text-[#1A1917]">Gezondheid</h1></div>
+        <div><h1 className="text-editorial-h2 text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>Gezondheid</h1></div>
         <div className="space-y-3">
-          {[1, 2, 3].map((i) => <div key={i} className="h-24 bg-white rounded-2xl animate-pulse" />)}
+          {[1, 2, 3].map((i) => <div key={i} className="h-24 bg-[#F0F0EE] rounded-2xl animate-shimmer" />)}
         </div>
       </div>
     )
@@ -146,14 +146,15 @@ export default function HealthPage() {
   return (
     <div className="space-y-6">
       {/* Hero Section */}
+      <p className="text-label mb-3">Gezondheid</p>
       <div
-        className="p-8 bg-white rounded-2xl border border-[#F0F0EE] animate-slide-up text-center"
+        className="animate-slide-up text-center"
         style={{
           fontFamily: 'var(--font-display)',
         }}
       >
         {heroMetric.type === 'emoji' && (
-          <div>
+          <div className="p-8 bg-white rounded-2xl border border-[#F0F0EE]">
             <div className="text-8xl mb-3">{heroMetric.value}</div>
             <p className="text-[18px] font-semibold" style={{ color: '#1A1917' }}>
               {heroMetric.label}
@@ -164,7 +165,7 @@ export default function HealthPage() {
           </div>
         )}
         {heroMetric.type === 'steps' && (
-          <div>
+          <div className="p-8 bg-white rounded-2xl border border-[#F0F0EE]">
             <p className="text-[14px]" style={{ color: '#ACACAC' }}>Vandaag</p>
             <div className="text-7xl font-bold my-3" style={{ color: '#1A1917' }}>
               {(heroMetric.value as number / 1000).toFixed(1)}k
@@ -175,7 +176,7 @@ export default function HealthPage() {
           </div>
         )}
         {heroMetric.type === 'default' && (
-          <div>
+          <div className="p-8 bg-white rounded-2xl border border-[#F0F0EE]">
             <h1 className="text-6xl font-bold" style={{ color: '#1A1917' }}>
               {heroMetric.value}
             </h1>
@@ -203,7 +204,7 @@ export default function HealthPage() {
             className="p-4 text-center bg-white rounded-2xl border border-[#F0F0EE] animate-slide-up hover:bg-[#FAFAF8] transition-colors"
             style={{ animationDelay: '120ms' }}
           >
-            <Moon size={18} strokeWidth={1.5} className="mx-auto mb-1" style={{ color: '#AF52DE' }} />
+            <Moon size={18} strokeWidth={1.5} className="mx-auto mb-1" style={{ color: '#7B5EA7' }} />
             <p className="text-[18px] font-bold" style={{ color: '#1A1917' }}>
               {weekAvg.sleep}u
             </p>
@@ -235,8 +236,8 @@ export default function HealthPage() {
             <AreaChart data={chartData}>
               <defs>
                 <linearGradient id="sleepGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#AF52DE" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="#AF52DE" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#7B5EA7" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="#7B5EA7" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#ACACAC' }} axisLine={false} tickLine={false} />
@@ -244,7 +245,7 @@ export default function HealthPage() {
               <Tooltip
                 contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
               />
-              <Area type="monotone" dataKey="slaap" stroke="#AF52DE" fill="url(#sleepGrad)" strokeWidth={2} name="Slaap (u)" />
+              <Area type="monotone" dataKey="slaap" stroke="#7B5EA7" fill="url(#sleepGrad)" strokeWidth={2} name="Slaap (u)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -267,7 +268,7 @@ export default function HealthPage() {
         <div className="space-y-4">
           {/* Steps */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center border rounded-xl" style={{ backgroundColor: 'rgba(196,125,21,0.06)', borderColor: '#FFE4CC' }}>
+            <div className="w-9 h-9 flex items-center justify-center border rounded-xl" style={{ backgroundColor: 'rgba(196,125,21,0.06)', borderColor: 'rgba(196,125,21,0.12)' }}>
               <Footprints size={16} strokeWidth={1.5} style={{ color: '#C47D15' }} />
             </div>
             <div className="flex-1">
@@ -285,8 +286,8 @@ export default function HealthPage() {
 
           {/* Sleep */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center border rounded-xl" style={{ backgroundColor: '#F5EEFA', borderColor: '#E8D6F8' }}>
-              <Moon size={16} strokeWidth={1.5} style={{ color: '#AF52DE' }} />
+            <div className="w-9 h-9 flex items-center justify-center border rounded-xl" style={{ backgroundColor: 'rgba(123,94,167,0.06)', borderColor: 'rgba(123,94,167,0.12)' }}>
+              <Moon size={16} strokeWidth={1.5} style={{ color: '#7B5EA7' }} />
             </div>
             <div className="flex-1">
               <label className="text-[12px] font-medium" style={{ color: '#ACACAC' }}>Slaap (uren)</label>
@@ -358,7 +359,7 @@ export default function HealthPage() {
 
           {/* Heart Rate */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center border rounded-xl" style={{ backgroundColor: 'rgba(196,55,42,0.06)', borderColor: '#FFD4D4' }}>
+            <div className="w-9 h-9 flex items-center justify-center border rounded-xl" style={{ backgroundColor: 'rgba(196,55,42,0.06)', borderColor: 'rgba(196,55,42,0.12)' }}>
               <Heart size={16} strokeWidth={1.5} style={{ color: '#C4372A' }} />
             </div>
             <div className="flex-1">
@@ -377,7 +378,7 @@ export default function HealthPage() {
           {/* Stress */}
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-9 h-9 flex items-center justify-center border rounded-xl" style={{ backgroundColor: 'rgba(196,125,21,0.06)', borderColor: '#FFE4CC' }}>
+              <div className="w-9 h-9 flex items-center justify-center border rounded-xl" style={{ backgroundColor: 'rgba(196,125,21,0.06)', borderColor: 'rgba(196,125,21,0.12)' }}>
                 <Brain size={16} strokeWidth={1.5} style={{ color: '#C47D15' }} />
               </div>
               <label className="text-[12px] font-medium" style={{ color: '#ACACAC' }}>
@@ -400,7 +401,7 @@ export default function HealthPage() {
 
           {/* Weight */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center border rounded-xl" style={{ backgroundColor: 'rgba(61,139,92,0.06)', borderColor: '#D0F5DC' }}>
+            <div className="w-9 h-9 flex items-center justify-center border rounded-xl" style={{ backgroundColor: 'rgba(61,139,92,0.06)', borderColor: 'rgba(61,139,92,0.12)' }}>
               <Activity size={16} strokeWidth={1.5} style={{ color: '#3D8B5C' }} />
             </div>
             <div className="flex-1">

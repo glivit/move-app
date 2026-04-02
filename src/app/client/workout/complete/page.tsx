@@ -565,7 +565,7 @@ function WorkoutCompletePage() {
       <button
         onClick={handleComplete}
         disabled={saving}
-        className="w-full py-4 rounded-xl bg-[#1A1917] text-white font-bold text-[14px] uppercase tracking-[0.06em] flex items-center justify-center gap-2 hover:bg-[#333] transition-colors disabled:opacity-50"
+        className="w-full py-4 rounded-xl bg-[#1A1917] text-white font-bold text-[14px] uppercase tracking-[0.06em] flex items-center justify-center gap-2 hover:bg-[#333330] transition-colors disabled:opacity-50"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         {saving ? (

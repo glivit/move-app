@@ -194,7 +194,7 @@ export default function ExercisesPage() {
       <SubPageHeader overline="Training" title="Oefeningen" backHref="/client/progress" />
 
       {/* Summary */}
-      <div className="flex gap-4 mb-6 border-b border-[#F0F0EE] pb-5">
+      <div className="flex gap-4 mb-6 border-b border-[#F0F0EE] pb-5 animate-slide-up" style={{ animationDelay: '60ms' }}>
         <div className="text-center flex-1">
           <p className="text-[22px] font-bold text-[#1A1917]">{exerciseStats.length}</p>
           <p className="text-label mt-1">Oefeningen</p>
@@ -214,7 +214,7 @@ export default function ExercisesPage() {
       </div>
 
       {/* Search */}
-      <div className="relative mb-4">
+      <div className="relative mb-4 animate-slide-up" style={{ animationDelay: '120ms' }}>
         <Search size={16} strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#C0C0C0]" />
         <input
           type="text"
@@ -226,7 +226,7 @@ export default function ExercisesPage() {
       </div>
 
       {/* Muscle group filter */}
-      <div className="flex gap-1 mb-5 overflow-x-auto pb-1 -mx-4 px-4">
+      <div className="flex gap-1 mb-5 overflow-x-auto pb-1 -mx-4 px-4 animate-slide-up" style={{ animationDelay: '180ms' }}>
         <button
           onClick={() => setSelectedGroup(null)}
           className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 transition-all rounded-xl ${
@@ -249,7 +249,7 @@ export default function ExercisesPage() {
       </div>
 
       {/* Exercise list */}
-      <div className="space-y-2">
+      <div className="space-y-2 animate-slide-up" style={{ animationDelay: '240ms' }}>
         {filtered.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-[14px] text-[#C0C0C0]">Geen oefeningen gevonden</p>

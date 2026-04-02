@@ -115,7 +115,7 @@ export default function ProfilePage() {
     <div className="pb-28">
 
       {/* ═══ PROFILE HEADER — editorial, centered ═══════ */}
-      <div className="flex flex-col items-center pt-8 pb-8 border-b border-[#F0F0EE]">
+      <div className="flex flex-col items-center pt-8 pb-8 border-b border-[#F0F0EE] animate-slide-up" style={{ animationDelay: '60ms' }}>
         {/* Avatar */}
         <div className="w-20 h-20 rounded-full bg-[#1A1917] text-white flex items-center justify-center text-[22px] font-semibold mb-4 overflow-hidden">
           {profile?.avatar_url ? (
@@ -135,7 +135,7 @@ export default function ProfilePage() {
 
       {/* ═══ SETTINGS — editorial list ═══════════════════ */}
       {menuSections.map((section, si) => (
-        <div key={si} className={si > 0 ? 'border-t-8 border-[#FFFFFF]' : ''}>
+        <div key={si} className={si > 0 ? 'border-t-8 border-[#FFFFFF]' : ''} style={{ animation: `slide-up 0.6s ease-out ${120 + si * 60}ms both` }}>
           {section.items.map((item, i) => {
             const Icon = item.icon
             return (
@@ -158,7 +158,7 @@ export default function ProfilePage() {
       ))}
 
       {/* Pakket */}
-      <div className="border-t-8 border-[#FFFFFF]">
+      <div className="border-t-8 border-[#FFFFFF] animate-slide-up" style={{ animationDelay: '240ms' }}>
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             <CreditCard size={18} strokeWidth={1.5} className="text-[#ACACAC]" />
@@ -169,7 +169,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Logout */}
-      <div className="border-t-8 border-[#FFFFFF] mb-4">
+      <div className="border-t-8 border-[#FFFFFF] mb-4 animate-slide-up" style={{ animationDelay: '300ms' }}>
         <button
           onClick={handleLogout}
           disabled={signingOut}

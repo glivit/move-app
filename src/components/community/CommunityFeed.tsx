@@ -152,7 +152,7 @@ export function CommunityFeed({ isCoach = false }: Props) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-slide-up">
       {/* New Post */}
       <div
         className="rounded-2xl p-5 border"
@@ -226,7 +226,7 @@ export function CommunityFeed({ isCoach = false }: Props) {
           return (
             <div
               key={post.id}
-              className="rounded-2xl border overflow-hidden"
+              className="rounded-2xl border overflow-hidden hover:bg-[#FAFAF8] transition-colors"
               style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
             >
               {/* Pinned indicator */}
