@@ -67,7 +67,7 @@ export default function InvoicesPage() {
       </div>
 
       {/* Current Package */}
-      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] p-6">
+      <div className="bg-white rounded-2xl border border-[#F0F0EE] p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-[13px] text-[#8E8E93] uppercase tracking-wide font-medium">Huidig pakket</p>
@@ -92,7 +92,7 @@ export default function InvoicesPage() {
       {profile?.stripe_customer_id && (
         <a
           href="/api/billing/portal"
-          className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] p-5 flex items-center justify-between hover:bg-[#FAFAFA] transition-colors"
+          className="bg-white rounded-2xl border border-[#F0F0EE] p-5 flex items-center justify-between hover:bg-[#FAFAFA] transition-colors"
         >
           <div className="flex items-center gap-3">
             <ExternalLink strokeWidth={1.5} className="w-5 h-5 text-[#1A1917]" />
@@ -106,7 +106,7 @@ export default function InvoicesPage() {
       )}
 
       {/* Empty State */}
-      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] p-8 text-center">
+      <div className="bg-white rounded-2xl border border-[#F0F0EE] p-8 text-center">
         <Receipt strokeWidth={1.5} className="w-10 h-10 text-[#C7C7CC] mx-auto mb-3" />
         <p className="text-[15px] text-[#8E8E93] mb-1">Factuuroverzicht</p>
         <p className="text-[13px] text-[#C7C7CC]">

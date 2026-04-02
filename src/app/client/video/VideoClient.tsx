@@ -132,7 +132,7 @@ export default function ClientVideoPage() {
                 return (
                   <div
                     key={session.id}
-                    className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE]"
+                    className="bg-white rounded-2xl p-5 border border-[#F0F0EE]"
                   >
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-center gap-3">
@@ -210,7 +210,7 @@ export default function ClientVideoPage() {
               {past.map((session) => (
                 <div
                   key={session.id}
-                  className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] flex items-center gap-3"
+                  className="bg-white rounded-2xl p-4 border border-[#F0F0EE] flex items-center gap-3"
                 >
                   <div className="w-9 h-9 rounded-lg bg-[#F8F8F6] flex items-center justify-center">
                     <Video strokeWidth={1.5} className="w-4 h-4 text-[#ACACAC]" />
@@ -234,7 +234,7 @@ export default function ClientVideoPage() {
 
         {/* Empty State */}
         {sessions.length === 0 && (
-          <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] text-center">
+          <div className="bg-white rounded-2xl p-12 border border-[#F0F0EE] text-center">
             <div className="w-16 h-16 rounded-full bg-[#007AFF]/10 flex items-center justify-center mx-auto mb-4">
               <Video strokeWidth={1.5} className="w-8 h-8 text-[#007AFF]" />
             </div>

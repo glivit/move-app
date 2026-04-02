@@ -107,7 +107,7 @@ export default function GoalsPage() {
       {/* Primary Goal */}
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Hoofddoel</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
+        <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
           {GOAL_OPTIONS.map((goal) => (
             <button
               key={goal.id}
@@ -154,7 +154,7 @@ export default function GoalsPage() {
       {/* Motivation */}
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Motivatie</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] p-5">
+        <div className="bg-white rounded-2xl border border-[#F0F0EE] p-5">
           <textarea
             value={motivation}
             onChange={(e) => setMotivation(e.target.value)}

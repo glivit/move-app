@@ -446,7 +446,7 @@ export default function StatsPage() {
       {activeTab === 'kracht' && (
         <div>
           {krachtData.length > 0 ? (
-            <div className="bg-white rounded-2xl shadow-[shadow-lg] p-4">
+            <div className="bg-white rounded-2xl border border-[#F0F0EE] p-4">
               <p className="text-label mb-3">Max gewicht per week (kg)</p>
               <ResponsiveContainer width="100%" height={220}>
                 {groupBy === 'spiergroep' ? (
@@ -482,7 +482,7 @@ export default function StatsPage() {
       {activeTab === 'volume' && (
         <div>
           {volumeData.length > 0 ? (
-            <div className="bg-white rounded-2xl shadow-[shadow-lg] p-4">
+            <div className="bg-white rounded-2xl border border-[#F0F0EE] p-4">
               <p className="text-label mb-3">
                 Volume per week {groupBy === 'spiergroep' ? '(ton)' : '(kg)'}
               </p>
@@ -532,7 +532,7 @@ export default function StatsPage() {
                 const group = ex ? getMuscleGroup(ex.target_muscle) : 'Overig'
 
                 return (
-                  <div key={pr.id} className="bg-white rounded-2xl shadow-[shadow-lg] p-4">
+                  <div key={pr.id} className="bg-white rounded-2xl border border-[#F0F0EE] p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 flex items-center justify-center shrink-0" style={{ backgroundColor: `${GROUP_COLORS[group] || '#ACACAC'}15` }}>
                         <Trophy size={16} strokeWidth={1.5} style={{ color: GROUP_COLORS[group] || '#ACACAC' }} />

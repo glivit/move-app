@@ -16,7 +16,9 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
       {/* Main content */}
       <main className="lg:pl-[280px]">
         <div className="max-w-lg mx-auto px-6 pt-16 pb-4 lg:max-w-3xl lg:px-8 lg:pt-12">
-          {children}
+          <div className="animate-fade-in">
+            {children}
+          </div>
         </div>
       </main>
 

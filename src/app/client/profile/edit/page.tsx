@@ -76,7 +76,7 @@ export default function EditProfilePage() {
       </div>
 
       {/* Avatar */}
-      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] p-6 flex flex-col items-center">
+      <div className="bg-white rounded-2xl border border-[#F0F0EE] p-6 flex flex-col items-center">
         <div className="relative mb-4">
           <div className="w-24 h-24 rounded-full bg-[#1A1917] text-white flex items-center justify-center text-3xl font-semibold overflow-hidden">
             {avatarUrl ? (
@@ -93,7 +93,7 @@ export default function EditProfilePage() {
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
+      <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
         <div className="px-5 py-4">
           <label className="block text-[11px] font-medium text-[#8E8E93] uppercase tracking-wide mb-1">Volledige naam</label>
           <input

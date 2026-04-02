@@ -3,18 +3,19 @@
 
 @theme {
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   * MŌVE Editorial Design System
-   * Inspired by Aesop — warm, monochromatic, editorial
-   * 8px grid · 1.25 type scale · generous whitespace
+   * MŌVE v3 Design System
+   * Ultra-clean, minimal — inspired by Oura Ring, Apple Health
+   * White canvas · Manrope display · DM Sans body · terracotta accent
    * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-  /* Surfaces — warm cream stone palette */
-  --color-bg: #EEEBE3;
-  --color-bg-elevated: #F5F2EC;
+  /* Surfaces — pure white canvas */
+  --color-bg: #FFFFFF;
+  --color-bg-elevated: #FAFAF8;
   --color-bg-dark: #1A1917;
+  --color-bg-subtle: #F8F8F6;
   --color-surface: #FFFFFF;
-  --color-surface-warm: #FAF8F3;
-  --color-surface-muted: #E5E1D9;
+  --color-surface-warm: #FAFAF8;
+  --color-surface-muted: #F8F8F6;
 
   /* Accent — editorial charcoal */
   --color-accent: #1A1917;
@@ -22,40 +23,40 @@
   --color-accent-hover: #333330;
   --color-accent-light: rgba(26, 25, 23, 0.04);
   --color-accent-subtle: rgba(26, 25, 23, 0.08);
-  --color-accent-surface: #EDEAE4;
+  --color-accent-surface: #F8F8F6;
 
   /* Pop accent — warm terracotta for active indicators & CTAs */
   --color-pop: #D46A3A;
-  --color-pop-light: rgba(212, 106, 58, 0.12);
-  --color-pop-muted: rgba(212, 106, 58, 0.25);
+  --color-pop-light: rgba(212, 106, 58, 0.08);
+  --color-pop-muted: rgba(212, 106, 58, 0.20);
 
   /* Streak — warm red for completed day indicators */
-  --color-streak: #E05A3A;
+  --color-streak: #D46A3A;
 
-  /* Typography */
+  /* Typography — v3 neutral greys */
   --color-text-primary: #1A1917;
-  --color-text-secondary: #6B6862;
-  --color-text-muted: #A09D96;
-  --color-text-faint: #C5C2BC;
+  --color-text-secondary: #ACACAC;
+  --color-text-muted: #C0C0C0;
+  --color-text-faint: #D5D5D5;
 
-  /* Borders */
-  --color-border: #DDD9D0;
-  --color-border-subtle: #E8E4DC;
-  --color-border-strong: #CCC7BC;
+  /* Borders — ultra-light, barely there */
+  --color-border: #F0F0EE;
+  --color-border-subtle: #F0F0EE;
+  --color-border-strong: #E0E0E0;
 
   /* Status */
   --color-success: #3D8B5C;
   --color-warning: #C47D15;
   --color-error: #C4372A;
 
-  /* Client surfaces */
-  --color-client-bg: #EEEBE3;
+  /* Client surfaces — maps to same v3 tokens */
+  --color-client-bg: #FFFFFF;
   --color-client-surface: #FFFFFF;
-  --color-client-surface-muted: #E5E1D9;
-  --color-client-border: #DDD9D0;
-  --color-client-border-strong: #CCC7BC;
-  --color-client-text-secondary: #6B6862;
-  --color-client-text-muted: #A09D96;
+  --color-client-surface-muted: #F8F8F6;
+  --color-client-border: #F0F0EE;
+  --color-client-border-strong: #E0E0E0;
+  --color-client-text-secondary: #ACACAC;
+  --color-client-text-muted: #C0C0C0;
 
   /* Data visualization */
   --color-data-orange: #C47D15;
@@ -81,12 +82,13 @@
   --radius-lg: 0.875rem;
   --radius-xl: 1rem;
   --radius-2xl: 1.25rem;
-  --radius-card: 1rem;
+  --radius-card: 1.25rem;
 
-  /* Shadows — warm, soft depth */
-  --shadow-card: 0 1px 3px rgba(26, 25, 23, 0.04), 0 4px 12px rgba(26, 25, 23, 0.03);
+  /* Shadows — minimal, only for elevated elements */
+  --shadow-card: none;
   --shadow-elevated: 0 2px 8px rgba(26, 25, 23, 0.06), 0 12px 28px rgba(26, 25, 23, 0.05);
-  --shadow-card-hover: 0 2px 6px rgba(26, 25, 23, 0.06), 0 8px 20px rgba(26, 25, 23, 0.04);
+  --shadow-card-hover: none;
+  --shadow-clean: none;
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -170,100 +172,82 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1;
 }
 
-/* Card v2 — border-only, no shadow, clean */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * v3 CARD SYSTEM — border-only, no shadows, ultra-clean
+ * One pattern: white bg + thin #F0F0EE border + rounded-2xl
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Card v2 — now v3: thin border, no shadow */
 .card-v2 {
   background: #FFFFFF;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-2xl);
+  border: 1px solid #F0F0EE;
+  border-radius: 1.25rem;
   transition: border-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .card-v2:hover {
-  border-color: var(--color-border-strong);
-}
-.card-v2:active {
-  transform: scale(0.98);
+  border-color: #E0E0E0;
 }
 
 /* Card interactive — for tappable elements */
 .card-v2-interactive {
   background: #FFFFFF;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-2xl);
+  border: 1px solid #F0F0EE;
+  border-radius: 1.25rem;
   cursor: pointer;
   transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .card-v2-interactive:hover {
-  border-color: var(--color-border-strong);
+  border-color: #E0E0E0;
+  background: #FAFAF8;
 }
 .card-v2-interactive:active {
   transform: scale(0.98);
   transition-duration: 100ms;
 }
 
-/* Card flat — no border, just white on cream (for quiet sections) */
+/* Card flat — no border, subtle bg */
 .card-v2-flat {
-  background: #FFFFFF;
-  border-radius: var(--radius-2xl);
+  background: #F8F8F6;
+  border-radius: 1.25rem;
 }
 
 /* Elevated — ONLY for modals, sheets, floating elements */
 .card-elevated-v2 {
   background: #FFFFFF;
-  border-radius: var(--radius-2xl);
+  border-radius: 1.25rem;
   box-shadow: var(--shadow-elevated);
 }
 
-/* Backward compat — old card classes now map to v2 */
-.card-editorial {
-  background: #FFFFFF;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-card);
-  transition: border-color 300ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-.card-editorial:hover {
-  border-color: var(--color-border-strong);
-}
-.card-bordered {
-  background: #FFFFFF;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-card);
-  transition: border-color 300ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-.card-bordered:hover {
-  border-color: var(--color-border-strong);
-}
-.card-tactile {
-  background: #FFFFFF;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-lg);
-  transition: border-color 300ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-.card-tactile:hover {
-  border-color: var(--color-border-strong);
-}
-.card-elevated {
-  background: #FFFFFF;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-lg);
-  transition: border-color 300ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-.card-elevated:hover {
-  border-color: var(--color-border-strong);
+/* shadow-clean — maps to no shadow in v3 (border only) */
+.shadow-clean {
+  box-shadow: none;
+  border: 1px solid #F0F0EE;
 }
 
-/* Glass — frosted surface */
+/* All legacy card classes → v3 thin border */
+.card-editorial,
+.card-bordered,
+.card-tactile,
+.card-elevated,
+.premium-card {
+  background: #FFFFFF;
+  border: 1px solid #F0F0EE;
+  border-radius: 1.25rem;
+  transition: border-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-editorial:hover,
+.card-bordered:hover,
+.card-tactile:hover,
+.card-elevated:hover,
+.premium-card:hover {
+  border-color: #E0E0E0;
+}
+
+/* Glass — frosted surface (v3: white-based) */
 .glass-warm {
-  background: rgba(238, 235, 227, 0.85);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px) saturate(1.2);
   -webkit-backdrop-filter: blur(20px) saturate(1.2);
-}
-
-/* Premium-card backward compat */
-.premium-card {
-  transition: border-color 300ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-.premium-card:hover {
-  border-color: var(--color-border-strong);
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -469,9 +453,9 @@ a, button {
 .animate-shimmer {
   background: linear-gradient(
     90deg,
-    var(--color-surface-muted) 0%,
-    var(--color-border-subtle) 50%,
-    var(--color-surface-muted) 100%
+    #F8F8F6 0%,
+    #F0F0EE 50%,
+    #F8F8F6 100%
   );
   background-size: 200% 100%;
   animation: shimmer 1.8s ease-in-out infinite;

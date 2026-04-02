@@ -86,7 +86,7 @@ function MetricCard({ label, data, unit, color, invertDelta = false }: {
   const deltaPositive = delta !== null ? (invertDelta ? delta < 0 : delta > 0) : null
 
   return (
-    <div className="bg-white rounded-2xl shadow-[shadow-lg] p-4">
+    <div className="bg-white rounded-2xl border border-[#F0F0EE] p-4">
       <div className="flex items-baseline justify-between mb-3">
         <p className="text-label">{label}</p>
         {delta !== null && (

@@ -93,7 +93,7 @@ export default function NotificationsPage() {
       </div>
 
       {/* Push Notification Toggle */}
-      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
+      <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
         <div className="px-5 py-4 flex items-center justify-between">
           <div>
             <p className="text-[15px] text-[#1A1A18] font-medium">Push meldingen</p>
@@ -117,7 +117,7 @@ export default function NotificationsPage() {
       {/* Notification Categories */}
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Training</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
+        <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
           <div className="px-5 py-4 flex items-center justify-between">
             <div>
               <p className="text-[15px] text-[#1A1A18]">Workout herinneringen</p>
@@ -137,7 +137,7 @@ export default function NotificationsPage() {
 
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Coach</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
+        <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
           <div className="px-5 py-4 flex items-center justify-between">
             <div>
               <p className="text-[15px] text-[#1A1A18]">Berichten van coach</p>
@@ -157,7 +157,7 @@ export default function NotificationsPage() {
 
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Voortgang</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
+        <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
           <div className="px-5 py-4 flex items-center justify-between">
             <div>
               <p className="text-[15px] text-[#1A1A18]">Wekelijks overzicht</p>

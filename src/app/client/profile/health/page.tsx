@@ -205,7 +205,7 @@ export default function HealthPage() {
       {/* Activity Level */}
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Huidig activiteitsniveau</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
+        <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
           {[
             { id: 'sedentair', label: 'Sedentair', desc: 'Weinig tot geen beweging' },
             { id: 'licht', label: 'Licht actief', desc: '1-2 keer per week' },
@@ -235,7 +235,7 @@ export default function HealthPage() {
       {/* Details */}
       <div>
         <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Extra details</p>
-        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#F0F0EE] p-5">
+        <div className="bg-white rounded-2xl border border-[#F0F0EE] p-5">
           <textarea
             value={details}
             onChange={(e) => setDetails(e.target.value)}

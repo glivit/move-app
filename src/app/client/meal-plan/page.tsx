@@ -98,7 +98,7 @@ export default function ClientMealPlanPage() {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-semibold text-text-primary">Voeding</h1>
-        <div className="bg-white rounded-2xl px-5 py-4 shadow-clean">
+        <div className="bg-white rounded-2xl px-5 py-4 border border-[#F0F0EE]">
           <p className="text-data-red text-sm">{error}</p>
         </div>
       </div>
@@ -109,7 +109,7 @@ export default function ClientMealPlanPage() {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-semibold text-text-primary">Voeding</h1>
-        <div className="bg-white rounded-2xl px-5 py-8 shadow-clean text-center">
+        <div className="bg-white rounded-2xl px-5 py-8 border border-[#F0F0EE] text-center">
           <UtensilsCrossed
             size={40}
             strokeWidth={1.5}
@@ -136,7 +136,7 @@ export default function ClientMealPlanPage() {
             {mealPlan.title}
           </p>
         </div>
-        <div className="bg-white rounded-2xl px-5 py-8 shadow-clean text-center">
+        <div className="bg-white rounded-2xl px-5 py-8 border border-[#F0F0EE] text-center">
           <FileText
             size={40}
             strokeWidth={1.5}
@@ -163,7 +163,7 @@ export default function ClientMealPlanPage() {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-semibold text-text-primary">Voeding</h1>
-        <div className="bg-white rounded-2xl px-5 py-4 shadow-clean text-center">
+        <div className="bg-white rounded-2xl px-5 py-4 border border-[#F0F0EE] text-center">
           <p className="text-client-text-secondary text-sm">
             Geen maaltijden ingepland
           </p>

@@ -153,7 +153,7 @@ export default function ClientProgramPage() {
         <div>
           <h1 className="text-editorial-h2 text-[#1A1917]">Training</h1>
         </div>
-        <div className="bg-white rounded-2xl p-8 shadow-clean text-center">
+        <div className="bg-white rounded-2xl p-8 border border-[#F0F0EE] text-center">
           <Dumbbell
             size={48}
             strokeWidth={1.5}
@@ -184,7 +184,7 @@ export default function ClientProgramPage() {
       <PeriodizationBar />
 
       {/* Day Picker */}
-      <div className="bg-white rounded-2xl shadow-clean overflow-hidden">
+      <div className="bg-white rounded-2xl border border-[#F0F0EE] overflow-hidden">
         <DayPicker
           days={dayNames}
           activeDay={activeDay}
@@ -209,7 +209,7 @@ export default function ClientProgramPage() {
 
       {/* Rest Day Message */}
       {isRestDay ? (
-        <div className="bg-white rounded-2xl p-8 shadow-clean text-center">
+        <div className="bg-white rounded-2xl p-8 border border-[#F0F0EE] text-center">
           <Moon
             size={48}
             strokeWidth={1.5}

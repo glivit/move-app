@@ -130,7 +130,7 @@ export default function NotificationsPage() {
             <Link
               key={prompt.id}
               href="/client/prompts"
-              className="block rounded-2xl border-2 border-[#333330]/20 bg-white p-5 transition-all hover:border-[#333330]/40 hover:shadow-md"
+              className="block rounded-2xl border-2 border-[#333330]/20 bg-white p-5 transition-all hover:border-[#333330]/40 hover:border-[#1A1917]/30"
             >
               <div className="flex items-start gap-3.5">
                 <div className="w-10 h-10 rounded-xl bg-[#333330]/12 flex items-center justify-center flex-shrink-0">
