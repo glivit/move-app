@@ -107,11 +107,11 @@ export default function ResourcesPage() {
       {/* Hero Section */}
       <div className="animate-slide-up">
         <p className="text-label mb-3">Kennisbank</p>
-        <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>Resources</h1>
+        <h1 className="page-title">Resources</h1>
       </div>
 
       {/* Search */}
-      <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white animate-slide-up" style={{ animationDelay: '100ms' }}>
+      <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white animate-slide-up stagger-2">
         <Search size={18} strokeWidth={1.5} style={{ color: '#C0C0C0' }} />
         <input
           type="text"
@@ -124,7 +124,7 @@ export default function ResourcesPage() {
       </div>
 
       {/* Category Pills */}
-      <div className="overflow-x-auto pb-1 -mx-4 px-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
+      <div className="overflow-x-auto pb-1 -mx-4 px-4 animate-slide-up stagger-3">
         <div className="flex gap-2">
           {categories.map((cat) => (
             <button
@@ -145,13 +145,13 @@ export default function ResourcesPage() {
 
       {/* Content */}
       {loading ? (
-        <div className="space-y-3 animate-slide-up" style={{ animationDelay: '300ms' }}>
+        <div className="space-y-3 animate-slide-up stagger-6">
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-32 bg-white rounded-2xl animate-pulse" />
           ))}
         </div>
       ) : filteredResources.length === 0 ? (
-        <div className="p-12 text-center bg-white rounded-2xl animate-slide-up" style={{ animationDelay: '300ms' }}>
+        <div className="p-12 text-center bg-white rounded-2xl animate-slide-up stagger-6">
           <BookOpen size={40} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#C0C0C0' }} />
           <p className="text-[14px]" style={{ color: '#ACACAC' }}>Geen content gevonden</p>
         </div>
@@ -159,7 +159,7 @@ export default function ResourcesPage() {
         <>
           {/* Featured */}
           {featured.length > 0 && (
-            <div className="space-y-3 animate-slide-up" style={{ animationDelay: '300ms' }}>
+            <div className="space-y-3 animate-slide-up stagger-6">
               {featured.map((resource) => (
                 <button
                   key={resource.id}
@@ -215,7 +215,7 @@ export default function ResourcesPage() {
           )}
 
           {/* Regular */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-slide-up" style={{ animationDelay: '400ms' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-slide-up stagger-7">
             {regular.map((resource) => (
               <button
                 key={resource.id}

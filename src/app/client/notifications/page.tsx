@@ -107,7 +107,7 @@ export default function NotificationsPage() {
         </Link>
         <div>
           <p className="text-label mb-1">Inbox</p>
-          <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
+          <h1 className="page-title">
             Notificaties
           </h1>
         </div>
@@ -115,7 +115,7 @@ export default function NotificationsPage() {
 
       {/* Empty state */}
       {hasNothing && (
-        <div className="text-center py-16 animate-slide-up" style={{ animationDelay: '100ms' }}>
+        <div className="text-center py-16 animate-slide-up stagger-2">
           <div className="w-14 h-14 rounded-full bg-[#F0F0EE] flex items-center justify-center mx-auto mb-4">
             <Megaphone strokeWidth={1.5} className="w-6 h-6 text-[#C0C0C0]" />
           </div>
@@ -125,7 +125,7 @@ export default function NotificationsPage() {
 
       {/* Pending prompts */}
       {prompts.length > 0 && (
-        <div className="space-y-3 animate-slide-up" style={{ animationDelay: '200ms' }}>
+        <div className="space-y-3 animate-slide-up stagger-3">
           <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#C0C0C0] px-1">
             Openstaande vragen
           </p>
@@ -156,7 +156,7 @@ export default function NotificationsPage() {
 
       {/* Unread broadcasts */}
       {unreadBroadcasts.length > 0 && (
-        <div className="space-y-3 animate-slide-up" style={{ animationDelay: '300ms' }}>
+        <div className="space-y-3 animate-slide-up stagger-5">
           <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#C0C0C0] px-1">
             Nieuw
           </p>
@@ -172,7 +172,7 @@ export default function NotificationsPage() {
 
       {/* Read broadcasts */}
       {readBroadcasts.length > 0 && (
-        <div className="space-y-3 animate-slide-up" style={{ animationDelay: '400ms' }}>
+        <div className="space-y-3 animate-slide-up stagger-7">
           <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#C0C0C0] px-1">
             Gelezen
           </p>
@@ -200,7 +200,7 @@ function BroadcastCard({ broadcast, onTap }: {
       onClick={onTap}
       className={`w-full text-left rounded-2xl p-5 transition-all active:scale-[0.98] ${
         isUnread
-          ? 'border-2 border-[#3068C4]/25 bg-white shadow-sm'
+          ? 'border-2 border-[#3068C4]/25 bg-white border border-[#F0F0EE]'
           : 'border border-[#F0F0EE] bg-white'
       }`}
     >

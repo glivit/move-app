@@ -232,7 +232,7 @@ export default function ClientDashboard() {
 
       {/* ═══ ONBOARDING ═══════════════════════════════════ */}
       {showOnboarding && (
-        <Link href="/onboarding" className="mb-8 block animate-slide-up" style={{ animationDelay: '120ms' }}>
+        <Link href="/onboarding" className="mb-8 block animate-slide-up stagger-3">
           <p className="mb-3 text-[12px] font-medium uppercase tracking-[1.5px] text-[#B0B0B0]" style={{ fontFamily: 'var(--font-body)' }}>
             Profiel voltooien
           </p>
@@ -248,7 +248,7 @@ export default function ClientDashboard() {
 
       {/* ═══ DAY 1 EMPTY STATE ════════════════════════════ */}
       {isDay1 && !showOnboarding && (
-        <div className="mb-12 animate-slide-up py-8" style={{ animationDelay: '120ms' }}>
+        <div className="mb-12 animate-slide-up py-8 stagger-3">
           <p className="mb-3 text-[28px] leading-[1.1] tracking-[-0.5px] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
             Welkom bij MŌVE
           </p>
@@ -279,7 +279,7 @@ export default function ClientDashboard() {
                 {training.today.exerciseCount && <>{training.today.exerciseCount} oefeningen · </>}
                 ~{training.today.durationMin} min
               </p>
-              <Link href="/client/workout" className="mt-9 inline-flex items-center gap-2.5 rounded-2xl bg-[#1A1917] px-8 py-4 text-[15px] font-medium text-white transition-all duration-250 hover:bg-[#333] hover:gap-3.5 hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(26,25,23,0.12)] active:scale-[0.97] group" style={{ fontFamily: 'var(--font-body)' }}>
+              <Link href="/client/workout" className="mt-9 inline-flex items-center gap-2.5 rounded-2xl bg-[#1A1917] px-8 py-4 text-[15px] font-medium text-white transition-all duration-250 hover:bg-[#333] hover:gap-3.5 hover:-translate-y-px active:scale-[0.97] group" style={{ fontFamily: 'var(--font-body)' }}>
                 Start workout
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-250 group-hover:translate-x-0.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
               </Link>

@@ -148,7 +148,7 @@ export default function WorkoutHistoryPage() {
       </h1>
 
       {/* ── Calendar ── */}
-      <div className="mb-10 animate-slide-up" style={{ animationDelay: '60ms' }}>
+      <div className="mb-10 animate-slide-up stagger-2">
         {/* Month nav */}
         <div className="flex items-center gap-4 mb-6">
           <button onClick={handlePrevMonth} className="p-1 text-[#D0D0D0] hover:text-[#1A1917] transition-colors">
@@ -210,7 +210,7 @@ export default function WorkoutHistoryPage() {
 
       {/* ── Recent workouts ── */}
       {recentWorkouts.length > 0 ? (
-        <div className="animate-slide-up" style={{ animationDelay: '120ms' }}>
+        <div className="animate-slide-up stagger-3">
           <p
             className="text-[12px] font-medium text-[#B0B0B0] uppercase tracking-[1.5px] mb-4"
             style={{ fontFamily: 'var(--font-body)' }}

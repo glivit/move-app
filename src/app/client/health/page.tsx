@@ -135,7 +135,7 @@ export default function HealthPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div><h1 className="text-editorial-h2 text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>Gezondheid</h1></div>
+        <div><h1 className="page-title">Gezondheid</h1></div>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => <div key={i} className="h-24 bg-[#F0F0EE] rounded-2xl animate-shimmer" />)}
         </div>
@@ -146,41 +146,36 @@ export default function HealthPage() {
   return (
     <div className="space-y-6">
       {/* Hero Section */}
-      <p className="text-label mb-3">Gezondheid</p>
-      <div
-        className="animate-slide-up text-center"
-        style={{
-          fontFamily: 'var(--font-display)',
-        }}
-      >
+      <h1 className="page-title mb-6">Gezondheid</h1>
+      <div className="animate-slide-up text-center">
         {heroMetric.type === 'emoji' && (
           <div className="p-8 bg-white rounded-2xl border border-[#F0F0EE]">
             <div className="text-8xl mb-3">{heroMetric.value}</div>
-            <p className="text-[18px] font-semibold" style={{ color: '#1A1917' }}>
+            <p className="text-[18px] font-semibold text-[#1A1917]">
               {heroMetric.label}
             </p>
-            <p className="text-[13px] mt-1" style={{ color: '#ACACAC' }}>
+            <p className="text-[13px] mt-1 text-[#ACACAC]">
               Slaapkwaliteit vandaag
             </p>
           </div>
         )}
         {heroMetric.type === 'steps' && (
           <div className="p-8 bg-white rounded-2xl border border-[#F0F0EE]">
-            <p className="text-[14px]" style={{ color: '#ACACAC' }}>Vandaag</p>
-            <div className="text-7xl font-bold my-3" style={{ color: '#1A1917' }}>
+            <p className="text-[14px] text-[#ACACAC]">Vandaag</p>
+            <div className="text-7xl font-bold my-3 text-[#1A1917]">
               {(heroMetric.value as number / 1000).toFixed(1)}k
             </div>
-            <p className="text-[16px] font-semibold" style={{ color: '#C47D15' }}>
+            <p className="text-[16px] font-semibold text-[#C47D15]">
               {heroMetric.label}
             </p>
           </div>
         )}
         {heroMetric.type === 'default' && (
           <div className="p-8 bg-white rounded-2xl border border-[#F0F0EE]">
-            <h1 className="text-6xl font-bold" style={{ color: '#1A1917' }}>
+            <h1 className="text-6xl font-bold text-[#1A1917]">
               {heroMetric.value}
             </h1>
-            <p className="text-[13px] mt-2" style={{ color: '#ACACAC' }}>
+            <p className="text-[13px] mt-2 text-[#ACACAC]">
               Track je dagelijkse gezondheidsdata
             </p>
           </div>
@@ -191,34 +186,31 @@ export default function HealthPage() {
       {weekAvg && (
         <div className="grid grid-cols-3 gap-3">
           <div
-            className="p-4 text-center bg-white rounded-2xl border border-[#F0F0EE] animate-slide-up hover:bg-[#FAFAF8] transition-colors"
-            style={{ animationDelay: '60ms' }}
+            className="p-4 text-center bg-white rounded-2xl border border-[#F0F0EE] animate-slide-up hover:bg-[#FAFAF8] transition-colors stagger-2"
           >
-            <Footprints size={18} strokeWidth={1.5} className="mx-auto mb-1" style={{ color: '#C47D15' }} />
-            <p className="text-[18px] font-bold" style={{ color: '#1A1917' }}>
+            <Footprints size={18} strokeWidth={1.5} className="mx-auto mb-1 text-[#C47D15]" />
+            <p className="text-[18px] font-bold text-[#1A1917]">
               {(weekAvg.steps / 1000).toFixed(1)}k
             </p>
-            <p className="text-[11px]" style={{ color: '#ACACAC' }}>Gem. stappen</p>
+            <p className="text-[11px] text-[#ACACAC]">Gem. stappen</p>
           </div>
           <div
-            className="p-4 text-center bg-white rounded-2xl border border-[#F0F0EE] animate-slide-up hover:bg-[#FAFAF8] transition-colors"
-            style={{ animationDelay: '120ms' }}
+            className="p-4 text-center bg-white rounded-2xl border border-[#F0F0EE] animate-slide-up hover:bg-[#FAFAF8] transition-colors stagger-3"
           >
-            <Moon size={18} strokeWidth={1.5} className="mx-auto mb-1" style={{ color: '#7B5EA7' }} />
-            <p className="text-[18px] font-bold" style={{ color: '#1A1917' }}>
+            <Moon size={18} strokeWidth={1.5} className="mx-auto mb-1 text-[#7B5EA7]" />
+            <p className="text-[18px] font-bold text-[#1A1917]">
               {weekAvg.sleep}u
             </p>
-            <p className="text-[11px]" style={{ color: '#ACACAC' }}>Gem. slaap</p>
+            <p className="text-[11px] text-[#ACACAC]">Gem. slaap</p>
           </div>
           <div
-            className="p-4 text-center bg-white rounded-2xl border border-[#F0F0EE] animate-slide-up hover:bg-[#FAFAF8] transition-colors"
-            style={{ animationDelay: '180ms' }}
+            className="p-4 text-center bg-white rounded-2xl border border-[#F0F0EE] animate-slide-up hover:bg-[#FAFAF8] transition-colors stagger-4"
           >
-            <Droplets size={18} strokeWidth={1.5} className="mx-auto mb-1" style={{ color: '#3068C4' }} />
-            <p className="text-[18px] font-bold" style={{ color: '#1A1917' }}>
+            <Droplets size={18} strokeWidth={1.5} className="mx-auto mb-1 text-[#3068C4]" />
+            <p className="text-[18px] font-bold text-[#1A1917]">
               {(weekAvg.water / 1000).toFixed(1)}L
             </p>
-            <p className="text-[11px]" style={{ color: '#ACACAC' }}>Gem. water</p>
+            <p className="text-[11px] text-[#ACACAC]">Gem. water</p>
           </div>
         </div>
       )}
@@ -226,10 +218,9 @@ export default function HealthPage() {
       {/* Mini Chart */}
       {chartData.length > 2 && (
         <div
-          className="p-4 bg-white rounded-2xl border border-[#F0F0EE] animate-slide-up"
-          style={{ animationDelay: '240ms' }}
+          className="p-4 bg-white rounded-2xl border border-[#F0F0EE] animate-slide-up stagger-5"
         >
-          <p className="text-[13px] font-semibold mb-3" style={{ color: '#1A1917' }}>
+          <p className="text-[13px] font-semibold mb-3 text-[#1A1917]">
             Laatste 7 dagen
           </p>
           <ResponsiveContainer width="100%" height={120}>
@@ -253,14 +244,13 @@ export default function HealthPage() {
 
       {/* Today's Input */}
       <div
-        className="p-5 bg-white rounded-2xl border border-[#F0F0EE] animate-slide-up"
-        style={{ animationDelay: '300ms' }}
+        className="p-5 bg-white rounded-2xl border border-[#F0F0EE] animate-slide-up stagger-6"
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[15px] font-semibold" style={{ color: '#1A1917' }}>
+          <h2 className="text-[15px] font-semibold text-[#1A1917]">
             Vandaag
           </h2>
-          <span className="text-[12px]" style={{ color: '#ACACAC' }}>
+          <span className="text-[12px] text-[#ACACAC]">
             {new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' })}
           </span>
         </div>
@@ -268,44 +258,42 @@ export default function HealthPage() {
         <div className="space-y-4">
           {/* Steps */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center border rounded-xl" style={{ backgroundColor: 'rgba(196,125,21,0.06)', borderColor: 'rgba(196,125,21,0.12)' }}>
-              <Footprints size={16} strokeWidth={1.5} style={{ color: '#C47D15' }} />
+            <div className="w-9 h-9 flex items-center justify-center bg-white border border-[#C47D15]/20 rounded-xl">
+              <Footprints size={16} strokeWidth={1.5} className="text-[#C47D15]" />
             </div>
             <div className="flex-1">
-              <label className="text-[12px] font-medium" style={{ color: '#ACACAC' }}>Stappen</label>
+              <label className="text-[12px] font-medium text-[#ACACAC]">Stappen</label>
               <input
                 type="number"
                 value={todayData.steps || ''}
                 onChange={(e) => updateField('steps', parseInt(e.target.value) || undefined)}
                 placeholder="0"
-                className="w-full text-[15px] font-semibold bg-transparent outline-none"
-                style={{ color: '#1A1917' }}
+                className="w-full text-[15px] font-semibold bg-transparent outline-none text-[#1A1917]"
               />
             </div>
           </div>
 
           {/* Sleep */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center border rounded-xl" style={{ backgroundColor: 'rgba(123,94,167,0.06)', borderColor: 'rgba(123,94,167,0.12)' }}>
-              <Moon size={16} strokeWidth={1.5} style={{ color: '#7B5EA7' }} />
+            <div className="w-9 h-9 flex items-center justify-center bg-white border border-[#7B5EA7]/20 rounded-xl">
+              <Moon size={16} strokeWidth={1.5} className="text-[#7B5EA7]" />
             </div>
             <div className="flex-1">
-              <label className="text-[12px] font-medium" style={{ color: '#ACACAC' }}>Slaap (uren)</label>
+              <label className="text-[12px] font-medium text-[#ACACAC]">Slaap (uren)</label>
               <input
                 type="number"
                 step="0.5"
                 value={todayData.sleep_hours || ''}
                 onChange={(e) => updateField('sleep_hours', parseFloat(e.target.value) || undefined)}
                 placeholder="0"
-                className="w-full text-[15px] font-semibold bg-transparent outline-none"
-                style={{ color: '#1A1917' }}
+                className="w-full text-[15px] font-semibold bg-transparent outline-none text-[#1A1917]"
               />
             </div>
           </div>
 
           {/* Sleep quality */}
           <div>
-            <label className="text-[12px] font-medium" style={{ color: '#ACACAC' }}>Slaapkwaliteit</label>
+            <label className="text-[12px] font-medium text-[#ACACAC]">Slaapkwaliteit</label>
             <div className="flex gap-2 mt-1.5">
               {SLEEP_QUALITY_OPTIONS.map((opt) => (
                 <button
@@ -327,19 +315,18 @@ export default function HealthPage() {
 
           {/* Water */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center border rounded-xl" style={{ backgroundColor: 'rgba(48,104,196,0.06)', borderColor: 'rgba(48,104,196,0.12)' }}>
-              <Droplets size={16} strokeWidth={1.5} style={{ color: '#3068C4' }} />
+            <div className="w-9 h-9 flex items-center justify-center bg-white border border-[#3068C4]/20 rounded-xl">
+              <Droplets size={16} strokeWidth={1.5} className="text-[#3068C4]" />
             </div>
             <div className="flex-1">
-              <label className="text-[12px] font-medium" style={{ color: '#ACACAC' }}>Water (ml)</label>
+              <label className="text-[12px] font-medium text-[#ACACAC]">Water (ml)</label>
               <input
                 type="number"
                 step="250"
                 value={todayData.water_ml || ''}
                 onChange={(e) => updateField('water_ml', parseInt(e.target.value) || undefined)}
                 placeholder="0"
-                className="w-full text-[15px] font-semibold bg-transparent outline-none"
-                style={{ color: '#1A1917' }}
+                className="w-full text-[15px] font-semibold bg-transparent outline-none text-[#1A1917]"
               />
             </div>
             {/* Quick add buttons */}
@@ -348,8 +335,7 @@ export default function HealthPage() {
                 <button
                   key={ml}
                   onClick={() => updateField('water_ml', (todayData.water_ml || 0) + ml)}
-                  className="px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] border rounded-xl hover:bg-[#FAFAF8] transition-colors"
-                  style={{ backgroundColor: 'rgba(48,104,196,0.06)', color: '#3068C4', borderColor: 'rgba(48,104,196,0.12)' }}
+                  className="px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] bg-white border border-[#3068C4]/20 text-[#3068C4] rounded-xl hover:bg-[#FAFAF8] transition-colors"
                 >
                   +{ml}
                 </button>
@@ -359,18 +345,17 @@ export default function HealthPage() {
 
           {/* Heart Rate */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center border rounded-xl" style={{ backgroundColor: 'rgba(196,55,42,0.06)', borderColor: 'rgba(196,55,42,0.12)' }}>
-              <Heart size={16} strokeWidth={1.5} style={{ color: '#C4372A' }} />
+            <div className="w-9 h-9 flex items-center justify-center bg-white border border-[#C4372A]/20 rounded-xl">
+              <Heart size={16} strokeWidth={1.5} className="text-[#C4372A]" />
             </div>
             <div className="flex-1">
-              <label className="text-[12px] font-medium" style={{ color: '#ACACAC' }}>Rusthartslag (bpm)</label>
+              <label className="text-[12px] font-medium text-[#ACACAC]">Rusthartslag (bpm)</label>
               <input
                 type="number"
                 value={todayData.resting_heart_rate || ''}
                 onChange={(e) => updateField('resting_heart_rate', parseInt(e.target.value) || undefined)}
                 placeholder="0"
-                className="w-full text-[15px] font-semibold bg-transparent outline-none"
-                style={{ color: '#1A1917' }}
+                className="w-full text-[15px] font-semibold bg-transparent outline-none text-[#1A1917]"
               />
             </div>
           </div>
@@ -378,10 +363,10 @@ export default function HealthPage() {
           {/* Stress */}
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-9 h-9 flex items-center justify-center border rounded-xl" style={{ backgroundColor: 'rgba(196,125,21,0.06)', borderColor: 'rgba(196,125,21,0.12)' }}>
-                <Brain size={16} strokeWidth={1.5} style={{ color: '#C47D15' }} />
+              <div className="w-9 h-9 flex items-center justify-center bg-white border border-[#C47D15]/20 rounded-xl">
+                <Brain size={16} strokeWidth={1.5} className="text-[#C47D15]" />
               </div>
-              <label className="text-[12px] font-medium" style={{ color: '#ACACAC' }}>
+              <label className="text-[12px] font-medium text-[#ACACAC]">
                 Stressniveau: {todayData.stress_level || '–'}/10
               </label>
             </div>
@@ -393,7 +378,7 @@ export default function HealthPage() {
               onChange={(e) => updateField('stress_level', parseInt(e.target.value))}
               className="w-full accent-[#C47D15]"
             />
-            <div className="flex justify-between text-[10px]" style={{ color: '#ACACAC' }}>
+            <div className="flex justify-between text-[10px] text-[#ACACAC]">
               <span>Ontspannen</span>
               <span>Gestrest</span>
             </div>
@@ -401,33 +386,31 @@ export default function HealthPage() {
 
           {/* Weight */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center border rounded-xl" style={{ backgroundColor: 'rgba(61,139,92,0.06)', borderColor: 'rgba(61,139,92,0.12)' }}>
-              <Activity size={16} strokeWidth={1.5} style={{ color: '#3D8B5C' }} />
+            <div className="w-9 h-9 flex items-center justify-center bg-white border border-[#3D8B5C]/20 rounded-xl">
+              <Activity size={16} strokeWidth={1.5} className="text-[#3D8B5C]" />
             </div>
             <div className="flex-1">
-              <label className="text-[12px] font-medium" style={{ color: '#ACACAC' }}>Gewicht (kg)</label>
+              <label className="text-[12px] font-medium text-[#ACACAC]">Gewicht (kg)</label>
               <input
                 type="number"
                 step="0.1"
                 value={todayData.weight_kg || ''}
                 onChange={(e) => updateField('weight_kg', parseFloat(e.target.value) || undefined)}
                 placeholder="0.0"
-                className="w-full text-[15px] font-semibold bg-transparent outline-none"
-                style={{ color: '#1A1917' }}
+                className="w-full text-[15px] font-semibold bg-transparent outline-none text-[#1A1917]"
               />
             </div>
           </div>
 
           {/* Notes */}
           <div>
-            <label className="text-[12px] font-medium" style={{ color: '#ACACAC' }}>Notities</label>
+            <label className="text-[12px] font-medium text-[#ACACAC]">Notities</label>
             <textarea
               value={todayData.notes || ''}
               onChange={(e) => updateField('notes', e.target.value)}
               rows={2}
               placeholder="Hoe voel je je vandaag?"
-              className="w-full mt-1 p-3 border rounded-xl text-[13px] resize-none focus:outline-none focus:border-[#1A1917]"
-              style={{ borderColor: '#F0F0EE', color: '#1A1917' }}
+              className="w-full mt-1 p-3 border border-[#F0F0EE] rounded-xl text-[13px] resize-none focus:outline-none focus:border-[#1A1917] text-[#1A1917]"
             />
           </div>
         </div>
@@ -436,8 +419,7 @@ export default function HealthPage() {
         <button
           onClick={saveMetrics}
           disabled={saving}
-          className="w-full mt-4 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-white transition-all disabled:opacity-50 border rounded-xl hover:bg-opacity-90"
-          style={{ backgroundColor: saved ? '#3D8B5C' : '#1A1917', borderColor: saved ? '#3D8B5C' : '#1A1917' }}
+          className={`w-full mt-4 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-white transition-all disabled:opacity-50 border rounded-xl hover:bg-opacity-90 ${saved ? 'bg-[#3D8B5C] border-[#3D8B5C]' : 'bg-[#1A1917] border-[#1A1917]'}`}
         >
           <span className="flex items-center justify-center gap-2">
             <Save size={16} strokeWidth={2} />

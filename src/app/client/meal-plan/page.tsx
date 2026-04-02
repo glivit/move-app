@@ -187,15 +187,15 @@ export default function ClientMealPlanPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-text-primary">Voeding</h1>
+      <div className="animate-slide-up">
+        <h1 className="page-title">Voeding</h1>
         <p className="text-sm text-client-text-secondary mt-1">
           {mealPlan.title}
         </p>
       </div>
 
       {/* Macro Dashboard */}
-      <div className="bg-white rounded-2xl">
+      <div className="bg-white rounded-2xl animate-slide-up stagger-2">
         <MacroDashboard
           calories={{
             consumed: dayTotals.calories,
@@ -218,14 +218,16 @@ export default function ClientMealPlanPage() {
       </div>
 
       {/* Day Picker */}
-      <DayPicker
-        days={dayNames}
-        activeDay={selectedDayIndex}
-        onDayChange={setSelectedDayIndex}
-      />
+      <div className="animate-slide-up stagger-3">
+        <DayPicker
+          days={dayNames}
+          activeDay={selectedDayIndex}
+          onDayChange={setSelectedDayIndex}
+        />
+      </div>
 
       {/* Meals Section */}
-      <div>
+      <div className="animate-slide-up stagger-4">
         <h2 className="text-[15px] font-semibold text-text-primary mb-3">
           Maaltijden
         </h2>

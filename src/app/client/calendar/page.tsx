@@ -232,7 +232,7 @@ export default function CalendarPage() {
       </div>
 
       {/* ═══ DOT GRID CALENDAR ═════════════════════════════ */}
-      <div className="mb-6 animate-fade-in" style={{ animationDelay: '60ms' }}>
+      <div className="mb-6 animate-fade-in stagger-2">
         {/* Day labels */}
         <div className="grid grid-cols-7 mb-3">
           {DAYS_NL.map((d, i) => (
@@ -452,7 +452,7 @@ export default function CalendarPage() {
 
       {/* Empty state — no selected date */}
       {!selectedDate && completedWorkouts.length === 0 && (
-        <div className="text-center py-10 animate-fade-in" style={{ animationDelay: '120ms' }}>
+        <div className="text-center py-10 animate-fade-in stagger-3">
           <p
             className="text-[22px] leading-[1.2] tracking-[-0.01em] text-[#1A1917] mb-2"
             style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
@@ -465,7 +465,7 @@ export default function CalendarPage() {
         </div>
       )}
       {!selectedDate && completedWorkouts.length > 0 && (
-        <div className="text-center py-8 animate-fade-in" style={{ animationDelay: '120ms' }}>
+        <div className="text-center py-8 animate-fade-in stagger-3">
           <p className="text-[14px] text-[#C0C0C0]">Tik op een dag voor details</p>
         </div>
       )}

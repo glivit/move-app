@@ -1009,9 +1009,7 @@ function ActiveWorkoutPage() {
             className={`px-5 h-10 rounded-xl font-semibold text-[12px] uppercase tracking-[0.08em] transition-all ${
               saving
                 ? 'bg-[#C0C0C0] text-[#ACACAC] cursor-wait'
-                : allDone
-                  ? 'bg-[#D46A3A] text-white shadow-lg shadow-[#D46A3A]/30'
-                  : 'bg-[#D46A3A] text-white shadow-md shadow-[#D46A3A]/20'
+                : 'bg-[#D46A3A] text-white'
             }`}
           >
             {saving ? 'Opslaan...' : 'Klaar'}
@@ -1192,7 +1190,7 @@ function ActiveWorkoutPage() {
             className={`w-full py-4 rounded-2xl font-bold text-[14px] uppercase tracking-[0.08em] flex items-center justify-center gap-2 transition-all ${
               saving
                 ? 'bg-[#C0C0C0] text-[#ACACAC] cursor-wait'
-                : 'bg-[#D46A3A] text-white shadow-lg shadow-[#D46A3A]/30 hover:shadow-[#D46A3A]/40'
+                : 'bg-[#D46A3A] text-white'
             }`}
           >
             {saving ? (

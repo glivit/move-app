@@ -115,7 +115,7 @@ export default function ProfilePage() {
     <div className="pb-28">
 
       {/* ═══ PROFILE HEADER — editorial, centered ═══════ */}
-      <div className="flex flex-col items-center pt-8 pb-8 border-b border-[#F0F0EE] animate-slide-up" style={{ animationDelay: '60ms' }}>
+      <div className="flex flex-col items-center pt-8 pb-8 border-b border-[#F0F0EE] animate-slide-up stagger-2">
         {/* Avatar */}
         <div className="w-20 h-20 rounded-full bg-[#1A1917] text-white flex items-center justify-center text-[22px] font-semibold mb-4 overflow-hidden">
           {profile?.avatar_url ? (
@@ -125,7 +125,7 @@ export default function ProfilePage() {
           )}
         </div>
 
-        <h1 className="text-editorial-h2 text-[#1A1917]">
+        <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]">
           {profile?.full_name || 'Profiel'}
         </h1>
         <p className="text-[13px] text-[#ACACAC] mt-1">
@@ -135,14 +135,14 @@ export default function ProfilePage() {
 
       {/* ═══ SETTINGS — editorial list ═══════════════════ */}
       {menuSections.map((section, si) => (
-        <div key={si} className={si > 0 ? 'border-t-8 border-[#FFFFFF]' : ''} style={{ animation: `slide-up 0.6s ease-out ${120 + si * 60}ms both` }}>
+        <div key={si} className={`${si > 0 ? 'border-t-8 border-[#FFFFFF]' : ''} ${si === 0 ? 'animate-slide-up stagger-3' : si === 1 ? 'animate-slide-up stagger-4' : ''}`}>
           {section.items.map((item, i) => {
             const Icon = item.icon
             return (
               <a
                 key={item.href}
                 href={item.href}
-                className={`flex items-center justify-between px-6 py-4 hover:bg-[#F8F8F6] transition-colors ${
+                className={`flex items-center justify-between px-6 py-4 hover:bg-[#FAFAF8] transition-colors ${
                   i > 0 ? 'border-t border-[#F0F0EE]' : ''
                 }`}
               >
@@ -158,7 +158,7 @@ export default function ProfilePage() {
       ))}
 
       {/* Pakket */}
-      <div className="border-t-8 border-[#FFFFFF] animate-slide-up" style={{ animationDelay: '240ms' }}>
+      <div className="border-t-8 border-[#FFFFFF] animate-slide-up stagger-5">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             <CreditCard size={18} strokeWidth={1.5} className="text-[#ACACAC]" />
@@ -169,7 +169,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Logout */}
-      <div className="border-t-8 border-[#FFFFFF] mb-4 animate-slide-up" style={{ animationDelay: '300ms' }}>
+      <div className="border-t-8 border-[#FFFFFF] mb-4 animate-slide-up stagger-6">
         <button
           onClick={handleLogout}
           disabled={signingOut}

@@ -189,7 +189,7 @@ export default function MeasurementsPage() {
       />
 
       {/* ═══ TAB BAR ═════════════════════════════════════════ */}
-      <div className="flex border-b border-[#F0F0EE] mb-6 animate-slide-up" style={{ animationDelay: '60ms' }}>
+      <div className="flex border-b border-[#F0F0EE] mb-6 animate-slide-up stagger-2">
         {tabs.map(tab => {
           const Icon = tab.icon
           return (
@@ -211,7 +211,7 @@ export default function MeasurementsPage() {
 
       {/* ═══ TAB: FOTO'S ═════════════════════════════════════ */}
       {activeTab === 'fotos' && (
-        <div className="space-y-4 animate-slide-up" style={{ animationDelay: '120ms' }}>
+        <div className="space-y-4 animate-slide-up stagger-3">
           {photosCheckins.length === 0 ? (
             <div className="text-center py-16">
               <Camera size={32} strokeWidth={1} className="text-[#D5D5D5] mx-auto mb-4" />
@@ -299,7 +299,7 @@ export default function MeasurementsPage() {
 
       {/* ═══ TAB: METINGEN (InBody) ══════════════════════════ */}
       {activeTab === 'metingen' && (
-        <div className="space-y-3 animate-slide-up" style={{ animationDelay: '120ms' }}>
+        <div className="space-y-3 animate-slide-up stagger-3">
           {weightData.length === 0 && bodyFatData.length === 0 ? (
             <div className="text-center py-16">
               <Scale size={32} strokeWidth={1} className="text-[#D5D5D5] mx-auto mb-4" />
@@ -325,7 +325,7 @@ export default function MeasurementsPage() {
 
       {/* ═══ TAB: OMTREK ═════════════════════════════════════ */}
       {activeTab === 'omtrek' && (
-        <div className="space-y-3 animate-slide-up" style={{ animationDelay: '120ms' }}>
+        <div className="space-y-3 animate-slide-up stagger-3">
           {chestData.length === 0 && waistData.length === 0 ? (
             <div className="text-center py-16">
               <Ruler size={32} strokeWidth={1} className="text-[#D5D5D5] mx-auto mb-4" />

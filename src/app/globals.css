@@ -411,6 +411,84 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * v3 PAGE COMPOSITION UTILITIES
+ * Reusable patterns for page heroes, sections, body text
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Page title — 28px Manrope hero heading used on every client page */
+.page-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--color-text-primary);
+}
+
+/* Section title — 20px medium weight for content sections */
+.section-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+/* Body — 14px primary body text */
+.text-body {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+/* Body secondary — 14px muted */
+.text-body-secondary {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+/* Caption — 13px smallest readable body text */
+.text-caption {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+/* v3 Input — consistent text fields */
+.input-v3 {
+  width: 100%;
+  padding: 8px 12px;
+  background: #FFFFFF;
+  border: 1px solid #F0F0EE;
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  transition: border-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.input-v3::placeholder {
+  color: var(--color-text-secondary);
+}
+.input-v3:focus {
+  outline: none;
+  border-color: var(--color-text-primary);
+}
+
+/* v3 Spinner — consistent loading indicator */
+.spinner-v3 {
+  border-width: 1.5px;
+  border-style: solid;
+  border-color: #C0C0C0;
+  border-top-color: #1A1917;
+  border-radius: 9999px;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  * EDITORIAL DIVIDERS & SPACING
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 

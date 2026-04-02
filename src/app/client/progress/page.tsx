@@ -257,14 +257,14 @@ export default function ProgressPage() {
 
       {/* Supporting stats as text */}
       {supportingText && (
-        <p className="text-[14px] text-[#ACACAC] mb-10 animate-fade-in" style={{ animationDelay: '60ms' }}>
+        <p className="text-[14px] text-[#ACACAC] mb-10 animate-fade-in stagger-2">
           {supportingText}
         </p>
       )}
 
       {/* ═══ 12 WEEK CHART — full-width, clean ════════════ */}
       {weeklyStats.length > 0 && (
-        <div className="bg-white rounded-2xl border border-[#F0F0EE] p-7 mb-6 animate-slide-up" style={{ animationDelay: '120ms' }}>
+        <div className="bg-white rounded-2xl border border-[#F0F0EE] p-7 mb-6 animate-slide-up stagger-3">
           <div className="flex items-baseline justify-between mb-6">
             <div>
               <span className="stat-number text-[32px] text-[#1A1917]">{thisWeekVal}</span>
@@ -319,8 +319,7 @@ export default function ProgressPage() {
       {body.weightData.length >= 2 && (
         <Link
           href="/client/measurements"
-          className="block bg-white rounded-2xl border border-[#F0F0EE] p-7 mb-6 group hover:bg-[#FAFAF8] transition-colors animate-slide-up"
-          style={{ animationDelay: '180ms' }}
+          className="block bg-white rounded-2xl border border-[#F0F0EE] p-7 mb-6 group hover:bg-[#FAFAF8] transition-colors animate-slide-up stagger-4"
         >
           <div className="flex items-center justify-between mb-5">
             <span className="text-label">Gewicht</span>
@@ -352,7 +351,7 @@ export default function ProgressPage() {
 
       {/* ═══ RECORDS — top 3 inline ══════════════════════ */}
       {strength.recentPrs.length > 0 && (
-        <div className="bg-white rounded-2xl border border-[#F0F0EE] overflow-hidden mb-6 animate-slide-up" style={{ animationDelay: '240ms' }}>
+        <div className="bg-white rounded-2xl border border-[#F0F0EE] overflow-hidden mb-6 animate-slide-up stagger-5">
           <div className="flex items-center justify-between px-7 pt-6 pb-4">
             <span className="text-label">Recente records</span>
             {strength.totalPrs > 3 && (
@@ -385,7 +384,7 @@ export default function ProgressPage() {
 
       {/* ═══ PHOTO COMPARISON — prominent CTA ════════════ */}
       {body.hasPhotos && (
-        <div className="mb-6 animate-slide-up" style={{ animationDelay: '300ms' }}>
+        <div className="mb-6 animate-slide-up stagger-6">
           <PhotoComparison />
           <Link
             href="/client/progress/photos"

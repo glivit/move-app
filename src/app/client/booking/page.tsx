@@ -126,7 +126,7 @@ export default function BookingPage() {
       <div className="space-y-6">
         <div className="animate-slide-up">
           <p className="text-label mb-3">Afspraken</p>
-          <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>Boeken</h1>
+          <h1 className="page-title">Boeken</h1>
         </div>
         <div className="bg-white h-64 rounded-2xl animate-pulse" />
       </div>
@@ -154,11 +154,11 @@ export default function BookingPage() {
     <div className="space-y-6">
       <div className="animate-slide-up">
         <p className="text-label mb-3">Afspraken</p>
-        <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>Boeken</h1>
+        <h1 className="page-title">Boeken</h1>
       </div>
 
       {slots.length === 0 ? (
-        <div className="bg-white p-12 rounded-2xl text-center animate-slide-up" style={{ animationDelay: '100ms' }}>
+        <div className="bg-white p-12 rounded-2xl text-center animate-slide-up stagger-2">
           <Calendar strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[#C0C0C0]" />
           <p className="text-[15px] font-semibold text-[#1A1917] mb-2">Geen beschikbare tijden</p>
           <p className="text-[13px] text-[#ACACAC]">
@@ -166,7 +166,7 @@ export default function BookingPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up" style={{ animationDelay: '100ms' }}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-slide-up stagger-2">
           {/* Calendar */}
           <div className="bg-white p-5 rounded-2xl">
             <div className="flex items-center justify-between mb-4">
@@ -239,7 +239,7 @@ export default function BookingPage() {
           {/* Time slots */}
           <div className="space-y-4">
             {selectedDate && (
-              <div className="bg-white p-5 rounded-2xl animate-slide-up" style={{ animationDelay: '200ms' }}>
+              <div className="bg-white p-5 rounded-2xl animate-slide-up stagger-3">
                 <h3 className="text-[15px] font-semibold text-[#1A1917] mb-1">
                   {new Date(selectedDate).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </h3>
@@ -265,7 +265,7 @@ export default function BookingPage() {
 
             {/* Booking confirmation */}
             {selectedSlot && (
-              <div className="bg-white p-5 rounded-2xl animate-slide-up" style={{ animationDelay: '300ms' }}>
+              <div className="bg-white p-5 rounded-2xl animate-slide-up stagger-6">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 bg-[#1A1917]/10 flex items-center justify-center">
                     <Video className="w-5 h-5 text-[#1A1917]" strokeWidth={1.5} />

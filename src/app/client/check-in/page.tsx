@@ -255,7 +255,7 @@ export default function CheckInPage() {
       </div>
 
       {/* Step dots */}
-      <div className="flex justify-center gap-3 animate-slide-up" style={{ animationDelay: '60ms' }}>
+      <div className="flex justify-center gap-3 animate-slide-up stagger-2">
         {steps.map((_, i) => (
           <div
             key={i}

@@ -298,7 +298,7 @@ export default function ClientMessagesPage() {
   return (
     <div className="flex flex-col h-[calc(100dvh-140px)] bg-[#FFFFFF] -mx-4 -mt-4">
       {/* Header */}
-      <div className="px-4 py-4 border-b border-[#F0F0EE]">
+      <div className="px-4 py-4 border-b border-[#F0F0EE] animate-slide-up">
         <h1 className="text-lg font-semibold text-[#1A1917]">{coachName}</h1>
         <p className="text-xs text-[#C0C0C0] mt-0.5">Je coach</p>
       </div>
@@ -306,7 +306,7 @@ export default function ClientMessagesPage() {
       {/* Messages */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
+        className="flex-1 overflow-y-auto px-4 py-4 space-y-3 animate-slide-up stagger-2"
       >
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full animate-fade-in">

@@ -175,7 +175,7 @@ export default function HealthConnectPage() {
           const Icon = provider.icon
 
           return (
-            <div key={provider.id} className="bg-white rounded-2xl p-5 shadow-sm">
+            <div key={provider.id} className="bg-white rounded-2xl p-5 border border-[#F0F0EE]">
               <div className="flex items-center gap-4">
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center"

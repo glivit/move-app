@@ -380,7 +380,7 @@ export default function StatsPage() {
       </div>
 
       {/* Tab bar */}
-      <div className="flex mb-5 animate-slide-up" style={{ animationDelay: '60ms' }}>
+      <div className="flex mb-5 animate-slide-up stagger-2">
         {tabs.map(tab => (
           <button
             key={tab.id}
@@ -397,7 +397,7 @@ export default function StatsPage() {
       </div>
 
       {/* Controls: time range + grouping */}
-      <div className="flex items-center justify-between mb-5 animate-slide-up" style={{ animationDelay: '120ms' }}>
+      <div className="flex items-center justify-between mb-5 animate-slide-up stagger-3">
         <div className="flex gap-1">
           {(['4w', '8w', '12w', 'all'] as TimeRange[]).map(r => (
             <button
@@ -479,7 +479,7 @@ export default function StatsPage() {
 
       {/* ═══ TAB: KRACHT ═══════════════════════════════════ */}
       {activeTab === 'kracht' && (
-        <div className="animate-slide-up" style={{ animationDelay: '180ms' }}>
+        <div className="animate-slide-up stagger-4">
           {krachtData.length > 0 ? (
             <div className="bg-white rounded-2xl border border-[#F0F0EE] p-4 hover:bg-[#FAFAF8] transition-colors">
               <p className="text-label mb-3">Max gewicht per week (kg)</p>
@@ -515,7 +515,7 @@ export default function StatsPage() {
 
       {/* ═══ TAB: VOLUME ═══════════════════════════════════ */}
       {activeTab === 'volume' && (
-        <div className="animate-slide-up" style={{ animationDelay: '180ms' }}>
+        <div className="animate-slide-up stagger-4">
           {volumeData.length > 0 ? (
             <div className="bg-white rounded-2xl border border-[#F0F0EE] p-4 hover:bg-[#FAFAF8] transition-colors">
               <p className="text-label mb-3">
@@ -553,7 +553,7 @@ export default function StatsPage() {
 
       {/* ═══ TAB: PR'S ═══════════════════════════════════ */}
       {activeTab === 'prs' && (
-        <div className="animate-slide-up" style={{ animationDelay: '180ms' }}>
+        <div className="animate-slide-up stagger-4">
           {filteredPrs.length === 0 ? (
             <div className="text-center py-12">
               <Trophy size={32} strokeWidth={1} className="text-[#D5D5D5] mx-auto mb-4" />

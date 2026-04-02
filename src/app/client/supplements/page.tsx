@@ -181,7 +181,7 @@ export default function SupplementsPage() {
 
       {/* Add form */}
       {showAdd && (
-        <form onSubmit={addSupplement} className="bg-white p-5 rounded-2xl border border-[#F0F0EE] space-y-4 animate-slide-up" style={{ animationDelay: '60ms' }}>
+        <form onSubmit={addSupplement} className="bg-white p-5 rounded-2xl border border-[#F0F0EE] space-y-4 animate-slide-up stagger-2">
           <h3 className="text-[15px] font-semibold text-[#1A1917]">Nieuw supplement toevoegen</h3>
 
           <div>
@@ -251,7 +251,7 @@ export default function SupplementsPage() {
           {grouped.map((group, groupIndex) => {
             const GroupIcon = group.icon
             return (
-              <div key={group.value} className="animate-slide-up" style={{ animationDelay: `${120 + groupIndex * 60}ms` }}>
+              <div key={group.value} className="animate-slide-up" style={{ animationDelay: `${60 + groupIndex * 60}ms` }}>
                 <div className="flex items-center gap-2 mb-3">
                   <GroupIcon className="w-4 h-4 text-[#ACACAC]" strokeWidth={1.5} />
                   <h3 className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.12em]">{group.label}</h3>

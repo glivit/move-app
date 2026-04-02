@@ -92,7 +92,7 @@ export default function AccountabilityPage() {
       <div className="space-y-6">
         <div className="mb-8 animate-slide-up">
           <p className="text-label mb-3">Dagelijks</p>
-          <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
+          <h1 className="page-title">
             Check
           </h1>
         </div>
@@ -111,11 +111,11 @@ export default function AccountabilityPage() {
       <div className="space-y-6">
         <div className="mb-8 animate-slide-up">
           <p className="text-label mb-3">Dagelijks</p>
-          <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
+          <h1 className="page-title">
             Check
           </h1>
         </div>
-        <div className="bg-white p-8 rounded-2xl border border-[#F0F0EE] text-center animate-slide-up" style={{ animationDelay: '60ms' }}>
+        <div className="bg-white p-8 rounded-2xl border border-[#F0F0EE] text-center animate-slide-up stagger-2">
           <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#3D8B5C] mx-auto mb-3" />
           <p className="font-semibold text-[#1A1917] text-lg">Alles op schema!</p>
           <p className="text-[14px] text-[#ACACAC] mt-2">
@@ -132,11 +132,11 @@ export default function AccountabilityPage() {
       <div className="space-y-6">
         <div className="mb-8 animate-slide-up">
           <p className="text-label mb-3">Dagelijks</p>
-          <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
+          <h1 className="page-title">
             Check
           </h1>
         </div>
-        <div className="bg-white p-8 rounded-2xl border border-[#F0F0EE] text-center animate-slide-up" style={{ animationDelay: '60ms' }}>
+        <div className="bg-white p-8 rounded-2xl border border-[#F0F0EE] text-center animate-slide-up stagger-2">
           <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#3D8B5C] mx-auto mb-3" />
           <p className="font-semibold text-[#1A1917] text-lg">Bedankt voor je feedback!</p>
           <p className="text-[14px] text-[#ACACAC] mt-2">
@@ -164,7 +164,7 @@ export default function AccountabilityPage() {
     <div className="space-y-6">
       <div className="mb-8 animate-slide-up">
         <p className="text-label mb-3">Dagelijks</p>
-        <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
+        <h1 className="page-title">
           Check
         </h1>
       </div>
@@ -173,7 +173,7 @@ export default function AccountabilityPage() {
       </p>
 
       {/* Status cards */}
-      <div className="space-y-3 animate-slide-up" style={{ animationDelay: '60ms' }}>
+      <div className="space-y-3 animate-slide-up stagger-2">
         {/* Workout status */}
         <div className={`p-5 border rounded-2xl ${
           log.workout_completed
@@ -275,8 +275,7 @@ export default function AccountabilityPage() {
       <button
         onClick={handleSubmit}
         disabled={submitting}
-        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#1A1917] text-white font-semibold uppercase tracking-wider text-[15px] hover:bg-[#333330] transition-colors disabled:opacity-50 rounded-xl animate-slide-up"
-        style={{ animationDelay: '120ms' }}
+        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#1A1917] text-white font-semibold uppercase tracking-wider text-[15px] hover:bg-[#333330] transition-colors disabled:opacity-50 rounded-xl animate-slide-up stagger-3"
       >
         {submitting ? (
           <>

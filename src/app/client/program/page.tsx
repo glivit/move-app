@@ -155,13 +155,12 @@ export default function ClientProgramPage() {
         <div className="mb-8 animate-slide-up">
           <p className="text-label mb-3 text-[#ACACAC]">Schema</p>
           <h1
-            className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]"
-            style={{ fontFamily: 'var(--font-display)' }}
+            className="page-title"
           >
             Training
           </h1>
         </div>
-        <div className="bg-white rounded-2xl p-8 border border-[#F0F0EE] text-center animate-slide-up" style={{ animationDelay: '60ms' }}>
+        <div className="bg-white rounded-2xl p-8 border border-[#F0F0EE] text-center animate-slide-up stagger-2">
           <Dumbbell
             size={48}
             strokeWidth={1.5}
@@ -195,12 +194,12 @@ export default function ClientProgramPage() {
       </div>
 
       {/* Periodization Bar */}
-      <div className="animate-slide-up" style={{ animationDelay: '60ms' }}>
+      <div className="animate-slide-up stagger-2">
         <PeriodizationBar />
       </div>
 
       {/* Day Picker */}
-      <div className="bg-white rounded-2xl border border-[#F0F0EE] overflow-hidden animate-slide-up" style={{ animationDelay: '120ms' }}>
+      <div className="bg-white rounded-2xl border border-[#F0F0EE] overflow-hidden animate-slide-up stagger-3">
         <DayPicker
           days={dayNames}
           activeDay={activeDay}
@@ -211,7 +210,7 @@ export default function ClientProgramPage() {
 
       {/* Progress Text */}
       {!isRestDay && (
-        <div className="flex items-center justify-between animate-slide-up" style={{ animationDelay: '180ms' }}>
+        <div className="flex items-center justify-between animate-slide-up stagger-4">
           <p className="text-[14px] text-[#ACACAC]">
             {completedCount} van {currentDayExercises.length} voltooid
           </p>
@@ -227,7 +226,7 @@ export default function ClientProgramPage() {
       )}
 
       {/* Day Title */}
-      <div className="animate-slide-up" style={{ animationDelay: '220ms' }}>
+      <div className="animate-slide-up stagger-4">
         <h2 className="text-[20px] font-semibold text-[#1A1917]">
           {currentDay?.name}
         </h2>
@@ -235,7 +234,7 @@ export default function ClientProgramPage() {
 
       {/* Rest Day Message */}
       {isRestDay ? (
-        <div className="bg-white rounded-2xl p-8 border border-[#F0F0EE] text-center animate-slide-up" style={{ animationDelay: '260ms' }}>
+        <div className="bg-white rounded-2xl p-8 border border-[#F0F0EE] text-center animate-slide-up stagger-5">
           <Moon
             size={48}
             strokeWidth={1.5}

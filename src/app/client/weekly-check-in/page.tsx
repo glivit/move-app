@@ -138,10 +138,12 @@ export default function WeeklyCheckInPage() {
 
   return (
     <div className="space-y-6 pb-28">
-      <SubPageHeader overline="Wekelijks" title="Check-in" backHref="/client" />
+      <div className="animate-slide-up">
+        <SubPageHeader overline="Wekelijks" title="Check-in" backHref="/client" />
+      </div>
 
       {/* ─── GEWICHT ─────────────────────────────────────── */}
-      <div className="bg-white border border-[#F0F0EE] p-5">
+      <div className="bg-white border border-[#F0F0EE] p-5 animate-slide-up stagger-2">
         <div className="flex items-center gap-2 mb-4">
           <Scale size={18} strokeWidth={1.5} className="text-[#1A1917]" />
           <span className="text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.06em]">Gewicht</span>
@@ -174,7 +176,7 @@ export default function WeeklyCheckInPage() {
       </div>
 
       {/* ─── FOTO ────────────────────────────────────────── */}
-      <div className="bg-white border border-[#F0F0EE] p-5">
+      <div className="bg-white border border-[#F0F0EE] p-5 animate-slide-up stagger-3">
         <div className="flex items-center gap-2 mb-4">
           <Camera size={18} strokeWidth={1.5} className="text-[#1A1917]" />
           <span className="text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.06em]">Foto vooraanzicht</span>
@@ -212,7 +214,7 @@ export default function WeeklyCheckInPage() {
       </div>
 
       {/* ─── HOE GAAT HET ────────────────────────────────── */}
-      <div className="bg-white border border-[#F0F0EE] p-5 space-y-6">
+      <div className="bg-white border border-[#F0F0EE] p-5 space-y-6 animate-slide-up stagger-4">
         <span className="text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.06em]">
           Hoe was je week?
         </span>
@@ -243,7 +245,7 @@ export default function WeeklyCheckInPage() {
       </div>
 
       {/* ─── NOTITIES ────────────────────────────────────── */}
-      <div className="bg-white border border-[#F0F0EE] p-5">
+      <div className="bg-white border border-[#F0F0EE] p-5 animate-slide-up stagger-5">
         <label className="block text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.06em] mb-3">
           Iets te melden?
           <span className="text-[11px] text-[#ACACAC] ml-2 normal-case tracking-normal font-normal">optioneel</span>
@@ -261,7 +263,7 @@ export default function WeeklyCheckInPage() {
       <button
         onClick={handleSubmit}
         disabled={submitting || !weight.trim()}
-        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#1A1917] text-white font-semibold uppercase tracking-wider text-[15px] hover:bg-[#2A2A28] transition-colors disabled:opacity-40"
+        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#1A1917] text-white font-semibold uppercase tracking-wider text-[15px] hover:bg-[#2A2A28] transition-colors disabled:opacity-40 animate-slide-up stagger-6"
       >
         {submitting ? (
           <>

@@ -639,10 +639,7 @@ export default function ClientNutritionPage() {
         </button>
 
         <p className="text-label mb-2">Voeding</p>
-        <h1
-          className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917] mb-6"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
+        <h1 className="page-title">
           Voeding
         </h1>
 
@@ -664,7 +661,7 @@ export default function ClientNutritionPage() {
       </div>
 
       {/* ── HERO: Calorie number ── */}
-      <div className="mb-9 animate-slide-up" style={{ animationDelay: '100ms' }}>
+      <div className="mb-9 animate-slide-up stagger-2">
         <p
           className="text-[52px] leading-[0.9] tracking-[-2px]"
           style={{
@@ -695,7 +692,7 @@ export default function ClientNutritionPage() {
       </div>
 
       {/* ── Macro row ── */}
-      <div className="flex border-t border-[#F0F0EE] pt-6 mb-12 animate-slide-up" style={{ animationDelay: '200ms' }}>
+      <div className="flex border-t border-[#F0F0EE] pt-6 mb-12 animate-slide-up stagger-3">
         {[
           { label: 'EIWIT', actual: actualProt, target: targetProt, unit: 'g' },
           { label: 'KOOLH', actual: actualCarbs, target: targetCarbs, unit: 'g' },
@@ -727,13 +724,13 @@ export default function ClientNutritionPage() {
 
       {/* ── Meals section ── */}
       <p
-        className="text-[12px] font-medium text-[#B0B0B0] uppercase tracking-[1.5px] mb-4 animate-slide-up"
-        style={{ fontFamily: 'var(--font-body)', animationDelay: '300ms' }}
+        className="text-[12px] font-medium text-[#B0B0B0] uppercase tracking-[1.5px] mb-4 animate-slide-up stagger-6"
+        style={{ fontFamily: 'var(--font-body)' }}
       >
         Maaltijden
       </p>
 
-      <div className="mb-4 animate-slide-up" style={{ animationDelay: '400ms' }}>
+      <div className="mb-4 animate-slide-up stagger-7">
         {meals.map((meal) => {
           const log = logs.get(meal.id)
           const isCompleted = log?.completed || false
