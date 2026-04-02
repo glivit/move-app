@@ -310,7 +310,7 @@ function FoodSearchModal({
         <div className="flex-1 overflow-y-auto">
           {loading && (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#1A1917] border-t-transparent" />
+              <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#C0C0C0] border-t-[#1A1917]" />
             </div>
           )}
 
@@ -594,7 +594,7 @@ export default function ClientNutritionPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#1A1917] border-t-transparent" />
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#C0C0C0] border-t-[#1A1917]" />
       </div>
     )
   }
@@ -626,26 +626,28 @@ export default function ClientNutritionPage() {
   return (
     <div className="pb-28">
 
-      {/* ── Back + Title ── */}
-      <button
-        onClick={() => window.history.back()}
-        className="flex items-center gap-1.5 mb-7 mt-2 group"
-      >
-        <ChevronLeft strokeWidth={1.5} className="w-[18px] h-[18px] text-[#C0C0C0] group-hover:text-[#1A1917] transition-colors" />
-        <span className="text-[14px] text-[#C0C0C0] group-hover:text-[#1A1917] transition-colors" style={{ fontFamily: 'var(--font-body)' }}>
-          Home
-        </span>
-      </button>
+      {/* ── Hero Section ── */}
+      <div className="animate-slide-up mb-10">
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center gap-1.5 mb-4 mt-2 group"
+        >
+          <ChevronLeft strokeWidth={1.5} className="w-[18px] h-[18px] text-[#C0C0C0] group-hover:text-[#1A1917] transition-colors" />
+          <span className="text-[14px] text-[#C0C0C0] group-hover:text-[#1A1917] transition-colors" style={{ fontFamily: 'var(--font-body)' }}>
+            Home
+          </span>
+        </button>
 
-      <h1
-        className="text-[28px] tracking-[-0.5px] leading-[1.1] text-[#1A1917] mb-2"
-        style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
-      >
-        Voeding
-      </h1>
+        <p className="text-label mb-2">Voeding</p>
+        <h1
+          className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917] mb-6"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          Voeding
+        </h1>
 
-      {/* ── Date nav ── */}
-      <div className="flex items-center gap-4 mb-10">
+        {/* ── Date nav ── */}
+        <div className="flex items-center gap-4">
         <button onClick={() => navigateDate(-1)} className="p-1 text-[#D0D0D0] hover:text-[#1A1917] transition-colors">
           <ChevronLeft strokeWidth={1.5} className="w-4 h-4" />
         </button>
@@ -658,10 +660,11 @@ export default function ClientNutritionPage() {
         <button onClick={() => navigateDate(1)} className="p-1 text-[#D0D0D0] hover:text-[#1A1917] transition-colors">
           <ChevronRight strokeWidth={1.5} className="w-4 h-4" />
         </button>
+        </div>
       </div>
 
       {/* ── HERO: Calorie number ── */}
-      <div className="mb-9">
+      <div className="mb-9 animate-slide-up" style={{ animationDelay: '100ms' }}>
         <p
           className="text-[52px] leading-[0.9] tracking-[-2px]"
           style={{
@@ -692,7 +695,7 @@ export default function ClientNutritionPage() {
       </div>
 
       {/* ── Macro row ── */}
-      <div className="flex border-t border-[#F0F0EE] pt-6 mb-12">
+      <div className="flex border-t border-[#F0F0EE] pt-6 mb-12 animate-slide-up" style={{ animationDelay: '200ms' }}>
         {[
           { label: 'EIWIT', actual: actualProt, target: targetProt, unit: 'g' },
           { label: 'KOOLH', actual: actualCarbs, target: targetCarbs, unit: 'g' },
@@ -724,13 +727,13 @@ export default function ClientNutritionPage() {
 
       {/* ── Meals section ── */}
       <p
-        className="text-[12px] font-medium text-[#B0B0B0] uppercase tracking-[1.5px] mb-4"
-        style={{ fontFamily: 'var(--font-body)' }}
+        className="text-[12px] font-medium text-[#B0B0B0] uppercase tracking-[1.5px] mb-4 animate-slide-up"
+        style={{ fontFamily: 'var(--font-body)', animationDelay: '300ms' }}
       >
         Maaltijden
       </p>
 
-      <div className="mb-4">
+      <div className="mb-4 animate-slide-up" style={{ animationDelay: '400ms' }}>
         {meals.map((meal) => {
           const log = logs.get(meal.id)
           const isCompleted = log?.completed || false
@@ -761,7 +764,7 @@ export default function ClientNutritionPage() {
                     </svg>
                   )}
                   {isSaving && (
-                    <div className="w-3 h-3 border-[1.5px] border-[#1A1917] border-t-transparent rounded-full animate-spin" />
+                    <div className="w-3 h-3 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
                   )}
                 </button>
 

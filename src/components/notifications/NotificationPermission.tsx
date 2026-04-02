@@ -117,10 +117,10 @@ export function NotificationPermission() {
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold" style={{ color: '#1A1A18' }}>
+            <p className="text-sm font-semibold" style={{ color: '#1A1917' }}>
               Meldingen inschakelen
             </p>
-            <p className="text-xs mt-0.5" style={{ color: '#8E8E93' }}>
+            <p className="text-xs mt-0.5" style={{ color: '#ACACAC' }}>
               Ontvang berichten van je coach direct op je iPhone.
             </p>
 
@@ -136,7 +136,7 @@ export function NotificationPermission() {
               <button
                 onClick={dismiss}
                 className="py-2.5 px-3 rounded-xl text-xs font-semibold transition-all active:scale-[0.97]"
-                style={{ color: '#8E8E93', backgroundColor: '#FAFAFA', minHeight: '44px' }}
+                style={{ color: '#ACACAC', backgroundColor: '#FAFAFA', minHeight: '44px' }}
               >
                 Later
               </button>
@@ -144,7 +144,7 @@ export function NotificationPermission() {
           </div>
 
           <button onClick={dismiss} className="flex-shrink-0 p-1">
-            <X strokeWidth={1.5} className="w-4 h-4" style={{ color: '#C7C7CC' }} />
+            <X strokeWidth={1.5} className="w-4 h-4" style={{ color: '#C0C0C0' }} />
           </button>
         </div>
       </div>

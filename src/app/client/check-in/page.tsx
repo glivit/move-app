@@ -277,7 +277,7 @@ export default function CheckInPage() {
       )}
 
       {/* Step content */}
-      <div className="card-v2 p-6 transition-all duration-300 animate-slide-up">
+      <div className="bg-white rounded-2xl border border-[#F0F0EE] p-6 transition-all duration-300 animate-slide-up">
         {currentStep === 0 && (
           <PhotoUploadStep
             photos={data.photos}

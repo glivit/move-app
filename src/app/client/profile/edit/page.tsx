@@ -86,40 +86,40 @@ export default function EditProfilePage() {
             )}
           </div>
           <div className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center border border-[#F0F0EE]">
-            <Camera strokeWidth={1.5} className="w-4 h-4 text-[#8E8E93]" />
+            <Camera strokeWidth={1.5} className="w-4 h-4 text-[#ACACAC]" />
           </div>
         </div>
-        <p className="text-[13px] text-[#8E8E93]">Tik om foto te wijzigen</p>
+        <p className="text-[13px] text-[#ACACAC]">Tik om foto te wijzigen</p>
       </div>
 
       {/* Form */}
       <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
         <div className="px-5 py-4">
-          <label className="block text-[11px] font-medium text-[#8E8E93] uppercase tracking-wide mb-1">Volledige naam</label>
+          <label className="block text-[11px] font-medium text-[#ACACAC] uppercase tracking-wide mb-1">Volledige naam</label>
           <input
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="w-full text-[15px] text-[#1A1A18] bg-transparent focus:outline-none"
+            className="w-full text-[15px] text-[#1A1917] bg-transparent focus:outline-none"
           />
         </div>
         <div className="px-5 py-4">
-          <label className="block text-[11px] font-medium text-[#8E8E93] uppercase tracking-wide mb-1">E-mail</label>
+          <label className="block text-[11px] font-medium text-[#ACACAC] uppercase tracking-wide mb-1">E-mail</label>
           <input
             type="email"
             value={email}
             disabled
-            className="w-full text-[15px] text-[#8E8E93] bg-transparent cursor-not-allowed"
+            className="w-full text-[15px] text-[#ACACAC] bg-transparent cursor-not-allowed"
           />
         </div>
         <div className="px-5 py-4">
-          <label className="block text-[11px] font-medium text-[#8E8E93] uppercase tracking-wide mb-1">Telefoon</label>
+          <label className="block text-[11px] font-medium text-[#ACACAC] uppercase tracking-wide mb-1">Telefoon</label>
           <input
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="+32 ..."
-            className="w-full text-[15px] text-[#1A1A18] bg-transparent placeholder:text-[#C7C7CC] focus:outline-none"
+            className="w-full text-[15px] text-[#1A1917] bg-transparent placeholder:text-[#C0C0C0] focus:outline-none"
           />
         </div>
       </div>

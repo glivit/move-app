@@ -130,12 +130,12 @@ export function ActiveWorkoutBar() {
             <div className="flex items-center gap-2.5 px-3.5 py-2.5">
               {/* Timer */}
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isStale ? 'bg-[#FF9500]' : 'bg-[var(--color-pop)]'}`} />
-                <span className={`text-[14px] font-bold tabular-nums ${isStale ? 'text-[#FF9500]' : 'text-white'}`}>
+                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isStale ? 'bg-[#C47D15]' : 'bg-[var(--color-pop)]'}`} />
+                <span className={`text-[14px] font-bold tabular-nums ${isStale ? 'text-[#C47D15]' : 'text-white'}`}>
                   {formatTimer(seconds)}
                 </span>
                 {isStale && (
-                  <span className="text-[10px] text-[#FF9500] font-medium">Vergeten?</span>
+                  <span className="text-[10px] text-[#C47D15] font-medium">Vergeten?</span>
                 )}
               </div>
 
@@ -144,7 +144,7 @@ export function ActiveWorkoutBar() {
                 onClick={() => setShowStopSheet(true)}
                 className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
               >
-                <Square size={13} strokeWidth={2.5} className="text-[#FF3B30]" />
+                <Square size={13} strokeWidth={2.5} className="text-[#C4372A]" />
               </button>
 
               {/* Finish button */}
@@ -199,13 +199,13 @@ export function ActiveWorkoutBar() {
                 <button
                   onClick={handleDiscard}
                   disabled={stopping}
-                  className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#FF3B30]/5 hover:bg-[#FF3B30]/10 transition-colors text-left disabled:opacity-50"
+                  className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#C4372A]/5 hover:bg-[#C4372A]/10 transition-colors text-left disabled:opacity-50"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-[#FF3B30] flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#C4372A] flex items-center justify-center flex-shrink-0">
                     <X size={16} strokeWidth={2.5} className="text-white" />
                   </div>
                   <div>
-                    <p className="text-[14px] font-semibold text-[#FF3B30]">
+                    <p className="text-[14px] font-semibold text-[#C4372A]">
                       {stopping ? 'Verwijderen...' : 'Verwijderen'}
                     </p>
                     <p className="text-[12px] text-[#A09D96]">Wis deze sessie volledig</p>

@@ -95,7 +95,7 @@ export function RestTimer({ initialSeconds, onComplete, onDismiss }: RestTimerPr
           <circle cx="100" cy="100" r={radius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="6" />
           <circle
             cx="100" cy="100" r={radius} fill="none"
-            stroke={isFinished ? '#34C759' : secondsLeft <= 3 ? '#FF9500' : '#1A1917'}
+            stroke={isFinished ? '#3D8B5C' : secondsLeft <= 3 ? '#C47D15' : '#1A1917'}
             strokeWidth="6" strokeLinecap="round"
             strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
             className="transition-all duration-1000 ease-linear"
@@ -103,7 +103,7 @@ export function RestTimer({ initialSeconds, onComplete, onDismiss }: RestTimerPr
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className={`text-[56px] font-bold tabular-nums tracking-tight transition-colors ${
-            isFinished ? 'text-[#34C759]' : secondsLeft <= 3 ? 'text-[#FF9500]' : 'text-white'
+            isFinished ? 'text-[#3D8B5C]' : secondsLeft <= 3 ? 'text-[#C47D15]' : 'text-white'
           }`}>
             {minutes}:{seconds.toString().padStart(2, '0')}
           </span>
@@ -116,7 +116,7 @@ export function RestTimer({ initialSeconds, onComplete, onDismiss }: RestTimerPr
       {isFinished ? (
         <button
           onClick={onDismiss}
-          className="px-8 py-4 bg-[#34C759] text-white rounded-2xl font-semibold text-[16px] shadow-[0_4px_24px_rgba(52,199,89,0.3)] hover:bg-[#2DB84E] transition-all"
+          className="px-8 py-4 bg-[#3D8B5C] text-white rounded-2xl font-semibold text-[16px] shadow-[0_4px_24px_rgba(61,139,92,0.3)] hover:bg-[#3D8B5C] transition-all"
         >
           Volgende set
         </button>

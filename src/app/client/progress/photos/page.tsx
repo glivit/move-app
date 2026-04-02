@@ -319,7 +319,7 @@ export default function PhotoComparisonPage() {
             <p className="text-white/50 text-[10px] uppercase font-bold tracking-wide">Gewicht</p>
             <p className="text-white text-[14px] font-semibold">
               {before.weight_kg}kg → {after.weight_kg}kg
-              <span className={`ml-1 text-[12px] ${after.weight_kg < before.weight_kg ? 'text-[#34C759]' : 'text-[#FF6B6B]'}`}>
+              <span className={`ml-1 text-[12px] ${after.weight_kg < before.weight_kg ? 'text-[#3D8B5C]' : 'text-[#C4372A]'}`}>
                 ({after.weight_kg > before.weight_kg ? '+' : ''}{(after.weight_kg - before.weight_kg).toFixed(1)})
               </span>
             </p>

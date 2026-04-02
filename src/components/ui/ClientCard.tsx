@@ -31,7 +31,7 @@ function formatStartDate(date: string | null | undefined): string {
 export function ClientCard({ client }: ClientCardProps) {
   return (
     <Link href={`/coach/clients/${client.id}`} className="block">
-      <div className="bg-white rounded-2xl shadow-clean p-5 hover:shadow-clean-hover transition-all duration-200 flex flex-col h-full group cursor-pointer">
+      <div className="bg-white rounded-2xl border border-[#F0F0EE] p-5 hover:border-[#1A1917]/10 transition-all duration-200 flex flex-col h-full group cursor-pointer">
         <div className="flex flex-col h-full">
           {/* Avatar Section */}
           <div className="flex items-start gap-4 mb-4">

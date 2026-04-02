@@ -188,7 +188,7 @@ export default function HealthConnectPage() {
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-[#1A1917]">{provider.name}</h3>
                     {isConnected && (
-                      <span className="px-2 py-0.5 rounded-full bg-[#34C759]/10 text-[#34C759] text-[10px] font-bold uppercase">
+                      <span className="px-2 py-0.5 rounded-full bg-[#3D8B5C]/10 text-[#3D8B5C] text-[10px] font-bold uppercase">
                         Gekoppeld
                       </span>
                     )}

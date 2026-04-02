@@ -74,7 +74,7 @@ export default function BroadcastDetailPage() {
   if (loading) {
     return (
       <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-[1.5px] border-[#1A1917] border-t-transparent" />
+        <div className="animate-spin rounded-full h-8 w-8 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917]" />
       </div>
     )
   }

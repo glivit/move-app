@@ -151,14 +151,14 @@ export default function HealthPage() {
       {/* Info Banner */}
       <div className="bg-[#FFF3CD] rounded-2xl p-4 flex gap-3">
         <AlertTriangle strokeWidth={1.5} className="w-5 h-5 text-[#1A1917] flex-shrink-0 mt-0.5" />
-        <p className="text-[13px] text-[#1A1A18]">
+        <p className="text-[13px] text-[#1A1917]">
           Deze informatie helpt je coach om een veilig en aangepast trainingsprogramma op te stellen. Wees eerlijk en volledig.
         </p>
       </div>
 
       {/* Injured Body Parts */}
       <div>
-        <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Pijnlijke of geblesseerde zones</p>
+        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Pijnlijke of geblesseerde zones</p>
         <div className="flex flex-wrap gap-2">
           {BODY_PARTS.map((part) => {
             const selected = injuredParts.includes(part.id)
@@ -168,8 +168,8 @@ export default function HealthPage() {
                 onClick={() => togglePart(part.id)}
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
-                    ? 'bg-[#FF9500] text-white'
-                    : 'bg-white border border-[#F0F0EE] text-[#1A1A18] hover:border-[#FF9500]'
+                    ? 'bg-[#C47D15] text-white'
+                    : 'bg-white border border-[#F0F0EE] text-[#1A1917] hover:border-[#C47D15]'
                 }`}
               >
                 {part.label}
@@ -181,7 +181,7 @@ export default function HealthPage() {
 
       {/* Medical Limitations */}
       <div>
-        <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Medische aandoeningen</p>
+        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Medische aandoeningen</p>
         <div className="flex flex-wrap gap-2">
           {LIMITATION_TYPES.map((limit) => {
             const selected = limitations.includes(limit)
@@ -191,8 +191,8 @@ export default function HealthPage() {
                 onClick={() => toggleLimitation(limit)}
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
-                    ? 'bg-[#FF3B30] text-white'
-                    : 'bg-white border border-[#F0F0EE] text-[#1A1A18] hover:border-[#FF3B30]'
+                    ? 'bg-[#C4372A] text-white'
+                    : 'bg-white border border-[#F0F0EE] text-[#1A1917] hover:border-[#C4372A]'
                 }`}
               >
                 {limit}
@@ -204,7 +204,7 @@ export default function HealthPage() {
 
       {/* Activity Level */}
       <div>
-        <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Huidig activiteitsniveau</p>
+        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Huidig activiteitsniveau</p>
         <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
           {[
             { id: 'sedentair', label: 'Sedentair', desc: 'Weinig tot geen beweging' },
@@ -219,8 +219,8 @@ export default function HealthPage() {
               className="w-full px-5 py-4 flex items-center justify-between hover:bg-[#FAFAFA] transition-colors"
             >
               <div>
-                <p className="text-[15px] text-[#1A1A18] text-left">{level.label}</p>
-                <p className="text-[13px] text-[#8E8E93] text-left">{level.desc}</p>
+                <p className="text-[15px] text-[#1A1917] text-left">{level.label}</p>
+                <p className="text-[13px] text-[#ACACAC] text-left">{level.desc}</p>
               </div>
               {activityLevel === level.id && (
                 <div className="w-6 h-6 rounded-full bg-[#1A1917] flex items-center justify-center flex-shrink-0">
@@ -234,14 +234,14 @@ export default function HealthPage() {
 
       {/* Details */}
       <div>
-        <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Extra details</p>
+        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Extra details</p>
         <div className="bg-white rounded-2xl border border-[#F0F0EE] p-5">
           <textarea
             value={details}
             onChange={(e) => setDetails(e.target.value)}
             placeholder="Beschrijf eventuele blessures, operaties, of andere relevante gezondheidsinformatie..."
             rows={4}
-            className="w-full text-[15px] text-[#1A1A18] bg-transparent placeholder:text-[#C7C7CC] focus:outline-none resize-none"
+            className="w-full text-[15px] text-[#1A1917] bg-transparent placeholder:text-[#C0C0C0] focus:outline-none resize-none"
           />
         </div>
       </div>

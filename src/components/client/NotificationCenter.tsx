@@ -147,7 +147,7 @@ export function NotificationCenter() {
       >
         <Bell strokeWidth={1.5} className="w-6 h-6 text-[#6B6862]" />
         {count > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-[20px] rounded-full bg-[#FF3B30] flex items-center justify-center px-1">
+          <span className="absolute -top-0.5 -right-0.5 min-w-[20px] h-[20px] rounded-full bg-[#C4372A] flex items-center justify-center px-1">
             <span className="text-[11px] font-bold text-white leading-none">
               {count > 9 ? '9+' : count}
             </span>

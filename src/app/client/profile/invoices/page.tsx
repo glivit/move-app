@@ -70,8 +70,8 @@ export default function InvoicesPage() {
       <div className="bg-white rounded-2xl border border-[#F0F0EE] p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-[13px] text-[#8E8E93] uppercase tracking-wide font-medium">Huidig pakket</p>
-            <p className="text-[20px] font-semibold text-[#1A1A18] mt-1">
+            <p className="text-[13px] text-[#ACACAC] uppercase tracking-wide font-medium">Huidig pakket</p>
+            <p className="text-[20px] font-semibold text-[#1A1917] mt-1">
               {profile?.package?.charAt(0).toUpperCase()}{profile?.package?.slice(1) || 'Standaard'}
             </p>
           </div>
@@ -79,11 +79,11 @@ export default function InvoicesPage() {
             <p className="text-[28px] font-bold text-[#1A1917]">
               €{getPackagePrice(profile?.package)}
             </p>
-            <p className="text-[13px] text-[#8E8E93]">/maand</p>
+            <p className="text-[13px] text-[#ACACAC]">/maand</p>
           </div>
         </div>
         <div className="h-px bg-[#F0F0EE] mb-4" />
-        <p className="text-[13px] text-[#8E8E93]">
+        <p className="text-[13px] text-[#ACACAC]">
           Facturatie wordt beheerd via Stripe. Neem contact op met je coach voor wijzigingen aan je pakket.
         </p>
       </div>
@@ -97,19 +97,19 @@ export default function InvoicesPage() {
           <div className="flex items-center gap-3">
             <ExternalLink strokeWidth={1.5} className="w-5 h-5 text-[#1A1917]" />
             <div>
-              <p className="text-[15px] text-[#1A1A18] font-medium">Stripe klantenportaal</p>
-              <p className="text-[13px] text-[#8E8E93]">Beheer betalingen, facturen en betaalmethoden</p>
+              <p className="text-[15px] text-[#1A1917] font-medium">Stripe klantenportaal</p>
+              <p className="text-[13px] text-[#ACACAC]">Beheer betalingen, facturen en betaalmethoden</p>
             </div>
           </div>
-          <ChevronLeft strokeWidth={1.5} className="w-5 h-5 text-[#C7C7CC] rotate-180" />
+          <ChevronLeft strokeWidth={1.5} className="w-5 h-5 text-[#C0C0C0] rotate-180" />
         </a>
       )}
 
       {/* Empty State */}
       <div className="bg-white rounded-2xl border border-[#F0F0EE] p-8 text-center">
-        <Receipt strokeWidth={1.5} className="w-10 h-10 text-[#C7C7CC] mx-auto mb-3" />
-        <p className="text-[15px] text-[#8E8E93] mb-1">Factuuroverzicht</p>
-        <p className="text-[13px] text-[#C7C7CC]">
+        <Receipt strokeWidth={1.5} className="w-10 h-10 text-[#C0C0C0] mx-auto mb-3" />
+        <p className="text-[15px] text-[#ACACAC] mb-1">Factuuroverzicht</p>
+        <p className="text-[13px] text-[#C0C0C0]">
           Facturen worden automatisch gegenereerd via Stripe en zijn beschikbaar in het klantenportaal.
         </p>
       </div>

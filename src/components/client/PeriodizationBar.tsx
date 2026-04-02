@@ -14,13 +14,13 @@ interface TrainingPhase {
 }
 
 const PHASE_COLORS: Record<string, { color: string; bgColor: string }> = {
-  prep: { color: '#007AFF', bgColor: '#EBF5FF' },
+  prep: { color: '#3068C4', bgColor: 'rgba(48,104,196,0.06)' },
   hypertrophy: { color: '#AF52DE', bgColor: '#F5EEFA' },
-  strength: { color: '#FF9500', bgColor: '#FFF3E0' },
-  power: { color: '#FF3B30', bgColor: '#FFE5E5' },
-  deload: { color: '#34C759', bgColor: '#E8FAF0' },
+  strength: { color: '#C47D15', bgColor: 'rgba(196,125,21,0.06)' },
+  power: { color: '#C4372A', bgColor: 'rgba(196,55,42,0.06)' },
+  deload: { color: '#3D8B5C', bgColor: 'rgba(61,139,92,0.06)' },
   peaking: { color: '#FF2D55', bgColor: '#FFE5EC' },
-  maintenance: { color: '#8E8E93', bgColor: '#E8E4DC' },
+  maintenance: { color: '#ACACAC', bgColor: '#E8E4DC' },
 }
 
 export function PeriodizationBar() {

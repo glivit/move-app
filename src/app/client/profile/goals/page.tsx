@@ -106,7 +106,7 @@ export default function GoalsPage() {
 
       {/* Primary Goal */}
       <div>
-        <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Hoofddoel</p>
+        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Hoofddoel</p>
         <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
           {GOAL_OPTIONS.map((goal) => (
             <button
@@ -116,7 +116,7 @@ export default function GoalsPage() {
             >
               <div className="flex items-center gap-3">
                 <span className="text-xl">{goal.emoji}</span>
-                <span className="text-[15px] text-[#1A1A18]">{goal.label}</span>
+                <span className="text-[15px] text-[#1A1917]">{goal.label}</span>
               </div>
               {primaryGoal === goal.id && (
                 <div className="w-6 h-6 rounded-full bg-[#1A1917] flex items-center justify-center">
@@ -130,7 +130,7 @@ export default function GoalsPage() {
 
       {/* Secondary Goals */}
       <div>
-        <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Nevendoelen (optioneel)</p>
+        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Nevendoelen (optioneel)</p>
         <div className="flex flex-wrap gap-2">
           {GOAL_OPTIONS.filter(g => g.id !== primaryGoal).map((goal) => {
             const selected = secondaryGoals.includes(goal.id)
@@ -141,7 +141,7 @@ export default function GoalsPage() {
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
                     ? 'bg-[#1A1917] text-white'
-                    : 'bg-white border border-[#F0F0EE] text-[#1A1A18] hover:border-[#1A1917]'
+                    : 'bg-white border border-[#F0F0EE] text-[#1A1917] hover:border-[#1A1917]'
                 }`}
               >
                 {goal.emoji} {goal.label}
@@ -153,14 +153,14 @@ export default function GoalsPage() {
 
       {/* Motivation */}
       <div>
-        <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Motivatie</p>
+        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Motivatie</p>
         <div className="bg-white rounded-2xl border border-[#F0F0EE] p-5">
           <textarea
             value={motivation}
             onChange={(e) => setMotivation(e.target.value)}
             placeholder="Waarom wil je dit bereiken? Wat drijft je?"
             rows={4}
-            className="w-full text-[15px] text-[#1A1A18] bg-transparent placeholder:text-[#C7C7CC] focus:outline-none resize-none"
+            className="w-full text-[15px] text-[#1A1917] bg-transparent placeholder:text-[#C0C0C0] focus:outline-none resize-none"
           />
         </div>
       </div>

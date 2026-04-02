@@ -75,7 +75,7 @@ export default function HelpPage() {
 
       {/* FAQ */}
       <div>
-        <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Veelgestelde vragen</p>
+        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Veelgestelde vragen</p>
         <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
           {FAQ_ITEMS.map((item, index) => (
             <div key={index}>
@@ -83,17 +83,17 @@ export default function HelpPage() {
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-[#FAFAFA] transition-colors"
               >
-                <span className="text-[15px] text-[#1A1A18] pr-4">{item.q}</span>
+                <span className="text-[15px] text-[#1A1917] pr-4">{item.q}</span>
                 <ChevronDown
                   strokeWidth={1.5}
-                  className={`w-5 h-5 text-[#8E8E93] flex-shrink-0 transition-transform ${
+                  className={`w-5 h-5 text-[#ACACAC] flex-shrink-0 transition-transform ${
                     openIndex === index ? 'rotate-180' : ''
                   }`}
                 />
               </button>
               {openIndex === index && (
                 <div className="px-5 pb-4">
-                  <p className="text-[14px] text-[#8E8E93] leading-relaxed">{item.a}</p>
+                  <p className="text-[14px] text-[#ACACAC] leading-relaxed">{item.a}</p>
                 </div>
               )}
             </div>
@@ -103,8 +103,8 @@ export default function HelpPage() {
 
       {/* App Version */}
       <div className="text-center pt-4">
-        <p className="text-[13px] text-[#C7C7CC]">MŌVE Coaching App v1.0.0</p>
-        <p className="text-[11px] text-[#C7C7CC] mt-1">Premium Coaching · Knokke</p>
+        <p className="text-[13px] text-[#C0C0C0]">MŌVE Coaching App v1.0.0</p>
+        <p className="text-[11px] text-[#C0C0C0] mt-1">Premium Coaching · Knokke</p>
       </div>
     </div>
   )

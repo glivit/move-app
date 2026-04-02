@@ -20,17 +20,17 @@ interface Resource {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Voeding: '#34C759',
-  Training: '#007AFF',
-  Herstel: '#FF9500',
+  Voeding: '#3D8B5C',
+  Training: '#3068C4',
+  Herstel: '#C47D15',
   Mindset: '#AF52DE',
   Lifestyle: '#FF2D55',
 }
 
 const CATEGORY_BG: Record<string, string> = {
-  Voeding: '#E8FAF0',
-  Training: '#EBF5FF',
-  Herstel: '#FFF3E0',
+  Voeding: 'rgba(61,139,92,0.06)',
+  Training: 'rgba(48,104,196,0.06)',
+  Herstel: 'rgba(196,125,21,0.06)',
   Mindset: '#F5EEFA',
   Lifestyle: '#FFE5EC',
 }
@@ -104,29 +104,27 @@ export default function ResourcesPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-editorial-h2 text-[#1A1917]">Kennisbank</h1>
-        <p className="text-[14px] mt-1" style={{ color: '#ACACAC' }}>
-          Artikelen, video&apos;s en tips van je coach
-        </p>
+      {/* Hero Section */}
+      <div className="animate-slide-up">
+        <p className="text-label mb-3">Kennisbank</p>
+        <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>Resources</h1>
       </div>
 
       {/* Search */}
-      <div className="flex items-center gap-3 px-4 py-3 rounded-2xl shadow-none bg-white">
-        <Search size={18} strokeWidth={1.5} style={{ color: '#C7C7CC' }} />
+      <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white animate-slide-up" style={{ animationDelay: '100ms' }}>
+        <Search size={18} strokeWidth={1.5} style={{ color: '#C0C0C0' }} />
         <input
           type="text"
           placeholder="Zoek content..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="flex-1 bg-transparent text-[14px] outline-none"
-          style={{ color: '#1A1A18' }}
+          style={{ color: '#1A1917' }}
         />
       </div>
 
       {/* Category Pills */}
-      <div className="overflow-x-auto pb-1 -mx-4 px-4">
+      <div className="overflow-x-auto pb-1 -mx-4 px-4 animate-slide-up" style={{ animationDelay: '200ms' }}>
         <div className="flex gap-2">
           {categories.map((cat) => (
             <button
@@ -147,26 +145,26 @@ export default function ResourcesPage() {
 
       {/* Content */}
       {loading ? (
-        <div className="space-y-3">
+        <div className="space-y-3 animate-slide-up" style={{ animationDelay: '300ms' }}>
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-white rounded-2xl shadow-none animate-pulse" />
+            <div key={i} className="h-32 bg-white rounded-2xl animate-pulse" />
           ))}
         </div>
       ) : filteredResources.length === 0 ? (
-        <div className="p-12 text-center bg-white rounded-2xl shadow-none">
-          <BookOpen size={40} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#C7C7CC' }} />
+        <div className="p-12 text-center bg-white rounded-2xl animate-slide-up" style={{ animationDelay: '300ms' }}>
+          <BookOpen size={40} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#C0C0C0' }} />
           <p className="text-[14px]" style={{ color: '#ACACAC' }}>Geen content gevonden</p>
         </div>
       ) : (
         <>
           {/* Featured */}
           {featured.length > 0 && (
-            <div className="space-y-3">
+            <div className="space-y-3 animate-slide-up" style={{ animationDelay: '300ms' }}>
               {featured.map((resource) => (
                 <button
                   key={resource.id}
                   onClick={() => { setSelectedResource(resource); trackView(resource.id) }}
-                  className="w-full text-left overflow-hidden transition-all bg-white rounded-2xl shadow-none"
+                  className="w-full text-left overflow-hidden transition-all bg-white rounded-2xl hover:bg-[#FAFAF8]"
                 >
                   {resource.thumbnail_url ? (
                     <div className="relative aspect-[21/9] overflow-hidden">
@@ -174,7 +172,7 @@ export default function ResourcesPage() {
                       {resource.content_type === 'video' && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                           <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
-                            <Play size={20} strokeWidth={2} style={{ color: '#FF3B30' }} fill="#FF3B30" />
+                            <Play size={20} strokeWidth={2} style={{ color: '#C4372A' }} fill="#C4372A" />
                           </div>
                         </div>
                       )}
@@ -198,13 +196,13 @@ export default function ResourcesPage() {
                         {resource.category}
                       </span>
                       {resource.duration_minutes ? (
-                        <span className="flex items-center gap-1 text-[11px]" style={{ color: '#C7C7CC' }}>
+                        <span className="flex items-center gap-1 text-[11px]" style={{ color: '#C0C0C0' }}>
                           <Clock size={10} strokeWidth={1.5} />
                           {resource.duration_minutes} min
                         </span>
                       ) : null}
                     </div>
-                    <h3 className="text-[16px] font-semibold mb-1" style={{ color: '#1A1A18' }}>
+                    <h3 className="text-[16px] font-semibold mb-1" style={{ color: '#1A1917' }}>
                       {resource.title}
                     </h3>
                     <p className="text-[13px] line-clamp-2" style={{ color: '#ACACAC' }}>
@@ -217,12 +215,12 @@ export default function ResourcesPage() {
           )}
 
           {/* Regular */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-slide-up" style={{ animationDelay: '400ms' }}>
             {regular.map((resource) => (
               <button
                 key={resource.id}
                 onClick={() => { setSelectedResource(resource); trackView(resource.id) }}
-                className="w-full text-left overflow-hidden transition-all bg-white rounded-2xl shadow-none"
+                className="w-full text-left overflow-hidden transition-all bg-white rounded-2xl hover:bg-[#FAFAF8]"
               >
                 {resource.thumbnail_url ? (
                   <div className="relative aspect-video overflow-hidden">
@@ -230,7 +228,7 @@ export default function ResourcesPage() {
                     {resource.content_type === 'video' && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                         <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
-                          <Play size={16} strokeWidth={2} style={{ color: '#FF3B30' }} fill="#FF3B30" />
+                          <Play size={16} strokeWidth={2} style={{ color: '#C4372A' }} fill="#C4372A" />
                         </div>
                       </div>
                     )}
@@ -250,10 +248,10 @@ export default function ResourcesPage() {
                       {resource.category}
                     </span>
                     {resource.content_type === 'video' && (
-                      <Play size={10} strokeWidth={2} style={{ color: '#FF3B30' }} />
+                      <Play size={10} strokeWidth={2} style={{ color: '#C4372A' }} />
                     )}
                   </div>
-                  <h3 className="text-[14px] font-semibold line-clamp-2" style={{ color: '#1A1A18' }}>
+                  <h3 className="text-[14px] font-semibold line-clamp-2" style={{ color: '#1A1917' }}>
                     {resource.title}
                   </h3>
                 </div>
@@ -267,7 +265,7 @@ export default function ResourcesPage() {
       {selectedResource && (
         <div className="fixed inset-0 z-50 flex items-end lg:items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSelectedResource(null)} />
-          <div className="relative w-full max-w-2xl mx-4 mb-4 lg:mb-0 max-h-[85vh] overflow-y-auto bg-white rounded-2xl shadow-none">
+          <div className="relative w-full max-w-2xl mx-4 mb-4 lg:mb-0 max-h-[85vh] overflow-y-auto bg-white rounded-2xl">
             <button
               onClick={() => setSelectedResource(null)}
               className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center bg-black/20 backdrop-blur-sm"
@@ -311,14 +309,14 @@ export default function ResourcesPage() {
                 ) : null}
               </div>
 
-              <h2 className="text-xl font-bold mb-2" style={{ color: '#1A1A18' }}>
+              <h2 className="text-xl font-bold mb-2" style={{ color: '#1A1917' }}>
                 {selectedResource.title}
               </h2>
               <p className="text-[14px] mb-4" style={{ color: '#ACACAC' }}>
                 {selectedResource.description}
               </p>
 
-              <div className="text-[14px] leading-relaxed whitespace-pre-wrap" style={{ color: '#1A1A18' }}>
+              <div className="text-[14px] leading-relaxed whitespace-pre-wrap" style={{ color: '#1A1917' }}>
                 {selectedResource.content}
               </div>
 

@@ -88,7 +88,7 @@ export default function ClientMealPlanPage() {
       <div className="space-y-6">
         <h1 className="text-2xl font-semibold text-text-primary">Voeding</h1>
         <div className="flex items-center justify-center py-12">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-[#C0C0C0] border-t-[#1A1917]" />
         </div>
       </div>
     )

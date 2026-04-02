@@ -35,8 +35,8 @@ export function CalorieGauge({ consumed, target, meals }: CalorieGaugeProps) {
           <defs>
             <linearGradient id="calorieGradient" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#FFCC00" />
-              <stop offset="33%" stopColor="#FF9500" />
-              <stop offset="66%" stopColor="#FF3B30" />
+              <stop offset="33%" stopColor="#C47D15" />
+              <stop offset="66%" stopColor="#C4372A" />
               <stop offset="100%" stopColor="#AF52DE" />
             </linearGradient>
           </defs>

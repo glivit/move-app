@@ -111,7 +111,7 @@ export default function DietPage() {
 
       {/* Diet Type */}
       <div>
-        <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Dieettype</p>
+        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Dieettype</p>
         <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
           {DIET_TYPES.map((diet) => (
             <button
@@ -120,8 +120,8 @@ export default function DietPage() {
               className="w-full px-5 py-4 flex items-center justify-between hover:bg-[#FAFAFA] transition-colors"
             >
               <div>
-                <p className="text-[15px] text-[#1A1A18] text-left">{diet.label}</p>
-                <p className="text-[13px] text-[#8E8E93] text-left">{diet.desc}</p>
+                <p className="text-[15px] text-[#1A1917] text-left">{diet.label}</p>
+                <p className="text-[13px] text-[#ACACAC] text-left">{diet.desc}</p>
               </div>
               {dietType === diet.id && (
                 <div className="w-6 h-6 rounded-full bg-[#1A1917] flex items-center justify-center flex-shrink-0">
@@ -135,7 +135,7 @@ export default function DietPage() {
 
       {/* Allergies */}
       <div>
-        <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Allergieën & intoleranties</p>
+        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Allergieën & intoleranties</p>
         <div className="flex flex-wrap gap-2">
           {ALLERGY_OPTIONS.map((allergy) => {
             const selected = allergies.includes(allergy)
@@ -145,8 +145,8 @@ export default function DietPage() {
                 onClick={() => toggleAllergy(allergy)}
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
-                    ? 'bg-[#FF3B30] text-white'
-                    : 'bg-white border border-[#F0F0EE] text-[#1A1A18] hover:border-[#FF3B30]'
+                    ? 'bg-[#C4372A] text-white'
+                    : 'bg-white border border-[#F0F0EE] text-[#1A1917] hover:border-[#C4372A]'
                 }`}
               >
                 {allergy}
@@ -158,14 +158,14 @@ export default function DietPage() {
 
       {/* Other */}
       <div>
-        <p className="text-[13px] font-medium text-[#8E8E93] uppercase tracking-wide px-1 mb-2">Overige opmerkingen</p>
+        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Overige opmerkingen</p>
         <div className="bg-white rounded-2xl border border-[#F0F0EE] p-5">
           <textarea
             value={otherRestrictions}
             onChange={(e) => setOtherRestrictions(e.target.value)}
             placeholder="Bijv. ik eet niet graag aubergine, intermittent fasting, ..."
             rows={3}
-            className="w-full text-[15px] text-[#1A1A18] bg-transparent placeholder:text-[#C7C7CC] focus:outline-none resize-none"
+            className="w-full text-[15px] text-[#1A1917] bg-transparent placeholder:text-[#C0C0C0] focus:outline-none resize-none"
           />
         </div>
       </div>

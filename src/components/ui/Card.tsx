@@ -9,8 +9,8 @@ const variantStyles = {
   default: 'bg-surface border border-border shadow-card',
   elevated: 'bg-surface shadow-elevated',
   muted: 'bg-surface-muted border border-border',
-  clean: 'bg-white shadow-clean hover:shadow-clean-hover transition-shadow duration-150',
-  accent: 'bg-accent-surface shadow-clean',
+  clean: 'bg-white border border-[#F0F0EE] hover:border-[#1A1917]/10 transition-shadow duration-150',
+  accent: 'bg-accent-surface border border-[#F0F0EE]',
 }
 
 const paddingStyles = {

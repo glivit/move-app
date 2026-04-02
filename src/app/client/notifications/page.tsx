@@ -89,7 +89,7 @@ export default function NotificationsPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-[1.5px] border-[#1A1917] border-t-transparent" />
+        <div className="animate-spin rounded-full h-8 w-8 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917]" />
       </div>
     )
   }
@@ -100,19 +100,22 @@ export default function NotificationsPage() {
 
   return (
     <div className="pb-24 space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-3 pt-1">
+      {/* Hero Section */}
+      <div className="flex items-center gap-3 pt-1 animate-slide-up">
         <Link href="/client" className="p-2 -ml-2 rounded-xl hover:bg-[#F0F0EE] transition-colors">
           <ArrowLeft strokeWidth={1.5} className="w-5 h-5 text-[#ACACAC]" />
         </Link>
-        <h1 className="text-editorial-h2 text-[#1A1917]">
-          Meldingen
-        </h1>
+        <div>
+          <p className="text-label mb-1">Inbox</p>
+          <h1 className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
+            Notificaties
+          </h1>
+        </div>
       </div>
 
       {/* Empty state */}
       {hasNothing && (
-        <div className="text-center py-16">
+        <div className="text-center py-16 animate-slide-up" style={{ animationDelay: '100ms' }}>
           <div className="w-14 h-14 rounded-full bg-[#F0F0EE] flex items-center justify-center mx-auto mb-4">
             <Megaphone strokeWidth={1.5} className="w-6 h-6 text-[#C0C0C0]" />
           </div>
@@ -122,7 +125,7 @@ export default function NotificationsPage() {
 
       {/* Pending prompts */}
       {prompts.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-3 animate-slide-up" style={{ animationDelay: '200ms' }}>
           <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#C0C0C0] px-1">
             Openstaande vragen
           </p>
@@ -130,7 +133,7 @@ export default function NotificationsPage() {
             <Link
               key={prompt.id}
               href="/client/prompts"
-              className="block rounded-2xl border-2 border-[#333330]/20 bg-white p-5 transition-all hover:border-[#333330]/40 hover:border-[#1A1917]/30"
+              className="block rounded-2xl border-2 border-[#333330]/20 bg-white p-5 transition-all hover:border-[#1A1917]/30"
             >
               <div className="flex items-start gap-3.5">
                 <div className="w-10 h-10 rounded-xl bg-[#333330]/12 flex items-center justify-center flex-shrink-0">
@@ -153,7 +156,7 @@ export default function NotificationsPage() {
 
       {/* Unread broadcasts */}
       {unreadBroadcasts.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-3 animate-slide-up" style={{ animationDelay: '300ms' }}>
           <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#C0C0C0] px-1">
             Nieuw
           </p>
@@ -169,7 +172,7 @@ export default function NotificationsPage() {
 
       {/* Read broadcasts */}
       {readBroadcasts.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-3 animate-slide-up" style={{ animationDelay: '400ms' }}>
           <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#C0C0C0] px-1">
             Gelezen
           </p>

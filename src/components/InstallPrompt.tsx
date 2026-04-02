@@ -134,10 +134,10 @@ export function InstallPrompt() {
               </h3>
               <p className="text-xs text-[#A09D96] mt-1 leading-relaxed">
                 Tik op{' '}
-                <Share className="h-3.5 w-3.5 inline-block text-[#007AFF] -mt-0.5" />{' '}
+                <Share className="h-3.5 w-3.5 inline-block text-[#3068C4] -mt-0.5" />{' '}
                 <span className="font-medium text-[#1A1917]">Deel</span> onderaan
                 en kies{' '}
-                <Plus className="h-3.5 w-3.5 inline-block text-[#007AFF] -mt-0.5" />{' '}
+                <Plus className="h-3.5 w-3.5 inline-block text-[#3068C4] -mt-0.5" />{' '}
                 <span className="font-medium text-[#1A1917]">Zet op beginscherm</span>
               </p>
             </div>

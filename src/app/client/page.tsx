@@ -138,7 +138,7 @@ export default function ClientDashboard() {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-6 w-6 animate-spin rounded-full border-[1.5px] border-[#1A1917] border-t-transparent" />
+        <div className="h-6 w-6 animate-spin rounded-full border-[1.5px] border-[#C0C0C0] border-t-[#1A1917]" />
       </div>
     )
   }

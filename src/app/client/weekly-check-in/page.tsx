@@ -119,7 +119,7 @@ export default function WeeklyCheckInPage() {
       <div className="space-y-6">
         <SubPageHeader overline="Wekelijks" title="Check-in" backHref="/client" />
         <div className="bg-white p-8 border border-[#F0F0EE] text-center">
-          <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#34C759] mx-auto mb-3" />
+          <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#3D8B5C] mx-auto mb-3" />
           <p className="font-semibold text-[#1A1917] text-lg">
             {submitted ? 'Check-in verstuurd!' : 'Al ingediend deze week'}
           </p>

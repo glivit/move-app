@@ -92,13 +92,13 @@ export function MacroRings({ protein, carbs, fat }: MacroRingsProps) {
         label="Eiwit"
         current={protein.current}
         target={protein.target}
-        color="#FF9500"
+        color="#C47D15"
       />
       <MacroRing
         label="Koolh."
         current={carbs.current}
         target={carbs.target}
-        color="#FF3B30"
+        color="#C4372A"
       />
       <MacroRing
         label="Vet"

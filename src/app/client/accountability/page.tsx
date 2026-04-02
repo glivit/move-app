@@ -106,8 +106,8 @@ export default function AccountabilityPage() {
     return (
       <div className="space-y-6">
         <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
-        <div className="bg-white p-8 rounded-2xl shadow-none text-center">
-          <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#34C759] mx-auto mb-3" />
+        <div className="bg-white p-8 rounded-2xl border border-[#F0F0EE] text-center">
+          <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#3D8B5C] mx-auto mb-3" />
           <p className="font-semibold text-[#1A1917] text-lg">Alles op schema!</p>
           <p className="text-[14px] text-[#ACACAC] mt-2">
             Je hebt vandaag alles gedaan. Ga zo door!
@@ -122,8 +122,8 @@ export default function AccountabilityPage() {
     return (
       <div className="space-y-6">
         <SubPageHeader overline="Dagelijks" title="Check" backHref="/client" />
-        <div className="bg-white p-8 rounded-2xl shadow-none text-center">
-          <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#34C759] mx-auto mb-3" />
+        <div className="bg-white p-8 rounded-2xl border border-[#F0F0EE] text-center">
+          <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#3D8B5C] mx-auto mb-3" />
           <p className="font-semibold text-[#1A1917] text-lg">Bedankt voor je feedback!</p>
           <p className="text-[14px] text-[#ACACAC] mt-2">
             Je coach bekijkt dit en helpt je op schema te blijven.
@@ -163,10 +163,10 @@ export default function AccountabilityPage() {
         }`}>
           <div className="flex items-center gap-3 mb-2">
             <div className={`w-10 h-10 flex items-center justify-center ${
-              log.workout_completed ? 'bg-[#34C759]/20' : 'bg-[#FF9500]/20'
+              log.workout_completed ? 'bg-[#3D8B5C]/20' : 'bg-[#C47D15]/20'
             }`}>
               <Dumbbell size={20} strokeWidth={1.5} className={
-                log.workout_completed ? 'text-[#34C759]' : 'text-[#FF9500]'
+                log.workout_completed ? 'text-[#3D8B5C]' : 'text-[#C47D15]'
               } />
             </div>
             <div>
@@ -201,10 +201,10 @@ export default function AccountabilityPage() {
         }`}>
           <div className="flex items-center gap-3 mb-2">
             <div className={`w-10 h-10 flex items-center justify-center ${
-              log.nutrition_logged ? 'bg-[#34C759]/20' : 'bg-[#FF9500]/20'
+              log.nutrition_logged ? 'bg-[#3D8B5C]/20' : 'bg-[#C47D15]/20'
             }`}>
               <UtensilsCrossed size={20} strokeWidth={1.5} className={
-                log.nutrition_logged ? 'text-[#34C759]' : 'text-[#FF9500]'
+                log.nutrition_logged ? 'text-[#3D8B5C]' : 'text-[#C47D15]'
               } />
             </div>
             <div className="flex-1">
@@ -220,7 +220,7 @@ export default function AccountabilityPage() {
             <div className="mt-2 mb-3">
               <div className="h-2 bg-[#FED7AA]/50 overflow-hidden">
                 <div
-                  className="h-full bg-[#FF9500] transition-all"
+                  className="h-full bg-[#C47D15] transition-all"
                   style={{ width: `${(log.meals_completed! / log.meals_total!) * 100}%` }}
                 />
               </div>

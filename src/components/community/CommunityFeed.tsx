@@ -35,9 +35,9 @@ interface Comment {
 }
 
 const POST_TYPE_CONFIG: Record<string, { icon: any; label: string; color: string; bg: string }> = {
-  update: { icon: Megaphone, label: 'Update', color: '#007AFF', bg: '#EBF5FF' },
-  motivation: { icon: Sparkles, label: 'Motivatie', color: '#FF9500', bg: '#FFF3E0' },
-  tip: { icon: Lightbulb, label: 'Tip', color: '#34C759', bg: '#E8FAF0' },
+  update: { icon: Megaphone, label: 'Update', color: '#3068C4', bg: 'rgba(48,104,196,0.06)' },
+  motivation: { icon: Sparkles, label: 'Motivatie', color: '#C47D15', bg: 'rgba(196,125,21,0.06)' },
+  tip: { icon: Lightbulb, label: 'Tip', color: '#3D8B5C', bg: 'rgba(61,139,92,0.06)' },
   achievement: { icon: Trophy, label: 'Prestatie', color: '#1A1917', bg: '#F5F2EC' },
   question: { icon: HelpCircle, label: 'Vraag', color: '#AF52DE', bg: '#F5EEFA' },
 }
@@ -164,7 +164,7 @@ export function CommunityFeed({ isCoach = false }: Props) {
           placeholder={isCoach ? 'Deel een update met je community...' : 'Deel iets met de groep...'}
           rows={2}
           className="w-full text-[14px] bg-transparent outline-none resize-none"
-          style={{ color: '#1A1A18' }}
+          style={{ color: '#1A1917' }}
         />
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#E8E4DC]">
           {/* Post type selector */}
@@ -178,7 +178,7 @@ export function CommunityFeed({ isCoach = false }: Props) {
                   className="p-1.5 rounded-lg transition-all"
                   style={{
                     backgroundColor: postType === key ? cfg.bg : 'transparent',
-                    color: postType === key ? cfg.color : '#C7C7CC',
+                    color: postType === key ? cfg.color : '#C0C0C0',
                   }}
                   title={cfg.label}
                 >
@@ -212,8 +212,8 @@ export function CommunityFeed({ isCoach = false }: Props) {
           className="rounded-2xl p-12 text-center border"
           style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
         >
-          <Megaphone size={32} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#C7C7CC' }} />
-          <p className="text-[14px]" style={{ color: '#8E8E93' }}>
+          <Megaphone size={32} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#C0C0C0' }} />
+          <p className="text-[14px]" style={{ color: '#ACACAC' }}>
             Nog geen berichten. Deel de eerste update!
           </p>
         </div>
@@ -244,7 +244,7 @@ export function CommunityFeed({ isCoach = false }: Props) {
                     className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-[11px] font-bold"
                     style={{
                       backgroundColor: post.author?.role === 'coach' ? '#F5F2EC' : '#FAFAFA',
-                      color: post.author?.role === 'coach' ? '#1A1917' : '#8E8E93',
+                      color: post.author?.role === 'coach' ? '#1A1917' : '#ACACAC',
                     }}
                   >
                     {post.author?.avatar_url ? (
@@ -255,7 +255,7 @@ export function CommunityFeed({ isCoach = false }: Props) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-[13px] font-semibold" style={{ color: '#1A1A18' }}>
+                      <span className="text-[13px] font-semibold" style={{ color: '#1A1917' }}>
                         {post.author?.full_name}
                       </span>
                       {post.author?.role === 'coach' && (
@@ -271,14 +271,14 @@ export function CommunityFeed({ isCoach = false }: Props) {
                         {typeConfig.label}
                       </span>
                     </div>
-                    <p className="text-[11px]" style={{ color: '#C7C7CC' }}>
+                    <p className="text-[11px]" style={{ color: '#C0C0C0' }}>
                       {timeAgo(post.created_at)}
                     </p>
                   </div>
                 </div>
 
                 {/* Content */}
-                <p className="text-[14px] leading-relaxed whitespace-pre-wrap mb-4" style={{ color: '#1A1A18' }}>
+                <p className="text-[14px] leading-relaxed whitespace-pre-wrap mb-4" style={{ color: '#1A1917' }}>
                   {post.content}
                 </p>
 
@@ -293,19 +293,19 @@ export function CommunityFeed({ isCoach = false }: Props) {
                   <button
                     onClick={() => toggleLike(post.id)}
                     className="flex items-center gap-1.5 text-[12px] font-medium transition-all"
-                    style={{ color: post.user_liked ? '#FF3B30' : '#8E8E93' }}
+                    style={{ color: post.user_liked ? '#C4372A' : '#ACACAC' }}
                   >
                     <Heart
                       size={16}
                       strokeWidth={1.5}
-                      fill={post.user_liked ? '#FF3B30' : 'none'}
+                      fill={post.user_liked ? '#C4372A' : 'none'}
                     />
                     {post.like_count > 0 && post.like_count}
                   </button>
                   <button
                     onClick={() => loadComments(post.id)}
                     className="flex items-center gap-1.5 text-[12px] font-medium transition-all"
-                    style={{ color: isExpanded ? '#007AFF' : '#8E8E93' }}
+                    style={{ color: isExpanded ? '#3068C4' : '#ACACAC' }}
                   >
                     <MessageCircle size={16} strokeWidth={1.5} />
                     {post.comment_count > 0 && post.comment_count}
@@ -320,7 +320,7 @@ export function CommunityFeed({ isCoach = false }: Props) {
                   {(comments[post.id] || []).map((comment) => (
                     <div key={comment.id} className="px-5 py-3 border-b border-[#E8E4DC] last:border-b-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[12px] font-semibold" style={{ color: '#1A1A18' }}>
+                        <span className="text-[12px] font-semibold" style={{ color: '#1A1917' }}>
                           {comment.author?.full_name}
                         </span>
                         {comment.author?.role === 'coach' && (
@@ -328,11 +328,11 @@ export function CommunityFeed({ isCoach = false }: Props) {
                             COACH
                           </span>
                         )}
-                        <span className="text-[10px]" style={{ color: '#C7C7CC' }}>
+                        <span className="text-[10px]" style={{ color: '#C0C0C0' }}>
                           {timeAgo(comment.created_at)}
                         </span>
                       </div>
-                      <p className="text-[13px]" style={{ color: '#1A1A18' }}>{comment.content}</p>
+                      <p className="text-[13px]" style={{ color: '#1A1917' }}>{comment.content}</p>
                     </div>
                   ))}
 
@@ -346,7 +346,7 @@ export function CommunityFeed({ isCoach = false }: Props) {
                       onKeyDown={(e) => e.key === 'Enter' && addComment(post.id)}
                       placeholder="Schrijf een reactie..."
                       className="flex-1 text-[13px] bg-white px-3 py-2 rounded-xl border border-[#E8E4DC] outline-none focus:border-[#1A1917]"
-                      style={{ color: '#1A1A18' }}
+                      style={{ color: '#1A1917' }}
                     />
                     <button
                       onClick={() => addComment(post.id)}

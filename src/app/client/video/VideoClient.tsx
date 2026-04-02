@@ -87,10 +87,10 @@ export default function ClientVideoPage() {
 
   function statusLabel(status: string) {
     switch (status) {
-      case 'scheduled': return { text: 'Gepland', color: '#007AFF', bg: '#007AFF' }
-      case 'in_progress': return { text: 'Bezig', color: '#34C759', bg: '#34C759' }
+      case 'scheduled': return { text: 'Gepland', color: '#3068C4', bg: '#3068C4' }
+      case 'in_progress': return { text: 'Bezig', color: '#3D8B5C', bg: '#3D8B5C' }
       case 'completed': return { text: 'Afgerond', color: '#ACACAC', bg: '#ACACAC' }
-      case 'cancelled': return { text: 'Geannuleerd', color: '#FF3B30', bg: '#FF3B30' }
+      case 'cancelled': return { text: 'Geannuleerd', color: '#C4372A', bg: '#C4372A' }
       default: return { text: status, color: '#ACACAC', bg: '#ACACAC' }
     }
   }
@@ -100,7 +100,7 @@ export default function ClientVideoPage() {
       <div className="min-h-screen bg-[#F8F8F6]">
         <div className="max-w-lg mx-auto px-5 py-8">
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#1A1917] border-t-transparent" />
+            <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#C0C0C0] border-t-[#1A1917]" />
           </div>
         </div>
       </div>
@@ -136,8 +136,8 @@ export default function ClientVideoPage() {
                   >
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-xl bg-[#007AFF]/10 flex items-center justify-center">
-                          <Video strokeWidth={1.5} className="w-5 h-5 text-[#007AFF]" />
+                        <div className="w-11 h-11 rounded-xl bg-[#3068C4]/10 flex items-center justify-center">
+                          <Video strokeWidth={1.5} className="w-5 h-5 text-[#3068C4]" />
                         </div>
                         <div>
                           <p className="text-[15px] font-semibold text-[#1A1A18]">
@@ -162,7 +162,7 @@ export default function ClientVideoPage() {
                     {joinable ? (
                       <Link
                         href={`/client/video/${session.id}`}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#34C759] text-white text-[14px] font-semibold hover:bg-[#2DB84E] transition-colors"
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#3D8B5C] text-white text-[14px] font-semibold hover:bg-[#3D8B5C] transition-colors"
                       >
                         <Phone strokeWidth={1.5} className="w-4 h-4" />
                         Nu deelnemen
@@ -235,8 +235,8 @@ export default function ClientVideoPage() {
         {/* Empty State */}
         {sessions.length === 0 && (
           <div className="bg-white rounded-2xl p-12 border border-[#F0F0EE] text-center">
-            <div className="w-16 h-16 rounded-full bg-[#007AFF]/10 flex items-center justify-center mx-auto mb-4">
-              <Video strokeWidth={1.5} className="w-8 h-8 text-[#007AFF]" />
+            <div className="w-16 h-16 rounded-full bg-[#3068C4]/10 flex items-center justify-center mx-auto mb-4">
+              <Video strokeWidth={1.5} className="w-8 h-8 text-[#3068C4]" />
             </div>
             <h2 className="text-[17px] font-semibold text-[#1A1A18] mb-2">
               Geen video calls gepland
