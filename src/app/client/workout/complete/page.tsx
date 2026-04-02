@@ -39,7 +39,7 @@ interface ExerciseGroup {
   painNotes: string
 }
 
-// ─── Animated Counter (Cormorant serif) ─────────────────────
+// ─── Animated Counter ─────────────────────
 
 function AnimatedStat({ value, suffix = '' }: { value: number | string; suffix?: string }) {
   const numValue = typeof value === 'number' ? value : parseFloat(value) || 0
@@ -62,7 +62,10 @@ function AnimatedStat({ value, suffix = '' }: { value: number | string; suffix?:
   }, [numValue])
 
   return (
-    <span className="stat-number text-[40px] text-[#1A1917]">
+    <span
+      className="text-[40px] tracking-[-1.5px] leading-[0.9] text-[#1A1917]"
+      style={{ fontFamily: 'var(--font-display)', fontWeight: 800 }}
+    >
       {display}{suffix}
     </span>
   )
@@ -73,8 +76,8 @@ function AnimatedStat({ value, suffix = '' }: { value: number | string; suffix?:
 export default function WorkoutCompletePageWrapper() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#EEEBE3] flex items-center justify-center">
-        <div className="w-6 h-6 border-[1.5px] border-[#CCC7BC] border-t-[#1A1917] rounded-full animate-spin" />
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#1A1917] border-t-transparent" />
       </div>
     }>
       <WorkoutCompletePage />
@@ -97,11 +100,11 @@ function WorkoutCompletePage() {
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
-  // ─── Subtle confetti (3-5 particles, 2s) ───────
+  // Subtle confetti
   const spawnConfetti = useCallback(() => {
-    const colors = ['#D46A3A', '#3D8B5C', '#E8E4DC']
+    const colors = ['#D46A3A', '#3D8B5C', '#F0F0EE']
     const container = document.body
-    const count = 3 + Math.floor(Math.random() * 3) // 3-5 particles
+    const count = 3 + Math.floor(Math.random() * 3)
     for (let i = 0; i < count; i++) {
       const el = document.createElement('div')
       el.className = 'confetti-particle'
@@ -132,7 +135,7 @@ function WorkoutCompletePage() {
           const sd = sessionData as unknown as WorkoutSessionComplete
           let workoutSets = sd.workout_sets || []
 
-          // RESCUE: If no sets in DB, recover from localStorage and save them
+          // RESCUE: If no sets in DB, recover from localStorage
           if (workoutSets.length === 0) {
             try {
               const raw = localStorage.getItem('move_active_workout')
@@ -276,7 +279,6 @@ function WorkoutCompletePage() {
 
       if (!res.ok) {
         console.error('[handleComplete] Server error:', await res.json())
-        console.warn('[handleComplete] Falling back to direct write...')
         await supabase
           .from('workout_sessions')
           .update({
@@ -313,16 +315,16 @@ function WorkoutCompletePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#EEEBE3] flex items-center justify-center">
-        <div className="w-6 h-6 border-[1.5px] border-[#CCC7BC] border-t-[#1A1917] rounded-full animate-spin" />
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#1A1917] border-t-transparent" />
       </div>
     )
   }
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-[#EEEBE3] flex items-center justify-center">
-        <p className="text-[#A09D96] text-[14px]">Sessie niet gevonden</p>
+      <div className="flex items-center justify-center h-64">
+        <p className="text-[14px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>Sessie niet gevonden</p>
       </div>
     )
   }
@@ -334,7 +336,6 @@ function WorkoutCompletePage() {
   const endTime = new Date()
   const minutes = Math.floor((endTime.getTime() - startTime.getTime()) / 1000 / 60)
 
-  // Text chips instead of emojis
   const moodOptions = [
     { value: 1, label: 'Zwaar' },
     { value: 2, label: 'Oké' },
@@ -346,200 +347,240 @@ function WorkoutCompletePage() {
   const painCount = exerciseGroups.filter(g => g.painFlag).length
 
   return (
-    <div className="min-h-screen bg-[#EEEBE3]">
+    <div className="pb-28">
 
-      {/* ═══ HEADER — celebration ═══════════════════ */}
-      <div className="pt-16 pb-6 text-center animate-fade-in">
-        <p className="text-label mb-4">Voltooid</p>
+      {/* ── Header — celebration ── */}
+      <div className="pt-8 pb-2 text-center mb-8">
+        <p
+          className="text-[12px] font-medium text-[#3D8B5C] uppercase tracking-[1.5px] mb-4"
+          style={{ fontFamily: 'var(--font-body)' }}
+        >
+          Voltooid
+        </p>
         <h1
-          className="text-[40px] leading-[1.08] tracking-[-0.03em] text-[#1A1917]"
-          style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
+          className="text-[40px] tracking-[-1.5px] leading-[1.05] text-[#1A1917]"
+          style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
         >
           Goed gedaan
         </h1>
         {prsCount > 0 && (
-          <div className="mt-4 inline-flex items-center gap-2 bg-[rgba(212,106,58,0.1)] px-4 py-2 rounded-xl animate-scale-in">
+          <div className="mt-4 inline-flex items-center gap-2">
             <Trophy size={16} strokeWidth={2} className="text-[#D46A3A]" />
-            <span className="text-[14px] font-semibold text-[#D46A3A]">
+            <span
+              className="text-[14px] font-semibold text-[#D46A3A]"
+              style={{ fontFamily: 'var(--font-body)' }}
+            >
               {prsCount} {prsCount === 1 ? 'nieuw record' : 'nieuwe records'}
             </span>
           </div>
         )}
       </div>
 
-      {/* ═══ STATS — Cormorant numbers, no cards ════ */}
-      <div className="max-w-lg mx-auto px-4 mb-10">
-        <div className="flex items-center justify-center gap-8 animate-count-up">
-          <div className="text-center">
-            <AnimatedStat value={minutes} />
-            <p className="text-label mt-1">Minuten</p>
-          </div>
-          <div className="w-px h-10 bg-[#E5E1D9]" />
-          <div className="text-center">
-            <AnimatedStat value={totalSets} />
-            <p className="text-label mt-1">Sets</p>
-          </div>
-          <div className="w-px h-10 bg-[#E5E1D9]" />
-          <div className="text-center">
-            <AnimatedStat
-              value={totalVolume > 1000 ? +(totalVolume / 1000).toFixed(1) : totalVolume}
-              suffix={totalVolume > 1000 ? 't' : ''}
-            />
-            <p className="text-label mt-1">Volume</p>
-          </div>
+      {/* ── Stats row ── */}
+      <div className="flex items-center justify-center gap-8 mb-12">
+        <div className="text-center">
+          <AnimatedStat value={minutes} />
+          <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mt-1" style={{ fontFamily: 'var(--font-body)' }}>
+            Minuten
+          </p>
+        </div>
+        <div className="w-px h-10 bg-[#F0F0EE]" />
+        <div className="text-center">
+          <AnimatedStat value={totalSets} />
+          <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mt-1" style={{ fontFamily: 'var(--font-body)' }}>
+            Sets
+          </p>
+        </div>
+        <div className="w-px h-10 bg-[#F0F0EE]" />
+        <div className="text-center">
+          <AnimatedStat
+            value={totalVolume > 1000 ? +(totalVolume / 1000).toFixed(1) : totalVolume}
+            suffix={totalVolume > 1000 ? 't' : ''}
+          />
+          <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mt-1" style={{ fontFamily: 'var(--font-body)' }}>
+            Volume
+          </p>
         </div>
       </div>
 
-      <main className="max-w-lg mx-auto px-4 pb-32 space-y-4">
-
-        {/* ═══ GEVOEL — text chips, no emojis ═══════ */}
-        <div className="card-v2 p-6 animate-slide-up" style={{ animationDelay: '120ms' }}>
-          <p className="text-label mb-4">Hoe voelde je je?</p>
-          <div className="flex gap-2">
-            {moodOptions.map((mood) => (
-              <button
-                key={mood.value}
-                onClick={() => setMoodRating(mood.value)}
-                className={`flex-1 py-3 text-center rounded-xl text-[13px] font-semibold transition-all ${
-                  moodRating === mood.value
-                    ? 'bg-[#1A1917] text-white'
-                    : 'bg-[#F5F2EC] text-[#6B6862] hover:bg-[#F0EDE8]'
-                }`}
-              >
-                {mood.label}
-              </button>
-            ))}
-          </div>
+      {/* ── Gevoel ── */}
+      <div className="border-t border-[#F0F0EE] pt-6 mb-8">
+        <p
+          className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-4"
+          style={{ fontFamily: 'var(--font-body)' }}
+        >
+          Hoe voelde je je?
+        </p>
+        <div className="flex gap-2">
+          {moodOptions.map((m) => (
+            <button
+              key={m.value}
+              onClick={() => setMoodRating(m.value)}
+              className={`flex-1 py-3 text-center rounded-xl text-[13px] font-medium transition-all ${
+                moodRating === m.value
+                  ? 'bg-[#1A1917] text-white'
+                  : 'border border-[#F0F0EE] text-[#ACACAC] hover:border-[#C0C0C0]'
+              }`}
+              style={{ fontFamily: 'var(--font-body)' }}
+            >
+              {m.label}
+            </button>
+          ))}
         </div>
+      </div>
 
-        {/* ═══ MOEILIJKHEID — numbered 1-5 ══════════ */}
-        <div className="card-v2 p-6 animate-slide-up" style={{ animationDelay: '180ms' }}>
-          <p className="text-label mb-4">Moeilijkheidsgraad</p>
-          <div className="flex gap-2">
-            {[1, 2, 3, 4, 5].map((level) => (
-              <button
-                key={level}
-                onClick={() => setDifficultyRating(level)}
-                className={`flex-1 py-3 text-center rounded-xl transition-all ${
-                  difficultyRating === level
-                    ? 'bg-[#D46A3A] text-white'
-                    : 'bg-[#F5F2EC] text-[#6B6862] hover:bg-[#F0EDE8]'
-                }`}
+      {/* ── Moeilijkheid ── */}
+      <div className="border-t border-[#F0F0EE] pt-6 mb-8">
+        <p
+          className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-4"
+          style={{ fontFamily: 'var(--font-body)' }}
+        >
+          Moeilijkheidsgraad
+        </p>
+        <div className="flex gap-2">
+          {[1, 2, 3, 4, 5].map((level) => (
+            <button
+              key={level}
+              onClick={() => setDifficultyRating(level)}
+              className={`flex-1 py-3 text-center rounded-xl transition-all ${
+                difficultyRating === level
+                  ? 'bg-[#D46A3A] text-white'
+                  : 'border border-[#F0F0EE] text-[#ACACAC] hover:border-[#C0C0C0]'
+              }`}
+            >
+              <span
+                className="text-[20px]"
+                style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
               >
-                <span className="stat-number text-[20px]">{level}</span>
-              </button>
-            ))}
-          </div>
-          <div className="flex justify-between mt-2 px-1">
-            <span className="text-[10px] text-[#C5C2BC]">Makkelijk</span>
-            <span className="text-[10px] text-[#C5C2BC]">Te zwaar</span>
-          </div>
+                {level}
+              </span>
+            </button>
+          ))}
         </div>
+        <div className="flex justify-between mt-2 px-1">
+          <span className="text-[10px] text-[#D5D5D5]" style={{ fontFamily: 'var(--font-body)' }}>Makkelijk</span>
+          <span className="text-[10px] text-[#D5D5D5]" style={{ fontFamily: 'var(--font-body)' }}>Te zwaar</span>
+        </div>
+      </div>
 
-        {/* ═══ PIJN PER OEFENING ══════════════════ */}
-        {exerciseGroups.length > 0 && (
-          <div className="card-v2 overflow-hidden animate-slide-up" style={{ animationDelay: '240ms' }}>
-            <div className="flex items-center justify-between p-6 pb-3">
-              <p className="text-label">Pijn of ongemak?</p>
-              {painCount > 0 && (
-                <span className="text-[11px] font-semibold text-[#C4372A] bg-[rgba(196,55,42,0.06)] px-2.5 py-1 rounded-lg">
-                  {painCount} oefening{painCount !== 1 ? 'en' : ''}
+      {/* ── Pijn per oefening ── */}
+      {exerciseGroups.length > 0 && (
+        <div className="border-t border-[#F0F0EE] pt-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <p
+              className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px]"
+              style={{ fontFamily: 'var(--font-body)' }}
+            >
+              Pijn of ongemak?
+            </p>
+            {painCount > 0 && (
+              <span className="text-[11px] font-medium text-[#C4372A]" style={{ fontFamily: 'var(--font-body)' }}>
+                {painCount} oefening{painCount !== 1 ? 'en' : ''}
+              </span>
+            )}
+          </div>
+
+          {exerciseGroups.map((group, i) => (
+            <div key={group.exerciseId} className={i > 0 ? 'border-t border-[#F0F0EE]' : ''}>
+              <button
+                onClick={() => {
+                  togglePain(group.exerciseId)
+                  setExpandedExercise(!group.painFlag ? group.exerciseId : null)
+                }}
+                className="w-full flex items-center gap-3 py-3.5"
+              >
+                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                  group.painFlag ? 'border-[#C4372A] bg-[#C4372A]' : 'border-[#E0E0E0]'
+                }`}>
+                  {group.painFlag && <AlertTriangle size={10} strokeWidth={2.5} className="text-white" />}
+                </div>
+                <span
+                  className={`text-[14px] font-medium flex-1 text-left ${
+                    group.painFlag ? 'text-[#C4372A]' : 'text-[#1A1917]'
+                  }`}
+                  style={{ fontFamily: 'var(--font-body)' }}
+                >
+                  {group.name}
                 </span>
+                <span className="text-[12px] text-[#C0C0C0]" style={{ fontFamily: 'var(--font-body)' }}>
+                  {group.sets.length} sets
+                </span>
+                {group.painFlag && (
+                  expandedExercise === group.exerciseId
+                    ? <ChevronUp size={14} className="text-[#C4372A]" />
+                    : <ChevronDown size={14} className="text-[#C4372A]" />
+                )}
+              </button>
+              {group.painFlag && expandedExercise === group.exerciseId && (
+                <div className="pb-4 pl-8">
+                  <textarea
+                    value={group.painNotes}
+                    onChange={(e) => setPainNotes(group.exerciseId, e.target.value)}
+                    placeholder="Waar voelde je pijn? (bijv. linkerschouder, onderrug...)"
+                    className="w-full px-4 py-3 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:border-[#C4372A]/40 resize-none h-16 bg-white"
+                    style={{ fontFamily: 'var(--font-body)' }}
+                  />
+                </div>
               )}
             </div>
-            <div className="px-6 pb-6">
-              <div className="rounded-xl overflow-hidden border border-[#E8E4DC]">
-                {exerciseGroups.map((group, i) => (
-                  <div key={group.exerciseId} className={i > 0 ? 'border-t border-[#E8E4DC]' : ''}>
-                    <button
-                      onClick={() => {
-                        togglePain(group.exerciseId)
-                        setExpandedExercise(!group.painFlag ? group.exerciseId : null)
-                      }}
-                      className={`w-full flex items-center gap-3 px-4 py-3.5 transition-colors ${
-                        group.painFlag ? 'bg-[rgba(196,55,42,0.04)]' : 'hover:bg-[#FAF8F3]'
-                      }`}
-                    >
-                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                        group.painFlag ? 'border-[#C4372A] bg-[#C4372A]' : 'border-[#DDD9D0]'
-                      }`}>
-                        {group.painFlag && <AlertTriangle size={10} strokeWidth={2.5} className="text-white" />}
-                      </div>
-                      <span className={`text-[14px] font-medium flex-1 text-left ${
-                        group.painFlag ? 'text-[#C4372A]' : 'text-[#1A1917]'
-                      }`}>
-                        {group.name}
-                      </span>
-                      <span className="text-[12px] text-[#CCC7BC]">{group.sets.length} sets</span>
-                      {group.painFlag && (
-                        expandedExercise === group.exerciseId
-                          ? <ChevronUp size={14} className="text-[#C4372A]" />
-                          : <ChevronDown size={14} className="text-[#C4372A]" />
-                      )}
-                    </button>
-                    {group.painFlag && expandedExercise === group.exerciseId && (
-                      <div className="px-4 pb-4 bg-[rgba(196,55,42,0.04)]">
-                        <textarea
-                          value={group.painNotes}
-                          onChange={(e) => setPainNotes(group.exerciseId, e.target.value)}
-                          placeholder="Waar voelde je pijn? (bijv. linkerschouder, onderrug...)"
-                          className="w-full px-4 py-3 border border-[#E8E4DC] rounded-xl text-[13px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#C4372A]/40 resize-none h-16 bg-white"
-                        />
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Feedback voor coach ── */}
+      <div className="border-t border-[#F0F0EE] pt-6 mb-8">
+        <p
+          className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-3"
+          style={{ fontFamily: 'var(--font-body)' }}
+        >
+          Feedback voor je coach
+        </p>
+        <textarea
+          value={feedbackText}
+          onChange={(e) => setFeedbackText(e.target.value)}
+          placeholder="Welke oefeningen wil je meer of minder?"
+          className="w-full px-4 py-3 border border-[#F0F0EE] rounded-xl text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917] resize-none h-20 bg-white"
+          style={{ fontFamily: 'var(--font-body)' }}
+        />
+      </div>
+
+      {/* ── Notities ── */}
+      <div className="border-t border-[#F0F0EE] pt-6 mb-10">
+        <p
+          className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-3"
+          style={{ fontFamily: 'var(--font-body)' }}
+        >
+          Notities <span className="normal-case tracking-normal text-[#D5D5D5]">(optioneel)</span>
+        </p>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Hoe ging het? Extra opmerkingen..."
+          className="w-full px-4 py-3 border border-[#F0F0EE] rounded-xl text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917] resize-none h-20 bg-white"
+          style={{ fontFamily: 'var(--font-body)' }}
+        />
+      </div>
+
+      {/* ── CTA ── */}
+      <button
+        onClick={handleComplete}
+        disabled={saving}
+        className="w-full py-4 rounded-xl bg-[#1A1917] text-white font-bold text-[14px] uppercase tracking-[0.06em] flex items-center justify-center gap-2 hover:bg-[#333] transition-colors disabled:opacity-50"
+        style={{ fontFamily: 'var(--font-display)' }}
+      >
+        {saving ? (
+          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        ) : (
+          <>
+            Opslaan & afsluiten
+            <ArrowRight size={16} strokeWidth={2} />
+          </>
         )}
+      </button>
 
-        {/* ═══ FEEDBACK VOOR COACH ════════════════ */}
-        <div className="card-v2 p-6 animate-slide-up" style={{ animationDelay: '300ms' }}>
-          <p className="text-label mb-3">Feedback voor je coach</p>
-          <textarea
-            value={feedbackText}
-            onChange={(e) => setFeedbackText(e.target.value)}
-            placeholder="Welke oefeningen wil je meer of minder?"
-            className="w-full px-4 py-3 border border-[#E8E4DC] rounded-xl bg-[#FAF8F3] text-[14px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
-          />
-        </div>
-
-        {/* ═══ NOTITIES ═══════════════════════════ */}
-        <div className="card-v2 p-6 animate-slide-up" style={{ animationDelay: '360ms' }}>
-          <p className="text-label mb-3">
-            Notities <span className="font-normal text-[#C5C2BC]">(optioneel)</span>
-          </p>
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Hoe ging het? Extra opmerkingen..."
-            className="w-full px-4 py-3 border border-[#E8E4DC] rounded-xl bg-[#FAF8F3] text-[14px] text-[#1A1917] placeholder-[#C5C2BC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
-          />
-        </div>
-
-        {/* ═══ OPSLAAN CTA ════════════════════════ */}
-        <div className="animate-slide-up" style={{ animationDelay: '420ms' }}>
-          <button
-            onClick={handleComplete}
-            disabled={saving}
-            className="btn-pop w-full flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            {saving ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <>
-                Opslaan & afsluiten
-                <ArrowRight size={16} strokeWidth={2} />
-              </>
-            )}
-          </button>
-
-          <p className="text-center text-[12px] text-[#C5C2BC] mt-3">
-            Je coach ziet deze feedback bij de volgende aanpassing
-          </p>
-        </div>
-      </main>
+      <p className="text-center text-[12px] text-[#D5D5D5] mt-3" style={{ fontFamily: 'var(--font-body)' }}>
+        Je coach ziet deze feedback bij de volgende aanpassing
+      </p>
     </div>
   )
 }

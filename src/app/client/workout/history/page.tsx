@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase'
-import { ChevronLeft, ChevronRight, Calendar, TrendingUp } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
 
 interface WorkoutSession {
   id: string
@@ -29,8 +29,9 @@ interface CalendarDay {
   year: number
 }
 
+const MOOD_LABELS: Record<number, string> = { 1: 'Zwaar', 2: 'Oké', 3: 'Goed', 4: 'Sterk', 5: 'Top' }
+
 export default function WorkoutHistoryPage() {
-  const [user, setUser] = useState<any>(null)
   const [workouts, setWorkouts] = useState<WorkoutSession[]>([])
   const [loading, setLoading] = useState(true)
   const [currentMonth, setCurrentMonth] = useState(new Date())
@@ -42,7 +43,6 @@ export default function WorkoutHistoryPage() {
         const supabase = createClient()
         const { data: { user: authUser } } = await supabase.auth.getUser()
         if (!authUser) return
-        setUser({ id: authUser.id })
 
         const { data: sessionsData } = await supabase
           .from('workout_sessions')
@@ -108,79 +108,78 @@ export default function WorkoutHistoryPage() {
   const monthName = currentMonth.toLocaleDateString('nl-BE', { month: 'long', year: 'numeric' })
   const recentWorkouts = workouts.slice(0, 10)
 
-  const getMoodEmoji = (rating: number | null) => {
-    if (!rating) return '—'
-    const emojis: Record<number, string> = { 1: '😫', 2: '😐', 3: '😊', 4: '💪', 5: '🔥' }
-    return emojis[rating] || '—'
-  }
-
   const formatDuration = (seconds: number | null) => {
     if (!seconds) return '—'
-    const minutes = Math.floor(seconds / 60)
-    return `${minutes} min`
+    return `${Math.floor(seconds / 60)} min`
   }
 
   const calculateVolume = (sets: any[] | undefined | null) => {
     if (!sets || sets.length === 0) return 0
-    return sets.reduce((sum, set) => sum + (set.weight_kg || 0) * (set.actual_reps || 0), 0)
+    return sets.reduce((sum: number, set: any) => sum + (set.weight_kg || 0) * (set.actual_reps || 0), 0)
   }
 
   if (loading) {
     return (
-      <div className="pb-28">
-        <div className="mb-8">
-          <div className="h-4 w-32 bg-[#E5E1D9] rounded-md mb-3 animate-pulse" />
-          <div className="h-10 w-56 bg-[#E5E1D9] rounded-lg animate-pulse" />
-        </div>
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 bg-white rounded-2xl shadow-[var(--shadow-card)] animate-pulse" />
-          ))}
-        </div>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#1A1917] border-t-transparent" />
       </div>
     )
   }
 
   return (
     <div className="pb-28">
-      {/* Header */}
-      <div className="mb-8">
-        <span className="text-label">Overzicht</span>
-        <h1 className="text-editorial-h2 text-[#1A1917] mt-3">
-          Geschiedenis
-        </h1>
-      </div>
 
-      {/* Calendar card */}
-      <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] overflow-hidden mb-6">
-        {/* Month header */}
-        <div className="px-5 py-4 flex items-center justify-between">
-          <button
-            onClick={handlePrevMonth}
-            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[#F5F2EC] transition-colors"
-          >
-            <ChevronLeft size={18} strokeWidth={1.5} className="text-[#6B6862]" />
+      {/* ── Back + Header ── */}
+      <button
+        onClick={() => window.history.back()}
+        className="flex items-center gap-1.5 mb-7 mt-2 group"
+      >
+        <ChevronLeft strokeWidth={1.5} className="w-[18px] h-[18px] text-[#C0C0C0] group-hover:text-[#1A1917] transition-colors" />
+        <span className="text-[14px] text-[#C0C0C0] group-hover:text-[#1A1917] transition-colors" style={{ fontFamily: 'var(--font-body)' }}>
+          Training
+        </span>
+      </button>
+
+      <h1
+        className="text-[28px] tracking-[-0.5px] leading-[1.1] text-[#1A1917] mb-8"
+        style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
+      >
+        Geschiedenis
+      </h1>
+
+      {/* ── Calendar ── */}
+      <div className="mb-10">
+        {/* Month nav */}
+        <div className="flex items-center gap-4 mb-6">
+          <button onClick={handlePrevMonth} className="p-1 text-[#D0D0D0] hover:text-[#1A1917] transition-colors">
+            <ChevronLeft strokeWidth={1.5} className="w-4 h-4" />
           </button>
-          <h3 className="text-[15px] font-semibold text-[#1A1917] capitalize">{monthName}</h3>
-          <button
-            onClick={handleNextMonth}
-            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[#F5F2EC] transition-colors"
+          <span
+            className="text-[14px] font-medium text-[#1A1917] capitalize"
+            style={{ fontFamily: 'var(--font-body)' }}
           >
-            <ChevronRight size={18} strokeWidth={1.5} className="text-[#6B6862]" />
+            {monthName}
+          </span>
+          <button onClick={handleNextMonth} className="p-1 text-[#D0D0D0] hover:text-[#1A1917] transition-colors">
+            <ChevronRight strokeWidth={1.5} className="w-4 h-4" />
           </button>
         </div>
 
         {/* Day labels */}
-        <div className="grid grid-cols-7 gap-0 px-3 py-2 border-t border-[#F0EDE8]">
+        <div className="grid grid-cols-7 gap-0 mb-2">
           {['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'].map((day) => (
-            <div key={day} className="text-[11px] font-semibold text-[#A09D96] text-center py-1 uppercase tracking-[0.06em]">
+            <div
+              key={day}
+              className="text-[11px] font-medium text-[#C0C0C0] text-center py-1 uppercase tracking-[0.06em]"
+              style={{ fontFamily: 'var(--font-body)' }}
+            >
               {day}
             </div>
           ))}
         </div>
 
         {/* Calendar grid */}
-        <div className="grid grid-cols-7 gap-0 px-3 pb-3">
+        <div className="grid grid-cols-7 gap-0">
           {calendarDays.map((day, index) => {
             const isCurrentMonth = day.month === currentMonth.getMonth()
             const isToday = day.isToday
@@ -188,16 +187,20 @@ export default function WorkoutHistoryPage() {
             return (
               <div
                 key={index}
-                className={`aspect-square flex items-center justify-center text-[13px] font-medium relative rounded-lg ${
-                  !isCurrentMonth ? 'text-[#DDD9D0]' : 'text-[#1A1917]'
-                } ${isToday ? 'bg-[var(--color-pop)] text-white font-semibold' : ''}`}
+                className={`aspect-square flex items-center justify-center text-[13px] font-medium relative ${
+                  !isCurrentMonth ? 'text-[#E0E0E0]' : 'text-[#1A1917]'
+                } ${isToday ? 'text-white' : ''}`}
+                style={{ fontFamily: 'var(--font-body)' }}
               >
-                {day.date}
+                {isToday && (
+                  <div className="absolute inset-1 rounded-full bg-[#1A1917]" />
+                )}
+                <span className="relative z-10">{day.date}</span>
                 {day.hasWorkout && !isToday && (
-                  <div className="absolute bottom-1 w-1.5 h-1.5 bg-[var(--color-pop)] rounded-full" />
+                  <div className="absolute bottom-1 w-[5px] h-[5px] bg-[#D46A3A] rounded-full" />
                 )}
                 {day.hasWorkout && isToday && (
-                  <div className="absolute bottom-1 w-1.5 h-1.5 bg-white rounded-full" />
+                  <div className="absolute bottom-1 w-[5px] h-[5px] bg-white rounded-full" />
                 )}
               </div>
             )
@@ -205,92 +208,109 @@ export default function WorkoutHistoryPage() {
         </div>
       </div>
 
-      {/* Recent workouts */}
+      {/* ── Recent workouts ── */}
       {recentWorkouts.length > 0 ? (
         <div>
-          <p className="text-label mb-4">Recente trainingen</p>
-          <div className="space-y-3">
-            {recentWorkouts.map((workout, i) => {
-              const isExpanded = expandedWorkoutId === workout.id
-              const volume = calculateVolume(workout.workout_sets)
-              const workoutDate = new Date(workout.completed_at || '')
-              const dateStr = workoutDate.toLocaleDateString('nl-BE', {
-                weekday: 'short',
-                month: 'short',
-                day: 'numeric',
-              })
+          <p
+            className="text-[12px] font-medium text-[#B0B0B0] uppercase tracking-[1.5px] mb-4"
+            style={{ fontFamily: 'var(--font-body)' }}
+          >
+            Recente trainingen
+          </p>
 
-              return (
-                <div
-                  key={workout.id}
-                  className="bg-white rounded-2xl shadow-[var(--shadow-card)] overflow-hidden animate-gentle-rise"
-                  style={{ animationDelay: `${i * 60}ms` }}
+          {recentWorkouts.map((workout) => {
+            const isExpanded = expandedWorkoutId === workout.id
+            const volume = calculateVolume(workout.workout_sets)
+            const workoutDate = new Date(workout.completed_at || '')
+            const dateStr = workoutDate.toLocaleDateString('nl-BE', {
+              weekday: 'short', month: 'short', day: 'numeric',
+            })
+            const dayName = (Array.isArray(workout.program_template_days)
+              ? workout.program_template_days[0]?.name
+              : workout.program_template_days?.name) || 'Training'
+
+            return (
+              <div key={workout.id}>
+                <button
+                  onClick={() => setExpandedWorkoutId(isExpanded ? null : workout.id)}
+                  className="w-full text-left flex items-center gap-3 py-4 border-t border-[#F0F0EE] hover:opacity-70 transition-opacity"
                 >
-                  <button
-                    onClick={() => setExpandedWorkoutId(isExpanded ? null : workout.id)}
-                    className="w-full px-5 py-4 text-left hover:bg-[#FAF8F3] transition-colors"
-                  >
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <p className="text-[14px] font-semibold text-[#1A1917]">{dateStr}</p>
-                          <span className="text-[11px] uppercase tracking-[0.06em] text-[#A09D96] font-medium">
-                            {(Array.isArray(workout.program_template_days) ? workout.program_template_days[0]?.name : workout.program_template_days?.name) || 'Training'}
-                          </span>
-                        </div>
-                        <div className="mt-1.5 flex items-center gap-4 text-[12px] text-[#A09D96]">
-                          <span>{formatDuration(workout.duration_seconds)}</span>
-                          <span>{volume.toLocaleString('nl-BE')} kg</span>
-                          <span>{getMoodEmoji(workout.mood_rating)}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p
+                        className="text-[14px] font-medium text-[#1A1917]"
+                        style={{ fontFamily: 'var(--font-body)' }}
+                      >
+                        {dateStr}
+                      </p>
+                      <span className="text-[11px] text-[#C0C0C0]" style={{ fontFamily: 'var(--font-body)' }}>
+                        {dayName}
+                      </span>
+                    </div>
+                    <div className="mt-0.5 flex items-center gap-3 text-[12px] text-[#C0C0C0]" style={{ fontFamily: 'var(--font-body)' }}>
+                      <span>{formatDuration(workout.duration_seconds)}</span>
+                      <span>{volume.toLocaleString('nl-BE')} kg</span>
+                      {workout.mood_rating && (
+                        <span>{MOOD_LABELS[workout.mood_rating] || '—'}</span>
+                      )}
+                    </div>
+                  </div>
+                  <ChevronRight
+                    size={16}
+                    strokeWidth={1.5}
+                    className={`text-[#D5D5D5] shrink-0 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                  />
+                </button>
+
+                {isExpanded && (
+                  <div className="pl-0 pb-4 border-b border-[#F0F0EE]">
+                    {workout.notes && (
+                      <div className="mb-3">
+                        <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-1" style={{ fontFamily: 'var(--font-body)' }}>
+                          Notities
+                        </p>
+                        <p className="text-[13px] text-[#1A1917] whitespace-pre-wrap" style={{ fontFamily: 'var(--font-body)' }}>
+                          {workout.notes}
+                        </p>
+                      </div>
+                    )}
+                    {workout.workout_sets && workout.workout_sets.length > 0 && (
+                      <div>
+                        <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-2" style={{ fontFamily: 'var(--font-body)' }}>
+                          Sets
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {workout.workout_sets.map((set, idx) => (
+                            <div key={idx} className="px-3 py-2 border border-[#F0F0EE] rounded-lg text-center">
+                              <p className="text-[10px] text-[#C0C0C0] uppercase tracking-[0.06em] mb-0.5" style={{ fontFamily: 'var(--font-body)' }}>
+                                Set {idx + 1}
+                              </p>
+                              <p
+                                className="text-[13px] font-medium text-[#1A1917] tabular-nums"
+                                style={{ fontFamily: 'var(--font-display)' }}
+                              >
+                                {set.weight_kg || '—'} × {set.actual_reps || '—'}
+                              </p>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                      <ChevronRight
-                        size={16}
-                        strokeWidth={1.5}
-                        className={`text-[#CCC7BC] flex-shrink-0 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
-                      />
-                    </div>
-                  </button>
-
-                  {isExpanded && (
-                    <div className="border-t border-[#F0EDE8] px-5 py-4 bg-[#FAF8F3] space-y-3">
-                      {workout.notes && (
-                        <div>
-                          <p className="text-label mb-2">Notities</p>
-                          <p className="text-[13px] text-[#1A1917] whitespace-pre-wrap">{workout.notes}</p>
-                        </div>
-                      )}
-                      {workout.workout_sets && workout.workout_sets.length > 0 && (
-                        <div>
-                          <p className="text-label mb-2">Sets</p>
-                          <div className="grid grid-cols-3 gap-2">
-                            {workout.workout_sets.map((set, idx) => (
-                              <div key={idx} className="bg-white rounded-xl p-3 text-center shadow-sm">
-                                <p className="text-[10px] text-[#A09D96] uppercase tracking-[0.06em] mb-0.5">Set {idx + 1}</p>
-                                <p className="text-[13px] font-semibold text-[#1A1917] tabular-nums">
-                                  {set.weight_kg || '—'} × {set.actual_reps || '—'}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-8 text-center">
-          <div className="w-14 h-14 bg-[var(--color-pop-light)] rounded-xl flex items-center justify-center mx-auto mb-4">
-            <Calendar size={24} strokeWidth={1.5} className="text-[var(--color-pop)]" />
-          </div>
-          <p className="text-[14px] font-medium text-[#1A1917] mb-1">
-            Geen trainingen geregistreerd
+        <div className="py-16 text-center">
+          <p
+            className="text-[36px] tracking-[-1px] leading-[1.1] text-[#1A1917] mb-3"
+            style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
+          >
+            Nog geen data
           </p>
-          <p className="text-[13px] text-[#A09D96]">
+          <p className="text-[14px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
             Voltooi je eerste training om te beginnen
           </p>
         </div>
