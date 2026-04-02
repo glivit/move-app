@@ -122,11 +122,12 @@ function formatNumber(n: number): string {
 export default function ClientDashboard() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [selectedDay, setSelectedDay] = useState<number | null>(null)
   useEffect(() => { loadDashboard() }, [])
 
   async function loadDashboard() {
     try {
-      const d = await cachedFetch<DashboardData>('/api/dashboard', { maxAge: 30_000 })
+      const d = await cachedFetch<DashboardData>('/api/dashboard', { maxAge: 120_000 })
       setData(d)
     } catch (err) {
       console.error('Dashboard load error:', err)
@@ -207,9 +208,10 @@ export default function ClientDashboard() {
       </div>
 
       {/* ═══ WEEK STRIP — chunky 36px dots ════════════════ */}
-      <div className="mt-9 mb-12 flex items-center justify-between animate-fade-in" style={{ animationDelay: '80ms' }}>
+      <div className="mt-9 mb-12 animate-fade-in" style={{ animationDelay: '80ms' }}>
+        <div className="flex items-center justify-between">
         {weekDots.map((dot, i) => (
-          <div key={i} className="flex flex-col items-center gap-2.5">
+          <button key={i} onClick={() => setSelectedDay(selectedDay === dot.dow ? null : dot.dow)} className="flex flex-col items-center gap-2.5 transition-transform active:scale-90">
             <span className="text-[11px] font-medium uppercase tracking-[0.5px] text-[#C8C8C8]">
               {dot.label}
             </span>
@@ -226,8 +228,36 @@ export default function ClientDashboard() {
             ) : (
               <div className="h-[6px] w-[6px] rounded-full bg-[#E5E5E5]" />
             )}
-          </div>
+          </button>
         ))}
+        </div>
+        {/* Selected day info */}
+        {selectedDay && (() => {
+          const dayInfo = training.scheduleDays?.find(s => s.dayNumber === selectedDay)
+          const dayDot = weekDots.find(d => d.dow === selectedDay)
+          if (!dayDot) return null
+          return (
+            <div className="mt-5 rounded-xl bg-[#FAFAF8] px-4 py-3 animate-fade-in">
+              {dayInfo ? (
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[14px] font-medium text-[#1A1917]">{dayInfo.name}</p>
+                    {dayInfo.focus && <p className="text-[12px] text-[#ACACAC] mt-0.5">{dayInfo.focus}</p>}
+                  </div>
+                  {dayDot.completed ? (
+                    <span className="text-[12px] font-medium text-[#3D8B5C]">Voltooid</span>
+                  ) : dayDot.isPast ? (
+                    <span className="text-[12px] text-[#ACACAC]">Gemist</span>
+                  ) : (
+                    <span className="text-[12px] text-[#D46A3A]">Gepland</span>
+                  )}
+                </div>
+              ) : (
+                <p className="text-[13px] text-[#ACACAC]">Geen training gepland</p>
+              )}
+            </div>
+          )
+        })()}
       </div>
 
       {/* ═══ ONBOARDING ═══════════════════════════════════ */}

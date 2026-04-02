@@ -14,18 +14,27 @@ export function SyncStatusIndicator() {
   })
   const [visible, setVisible] = useState(false)
   const [hideTimeout, setHideTimeout] = useState<NodeJS.Timeout | null>(null)
+  const [hadPendingItems, setHadPendingItems] = useState(false)
 
   useEffect(() => {
     const unsubscribe = onSyncStatusChange((newStatus) => {
       setStatus(newStatus)
 
+      // Track whether there were pending items before sync completed
+      if (newStatus.pendingCount > 0 || newStatus.isSyncing) {
+        setHadPendingItems(true)
+      }
+
       // Show indicator when offline, syncing, or has pending items
       if (!newStatus.isOnline || newStatus.isSyncing || newStatus.pendingCount > 0 || newStatus.lastError) {
         setVisible(true)
         if (hideTimeout) clearTimeout(hideTimeout)
-      } else if (newStatus.isOnline && !newStatus.isSyncing && newStatus.pendingCount === 0) {
-        // Auto-hide after successful sync
-        const timeout = setTimeout(() => setVisible(false), 3000)
+      } else if (newStatus.isOnline && !newStatus.isSyncing && newStatus.pendingCount === 0 && hadPendingItems) {
+        // Only show success toast if we actually synced something
+        const timeout = setTimeout(() => {
+          setVisible(false)
+          setHadPendingItems(false)
+        }, 3000)
         setHideTimeout(timeout)
         setVisible(true)
       }
@@ -35,7 +44,7 @@ export function SyncStatusIndicator() {
       unsubscribe()
       if (hideTimeout) clearTimeout(hideTimeout)
     }
-  }, [])
+  }, [hadPendingItems])
 
   if (!visible) return null
 

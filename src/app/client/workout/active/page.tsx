@@ -335,6 +335,7 @@ function FormCheckModal({ exerciseName, onClose }: { exerciseName: string; onClo
   const [uploading, setUploading] = useState(false)
   const [sent, setSent] = useState(false)
   const [note, setNote] = useState('')
+  const [uploadError, setUploadError] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -384,6 +385,7 @@ function FormCheckModal({ exerciseName, onClose }: { exerciseName: string; onClo
       setTimeout(onClose, 1500)
     } catch (err) {
       console.error('Form check upload fout:', err)
+      setUploadError(err instanceof Error ? err.message : 'Upload mislukt, probeer opnieuw')
     } finally {
       setUploading(false)
     }
@@ -418,13 +420,15 @@ function FormCheckModal({ exerciseName, onClose }: { exerciseName: string; onClo
               ref={fileInputRef}
               type="file"
               accept="video/*"
-              capture="environment"
               onChange={handleFileSelect}
               className="hidden"
             />
 
+            {uploadError && (
+              <p className="text-[13px] text-[#C4372A] mb-3 text-center">{uploadError}</p>
+            )}
             <button
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => { setUploadError(' + chr(39) + chr(39) + '); fileInputRef.current?.click() }}
               disabled={uploading}
               className="w-full py-4 rounded-2xl font-bold text-[14px] uppercase tracking-[0.08em] bg-[#D46A3A] text-white flex items-center justify-center gap-2 disabled:opacity-50"
             >

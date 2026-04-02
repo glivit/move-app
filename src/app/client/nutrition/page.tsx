@@ -287,12 +287,12 @@ function FoodSearchModal({
     <div className="fixed inset-0 z-50 flex flex-col">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/30"
+        className="fixed inset-0 bg-black/30 z-50"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl rounded-b-none flex flex-col max-h-[90vh] z-50">
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-white rounded-t-2xl rounded-b-none flex flex-col max-h-[90vh] z-[51]">
         {/* Search input */}
         <div className="px-4 py-4 border-b border-[#F0F0EE]">
           <input

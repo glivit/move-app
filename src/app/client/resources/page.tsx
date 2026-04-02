@@ -111,7 +111,7 @@ export default function ResourcesPage() {
       </div>
 
       {/* Search */}
-      <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white animate-slide-up stagger-2">
+      <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white dark:bg-[#1A1917] animate-slide-up stagger-2">
         <Search size={18} strokeWidth={1.5} style={{ color: '#C0C0C0' }} />
         <input
           type="text"
@@ -147,11 +147,11 @@ export default function ResourcesPage() {
       {loading ? (
         <div className="space-y-3 animate-slide-up stagger-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-white rounded-2xl animate-pulse" />
+            <div key={i} className="h-32 bg-white dark:bg-[#1A1917] rounded-2xl animate-pulse" />
           ))}
         </div>
       ) : filteredResources.length === 0 ? (
-        <div className="p-12 text-center bg-white rounded-2xl animate-slide-up stagger-6">
+        <div className="p-12 text-center bg-white dark:bg-[#1A1917] rounded-2xl animate-slide-up stagger-6">
           <BookOpen size={40} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#C0C0C0' }} />
           <p className="text-[14px]" style={{ color: '#ACACAC' }}>Geen content gevonden</p>
         </div>
@@ -164,14 +164,14 @@ export default function ResourcesPage() {
                 <button
                   key={resource.id}
                   onClick={() => { setSelectedResource(resource); trackView(resource.id) }}
-                  className="w-full text-left overflow-hidden transition-all bg-white rounded-2xl hover:bg-[#FAFAF8]"
+                  className="w-full text-left overflow-hidden transition-all bg-white dark:bg-[#1A1917] rounded-2xl hover:bg-[#FAFAF8] dark:bg-[#232320]"
                 >
                   {resource.thumbnail_url ? (
                     <div className="relative aspect-[21/9] overflow-hidden">
                       <img src={resource.thumbnail_url} alt="" className="w-full h-full object-cover" />
                       {resource.content_type === 'video' && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                          <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center">
+                          <div className="w-12 h-12 rounded-full bg-white dark:bg-[#1A1917]/90 flex items-center justify-center">
                             <Play size={20} strokeWidth={2} style={{ color: '#C4372A' }} fill="#C4372A" />
                           </div>
                         </div>
@@ -220,14 +220,14 @@ export default function ResourcesPage() {
               <button
                 key={resource.id}
                 onClick={() => { setSelectedResource(resource); trackView(resource.id) }}
-                className="w-full text-left overflow-hidden transition-all bg-white rounded-2xl hover:bg-[#FAFAF8]"
+                className="w-full text-left overflow-hidden transition-all bg-white dark:bg-[#1A1917] rounded-2xl hover:bg-[#FAFAF8] dark:bg-[#232320]"
               >
                 {resource.thumbnail_url ? (
                   <div className="relative aspect-video overflow-hidden">
                     <img src={resource.thumbnail_url} alt="" className="w-full h-full object-cover" />
                     {resource.content_type === 'video' && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                        <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-full bg-white dark:bg-[#1A1917]/90 flex items-center justify-center">
                           <Play size={16} strokeWidth={2} style={{ color: '#C4372A' }} fill="#C4372A" />
                         </div>
                       </div>
@@ -265,7 +265,7 @@ export default function ResourcesPage() {
       {selectedResource && (
         <div className="fixed inset-0 z-50 flex items-end lg:items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSelectedResource(null)} />
-          <div className="relative w-full max-w-2xl mx-4 mb-4 lg:mb-0 max-h-[85vh] overflow-y-auto bg-white rounded-2xl">
+          <div className="relative w-full max-w-2xl mx-4 mb-4 lg:mb-0 max-h-[85vh] overflow-y-auto bg-white dark:bg-[#1A1917] rounded-2xl">
             <button
               onClick={() => setSelectedResource(null)}
               className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full flex items-center justify-center bg-black/20 backdrop-blur-sm"

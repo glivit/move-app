@@ -13,7 +13,7 @@ interface CacheEntry {
 const cache = new Map<string, CacheEntry>()
 
 // Default: serve cached data for 30 seconds, then revalidate
-const DEFAULT_MAX_AGE = 30_000
+const DEFAULT_MAX_AGE = 120_000
 
 /**
  * Fetch with stale-while-revalidate caching.

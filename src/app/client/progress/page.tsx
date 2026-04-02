@@ -385,10 +385,10 @@ export default function ProgressPage() {
           <PhotoComparison />
           <Link
             href="/client/progress/photos"
-            className="flex items-center justify-center gap-2 mt-3 py-2 text-[13px] font-medium text-[#D46A3A] hover:opacity-70 transition-opacity"
+            className="flex items-center justify-center gap-2.5 mt-5 py-3.5 rounded-2xl bg-[#1A1917] text-white text-[14px] font-medium transition-all duration-250 hover:bg-[#333] active:scale-[0.97] group"
           >
-            Foto vergelijking bekijken
-            <ChevronRight size={14} />
+            Alle foto's bekijken
+            <ChevronRight size={16} strokeWidth={2} className="transition-transform duration-250 group-hover:translate-x-0.5" />
           </Link>
         </div>
       )}
