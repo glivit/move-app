@@ -67,7 +67,7 @@
   --color-data-yellow: #D4A12A;
 
   /* Fonts */
-  --font-display: 'Cormorant Garamond', serif;
+  --font-display: 'Manrope', sans-serif;
   --font-body: 'DM Sans', sans-serif;
   --font-mono: 'DM Mono', monospace;
 
@@ -112,18 +112,18 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.15;
 }
 
-/* Client app uses body font for headings by default */
+/* Client app — white bg, Manrope for headings */
 .client-app {
-  background-color: #EEEBE3;
+  background-color: #FFFFFF;
 }
 
 .client-app h1,
 .client-app h2,
 .client-app h3 {
-  font-family: var(--font-body);
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  line-height: 1.2;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
 }
 
 /* Display headings — editorial serif, big & bold */

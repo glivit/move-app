@@ -61,7 +61,7 @@ export function ClientBottomNav() {
       )}
 
       {/* Bottom Nav Bar — minimal, editorial */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#EEEBE3]/90 backdrop-blur-lg border-t border-[#E8E4DC] pb-safe">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-lg border-t border-[#F0F0EE] pb-safe">
         <div className="max-w-lg mx-auto flex items-center justify-around h-14">
           {navItems.map((item) => {
             const Icon = item.icon
