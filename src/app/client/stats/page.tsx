@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase'
-import { SubPageHeader } from '@/components/layout/SubPageHeader'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   AreaChart, Area
@@ -92,6 +91,25 @@ function filterByRange(dateStr: string, range: TimeRange): boolean {
   const cutoff = new Date()
   cutoff.setDate(cutoff.getDate() - weeks * 7)
   return new Date(dateStr) >= cutoff
+}
+
+// ─── Animated Number ────────────────────────────────────────
+
+function AnimatedNumber({ value, suffix = '' }: { value: number; suffix?: string }) {
+  const [display, setDisplay] = useState(0)
+  useEffect(() => {
+    if (value === 0) { setDisplay(0); return }
+    const startTime = performance.now()
+    function animate(currentTime: number) {
+      const elapsed = currentTime - startTime
+      const progress = Math.min(elapsed / 1000, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setDisplay(Math.round(eased * value))
+      if (progress < 1) requestAnimationFrame(animate)
+    }
+    requestAnimationFrame(animate)
+  }, [value])
+  return <span>{display.toLocaleString('nl-BE')}{suffix}</span>
 }
 
 // ─── Custom Tooltip ─────────────────────────────────────────
@@ -191,6 +209,16 @@ export default function StatsPage() {
     for (const s of workoutSessions) map[s.id] = s
     return map
   }, [workoutSessions])
+
+  // ─── TOTAL VOLUME (for hero) ───────────────────────────
+  const totalVolume = useMemo(() => {
+    return workoutSets
+      .filter(s => {
+        const session = sessionMap[s.workout_session_id]
+        return session && filterByRange(session.started_at, timeRange)
+      })
+      .reduce((sum, s) => sum + (s.weight_kg || 0) * (s.actual_reps || 0), 0)
+  }, [workoutSets, sessionMap, timeRange])
 
   // ─── KRACHT DATA: max weight per week, grouped ─────────
   const krachtData = useMemo(() => {
@@ -342,10 +370,17 @@ export default function StatsPage() {
 
   return (
     <div className="pb-24">
-      <SubPageHeader overline="Training" title="Statistieken" backHref="/client/progress" />
+      {/* Hero Section */}
+      <div className="mb-10 animate-slide-up">
+        <p className="text-label mb-3">Training</p>
+        <p className="stat-number-hero text-[#1A1917]">
+          <AnimatedNumber value={Math.round(totalVolume / 1000)} suffix=" ton" />
+        </p>
+        <p className="text-[16px] text-[#ACACAC] mt-2">totaal volume</p>
+      </div>
 
       {/* Tab bar */}
-      <div className="flex border-b border-[#F0F0EE] mb-5">
+      <div className="flex mb-5 animate-slide-up" style={{ animationDelay: '60ms' }}>
         {tabs.map(tab => (
           <button
             key={tab.id}
@@ -353,7 +388,7 @@ export default function StatsPage() {
             className={`flex-1 py-3 text-[13px] font-semibold uppercase tracking-[0.06em] transition-all border-b-2 text-center ${
               activeTab === tab.id
                 ? 'border-[#1A1917] text-[#1A1917]'
-                : 'border-transparent text-[#C0C0C0] hover:text-[#ACACAC]'
+                : 'border-transparent text-[#C0C0C0] hover:bg-[#FAFAF8]'
             }`}
           >
             {tab.label}
@@ -362,7 +397,7 @@ export default function StatsPage() {
       </div>
 
       {/* Controls: time range + grouping */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-5 animate-slide-up" style={{ animationDelay: '120ms' }}>
         <div className="flex gap-1">
           {(['4w', '8w', '12w', 'all'] as TimeRange[]).map(r => (
             <button
@@ -444,9 +479,9 @@ export default function StatsPage() {
 
       {/* ═══ TAB: KRACHT ═══════════════════════════════════ */}
       {activeTab === 'kracht' && (
-        <div>
+        <div className="animate-slide-up" style={{ animationDelay: '180ms' }}>
           {krachtData.length > 0 ? (
-            <div className="bg-white rounded-2xl border border-[#F0F0EE] p-4">
+            <div className="bg-white rounded-2xl border border-[#F0F0EE] p-4 hover:bg-[#FAFAF8] transition-colors">
               <p className="text-label mb-3">Max gewicht per week (kg)</p>
               <ResponsiveContainer width="100%" height={220}>
                 {groupBy === 'spiergroep' ? (
@@ -480,9 +515,9 @@ export default function StatsPage() {
 
       {/* ═══ TAB: VOLUME ═══════════════════════════════════ */}
       {activeTab === 'volume' && (
-        <div>
+        <div className="animate-slide-up" style={{ animationDelay: '180ms' }}>
           {volumeData.length > 0 ? (
-            <div className="bg-white rounded-2xl border border-[#F0F0EE] p-4">
+            <div className="bg-white rounded-2xl border border-[#F0F0EE] p-4 hover:bg-[#FAFAF8] transition-colors">
               <p className="text-label mb-3">
                 Volume per week {groupBy === 'spiergroep' ? '(ton)' : '(kg)'}
               </p>
@@ -518,7 +553,7 @@ export default function StatsPage() {
 
       {/* ═══ TAB: PR'S ═══════════════════════════════════ */}
       {activeTab === 'prs' && (
-        <div>
+        <div className="animate-slide-up" style={{ animationDelay: '180ms' }}>
           {filteredPrs.length === 0 ? (
             <div className="text-center py-12">
               <Trophy size={32} strokeWidth={1} className="text-[#D5D5D5] mx-auto mb-4" />
@@ -532,7 +567,7 @@ export default function StatsPage() {
                 const group = ex ? getMuscleGroup(ex.target_muscle) : 'Overig'
 
                 return (
-                  <div key={pr.id} className="bg-white rounded-2xl border border-[#F0F0EE] p-4">
+                  <div key={pr.id} className="bg-white rounded-2xl border border-[#F0F0EE] p-4 hover:bg-[#FAFAF8] transition-colors">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 flex items-center justify-center shrink-0" style={{ backgroundColor: `${GROUP_COLORS[group] || '#ACACAC'}15` }}>
                         <Trophy size={16} strokeWidth={1.5} style={{ color: GROUP_COLORS[group] || '#ACACAC' }} />

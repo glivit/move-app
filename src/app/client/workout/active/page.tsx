@@ -305,7 +305,7 @@ function ExercisePickerModal({
                   onClick={() => onSelect(ex)}
                   className="w-full text-left px-4 py-3.5 rounded-xl hover:bg-white transition-colors flex items-center gap-3"
                 >
-                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm">
+                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden border border-[#F0F0EE]">
                     {ex.gif_url ? (
                       <img src={ex.gif_url} alt="" className="w-full h-full object-cover" style={{ filter: 'saturate(0.3)' }} />
                     ) : (
@@ -996,7 +996,7 @@ function ActiveWorkoutPage() {
             <X size={20} strokeWidth={1.5} className="text-[#ACACAC]" />
           </button>
 
-          <div className="flex items-center gap-2 bg-white px-4 py-1.5 rounded-xl shadow-sm">
+          <div className="flex items-center gap-2 bg-white px-4 py-1.5 rounded-xl border border-[#F0F0EE]">
             <Clock size={14} strokeWidth={1.5} className="text-[#D46A3A]" />
             <span className="stat-number text-[20px] text-[#1A1917]">
               {formatTimer(workoutSeconds)}
@@ -1065,7 +1065,7 @@ function ActiveWorkoutPage() {
                     <Info size={13} strokeWidth={1.5} className="text-[#C0C0C0] flex-shrink-0" />
                   </button>
                   <span className={`text-[12px] font-medium tabular-nums ml-2 px-2 py-0.5 rounded-lg ${
-                    exDone ? 'bg-rgba(212,106,58,0.08) text-[#D46A3A]' : 'text-[#ACACAC]'
+                    exDone ? 'bg-[rgba(212,106,58,0.08)] text-[#D46A3A]' : 'text-[#ACACAC]'
                   }`}>
                     {exCompleted}/{exSets.length}
                   </span>
@@ -1166,7 +1166,7 @@ function ActiveWorkoutPage() {
                       const name = exerciseData.name_nl || exerciseData.name
                       setFormCheckExercise({ id: ex.exercise_id, name })
                     }}
-                    className="py-2.5 px-4 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#D46A3A] uppercase tracking-[0.06em] rounded-xl hover:bg-rgba(212,106,58,0.08) transition-colors touch-manipulation"
+                    className="py-2.5 px-4 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#D46A3A] uppercase tracking-[0.06em] rounded-xl hover:bg-[rgba(212,106,58,0.08)] transition-colors touch-manipulation"
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
                     📹 Form check

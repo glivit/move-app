@@ -264,7 +264,7 @@ export default function ProgressPage() {
 
       {/* ═══ 12 WEEK CHART — full-width, clean ════════════ */}
       {weeklyStats.length > 0 && (
-        <div className="card-v2 p-7 mb-6 animate-slide-up" style={{ animationDelay: '120ms' }}>
+        <div className="bg-white rounded-2xl border border-[#F0F0EE] p-7 mb-6 animate-slide-up" style={{ animationDelay: '120ms' }}>
           <div className="flex items-baseline justify-between mb-6">
             <div>
               <span className="stat-number text-[32px] text-[#1A1917]">{thisWeekVal}</span>
@@ -319,7 +319,7 @@ export default function ProgressPage() {
       {body.weightData.length >= 2 && (
         <Link
           href="/client/measurements"
-          className="block card-v2-interactive p-7 mb-6 group animate-slide-up"
+          className="block bg-white rounded-2xl border border-[#F0F0EE] p-7 mb-6 group hover:bg-[#FAFAF8] transition-colors animate-slide-up"
           style={{ animationDelay: '180ms' }}
         >
           <div className="flex items-center justify-between mb-5">
@@ -352,7 +352,7 @@ export default function ProgressPage() {
 
       {/* ═══ RECORDS — top 3 inline ══════════════════════ */}
       {strength.recentPrs.length > 0 && (
-        <div className="card-v2 overflow-hidden mb-6 animate-slide-up" style={{ animationDelay: '240ms' }}>
+        <div className="bg-white rounded-2xl border border-[#F0F0EE] overflow-hidden mb-6 animate-slide-up" style={{ animationDelay: '240ms' }}>
           <div className="flex items-center justify-between px-7 pt-6 pb-4">
             <span className="text-label">Recente records</span>
             {strength.totalPrs > 3 && (

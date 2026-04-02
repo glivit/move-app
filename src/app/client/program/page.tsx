@@ -132,14 +132,16 @@ export default function ClientProgramPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-editorial-h2 text-[#1A1917]">Training</h1>
+        <div className="animate-slide-up">
+          <div className="h-3 w-16 bg-[#F0F0EE] rounded-full mb-3 animate-shimmer" />
+          <div className="h-8 w-32 bg-[#F0F0EE] rounded-lg mb-2 animate-shimmer" />
+          <div className="h-4 w-48 bg-[#F0F0EE] rounded-full animate-shimmer" />
         </div>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-24 bg-client-surface-muted rounded-2xl animate-pulse"
+              className="h-24 bg-[#F0F0EE] rounded-2xl animate-shimmer"
             />
           ))}
         </div>
@@ -150,19 +152,25 @@ export default function ClientProgramPage() {
   if (!program || !programData) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-editorial-h2 text-[#1A1917]">Training</h1>
+        <div className="mb-8 animate-slide-up">
+          <p className="text-label mb-3 text-[#ACACAC]">Schema</p>
+          <h1
+            className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]"
+            style={{ fontFamily: 'var(--font-display)' }}
+          >
+            Training
+          </h1>
         </div>
-        <div className="bg-white rounded-2xl p-8 border border-[#F0F0EE] text-center">
+        <div className="bg-white rounded-2xl p-8 border border-[#F0F0EE] text-center animate-slide-up" style={{ animationDelay: '60ms' }}>
           <Dumbbell
             size={48}
             strokeWidth={1.5}
-            className="text-client-text-secondary opacity-30 mx-auto mb-3"
+            className="text-[#D5D5D5] mx-auto mb-3"
           />
-          <p className="font-medium text-text-primary">
+          <p className="font-medium text-[#1A1917]">
             Je trainingsschema wordt opgesteld
           </p>
-          <p className="text-[14px] text-client-text-secondary mt-2">
+          <p className="text-[14px] text-[#ACACAC] mt-2">
             Je coach zal binnenkort een trainingsplan voor je opstellen.
           </p>
         </div>
@@ -172,19 +180,27 @@ export default function ClientProgramPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-editorial-h2 text-[#1A1917]">Training</h1>
-        <p className="text-[14px] text-[#ACACAC] mt-1">
-          {program.title}
-        </p>
+      {/* Hero Section */}
+      <div className="mb-8 animate-slide-up">
+        <p className="text-label mb-3 text-[#ACACAC]">Schema</p>
+        <h1
+          className="text-[28px] font-bold tracking-[-0.02em] text-[#1A1917]"
+          style={{ fontFamily: 'var(--font-display)' }}
+        >
+          Training
+        </h1>
+        {program && (
+          <p className="text-[15px] text-[#ACACAC] mt-1">{program.title}</p>
+        )}
       </div>
 
       {/* Periodization Bar */}
-      <PeriodizationBar />
+      <div className="animate-slide-up" style={{ animationDelay: '60ms' }}>
+        <PeriodizationBar />
+      </div>
 
       {/* Day Picker */}
-      <div className="bg-white rounded-2xl border border-[#F0F0EE] overflow-hidden">
+      <div className="bg-white rounded-2xl border border-[#F0F0EE] overflow-hidden animate-slide-up" style={{ animationDelay: '120ms' }}>
         <DayPicker
           days={dayNames}
           activeDay={activeDay}
@@ -195,27 +211,37 @@ export default function ClientProgramPage() {
 
       {/* Progress Text */}
       {!isRestDay && (
-        <p className="text-[14px] text-client-text-secondary">
-          {completedCount} van {currentDayExercises.length} oefeningen voltooid
-        </p>
+        <div className="flex items-center justify-between animate-slide-up" style={{ animationDelay: '180ms' }}>
+          <p className="text-[14px] text-[#ACACAC]">
+            {completedCount} van {currentDayExercises.length} voltooid
+          </p>
+          <div className="w-24 h-[3px] bg-[#F0F0EE] rounded-full overflow-hidden">
+            <div
+              className="h-full bg-[#3D8B5C] rounded-full transition-all"
+              style={{
+                width: `${currentDayExercises.length > 0 ? (completedCount / currentDayExercises.length) * 100 : 0}%`,
+              }}
+            />
+          </div>
+        </div>
       )}
 
       {/* Day Title */}
-      <div>
-        <h2 className="text-xl font-semibold text-text-primary">
+      <div className="animate-slide-up" style={{ animationDelay: '220ms' }}>
+        <h2 className="text-[20px] font-semibold text-[#1A1917]">
           {currentDay?.name}
         </h2>
       </div>
 
       {/* Rest Day Message */}
       {isRestDay ? (
-        <div className="bg-white rounded-2xl p-8 border border-[#F0F0EE] text-center">
+        <div className="bg-white rounded-2xl p-8 border border-[#F0F0EE] text-center animate-slide-up" style={{ animationDelay: '260ms' }}>
           <Moon
             size={48}
             strokeWidth={1.5}
-            className="text-client-text-secondary opacity-30 mx-auto mb-3"
+            className="text-[#D5D5D5] mx-auto mb-3"
           />
-          <p className="font-medium text-text-primary">
+          <p className="font-medium text-[#1A1917]">
             Rustdag — geniet ervan!
           </p>
         </div>
@@ -223,26 +249,31 @@ export default function ClientProgramPage() {
         /* Exercises List */
         <div className="space-y-3">
           {currentDayExercises.map((exercise, index) => (
-            <ExerciseCard
+            <div
               key={`${activeDay}-${exercise.name}`}
-              exercise={exercise}
-              index={index}
-              completed={completedExercises.has(`${activeDay}-${exercise.name}`)}
-              onToggle={() =>
-                toggleExerciseComplete(`${activeDay}-${exercise.name}`)
-              }
-            />
+              className="animate-slide-up"
+              style={{ animationDelay: `${260 + index * 40}ms` }}
+            >
+              <ExerciseCard
+                exercise={exercise}
+                index={index}
+                completed={completedExercises.has(`${activeDay}-${exercise.name}`)}
+                onToggle={() =>
+                  toggleExerciseComplete(`${activeDay}-${exercise.name}`)
+                }
+              />
+            </div>
           ))}
         </div>
       )}
 
       {/* Coach Notes */}
       {program.coach_notes && (
-        <div className="bg-accent/5 rounded-2xl p-5 border border-accent/20">
-          <p className="text-[13px] text-text-primary font-medium mb-2">
+        <div className="rounded-2xl p-5 border animate-slide-up" style={{ animationDelay: `${isRestDay ? '300ms' : 260 + currentDayExercises.length * 40 + 40}ms`, backgroundColor: 'rgba(212,106,58,0.04)', borderColor: 'rgba(212,106,58,0.12)' }}>
+          <p className="text-[13px] text-[#1A1917] font-medium mb-2">
             Coach notities
           </p>
-          <p className="text-[14px] text-text-primary whitespace-pre-wrap">
+          <p className="text-[14px] text-[#1A1917] whitespace-pre-wrap">
             {program.coach_notes}
           </p>
         </div>

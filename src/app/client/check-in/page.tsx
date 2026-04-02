@@ -181,7 +181,7 @@ export default function CheckInPage() {
   if (submitted) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4 py-8">
-        <div className="card-v2 p-8 max-w-sm w-full text-center space-y-6">
+        <div className="bg-white rounded-2xl border border-[#F0F0EE] p-8 max-w-sm w-full text-center space-y-6 animate-slide-up">
           <div className="flex justify-center">
             <div className="w-20 h-20 rounded-full bg-[rgba(61,139,92,0.08)] flex items-center justify-center animate-scale-in">
               <CheckCircle className="h-10 w-10 text-[#3D8B5C]" strokeWidth={1.5} />
@@ -198,7 +198,7 @@ export default function CheckInPage() {
               Je coach bekijkt je resultaten binnen 24 uur.
             </p>
           </div>
-          <button onClick={() => router.push('/client')} className="btn-pop w-full py-4 text-[13px]">
+          <button onClick={() => router.push('/client')} className="bg-[#1A1917] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#333330] transition-colors active:scale-[0.98] rounded-2xl w-full py-4">
             Terug naar dashboard
           </button>
         </div>
@@ -209,7 +209,7 @@ export default function CheckInPage() {
   if (!canSubmit) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4 py-8">
-        <div className="card-v2 p-8 max-w-sm w-full text-center space-y-6">
+        <div className="bg-white rounded-2xl border border-[#F0F0EE] p-8 max-w-sm w-full text-center space-y-6 animate-slide-up">
           <div className="flex justify-center">
             <div className="w-20 h-20 rounded-full bg-[rgba(196,125,21,0.08)] flex items-center justify-center">
               <Calendar className="h-10 w-10 text-[#C47D15]" strokeWidth={1.5} />
@@ -224,7 +224,7 @@ export default function CheckInPage() {
             </h2>
             <p className="text-[14px] text-[#ACACAC] leading-relaxed">{windowMessage}</p>
           </div>
-          <button onClick={() => router.push('/client')} className="btn-primary w-full py-4 text-[13px]">
+          <button onClick={() => router.push('/client')} className="bg-[#1A1917] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#333330] transition-colors active:scale-[0.98] rounded-2xl w-full py-4 text-[13px]">
             Terug naar dashboard
           </button>
         </div>
@@ -255,7 +255,7 @@ export default function CheckInPage() {
       </div>
 
       {/* Step dots */}
-      <div className="flex justify-center gap-3">
+      <div className="flex justify-center gap-3 animate-slide-up" style={{ animationDelay: '60ms' }}>
         {steps.map((_, i) => (
           <div
             key={i}
@@ -320,7 +320,7 @@ export default function CheckInPage() {
         {currentStep < steps.length - 1 ? (
           <button
             onClick={() => setCurrentStep(currentStep + 1)}
-            className="flex-1 btn-pop py-4 text-[13px]"
+            className="flex-1 bg-[#1A1917] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#333330] transition-colors active:scale-[0.98] rounded-2xl py-4"
           >
             Volgende
           </button>
@@ -328,7 +328,7 @@ export default function CheckInPage() {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="flex-1 btn-pop py-4 text-[13px] disabled:opacity-50"
+            className="flex-1 bg-[#1A1917] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#333330] transition-colors active:scale-[0.98] rounded-2xl py-4 disabled:opacity-50"
           >
             {submitting ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
