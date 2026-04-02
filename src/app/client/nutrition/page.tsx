@@ -267,7 +267,7 @@ function FoodSearchModal({
           client_notes: existing?.client_notes || null,
           completed_at: existing?.completed_at || null,
         }
-        setLogs(new Map(logs.set(mealId, newLog)))
+        const _upd = new Map(logs); _upd.set(mealId, newLog); setLogs(_upd)
 
         // Refresh summary
         const sumRes = await fetch(`/api/nutrition-log?date=${dateStr}`)
@@ -302,7 +302,6 @@ function FoodSearchModal({
             placeholder="Zoek voedingsmiddel..."
             autoFocus
             className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
-            style={{ fontFamily: 'var(--font-body)' }}
           />
         </div>
 
@@ -316,7 +315,7 @@ function FoodSearchModal({
 
           {!loading && searchResults.length === 0 && query && (
             <div className="py-8 text-center">
-              <p className="text-[13px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="text-[13px] text-[#ACACAC]">
                 Geen resultaten gevonden
               </p>
             </div>
@@ -334,17 +333,17 @@ function FoodSearchModal({
                 >
                   <div className="flex items-center gap-2 justify-between">
                     <div className="flex-1 text-left min-w-0">
-                      <p className="text-[14px] text-[#1A1917] truncate" style={{ fontFamily: 'var(--font-body)' }}>
+                      <p className="text-[14px] text-[#1A1917] truncate">
                         {product.name}
                       </p>
                       {product.brand && (
-                        <p className="text-[12px] text-[#ACACAC] truncate" style={{ fontFamily: 'var(--font-body)' }}>
+                        <p className="text-[12px] text-[#ACACAC] truncate">
                           {product.brand}
                         </p>
                       )}
                     </div>
                     {product.source === 'local' && (
-                      <span className="px-2 py-0.5 bg-[#F0F0EE] text-[#ACACAC] rounded text-[10px] font-medium shrink-0" style={{ fontFamily: 'var(--font-body)' }}>
+                      <span className="px-2 py-0.5 bg-[#F0F0EE] text-[#ACACAC] rounded text-[10px] font-medium shrink-0">
                         DB
                       </span>
                     )}
@@ -369,7 +368,7 @@ function FoodSearchModal({
           <div className="border-t border-[#F0F0EE] px-4 py-4 space-y-3">
             <div className="flex items-center gap-3">
               <div className="flex-1">
-                <p className="text-[12px] text-[#ACACAC] mb-1" style={{ fontFamily: 'var(--font-body)' }}>
+                <p className="text-[12px] text-[#ACACAC] mb-1">
                   Hoeveelheid (gram)
                 </p>
                 <input
@@ -377,14 +376,12 @@ function FoodSearchModal({
                   value={grams}
                   onChange={(e) => setGrams(Math.max(1, parseInt(e.target.value) || 0))}
                   className="w-full px-3 py-2 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] bg-white focus:outline-none focus:border-[#1A1917]"
-                  style={{ fontFamily: 'var(--font-body)' }}
-                />
+                      />
               </div>
               <button
                 onClick={handleConfirm}
                 className="px-6 py-2.5 bg-[#1A1917] text-white rounded-xl text-[13px] font-medium"
-                style={{ fontFamily: 'var(--font-body)' }}
-              >
+                  >
                 Bevestigen
               </button>
             </div>
@@ -411,6 +408,7 @@ export default function ClientNutritionPage() {
   const [water, setWater] = useState<number>(0)
   const [savingMeal, setSavingMeal] = useState<string | null>(null)
   const [showDailyPanel, setShowDailyPanel] = useState(false)
+  const [daySubmitted, setDaySubmitted] = useState(false)
   const [foodSearchModal, setFoodSearchModal] = useState<{
     isOpen: boolean
     mode: 'swap' | 'add'
@@ -502,12 +500,47 @@ export default function ClientNutritionPage() {
           client_notes: existing?.client_notes || null,
           completed_at: nowCompleted ? new Date().toISOString() : null,
         }
-        setLogs(new Map(logs.set(meal.id, newLog)))
+        const updated = new Map(logs)
+        updated.set(meal.id, newLog)
+        setLogs(updated)
 
         // Refresh summary
         const sumRes = await fetch(`/api/nutrition-log?date=${dateStr}`)
         const sumData = await sumRes.json()
         if (sumData.summary) setSummary(sumData.summary)
+      } else {
+        // Retry once on failure
+        console.error('Nutrition toggle failed:', res.status)
+        const retry = await fetch('/api/nutrition-log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            plan_id: plan?.id,
+            date: dateStr,
+            meal_id: meal.id,
+            meal_name: meal.name,
+            completed: nowCompleted,
+            foods_eaten: existing?.foods_eaten || meal.foods || [],
+            client_notes: existing?.client_notes || null,
+          }),
+        })
+        if (retry.ok) {
+          const newLog: MealLog = {
+            meal_id: meal.id,
+            meal_name: meal.name,
+            completed: nowCompleted,
+            foods_eaten: existing?.foods_eaten || meal.foods || [],
+            client_notes: existing?.client_notes || null,
+            completed_at: nowCompleted ? new Date().toISOString() : null,
+          }
+          const updated = new Map(logs)
+          updated.set(meal.id, newLog)
+          setLogs(updated)
+
+          const sumRes = await fetch(`/api/nutrition-log?date=${dateStr}`)
+          const sumData = await sumRes.json()
+          if (sumData.summary) setSummary(sumData.summary)
+        }
       }
     } catch (err) {
       console.error('Toggle error:', err)
@@ -541,7 +574,7 @@ export default function ClientNutritionPage() {
         ...(existing || { meal_id: mealId, meal_name: meal.name, completed: false, foods_eaten: meal.foods || [], completed_at: null }),
         client_notes: noteText.trim() || null,
       }
-      setLogs(new Map(logs.set(mealId, newLog)))
+      const _upd = new Map(logs); _upd.set(mealId, newLog); setLogs(_upd)
       setEditingNotes(null)
     } catch (err) {
       console.error('Save notes error:', err)
@@ -602,14 +635,14 @@ export default function ClientNutritionPage() {
   if (!plan) {
     return (
       <div className="pb-28">
-        <h1 className="page-title mb-6">
+        <h1 className="page-title-sm mb-6">
           Voeding
         </h1>
         <div className="py-16 text-center">
           <p className="text-editorial-h1 mb-3">
             Nog geen plan
           </p>
-          <p className="text-[14px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
+          <p className="text-[14px] text-[#ACACAC]">
             Je coach bereidt je voedingsplan voor.
           </p>
         </div>
@@ -627,7 +660,7 @@ export default function ClientNutritionPage() {
           className="flex items-center gap-1.5 mb-4 mt-2 group"
         >
           <ChevronLeft strokeWidth={1.5} className="w-[18px] h-[18px] text-[#C0C0C0] group-hover:text-[#1A1917] transition-colors" />
-          <span className="text-[14px] text-[#C0C0C0] group-hover:text-[#1A1917] transition-colors" style={{ fontFamily: 'var(--font-body)' }}>
+          <span className="text-[14px] text-[#C0C0C0] group-hover:text-[#1A1917] transition-colors">
             Home
           </span>
         </button>
@@ -644,7 +677,6 @@ export default function ClientNutritionPage() {
         </button>
         <span
           className="text-[14px] font-medium text-[#1A1917]"
-          style={{ fontFamily: 'var(--font-body)' }}
         >
           {formatDate(selectedDate)}
         </span>
@@ -655,7 +687,7 @@ export default function ClientNutritionPage() {
       </div>
 
       {/* ── HERO: Calorie number ── */}
-      <div className="mb-9 animate-slide-up stagger-2">
+      <div className="mb-14 animate-slide-up stagger-2">
         <p
           className="text-[52px] leading-[0.9] tracking-[-2px]"
           style={{
@@ -667,7 +699,6 @@ export default function ClientNutritionPage() {
         </p>
         <p
           className="text-[16px] font-light text-[#ACACAC] mt-1.5 tracking-[0.01em]"
-          style={{ fontFamily: 'var(--font-body)' }}
         >
           / {targetCal.toLocaleString('nl-NL')} kcal
         </p>
@@ -685,39 +716,32 @@ export default function ClientNutritionPage() {
       </div>
 
       {/* ── Macro row ── */}
-      <div className="flex border-t border-[#F0F0EE] pt-6 mb-12 animate-slide-up stagger-3">
-        {[
-          { label: 'EIWIT', actual: actualProt, target: targetProt, unit: 'g' },
-          { label: 'KOOLH', actual: actualCarbs, target: targetCarbs, unit: 'g' },
-          { label: 'VET', actual: actualFat, target: targetFat, unit: 'g' },
-        ].map((macro, i) => (
-          <div key={macro.label} className={`flex-1 ${i > 0 ? 'pl-5 border-l border-[#F0F0EE]' : ''}`}>
-            <p
-              className="text-[18px] tracking-[-0.5px]"
-              style={{
-                fontWeight: 700,
-                color: allDone && macro.actual >= macro.target * 0.9 ? '#3D8B5C' : '#1A1917',
-              }}
-            >
-              {macro.actual}
-            </p>
-            <p className="text-[12px] text-[#C0C0C0] mt-0.5" style={{ fontFamily: 'var(--font-body)' }}>
-              / {macro.target}{macro.unit}
-            </p>
-            <p
-              className="text-[11px] text-[#C0C0C0] uppercase tracking-[0.5px] mt-1.5"
-              style={{ fontFamily: 'var(--font-body)' }}
-            >
-              {macro.label}
-            </p>
-          </div>
-        ))}
+      <div className="mt-12 animate-slide-up stagger-3">
+        <div className="border-t border-[#F0F0EE] pt-6 flex gap-3 text-[14px]">
+          {[
+            { label: 'Eiwit', actual: actualProt, target: targetProt, unit: 'g' },
+            { label: 'Koolhydraten', actual: actualCarbs, target: targetCarbs, unit: 'g' },
+            { label: 'Vet', actual: actualFat, target: targetFat, unit: 'g' },
+          ].map((macro, i) => (
+            <div key={macro.label} className="flex items-baseline gap-1">
+              {i > 0 && <span className="text-[#C0C0C0]">·</span>}
+              <span
+                className="font-semibold"
+                style={{
+                  color: allDone && macro.actual >= macro.target * 0.9 ? '#3D8B5C' : '#1A1917',
+                }}
+              >
+                {macro.actual}g
+              </span>
+              <span className="text-[#C0C0C0]">{macro.label}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* ── Meals section ── */}
       <p
-        className="text-[12px] font-medium text-[#B0B0B0] uppercase tracking-[1.5px] mb-4 animate-slide-up stagger-6"
-        style={{ fontFamily: 'var(--font-body)' }}
+        className="text-[12px] font-medium text-[#B0B0B0] uppercase tracking-[1.5px] mb-4 mt-12 animate-slide-up stagger-6"
       >
         Maaltijden
       </p>
@@ -735,39 +759,18 @@ export default function ClientNutritionPage() {
 
           return (
             <div key={meal.id}>
-              {/* Meal row */}
-              <div className="flex items-center gap-3.5 py-4 border-t border-[#F0F0EE]">
-                {/* Circle checkbox */}
-                <button
-                  onClick={() => toggleMealComplete(meal)}
-                  disabled={isSaving}
-                  className={`w-7 h-7 rounded-full border-[1.5px] flex items-center justify-center shrink-0 transition-all ${
-                    isCompleted
-                      ? 'bg-[#1A1917] border-[#1A1917]'
-                      : 'border-[#E0E0E0] hover:border-[#1A1917]'
-                  } ${isSaving ? 'opacity-50' : ''}`}
-                >
-                  {isCompleted && (
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                      <path d="M2.5 6L5 8.5L9.5 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  )}
-                  {isSaving && (
-                    <div className="w-3 h-3 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
-                  )}
-                </button>
-
-                {/* Meal info */}
-                <button
-                  onClick={() => setExpandedMeal(isExpanded ? null : meal.id)}
-                  className="flex-1 text-left min-w-0"
-                >
+              {/* Meal row - flat with hover state */}
+              <button
+                onClick={() => setExpandedMeal(isExpanded ? null : meal.id)}
+                className="w-full flex items-center justify-between py-5 border-t border-[#F0F0EE] hover:opacity-60 transition-opacity"
+              >
+                {/* Left: Meal name and time */}
+                <div className="flex-1 text-left min-w-0">
                   <div className="flex items-center gap-2">
                     <p
                       className={`text-[15px] font-medium truncate ${
                         isCompleted ? 'text-[#ACACAC] line-through decoration-[#D5D5D5]' : 'text-[#1A1917]'
                       }`}
-                      style={{ fontFamily: 'var(--font-body)' }}
                     >
                       {meal.name}
                     </p>
@@ -775,119 +778,145 @@ export default function ClientNutritionPage() {
                       <MessageSquare strokeWidth={1.5} className="w-3 h-3 text-[#C0C0C0] shrink-0" />
                     )}
                   </div>
-                  <p className="text-[12px] text-[#C0C0C0] mt-0.5" style={{ fontFamily: 'var(--font-body)' }}>
+                  <p className="text-[12px] text-[#C0C0C0] mt-0.5">
                     {meal.time} · {foods.length} items
                   </p>
-                </button>
-
-                {/* Kcal on right */}
-                <div className="shrink-0 text-right">
-                  <span
-                    className={`text-[14px] ${isCompleted ? 'text-[#C0C0C0]' : 'text-[#1A1917]'}`}
-                    style={{ fontWeight: 600 }}
-                  >
-                    {mealCal}
-                  </span>
-                  <span className="text-[11px] text-[#C0C0C0] ml-0.5" style={{ fontFamily: 'var(--font-body)' }}>
-                    kcal
-                  </span>
                 </div>
-              </div>
+
+                {/* Right: Kcal + chevron */}
+                <div className="shrink-0 flex items-center gap-2 ml-4">
+                  <div className="text-right">
+                    <span
+                      className={`text-[14px] ${isCompleted ? 'text-[#C0C0C0]' : 'text-[#1A1917]'}`}
+                      style={{ fontWeight: 600 }}
+                    >
+                      {mealCal}
+                    </span>
+                    <span className="text-[11px] text-[#C0C0C0] ml-0.5">
+                      kcal
+                    </span>
+                  </div>
+                  <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#D5D5D5] shrink-0" />
+                </div>
+              </button>
 
               {/* Expanded: food details */}
               {isExpanded && (
-                <div className="pl-[42px] pb-4 border-b border-[#F0F0EE]">
-                  {foods.map((food) => (
-                    <div key={food.id} className="flex items-center justify-between py-2 group">
-                      <div className="flex items-center gap-1.5 flex-1">
-                        <span className="text-[13px] text-[#1A1917]" style={{ fontFamily: 'var(--font-body)' }}>
-                          {food.name}
-                        </span>
-                        <span className="text-[11px] text-[#C0C0C0]" style={{ fontFamily: 'var(--font-body)' }}>
-                          {food.grams}g
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[12px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
-                          {calcMacro(food, 'calories')} kcal
-                        </span>
-                        <button
-                          onClick={() => setFoodSearchModal({
-                            isOpen: true,
-                            mode: 'swap',
-                            mealId: meal.id,
-                            foodId: food.id,
-                            originalGrams: food.grams,
-                          })}
-                          className="p-1 text-[#C0C0C0] hover:text-[#1A1917] transition-colors opacity-0 group-hover:opacity-100"
-                        >
-                          <ArrowLeftRight strokeWidth={1.5} className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-
-                  {/* Add food button */}
-                  <button
-                    onClick={() => setFoodSearchModal({
-                      isOpen: true,
-                      mode: 'add',
-                      mealId: meal.id,
-                      originalGrams: 100,
-                    })}
-                    className="mt-3 px-3 py-2 text-[13px] text-[#D46A3A] font-medium hover:bg-[rgba(212,106,58,0.06)] rounded-lg transition-colors"
-                    style={{ fontFamily: 'var(--font-body)' }}
-                  >
-                    + Voeg item toe
-                  </button>
-
-                  {/* Notes in expanded view */}
-                  <div className="mt-2">
-                    {editingNotes === meal.id ? (
-                      <div className="space-y-2">
-                        <textarea
-                          value={noteText}
-                          onChange={(e) => setNoteText(e.target.value)}
-                          placeholder="Notitie..."
-                          rows={2}
-                          autoFocus
-                          className="w-full px-3 py-2 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917] resize-none"
-                          style={{ fontFamily: 'var(--font-body)' }}
-                        />
-                        <div className="flex gap-2 justify-end">
-                          <button
-                            onClick={() => setEditingNotes(null)}
-                            className="px-3 py-1.5 text-[12px] text-[#ACACAC]"
-                            style={{ fontFamily: 'var(--font-body)' }}
-                          >
-                            Annuleer
-                          </button>
-                          <button
-                            onClick={() => saveNotes(meal.id)}
-                            className="px-3 py-1.5 rounded-xl bg-[#1A1917] text-white text-[12px] font-medium"
-                            style={{ fontFamily: 'var(--font-body)' }}
-                          >
-                            Opslaan
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
+                <div className="py-4 border-t border-[#F0F0EE] bg-[#FAFAF8]">
+                  <div className="px-4 space-y-3">
+                    {/* Complete meal checkbox */}
+                    <div className="flex items-center gap-2">
                       <button
-                        onClick={() => {
-                          setNoteText(log?.client_notes || '')
-                          setEditingNotes(meal.id)
-                        }}
-                        className="flex items-center gap-1.5 text-[12px] text-[#C0C0C0] hover:text-[#1A1917] transition-colors pt-1"
-                        style={{ fontFamily: 'var(--font-body)' }}
+                        onClick={() => toggleMealComplete(meal)}
+                        disabled={isSaving}
+                        className={`w-5 h-5 rounded-full border-[1.5px] flex items-center justify-center shrink-0 transition-all ${
+                          isCompleted
+                            ? 'bg-[#1A1917] border-[#1A1917]'
+                            : 'border-[#E0E0E0] hover:border-[#1A1917]'
+                        } ${isSaving ? 'opacity-50' : ''}`}
                       >
-                        <Pencil strokeWidth={1.5} className="w-3 h-3" />
-                        {hasNotes ? (
-                          <span className="text-[#1A1917]">{log?.client_notes}</span>
-                        ) : (
-                          <span>Notitie toevoegen</span>
+                        {isCompleted && (
+                          <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                            <path d="M2.5 6L5 8.5L9.5 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                        {isSaving && (
+                          <div className="w-2 h-2 border-[1px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
                         )}
                       </button>
-                    )}
+                      <span className="text-[13px] text-[#C0C0C0]">Mark as complete</span>
+                    </div>
+
+                    {/* Foods list */}
+                    <div className="space-y-2">
+                      {foods.map((food) => (
+                        <div key={food.id} className="flex items-center justify-between py-1 group">
+                          <div className="flex items-center gap-1.5 flex-1">
+                            <span className="text-[13px] text-[#1A1917]">
+                              {food.name}
+                            </span>
+                            <span className="text-[11px] text-[#C0C0C0]">
+                              {food.grams}g
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[12px] text-[#ACACAC]">
+                              {calcMacro(food, 'calories')} kcal
+                            </span>
+                            <button
+                              onClick={() => setFoodSearchModal({
+                                isOpen: true,
+                                mode: 'swap',
+                                mealId: meal.id,
+                                foodId: food.id,
+                                originalGrams: food.grams,
+                              })}
+                              className="p-1 text-[#C0C0C0] hover:text-[#1A1917] transition-colors opacity-0 group-hover:opacity-100"
+                            >
+                              <ArrowLeftRight strokeWidth={1.5} className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Add food button */}
+                    <button
+                      onClick={() => setFoodSearchModal({
+                        isOpen: true,
+                        mode: 'add',
+                        mealId: meal.id,
+                        originalGrams: 100,
+                      })}
+                      className="mt-3 px-3 py-2 text-[13px] text-[#D46A3A] font-medium hover:bg-[rgba(212,106,58,0.06)] rounded-lg transition-colors"
+                    >
+                      + Voeg item toe
+                    </button>
+
+                    {/* Notes in expanded view */}
+                    <div className="pt-2">
+                      {editingNotes === meal.id ? (
+                        <div className="space-y-2">
+                          <textarea
+                            value={noteText}
+                            onChange={(e) => setNoteText(e.target.value)}
+                            placeholder="Notitie..."
+                            rows={2}
+                            autoFocus
+                            className="w-full px-3 py-2 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917] resize-none"
+                          />
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              onClick={() => setEditingNotes(null)}
+                              className="px-3 py-1.5 text-[12px] text-[#ACACAC]"
+                            >
+                              Annuleer
+                            </button>
+                            <button
+                              onClick={() => saveNotes(meal.id)}
+                              className="px-3 py-1.5 rounded-xl bg-[#1A1917] text-white text-[12px] font-medium"
+                            >
+                              Opslaan
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setNoteText(log?.client_notes || '')
+                            setEditingNotes(meal.id)
+                          }}
+                          className="flex items-center gap-1.5 text-[12px] text-[#C0C0C0] hover:text-[#1A1917] transition-colors pt-1"
+                        >
+                          <Pencil strokeWidth={1.5} className="w-3 h-3" />
+                          {hasNotes ? (
+                            <span className="text-[#1A1917]">{log?.client_notes}</span>
+                          ) : (
+                            <span>Notitie toevoegen</span>
+                          )}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
@@ -899,17 +928,17 @@ export default function ClientNutritionPage() {
       {/* ── Daily note row ── */}
       <button
         onClick={() => setShowDailyPanel(!showDailyPanel)}
-        className="w-full flex items-center gap-3 py-[18px] border-t border-[#F0F0EE] mt-3 hover:opacity-70 transition-opacity"
+        className="w-full flex items-center gap-3 py-5 border-t border-[#F0F0EE] mt-12 hover:opacity-60 transition-opacity"
       >
         <div
           className="w-[6px] h-[6px] rounded-full shrink-0"
           style={{ backgroundColor: allDone ? '#3D8B5C' : '#D46A3A' }}
         />
         <div className="flex-1 text-left">
-          <p className="text-[14px] font-medium text-[#1A1917]" style={{ fontFamily: 'var(--font-body)' }}>
+          <p className="text-[14px] font-medium text-[#1A1917]">
             Dagnotitie
           </p>
-          <p className="text-[12px] text-[#C0C0C0] mt-0.5" style={{ fontFamily: 'var(--font-body)' }}>
+          <p className="text-[12px] text-[#C0C0C0] mt-0.5">
             {mood ? MOODS.find(m => m.key === mood)?.label : ''}
             {mood && dailyNote ? ' · ' : ''}
             {dailyNote ? dailyNote.slice(0, 40) + (dailyNote.length > 40 ? '...' : '') : (mood ? '' : 'Hoe ging je dag?')}
@@ -925,7 +954,6 @@ export default function ClientNutritionPage() {
           <div>
             <p
               className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-3"
-              style={{ fontFamily: 'var(--font-body)' }}
             >
               Hoe voel je je vandaag?
             </p>
@@ -939,7 +967,6 @@ export default function ClientNutritionPage() {
                       ? 'border-[#1A1917] bg-[#1A1917] text-white'
                       : 'border-[#F0F0EE] text-[#ACACAC] hover:border-[#C0C0C0]'
                   }`}
-                  style={{ fontFamily: 'var(--font-body)' }}
                 >
                   {m.label}
                 </button>
@@ -951,7 +978,6 @@ export default function ClientNutritionPage() {
           <div>
             <p
               className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-3"
-              style={{ fontFamily: 'var(--font-body)' }}
             >
               Water (liter)
             </p>
@@ -965,7 +991,6 @@ export default function ClientNutritionPage() {
                       ? 'border-[#D46A3A] bg-[rgba(212,106,58,0.06)] text-[#D46A3A]'
                       : 'border-[#F0F0EE] text-[#ACACAC] hover:border-[#C0C0C0]'
                   }`}
-                  style={{ fontFamily: 'var(--font-body)' }}
                 >
                   {l}L
                 </button>
@@ -977,7 +1002,6 @@ export default function ClientNutritionPage() {
           <div>
             <p
               className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-3"
-              style={{ fontFamily: 'var(--font-body)' }}
             >
               Dagnotitie voor je coach
             </p>
@@ -988,7 +1012,6 @@ export default function ClientNutritionPage() {
               placeholder="Hoe ging het vandaag? Honger gehad? Iets vervangen?"
               rows={3}
               className="w-full px-4 py-3 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917] resize-none"
-              style={{ fontFamily: 'var(--font-body)' }}
             />
           </div>
         </div>
@@ -996,19 +1019,43 @@ export default function ClientNutritionPage() {
 
       {/* ── Guidelines ── */}
       {plan.guidelines && (
-        <div className="border-t border-[#F0F0EE] pt-5 mt-4">
+        <div className="border-t border-[#F0F0EE] pt-5 mt-12">
           <p
             className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-2"
-            style={{ fontFamily: 'var(--font-body)' }}
           >
             Richtlijnen
           </p>
           <p
             className="text-[13px] text-[#ACACAC] leading-relaxed whitespace-pre-wrap"
-            style={{ fontFamily: 'var(--font-body)' }}
           >
             {plan.guidelines}
           </p>
+        </div>
+      )}
+
+      {/* Dag indienen button */}
+      {meals.length > 0 && (
+        <div className="fixed bottom-20 left-0 right-0 px-4 z-30 pointer-events-none">
+          <div className="max-w-lg mx-auto pointer-events-auto">
+            <button
+              onClick={async () => {
+                await saveDailySummary()
+                setDaySubmitted(true)
+                setTimeout(() => setDaySubmitted(false), 3000)
+              }}
+              disabled={daySubmitted}
+              className={"w-full py-4 rounded-2xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-all shadow-lg " + (
+                daySubmitted
+                  ? "bg-[#3D8B5C] text-white"
+                  : allDone
+                    ? "bg-[#3D8B5C] text-white hover:bg-[#347A4F]"
+                    : "bg-[#1A1917] text-white hover:bg-[#333330]"
+              )}
+              style={{ fontFamily: 'var(--font-body)' }}
+            >
+              {daySubmitted ? 'Ingediend ✓' : ('Dag indienen (' + completedCount + '/' + meals.length + ')')}
+            </button>
+          </div>
         </div>
       )}
 

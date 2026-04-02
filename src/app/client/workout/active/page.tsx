@@ -848,6 +848,16 @@ function ActiveWorkoutPage() {
       return
     }
 
+    // Mark the workout session as completed in DB
+    // This ensures it is recorded even if the user skips the feedback page
+    try {
+      const supabaseFinish = createClient()
+      await supabaseFinish
+        .from('workout_sessions')
+        .update({ completed_at: new Date().toISOString() })
+        .eq('id', session.id)
+    } catch { /* best-effort -- workout-finish page will retry */ }
+
     // Auto-update estimated 1RMs based on this session's performance
     try {
       fetch('/api/update-1rm', {
