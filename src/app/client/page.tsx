@@ -136,52 +136,39 @@ export default function ClientDashboard() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-6 w-6 animate-spin rounded-full border-[1.5px] border-[#C0C0C0] border-t-[#1A1917]" />
-      </div>
-    )
-  }
-
-  if (!data) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center text-[#999]">
-        Er ging iets mis bij het laden.
-      </div>
-    )
-  }
-
-  const { training, nutrition, actions, momentum, onboarding } = data
-  const firstName = data.profile?.firstName || ''
+  // ALL hooks must be called before any early return (React rules of hooks)
+  const training = data?.training
+  const nutrition = data?.nutrition
+  const actions = data?.actions
+  const momentum = data?.momentum
+  const onboarding = data?.onboarding
+  const firstName = data?.profile?.firstName || ''
   const showOnboarding = onboarding && !onboarding.complete
 
-  // Memoize expensive week dots calculation
   const weekDots = useMemo(
-    () => getWeekDots(training.scheduleDays || [], training.completedDates || []),
-    [training.scheduleDays, training.completedDates]
+    () => training ? getWeekDots(training.scheduleDays || [], training.completedDates || []) : [],
+    [training?.scheduleDays, training?.completedDates]
   )
 
-  const isDay1 = momentum.streakDays === 0 && momentum.workoutsThisWeek === 0 && !training.completedDates?.length
+  const isDay1 = momentum ? (momentum.streakDays === 0 && momentum.workoutsThisWeek === 0 && !training?.completedDates?.length) : false
 
-  // Memoize calorie calculations
   const caloriesConsumed = useMemo(
-    () => getCaloriesConsumed(nutrition),
+    () => getCaloriesConsumed(nutrition ?? null),
     [nutrition]
   )
   const caloriesTarget = nutrition?.targets?.calories || 0
 
-  // Memoize primary action logic
   const primaryAction = useMemo(() => {
+    if (!data) return 'rest' as const
     if (showOnboarding) return 'onboarding' as const
-    if (training.today && !training.today.completed) return 'training' as const
-    if (training.today?.completed) return 'done' as const
-    if (actions.checkInDue?.overdue) return 'checkin' as const
+    if (training?.today && !training.today.completed) return 'training' as const
+    if (training?.today?.completed) return 'done' as const
+    if (actions?.checkInDue?.overdue) return 'checkin' as const
     return 'rest' as const
-  }, [showOnboarding, training.today, actions.checkInDue])
+  }, [data, showOnboarding, training?.today, actions?.checkInDue])
 
-  // Memoize nudges array calculation
   const nudges = useMemo(() => {
+    if (!actions) return []
     const result: Array<{ text: string; sub?: string; href: string }> = []
     if (actions.unreadMessages > 0) {
       result.push({ text: `${actions.unreadMessages} ${actions.unreadMessages === 1 ? 'nieuw bericht' : 'nieuwe berichten'}`, href: '/client/messages' })
@@ -199,7 +186,24 @@ export default function ClientDashboard() {
       result.push({ text: 'Maandelijkse meting', sub: actions.checkInDue.daysUntil === 0 ? 'Vandaag' : `Nog ${actions.checkInDue.daysUntil} ${actions.checkInDue.daysUntil === 1 ? 'dag' : 'dagen'}`, href: '/client/check-in' })
     }
     return result
-  }, [actions.unreadMessages, actions.nextVideoCall, actions.pendingPrompt, actions.accountabilityPending, actions.checkInDue])
+  }, [actions])
+
+  // Early returns AFTER all hooks
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-6 w-6 animate-spin rounded-full border-[1.5px] border-[#C0C0C0] border-t-[#1A1917]" />
+      </div>
+    )
+  }
+
+  if (!data || !training || !nutrition || !actions || !momentum) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center text-[#999]">
+        Er ging iets mis bij het laden.
+      </div>
+    )
+  }
 
   return (
     <div className="pb-28">
