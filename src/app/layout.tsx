@@ -5,8 +5,8 @@ import { OfflineIndicator } from '@/components/OfflineIndicator'
 import { InstallPrompt } from '@/components/InstallPrompt'
 import './globals.css'
 
-// NOTE: removed global force-dynamic — each route should set its own caching
-// strategy. Client pages are 'use client' + useEffect so they don't need this.
+// Force dynamic rendering — required because middleware uses auth/cookies
+export const dynamic = 'force-dynamic'
 
 const manrope = Manrope({
   subsets: ['latin'],
