@@ -8,9 +8,21 @@ import { FoodSearch, type FoodItem } from '@/components/coach/FoodSearch'
 import {
   ArrowLeft, Plus, Trash2, Check, ChevronDown, ChevronUp,
   Clock, GripVertical, Copy, Search, Eye, CheckCircle,
-  ChevronLeft, ChevronRight, Droplets, MessageSquare, Pencil
+  ChevronLeft, ChevronRight, Droplets, MessageSquare, Pencil, Zap
 } from 'lucide-react'
 import Link from 'next/link'
+
+interface TemplateSummary {
+  id: string
+  title: string
+  description: string
+  calories_target: number
+  protein_g: number
+  carbs_g: number
+  fat_g: number
+  tags: string[]
+  mealsCount: number
+}
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -164,6 +176,9 @@ export default function NutritionPage() {
   const [newMealName, setNewMealName] = useState('')
   const [newMealTime, setNewMealTime] = useState('12:00')
   const [activeTab, setActiveTab] = useState<'plan' | 'compliance'>('plan')
+  const [showTemplates, setShowTemplates] = useState(false)
+  const [templates, setTemplates] = useState<TemplateSummary[]>([])
+  const [assigningTemplate, setAssigningTemplate] = useState<string | null>(null)
 
   // Compliance state
   const [complianceDate, setComplianceDate] = useState(new Date().toISOString().split('T')[0])
@@ -284,6 +299,41 @@ export default function NutritionPage() {
     if (dateStr === today) return 'Vandaag'
     if (dateStr === yesterdayStr) return 'Gisteren'
     return new Date(dateStr).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })
+  }
+
+  async function loadTemplates() {
+    try {
+      const res = await fetch('/api/template-diets')
+      if (res.ok) setTemplates(await res.json())
+    } catch { /* silent */ }
+  }
+
+  async function handleAssignTemplate(templateId: string) {
+    try {
+      setAssigningTemplate(templateId)
+      const res = await fetch('/api/template-diets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ templateId, clientId: params.id }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Fout bij toewijzen')
+      }
+      setShowTemplates(false)
+      setSuccessMsg('Template toegewezen!')
+      setTimeout(() => setSuccessMsg(null), 3000)
+      await loadData()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Fout bij toewijzen')
+    } finally {
+      setAssigningTemplate(null)
+    }
+  }
+
+  function openTemplates() {
+    setShowTemplates(true)
+    if (templates.length === 0) loadTemplates()
   }
 
   function loadPlanIntoState(plan: any) {
@@ -484,16 +534,72 @@ export default function NutritionPage() {
               {clientName} — {isEditing ? 'bewerken' : 'beheer voedingsplan'}
             </p>
           </div>
-          {hasActivePlan && (
-            <button
-              onClick={() => { setIsEditing(true); loadPlanIntoState(activePlan) }}
-              className="px-5 py-2.5 rounded-xl font-semibold text-white transition-all hover:opacity-90 flex items-center gap-2 bg-[#1A1917]"
-            >
-              <Copy strokeWidth={1.5} className="w-4 h-4" />
-              Bewerken
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {!showTemplates && (
+              <button
+                onClick={openTemplates}
+                className="px-4 py-2.5 rounded-xl font-semibold transition-all flex items-center gap-2 bg-[#F5F2EC] text-[#1A1917] border border-[#E5E1D9] hover:bg-[#EBE8E0]"
+              >
+                <Zap strokeWidth={1.5} className="w-4 h-4" />
+                Template
+              </button>
+            )}
+            {hasActivePlan && (
+              <button
+                onClick={() => { setIsEditing(true); loadPlanIntoState(activePlan) }}
+                className="px-5 py-2.5 rounded-xl font-semibold text-white transition-all hover:opacity-90 flex items-center gap-2 bg-[#1A1917]"
+              >
+                <Copy strokeWidth={1.5} className="w-4 h-4" />
+                Bewerken
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* Template Selection */}
+        {showTemplates && (
+          <div className="rounded-2xl p-6 mb-6 bg-white shadow-sm border border-[#E5E1D9]">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-[18px] font-bold text-[#1A1A18]">Kies een template</h2>
+              <button onClick={() => setShowTemplates(false)} className="text-[13px] text-[#8E8E93] hover:text-[#1A1A18]">Annuleer</button>
+            </div>
+            <p className="text-[12px] text-[#8E8E93] mb-5">High-protein templates met producten uit onze database. Direct actief op het dashboard.</p>
+            {templates.length === 0 ? (
+              <div className="flex justify-center py-6">
+                <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#1A1917] border-t-transparent" />
+              </div>
+            ) : (
+              <div className="grid gap-2">
+                {templates.map((tpl) => (
+                  <button
+                    key={tpl.id}
+                    onClick={() => handleAssignTemplate(tpl.id)}
+                    disabled={assigningTemplate !== null}
+                    className="text-left p-4 rounded-xl border border-[#F0F0EE] hover:border-[#D46A3A]/30 hover:bg-[#FFF8F5] transition-all disabled:opacity-50 group"
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-[14px] text-[#1A1A18] group-hover:text-[#D46A3A] transition-colors">{tpl.title}</p>
+                        <p className="text-[11px] text-[#8E8E93] mt-0.5">{tpl.description}</p>
+                        <div className="flex items-center gap-3 mt-2 text-[11px] text-[#8E8E93]">
+                          <span className="font-semibold text-[#1A1A18]">{tpl.calories_target} kcal</span>
+                          <span>P {tpl.protein_g}g</span>
+                          <span>K {tpl.carbs_g}g</span>
+                          <span>V {tpl.fat_g}g</span>
+                        </div>
+                      </div>
+                      {assigningTemplate === tpl.id ? (
+                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#D46A3A] border-t-transparent shrink-0" />
+                      ) : (
+                        <span className="text-[12px] font-semibold text-[#D46A3A] opacity-0 group-hover:opacity-100 transition-opacity shrink-0">Toewijzen →</span>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Tab Navigation */}
         {activePlan && (
