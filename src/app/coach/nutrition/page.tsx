@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
-import { Apple, ChevronRight, Search, Eye, CheckCircle, AlertCircle, Droplets, Copy, BookOpen, Users, Loader2, Plus, Pencil } from 'lucide-react'
+import { Apple, ChevronRight, Search, Eye, CheckCircle, AlertCircle, Droplets, Copy, BookOpen, Users, Loader2, Plus, Pencil, Zap } from 'lucide-react'
 
 interface DailySummary {
   client_id: string
@@ -48,6 +48,18 @@ const MOOD_EMOJI: Record<string, string> = {
   terrible: '😢',
 }
 
+interface PrebuiltTemplate {
+  id: string
+  title: string
+  description: string
+  calories_target: number
+  protein_g: number
+  carbs_g: number
+  fat_g: number
+  tags: string[]
+  mealsCount: number
+}
+
 interface NutritionTemplate {
   id: string
   title: string
@@ -63,16 +75,39 @@ interface NutritionTemplate {
 export default function NutritionOverviewPage() {
   const [clients, setClients] = useState<ClientNutrition[]>([])
   const [templates, setTemplates] = useState<NutritionTemplate[]>([])
+  const [prebuiltTemplates, setPrebuiltTemplates] = useState<PrebuiltTemplate[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [filter, setFilter] = useState<'all' | 'with_plan' | 'without_plan' | 'needs_review'>('all')
   const [showAssignModal, setShowAssignModal] = useState<string | null>(null)
+  const [showPrebuiltAssign, setShowPrebuiltAssign] = useState<string | null>(null)
   const [assigning, setAssigning] = useState(false)
   const [coachId, setCoachId] = useState<string | null>(null)
 
   useEffect(() => {
     loadClients()
   }, [])
+
+  async function assignPrebuiltToClient(templateId: string, clientId: string) {
+    setAssigning(true)
+    try {
+      const res = await fetch('/api/template-diets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ templateId, clientId }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Fout bij toewijzen')
+      }
+      setShowPrebuiltAssign(null)
+      loadClients()
+    } catch (err) {
+      console.error('Failed to assign prebuilt template:', err)
+    } finally {
+      setAssigning(false)
+    }
+  }
 
   async function assignTemplateToClient(templateId: string, clientId: string) {
     setAssigning(true)
@@ -129,6 +164,17 @@ export default function NutritionOverviewPage() {
           .order('created_at', { ascending: false })
 
         setTemplates(templateData || [])
+      }
+
+      // Get pre-built templates
+      try {
+        const res = await fetch('/api/template-diets')
+        if (res.ok) {
+          const data = await res.json()
+          setPrebuiltTemplates(data)
+        }
+      } catch {
+        // silent
       }
 
       // Get all clients
@@ -362,6 +408,101 @@ export default function NutritionOverviewPage() {
             </div>
         )}
           </div>
+
+        {/* Pre-built MŌVE Templates */}
+        {prebuiltTemplates.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <Zap strokeWidth={1.5} className="w-4 h-4 text-[#D46A3A]" />
+              <h2 className="text-[15px] font-semibold text-[#1A1A18]">Standaard templates</h2>
+              <span className="text-[12px] text-[#8E8E93] ml-1">High protein</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {prebuiltTemplates.map((tpl) => (
+                <div
+                  key={tpl.id}
+                  className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-5"
+                >
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-[15px] font-semibold text-[#1A1A18]">{tpl.title}</h3>
+                      <p className="text-[12px] text-[#8E8E93] mt-1">{tpl.description}</p>
+                    </div>
+                    <button
+                      onClick={() => setShowPrebuiltAssign(tpl.id)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1A1917] text-white text-[12px] font-semibold rounded-full hover:bg-[#7A5C12] transition-colors shrink-0"
+                    >
+                      <Copy strokeWidth={1.5} className="w-3.5 h-3.5" />
+                      Toewijzen
+                    </button>
+                  </div>
+                  <p className="text-[13px] text-[#8E8E93] mb-2">
+                    {tpl.calories_target} kcal · {tpl.protein_g}g eiwit · {tpl.carbs_g}g koolh · {tpl.fat_g}g vet
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {tpl.tags.map((tag) => (
+                      <span key={tag} className="text-[11px] bg-[#EDEAE4] text-[#1A1917] px-2 py-0.5 rounded-full">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Assign Prebuilt Template Modal */}
+        {showPrebuiltAssign && (
+          <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowPrebuiltAssign(null)}>
+            <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              <div className="p-5 border-b border-[#E8E4DC]">
+                <h3 className="text-[17px] font-semibold text-[#1A1A18]">Template toewijzen</h3>
+                <p className="text-[13px] text-[#8E8E93] mt-1">
+                  {prebuiltTemplates.find(t => t.id === showPrebuiltAssign)?.title} — kies een cliënt
+                </p>
+              </div>
+              <div className="p-3 max-h-[60vh] overflow-y-auto">
+                {clients.map((client) => (
+                  <button
+                    key={client.id}
+                    onClick={() => assignPrebuiltToClient(showPrebuiltAssign, client.id)}
+                    disabled={assigning}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#FAFAFA] transition-colors text-left disabled:opacity-50"
+                  >
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold flex-shrink-0"
+                      style={{ backgroundColor: '#F5F5F3', color: '#1A1917' }}
+                    >
+                      {client.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[15px] text-[#1A1A18] font-medium truncate">{client.full_name}</p>
+                      <p className="text-[12px] text-[#8E8E93]">
+                        {client.nutrition_plan ? `Huidig: ${client.nutrition_plan.title}` : 'Geen plan'}
+                      </p>
+                    </div>
+                    {assigning ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-[#1A1917]" />
+                    ) : (
+                      <Copy strokeWidth={1.5} className="w-4 h-4 text-[#C7C7CC]" />
+                    )}
+                  </button>
+                ))}
+                {clients.length === 0 && (
+                  <p className="text-center text-[14px] text-[#8E8E93] py-8">Nog geen cliënten</p>
+                )}
+              </div>
+              <div className="p-3 border-t border-[#E8E4DC]">
+                <button
+                  onClick={() => setShowPrebuiltAssign(null)}
+                  className="w-full py-2.5 text-[14px] font-medium text-[#8E8E93] hover:text-[#1A1A18] transition-colors"
+                >
+                  Annuleren
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Assign Template Modal */}
         {showAssignModal && (
