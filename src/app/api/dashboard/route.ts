@@ -19,6 +19,8 @@ export async function GET(request: NextRequest) {
     const monthStart = new Date()
     monthStart.setDate(1)
 
+    const weekStartDate = getWeekStartDate()
+
     const [
       profileRes,
       programRes,
@@ -36,6 +38,8 @@ export async function GET(request: NextRequest) {
       lastCheckinRes,
       streakResult,
       weightEntriesRes,
+      weeklyCheckinRes,
+      weightLogsThisWeekRes,
     ] = await Promise.all([
       // Profile (include intake_completed for onboarding)
       supabase.from('profiles').select('id, full_name, role, package, start_date, intake_completed')
@@ -112,6 +116,20 @@ export async function GET(request: NextRequest) {
         .eq('client_id', user.id).eq('metric_type', 'weight')
         .gte('measured_at', monthStart.toISOString())
         .order('measured_at'),
+
+      // Weekly check-in this week (has the client submitted?)
+      supabase.from('weekly_checkins').select('id, date, weight_kg')
+        .eq('client_id', user.id)
+        .gte('date', weekStartDate)
+        .order('date', { ascending: false })
+        .limit(1)
+        .single(),
+
+      // Weight logs this week (for 2x/week minimum tracking)
+      supabase.from('health_metrics').select('id, value, measured_at')
+        .eq('client_id', user.id).eq('metric_type', 'weight')
+        .gte('measured_at', `${weekStartDate}T00:00:00`)
+        .order('measured_at', { ascending: false }),
     ])
 
     // ── Compute derived data ──────────────────────────────
@@ -226,6 +244,15 @@ export async function GET(request: NextRequest) {
       if (intakeForm.completed) onboardingStep = 10
     }
 
+    // ── Weekly check-in status ─────────────────────────────
+    const weeklyCheckinDone = !!weeklyCheckinRes.data
+    const weeklyCheckinData = weeklyCheckinRes.data
+
+    // ── Weight log frequency this week ───────────────────
+    const weightLogsThisWeek = weightLogsThisWeekRes.data || []
+    const weightLogCount = weightLogsThisWeek.length
+    const lastWeightLog = weightLogsThisWeek.length > 0 ? weightLogsThisWeek[0] : null
+
     // ── Check-in due (improved logic) ────────────────────
     const lastCheckin = lastCheckinRes.data
     const checkInDueInfo = (() => {
@@ -328,6 +355,19 @@ export async function GET(request: NextRequest) {
         checkInDue: checkInDueInfo,
       },
 
+      weeklyCheckIn: {
+        submitted: weeklyCheckinDone,
+        date: weeklyCheckinData?.date || null,
+        weightKg: weeklyCheckinData?.weight_kg || null,
+      },
+
+      weightLog: {
+        entriesThisWeek: weightLogCount,
+        targetPerWeek: 2,
+        lastValue: lastWeightLog ? lastWeightLog.value : null,
+        lastDate: lastWeightLog ? lastWeightLog.measured_at : null,
+      },
+
       momentum: {
         streakDays: streak,
         workoutsThisWeek: weekWorkouts.length,
@@ -358,6 +398,13 @@ function getWeekStart() {
   const day = d.getDay()
   const diff = d.getDate() - day + (day === 0 ? -6 : 1)
   return new Date(d.setDate(diff)).toISOString().split('T')[0] + 'T00:00:00'
+}
+
+function getWeekStartDate() {
+  const d = new Date()
+  const day = d.getDay()
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+  return new Date(d.setDate(diff)).toISOString().split('T')[0]
 }
 
 async function computeStreak(supabase: any, userId: string): Promise<number> {

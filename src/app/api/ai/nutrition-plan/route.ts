@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
       snack_preference: intake.snack_preference,
       evening_snacker: intake.evening_snacker,
       food_adventurousness: intake.food_adventurousness,
+      typical_daily_eating: intake.typical_daily_eating || '',
       training_location: intake.training_location,
       home_equipment: intake.home_equipment || [],
       experience_level: intake.experience_level,
@@ -169,6 +170,7 @@ Maaltijden per dag: ${clientData.meals_per_day || 'Niet opgegeven'}
 Sociale context: ${clientData.social_context || 'Niet opgegeven'}
 
 === VOEDING ===
+Huidig dagelijks eetpatroon: ${clientData.typical_daily_eating || 'Niet beschreven'}
 Favoriete maaltijden: ${(clientData.favorite_meals as string[]).length > 0 ? (clientData.favorite_meals as string[]).join(', ') : 'Geen opgegeven'}
 Gehate voedingsmiddelen: ${(clientData.hated_foods as string[]).length > 0 ? (clientData.hated_foods as string[]).join(', ') : 'Geen'}
 Allergieën/intoleranties: ${(clientData.allergies as string[]).length > 0 ? (clientData.allergies as string[]).join(', ') : 'Geen'}
@@ -242,9 +244,35 @@ Antwoord ALLEEN met het JSON-object, geen extra tekst.`
       throw new Error('AI response was not valid JSON')
     }
 
-    // Save to nutrition_plans table
+    // Deactivate any existing active plan
+    await db.from('nutrition_plans')
+      .update({ is_active: false })
+      .eq('client_id', userId)
+      .eq('is_active', true)
+
+    // Build meals array from AI plan for the dashboard
+    const mealPlan = (planJson as any).meal_plan || []
+    const mondayMeals = mealPlan.find((d: any) => d.day === 'Maandag')?.meals || mealPlan[0]?.meals || []
+    const meals = mondayMeals.map((m: any, i: number) => ({
+      id: `meal-${i}-${(m.type || '').toLowerCase()}`,
+      name: m.name || m.type || `Maaltijd ${i + 1}`,
+      type: m.type,
+      time: m.type === 'ontbijt' ? '08:00' : m.type === 'lunch' ? '12:30' : m.type === 'diner' ? '18:30' : '15:00',
+      items: m.description ? [{ name: m.description, grams: null, per100g: { calories: m.calories || 0, protein: m.protein_g || 0, carbs: m.carbs_g || 0, fat: m.fat_g || 0 } }] : [],
+    }))
+
+    const macros = (planJson as any).macros || {}
+
+    // Save to nutrition_plans table with all required fields
     const { error: insertError } = await db.from('nutrition_plans').insert({
       client_id: userId,
+      title: `Voedingsplan ${profile.full_name?.split(' ')[0] || ''}`.trim(),
+      is_active: true,
+      calories_target: (planJson as any).calorie_target || null,
+      protein_g: macros.protein_g || null,
+      carbs_g: macros.carbs_g || null,
+      fat_g: macros.fat_g || null,
+      meals,
       plan_data: planJson,
       generated_at: new Date().toISOString(),
     })

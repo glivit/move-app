@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
-import { ArrowRight, ChevronRight } from 'lucide-react'
+import { ArrowRight, ChevronRight, Scale, ClipboardCheck, CalendarCheck } from 'lucide-react'
 import { NotificationCenter } from '@/components/client/NotificationCenter'
 import { cachedFetch } from '@/lib/fetcher'
 
@@ -66,6 +66,17 @@ interface DashboardData {
     nextVideoCall: { id: string; scheduled_at: string } | null
     checkInDue: { daysUntil: number; overdue: boolean } | null
   }
+  weeklyCheckIn: {
+    submitted: boolean
+    date: string | null
+    weightKg: number | null
+  }
+  weightLog: {
+    entriesThisWeek: number
+    targetPerWeek: number
+    lastValue: number | null
+    lastDate: string | null
+  }
   momentum: {
     streakDays: number
     workoutsThisWeek: number
@@ -123,6 +134,9 @@ export default function ClientDashboard() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
+  const [weightInput, setWeightInput] = useState('')
+  const [weightSaving, setWeightSaving] = useState(false)
+  const [weightSaved, setWeightSaved] = useState(false)
   useEffect(() => { loadDashboard() }, [])
 
   async function loadDashboard() {
@@ -136,12 +150,36 @@ export default function ClientDashboard() {
     }
   }
 
+  const submitWeight = useCallback(async () => {
+    const val = parseFloat(weightInput.replace(',', '.'))
+    if (!val || val < 30 || val > 300) return
+    setWeightSaving(true)
+    try {
+      await fetch('/api/health-metrics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ metric_type: 'weight', value: val, measured_at: new Date().toISOString() }),
+      })
+      setWeightSaved(true)
+      setWeightInput('')
+      setTimeout(() => setWeightSaved(false), 2500)
+      // Refresh dashboard data
+      loadDashboard()
+    } catch (err) {
+      console.error('Weight log error:', err)
+    } finally {
+      setWeightSaving(false)
+    }
+  }, [weightInput])
+
   // ALL hooks must be called before any early return (React rules of hooks)
   const training = data?.training
   const nutrition = data?.nutrition
   const actions = data?.actions
   const momentum = data?.momentum
   const onboarding = data?.onboarding
+  const weeklyCheckIn = data?.weeklyCheckIn
+  const weightLog = data?.weightLog
   const firstName = data?.profile?.firstName || ''
   const showOnboarding = onboarding && !onboarding.complete
 
@@ -182,9 +220,7 @@ export default function ClientDashboard() {
     if (actions.accountabilityPending) {
       result.push({ text: 'Dagelijkse check', sub: 'Laat weten hoe je dag was', href: '/client/accountability' })
     }
-    if (actions.checkInDue !== null && !actions.checkInDue.overdue) {
-      result.push({ text: 'Maandelijkse meting', sub: actions.checkInDue.daysUntil === 0 ? 'Vandaag' : `Nog ${actions.checkInDue.daysUntil} ${actions.checkInDue.daysUntil === 1 ? 'dag' : 'dagen'}`, href: '/client/check-in' })
-    }
+    // Monthly check-in is now shown as a prominent card above, so skip it here
     return result
   }, [actions])
 
@@ -197,7 +233,7 @@ export default function ClientDashboard() {
     )
   }
 
-  if (!data || !training || !nutrition || !actions || !momentum) {
+  if (!data || !training || !actions || !momentum) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center text-[#999]">
         Er ging iets mis bij het laden.
@@ -404,6 +440,113 @@ export default function ClientDashboard() {
               </Link>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ═══ CHECK-INS & WEIGHT LOG ══════════════════════════ */}
+      {!isDay1 && !showOnboarding && (
+        <div className="mb-8 space-y-3 animate-fade-in" style={{ animationDelay: '220ms' }}>
+
+          {/* ── Weekly Check-in Card ────────────────── */}
+          {weeklyCheckIn && !weeklyCheckIn.submitted && (
+            <Link href="/client/weekly-check-in" className="flex items-center gap-4 rounded-2xl bg-[#FFF8F5] px-5 py-4 transition-all hover:bg-[#FFF0EA] active:scale-[0.98] group">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#D46A3A]/10">
+                <ClipboardCheck className="h-5 w-5 text-[#D46A3A]" strokeWidth={1.5} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[14px] font-semibold text-[#1A1917]">Wekelijkse check-in</p>
+                <p className="text-[12px] text-[#ACACAC] mt-0.5">Gewicht, energie & reflectie</p>
+              </div>
+              <span className="shrink-0 rounded-lg bg-[#D46A3A] px-3 py-1.5 text-[12px] font-semibold text-white">
+                Invullen
+              </span>
+            </Link>
+          )}
+          {weeklyCheckIn && weeklyCheckIn.submitted && (
+            <div className="flex items-center gap-4 rounded-2xl bg-[#F4FBF6] px-5 py-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#3D8B5C]/10">
+                <ClipboardCheck className="h-5 w-5 text-[#3D8B5C]" strokeWidth={1.5} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[14px] font-medium text-[#3D8B5C]">Check-in ingevuld</p>
+                <p className="text-[12px] text-[#ACACAC] mt-0.5">
+                  {weeklyCheckIn.weightKg ? `${weeklyCheckIn.weightKg} kg` : 'Deze week'}
+                </p>
+              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3D8B5C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+            </div>
+          )}
+
+          {/* ── Monthly Check-in Card ───────────────── */}
+          {actions?.checkInDue && (
+            <Link href="/client/check-in" className="flex items-center gap-4 rounded-2xl bg-[#F5F5FF] px-5 py-4 transition-all hover:bg-[#EDEDFF] active:scale-[0.98] group">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#6B5CE7]/10">
+                <CalendarCheck className="h-5 w-5 text-[#6B5CE7]" strokeWidth={1.5} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[14px] font-semibold text-[#1A1917]">Maandelijkse meting</p>
+                <p className="text-[12px] text-[#ACACAC] mt-0.5">
+                  {actions.checkInDue.overdue
+                    ? 'Achterstallig — vul nu in'
+                    : actions.checkInDue.daysUntil === 0
+                      ? 'Vandaag invullen'
+                      : `Nog ${actions.checkInDue.daysUntil} ${actions.checkInDue.daysUntil === 1 ? 'dag' : 'dagen'}`
+                  }
+                </p>
+              </div>
+              <span className={`shrink-0 rounded-lg px-3 py-1.5 text-[12px] font-semibold text-white ${actions.checkInDue.overdue ? 'bg-[#E04343]' : 'bg-[#6B5CE7]'}`}>
+                {actions.checkInDue.overdue ? 'Nu invullen' : 'Invullen'}
+              </span>
+            </Link>
+          )}
+
+          {/* ── Quick Weight Log ─────────────────────── */}
+          <div className="rounded-2xl bg-[#FAFAF8] px-5 py-4">
+            <div className="flex items-center gap-3 mb-3">
+              <Scale className="h-4 w-4 text-[#ACACAC]" strokeWidth={1.5} />
+              <span className="text-[13px] font-medium text-[#1A1917]">Gewicht loggen</span>
+              <span className={`ml-auto text-[12px] font-medium ${
+                (weightLog?.entriesThisWeek || 0) >= (weightLog?.targetPerWeek || 2)
+                  ? 'text-[#3D8B5C]'
+                  : 'text-[#ACACAC]'
+              }`}>
+                {weightLog?.entriesThisWeek || 0}/{weightLog?.targetPerWeek || 2} deze week
+              </span>
+            </div>
+            {weightSaved ? (
+              <div className="flex items-center gap-2 py-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3D8B5C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                <span className="text-[13px] text-[#3D8B5C] font-medium">Opgeslagen!</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  placeholder={weightLog?.lastValue ? `Vorige: ${weightLog.lastValue} kg` : 'bv. 78,5'}
+                  value={weightInput}
+                  onChange={(e) => setWeightInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') submitWeight() }}
+                  className="flex-1 rounded-xl bg-white border border-[#F0F0EE] px-4 py-2.5 text-[14px] text-[#1A1917] placeholder:text-[#CDCDCD] outline-none focus:border-[#D46A3A]/40 transition-colors"
+                />
+                <button
+                  onClick={submitWeight}
+                  disabled={weightSaving || !weightInput.trim()}
+                  className="shrink-0 rounded-xl bg-[#1A1917] px-4 py-2.5 text-[13px] font-medium text-white transition-all hover:bg-[#333] disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
+                >
+                  {weightSaving ? '...' : 'Log'}
+                </button>
+              </div>
+            )}
+            {weightLog?.lastValue && !weightSaved && (
+              <p className="mt-2 text-[11px] text-[#C8C8C8]">
+                Laatste: {weightLog.lastValue} kg
+                {weightLog.lastDate && (
+                  <> ({new Date(weightLog.lastDate).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })})</>
+                )}
+              </p>
+            )}
+          </div>
         </div>
       )}
 

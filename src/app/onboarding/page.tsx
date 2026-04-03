@@ -49,6 +49,7 @@ interface OnboardingData {
   snack_preference: string
   evening_snacker: string
   food_adventurousness: number
+  typical_daily_eating: string
   // Stap 5: Training & Gezondheid
   training_location: string
   home_equipment: string[]
@@ -319,6 +320,7 @@ export default function OnboardingPage() {
     snack_preference: '',
     evening_snacker: '',
     food_adventurousness: 5,
+    typical_daily_eating: '',
     training_location: '',
     home_equipment: [],
     experience_level: 1,
@@ -421,6 +423,7 @@ export default function OnboardingPage() {
         snack_preference: data.snack_preference,
         evening_snacker: data.evening_snacker,
         food_adventurousness: data.food_adventurousness,
+        typical_daily_eating: data.typical_daily_eating || null,
         // Stap 5
         training_location: data.training_location,
         home_equipment: data.home_equipment,
@@ -774,6 +777,18 @@ export default function OnboardingPage() {
               </div>
 
               <div className="space-y-5">
+                <div>
+                  <SectionLabel text="Wat eet je op een doorsnee dag?" />
+                  <p className="text-[12px] text-[#A09D96] mb-2">Beschrijf kort je typische ontbijt, lunch, avondeten en tussendoortjes</p>
+                  <textarea
+                    value={data.typical_daily_eating}
+                    onChange={(e) => update('typical_daily_eating', e.target.value)}
+                    placeholder="bv. Ontbijt: boterhammen met kaas. Lunch: broodje van de bakker. Avond: pasta of rijst met kip. Tussendoor: koekje bij de koffie..."
+                    rows={4}
+                    className="w-full rounded-xl border border-[#E5E1D9] bg-white px-4 py-3 text-[14px] text-[#1A1917] placeholder:text-[#C8C8C8] outline-none focus:border-[#D46A3A]/40 transition-colors resize-none"
+                  />
+                </div>
+
                 <TagInput
                   label="Favoriete maaltijden"
                   placeholder="Typ en druk enter..."
@@ -1012,11 +1027,11 @@ export default function OnboardingPage() {
               </div>
               <div>
                 <h2 className="text-2xl font-semibold text-[#1A1917]">
-                  {aiGenerating ? 'Je plan wordt gemaakt...' : 'Bijna klaar!'}
+                  {aiGenerating ? 'Even geduld...' : 'Bijna klaar!'}
                 </h2>
                 <p className="text-[#6B6862] mt-2">
                   {aiGenerating
-                    ? 'Onze AI nutritionist stelt je persoonlijke voedingsplan samen op basis van jouw voorkeuren.'
+                    ? 'Je coach stelt je persoonlijke voedingsplan samen op basis van je gegevens.'
                     : 'Je voedingsplan is klaar!'}
                 </p>
               </div>
