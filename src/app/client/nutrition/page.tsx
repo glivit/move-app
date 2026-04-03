@@ -150,10 +150,13 @@ function FoodSearchModal({
   const [customForm, setCustomForm] = useState({ name: '', brand: '', barcode: '', calories: '', protein: '', carbs: '', fat: '' })
   const [savingCustom, setSavingCustom] = useState(false)
   const [savingConfirm, setSavingConfirm] = useState(false)
+  const [scanning, setScanning] = useState(false)
+  const scannerRef = useRef<HTMLDivElement>(null)
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
     if (!isOpen) {
+      setScanning(false)
       setQuery('')
       setSearchResults([])
       setSelectedProduct(null)
@@ -290,59 +293,74 @@ function FoodSearchModal({
     }
   }
 
-  async function handleBarcodeScan() {
-    // Use the device camera to scan a barcode via the native input
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'image/*'
-    input.capture = 'environment'
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0]
-      if (!file) return
-      // For now, prompt user to type the barcode manually
-      // Full camera barcode scanning requires a library like html5-qrcode
-      const code = prompt('Voer de barcode in (nummer onder de streepjes):')
-      if (code) {
-        setLoading(true)
-        try {
-          const res = await fetch(`/api/food-search?barcode=${encodeURIComponent(code)}`)
-          const data: SearchResponse = await res.json()
-          if (data.products?.length > 0) {
-            setSearchResults(data.products)
-            setSelectedProduct(data.products[0])
-          } else {
-            setSearchResults([])
-            alert('Product niet gevonden. Voeg het handmatig toe via "Nieuw product".')
-            setModalTab('custom')
-            setCustomForm(prev => ({ ...prev, barcode: code }))
-          }
-        } catch {
-          alert('Zoeken mislukt')
-        }
-        setLoading(false)
+  async function lookupBarcode(code: string) {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/food-search?barcode=${encodeURIComponent(code.trim())}`)
+      const data: SearchResponse = await res.json()
+      if (data.products?.length > 0) {
+        setSearchResults(data.products)
+        setSelectedProduct(data.products[0])
+      } else {
+        setSearchResults([])
+        alert('Product niet gevonden. Voeg het handmatig toe via "Nieuw product".')
+        setModalTab('custom')
+        setCustomForm(prev => ({ ...prev, barcode: code.trim() }))
       }
+    } catch {
+      alert('Zoeken mislukt, probeer opnieuw.')
     }
-    // Fallback: just prompt for barcode number
-    const code = prompt('Voer de barcode in (nummer onder de streepjes):')
-    if (code) {
-      setLoading(true)
-      try {
-        const res = await fetch(`/api/food-search?barcode=${encodeURIComponent(code)}`)
-        const data: SearchResponse = await res.json()
-        if (data.products?.length > 0) {
-          setSearchResults(data.products)
-          setSelectedProduct(data.products[0])
-        } else {
-          setSearchResults([])
-          setModalTab('custom')
-          setCustomForm(prev => ({ ...prev, barcode: code }))
-        }
-      } catch {
-        // silent
-      }
-      setLoading(false)
-    }
+    setLoading(false)
   }
+
+  async function handleBarcodeScan() {
+    setScanning(true)
+  }
+
+  async function stopScanning() {
+    setScanning(false)
+  }
+
+  // Effect to start/stop html5-qrcode scanner
+  useEffect(() => {
+    if (!scanning) return
+    let html5QrCode: any = null
+    let stopped = false
+
+    async function startScanner() {
+      try {
+        const { Html5Qrcode } = await import('html5-qrcode')
+        if (stopped) return
+        html5QrCode = new Html5Qrcode('barcode-reader')
+        await html5QrCode.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: { width: 250, height: 150 } },
+          (decodedText: string) => {
+            // On successful scan
+            html5QrCode.stop().catch(() => {})
+            setScanning(false)
+            lookupBarcode(decodedText)
+          },
+          () => {} // ignore scan failures (no barcode in frame)
+        )
+      } catch (err) {
+        console.error('Scanner error:', err)
+        setScanning(false)
+        // Fallback to manual input
+        const code = prompt('Camera niet beschikbaar. Voer de barcode handmatig in:')
+        if (code) lookupBarcode(code)
+      }
+    }
+
+    startScanner()
+
+    return () => {
+      stopped = true
+      if (html5QrCode) {
+        html5QrCode.stop().catch(() => {})
+      }
+    }
+  }, [scanning])
 
   async function handleSaveCustomProduct() {
     if (!customForm.name || !customForm.calories) return
@@ -428,9 +446,13 @@ function FoodSearchModal({
                   className="flex-1 px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
                 />
                 <button
-                  onClick={handleBarcodeScan}
-                  className="px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[#ACACAC] hover:text-[#1A1917] hover:border-[#1A1917] transition-colors"
-                  title="Barcode scannen"
+                  onClick={scanning ? stopScanning : handleBarcodeScan}
+                  className={`px-3 py-2.5 border rounded-xl transition-colors ${
+                    scanning
+                      ? 'border-[#D46A3A] text-[#D46A3A] bg-[rgba(212,106,58,0.06)]'
+                      : 'border-[#F0F0EE] text-[#ACACAC] hover:text-[#1A1917] hover:border-[#1A1917]'
+                  }`}
+                  title={scanning ? 'Scanner stoppen' : 'Barcode scannen'}
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M3 7V5a2 2 0 0 1 2-2h2" /><path d="M17 3h2a2 2 0 0 1 2 2v2" /><path d="M21 17v2a2 2 0 0 1-2 2h-2" /><path d="M7 21H5a2 2 0 0 1-2-2v-2" />
@@ -439,6 +461,26 @@ function FoodSearchModal({
                 </button>
               </div>
             </div>
+            {/* Camera barcode scanner */}
+            {scanning && (
+              <div className="px-4 py-4 border-b border-[#F0F0EE] bg-[#1A1917]">
+                <div
+                  id="barcode-reader"
+                  ref={scannerRef}
+                  className="w-full rounded-xl overflow-hidden"
+                  style={{ minHeight: 200 }}
+                />
+                <p className="text-center text-[12px] text-[#C0C0C0] mt-2">
+                  Richt de camera op de barcode
+                </p>
+                <button
+                  onClick={stopScanning}
+                  className="w-full mt-2 py-2 text-[13px] text-[#D46A3A] font-medium hover:underline"
+                >
+                  Annuleren
+                </button>
+              </div>
+            )}
 
             {/* Results list */}
             <div className="flex-1 overflow-y-auto">
