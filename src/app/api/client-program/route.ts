@@ -1,8 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { NextRequest, NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
-
 // GET: Fetch the active program for the authenticated client
 export async function GET(request: NextRequest) {
   try {
@@ -96,7 +94,7 @@ export async function GET(request: NextRequest) {
       todayDay,
       todayCompleted,
     })
-    response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')
+    response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300')
     return response
   } catch (error) {
     console.error('Error fetching client program:', error)

@@ -1,9 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase'
 import { Heart, Footprints, Moon, Droplets, Brain, Activity, TrendingUp, TrendingDown, Minus } from 'lucide-react'
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
+
+const ClientHealthChart = dynamic(() => import('./ClientHealthChart').then(mod => ({ default: mod.ClientHealthChart })), {
+  ssr: false,
+  loading: () => <div className="h-24 bg-[#F8F8F6] rounded animate-pulse" />
+})
 
 interface HealthMetric {
   date: string
@@ -162,16 +167,7 @@ export function ClientHealthSummary({ clientId }: Props) {
       {chartData.length > 2 && (
         <div>
           <p className="text-[11px] font-medium mb-2" style={{ color: '#8E8E93' }}>Slaap afgelopen 7 dagen</p>
-          <ResponsiveContainer width="100%" height={80}>
-            <BarChart data={chartData}>
-              <XAxis dataKey="date" tick={{ fontSize: 9, fill: '#C7C7CC' }} axisLine={false} tickLine={false} />
-              <YAxis hide domain={[0, 10]} />
-              <Tooltip
-                contentStyle={{ borderRadius: 8, border: 'none', fontSize: 11, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-              />
-              <Bar dataKey="slaap" fill="#AF52DE" radius={[4, 4, 0, 0]} name="Slaap (u)" />
-            </BarChart>
-          </ResponsiveContainer>
+          <ClientHealthChart data={chartData} />
         </div>
       )}
     </div>

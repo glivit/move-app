@@ -39,7 +39,9 @@ export async function GET(request: NextRequest) {
     .eq('date', date)
     .single()
 
-  return NextResponse.json({ logs: logs || [], summary: summary || null })
+  const response = NextResponse.json({ logs: logs || [], summary: summary || null })
+  response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')
+  return response
 }
 
 // POST: Log or update a meal completion

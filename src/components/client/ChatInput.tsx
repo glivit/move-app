@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 import { Send, Paperclip, X, Camera, Image as ImageIcon, Film, Mic, Square } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 
@@ -255,10 +256,13 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
         <div className="px-4 pt-3">
           <div className="relative inline-block">
             {filePreview.type.startsWith('image/') ? (
-              <img
+              <Image
                 src={filePreview.localPreview || filePreview.url}
                 alt="Preview"
+                width={80}
+                height={80}
                 className="h-20 rounded-xl object-cover"
+                unoptimized
               />
             ) : filePreview.type.startsWith('video/') ? (
               <div className="h-20 w-32 rounded-xl bg-[#F0EDE8] flex items-center justify-center">

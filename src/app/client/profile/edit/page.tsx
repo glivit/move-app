@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import { ChevronLeft, Camera, Loader2, Check } from 'lucide-react'
 
@@ -80,7 +81,7 @@ export default function EditProfilePage() {
         <div className="relative mb-4">
           <div className="w-24 h-24 rounded-full bg-[#1A1917] text-white flex items-center justify-center text-3xl font-semibold overflow-hidden">
             {avatarUrl ? (
-              <img src={avatarUrl} alt={fullName} className="w-full h-full object-cover" />
+              <Image src={avatarUrl} alt={fullName} width={96} height={96} className="w-full h-full object-cover" unoptimized loading="lazy" />
             ) : (
               fullName ? fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '?'
             )}

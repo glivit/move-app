@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { memo, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
 import { DarkModeToggle } from '@/components/client/DarkModeToggle'
 import {
@@ -44,20 +45,22 @@ const secondaryNavItems = [
   { href: '/client/profile', label: 'Instellingen', icon: Settings },
 ]
 
-export function ClientSidebar() {
+function ClientSidebarComponent() {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
 
-  const isActive = (href: string) => {
+  // Memoize isActive function
+  const isActive = useCallback((href: string) => {
     if (href === '/client') return pathname === '/client'
     return pathname.startsWith(href)
-  }
+  }, [pathname])
 
-  const handleLogout = async () => {
+  // Memoize handleLogout
+  const handleLogout = useCallback(async () => {
     await supabase.auth.signOut()
     router.replace('/')
-  }
+  }, [supabase.auth, router])
 
   return (
     <aside
@@ -167,3 +170,5 @@ export function ClientSidebar() {
     </aside>
   )
 }
+
+export const ClientSidebar = memo(ClientSidebarComponent)

@@ -39,7 +39,9 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error
 
-    return NextResponse.json(mealPlans)
+    const response = NextResponse.json(mealPlans)
+    response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')
+    return response
   } catch (err) {
     console.error('Error fetching meal plans:', err)
     return NextResponse.json(

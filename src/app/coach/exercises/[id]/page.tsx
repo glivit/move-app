@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
+import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { ArrowLeft, Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
@@ -203,10 +204,13 @@ export default function ExerciseDetailPage() {
           <div className="bg-white rounded-2xl shadow-clean overflow-hidden">
             <div className="aspect-video bg-[#FAFAFA] flex items-center justify-center">
               {exercise.gif_url ? (
-                <img
+                <Image
                   src={exercise.gif_url}
                   alt={exercise.name}
+                  width={500}
+                  height={375}
                   className="w-full h-full object-cover"
+                  unoptimized
                   style={{ mixBlendMode: 'multiply' }}
                 />
               ) : (

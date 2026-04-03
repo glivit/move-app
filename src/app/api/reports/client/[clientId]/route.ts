@@ -2,8 +2,6 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
-
 interface RouteParams {
   params: Promise<{ clientId: string }>
 }
@@ -173,7 +171,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
     }
 
-    return NextResponse.json({ data: report })
+    const response = NextResponse.json({ data: report })
+    response.headers.set('Cache-Control', 'private, max-age=300, stale-while-revalidate=1800')
+    return response
   } catch (error) {
     console.error('Report API error:', error)
     return NextResponse.json({ error: 'Serverfout' }, { status: 500 })

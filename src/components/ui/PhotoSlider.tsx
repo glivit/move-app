@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, useCallback } from 'react'
+import Image from 'next/image'
 
 interface PhotoSliderProps {
   beforeUrl: string
@@ -53,11 +54,15 @@ export function PhotoSlider({
       onTouchEnd={handleMouseUp}
     >
       {/* After image (full width, below) */}
-      <img
+      <Image
         src={afterUrl}
         alt="Na"
+        width={400}
+        height={400}
         className="absolute inset-0 w-full h-full object-cover"
         draggable={false}
+        unoptimized
+        loading="lazy"
       />
 
       {/* Before image (clipped) */}
@@ -65,12 +70,16 @@ export function PhotoSlider({
         className="absolute inset-0 overflow-hidden"
         style={{ width: `${position}%` }}
       >
-        <img
+        <Image
           src={beforeUrl}
           alt="Voor"
+          width={400}
+          height={400}
           className="absolute inset-0 w-full h-full object-cover"
           style={{ width: containerRef.current?.offsetWidth || '100%' }}
           draggable={false}
+          unoptimized
+          loading="lazy"
         />
       </div>
 

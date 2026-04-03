@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { Card } from './Card'
 import { PackageBadge } from './PackageBadge'
@@ -38,10 +39,14 @@ export function ClientCard({ client }: ClientCardProps) {
             {/* Avatar Circle */}
             <div className="w-12 h-12 rounded-full bg-accent text-white flex items-center justify-center shrink-0">
               {client.avatar_url ? (
-                <img
+                <Image
                   src={client.avatar_url}
                   alt={client.full_name || 'Client'}
+                  width={48}
+                  height={48}
                   className="w-12 h-12 rounded-full object-cover"
+                  unoptimized
+                  loading="lazy"
                 />
               ) : (
                 <span className="text-base font-semibold">

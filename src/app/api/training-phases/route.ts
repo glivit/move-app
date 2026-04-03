@@ -2,8 +2,6 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
-
 /**
  * GET /api/training-phases?client_program_id=xxx
  * Get training phases for a program
@@ -28,7 +26,9 @@ export async function GET(request: NextRequest) {
       .eq('client_program_id', programId)
       .order('sort_order', { ascending: true })
 
-    return NextResponse.json({ data: { phases: phases || [] } })
+    const response = NextResponse.json({ data: { phases: phases || [] } })
+    response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300')
+    return response
   } catch (error) {
     console.error('Training phases GET error:', error)
     return NextResponse.json({ error: 'Serverfout' }, { status: 500 })

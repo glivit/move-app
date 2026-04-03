@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { Image as ImageIcon, FileText, Play } from 'lucide-react'
 
 interface MessagePreviewProps {
@@ -18,10 +19,14 @@ export function MessagePreview({ messageType, content, fileUrl }: MessagePreview
           rel="noopener noreferrer"
           className="inline-block rounded-lg overflow-hidden hover:opacity-90 transition-opacity"
         >
-          <img
+          <Image
             src={fileUrl}
             alt="Afbeelding bericht"
+            width={200}
+            height={200}
             className="max-h-48 object-cover rounded-lg"
+            unoptimized
+            loading="lazy"
           />
         </a>
       </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import NextImage from 'next/image'
 import { ArrowLeft, Camera, Download, Maximize2, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
@@ -242,11 +243,15 @@ export default function PhotoComparisonPage() {
           onPointerUp={handlePointerUp}
         >
           {/* Before (full) */}
-          <img
+          <NextImage
             src={beforeUrl!}
             alt="Before"
+            width={400}
+            height={300}
             className="absolute inset-0 w-full h-full object-cover"
             draggable={false}
+            unoptimized
+            loading="lazy"
           />
 
           {/* After (clipped from right) */}
@@ -254,10 +259,14 @@ export default function PhotoComparisonPage() {
             className="absolute inset-0 overflow-hidden"
             style={{ clipPath: `inset(0 0 0 ${sliderPercent}%)` }}
           >
-            <img
+            <NextImage
               src={afterUrl!}
               alt="After"
+              width={400}
+              height={300}
               className="absolute inset-0 w-full h-full object-cover"
+              unoptimized
+              loading="lazy"
               draggable={false}
             />
           </div>
@@ -285,7 +294,7 @@ export default function PhotoComparisonPage() {
         <div className="mx-4 mt-2 grid grid-cols-2 gap-1 rounded-2xl overflow-hidden">
           <div className="relative aspect-[3/4] bg-[#2A2825]">
             {beforeUrl ? (
-              <img src={beforeUrl} alt="Before" className="w-full h-full object-cover" />
+              <NextImage src={beforeUrl} alt="Before" width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
             ) : (
               <div className="flex items-center justify-center h-full"><Camera size={24} className="text-[#ACACAC]" /></div>
             )}
@@ -296,7 +305,7 @@ export default function PhotoComparisonPage() {
           </div>
           <div className="relative aspect-[3/4] bg-[#2A2825]">
             {afterUrl ? (
-              <img src={afterUrl} alt="After" className="w-full h-full object-cover" />
+              <NextImage src={afterUrl} alt="After" width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
             ) : (
               <div className="flex items-center justify-center h-full"><Camera size={24} className="text-[#ACACAC]" /></div>
             )}
@@ -419,8 +428,8 @@ export default function PhotoComparisonPage() {
             <X size={20} className="text-white" />
           </button>
           <div className="w-full h-full grid grid-cols-2 gap-[2px]">
-            <img src={beforeUrl!} alt="Before" className="w-full h-full object-contain" />
-            <img src={afterUrl!} alt="After" className="w-full h-full object-contain" />
+            <NextImage src={beforeUrl!} alt="Before" width={600} height={600} className="w-full h-full object-contain" unoptimized loading="lazy" />
+            <NextImage src={afterUrl!} alt="After" width={600} height={600} className="w-full h-full object-contain" unoptimized loading="lazy" />
           </div>
           <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-8">
             <p className="text-white text-[14px] font-semibold">Before — {formatDate(before.date)}</p>

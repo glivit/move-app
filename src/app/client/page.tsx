@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ChevronRight } from 'lucide-react'
 import { NotificationCenter } from '@/components/client/NotificationCenter'
@@ -155,37 +155,51 @@ export default function ClientDashboard() {
   const { training, nutrition, actions, momentum, onboarding } = data
   const firstName = data.profile?.firstName || ''
   const showOnboarding = onboarding && !onboarding.complete
-  const weekDots = getWeekDots(training.scheduleDays || [], training.completedDates || [])
+
+  // Memoize expensive week dots calculation
+  const weekDots = useMemo(
+    () => getWeekDots(training.scheduleDays || [], training.completedDates || []),
+    [training.scheduleDays, training.completedDates]
+  )
+
   const isDay1 = momentum.streakDays === 0 && momentum.workoutsThisWeek === 0 && !training.completedDates?.length
-  const caloriesConsumed = getCaloriesConsumed(nutrition)
+
+  // Memoize calorie calculations
+  const caloriesConsumed = useMemo(
+    () => getCaloriesConsumed(nutrition),
+    [nutrition]
+  )
   const caloriesTarget = nutrition?.targets?.calories || 0
 
-  const getPrimaryAction = () => {
+  // Memoize primary action logic
+  const primaryAction = useMemo(() => {
     if (showOnboarding) return 'onboarding' as const
     if (training.today && !training.today.completed) return 'training' as const
     if (training.today?.completed) return 'done' as const
     if (actions.checkInDue?.overdue) return 'checkin' as const
     return 'rest' as const
-  }
-  const primaryAction = getPrimaryAction()
+  }, [showOnboarding, training.today, actions.checkInDue])
 
-  // Build nudge list
-  const nudges: Array<{ text: string; sub?: string; href: string }> = []
-  if (actions.unreadMessages > 0) {
-    nudges.push({ text: `${actions.unreadMessages} ${actions.unreadMessages === 1 ? 'nieuw bericht' : 'nieuwe berichten'}`, href: '/client/messages' })
-  }
-  if (actions.nextVideoCall) {
-    nudges.push({ text: `Videocall ${new Date(actions.nextVideoCall.scheduled_at).toLocaleDateString('nl-BE', { weekday: 'short', day: 'numeric', month: 'short' })}`, href: `/client/video/${actions.nextVideoCall.id}` })
-  }
-  if (actions.pendingPrompt) {
-    nudges.push({ text: 'Wekelijkse reflectie', sub: actions.pendingPrompt.question || undefined, href: '/client/prompts' })
-  }
-  if (actions.accountabilityPending) {
-    nudges.push({ text: 'Dagelijkse check', sub: 'Laat weten hoe je dag was', href: '/client/accountability' })
-  }
-  if (actions.checkInDue !== null && !actions.checkInDue.overdue) {
-    nudges.push({ text: 'Maandelijkse meting', sub: actions.checkInDue.daysUntil === 0 ? 'Vandaag' : `Nog ${actions.checkInDue.daysUntil} ${actions.checkInDue.daysUntil === 1 ? 'dag' : 'dagen'}`, href: '/client/check-in' })
-  }
+  // Memoize nudges array calculation
+  const nudges = useMemo(() => {
+    const result: Array<{ text: string; sub?: string; href: string }> = []
+    if (actions.unreadMessages > 0) {
+      result.push({ text: `${actions.unreadMessages} ${actions.unreadMessages === 1 ? 'nieuw bericht' : 'nieuwe berichten'}`, href: '/client/messages' })
+    }
+    if (actions.nextVideoCall) {
+      result.push({ text: `Videocall ${new Date(actions.nextVideoCall.scheduled_at).toLocaleDateString('nl-BE', { weekday: 'short', day: 'numeric', month: 'short' })}`, href: `/client/video/${actions.nextVideoCall.id}` })
+    }
+    if (actions.pendingPrompt) {
+      result.push({ text: 'Wekelijkse reflectie', sub: actions.pendingPrompt.question || undefined, href: '/client/prompts' })
+    }
+    if (actions.accountabilityPending) {
+      result.push({ text: 'Dagelijkse check', sub: 'Laat weten hoe je dag was', href: '/client/accountability' })
+    }
+    if (actions.checkInDue !== null && !actions.checkInDue.overdue) {
+      result.push({ text: 'Maandelijkse meting', sub: actions.checkInDue.daysUntil === 0 ? 'Vandaag' : `Nog ${actions.checkInDue.daysUntil} ${actions.checkInDue.daysUntil === 1 ? 'dag' : 'dagen'}`, href: '/client/check-in' })
+    }
+    return result
+  }, [actions.unreadMessages, actions.nextVideoCall, actions.pendingPrompt, actions.accountabilityPending, actions.checkInDue])
 
   return (
     <div className="pb-28">

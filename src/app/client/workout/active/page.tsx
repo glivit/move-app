@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
+import { useEffect, useState, useCallback, useRef, Suspense, useMemo, memo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import {
   X,
@@ -17,13 +18,18 @@ import { notifyWorkoutBarChanged } from '@/components/workout/ActiveWorkoutBar'
 
 // ─── Exercise Info Panel — large GIF + collapsible text ────
 
-function ExerciseInfoPanel({ exerciseData }: { exerciseData: Exercise }) {
+function ExerciseInfoPanelComponent({ exerciseData }: { exerciseData: Exercise }) {
   const [showTips, setShowTips] = useState(false)
   const [showInstructions, setShowInstructions] = useState(false)
   const [imgLoaded, setImgLoaded] = useState(false)
   const [imgError, setImgError] = useState(false)
 
-  const hasGif = exerciseData.gif_url && !imgError
+  const hasGif = useMemo(() => exerciseData.gif_url && !imgError, [exerciseData.gif_url, imgError])
+
+  const handleTipsToggle = useCallback(() => setShowTips(!showTips), [showTips])
+  const handleInstructionsToggle = useCallback(() => setShowInstructions(!showInstructions), [showInstructions])
+  const handleImageLoad = useCallback(() => setImgLoaded(true), [])
+  const handleImageError = useCallback(() => setImgError(true), [])
 
   return (
     <div className="px-5 pb-3 space-y-3">
@@ -36,12 +42,14 @@ function ExerciseInfoPanel({ exerciseData }: { exerciseData: Exercise }) {
                 <div className="w-8 h-8 border-[1.5px] border-[#D5D5D5] border-t-[#1A1917] rounded-full animate-spin" />
               </div>
             )}
-            <img
+            <Image
               src={exerciseData.gif_url!}
               alt={exerciseData.name_nl || exerciseData.name}
-              loading="eager"
-              onLoad={() => setImgLoaded(true)}
-              onError={() => setImgError(true)}
+              width={500}
+              height={375}
+              unoptimized
+              onLoad={handleImageLoad}
+              onError={handleImageError}
               className="w-full object-contain transition-opacity duration-500"
               style={{
                 maxHeight: '50vh',
@@ -76,7 +84,7 @@ function ExerciseInfoPanel({ exerciseData }: { exerciseData: Exercise }) {
       {exerciseData.coach_tips && (
         <div className="border border-[#F0F0EE] rounded-xl overflow-hidden">
           <button
-            onClick={() => setShowTips(!showTips)}
+            onClick={handleTipsToggle}
             className="w-full flex items-center justify-between p-3"
           >
             <p className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.08em]">Coach tips</p>
@@ -94,7 +102,7 @@ function ExerciseInfoPanel({ exerciseData }: { exerciseData: Exercise }) {
       {exerciseData.instructions && (
         <div className="border border-[#F0F0EE] rounded-xl overflow-hidden">
           <button
-            onClick={() => setShowInstructions(!showInstructions)}
+            onClick={handleInstructionsToggle}
             className="w-full flex items-center justify-between p-3"
           >
             <p className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.08em]">Uitvoering</p>
@@ -110,6 +118,8 @@ function ExerciseInfoPanel({ exerciseData }: { exerciseData: Exercise }) {
     </div>
   )
 }
+
+const ExerciseInfoPanel = memo(ExerciseInfoPanelComponent)
 
 interface Exercise {
   id: string
@@ -206,7 +216,7 @@ function formatTimer(seconds: number): string {
 
 // ─── Exercise Picker Modal ────────────────────────────────
 
-function ExercisePickerModal({
+function ExercisePickerModalComponent({
   onSelect,
   onClose,
 }: {
@@ -258,6 +268,10 @@ function ExercisePickerModal({
     )
   }, [searchQuery, exercises])
 
+  const handleSelectExercise = useCallback((exercise: Exercise) => {
+    onSelect(exercise)
+  }, [onSelect])
+
   return (
     <div className="fixed inset-0 bg-black/30 z-[80] flex items-end">
       <div className="w-full max-h-[85vh] bg-white rounded-t-2xl flex flex-col animate-slide-up">
@@ -302,12 +316,12 @@ function ExercisePickerModal({
               {filteredExercises.map((ex) => (
                 <button
                   key={ex.id}
-                  onClick={() => onSelect(ex)}
+                  onClick={() => handleSelectExercise(ex)}
                   className="w-full text-left px-4 py-3.5 rounded-xl hover:bg-white transition-colors flex items-center gap-3"
                 >
                   <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden border border-[#F0F0EE]">
                     {ex.gif_url ? (
-                      <img src={ex.gif_url} alt="" className="w-full h-full object-cover" style={{ filter: 'saturate(0.3)' }} />
+                      <Image src={ex.gif_url} alt="" width={40} height={40} className="w-full h-full object-cover" unoptimized loading="lazy" style={{ filter: 'saturate(0.3)' }} />
                     ) : (
                       <span className="text-[10px] text-[#ACACAC] uppercase">{ex.target_muscle?.slice(0, 3)}</span>
                     )}
@@ -329,9 +343,11 @@ function ExercisePickerModal({
   )
 }
 
+const ExercisePickerModal = memo(ExercisePickerModalComponent)
+
 // ─── Form Check Modal ────────────────────────────────────────
 
-function FormCheckModal({ exerciseName, onClose }: { exerciseName: string; onClose: () => void }) {
+function FormCheckModalComponent({ exerciseName, onClose }: { exerciseName: string; onClose: () => void }) {
   const [uploading, setUploading] = useState(false)
   const [sent, setSent] = useState(false)
   const [note, setNote] = useState('')
@@ -454,6 +470,8 @@ function FormCheckModal({ exerciseName, onClose }: { exerciseName: string; onClo
     </div>
   )
 }
+
+const FormCheckModal = memo(FormCheckModalComponent)
 
 // ─── Main Wrapper ──────────────────────────────────────────
 
@@ -1271,7 +1289,7 @@ function ActiveWorkoutPage() {
 }
 
 // --- Set row component ---
-function SetRow({
+function SetRowComponent({
   set, index, prevLabel, prefilledWeight, prevSet, onComplete, exerciseId, setSets, exSets,
 }: {
   set: SetData
@@ -1294,25 +1312,25 @@ function SetRow({
     }
   }, [set.weight_kg, set.completed, weight])
 
-  const handleWeightChange = (value: string) => {
+  const handleWeightChange = useCallback((value: string) => {
     setWeight(value)
     setSets((prev: Record<string, SetData[]>) => {
       const updated = [...(prev[exerciseId] || [])]
       updated[index] = { ...updated[index], weight_kg: value ? parseFloat(value) : null }
       return { ...prev, [exerciseId]: updated }
     })
-  }
+  }, [exerciseId, index, setSets])
 
-  const handleRepsChange = (value: string) => {
+  const handleRepsChange = useCallback((value: string) => {
     setReps(value)
     setSets((prev: Record<string, SetData[]>) => {
       const updated = [...(prev[exerciseId] || [])]
       updated[index] = { ...updated[index], actual_reps: value ? parseInt(value) : set.prescribed_reps }
       return { ...prev, [exerciseId]: updated }
     })
-  }
+  }, [exerciseId, index, set.prescribed_reps, setSets])
 
-  const handleCompleteClick = () => {
+  const handleCompleteClick = useCallback(() => {
     if (set.completed) {
       // Uncheck: toggle back to incomplete
       const updatedSets = [...exSets]
@@ -1329,7 +1347,7 @@ function SetRow({
     }
     setSets((prev: Record<string, SetData[]>) => ({ ...prev, [exerciseId]: updatedSets }))
     onComplete(finalWeight)
-  }
+  }, [set, weight, reps, exSets, index, exerciseId, onComplete, setSets])
 
   return (
     <div className={`flex items-center gap-2 px-1 py-1.5 rounded-lg transition-all ${set.completed ? 'opacity-40 animate-row-success' : ''}`}>
@@ -1385,3 +1403,5 @@ function SetRow({
     </div>
   )
 }
+
+const SetRow = memo(SetRowComponent)

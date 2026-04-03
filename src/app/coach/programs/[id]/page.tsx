@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useParams, useRouter } from 'next/navigation'
+import Image from 'next/image'
 import Link from 'next/link'
 import {
   ChevronLeft,
@@ -850,12 +851,13 @@ export default function ProgramEditorPage() {
                         {/* GIF Thumbnail */}
                         <div className="w-12 h-12 rounded-lg bg-[#FAFAFA] flex-shrink-0 overflow-hidden flex items-center justify-center">
                           {exercise.gif_url ? (
-                            <img
+                            <Image
                               src={exercise.gif_url}
                               alt={exercise.name}
+                              width={48}
+                              height={48}
                               className="w-full h-full object-cover"
-                              loading="lazy"
-                              decoding="async"
+                              unoptimized
                               style={{ mixBlendMode: 'multiply' }}
                             />
                           ) : (

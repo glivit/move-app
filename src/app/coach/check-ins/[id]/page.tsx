@@ -98,10 +98,14 @@ export default async function CheckInReviewPage({ params }: Props) {
               <div key={idx} className="space-y-2">
                 <div className="relative w-full aspect-square rounded-2xl overflow-hidden flex items-center justify-center bg-white border border-client-border">
                   {photo.url ? (
-                    <img
+                    <Image
                       src={photo.url}
                       alt={`Photo ${photo.label}`}
+                      width={400}
+                      height={400}
                       className="w-full h-full object-cover"
+                      unoptimized
+                      loading="lazy"
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center gap-2">

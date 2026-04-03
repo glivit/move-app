@@ -22,7 +22,9 @@ export async function GET(req: NextRequest) {
     .order('date', { ascending: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data)
+  const response = NextResponse.json(data)
+  response.headers.set('Cache-Control', 'private, max-age=120, stale-while-revalidate=600')
+  return response
 }
 
 // POST: Upsert health metrics for today (or specified date)

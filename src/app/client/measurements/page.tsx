@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import { Camera, Scale, Ruler, Plus, ChevronLeft, ChevronRight } from 'lucide-react'
 import { SubPageHeader } from '@/components/layout/SubPageHeader'
@@ -262,10 +263,14 @@ export default function MeasurementsPage() {
                   ].map((photo, i) => (
                     <div key={i} className="aspect-[3/4] bg-[#F0F0EE] relative overflow-hidden">
                       {photo.url ? (
-                        <img
+                        <Image
                           src={photo.url}
                           alt={photo.label}
+                          width={400}
+                          height={500}
                           className="w-full h-full object-cover"
+                          unoptimized
+                          loading="lazy"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">

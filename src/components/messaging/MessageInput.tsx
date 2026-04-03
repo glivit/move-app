@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import Image from 'next/image'
 import { Send, Paperclip } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { Button } from '@/components/ui/Button'
@@ -94,10 +95,14 @@ export function MessageInput({ onSend, disabled = false }: MessageInputProps) {
           <div>
             <p className="text-sm font-medium text-text-primary truncate">{filePreview.name}</p>
             {filePreview.type.startsWith('image/') && (
-              <img
+              <Image
                 src={filePreview.url}
                 alt="preview"
+                width={150}
+                height={150}
                 className="mt-2 max-h-32 rounded"
+                unoptimized
+                loading="lazy"
               />
             )}
           </div>

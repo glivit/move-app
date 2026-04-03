@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useRef, useState } from 'react'
+import Image from 'next/image'
 import { Camera, X, Check } from 'lucide-react'
 
 interface Props {
@@ -142,7 +143,7 @@ export function PhotoUploadStep({ photos, onChange }: Props) {
               {hasPhoto ? (
                 /* ── Photo taken ── */
                 <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[#1A1917]">
-                  <img src={previews[key]} alt={label} className="w-full h-full object-cover" />
+                  <Image src={previews[key]} alt={label} width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
                   {/* Remove button */}
                   <button
                     onClick={() => handleFileChange(key, null)}

@@ -1,11 +1,22 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
+import dynamic from 'next/dynamic'
 import { useParams } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { ArrowLeft, Trophy, Camera, ImageOff, ChevronLeft, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+
+const ProgressLineChart = dynamic(() => import('@/components/coach/ProgressCharts').then(mod => ({ default: mod.ProgressLineChart })), {
+  ssr: false,
+  loading: () => <div className="h-64 bg-[#F8F8F6] rounded animate-pulse" />
+})
+
+const ProgressBarChart = dynamic(() => import('@/components/coach/ProgressCharts').then(mod => ({ default: mod.ProgressBarChart })), {
+  ssr: false,
+  loading: () => <div className="h-64 bg-[#F8F8F6] rounded animate-pulse" />
+})
 
 interface CheckIn {
   id: string
@@ -409,7 +420,7 @@ export default function CoachClientProgressPage() {
                     <div key={idx} className="space-y-2">
                       <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#FAFAFA] border border-[#E8E4DC]">
                         {photoUrl ? (
-                          <img src={photoUrl} alt={`${entry.label} ${positionLabels[photoPosition]}`} className="w-full h-full object-cover" />
+                          <Image src={photoUrl} alt={`${entry.label} ${positionLabels[photoPosition]}`} width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
                         ) : (
                           <div className="flex flex-col items-center justify-center h-full gap-2">
                             <ImageOff className="w-6 h-6 text-[#C7C7CC]" strokeWidth={1.5} />
@@ -447,7 +458,7 @@ export default function CoachClientProgressPage() {
                         <div key={idx}>
                           <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#FAFAFA]">
                             {photoUrl ? (
-                              <img src={photoUrl} alt={entry.label} className="w-full h-full object-cover" />
+                              <Image src={photoUrl} alt={entry.label} width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
                             ) : (
                               <div className="flex items-center justify-center h-full">
                                 <ImageOff className="w-8 h-8 text-[#C7C7CC]" strokeWidth={1.5} />
@@ -485,15 +496,15 @@ export default function CoachClientProgressPage() {
             <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
               <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-4">Gewicht</h3>
               <div style={{ height: 250 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={lichaamData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DC" />
-                    <XAxis dataKey="dateShort" tick={{ fontSize: 12, fill: '#C7C7CC' }} />
-                    <YAxis tick={{ fontSize: 12, fill: '#C7C7CC' }} domain={['dataMin - 2', 'dataMax + 2']} />
-                    <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }} />
-                    <Line type="monotone" dataKey="weight" name="Gewicht (kg)" stroke="#34C759" strokeWidth={2} dot={{ fill: '#34C759', r: 4 }} activeDot={{ r: 6 }} connectNulls />
-                  </LineChart>
-                </ResponsiveContainer>
+                <ProgressLineChart
+                  data={lichaamData}
+                  dataKey="weight"
+                  name="Gewicht (kg)"
+                  color="#34C759"
+                  height={250}
+                  yAxisConfig={{ domain: ['dataMin - 2', 'dataMax + 2'] }}
+                  tooltip={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }}
+                />
               </div>
             </div>
           )}
@@ -503,15 +514,14 @@ export default function CoachClientProgressPage() {
             <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
               <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-4">Vetpercentage</h3>
               <div style={{ height: 250 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={lichaamData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DC" />
-                    <XAxis dataKey="dateShort" tick={{ fontSize: 12, fill: '#C7C7CC' }} />
-                    <YAxis tick={{ fontSize: 12, fill: '#C7C7CC' }} />
-                    <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }} />
-                    <Line type="monotone" dataKey="bodyFat" name="Vet (%)" stroke="#AF52DE" strokeWidth={2} dot={{ fill: '#AF52DE', r: 4 }} connectNulls />
-                  </LineChart>
-                </ResponsiveContainer>
+                <ProgressLineChart
+                  data={lichaamData}
+                  dataKey="bodyFat"
+                  name="Vet (%)"
+                  color="#AF52DE"
+                  height={250}
+                  tooltip={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }}
+                />
               </div>
             </div>
           )}
@@ -521,15 +531,14 @@ export default function CoachClientProgressPage() {
             <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
               <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-4">Spiermassa</h3>
               <div style={{ height: 250 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={lichaamData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DC" />
-                    <XAxis dataKey="dateShort" tick={{ fontSize: 12, fill: '#C7C7CC' }} />
-                    <YAxis tick={{ fontSize: 12, fill: '#C7C7CC' }} />
-                    <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }} />
-                    <Line type="monotone" dataKey="muscle" name="Spiermassa (kg)" stroke="#007AFF" strokeWidth={2} dot={{ fill: '#007AFF', r: 4 }} connectNulls />
-                  </LineChart>
-                </ResponsiveContainer>
+                <ProgressLineChart
+                  data={lichaamData}
+                  dataKey="muscle"
+                  name="Spiermassa (kg)"
+                  color="#007AFF"
+                  height={250}
+                  tooltip={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }}
+                />
               </div>
             </div>
           )}
@@ -662,15 +671,15 @@ export default function CoachClientProgressPage() {
             <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
               <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-4">{selectedExercise.name_nl || selectedExercise.name}</h3>
               <div style={{ height: 250 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={krachtData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DC" />
-                    <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#C7C7CC' }} />
-                    <YAxis tick={{ fontSize: 12, fill: '#C7C7CC' }} />
-                    <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }} />
-                    <Line type="monotone" dataKey="weight" stroke="#007AFF" strokeWidth={2} dot={{ fill: '#007AFF', r: 4 }} activeDot={{ r: 6 }} />
-                  </LineChart>
-                </ResponsiveContainer>
+                <ProgressLineChart
+                  data={krachtData}
+                  dataKey="weight"
+                  name="Gewicht (kg)"
+                  color="#007AFF"
+                  height={250}
+                  xAxisKey="date"
+                  tooltip={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }}
+                />
               </div>
             </div>
           ) : (

@@ -76,7 +76,7 @@ export async function POST(
     }
 
     // Generate PDF
-    const pdfBuffer = generateCheckInPDF({
+    const pdfBuffer = await generateCheckInPDF({
       clientName: client.full_name,
       date: checkin.date,
       weight_kg: checkin.weight_kg,

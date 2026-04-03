@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
+import Image from 'next/image'
 import { Play } from 'lucide-react'
 
 // ─── Muscle group icon SVGs in MŌVE gold ────────────────────────────
@@ -179,11 +180,12 @@ export function ExerciseMedia({
                 opacity: imgLoaded ? 1 : 0,
               }}
             >
-              <img
+              <Image
                 src={gifUrl!}
                 alt={displayName}
-                loading="eager"
-                decoding="async"
+                width={500}
+                height={375}
+                unoptimized
                 onLoad={() => setImgLoaded(true)}
                 onError={() => setImgError(true)}
                 className="w-full h-full object-contain"
@@ -280,11 +282,12 @@ export function ExerciseMedia({
       <div className="relative aspect-video overflow-hidden" style={{ background: '#F8F6F2' }}>
         {hasGif ? (
           <>
-            <img
+            <Image
               src={gifUrl!}
               alt={displayName}
-              loading="lazy"
-              decoding="async"
+              width={500}
+              height={375}
+              unoptimized
               onError={() => setImgError(true)}
               className="w-full h-full object-cover"
               style={{
@@ -327,11 +330,12 @@ export function ExerciseMedia({
       }}
     >
       {hasGif ? (
-        <img
+        <Image
           src={gifUrl!}
           alt={displayName}
-          loading="lazy"
-          decoding="async"
+          width={48}
+          height={48}
+          unoptimized
           onError={() => setImgError(true)}
           className="w-full h-full object-cover"
           style={{

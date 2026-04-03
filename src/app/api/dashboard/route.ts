@@ -342,8 +342,8 @@ export async function GET(request: NextRequest) {
         unreadBroadcastCount,
     })
 
-    // Allow browser to cache for 15s, serve stale for 60s while revalidating
-    response.headers.set('Cache-Control', 'private, max-age=15, stale-while-revalidate=60')
+    // Allow browser to cache for 30s, serve stale for 120s while revalidating
+    response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')
     return response
   } catch (err) {
     console.error('Dashboard API error:', err)

@@ -54,7 +54,9 @@ export async function GET(req: NextRequest) {
     (s.workout_sets || []).some((ws: any) => ws.pain_flag)
   )
 
-  return NextResponse.json({ sessions: feedbackSessions })
+  const response = NextResponse.json({ sessions: feedbackSessions })
+  response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')
+  return response
 }
 
 export async function PATCH(req: NextRequest) {

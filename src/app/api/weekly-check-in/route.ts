@@ -1,8 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { NextRequest, NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
-
 /**
  * GET /api/weekly-check-in
  * Check if user already submitted this week + get last check-in
@@ -40,12 +38,14 @@ export async function GET(request: NextRequest) {
       .limit(1)
       .single()
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       alreadySubmitted: !!thisWeek,
       thisWeek: thisWeek || null,
       lastWeight: last?.weight_kg || null,
       lastDate: last?.date || null,
     })
+    response.headers.set('Cache-Control', 'private, max-age=120, stale-while-revalidate=600')
+    return response
   } catch {
     return NextResponse.json({ alreadySubmitted: false, thisWeek: null, lastWeight: null, lastDate: null })
   }

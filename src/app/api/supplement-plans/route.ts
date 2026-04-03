@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
 
-export const dynamic = 'force-dynamic'
-
 // GET /api/supplement-plans?client_id=X
 export async function GET(request: NextRequest) {
   try {
@@ -64,13 +62,15 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       data: {
         plan: plan || null,
         todayLogs,
         compliance,
       },
     })
+    response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300')
+    return response
   } catch (error: any) {
     console.error('Error fetching supplement plan:', error)
     return NextResponse.json({ error: error.message || 'Server error' }, { status: 500 })

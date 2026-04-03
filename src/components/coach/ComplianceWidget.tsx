@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import { Flame, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 
@@ -170,7 +171,7 @@ export function ComplianceWidget() {
               {/* Avatar */}
               <div className="w-8 h-8 rounded-full bg-[#F5F5F3] flex items-center justify-center text-[12px] font-semibold text-[#8E8E93] flex-shrink-0 overflow-hidden">
                 {client.avatar_url ? (
-                  <img src={client.avatar_url} alt="" className="w-full h-full object-cover" />
+                  <Image src={client.avatar_url} alt="" width={32} height={32} className="w-full h-full object-cover" unoptimized loading="lazy" />
                 ) : (
                   `${client.first_name?.[0] || ''}${client.last_name?.[0] || ''}`
                 )}

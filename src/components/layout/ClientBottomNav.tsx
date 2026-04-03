@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, memo, useMemo, useCallback } from 'react'
 import { Home, TrendingUp, Plus, MessageCircle, User, X, ClipboardCheck, Dumbbell, Apple, Video } from 'lucide-react'
 
 const navItems = [
@@ -20,15 +20,21 @@ const quickActions = [
   { href: '/client/booking', label: 'Videocall', icon: Video },
 ]
 
-export function ClientBottomNav() {
+function ClientBottomNavComponent() {
   const pathname = usePathname()
   const [showQuickAdd, setShowQuickAdd] = useState(false)
 
-  const isActive = (href: string) => {
+  // Memoize isActive function
+  const isActive = useCallback((href: string) => {
     if (href === '/client') return pathname === '/client'
     if (href === '#add') return false
     return pathname.startsWith(href)
-  }
+  }, [pathname])
+
+  // Memoize handleQuickAddToggle
+  const handleQuickAddToggle = useCallback(() => {
+    setShowQuickAdd(!showQuickAdd)
+  }, [showQuickAdd])
 
   return (
     <>
@@ -71,7 +77,7 @@ export function ClientBottomNav() {
               return (
                 <button
                   key="center-add"
-                  onClick={() => setShowQuickAdd(!showQuickAdd)}
+                  onClick={handleQuickAddToggle}
                   className="relative"
                 >
                   <div className={`
@@ -111,3 +117,5 @@ export function ClientBottomNav() {
     </>
   )
 }
+
+export const ClientBottomNav = memo(ClientBottomNavComponent)

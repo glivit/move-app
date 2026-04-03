@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
 
-export const dynamic = 'force-dynamic'
-
 // GET /api/automations — list all rules for the coach
 export async function GET() {
   try {
@@ -48,7 +46,9 @@ export async function GET() {
       total_triggers: logCounts[rule.id] || 0,
     }))
 
-    return NextResponse.json({ data: rulesWithCounts })
+    const response = NextResponse.json({ data: rulesWithCounts })
+    response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')
+    return response
   } catch (error: any) {
     console.error('Error fetching automations:', error)
     return NextResponse.json({ error: error.message || 'Server error' }, { status: 500 })

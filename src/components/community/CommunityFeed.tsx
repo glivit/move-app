@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import {
   Heart, MessageCircle, Send, Pin, Sparkles, HelpCircle,
@@ -248,7 +249,7 @@ export function CommunityFeed({ isCoach = false }: Props) {
                     }}
                   >
                     {post.author?.avatar_url ? (
-                      <img src={post.author.avatar_url} alt="" className="w-8 h-8 rounded-full object-cover" />
+                      <Image src={post.author.avatar_url} alt="" width={32} height={32} className="w-8 h-8 rounded-full object-cover" unoptimized loading="lazy" />
                     ) : (
                       getInitials(post.author?.full_name || 'U')
                     )}
@@ -284,7 +285,7 @@ export function CommunityFeed({ isCoach = false }: Props) {
 
                 {post.image_url && (
                   <div className="rounded-xl overflow-hidden mb-4">
-                    <img src={post.image_url} alt="" className="w-full" />
+                    <Image src={post.image_url} alt="" width={400} height={300} className="w-full" unoptimized loading="lazy" />
                   </div>
                 )}
 

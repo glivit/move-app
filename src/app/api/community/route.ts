@@ -42,7 +42,9 @@ export async function GET(req: NextRequest) {
     user_liked: likedSet.has(post.id),
   }))
 
-  return NextResponse.json(enriched)
+  const response = NextResponse.json(enriched)
+  response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')
+  return response
 }
 
 // POST: Create a new post

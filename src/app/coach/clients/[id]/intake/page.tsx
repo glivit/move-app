@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import { ArrowLeft, Target, Dumbbell, Heart, Apple, Moon, Ruler, Camera, ImageOff } from 'lucide-react'
 import Link from 'next/link'
 
@@ -261,7 +262,7 @@ export default async function IntakeFormPage({ params }: Props) {
           <div className="grid grid-cols-2 gap-3">
             {signedPhotos.map(({ url, label }) => (
               <div key={label} className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#FAFAFA]">
-                <img src={url} alt={label} className="w-full h-full object-cover" />
+                <Image src={url} alt={label} width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
                 <span className="absolute bottom-2 left-2 text-xs font-medium text-white bg-black/50 px-2 py-0.5 rounded">
                   {label}
                 </span>

@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import { ClientProfileTabs } from '@/components/coach/ClientProfileTabs'
 import { PackageBadge } from '@/components/ui/PackageBadge'
 import { ReportButton } from '@/components/coach/ReportButton'
@@ -81,10 +82,14 @@ export default async function ClientProfilePage({ params }: Props) {
           {/* Avatar */}
           <div className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#FAFAFA' }}>
             {profile.avatar_url ? (
-              <img
+              <Image
                 src={profile.avatar_url}
                 alt={profile.full_name}
+                width={64}
+                height={64}
                 className="w-16 h-16 rounded-full object-cover"
+                unoptimized
+                loading="lazy"
               />
             ) : (
               <span className="text-xl font-semibold" style={{ color: '#1A1917' }}>

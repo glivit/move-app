@@ -2,8 +2,6 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
-
 /**
  * GET /api/onboarding-status
  * Returns a checklist of onboarding items and their completion status
@@ -91,7 +89,9 @@ export async function GET() {
       },
     ]
 
-    return NextResponse.json({ items })
+    const response = NextResponse.json({ items })
+    response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')
+    return response
   } catch (error) {
     console.error('Onboarding status error:', error)
     return NextResponse.json({ items: [] })

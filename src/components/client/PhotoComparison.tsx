@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import { Camera, ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -124,10 +125,14 @@ export function PhotoComparison() {
         {/* Before */}
         <div className="bg-[#1A1917] relative">
           {beforeUrl ? (
-            <img
+            <Image
               src={beforeUrl}
               alt="Before"
+              width={400}
+              height={500}
               className="w-full aspect-[3/4] object-cover"
+              unoptimized
+              loading="lazy"
             />
           ) : (
             <div className="w-full aspect-[3/4] flex items-center justify-center">
@@ -160,10 +165,14 @@ export function PhotoComparison() {
         {/* After */}
         <div className="bg-[#1A1917] relative">
           {afterUrl ? (
-            <img
+            <Image
               src={afterUrl}
               alt="After"
+              width={400}
+              height={500}
               className="w-full aspect-[3/4] object-cover"
+              unoptimized
+              loading="lazy"
             />
           ) : (
             <div className="w-full aspect-[3/4] flex items-center justify-center">

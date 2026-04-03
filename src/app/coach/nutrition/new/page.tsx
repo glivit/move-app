@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import {
   ChevronLeft, Save, Loader2, Plus, Trash2,
@@ -463,7 +464,7 @@ export default function NewNutritionPlanPage() {
                           <div className="flex items-center gap-2 pl-7 bg-[#FAFAFA] rounded-lg p-2.5">
                             <div className="w-8 h-8 rounded-lg bg-white border border-[#E8E4DC] flex items-center justify-center overflow-hidden shrink-0">
                               {item.image ? (
-                                <img src={item.image} alt="" className="w-full h-full object-cover" />
+                                <Image src={item.image} alt="" width={32} height={32} className="w-full h-full object-cover" unoptimized loading="lazy" />
                               ) : (
                                 <span className="text-[14px]">🍽️</span>
                               )}

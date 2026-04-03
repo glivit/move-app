@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import { Search, X } from 'lucide-react'
 
@@ -134,10 +135,13 @@ export function ExerciseSearchModal({ isOpen, onClose, onSelect }: ExerciseSearc
                 {/* Mini GIF */}
                 <div className="w-8 h-8 rounded-lg bg-[#FAFAFA] flex-shrink-0 overflow-hidden flex items-center justify-center">
                   {exercise.gif_url ? (
-                    <img
+                    <Image
                       src={exercise.gif_url}
                       alt={exercise.name}
+                      width={32}
+                      height={32}
                       className="w-full h-full object-cover"
+                      unoptimized
                       style={{ mixBlendMode: 'multiply' }}
                     />
                   ) : (

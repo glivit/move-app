@@ -2,8 +2,6 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
-
 /**
  * GET /api/accountability
  * Get today's accountability log for the authenticated client
@@ -32,7 +30,9 @@ export async function GET(request: NextRequest) {
       .limit(1)
       .single()
 
-    return NextResponse.json({ success: true, data: log || null })
+    const response = NextResponse.json({ success: true, data: log || null })
+    response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')
+    return response
   } catch (error) {
     console.error('Error fetching accountability:', error)
     return NextResponse.json({ success: true, data: null })

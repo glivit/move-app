@@ -18,7 +18,9 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
-  return NextResponse.json(data)
+  const response = NextResponse.json(data)
+  response.headers.set('Cache-Control', 'private, max-age=120, stale-while-revalidate=600')
+  return response
 }
 
 export async function POST(request: NextRequest) {

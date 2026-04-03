@@ -3,8 +3,6 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { calculateNextWeekTargets, estimateBest1RM } from '@/lib/progression'
 
-export const dynamic = 'force-dynamic'
-
 // GET /api/progression-rules?template_exercise_id=X or ?client_id=X&exercise_id=Y for suggestions
 export async function GET(request: NextRequest) {
   try {
@@ -34,7 +32,9 @@ export async function GET(request: NextRequest) {
         .single()
 
       if (!activeProgram) {
-        return NextResponse.json({ data: null, message: 'Geen actief programma' })
+        const response = NextResponse.json({ data: null, message: 'Geen actief programma' })
+        response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300')
+        return response
       }
 
       // Find the template exercise and its progression rule
@@ -51,12 +51,16 @@ export async function GET(request: NextRequest) {
         .single()
 
       if (!templateExercise) {
-        return NextResponse.json({ data: null, message: 'Oefening niet in template' })
+        const response = NextResponse.json({ data: null, message: 'Oefening niet in template' })
+        response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300')
+        return response
       }
 
       const rule = (templateExercise as any).program_progression_rules?.[0]
       if (!rule) {
-        return NextResponse.json({ data: null, message: 'Geen progressie-regel' })
+        const response = NextResponse.json({ data: null, message: 'Geen progressie-regel' })
+        response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300')
+        return response
       }
 
       // Get last week's workout data for this exercise
@@ -97,7 +101,9 @@ export async function GET(request: NextRequest) {
         deloadConfig
       )
 
-      return NextResponse.json({ data: suggestion })
+      const response = NextResponse.json({ data: suggestion })
+      response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300')
+      return response
     }
 
     // Mode: list rules for a template exercise
@@ -108,7 +114,9 @@ export async function GET(request: NextRequest) {
         .eq('template_exercise_id', templateExerciseId)
 
       if (error) throw error
-      return NextResponse.json({ data: rules || [] })
+      const response = NextResponse.json({ data: rules || [] })
+      response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300')
+      return response
     }
 
     return NextResponse.json({ error: 'template_exercise_id of mode=suggestions met client_id en exercise_id vereist' }, { status: 400 })

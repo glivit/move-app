@@ -2,8 +2,6 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
-
 /**
  * GET /api/scheduling/availability
  * Get coach availability slots (for coach: own slots, for client: available booking slots)
@@ -39,7 +37,9 @@ export async function GET(request: NextRequest) {
         .gte('blocked_date', new Date().toISOString().split('T')[0])
         .order('blocked_date', { ascending: true })
 
-      return NextResponse.json({ data: { slots: slots || [], blockedDates: blockedDates || [] } })
+      const response = NextResponse.json({ data: { slots: slots || [], blockedDates: blockedDates || [] } })
+      response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300')
+      return response
     }
 
     // Client: get available time slots for next 2 weeks
@@ -50,7 +50,9 @@ export async function GET(request: NextRequest) {
       .limit(1)
 
     if (!coaches || coaches.length === 0) {
-      return NextResponse.json({ data: { availableSlots: [] } })
+      const response = NextResponse.json({ data: { availableSlots: [] } })
+      response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300')
+      return response
     }
 
     const coachId = coaches[0].id
@@ -139,7 +141,9 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ data: { availableSlots } })
+    const response = NextResponse.json({ data: { availableSlots } })
+    response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300')
+    return response
   } catch (error) {
     console.error('Availability GET error:', error)
     return NextResponse.json({ error: 'Serverfout' }, { status: 500 })

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import { FoodSearch, type FoodItem } from '@/components/coach/FoodSearch'
 import {
@@ -745,7 +746,7 @@ export default function NutritionPage() {
                               <div key={idx} className="px-5 py-2.5 flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-lg bg-[#F5F5F3] flex items-center justify-center overflow-hidden shrink-0">
                                   {food.image ? (
-                                    <img src={food.image} alt="" className="w-full h-full object-cover" />
+                                    <Image src={food.image} alt="" width={32} height={32} className="w-full h-full object-cover" unoptimized loading="lazy" />
                                   ) : (
                                     <span className="text-[14px]">{getFoodEmoji(food.name || '')}</span>
                                   )}
@@ -840,7 +841,7 @@ export default function NutritionPage() {
                       <div key={fIdx} className="px-5 py-3 flex items-center gap-3">
                         <div className="w-9 h-9 rounded-lg bg-[#F5F5F3] flex items-center justify-center overflow-hidden shrink-0">
                           {food.image ? (
-                            <img src={food.image} alt="" className="w-full h-full object-cover" />
+                            <Image src={food.image} alt="" width={36} height={36} className="w-full h-full object-cover" unoptimized loading="lazy" />
                           ) : (
                             <span className="text-[16px]">{getFoodEmoji(food.name)}</span>
                           )}
@@ -1000,10 +1001,14 @@ export default function NutritionPage() {
                               {/* Food Image */}
                               <div className="w-10 h-10 rounded-lg bg-[#F5F5F3] border border-[#E8E4DC] flex items-center justify-center overflow-hidden shrink-0">
                                 {food.image ? (
-                                  <img
+                                  <Image
                                     src={food.image}
                                     alt=""
+                                    width={40}
+                                    height={40}
                                     className="w-full h-full object-cover"
+                                    unoptimized
+                                    loading="lazy"
                                     onError={(e) => {
                                       (e.target as HTMLImageElement).style.display = 'none'
                                       ;(e.target as HTMLImageElement).parentElement!.innerHTML = `<span style="font-size:18px">${getFoodEmoji(food.name)}</span>`

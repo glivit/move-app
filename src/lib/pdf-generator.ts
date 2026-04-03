@@ -1,5 +1,3 @@
-import { jsPDF } from 'jspdf'
-
 export interface CheckInData {
   clientName: string
   date: string
@@ -23,7 +21,8 @@ const TEXT_COLOR = '#1A1A18'
 const BG_COLOR = '#FAFAFA'
 const SECONDARY_TEXT = '#8B8B88'
 
-export function generateCheckInPDF(data: CheckInData): Buffer {
+export async function generateCheckInPDF(data: CheckInData): Promise<Buffer> {
+  const { jsPDF } = await import('jspdf')
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',

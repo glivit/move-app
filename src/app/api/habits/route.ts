@@ -68,11 +68,13 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     habits: habits || [],
     completions: completions || [],
     streaks,
   })
+  response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')
+  return response
 }
 
 // POST: Create a habit (coach) or toggle completion (client)

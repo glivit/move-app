@@ -99,7 +99,9 @@ export async function GET(request: NextRequest, { params }: GetSessionParams) {
       );
     }
 
-    return NextResponse.json({ success: true, data: session });
+    const response = NextResponse.json({ success: true, data: session });
+    response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300');
+    return response;
   } catch (error) {
     console.error('API error:', error);
     return NextResponse.json(

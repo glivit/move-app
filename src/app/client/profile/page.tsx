@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import {
   User,
@@ -119,7 +120,7 @@ export default function ProfilePage() {
         {/* Avatar */}
         <div className="w-20 h-20 rounded-full bg-[#1A1917] text-white flex items-center justify-center text-[22px] font-semibold mb-4 overflow-hidden">
           {profile?.avatar_url ? (
-            <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full object-cover" />
+            <Image src={profile.avatar_url} alt={profile.full_name} width={80} height={80} className="w-full h-full object-cover" unoptimized loading="lazy" />
           ) : (
             getInitials(profile?.full_name)
           )}

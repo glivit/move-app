@@ -1,8 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { NextRequest, NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
-
 // GET: Fetch exercises for a specific workout day
 export async function GET(request: NextRequest) {
   try {
@@ -89,11 +87,13 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       exercises: exercisesData || [],
       lastWeights,
       previousSets,
     })
+    response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300')
+    return response
   } catch (error) {
     console.error('Error in client-workout API:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

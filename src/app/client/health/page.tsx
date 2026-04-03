@@ -1,12 +1,17 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase'
 import {
   Heart, Footprints, Moon, Droplets, Activity, Brain,
   ChevronLeft, ChevronRight, Save, TrendingUp
 } from 'lucide-react'
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+
+const HealthChart = dynamic(() => import('@/components/client/HealthChart').then(mod => ({ default: mod.HealthChart })), {
+  ssr: false,
+  loading: () => <div className="h-32 bg-[#F8F8F6] rounded animate-pulse" />
+})
 
 interface HealthMetric {
   id?: string
@@ -223,22 +228,7 @@ export default function HealthPage() {
           <p className="text-[13px] font-semibold mb-3 text-[#1A1917]">
             Laatste 7 dagen
           </p>
-          <ResponsiveContainer width="100%" height={120}>
-            <AreaChart data={chartData}>
-              <defs>
-                <linearGradient id="sleepGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#7B5EA7" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="#7B5EA7" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#ACACAC' }} axisLine={false} tickLine={false} />
-              <YAxis hide />
-              <Tooltip
-                contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
-              />
-              <Area type="monotone" dataKey="slaap" stroke="#7B5EA7" fill="url(#sleepGrad)" strokeWidth={2} name="Slaap (u)" />
-            </AreaChart>
-          </ResponsiveContainer>
+          <HealthChart data={chartData} />
         </div>
       )}
 

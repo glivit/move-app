@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import { SubPageHeader } from '@/components/layout/SubPageHeader'
 import { Camera, Scale, CheckCircle2, Loader2, ChevronRight } from 'lucide-react'
@@ -194,7 +195,7 @@ export default function WeeklyCheckInPage() {
 
         {photoPreview ? (
           <div className="relative">
-            <img src={photoPreview} alt="Preview" className="w-full max-h-[300px] object-cover border border-[#F0F0EE]" />
+            <Image src={photoPreview} alt="Preview" width={400} height={300} className="w-full max-h-[300px] object-cover border border-[#F0F0EE]" unoptimized loading="lazy" />
             <button
               onClick={() => { setPhoto(null); setPhotoPreview(null) }}
               className="absolute top-2 right-2 w-8 h-8 bg-[#1A1917]/70 text-white flex items-center justify-center text-[14px]"

@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
 
-export const dynamic = 'force-dynamic'
-
 export async function GET() {
   try {
     const supabase = await createServerSupabaseClient()
@@ -21,7 +19,9 @@ export async function GET() {
       .limit(15)
 
     const ids = (earlyUsers || []).map((u: any) => u.id)
-    return NextResponse.json({ isTestUser: ids.includes(user.id) })
+    const response = NextResponse.json({ isTestUser: ids.includes(user.id) })
+    response.headers.set('Cache-Control', 'private, max-age=3600, stale-while-revalidate=86400')
+    return response
   } catch {
     return NextResponse.json({ isTestUser: false })
   }

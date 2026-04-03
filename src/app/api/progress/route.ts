@@ -159,7 +159,7 @@ export async function GET(request: NextRequest) {
     const totalCompleted = nutritionLogs.reduce((a: number, l: any) => a + (l.meals_completed || 0), 0)
     const nutritionCompliance = totalPlanned > 0 ? Math.round((totalCompleted / totalPlanned) * 100) : null
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       headline: {
         daysOnProgram,
         streak,
@@ -192,6 +192,8 @@ export async function GET(request: NextRequest) {
         daysTracked: nutritionLogs.length,
       },
     })
+    response.headers.set('Cache-Control', 'private, max-age=120, stale-while-revalidate=600')
+    return response
   } catch (err) {
     console.error('Progress API error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

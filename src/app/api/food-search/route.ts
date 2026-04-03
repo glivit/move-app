@@ -34,7 +34,9 @@ export async function GET(request: NextRequest) {
       }
 
       const { data } = await q
-      return NextResponse.json({ products: (data || []).map(mapLocalProduct), count: data?.length || 0 })
+      const response = NextResponse.json({ products: (data || []).map(mapLocalProduct), count: data?.length || 0 })
+      response.headers.set('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400')
+      return response
     } catch (err) {
       console.error('Popular products error:', err)
       return NextResponse.json({ products: [] })
@@ -44,7 +46,9 @@ export async function GET(request: NextRequest) {
   const cacheKey = `${barcode || ''}:${query || ''}:${category || ''}`
   const cached = CACHE.get(cacheKey)
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return NextResponse.json(cached.data)
+    const response = NextResponse.json(cached.data)
+    response.headers.set('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400')
+    return response
   }
 
   try {
@@ -57,7 +61,9 @@ export async function GET(request: NextRequest) {
     }
 
     CACHE.set(cacheKey, { data: result, timestamp: Date.now() })
-    return NextResponse.json(result)
+    const response = NextResponse.json(result)
+    response.headers.set('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400')
+    return response
   } catch (error) {
     console.error('Food search error:', error)
     return NextResponse.json({ products: [], error: 'Zoeken mislukt' }, { status: 500 })

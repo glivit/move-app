@@ -28,7 +28,9 @@ export async function GET(req: NextRequest) {
   }
 
   if (!user) {
-    return NextResponse.json({ diagnostics, message: 'Niet ingelogd' })
+    const response = NextResponse.json({ diagnostics, message: 'Niet ingelogd' })
+    response.headers.set('Cache-Control', 'private, max-age=10, stale-while-revalidate=60')
+    return response
   }
 
   // 3. Check push_subscriptions table exists and has data
@@ -117,5 +119,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ diagnostics })
+  const response = NextResponse.json({ diagnostics })
+  response.headers.set('Cache-Control', 'private, max-age=10, stale-while-revalidate=60')
+  return response
 }

@@ -120,7 +120,7 @@ Geef de samenvatting in max 5 zinnen. Begin direct met de naam van de client.`,
 
     const summary = response.content[0].type === 'text' ? response.content[0].text : ''
 
-    return NextResponse.json({
+    const responseObj = NextResponse.json({
       data: {
         summary,
         stats: {
@@ -132,6 +132,8 @@ Geef de samenvatting in max 5 zinnen. Begin direct met de naam van de client.`,
         },
       },
     })
+    responseObj.headers.set('Cache-Control', 'private, max-age=3600, stale-while-revalidate=86400')
+    return responseObj
   } catch (error: any) {
     console.error('AI weekly summary error:', error)
     return NextResponse.json({ error: error.message || 'Server error' }, { status: 500 })

@@ -47,7 +47,9 @@ export async function GET(
     }
 
     // Priority is managed client-side for now
-    return NextResponse.json({ clientId, isPriority: false })
+    const response = NextResponse.json({ clientId, isPriority: false })
+    response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')
+    return response
   } catch (error) {
     console.error('Priority check error:', error)
     return NextResponse.json({ error: 'Interne serverfout' }, { status: 500 })

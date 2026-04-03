@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
 
-export const dynamic = 'force-dynamic'
-
 // GET /api/automations/logs?rule_id=X&limit=50
 export async function GET(request: NextRequest) {
   try {
@@ -28,7 +26,9 @@ export async function GET(request: NextRequest) {
 
     const ruleIds = (rules || []).map((r: any) => r.id)
     if (ruleIds.length === 0) {
-      return NextResponse.json({ data: [] })
+      const response = NextResponse.json({ data: [] })
+      response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')
+      return response
     }
 
     let query = db
@@ -50,7 +50,9 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error
 
-    return NextResponse.json({ data: logs || [] })
+    const response = NextResponse.json({ data: logs || [] })
+    response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')
+    return response
   } catch (error: any) {
     console.error('Error fetching automation logs:', error)
     return NextResponse.json({ error: error.message || 'Server error' }, { status: 500 })

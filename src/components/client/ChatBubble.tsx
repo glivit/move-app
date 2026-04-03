@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { Play, FileText, Download, Mic, X } from 'lucide-react'
 
 interface ChatBubbleProps {
@@ -34,11 +35,14 @@ function ImageLightbox({ src, onClose }: { src: string; onClose: () => void }) {
       >
         <X size={20} className="text-white" />
       </button>
-      <img
+      <Image
         src={src}
         alt="Vergrote afbeelding"
+        width={600}
+        height={600}
         className="max-w-full max-h-full object-contain rounded-lg"
         onClick={(e) => e.stopPropagation()}
+        unoptimized
       />
     </div>
   )
@@ -52,11 +56,14 @@ function MediaContent({ message, isOwn }: { message: ChatBubbleProps['message'];
   if (message.type === 'image' && fileUrl) {
     return (
       <>
-        <img
+        <Image
           src={fileUrl}
           alt="Afbeelding"
+          width={260}
+          height={260}
           className="rounded-xl max-w-[260px] h-auto object-cover cursor-pointer hover:opacity-90 transition-opacity"
           onClick={() => setLightboxOpen(true)}
+          unoptimized
           loading="lazy"
         />
         {message.content && message.content !== fileUrl.split('/').pop() && (

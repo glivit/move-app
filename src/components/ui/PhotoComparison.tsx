@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
+import Image from 'next/image'
 
 interface PhotoSet {
   front: string | null
@@ -84,11 +85,15 @@ export function PhotoComparison({ currentPhotos, previousPhotos }: Props) {
           onPointerUp={handlePointerUp}
         >
           {/* "Before" layer (full) */}
-          <img
+          <Image
             src={previousUrl}
             alt="Vorige"
+            width={400}
+            height={400}
             className="absolute inset-0 w-full h-full object-cover"
             draggable={false}
+            unoptimized
+            loading="lazy"
           />
 
           {/* "After" layer (clipped) */}
@@ -96,11 +101,15 @@ export function PhotoComparison({ currentPhotos, previousPhotos }: Props) {
             className="absolute inset-0 overflow-hidden"
             style={{ clipPath: `inset(0 0 0 ${sliderPercent}%)` }}
           >
-            <img
+            <Image
               src={currentUrl}
               alt="Huidig"
+              width={400}
+              height={400}
               className="absolute inset-0 w-full h-full object-cover"
               draggable={false}
+              unoptimized
+              loading="lazy"
             />
           </div>
 
@@ -138,7 +147,7 @@ export function PhotoComparison({ currentPhotos, previousPhotos }: Props) {
               <div className="max-w-sm mx-auto space-y-2">
                 <p className="text-xs text-[#8E8E93] font-medium uppercase tracking-wider">Vorige</p>
                 <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-[#F5F5F3]">
-                  <img src={previousUrl} alt="Vorige" className="w-full h-full object-cover" />
+                  <Image src={previousUrl} alt="Vorige" width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
                 </div>
               </div>
             </div>
@@ -148,7 +157,7 @@ export function PhotoComparison({ currentPhotos, previousPhotos }: Props) {
               <div className="max-w-sm mx-auto space-y-2">
                 <p className="text-xs text-[#8E8E93] font-medium uppercase tracking-wider">Huidig</p>
                 <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-[#F5F5F3]">
-                  <img src={currentUrl} alt="Huidig" className="w-full h-full object-cover" />
+                  <Image src={currentUrl} alt="Huidig" width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
                 </div>
               </div>
             </div>

@@ -224,7 +224,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ success: true, data: sessions });
+    const response = NextResponse.json({ success: true, data: sessions });
+    response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300');
+    return response;
   } catch (error) {
     console.error('API error:', error);
     return NextResponse.json(

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { Search, Plus, X, Loader2 } from 'lucide-react'
 
 export interface FoodItem {
@@ -228,10 +229,13 @@ export function FoodSearch({ onSelect, onClose }: FoodSearchProps) {
             {/* Food Image or Emoji */}
             <div className="w-16 h-16 rounded-xl bg-white border border-[#E8E4DC] flex items-center justify-center overflow-hidden shrink-0">
               {selectedFood.image_small ? (
-                <img
+                <Image
                   src={selectedFood.image_small}
                   alt={selectedFood.name}
+                  width={64}
+                  height={64}
                   className="w-full h-full object-cover"
+                  unoptimized
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none'
                     ;(e.target as HTMLImageElement).parentElement!.innerHTML = `<span style="font-size:28px">${getFoodEmoji(selectedFood.name)}</span>`
@@ -362,10 +366,13 @@ export function FoodSearch({ onSelect, onClose }: FoodSearchProps) {
                   {/* Image */}
                   <div className="w-12 h-12 rounded-lg bg-[#F5F5F3] border border-[#E8E4DC] flex items-center justify-center overflow-hidden shrink-0">
                     {food.image_small ? (
-                      <img
+                      <Image
                         src={food.image_small}
                         alt={food.name}
+                        width={48}
+                        height={48}
                         className="w-full h-full object-cover"
+                        unoptimized
                         onError={(e) => {
                           (e.target as HTMLImageElement).style.display = 'none'
                           ;(e.target as HTMLImageElement).parentElement!.innerHTML = `<span style="font-size:20px">${getFoodEmoji(food.name)}</span>`

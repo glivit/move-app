@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
+import Image from 'next/image'
 import {
-  Plus, Edit2, Trash2, X, Play, FileText, Image, Video,
+  Plus, Edit2, Trash2, X, Play, FileText, Image as ImageIcon, Video,
   Star, Eye, Search
 } from 'lucide-react'
 
@@ -19,7 +20,7 @@ const contentTypeConfig: Record<string, { icon: any; label: string; color: strin
   article: { icon: FileText, label: 'Artikel', color: '#007AFF' },
   video: { icon: Play, label: 'Video', color: '#FF3B30' },
   pdf: { icon: FileText, label: 'PDF', color: '#FF9500' },
-  infographic: { icon: Image, label: 'Infographic', color: '#AF52DE' },
+  infographic: { icon: ImageIcon, label: 'Infographic', color: '#AF52DE' },
 }
 
 interface Resource {
@@ -445,7 +446,7 @@ export default function ResourcesPage() {
                   {/* Thumbnail / Type indicator */}
                   {resource.thumbnail_url ? (
                     <div className="relative aspect-video bg-[#E8E4DC] overflow-hidden">
-                      <img src={resource.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                      <Image src={resource.thumbnail_url} alt="" width={400} height={225} className="w-full h-full object-cover" unoptimized loading="lazy" />
                       {resource.content_type === 'video' && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                           <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">

@@ -2,8 +2,6 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
-
 /**
  * GET /api/accountability/coach
  * Get accountability overview for all clients (coach only)
@@ -105,7 +103,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: {
         logs: logs || [],
@@ -114,6 +112,8 @@ export async function GET(request: NextRequest) {
         ),
       },
     })
+    response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')
+    return response
   } catch (error) {
     console.error('Error in coach accountability:', error)
     return NextResponse.json({ error: 'Serverfout' }, { status: 500 })

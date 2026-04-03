@@ -1,8 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
-
 /**
  * GET /api/coach-badges
  * Returns badge counts for the coach sidebar.
@@ -28,13 +26,15 @@ export async function GET() {
     const messageCount = unreadMessages.count || 0
     const checkinCount = pendingCheckins.count || 0
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       '/coach': workoutCount + messageCount + checkinCount,
       '/coach/activity': workoutCount,
       '/coach/clients': workoutCount,
       '/coach/check-ins': checkinCount,
       '/coach/messages': messageCount,
     })
+    response.headers.set('Cache-Control', 'private, max-age=10, stale-while-revalidate=60')
+    return response
   } catch (e) {
     console.error('[coach-badges] Error:', e)
     return NextResponse.json({})

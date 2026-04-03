@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { createClient } from '@/lib/supabase'
 import {
   Check, ChevronLeft, ChevronRight, MessageSquare,
@@ -830,8 +830,17 @@ export default function ClientNutritionPage() {
   // ─── Calculations ─────────────────────────────────
 
   const meals = plan?.meals || []
-  const completedCount = Array.from(logs.values()).filter(l => l.completed).length
-  const allDone = meals.length > 0 && completedCount === meals.length
+
+  // Memoize completion count calculation
+  const completedCount = useMemo(
+    () => Array.from(logs.values()).filter(l => l.completed).length,
+    [logs]
+  )
+
+  const allDone = useMemo(
+    () => meals.length > 0 && completedCount === meals.length,
+    [meals.length, completedCount]
+  )
 
   const actualCal = summary?.total_calories || 0
   const actualProt = summary?.total_protein || 0
@@ -843,7 +852,35 @@ export default function ClientNutritionPage() {
   const targetCarbs = plan?.carbs_g || 0
   const targetFat = plan?.fat_g || 0
 
-  const calPct = targetCal > 0 ? Math.min((actualCal / targetCal) * 100, 100) : 0
+  const calPct = useMemo(
+    () => targetCal > 0 ? Math.min((actualCal / targetCal) * 100, 100) : 0,
+    [actualCal, targetCal]
+  )
+
+  // Memoize toggle meal handler
+  const handleToggleMealComplete = useCallback((meal: MealMoment) => {
+    toggleMealComplete(meal)
+  }, [])
+
+  // Memoize food search modal open handlers
+  const openAddFoodModal = useCallback((mealId: string) => {
+    setFoodSearchModal({
+      isOpen: true,
+      mode: 'add',
+      mealId,
+      originalGrams: 100,
+    })
+  }, [])
+
+  const openSwapFoodModal = useCallback((mealId: string, foodId: string, grams: number) => {
+    setFoodSearchModal({
+      isOpen: true,
+      mode: 'swap',
+      mealId,
+      foodId,
+      originalGrams: grams,
+    })
+  }, [])
 
   // ─── Render ───────────────────────────────────────
 
@@ -1030,7 +1067,7 @@ export default function ClientNutritionPage() {
                     {/* Complete meal checkbox */}
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => toggleMealComplete(meal)}
+                        onClick={() => handleToggleMealComplete(meal)}
                         disabled={isSaving}
                         className={`w-5 h-5 rounded-full border-[1.5px] flex items-center justify-center shrink-0 transition-all ${
                           isCompleted
@@ -1067,13 +1104,7 @@ export default function ClientNutritionPage() {
                               {calcMacro(food, 'calories')} kcal
                             </span>
                             <button
-                              onClick={() => setFoodSearchModal({
-                                isOpen: true,
-                                mode: 'swap',
-                                mealId: meal.id,
-                                foodId: food.id,
-                                originalGrams: food.grams,
-                              })}
+                              onClick={() => openSwapFoodModal(meal.id, food.id, food.grams)}
                               className="p-1 text-[#C0C0C0] hover:text-[#1A1917] transition-colors opacity-0 group-hover:opacity-100"
                             >
                               <ArrowLeftRight strokeWidth={1.5} className="w-3.5 h-3.5" />
@@ -1085,12 +1116,7 @@ export default function ClientNutritionPage() {
 
                     {/* Add food button */}
                     <button
-                      onClick={() => setFoodSearchModal({
-                        isOpen: true,
-                        mode: 'add',
-                        mealId: meal.id,
-                        originalGrams: 100,
-                      })}
+                      onClick={() => openAddFoodModal(meal.id)}
                       className="mt-3 px-3 py-2 text-[13px] text-[#D46A3A] font-medium hover:bg-[rgba(212,106,58,0.06)] rounded-lg transition-colors"
                     >
                       + Voeg item toe

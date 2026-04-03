@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import { Search, BookOpen, ChevronRight, Play, Clock, Star, X } from 'lucide-react'
 
@@ -168,7 +169,7 @@ export default function ResourcesPage() {
                 >
                   {resource.thumbnail_url ? (
                     <div className="relative aspect-[21/9] overflow-hidden">
-                      <img src={resource.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                      <Image src={resource.thumbnail_url} alt="" width={400} height={171} className="w-full h-full object-cover" unoptimized loading="lazy" />
                       {resource.content_type === 'video' && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                           <div className="w-12 h-12 rounded-full bg-white dark:bg-[#1A1917]/90 flex items-center justify-center">
@@ -224,7 +225,7 @@ export default function ResourcesPage() {
               >
                 {resource.thumbnail_url ? (
                   <div className="relative aspect-video overflow-hidden">
-                    <img src={resource.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                    <Image src={resource.thumbnail_url} alt="" width={400} height={225} className="w-full h-full object-cover" unoptimized loading="lazy" />
                     {resource.content_type === 'video' && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                         <div className="w-10 h-10 rounded-full bg-white dark:bg-[#1A1917]/90 flex items-center justify-center">
@@ -286,7 +287,7 @@ export default function ResourcesPage() {
 
             {selectedResource.content_type !== 'video' && selectedResource.thumbnail_url && (
               <div className="aspect-[21/9] overflow-hidden">
-                <img src={selectedResource.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                <Image src={selectedResource.thumbnail_url} alt="" width={400} height={171} className="w-full h-full object-cover" unoptimized loading="lazy" />
               </div>
             )}
 

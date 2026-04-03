@@ -21,7 +21,9 @@ export async function GET(req: NextRequest) {
     .order('created_at', { ascending: true })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data)
+  const response = NextResponse.json(data)
+  response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')
+  return response
 }
 
 // POST: Create a comment

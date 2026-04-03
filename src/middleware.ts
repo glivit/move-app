@@ -5,13 +5,18 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // Public routes — no auth check at all
+  // Static paths return immediately (no Supabase client needed)
   if (
     pathname === '/' ||
     pathname === '/offline' ||
     pathname === '/onboarding' ||
-    pathname.startsWith('/auth/') ||
-    pathname.startsWith('/api/')
+    pathname.startsWith('/auth/')
   ) {
+    return NextResponse.next()
+  }
+
+  // API routes handle their own auth — skip middleware entirely
+  if (pathname.startsWith('/api/')) {
     return NextResponse.next()
   }
 
@@ -139,6 +144,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|manifest\\.json|service-worker\\.js|sw\\.js|icon-.*\\.png|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|manifest\\.json|service-worker\\.js|sw\\.js|icon-.*\\.png|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
