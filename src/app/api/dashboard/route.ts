@@ -247,6 +247,11 @@ export async function GET(request: NextRequest) {
     // ── Weekly check-in status ─────────────────────────────
     const weeklyCheckinDone = !!weeklyCheckinRes.data
     const weeklyCheckinData = weeklyCheckinRes.data
+    // Only show weekly check-in after 7 days (not right after onboarding)
+    const daysSinceStart = profile?.start_date
+      ? Math.floor((Date.now() - new Date(profile.start_date).getTime()) / 86400000)
+      : 0
+    const weeklyCheckinShouldShow = daysSinceStart >= 7
 
     // ── Weight log frequency this week ───────────────────
     const weightLogsThisWeek = weightLogsThisWeekRes.data || []
@@ -313,6 +318,7 @@ export async function GET(request: NextRequest) {
           name: nextTrainingDay.name,
           label: nextTrainingDay.label,
         } : null,
+        completedToday: todayWorkoutDone,
         isRestDay: !todayTemplateDay,
         // All scheduled training days (day_number → name) for calendar
         scheduleDays: (program?.program_template_days || []).map((d: any) => ({
@@ -355,11 +361,11 @@ export async function GET(request: NextRequest) {
         checkInDue: checkInDueInfo,
       },
 
-      weeklyCheckIn: {
+      weeklyCheckIn: weeklyCheckinShouldShow ? {
         submitted: weeklyCheckinDone,
         date: weeklyCheckinData?.date || null,
         weightKg: weeklyCheckinData?.weight_kg || null,
-      },
+      } : null,
 
       weightLog: {
         entriesThisWeek: weightLogCount,

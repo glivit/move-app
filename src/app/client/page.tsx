@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ChevronRight, Scale, ClipboardCheck, CalendarCheck } from 'lucide-react'
 import { NotificationCenter } from '@/components/client/NotificationCenter'
-import { cachedFetch } from '@/lib/fetcher'
+import { cachedFetch, invalidateCache } from '@/lib/fetcher'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -27,6 +27,7 @@ interface DashboardData {
       exerciseCount: number | null
       completed: boolean
     } | null
+    completedToday: boolean
     next: {
       name: string
       label: string
@@ -163,7 +164,8 @@ export default function ClientDashboard() {
       setWeightSaved(true)
       setWeightInput('')
       setTimeout(() => setWeightSaved(false), 2500)
-      // Refresh dashboard data
+      // Refresh dashboard data (invalidate cache so weight count updates)
+      invalidateCache('/api/dashboard')
       loadDashboard()
     } catch (err) {
       console.error('Weight log error:', err)
@@ -199,11 +201,12 @@ export default function ClientDashboard() {
   const primaryAction = useMemo(() => {
     if (!data) return 'rest' as const
     if (showOnboarding) return 'onboarding' as const
+    // Completed workout (scheduled or ad-hoc on a rest day)
+    if (training?.today?.completed || training?.completedToday) return 'done' as const
     if (training?.today && !training.today.completed) return 'training' as const
-    if (training?.today?.completed) return 'done' as const
     if (actions?.checkInDue?.overdue) return 'checkin' as const
     return 'rest' as const
-  }, [data, showOnboarding, training?.today, actions?.checkInDue])
+  }, [data, showOnboarding, training, actions?.checkInDue])
 
   const nudges = useMemo(() => {
     if (!actions) return []
@@ -357,7 +360,7 @@ export default function ClientDashboard() {
                 Training vandaag
               </p>
               <h2 className="text-editorial-h1 mb-3">
-                {training.today.name}
+                {training.today?.name || 'Workout voltooid'}
               </h2>
               <p className="text-[14px] text-[#ACACAC]">
                 {training.today.exerciseCount && <>{training.today.exerciseCount} oefeningen · </>}
@@ -371,18 +374,20 @@ export default function ClientDashboard() {
           )}
 
           {/* Training done — workout name is quiet, streak is the hero */}
-          {primaryAction === 'done' && training.today && (
+          {primaryAction === 'done' && (
             <div>
               <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-[#EEFBF0]">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3D8B5C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
               </div>
               <h2 className="section-title mb-1">
-                {training.today.name}
+                {training.today?.name || 'Workout voltooid'}
               </h2>
-              <p className="text-[13px] text-[#ACACAC]">
-                {training.today.exerciseCount && <>{training.today.exerciseCount} oefeningen · </>}
-                ~{training.today.durationMin} min
-              </p>
+              {training.today && (
+  <p className="text-[13px] text-[#ACACAC]">
+                  {training.today.exerciseCount && <>{training.today.exerciseCount} oefeningen · </>}
+                  ~{training.today.durationMin} min
+                </p>
+)}
 
               {momentum.streakDays > 0 && (
                 <div className="mt-12 border-t border-[#F0F0EE] pt-12">
