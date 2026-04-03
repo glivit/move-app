@@ -143,11 +143,13 @@ function FoodSearchModal({
   const [query, setQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchProduct[]>([])
   const [selectedProduct, setSelectedProduct] = useState<SearchProduct | null>(null)
-  const [grams, setGrams] = useState(originalGrams || 100)
+  const [gramsInput, setGramsInput] = useState(String(originalGrams || 100))
+  const grams = parseInt(gramsInput) || 0
   const [loading, setLoading] = useState(false)
   const [modalTab, setModalTab] = useState<'search' | 'custom'>('search')
   const [customForm, setCustomForm] = useState({ name: '', brand: '', barcode: '', calories: '', protein: '', carbs: '', fat: '' })
   const [savingCustom, setSavingCustom] = useState(false)
+  const [savingConfirm, setSavingConfirm] = useState(false)
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
@@ -155,7 +157,7 @@ function FoodSearchModal({
       setQuery('')
       setSearchResults([])
       setSelectedProduct(null)
-      setGrams(originalGrams || 100)
+      setGramsInput(String(originalGrams || 100))
     }
   }, [isOpen, originalGrams])
 
@@ -198,7 +200,8 @@ function FoodSearchModal({
   }, [query, isOpen])
 
   async function handleConfirm() {
-    if (!selectedProduct || !plan) return
+    if (!selectedProduct || !plan || savingConfirm) return
+    setSavingConfirm(true)
 
     const meal = plan.meals.find(m => m.id === mealId)
     if (!meal) return
@@ -281,6 +284,9 @@ function FoodSearchModal({
       }
     } catch (err) {
       console.error('Save food error:', err)
+      alert('Opslaan mislukt, probeer opnieuw.')
+    } finally {
+      setSavingConfirm(false)
     }
   }
 
@@ -384,6 +390,10 @@ function FoodSearchModal({
 
       {/* Modal */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-white rounded-t-2xl rounded-b-none flex flex-col max-h-[90vh] z-[51]">
+        {/* Close handle */}
+        <div className="flex justify-center pt-3 pb-1">
+          <button onClick={onClose} className="w-10 h-1 bg-[#D5D5D5] rounded-full" aria-label="Sluiten" />
+        </div>
         {/* Tab bar: Search | Nieuw product */}
         <div className="flex border-b border-[#F0F0EE]">
           <button
@@ -596,16 +606,17 @@ function FoodSearchModal({
                 </p>
                 <input
                   type="number"
-                  value={grams}
-                  onChange={(e) => setGrams(Math.max(1, parseInt(e.target.value) || 0))}
+                  value={gramsInput}
+                  onChange={(e) => setGramsInput(e.target.value.replace(/[^0-9]/g, ''))}
                   className="w-full px-3 py-2 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] bg-white focus:outline-none focus:border-[#1A1917]"
                 />
               </div>
               <button
                 onClick={handleConfirm}
-                className="px-6 py-2.5 bg-[#1A1917] text-white rounded-xl text-[13px] font-medium"
+                disabled={savingConfirm || grams < 1}
+                className="px-6 py-2.5 bg-[#1A1917] text-white rounded-xl text-[13px] font-medium disabled:opacity-50"
               >
-                Bevestigen
+                {savingConfirm ? "Opslaan..." : "Bevestigen"}
               </button>
             </div>
           </div>
@@ -858,9 +869,9 @@ export default function ClientNutritionPage() {
   )
 
   // Memoize toggle meal handler
-  const handleToggleMealComplete = useCallback((meal: MealMoment) => {
+  const handleToggleMealComplete = (meal: MealMoment) => {
     toggleMealComplete(meal)
-  }, [])
+  }
 
   // Memoize food search modal open handlers
   const openAddFoodModal = useCallback((mealId: string) => {
