@@ -82,6 +82,8 @@ export default function NutritionOverviewPage() {
   const [showAssignModal, setShowAssignModal] = useState<string | null>(null)
   const [showPrebuiltAssign, setShowPrebuiltAssign] = useState<string | null>(null)
   const [assigning, setAssigning] = useState(false)
+  const [assignError, setAssignError] = useState<string | null>(null)
+  const [assignSuccess, setAssignSuccess] = useState<string | null>(null)
   const [coachId, setCoachId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -90,6 +92,7 @@ export default function NutritionOverviewPage() {
 
   async function assignPrebuiltToClient(templateId: string, clientId: string) {
     setAssigning(true)
+    setAssignError(null)
     try {
       const res = await fetch('/api/template-diets', {
         method: 'POST',
@@ -97,13 +100,17 @@ export default function NutritionOverviewPage() {
         body: JSON.stringify({ templateId, clientId }),
       })
       if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || 'Fout bij toewijzen')
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || `Fout bij toewijzen (${res.status})`)
       }
+      const result = await res.json()
       setShowPrebuiltAssign(null)
+      setAssignSuccess(result.message || 'Template toegewezen!')
+      setTimeout(() => setAssignSuccess(null), 3000)
       loadClients()
     } catch (err) {
       console.error('Failed to assign prebuilt template:', err)
+      setAssignError(err instanceof Error ? err.message : 'Fout bij toewijzen van template')
     } finally {
       setAssigning(false)
     }
@@ -111,10 +118,13 @@ export default function NutritionOverviewPage() {
 
   async function assignTemplateToClient(templateId: string, clientId: string) {
     setAssigning(true)
+    setAssignError(null)
     try {
       const supabase = createClient()
       const template = templates.find(t => t.id === templateId)
-      if (!template) return
+      if (!template) {
+        throw new Error('Template niet gevonden')
+      }
 
       // Deactivate existing plans for this client
       await supabase
@@ -124,7 +134,7 @@ export default function NutritionOverviewPage() {
         .eq('is_active', true)
 
       // Copy template to client
-      await supabase.from('nutrition_plans').insert({
+      const { error: insertErr } = await supabase.from('nutrition_plans').insert({
         client_id: clientId,
         title: template.title.replace(' — Template', ''),
         calories_target: template.calories_target,
@@ -137,10 +147,15 @@ export default function NutritionOverviewPage() {
         valid_from: new Date().toISOString().split('T')[0],
       })
 
+      if (insertErr) throw new Error(insertErr.message)
+
       setShowAssignModal(null)
-      loadClients() // Refresh
+      setAssignSuccess('Template toegewezen!')
+      setTimeout(() => setAssignSuccess(null), 3000)
+      loadClients()
     } catch (err) {
       console.error('Failed to assign template:', err)
+      setAssignError(err instanceof Error ? err.message : 'Fout bij toewijzen')
     } finally {
       setAssigning(false)
     }
@@ -334,6 +349,23 @@ export default function NutritionOverviewPage() {
           </div>
         </div>
 
+        {/* Success / Error Banners */}
+        {assignSuccess && (
+          <div className="mb-4 p-4 rounded-2xl bg-green-50 border border-green-200 text-green-800 text-[14px] font-medium flex items-center gap-2">
+            <CheckCircle strokeWidth={1.5} className="w-5 h-5 text-green-600 shrink-0" />
+            {assignSuccess}
+          </div>
+        )}
+        {assignError && (
+          <div className="mb-4 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-[14px] font-medium flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertCircle strokeWidth={1.5} className="w-5 h-5 text-red-600 shrink-0" />
+              {assignError}
+            </div>
+            <button onClick={() => setAssignError(null)} className="text-red-400 hover:text-red-600 text-[12px]">✕</button>
+          </div>
+        )}
+
         {/* Nutrition Templates */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-3">
@@ -462,6 +494,9 @@ export default function NutritionOverviewPage() {
                   {prebuiltTemplates.find(t => t.id === showPrebuiltAssign)?.title} — kies een cliënt
                 </p>
               </div>
+              {assignError && (
+                <div className="mx-5 mt-3 p-3 rounded-xl bg-red-50 text-red-700 text-[13px]">{assignError}</div>
+              )}
               <div className="p-3 max-h-[60vh] overflow-y-auto">
                 {clients.map((client) => (
                   <button
