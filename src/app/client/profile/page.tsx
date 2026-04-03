@@ -16,7 +16,48 @@ import {
   Shield,
   ChevronRight,
   LogOut,
+  Moon,
+  Sun,
 } from 'lucide-react'
+
+function DarkModeRow() {
+  const [dark, setDark] = useState(false)
+
+  useEffect(() => {
+    setDark(document.documentElement.classList.contains('dark'))
+  }, [])
+
+  const toggle = () => {
+    const next = !dark
+    setDark(next)
+    if (next) {
+      document.documentElement.classList.add('dark')
+      try { localStorage.setItem('move-dark-mode', 'true') } catch {}
+    } else {
+      document.documentElement.classList.remove('dark')
+      try { localStorage.setItem('move-dark-mode', 'false') } catch {}
+    }
+  }
+
+  return (
+    <button
+      onClick={toggle}
+      className="w-full flex items-center justify-between px-6 py-4 hover:bg-[#FAFAF8] transition-colors"
+    >
+      <div className="flex items-center gap-3">
+        {dark ? (
+          <Sun size={18} strokeWidth={1.5} className="text-[#ACACAC]" />
+        ) : (
+          <Moon size={18} strokeWidth={1.5} className="text-[#ACACAC]" />
+        )}
+        <span className="text-[14px] text-[#1A1917]">{dark ? 'Licht modus' : 'Donker modus'}</span>
+      </div>
+      <div className={`w-10 h-6 rounded-full transition-colors ${dark ? 'bg-[#1A1917]' : 'bg-[#E5E5E3]'} relative`}>
+        <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${dark ? 'translate-x-4' : 'translate-x-0.5'}`} />
+      </div>
+    </button>
+  )
+}
 
 interface Profile {
   id: string
@@ -160,14 +201,17 @@ export default function ProfilePage() {
         </div>
       ))}
 
-      {/* Pakket */}
+      {/* Weergave */}
       <div className="mt-8 animate-slide-up stagger-5">
-        <div className="bg-white rounded-2xl border border-[#F0F0EE] flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
-            <CreditCard size={18} strokeWidth={1.5} className="text-[#ACACAC]" />
-            <span className="text-[14px] text-[#1A1917]">Pakket</span>
+        <div className="bg-white rounded-2xl border border-[#F0F0EE] overflow-hidden">
+          <DarkModeRow />
+          <div className="flex items-center justify-between px-6 py-4 border-t border-[#F0F0EE]">
+            <div className="flex items-center gap-3">
+              <CreditCard size={18} strokeWidth={1.5} className="text-[#ACACAC]" />
+              <span className="text-[14px] text-[#1A1917]">Pakket</span>
+            </div>
+            <span className="text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.04em]">{profile?.package || 'Standaard'}</span>
           </div>
-          <span className="text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.04em]">{profile?.package || 'Standaard'}</span>
         </div>
       </div>
 

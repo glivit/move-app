@@ -207,7 +207,12 @@ function FoodSearchModal({
     setSavingConfirm(true)
 
     const meal = plan.meals.find(m => m.id === mealId)
-    if (!meal) return
+    if (!meal) {
+      console.error('Meal not found for id:', mealId, 'Available meals:', plan.meals.map(m => m.id))
+      setSavingConfirm(false)
+      alert('Maaltijd niet gevonden. Probeer opnieuw.')
+      return
+    }
 
     const existing = logs.get(mealId)
     const currentFoods = existing?.foods_eaten || meal.foods || []
@@ -880,6 +885,62 @@ export default function ClientNutritionPage() {
     setSelectedDate(d)
   }
 
+  async function copyYesterday(mealId: string) {
+    if (!plan) return
+    const meal = plan.meals.find(m => m.id === mealId)
+    if (!meal) return
+
+    setSavingMeal(mealId)
+    try {
+      const yesterday = new Date(selectedDate)
+      yesterday.setDate(yesterday.getDate() - 1)
+      const yesterdayStr = yesterday.toISOString().split('T')[0]
+
+      const res = await fetch(`/api/nutrition-log?date=${yesterdayStr}`)
+      const data = await res.json()
+      const yesterdayLog = (data.logs || []).find((l: any) => l.meal_id === mealId)
+
+      if (!yesterdayLog || !yesterdayLog.foods_eaten?.length) {
+        alert('Geen voeding gevonden voor gisteren bij deze maaltijd.')
+        setSavingMeal(null)
+        return
+      }
+
+      // Save yesterday's foods to today
+      const saveRes = await fetch('/api/nutrition-log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan_id: plan.id,
+          date: dateStr,
+          meal_id: mealId,
+          meal_name: meal.name,
+          completed: false,
+          foods_eaten: yesterdayLog.foods_eaten,
+          client_notes: null,
+        }),
+      })
+
+      if (saveRes.ok) {
+        const newLog: MealLog = {
+          meal_id: mealId,
+          meal_name: meal.name,
+          completed: false,
+          foods_eaten: yesterdayLog.foods_eaten,
+          client_notes: null,
+          completed_at: null,
+        }
+        const updated = new Map(logs)
+        updated.set(mealId, newLog)
+        setLogs(updated)
+      }
+    } catch (err) {
+      console.error('Copy yesterday error:', err)
+    } finally {
+      setSavingMeal(null)
+    }
+  }
+
   // ─── Calculations ─────────────────────────────────
 
   const meals = plan?.meals || []
@@ -1167,13 +1228,22 @@ export default function ClientNutritionPage() {
                       ))}
                     </div>
 
-                    {/* Add food button */}
-                    <button
-                      onClick={() => openAddFoodModal(meal.id)}
-                      className="mt-3 px-3 py-2 text-[13px] text-[#D46A3A] font-medium hover:bg-[rgba(212,106,58,0.06)] rounded-lg transition-colors"
-                    >
-                      + Voeg item toe
-                    </button>
+                    {/* Add food + copy yesterday buttons */}
+                    <div className="flex items-center gap-3 mt-3">
+                      <button
+                        onClick={() => openAddFoodModal(meal.id)}
+                        className="px-3 py-2 text-[13px] text-[#D46A3A] font-medium hover:bg-[rgba(212,106,58,0.06)] rounded-lg transition-colors"
+                      >
+                        + Voeg item toe
+                      </button>
+                      <button
+                        onClick={() => copyYesterday(meal.id)}
+                        disabled={isSaving}
+                        className="px-3 py-2 text-[12px] text-[#ACACAC] hover:text-[#1A1917] transition-colors"
+                      >
+                        Kopieer gisteren
+                      </button>
+                    </div>
 
                     {/* Notes in expanded view */}
                     <div className="pt-2">

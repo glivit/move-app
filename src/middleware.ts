@@ -55,9 +55,38 @@ export async function middleware(request: NextRequest) {
   if (cachedRole) {
     // Validate route access using cached role
     if (pathname.startsWith('/coach') && cachedRole !== 'coach') {
+      // Don't blindly redirect — verify from DB first in case cookie is stale
+      const { data: freshProfile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      if (freshProfile?.role === 'coach') {
+        // Cookie was stale — update it and allow access
+        supabaseResponse.cookies.set('move_role', 'coach', {
+          httpOnly: true, secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax', maxAge: 1800, path: '/',
+        })
+        return supabaseResponse
+      }
       return NextResponse.redirect(new URL('/client', request.url))
     }
     if (pathname.startsWith('/client') && cachedRole !== 'client') {
+      // Don't blindly redirect — verify from DB first in case cookie is stale
+      const { data: freshProfile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      if (freshProfile?.role === 'client') {
+        supabaseResponse.cookies.set('move_role', 'client', {
+          httpOnly: true, secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax', maxAge: 1800, path: '/',
+        })
+        return supabaseResponse
+      }
       return NextResponse.redirect(new URL('/coach', request.url))
     }
 
