@@ -145,6 +145,9 @@ function FoodSearchModal({
   const [selectedProduct, setSelectedProduct] = useState<SearchProduct | null>(null)
   const [grams, setGrams] = useState(originalGrams || 100)
   const [loading, setLoading] = useState(false)
+  const [modalTab, setModalTab] = useState<'search' | 'custom'>('search')
+  const [customForm, setCustomForm] = useState({ name: '', brand: '', barcode: '', calories: '', protein: '', carbs: '', fat: '' })
+  const [savingCustom, setSavingCustom] = useState(false)
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
@@ -281,6 +284,94 @@ function FoodSearchModal({
     }
   }
 
+  async function handleBarcodeScan() {
+    // Use the device camera to scan a barcode via the native input
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.capture = 'environment'
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (!file) return
+      // For now, prompt user to type the barcode manually
+      // Full camera barcode scanning requires a library like html5-qrcode
+      const code = prompt('Voer de barcode in (nummer onder de streepjes):')
+      if (code) {
+        setLoading(true)
+        try {
+          const res = await fetch(`/api/food-search?barcode=${encodeURIComponent(code)}`)
+          const data: SearchResponse = await res.json()
+          if (data.products?.length > 0) {
+            setSearchResults(data.products)
+            setSelectedProduct(data.products[0])
+          } else {
+            setSearchResults([])
+            alert('Product niet gevonden. Voeg het handmatig toe via "Nieuw product".')
+            setModalTab('custom')
+            setCustomForm(prev => ({ ...prev, barcode: code }))
+          }
+        } catch {
+          alert('Zoeken mislukt')
+        }
+        setLoading(false)
+      }
+    }
+    // Fallback: just prompt for barcode number
+    const code = prompt('Voer de barcode in (nummer onder de streepjes):')
+    if (code) {
+      setLoading(true)
+      try {
+        const res = await fetch(`/api/food-search?barcode=${encodeURIComponent(code)}`)
+        const data: SearchResponse = await res.json()
+        if (data.products?.length > 0) {
+          setSearchResults(data.products)
+          setSelectedProduct(data.products[0])
+        } else {
+          setSearchResults([])
+          setModalTab('custom')
+          setCustomForm(prev => ({ ...prev, barcode: code }))
+        }
+      } catch {
+        // silent
+      }
+      setLoading(false)
+    }
+  }
+
+  async function handleSaveCustomProduct() {
+    if (!customForm.name || !customForm.calories) return
+    setSavingCustom(true)
+    try {
+      const res = await fetch('/api/food-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: customForm.name,
+          brand: customForm.brand || null,
+          barcode: customForm.barcode || null,
+          per100g: {
+            calories: parseFloat(customForm.calories) || 0,
+            protein: parseFloat(customForm.protein) || 0,
+            carbs: parseFloat(customForm.carbs) || 0,
+            fat: parseFloat(customForm.fat) || 0,
+          },
+        }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        if (data.product) {
+          setSelectedProduct(data.product)
+          setModalTab('search')
+          setSearchResults([data.product])
+          setCustomForm({ name: '', brand: '', barcode: '', calories: '', protein: '', carbs: '', fat: '' })
+        }
+      }
+    } catch (err) {
+      console.error('Save custom product error:', err)
+    }
+    setSavingCustom(false)
+  }
+
   if (!isOpen) return null
 
   return (
@@ -293,78 +384,210 @@ function FoodSearchModal({
 
       {/* Modal */}
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-white rounded-t-2xl rounded-b-none flex flex-col max-h-[90vh] z-[51]">
-        {/* Search input */}
-        <div className="px-4 py-4 border-b border-[#F0F0EE]">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Zoek voedingsmiddel..."
-            autoFocus
-            className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
-          />
+        {/* Tab bar: Search | Nieuw product */}
+        <div className="flex border-b border-[#F0F0EE]">
+          <button
+            onClick={() => setModalTab('search')}
+            className={`flex-1 py-3 text-[13px] font-semibold uppercase tracking-[0.06em] transition-all border-b-2 text-center ${
+              modalTab === 'search' ? 'border-[#1A1917] text-[#1A1917]' : 'border-transparent text-[#C0C0C0]'
+            }`}
+          >
+            Zoeken
+          </button>
+          <button
+            onClick={() => setModalTab('custom')}
+            className={`flex-1 py-3 text-[13px] font-semibold uppercase tracking-[0.06em] transition-all border-b-2 text-center ${
+              modalTab === 'custom' ? 'border-[#1A1917] text-[#1A1917]' : 'border-transparent text-[#C0C0C0]'
+            }`}
+          >
+            Nieuw product
+          </button>
         </div>
 
-        {/* Results list */}
-        <div className="flex-1 overflow-y-auto">
-          {loading && (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#C0C0C0] border-t-[#1A1917]" />
-            </div>
-          )}
-
-          {!loading && searchResults.length === 0 && query && (
-            <div className="py-8 text-center">
-              <p className="text-[13px] text-[#ACACAC]">
-                Geen resultaten gevonden
-              </p>
-            </div>
-          )}
-
-          {!loading && searchResults.length > 0 && (
-            <div>
-              {searchResults.map((product, idx) => (
+        {modalTab === 'search' ? (
+          <>
+            {/* Search input + barcode button */}
+            <div className="px-4 py-4 border-b border-[#F0F0EE]">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Zoek voedingsmiddel..."
+                  autoFocus
+                  className="flex-1 px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
+                />
                 <button
-                  key={idx}
-                  onClick={() => setSelectedProduct(product)}
-                  className={`w-full px-4 py-3 border-t border-[#F0F0EE] flex flex-col gap-1 transition-colors ${
-                    selectedProduct === product ? 'bg-[rgba(212,106,58,0.06)]' : 'hover:bg-[#FAFAF8]'
-                  }`}
+                  onClick={handleBarcodeScan}
+                  className="px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[#ACACAC] hover:text-[#1A1917] hover:border-[#1A1917] transition-colors"
+                  title="Barcode scannen"
                 >
-                  <div className="flex items-center gap-2 justify-between">
-                    <div className="flex-1 text-left min-w-0">
-                      <p className="text-[14px] text-[#1A1917] truncate">
-                        {product.name}
-                      </p>
-                      {product.brand && (
-                        <p className="text-[12px] text-[#ACACAC] truncate">
-                          {product.brand}
-                        </p>
-                      )}
-                    </div>
-                    {product.source === 'local' && (
-                      <span className="px-2 py-0.5 bg-[#F0F0EE] text-[#ACACAC] rounded text-[10px] font-medium shrink-0">
-                        DB
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex gap-2 text-[11px] text-[#C0C0C0]">
-                    <span>{Math.round(product.per100g.calories)} kcal</span>
-                    <span>·</span>
-                    <span>P {product.per100g.protein}g</span>
-                    <span>·</span>
-                    <span>K {product.per100g.carbs}g</span>
-                    <span>·</span>
-                    <span>V {product.per100g.fat}g</span>
-                  </div>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2" /><path d="M17 3h2a2 2 0 0 1 2 2v2" /><path d="M21 17v2a2 2 0 0 1-2 2h-2" /><path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+                    <line x1="7" y1="8" x2="7" y2="16" /><line x1="10" y1="8" x2="10" y2="16" /><line x1="13" y1="8" x2="13" y2="16" /><line x1="17" y1="8" x2="17" y2="16" />
+                  </svg>
                 </button>
-              ))}
+              </div>
             </div>
-          )}
-        </div>
+
+            {/* Results list */}
+            <div className="flex-1 overflow-y-auto">
+              {loading && (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#C0C0C0] border-t-[#1A1917]" />
+                </div>
+              )}
+
+              {!loading && searchResults.length === 0 && query && (
+                <div className="py-8 text-center">
+                  <p className="text-[13px] text-[#ACACAC] mb-3">
+                    Geen resultaten voor &ldquo;{query}&rdquo;
+                  </p>
+                  <button
+                    onClick={() => { setModalTab('custom'); setCustomForm(prev => ({ ...prev, name: query })) }}
+                    className="text-[13px] font-medium text-[#D46A3A] hover:underline"
+                  >
+                    Voeg &ldquo;{query}&rdquo; handmatig toe
+                  </button>
+                </div>
+              )}
+
+              {!loading && searchResults.length > 0 && (
+                <div>
+                  {searchResults.map((product, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedProduct(product)}
+                      className={`w-full px-4 py-3 border-t border-[#F0F0EE] flex flex-col gap-1 transition-colors ${
+                        selectedProduct === product ? 'bg-[rgba(212,106,58,0.06)]' : 'hover:bg-[#FAFAF8]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 justify-between">
+                        <div className="flex-1 text-left min-w-0">
+                          <p className="text-[14px] text-[#1A1917] truncate">
+                            {product.name}
+                          </p>
+                          {product.brand && (
+                            <p className="text-[12px] text-[#ACACAC] truncate">
+                              {product.brand}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 text-[11px] text-[#C0C0C0]">
+                        <span>{Math.round(product.per100g.calories)} kcal</span>
+                        <span>·</span>
+                        <span>P {product.per100g.protein}g</span>
+                        <span>·</span>
+                        <span>K {product.per100g.carbs}g</span>
+                        <span>·</span>
+                        <span>V {product.per100g.fat}g</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          /* Custom product form */
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+            <p className="text-[13px] text-[#ACACAC]">
+              Voeg een product toe aan de database. Vul de voedingswaarden per 100g in.
+            </p>
+
+            <div>
+              <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.12em] block mb-1.5">Naam *</label>
+              <input
+                type="text"
+                value={customForm.name}
+                onChange={(e) => setCustomForm(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="bijv. Griekse yoghurt 0%"
+                className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[14px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.12em] block mb-1.5">Merk</label>
+                <input
+                  type="text"
+                  value={customForm.brand}
+                  onChange={(e) => setCustomForm(prev => ({ ...prev, brand: e.target.value }))}
+                  placeholder="optioneel"
+                  className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[14px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.12em] block mb-1.5">Barcode</label>
+                <input
+                  type="text"
+                  value={customForm.barcode}
+                  onChange={(e) => setCustomForm(prev => ({ ...prev, barcode: e.target.value }))}
+                  placeholder="optioneel"
+                  className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[14px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
+                />
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-[#F0F0EE]">
+              <p className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.12em] mb-3">Per 100g</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[12px] text-[#ACACAC] block mb-1">Calorieën (kcal) *</label>
+                  <input
+                    type="number"
+                    value={customForm.calories}
+                    onChange={(e) => setCustomForm(prev => ({ ...prev, calories: e.target.value }))}
+                    placeholder="0"
+                    className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[14px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[12px] text-[#ACACAC] block mb-1">Eiwit (g)</label>
+                  <input
+                    type="number"
+                    value={customForm.protein}
+                    onChange={(e) => setCustomForm(prev => ({ ...prev, protein: e.target.value }))}
+                    placeholder="0"
+                    className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[14px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[12px] text-[#ACACAC] block mb-1">Koolhydraten (g)</label>
+                  <input
+                    type="number"
+                    value={customForm.carbs}
+                    onChange={(e) => setCustomForm(prev => ({ ...prev, carbs: e.target.value }))}
+                    placeholder="0"
+                    className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[14px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[12px] text-[#ACACAC] block mb-1">Vet (g)</label>
+                  <input
+                    type="number"
+                    value={customForm.fat}
+                    onChange={(e) => setCustomForm(prev => ({ ...prev, fat: e.target.value }))}
+                    placeholder="0"
+                    className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[14px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={handleSaveCustomProduct}
+              disabled={savingCustom || !customForm.name || !customForm.calories}
+              className="w-full py-3 bg-[#1A1917] text-white font-semibold text-[13px] uppercase tracking-[0.08em] hover:bg-[#333330] transition-colors disabled:opacity-50 rounded-xl mt-2"
+            >
+              {savingCustom ? 'Opslaan...' : 'Product opslaan & selecteren'}
+            </button>
+          </div>
+        )}
 
         {/* Selection and gram input */}
-        {selectedProduct && (
+        {selectedProduct && modalTab === 'search' && (
           <div className="border-t border-[#F0F0EE] px-4 py-4 space-y-3">
             <div className="flex items-center gap-3">
               <div className="flex-1">
@@ -376,12 +599,12 @@ function FoodSearchModal({
                   value={grams}
                   onChange={(e) => setGrams(Math.max(1, parseInt(e.target.value) || 0))}
                   className="w-full px-3 py-2 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] bg-white focus:outline-none focus:border-[#1A1917]"
-                      />
+                />
               </div>
               <button
                 onClick={handleConfirm}
                 className="px-6 py-2.5 bg-[#1A1917] text-white rounded-xl text-[13px] font-medium"
-                  >
+              >
                 Bevestigen
               </button>
             </div>

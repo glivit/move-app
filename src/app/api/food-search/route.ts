@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 
-// Food search: local Supabase first, then Open Food Facts fallback
-// Local products have source: 'local', OFF products have source: 'openfoodfacts'
+// Food search: local Supabase only (750+ products)
+// No external API dependency — fast, reliable, offline-capable
 
 const CACHE = new Map<string, { data: any; timestamp: number }>()
 const CACHE_TTL = 1000 * 60 * 30 // 30 minutes
@@ -12,21 +12,28 @@ export async function GET(request: NextRequest) {
   const query = searchParams.get('q')?.trim()
   const barcode = searchParams.get('barcode')?.trim()
   const popular = searchParams.get('popular') === 'true'
+  const category = searchParams.get('category')?.trim()
 
   if (!query && !barcode && !popular) {
     return NextResponse.json({ products: [] })
   }
 
-  // Popular products: return only local popular items
+  // Popular products
   if (popular && !query && !barcode) {
     try {
       const supabase = await createServerSupabaseClient()
-      const { data } = await supabase
+      let q = supabase
         .from('food_products')
         .select('*')
         .eq('is_popular', true)
         .order('name')
-        .limit(30)
+        .limit(40)
+
+      if (category) {
+        q = q.eq('category', category)
+      }
+
+      const { data } = await q
       return NextResponse.json({ products: (data || []).map(mapLocalProduct), count: data?.length || 0 })
     } catch (err) {
       console.error('Popular products error:', err)
@@ -34,37 +41,19 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const cacheKey = barcode || query || ''
+  const cacheKey = `${barcode || ''}:${query || ''}:${category || ''}`
   const cached = CACHE.get(cacheKey)
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
     return NextResponse.json(cached.data)
   }
 
   try {
-    let allProducts: any[] = []
-
-    // 1. Search local food_products table first
-    try {
-      const supabase = await createServerSupabaseClient()
-      const localProducts = await searchLocalProducts(supabase, query, barcode)
-      allProducts = localProducts
-    } catch (localError) {
-      console.warn('Local search failed, will try Open Food Facts:', localError)
-    }
-
-    // 2. Search Open Food Facts as fallback
-    const offProducts = await searchOpenFoodFacts(query, barcode)
-
-    // 3. Merge results: local first, then OFF (deduplicated by name)
-    const localNames = new Set(allProducts.map(p => (p.name || '').toLowerCase()))
-    const mergedProducts = [
-      ...allProducts,
-      ...offProducts.filter(p => !localNames.has((p.name || '').toLowerCase()))
-    ]
+    const supabase = await createServerSupabaseClient()
+    const products = await searchLocalProducts(supabase, query, barcode, category)
 
     const result = {
-      products: mergedProducts,
-      count: mergedProducts.length,
+      products,
+      count: products.length,
     }
 
     CACHE.set(cacheKey, { data: result, timestamp: Date.now() })
@@ -75,99 +64,135 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function searchLocalProducts(supabase: any, query?: string | null, barcode?: string | null) {
-  const products: any[] = []
-
+async function searchLocalProducts(
+  supabase: any,
+  query?: string | null,
+  barcode?: string | null,
+  category?: string | null
+) {
+  // Barcode lookup — exact match
   if (barcode) {
-    // Exact match on barcode
     const { data, error } = await supabase
       .from('food_products')
       .select('*')
       .eq('barcode', barcode)
 
     if (error) {
-      console.error('Local barcode search error:', error)
+      console.error('Barcode search error:', error)
       return []
     }
 
-    if (data && data.length > 0) {
-      return data.map(mapLocalProduct)
-    }
+    return (data || []).map(mapLocalProduct)
   }
 
+  // Text search
   if (query) {
-    // Text search using ilike on name column
-    const { data, error } = await supabase
+    // Split query into words for better matching
+    const words = query.toLowerCase().split(/\s+/).filter(w => w.length >= 2)
+
+    let q = supabase
       .from('food_products')
       .select('*')
-      .or(`name.ilike.%${query}%,name_nl.ilike.%${query}%`)
-      .limit(20)
+
+    if (category) {
+      q = q.eq('category', category)
+    }
+
+    // Search across name, name_nl, and brand
+    if (words.length === 1) {
+      q = q.or(`name.ilike.%${words[0]}%,name_nl.ilike.%${words[0]}%,brand.ilike.%${words[0]}%`)
+    } else {
+      // Multi-word: all words must match somewhere in name or name_nl
+      const conditions = words.map(w =>
+        `name.ilike.%${w}%,name_nl.ilike.%${w}%,brand.ilike.%${w}%`
+      ).join(',')
+      q = q.or(conditions)
+    }
+
+    // Order: popular first, then by name
+    q = q.order('is_popular', { ascending: false })
+      .order('name')
+      .limit(30)
+
+    const { data, error } = await q
 
     if (error) {
-      console.error('Local text search error:', error)
+      console.error('Text search error:', error)
       return []
     }
 
-    if (data && data.length > 0) {
-      return data.map(mapLocalProduct)
+    // For multi-word queries, filter client-side for better relevance
+    let results = (data || []).map(mapLocalProduct)
+
+    if (words.length > 1) {
+      results = results.filter((p: any) => {
+        const searchable = `${p.name} ${p.brand || ''}`.toLowerCase()
+        return words.every(w => searchable.includes(w))
+      })
     }
+
+    return results
   }
 
   return []
 }
 
-async function searchOpenFoodFacts(query?: string | null, barcode?: string | null) {
+// POST: Add custom product (client-created)
+export async function POST(request: NextRequest) {
   try {
-    let url: string
-    if (barcode) {
-      // Lookup by barcode
-      url = `https://world.openfoodfacts.org/api/v2/product/${barcode}?fields=product_name,brands,image_front_small_url,image_front_url,nutriments,serving_size,quantity,categories_tags_nl`
-    } else if (query) {
-      // Search by name — prefer Belgian/Dutch products
-      url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=20&fields=code,product_name,brands,image_front_small_url,image_front_url,nutriments,serving_size,quantity,categories_tags_nl,nutriscore_grade`
-    } else {
-      return []
+    const supabase = await createServerSupabaseClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 })
     }
 
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'MOVE-CoachingApp/1.0 (glenndelille@gmail.com)',
-      },
-    })
+    const body = await request.json()
+    const { name, brand, barcode: productBarcode, category, serving_size_g, serving_label, per100g } = body
 
-    if (!response.ok) {
-      console.warn(`Open Food Facts API returned ${response.status}`)
-      return []
+    if (!name || !per100g?.calories) {
+      return NextResponse.json({ error: 'Naam en calorieën zijn verplicht' }, { status: 400 })
     }
 
-    const data = await response.json()
-    const products: any[] = []
+    const { data, error } = await supabase
+      .from('food_products')
+      .insert({
+        name,
+        name_nl: name,
+        brand: brand || null,
+        brand_category: 'supermarket',
+        source: 'manual',
+        barcode: productBarcode || null,
+        category: category || 'snack',
+        serving_size_g: serving_size_g || 100,
+        serving_label: serving_label || '100g',
+        calories_per_100g: per100g.calories,
+        protein_per_100g: per100g.protein || 0,
+        carbs_per_100g: per100g.carbs || 0,
+        fat_per_100g: per100g.fat || 0,
+        fiber_per_100g: per100g.fiber || 0,
+        sugar_per_100g: per100g.sugar || 0,
+        is_verified: false,
+        is_popular: false,
+      })
+      .select()
+      .single()
 
-    if (barcode) {
-      // Single product response
-      const p = data.product
-      if (p && p.product_name) {
-        products.push(mapOpenFoodFactsProduct(p))
-      }
-    } else {
-      // Search results
-      const offProducts = (data.products || [])
-        .filter((p: any) => p.product_name && p.nutriments)
-        .map(mapOpenFoodFactsProduct)
-
-      products.push(...offProducts)
+    if (error) {
+      console.error('Insert product error:', error)
+      return NextResponse.json({ error: 'Product opslaan mislukt' }, { status: 500 })
     }
 
-    return products
+    return NextResponse.json({ product: mapLocalProduct(data) })
   } catch (error) {
-    console.warn('Open Food Facts search error:', error)
-    return []
+    console.error('POST food error:', error)
+    return NextResponse.json({ error: 'Server fout' }, { status: 500 })
   }
 }
 
 function mapLocalProduct(p: any) {
   return {
-    source: 'local',
+    source: 'local' as const,
     barcode: p.barcode || null,
     name: p.name || 'Onbekend',
     brand: p.brand || null,
@@ -185,31 +210,6 @@ function mapLocalProduct(p: any) {
       fiber: p.fiber_per_100g || 0,
       sugar: p.sugar_per_100g || 0,
       salt: p.salt_per_100g || 0,
-    },
-  }
-}
-
-function mapOpenFoodFactsProduct(p: any) {
-  const n = p.nutriments || {}
-  return {
-    source: 'openfoodfacts',
-    barcode: p.code || null,
-    name: p.product_name || 'Onbekend',
-    brand: p.brands || null,
-    image_small: p.image_front_small_url || null,
-    image: p.image_front_url || null,
-    serving_size: p.serving_size || null,
-    serving_label: null,
-    quantity: p.quantity || null,
-    nutriscore: p.nutriscore_grade || null,
-    per100g: {
-      calories: Math.round(n['energy-kcal_100g'] || n['energy-kcal'] || 0),
-      protein: Math.round((n.proteins_100g || 0) * 10) / 10,
-      carbs: Math.round((n.carbohydrates_100g || 0) * 10) / 10,
-      fat: Math.round((n.fat_100g || 0) * 10) / 10,
-      fiber: Math.round((n.fiber_100g || 0) * 10) / 10,
-      sugar: Math.round((n.sugars_100g || 0) * 10) / 10,
-      salt: Math.round((n.salt_100g || 0) * 100) / 100,
     },
   }
 }
