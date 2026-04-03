@@ -83,11 +83,7 @@ export async function POST(request: NextRequest) {
         carbs_g: template.carbs_g,
         fat_g: template.fat_g,
         meals: template.meals,
-        plan_data: {
-          template_id: template.id,
-          description: template.description,
-          tags: template.tags,
-        },
+        guidelines: template.description,
       })
       .select()
       .single()
