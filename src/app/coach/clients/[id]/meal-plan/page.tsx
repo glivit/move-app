@@ -4,9 +4,21 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { MealPlanForm } from '@/components/coach/MealPlanForm'
-import { ArrowLeft, Plus, Archive, Check, Download } from 'lucide-react'
+import { ArrowLeft, Plus, Archive, Check, Download, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+
+interface TemplateSummary {
+  id: string
+  title: string
+  description: string
+  calories_target: number
+  protein_g: number
+  carbs_g: number
+  fat_g: number
+  tags: string[]
+  mealsCount: number
+}
 
 interface MealPlan {
   id: string
@@ -41,6 +53,9 @@ export default function MealPlanPage() {
   const [mealPlans, setMealPlans] = useState<MealPlan[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [showTemplates, setShowTemplates] = useState(false)
+  const [templates, setTemplates] = useState<TemplateSummary[]>([])
+  const [assigningTemplate, setAssigningTemplate] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [deactivatingId, setDeactivatingId] = useState<string | null>(null)
   const [activatingId, setActivatingId] = useState<string | null>(null)
@@ -117,6 +132,44 @@ export default function MealPlanPage() {
     setShowForm(false)
   }
 
+  async function loadTemplates() {
+    try {
+      const res = await fetch('/api/template-diets')
+      if (res.ok) {
+        const data = await res.json()
+        setTemplates(data)
+      }
+    } catch {
+      // silent
+    }
+  }
+
+  async function handleAssignTemplate(templateId: string) {
+    try {
+      setAssigningTemplate(templateId)
+      const res = await fetch('/api/template-diets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ templateId, clientId: params.id }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Fout bij toewijzen')
+      }
+      setShowTemplates(false)
+      await loadData()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Fout bij toewijzen van template')
+    } finally {
+      setAssigningTemplate(null)
+    }
+  }
+
+  function openTemplates() {
+    setShowTemplates(true)
+    if (templates.length === 0) loadTemplates()
+  }
+
   const clientName = profile?.full_name || 'Client'
   const activePlan = mealPlans.find((p) => p.is_active)
   const archivedPlans = mealPlans.filter((p) => !p.is_active)
@@ -163,14 +216,23 @@ export default function MealPlanPage() {
               Beheer en volg het voedingsplan van je client
             </p>
           </div>
-          {!showForm && mealPlans.length > 0 && (
-            <button
-              onClick={() => setShowForm(true)}
-              className="px-6 py-3 rounded-2xl font-semibold text-white transition-all hover:opacity-90 flex items-center gap-2 whitespace-nowrap bg-accent-dark"
-            >
-              <Plus strokeWidth={1.5} size={20} />
-              Nieuw plan
-            </button>
+          {!showForm && !showTemplates && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={openTemplates}
+                className="px-5 py-3 rounded-2xl font-semibold transition-all flex items-center gap-2 whitespace-nowrap bg-[#F5F2EC] text-[#1A1917] border border-[#E5E1D9] hover:bg-[#EBE8E0]"
+              >
+                <Zap strokeWidth={1.5} size={18} />
+                Template
+              </button>
+              <button
+                onClick={() => setShowForm(true)}
+                className="px-5 py-3 rounded-2xl font-semibold text-white transition-all hover:opacity-90 flex items-center gap-2 whitespace-nowrap bg-accent-dark"
+              >
+                <Plus strokeWidth={1.5} size={20} />
+                Nieuw plan
+              </button>
+            </div>
           )}
         </div>
 
@@ -180,6 +242,76 @@ export default function MealPlanPage() {
             <p className="text-[13px] text-red-600">
               {error}
             </p>
+          </Card>
+        )}
+
+        {/* Template Selection */}
+        {showTemplates && (
+          <Card className="rounded-2xl p-8 mb-10 bg-white shadow-clean border border-client-border">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-text-primary">
+                Kies een template
+              </h2>
+              <button
+                onClick={() => setShowTemplates(false)}
+                className="text-[13px] text-client-text-secondary hover:text-text-primary transition-colors"
+              >
+                Annuleer
+              </button>
+            </div>
+            <p className="text-[13px] text-client-text-secondary mb-6">
+              Alle templates zijn high-protein en direct klaar voor gebruik. Je cliënt ziet meteen het plan op het dashboard.
+            </p>
+            {templates.length === 0 ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-accent-dark border-t-transparent" />
+              </div>
+            ) : (
+              <div className="grid gap-3">
+                {templates.map((tpl) => (
+                  <button
+                    key={tpl.id}
+                    onClick={() => handleAssignTemplate(tpl.id)}
+                    disabled={assigningTemplate !== null}
+                    className="text-left p-5 rounded-xl border border-client-border hover:border-[#D46A3A]/40 hover:bg-[#FFF8F5] transition-all disabled:opacity-50 group"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-[15px] text-text-primary group-hover:text-[#D46A3A] transition-colors">
+                          {tpl.title}
+                        </p>
+                        <p className="text-[12px] text-client-text-secondary mt-1">
+                          {tpl.description}
+                        </p>
+                        <div className="flex items-center gap-4 mt-3 text-[12px] text-client-text-secondary">
+                          <span className="font-medium text-text-primary">{tpl.calories_target} kcal</span>
+                          <span>P {tpl.protein_g}g</span>
+                          <span>K {tpl.carbs_g}g</span>
+                          <span>V {tpl.fat_g}g</span>
+                          <span>{tpl.mealsCount} maaltijden</span>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          {tpl.tags.map((tag) => (
+                            <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full bg-[#F5F2EC] text-[#6B6862]">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="shrink-0 mt-1">
+                        {assigningTemplate === tpl.id ? (
+                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-accent-dark border-t-transparent" />
+                        ) : (
+                          <span className="text-[12px] font-semibold text-[#D46A3A] opacity-0 group-hover:opacity-100 transition-opacity">
+                            Toewijzen →
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </Card>
         )}
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { createClient } from '@/lib/supabase'
@@ -280,6 +280,67 @@ function SectionLabel({ text }: { text: string }) {
   return <p className="text-sm font-medium text-[#1A1917] mb-2">{text}</p>
 }
 
+/* ─── Completion screen — mat black → fade to dashboard ──── */
+
+function CompletionScreen() {
+  const router = useRouter()
+  const [phase, setPhase] = useState<'black' | 'greeting' | 'fading'>('black')
+
+  useEffect(() => {
+    // Phase 1: mat black for 400ms
+    const t1 = setTimeout(() => setPhase('greeting'), 400)
+    // Phase 2: show greeting for 2s
+    const t2 = setTimeout(() => setPhase('fading'), 2400)
+    // Phase 3: navigate after fade
+    const t3 = setTimeout(() => {
+      router.push('/client')
+      router.refresh()
+    }, 3200)
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
+  }, [router])
+
+  const greeting = (() => {
+    const h = new Date().getHours()
+    if (h < 6) return 'Goedenacht'
+    if (h < 12) return 'Goedemorgen'
+    if (h < 18) return 'Goedemiddag'
+    return 'Goedenavond'
+  })()
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#1A1917]"
+      style={{
+        opacity: phase === 'fading' ? 0 : 1,
+        transition: 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+      }}
+    >
+      <p
+        className="text-[15px] text-white/40 tracking-[0.3px]"
+        style={{
+          fontFamily: 'var(--font-body)',
+          opacity: phase === 'greeting' ? 1 : 0,
+          transform: phase === 'greeting' ? 'translateY(0)' : 'translateY(8px)',
+          transition: 'all 0.6s 0.1s cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+      >
+        {greeting}
+      </p>
+      <h1
+        className="text-[42px] font-bold text-white tracking-tight mt-2"
+        style={{
+          fontFamily: 'var(--font-display)',
+          opacity: phase === 'greeting' ? 1 : 0,
+          transform: phase === 'greeting' ? 'translateY(0)' : 'translateY(12px)',
+          transition: 'all 0.6s 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+      >
+        Let&apos;s MŌVE
+      </h1>
+    </div>
+  )
+}
+
 /* ═══════════════════════════════════════════════════════════
    Main component
    ═══════════════════════════════════════════════════════════ */
@@ -538,7 +599,7 @@ export default function OnboardingPage() {
                 </p>
               </div>
               <div className="space-y-2.5 pt-4">
-                {['Gepersonaliseerd trainingsplan', 'Voedingsadvies op maat', 'AI voedingsplan bij start'].map((t) => (
+                {['Gepersonaliseerd trainingsplan', 'Voedingsadvies op maat', 'Voedingsplan bij start'].map((t) => (
                   <div key={t} className="flex items-center gap-3">
                     <Check className="w-4.5 h-4.5 text-[#3D8B5C] flex-shrink-0" strokeWidth={2} />
                     <span className="text-sm text-[#6B6862]">{t}</span>
@@ -830,44 +891,6 @@ export default function OnboardingPage() {
                   value={data.current_snacks}
                   onChange={(v) => update('current_snacks', v)}
                 />
-
-                <div>
-                  <SectionLabel text="Waarom snack je?" />
-                  <ChipMulti
-                    options={['Honger', 'Verveling', 'Gewoonte', 'Stress']}
-                    selected={data.snack_reason}
-                    onChange={(v) => update('snack_reason', v)}
-                  />
-                </div>
-
-                <div>
-                  <SectionLabel text="Zoet of hartig?" />
-                  <ChipSingle
-                    options={['Zoet', 'Hartig', 'Beide']}
-                    value={data.snack_preference}
-                    onChange={(v) => update('snack_preference', v)}
-                  />
-                </div>
-
-                <div>
-                  <SectionLabel text="Avondsnacker?" />
-                  <ChipSingle
-                    options={['Ja', 'Soms', 'Nee']}
-                    value={data.evening_snacker}
-                    onChange={(v) => update('evening_snacker', v)}
-                  />
-                </div>
-
-                <SliderField
-                  label="Avontuurlijk met eten"
-                  value={data.food_adventurousness}
-                  min={1}
-                  max={10}
-                  step={1}
-                  leftLabel="Vaste prik"
-                  rightLabel="Alles proberen"
-                  onChange={(v) => update('food_adventurousness', v)}
-                />
               </div>
             </div>
           )}
@@ -1049,36 +1072,8 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* ═══ STEP 8: Complete ═══ */}
-          {step === TOTAL - 1 && (
-            <div className="space-y-8 pt-8 text-center">
-              <div className="h-20 w-20 bg-gradient-to-br from-[#3D8B5C]/20 to-[#3D8B5C]/10 rounded-3xl flex items-center justify-center mx-auto">
-                <Trophy className="w-10 h-10 text-[#3D8B5C]" strokeWidth={1.5} />
-              </div>
-              <div>
-                <h1 className="text-4xl font-[family-name:var(--font-display)] font-semibold text-[#1A1917]">Klaar!</h1>
-                <p className="text-[#6B6862] mt-3 leading-relaxed">
-                  Je profiel is compleet en je voedingsplan staat klaar. Je coach zal binnenkort contact met je opnemen.
-                </p>
-              </div>
-              <div className="bg-white rounded-2xl p-4 border border-[#E5E1D9] text-left space-y-2">
-                <p className="text-sm font-medium text-[#1A1917]">Volgende stappen:</p>
-                <ul className="space-y-1.5 text-sm text-[#6B6862]">
-                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#3D8B5C]" strokeWidth={2} /> Voedingsplan bekijken op je dashboard</li>
-                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#3D8B5C]" strokeWidth={2} /> Je coach stuurt je eerste trainingsplan</li>
-                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#3D8B5C]" strokeWidth={2} /> Start met je eerste workout</li>
-                </ul>
-              </div>
-              <Button
-                onClick={() => { router.push('/client'); router.refresh() }}
-                fullWidth
-                size="lg"
-                className="bg-[#1A1917] text-white hover:bg-[#333]"
-              >
-                Naar je dashboard
-              </Button>
-            </div>
-          )}
+          {/* ═══ STEP 8: Complete — mat black greeting → fade to dashboard ═══ */}
+          {step === TOTAL - 1 && <CompletionScreen />}
         </div>
       </div>
 
