@@ -1,25 +1,72 @@
-export default function CoachLoading() {
+export default function CoachDashboardLoading() {
   return (
-    <div className="space-y-8 animate-pulse">
+    <div className="space-y-10">
+      {/* Greeting */}
+      <div className="pt-2 animate-pulse">
+        <div className="h-10 w-72 bg-[#E5E1D9] rounded-xl" />
+        <div className="h-4 w-48 bg-[#E5E1D9] rounded mt-3" />
+      </div>
+
+      {/* KPI Cards — 5 columns matching real layout */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div
+            key={i}
+            className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] animate-pulse"
+            style={{ animationDelay: `${i * 80}ms` }}
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <div className="h-2.5 w-14 bg-[#E5E1D9] rounded mb-3" />
+                <div className="h-7 w-10 bg-[#E5E1D9] rounded" />
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-[#E5E1D9]" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Action Required section */}
       <div>
-        <div className="h-10 w-64 bg-[#E5E1D9] rounded-lg" />
-        <div className="h-4 w-40 bg-[#E5E1D9] rounded-md mt-3" />
+        <div className="h-6 w-36 bg-[#E5E1D9] rounded mb-6 animate-pulse" />
+        <div className="space-y-5">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden animate-pulse" style={{ animationDelay: `${(i + 5) * 80}ms` }}>
+              <div className="px-6 py-4 border-b border-[#E8E4DC] flex items-center gap-2.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-[#E5E1D9]" />
+                <div className="h-3.5 w-20 bg-[#E5E1D9] rounded" />
+                <div className="h-3 w-24 bg-[#E5E1D9] rounded ml-auto" />
+              </div>
+              {Array.from({ length: 3 }).map((_, j) => (
+                <div key={j} className={`flex items-center justify-between px-6 py-4 ${j < 2 ? 'border-b border-[#E8E4DC]' : ''}`}>
+                  <div className="flex items-center gap-3">
+                    <div className="h-4 w-32 bg-[#E5E1D9] rounded" />
+                    <div className="h-5 w-16 bg-[#E5E1D9] rounded-full" />
+                  </div>
+                  <div className="h-3 w-16 bg-[#E5E1D9] rounded" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {[1, 2, 3, 4].map(i => (
-          <div key={i} className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-            <div className="h-3 w-20 bg-[#E5E1D9] rounded mb-3" />
-            <div className="h-9 w-16 bg-[#E5E1D9] rounded" />
-          </div>
-        ))}
-      </div>
-      <div className="space-y-4">
-        {[1, 2, 3].map(i => (
-          <div key={i} className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-            <div className="h-4 w-32 bg-[#E5E1D9] rounded mb-3" />
-            <div className="h-3 w-48 bg-[#E5E1D9] rounded" />
-          </div>
-        ))}
+
+      {/* Quick Actions */}
+      <div>
+        <div className="h-6 w-32 bg-[#E5E1D9] rounded mb-6 animate-pulse" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] animate-pulse" style={{ animationDelay: `${(i + 7) * 80}ms` }}>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-[#E5E1D9]" />
+                <div>
+                  <div className="h-4 w-28 bg-[#E5E1D9] rounded mb-1.5" />
+                  <div className="h-3 w-40 bg-[#E5E1D9] rounded" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )

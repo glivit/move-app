@@ -295,11 +295,40 @@ export default function NutritionOverviewPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: '#FAFAFA' }}>
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <div className="flex items-center justify-center h-96">
-            <div className="animate-spin rounded-full h-12 w-12 border-2 border-[#1A1917] border-t-transparent" />
-          </div>
+      <div className="min-h-screen bg-client-bg">
+        {/* Header */}
+        <div className="mb-8 animate-pulse">
+          <div className="h-9 w-32 bg-[#E5E1D9] rounded-xl mb-2" />
+          <div className="h-4 w-56 bg-[#E5E1D9] rounded" />
+        </div>
+        {/* Action bar */}
+        <div className="flex items-center justify-between mb-6 animate-pulse">
+          <div className="h-10 w-64 bg-white rounded-xl border border-client-border" />
+          <div className="h-10 w-36 bg-[#E5E1D9] rounded-xl" />
+        </div>
+        {/* Client cards */}
+        <div className="space-y-4">
+          {[1, 2, 3, 4, 5].map(i => (
+            <div key={i} className="bg-white rounded-2xl p-5 border border-client-border shadow-clean animate-pulse">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#E5E1D9]" />
+                  <div>
+                    <div className="h-4 w-32 bg-[#E5E1D9] rounded mb-1" />
+                    <div className="h-3 w-20 bg-[#E5E1D9] rounded" />
+                  </div>
+                </div>
+                <div className="flex gap-6">
+                  {[1, 2, 3].map(j => (
+                    <div key={j} className="text-center">
+                      <div className="h-5 w-10 bg-[#E5E1D9] rounded mx-auto mb-1" />
+                      <div className="h-2.5 w-8 bg-[#E5E1D9] rounded mx-auto" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     )

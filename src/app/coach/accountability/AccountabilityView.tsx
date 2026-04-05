@@ -52,6 +52,9 @@ export default function AccountabilityView({ initialClients }: AccountabilityVie
       <div className="min-h-screen bg-client-bg">
         <div className="mb-8">
           <h1 className="font-display text-[32px] font-semibold text-text-primary">Accountability</h1>
+          <p className="mt-2 text-[15px] text-client-text-secondary">
+            Overzicht van klant accountability afgelopen {period} dagen
+          </p>
         </div>
         <div className="flex gap-2 mb-6">
           {[7, 14, 30].map(d => (
@@ -68,9 +71,31 @@ export default function AccountabilityView({ initialClients }: AccountabilityVie
             </button>
           ))}
         </div>
-        <div className="space-y-3">
+        {/* Summary stats skeleton */}
+        <div className="grid grid-cols-3 gap-3 mb-6 animate-pulse">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-24 bg-white rounded-2xl animate-pulse" />
+            <div key={i} className="bg-white rounded-2xl p-4 border border-client-border text-center">
+              <div className="h-7 w-10 bg-[#E5E1D9] rounded mx-auto mb-2" />
+              <div className="h-3 w-24 bg-[#E5E1D9] rounded mx-auto" />
+            </div>
+          ))}
+        </div>
+        {/* Client list skeleton */}
+        <div className="space-y-3">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="bg-white rounded-2xl p-5 border border-client-border animate-pulse">
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-[#E5E1D9] shrink-0" />
+                <div className="flex-1">
+                  <div className="h-4 w-32 bg-[#E5E1D9] rounded mb-2" />
+                  <div className="flex gap-3">
+                    <div className="h-3 w-16 bg-[#E5E1D9] rounded" />
+                    <div className="h-3 w-28 bg-[#E5E1D9] rounded" />
+                    <div className="h-3 w-24 bg-[#E5E1D9] rounded" />
+                  </div>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       </div>

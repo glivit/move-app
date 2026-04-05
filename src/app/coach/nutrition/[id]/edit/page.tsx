@@ -239,8 +239,33 @@ export default function EditNutritionPlanPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-[#8E8E93]" />
+      <div className="min-h-screen bg-[#FAFAFA]">
+        <div className="border-b border-[#E8E4DC]">
+          <div className="max-w-3xl mx-auto px-6 py-12 animate-pulse">
+            <div className="h-4 w-32 bg-[#E5E1D9] rounded mb-6" />
+            <div className="h-9 w-56 bg-[#E5E1D9] rounded-xl mb-2" />
+            <div className="h-4 w-44 bg-[#E5E1D9] rounded" />
+          </div>
+        </div>
+        <div className="max-w-3xl mx-auto px-6 py-8 space-y-6 animate-pulse">
+          <div className="bg-white rounded-2xl p-6 border border-[#E8E4DC]">
+            <div className="h-5 w-32 bg-[#E5E1D9] rounded mb-5" />
+            <div className="h-11 w-full bg-[#E5E1D9]/30 rounded-xl mb-4" />
+            <div className="grid grid-cols-4 gap-3">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="h-16 bg-[#E5E1D9]/30 rounded-xl" />
+              ))}
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl p-6 border border-[#E8E4DC]">
+            <div className="h-5 w-24 bg-[#E5E1D9] rounded mb-5" />
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-14 bg-[#E5E1D9]/30 rounded-xl" />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
