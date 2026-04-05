@@ -69,12 +69,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: linkError.message }, { status: 400 })
   }
 
-  // Extract token_hash from Supabase's action_link and build our OWN direct link.
-  // This completely bypasses Supabase's redirect (which uses implicit flow / hash
-  // fragments that get lost). Instead, user goes directly to our set-password page
-  // which calls verifyOtp() client-side.
-  const actionUrl = new URL(linkData.properties.action_link)
-  const tokenHash = actionUrl.searchParams.get('token')
+  // Use hashed_token directly from properties (most reliable).
+  // Fallback to parsing the URL if needed.
+  let tokenHash: string | null = linkData.properties?.hashed_token || null
+  if (!tokenHash) {
+    const actionUrl = new URL(linkData.properties.action_link)
+    tokenHash = actionUrl.searchParams.get('token') || actionUrl.searchParams.get('token_hash') || null
+  }
   const inviteLink = `${appUrl}/auth/set-password?token_hash=${tokenHash}&type=invite`
 
   // Update the auto-created profile with additional data

@@ -48,30 +48,38 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Client niet gevonden' }, { status: 404 })
   }
 
-  // Generate a new invite link
+  // Use magiclink for resends (invite type can fail for existing users).
+  // magiclink always generates a fresh token that works for existing accounts.
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
-    type: 'invite',
+    type: 'magiclink',
     email: clientProfile.email,
-    options: {
-      data: {
-        full_name: clientProfile.full_name,
-        role: 'client',
-      },
-    },
   })
 
   if (linkError) {
     console.error('Resend invite link error:', linkError)
     return NextResponse.json(
-      { error: 'Kon geen nieuwe uitnodiging genereren. Probeer later opnieuw.' },
+      { error: `Kon geen nieuwe uitnodiging genereren: ${linkError.message}` },
       { status: 500 }
     )
   }
 
-  // Build direct link — bypass Supabase redirect, use verifyOtp on our page
-  const actionUrl = new URL(linkData.properties.action_link)
-  const tokenHash = actionUrl.searchParams.get('token')
-  const inviteLink = `${appUrl}/auth/set-password?token_hash=${tokenHash}&type=invite`
+  // Use hashed_token directly from properties (most reliable).
+  // Fallback to parsing the action_link URL if hashed_token is missing.
+  let tokenHash: string | null = linkData.properties?.hashed_token || null
+  if (!tokenHash) {
+    const actionUrl = new URL(linkData.properties.action_link)
+    tokenHash = actionUrl.searchParams.get('token') || actionUrl.searchParams.get('token_hash') || null
+  }
+
+  if (!tokenHash) {
+    console.error('No token found in link data:', JSON.stringify(linkData.properties))
+    return NextResponse.json(
+      { error: 'Kon geen geldige token genereren. Probeer later opnieuw.' },
+      { status: 500 }
+    )
+  }
+
+  const inviteLink = `${appUrl}/auth/set-password?token_hash=${tokenHash}&type=magiclink`
 
   try {
     await sendInviteEmail({

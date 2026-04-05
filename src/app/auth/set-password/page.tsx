@@ -116,9 +116,11 @@ function SetPasswordContent() {
 
     async function verifyAndInit() {
       if (tokenHash) {
+        // Support invite, magiclink, and email types (resend uses magiclink)
+        const otpType = (type as 'invite' | 'magiclink' | 'email') || 'invite'
         const { error: otpError } = await supabase.auth.verifyOtp({
           token_hash: tokenHash,
-          type: (type as 'invite' | 'email') || 'invite',
+          type: otpType,
         })
 
         if (otpError) {
