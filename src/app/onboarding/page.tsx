@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { createClient } from '@/lib/supabase'
@@ -10,9 +10,8 @@ import {
   ChevronLeft,
   Check,
   Zap,
-  Trophy,
-  Loader2,
-  Sparkles,
+  Camera,
+  Lock,
 } from 'lucide-react'
 
 /* ─── Types ─────────────────────────────────────────────── */
@@ -24,7 +23,7 @@ interface OnboardingData {
   height_cm: string
   weight_kg: string
   // Stap 2: Doel
-  goal_type: string
+  goal_type: string[]
   goal_weight_kg: string
   goal_description: string
   goal_pace: string
@@ -43,7 +42,7 @@ interface OnboardingData {
   favorite_meals: string[]
   hated_foods: string[]
   allergies: string[]
-  cooking_style: string
+  cooking_style: string[]
   current_snacks: string[]
   snack_reason: string[]
   snack_preference: string
@@ -73,8 +72,6 @@ const STEPS = [
   { id: 'nutrition', title: 'Je voeding' },
   { id: 'training', title: 'Training & gezondheid' },
   { id: 'photos', title: "Foto's & metingen" },
-  { id: 'generating', title: 'Even geduld...' },
-  { id: 'complete', title: 'Klaar!' },
 ]
 
 const TOTAL = STEPS.length
@@ -280,67 +277,6 @@ function SectionLabel({ text }: { text: string }) {
   return <p className="text-sm font-medium text-[#1A1917] mb-2">{text}</p>
 }
 
-/* ─── Completion screen — mat black → fade to dashboard ──── */
-
-function CompletionScreen() {
-  const router = useRouter()
-  const [phase, setPhase] = useState<'black' | 'greeting' | 'fading'>('black')
-
-  useEffect(() => {
-    // Phase 1: mat black for 400ms
-    const t1 = setTimeout(() => setPhase('greeting'), 400)
-    // Phase 2: show greeting for 2s
-    const t2 = setTimeout(() => setPhase('fading'), 2400)
-    // Phase 3: navigate after fade
-    const t3 = setTimeout(() => {
-      router.push('/client')
-      router.refresh()
-    }, 3200)
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
-  }, [router])
-
-  const greeting = (() => {
-    const h = new Date().getHours()
-    if (h < 6) return 'Goedenacht'
-    if (h < 12) return 'Goedemorgen'
-    if (h < 18) return 'Goedemiddag'
-    return 'Goedenavond'
-  })()
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#1A1917]"
-      style={{
-        opacity: phase === 'fading' ? 0 : 1,
-        transition: 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
-      }}
-    >
-      <p
-        className="text-[15px] text-white/40 tracking-[0.3px]"
-        style={{
-          fontFamily: 'var(--font-body)',
-          opacity: phase === 'greeting' ? 1 : 0,
-          transform: phase === 'greeting' ? 'translateY(0)' : 'translateY(8px)',
-          transition: 'all 0.6s 0.1s cubic-bezier(0.16, 1, 0.3, 1)',
-        }}
-      >
-        {greeting}
-      </p>
-      <h1
-        className="text-[42px] font-bold text-white tracking-tight mt-2"
-        style={{
-          fontFamily: 'var(--font-display)',
-          opacity: phase === 'greeting' ? 1 : 0,
-          transform: phase === 'greeting' ? 'translateY(0)' : 'translateY(12px)',
-          transition: 'all 0.6s 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-        }}
-      >
-        Let&apos;s MŌVE
-      </h1>
-    </div>
-  )
-}
-
 /* ═══════════════════════════════════════════════════════════
    Main component
    ═══════════════════════════════════════════════════════════ */
@@ -349,16 +285,16 @@ export default function OnboardingPage() {
   const router = useRouter()
   const [step, setStep] = useState(0)
   const [submitting, setSubmitting] = useState(false)
-  const [aiGenerating, setAiGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [animatingOut, setAnimatingOut] = useState(false)
+  const [showPhotoStep, setShowPhotoStep] = useState(false)
 
   const [data, setData] = useState<OnboardingData>({
     sex: '',
     date_of_birth: '',
     height_cm: '',
     weight_kg: '',
-    goal_type: '',
+    goal_type: [],
     goal_weight_kg: '',
     goal_description: '',
     goal_pace: '',
@@ -375,7 +311,7 @@ export default function OnboardingPage() {
     favorite_meals: [],
     hated_foods: [],
     allergies: [],
-    cooking_style: '',
+    cooking_style: [],
     current_snacks: [],
     snack_reason: [],
     snack_preference: '',
@@ -456,8 +392,8 @@ export default function OnboardingPage() {
         height_cm: parseNum(data.height_cm),
         age: data.date_of_birth ? Math.floor((Date.now() - new Date(data.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)) : null,
         // Stap 2
-        primary_goal: data.goal_type,
-        goal_type: data.goal_type,
+        primary_goal: data.goal_type[0] || null,
+        goal_type: data.goal_type.join(', '),
         goal_weight_kg: parseNum(data.goal_weight_kg),
         goal_description: data.goal_description,
         goal_pace: data.goal_pace,
@@ -476,9 +412,9 @@ export default function OnboardingPage() {
         favorite_meals: data.favorite_meals,
         hated_foods: data.hated_foods,
         allergies: data.allergies,
-        dietary_preferences: data.cooking_style,
+        dietary_preferences: data.cooking_style.join(', '),
         dietary_restrictions: data.allergies.join(', '),
-        cooking_style: data.cooking_style,
+        cooking_style: data.cooking_style.join(', '),
         current_snacks: data.current_snacks,
         snack_reason: data.snack_reason,
         snack_preference: data.snack_preference,
@@ -540,24 +476,18 @@ export default function OnboardingPage() {
         }).then(() => {})
       }
 
-      // Go to AI generation screen
-      goTo(TOTAL - 2) // 'generating' step
       setSubmitting(false)
-      setAiGenerating(true)
 
-      // Trigger AI nutrition plan generation
-      try {
-        await fetch('/api/ai/nutrition-plan', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: user.id }),
-        })
-      } catch {
-        // Non-blocking — plan can be generated later
-      }
+      // Trigger AI nutrition plan generation in the background (non-blocking)
+      fetch('/api/ai/nutrition-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id }),
+      }).catch(() => {})
 
-      setAiGenerating(false)
-      goTo(TOTAL - 1) // 'complete' step
+      // Go straight to client dashboard
+      router.push('/client')
+      router.refresh()
     } catch {
       setError('Er ging iets mis. Probeer opnieuw.')
       setSubmitting(false)
@@ -678,9 +608,10 @@ export default function OnboardingPage() {
               <div className="space-y-5">
                 <div>
                   <SectionLabel text="Wat wil je bereiken?" />
-                  <ChipSingle
+                  <p className="text-xs text-[#A09D96] mb-2">Meerdere keuzes mogelijk</p>
+                  <ChipMulti
                     options={['Vetverlies', 'Spiermassa', 'Sterker worden', 'Gezonder leven', 'Sportprestatie', 'Revalidatie']}
-                    value={data.goal_type}
+                    selected={data.goal_type}
                     onChange={(v) => update('goal_type', v)}
                   />
                 </div>
@@ -820,7 +751,7 @@ export default function OnboardingPage() {
                 <div>
                   <SectionLabel text="Ik kook..." />
                   <ChipSingle
-                    options={['Voor mezelf', 'Voor gezin', 'Eet veel buitenshuis']}
+                    options={['Voor mezelf', 'Voor gezin', 'Iemand anders kookt', 'Eet veel buitenshuis']}
                     value={data.social_context}
                     onChange={(v) => update('social_context', v)}
                   />
@@ -877,9 +808,10 @@ export default function OnboardingPage() {
 
                 <div>
                   <SectionLabel text="Hoe kook je het liefst?" />
-                  <ChipSingle
-                    options={['Vers koken', 'Snel (<20 min)', 'Mealprep']}
-                    value={data.cooking_style}
+                  <p className="text-xs text-[#A09D96] mb-2">Meerdere keuzes mogelijk</p>
+                  <ChipMulti
+                    options={['Vers koken', 'Snel (<20 min)', 'Mealprep', 'Simpel & makkelijk']}
+                    selected={data.cooking_style}
                     onChange={(v) => update('cooking_style', v)}
                   />
                 </div>
@@ -1019,17 +951,67 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* ═══ STEP 6: Foto's & metingen (optioneel) ═══ */}
-          {step === 6 && (
+          {/* ═══ STEP 6: Foto's & metingen — nu of later ═══ */}
+          {step === 6 && !showPhotoStep && (
             <div className="space-y-6">
               <div>
                 <p className="text-xs text-[#A09D96] uppercase tracking-wider">Stap 6 van 6</p>
-                <h2 className="text-2xl font-semibold text-[#1A1917] mt-1">Foto's & metingen</h2>
-                <p className="text-sm text-[#6B6862] mt-1">Optioneel — je coach kan dit ook later invullen.</p>
+                <h2 className="text-2xl font-semibold text-[#1A1917] mt-1">Foto&apos;s & metingen</h2>
+              </div>
+
+              <div className="bg-white rounded-2xl p-6 border border-[#E5E1D9] space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 bg-[#D46A3A]/10 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                    <Camera className="w-5 h-5 text-[#D46A3A]" strokeWidth={1.5} />
+                  </div>
+                  <div>
+                    <p className="text-[15px] font-medium text-[#1A1917]">
+                      Kan je nu foto&apos;s nemen en afmetingen invullen?
+                    </p>
+                    <p className="text-sm text-[#6B6862] mt-1 leading-relaxed">
+                      Startfoto&apos;s en metingen helpen om je vooruitgang bij te houden. Je kan dit ook later doen vanuit je dashboard.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Privacy disclaimer */}
+                <div className="flex items-start gap-2.5 bg-[#F5F2EC] rounded-xl p-3.5">
+                  <Lock className="w-4 h-4 text-[#A09D96] shrink-0 mt-0.5" strokeWidth={1.5} />
+                  <p className="text-xs text-[#6B6862] leading-relaxed">
+                    Je foto&apos;s zijn <span className="font-medium text-[#1A1917]">alleen voor jou en je coach</span> zichtbaar. Ze dienen enkel om je eigen progress te volgen.
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-2.5 pt-2">
+                  <button
+                    onClick={() => setShowPhotoStep(true)}
+                    className="w-full py-3.5 bg-[#1A1917] text-white rounded-2xl text-sm font-medium hover:bg-[#333] transition-colors"
+                  >
+                    Ja, ik doe het nu
+                  </button>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={submitting}
+                    className="w-full py-3.5 bg-[#F5F2EC] text-[#6B6862] rounded-2xl text-sm font-medium border border-[#E5E1D9] hover:border-[#CCC7BC] transition-colors disabled:opacity-50"
+                  >
+                    {submitting ? 'Opslaan...' : 'Later doen — eerst mijn dashboard'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ═══ STEP 6b: Actual photo & measurement form ═══ */}
+          {step === 6 && showPhotoStep && (
+            <div className="space-y-6">
+              <div>
+                <p className="text-xs text-[#A09D96] uppercase tracking-wider">Stap 6 van 6</p>
+                <h2 className="text-2xl font-semibold text-[#1A1917] mt-1">Foto&apos;s & metingen</h2>
+                <p className="text-sm text-[#6B6862] mt-1">Neem een foto van voorkant, achterkant en zijkant.</p>
               </div>
 
               <div className="bg-white rounded-2xl p-5 border border-[#E5E1D9]">
-                <PhotoUploadStep photos={photos} onChange={setPhotos} />
+                <PhotoUploadStep photos={photos} onChange={setPhotos} showSilhouette={false} />
               </div>
 
               <div className="bg-white rounded-2xl p-5 border border-[#E5E1D9]">
@@ -1038,51 +1020,22 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* ═══ STEP 7: AI Generating ═══ */}
-          {step === TOTAL - 2 && (
-            <div className="space-y-6 pt-16 text-center">
-              <div className="h-20 w-20 bg-gradient-to-br from-[#D46A3A]/20 to-[#D46A3A]/10 rounded-3xl flex items-center justify-center mx-auto">
-                {aiGenerating ? (
-                  <Loader2 className="w-10 h-10 text-[#D46A3A] animate-spin" strokeWidth={1.5} />
-                ) : (
-                  <Sparkles className="w-10 h-10 text-[#D46A3A]" strokeWidth={1.5} />
-                )}
-              </div>
-              <div>
-                <h2 className="text-2xl font-semibold text-[#1A1917]">
-                  {aiGenerating ? 'Even geduld...' : 'Bijna klaar!'}
-                </h2>
-                <p className="text-[#6B6862] mt-2">
-                  {aiGenerating
-                    ? 'Je coach stelt je persoonlijke voedingsplan samen op basis van je gegevens.'
-                    : 'Je voedingsplan is klaar!'}
-                </p>
-              </div>
-              {aiGenerating && (
-                <div className="flex justify-center gap-1 pt-4">
-                  {[0, 1, 2].map((i) => (
-                    <div
-                      key={i}
-                      className="w-2 h-2 rounded-full bg-[#D46A3A] animate-pulse"
-                      style={{ animationDelay: `${i * 200}ms` }}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ═══ STEP 8: Complete — mat black greeting → fade to dashboard ═══ */}
-          {step === TOTAL - 1 && <CompletionScreen />}
+          {/* Generating & complete screens removed — goes straight to dashboard */}
         </div>
       </div>
 
-      {/* Footer Navigation */}
-      {step > 0 && step <= lastFormStep && (
+      {/* Footer Navigation — hide on photo choice screen (step 6 without showPhotoStep) */}
+      {step > 0 && step <= lastFormStep && !(step === lastFormStep && !showPhotoStep) && (
         <div className="border-t border-[#E5E1D9] bg-white px-6 py-4 safe-area-bottom">
           <div className="max-w-md mx-auto flex gap-3">
             <button
-              onClick={() => goTo(step - 1)}
+              onClick={() => {
+                if (step === lastFormStep && showPhotoStep) {
+                  setShowPhotoStep(false)
+                } else {
+                  goTo(step - 1)
+                }
+              }}
               className="flex items-center gap-1 px-4 py-2.5 text-sm font-medium text-[#6B6862] hover:text-[#1A1917] rounded-2xl transition-all"
             >
               <ChevronLeft className="w-4 h-4" strokeWidth={1.5} />

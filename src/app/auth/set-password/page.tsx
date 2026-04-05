@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { Eye, EyeOff } from 'lucide-react'
@@ -108,15 +108,43 @@ function SetPasswordContent() {
   const [userName, setUserName] = useState('')
   const [verifying, setVerifying] = useState(true)
   const [mounted, setMounted] = useState(false)
+  const verifyAttempted = useRef(false)
 
   useEffect(() => {
+    // Guard against React Strict Mode double-execution & re-renders
+    if (verifyAttempted.current) return
+    verifyAttempted.current = true
+
     const supabase = createClient()
     const tokenHash = searchParams.get('token_hash')
     const type = searchParams.get('type')
 
+    async function waitForUser(maxAttempts = 8): Promise<ReturnType<typeof supabase.auth.getUser> extends Promise<infer R> ? R : never> {
+      for (let i = 0; i < maxAttempts; i++) {
+        const result = await supabase.auth.getUser()
+        if (result.data.user) return result
+        // Exponential backoff: 200ms, 400ms, 800ms, ...
+        await new Promise(r => setTimeout(r, 200 * Math.pow(2, i)))
+      }
+      return await supabase.auth.getUser()
+    }
+
+    function initUser(user: { user_metadata?: { full_name?: string } }) {
+      setUserName(user.user_metadata?.full_name || '')
+      setVerifying(false)
+      requestAnimationFrame(() => setMounted(true))
+    }
+
     async function verifyAndInit() {
+      // 1. Check if we already have a session (e.g. from auth callback redirect)
+      const { data: { user: existingUser } } = await supabase.auth.getUser()
+      if (existingUser) {
+        initUser(existingUser)
+        return
+      }
+
+      // 2. If we have a token_hash, verify it (legacy direct-link flow)
       if (tokenHash) {
-        // Support invite, magiclink, and email types (resend uses magiclink)
         const otpType = (type as 'invite' | 'magiclink' | 'email') || 'invite'
         const { error: otpError } = await supabase.auth.verifyOtp({
           token_hash: tokenHash,
@@ -125,23 +153,30 @@ function SetPasswordContent() {
 
         if (otpError) {
           console.error('[SetPassword] verifyOtp error:', otpError)
+          // Token might have been consumed by a previous attempt (double-render,
+          // back button, etc.) — check if a session was established anyway
+          const { data: { user: retryUser } } = await waitForUser(3)
+          if (retryUser) {
+            initUser(retryUser)
+            return
+          }
           router.replace('/?error=Uitnodigingslink is verlopen of al gebruikt. Vraag je coach om een nieuwe.')
           return
         }
       }
 
-      const { data: { user } } = await supabase.auth.getUser()
+      // 3. Wait for session to be established after verifyOtp
+      //    (session propagation via cookies can take a moment)
+      const { data: { user } } = await waitForUser()
       if (user) {
-        setUserName(user.user_metadata?.full_name || '')
-        setVerifying(false)
-        requestAnimationFrame(() => setMounted(true))
+        initUser(user)
       } else {
         router.replace('/?error=Link is verlopen. Vraag je coach om een nieuwe uitnodiging.')
       }
     }
 
     verifyAndInit()
-  }, [searchParams, router])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSetPassword = async (e: React.FormEvent) => {
     e.preventDefault()

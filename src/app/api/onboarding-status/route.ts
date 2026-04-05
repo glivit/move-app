@@ -25,10 +25,22 @@ export async function GET() {
       .eq('id', user.id)
       .single()
 
-    // If onboarding fully completed or no profile, skip
-    if (!profile || profile.onboarding_completed) {
+    // If no profile, skip
+    if (!profile) {
       return NextResponse.json({ items: [] })
     }
+
+    // Check for progress photos and measurements in intake_forms
+    const { data: intake } = await adminDb
+      .from('intake_forms')
+      .select('photo_front_url, chest_cm, waist_cm')
+      .eq('client_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+
+    const hasProgressPhotos = !!(intake?.photo_front_url)
+    const hasMeasurements = !!(intake?.chest_cm || intake?.waist_cm)
 
     // Check for push subscription
     const { count: pushCount } = await adminDb
@@ -51,6 +63,18 @@ export async function GET() {
       .eq('user_id', user.id)
 
     const items = [
+      {
+        id: 'progress-photos',
+        label: "Startfoto's nemen",
+        href: '/client/progress',
+        completed: hasProgressPhotos,
+      },
+      {
+        id: 'tape-measurements',
+        label: 'Lichaamsmetingen invullen',
+        href: '/client/progress',
+        completed: hasMeasurements,
+      },
       {
         id: 'profile-photo',
         label: 'Profielfoto toevoegen',

@@ -7,6 +7,7 @@ import { Camera, X, Check, SwitchCamera } from 'lucide-react'
 interface Props {
   photos: { front: File | null; back: File | null; left: File | null; right: File | null }
   onChange: (photos: Props['photos']) => void
+  showSilhouette?: boolean
 }
 
 type Position = 'front' | 'back' | 'left' | 'right'
@@ -218,12 +219,7 @@ function CameraViewfinder({
           style={facingMode === 'user' ? { transform: 'scaleX(-1)' } : {}}
         />
 
-        {/* Silhouette overlay */}
-        {ready && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <Silhouette className="h-[75%] text-white/30" />
-          </div>
-        )}
+        {/* Silhouette overlay — removed per user feedback */}
 
         {/* Countdown */}
         {countdown !== null && (
@@ -251,7 +247,7 @@ function CameraViewfinder({
         {/* Guide text */}
         {ready && countdown === null && (
           <div className="absolute bottom-4 left-0 right-0 text-center pointer-events-none">
-            <p className="text-[12px] text-white/50">Lijn je lichaam uit met het silhouet</p>
+            <p className="text-[12px] text-white/50">Sta recht, armen langs je lichaam</p>
           </div>
         )}
       </div>
@@ -285,7 +281,7 @@ function CameraViewfinder({
 
 // ─── Main Component ────────────────────────────────────
 
-export function PhotoUploadStep({ photos, onChange }: Props) {
+export function PhotoUploadStep({ photos, onChange, showSilhouette = true }: Props) {
   const [previews, setPreviews] = useState<Record<string, string>>({})
   const [cameraActive, setCameraActive] = useState<Position | null>(null)
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({})
@@ -383,9 +379,11 @@ export function PhotoUploadStep({ photos, onChange }: Props) {
                   onClick={() => setCameraActive(key)}
                   className="aspect-[3/4] w-full rounded-2xl border-2 border-dashed border-[#DDD9D0] hover:border-[var(--color-pop)]/40 flex flex-col items-center justify-center transition-all bg-[#F5F2EC] relative overflow-hidden group"
                 >
-                  <div className="absolute inset-0 flex items-center justify-center opacity-15 group-hover:opacity-25 transition-opacity">
-                    <Silhouette className="h-[85%] text-[#1A1917]" />
-                  </div>
+                  {showSilhouette && (
+                    <div className="absolute inset-0 flex items-center justify-center opacity-15 group-hover:opacity-25 transition-opacity">
+                      <Silhouette className="h-[85%] text-[#1A1917]" />
+                    </div>
+                  )}
                   <div className="relative z-10 flex flex-col items-center gap-2">
                     <div className="w-12 h-12 rounded-xl bg-white/80 flex items-center justify-center shadow-sm">
                       <Camera className="h-5 w-5 text-[#6B6862]" strokeWidth={1.5} />

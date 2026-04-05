@@ -53,6 +53,9 @@ export async function POST(request: NextRequest) {
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
     type: 'magiclink',
     email: clientProfile.email,
+    options: {
+      redirectTo: `${appUrl}/auth/callback`,
+    },
   })
 
   if (linkError) {
@@ -63,23 +66,28 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // Use hashed_token directly from properties (most reliable).
-  // Fallback to parsing the action_link URL if hashed_token is missing.
-  let tokenHash: string | null = linkData.properties?.hashed_token || null
-  if (!tokenHash) {
-    const actionUrl = new URL(linkData.properties.action_link)
-    tokenHash = actionUrl.searchParams.get('token') || actionUrl.searchParams.get('token_hash') || null
+  // Use action_link (goes through Supabase's server-side verification).
+  // This is more reliable than client-side verifyOtp with token_hash because:
+  // 1. Token is verified server-side by Supabase (no React double-render issues)
+  // 2. Session is established via PKCE code exchange in our auth callback
+  // 3. No URL encoding or timing issues
+  let inviteLink = linkData.properties?.action_link || ''
+  if (inviteLink) {
+    const actionUrl = new URL(inviteLink)
+    actionUrl.searchParams.set('redirect_to', `${appUrl}/auth/callback`)
+    inviteLink = actionUrl.toString()
+  } else {
+    // Fallback: use hashed_token directly (legacy approach)
+    const tokenHash = linkData.properties?.hashed_token || ''
+    if (!tokenHash) {
+      console.error('No token found in link data:', JSON.stringify(linkData.properties))
+      return NextResponse.json(
+        { error: 'Kon geen geldige token genereren. Probeer later opnieuw.' },
+        { status: 500 }
+      )
+    }
+    inviteLink = `${appUrl}/auth/set-password?token_hash=${encodeURIComponent(tokenHash)}&type=magiclink`
   }
-
-  if (!tokenHash) {
-    console.error('No token found in link data:', JSON.stringify(linkData.properties))
-    return NextResponse.json(
-      { error: 'Kon geen geldige token genereren. Probeer later opnieuw.' },
-      { status: 500 }
-    )
-  }
-
-  const inviteLink = `${appUrl}/auth/set-password?token_hash=${tokenHash}&type=magiclink`
 
   try {
     await sendInviteEmail({

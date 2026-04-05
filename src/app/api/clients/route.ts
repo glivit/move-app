@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
         full_name,
         role: 'client',
       },
+      redirectTo: `${appUrl}/auth/callback`,
     },
   })
 
@@ -69,14 +70,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: linkError.message }, { status: 400 })
   }
 
-  // Use hashed_token directly from properties (most reliable).
-  // Fallback to parsing the URL if needed.
-  let tokenHash: string | null = linkData.properties?.hashed_token || null
-  if (!tokenHash) {
-    const actionUrl = new URL(linkData.properties.action_link)
-    tokenHash = actionUrl.searchParams.get('token') || actionUrl.searchParams.get('token_hash') || null
+  // Use action_link (goes through Supabase's server-side verification).
+  // This is more reliable than client-side verifyOtp with token_hash because:
+  // 1. Token is verified server-side (no React double-render issues)
+  // 2. Session is established via PKCE code exchange in our callback
+  // 3. No URL encoding issues with the token
+  // Ensure redirect_to points to our callback
+  let inviteLink = linkData.properties?.action_link || ''
+  if (inviteLink) {
+    const actionUrl = new URL(inviteLink)
+    actionUrl.searchParams.set('redirect_to', `${appUrl}/auth/callback`)
+    inviteLink = actionUrl.toString()
+  } else {
+    // Fallback: use hashed_token directly (legacy approach)
+    const tokenHash = linkData.properties?.hashed_token || ''
+    inviteLink = `${appUrl}/auth/set-password?token_hash=${encodeURIComponent(tokenHash)}&type=invite`
   }
-  const inviteLink = `${appUrl}/auth/set-password?token_hash=${tokenHash}&type=invite`
 
   // Update the auto-created profile with additional data
   const { error: profileError } = await admin

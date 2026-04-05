@@ -44,25 +44,28 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/auth/set-password', request.url))
     }
 
-    // Auto-detect: invited user arriving for the first time
+    // Auto-detect: invited user or user who needs to set a password
     if (user) {
       const invitedAt = user.app_metadata?.invited_at
       const providers = user.app_metadata?.providers || []
-      // invited_at is set by Supabase on inviteUserByEmail / generateLink type=invite
-      // Also check: user has no password provider yet (never set a password)
+      // Check if user has never set a password (no 'email' provider)
       const hasNoPassword = !providers.includes('email')
 
-      if (invitedAt && hasNoPassword) {
-        return NextResponse.redirect(new URL('/auth/set-password', request.url))
-      }
-
-      // Normal login — redirect based on role
+      // Fetch profile once for all checks
       const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .single()
 
+      // Redirect to set-password if user has no password yet:
+      // - Either they have invited_at (original invite flow)
+      // - Or they're a client without a password (magiclink resend flow)
+      if (hasNoPassword && (invitedAt || profile?.role === 'client')) {
+        return NextResponse.redirect(new URL('/auth/set-password', request.url))
+      }
+
+      // Normal login — redirect based on role
       if (profile?.role === 'coach') {
         return NextResponse.redirect(new URL('/coach', request.url))
       }
