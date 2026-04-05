@@ -43,7 +43,9 @@ export async function GET(request: NextRequest) {
     const lastWeights: Record<string, number | null> = {}
     const previousSets: Record<string, Array<{ set_number: number; weight_kg: number | null; actual_reps: number | null }>> = {}
 
-    if (exercisesData) {
+    if (exercisesData && exercisesData.length > 0) {
+      const exerciseIds = exercisesData.map((ex: any) => ex.exercise_id)
+
       // Find the most recent completed workout session for this day
       const { data: lastSession } = await adminClient
         .from('workout_sessions')
@@ -55,35 +57,58 @@ export async function GET(request: NextRequest) {
         .limit(1)
         .single()
 
-      for (const ex of exercisesData) {
-        // Get all completed sets from last session for this exercise
-        if (lastSession) {
-          const { data: prevSets } = await adminClient
-            .from('workout_sets')
-            .select('set_number, weight_kg, actual_reps')
-            .eq('workout_session_id', lastSession.id)
-            .eq('exercise_id', ex.exercise_id)
-            .eq('completed', true)
-            .order('set_number', { ascending: true })
-
-          if (prevSets && prevSets.length > 0) {
-            previousSets[ex.id] = prevSets
-            lastWeights[ex.id] = prevSets[0].weight_kg
-            continue
-          }
-        }
-
-        // Fallback: get most recent weight for this exercise from any session
-        const { data: lastSets } = await adminClient
+      // Batch fetch: all sets from last session in ONE query (fixes N+1)
+      let allPrevSets: any[] = []
+      if (lastSession) {
+        const { data } = await adminClient
           .from('workout_sets')
-          .select('weight_kg')
-          .eq('exercise_id', ex.exercise_id)
+          .select('exercise_id, set_number, weight_kg, actual_reps')
+          .eq('workout_session_id', lastSession.id)
+          .in('exercise_id', exerciseIds)
           .eq('completed', true)
-          .not('weight_kg', 'is', null)
-          .order('created_at', { ascending: false })
-          .limit(1)
+          .order('set_number', { ascending: true })
+        allPrevSets = data || []
+      }
 
-        lastWeights[ex.id] = lastSets?.[0]?.weight_kg || null
+      // Batch fetch: latest weight for each exercise from ANY session in ONE query
+      const { data: allLatestSets } = await adminClient
+        .from('workout_sets')
+        .select('exercise_id, weight_kg, created_at')
+        .in('exercise_id', exerciseIds)
+        .eq('completed', true)
+        .not('weight_kg', 'is', null)
+        .order('created_at', { ascending: false })
+
+      // Build lookup maps from batch results
+      const prevSetsByExercise: Record<string, any[]> = {}
+      for (const set of allPrevSets) {
+        if (!prevSetsByExercise[set.exercise_id]) {
+          prevSetsByExercise[set.exercise_id] = []
+        }
+        prevSetsByExercise[set.exercise_id].push({
+          set_number: set.set_number,
+          weight_kg: set.weight_kg,
+          actual_reps: set.actual_reps,
+        })
+      }
+
+      // Latest weight per exercise (first occurrence since sorted desc by created_at)
+      const latestWeightByExercise: Record<string, number | null> = {}
+      for (const set of allLatestSets || []) {
+        if (!(set.exercise_id in latestWeightByExercise)) {
+          latestWeightByExercise[set.exercise_id] = set.weight_kg
+        }
+      }
+
+      // Assign to each exercise (no additional queries needed)
+      for (const ex of exercisesData) {
+        const prevSets = prevSetsByExercise[ex.exercise_id]
+        if (prevSets && prevSets.length > 0) {
+          previousSets[ex.id] = prevSets
+          lastWeights[ex.id] = prevSets[0].weight_kg
+        } else {
+          lastWeights[ex.id] = latestWeightByExercise[ex.exercise_id] || null
+        }
       }
     }
 

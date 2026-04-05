@@ -1,5 +1,9 @@
+import dynamic from 'next/dynamic'
 import { CoachSidebar } from '@/components/layout/CoachSidebar'
-import { BugReporter } from '@/components/ui/BugReporter'
+
+const BugReporter = dynamic(
+  () => import('@/components/ui/BugReporter').then(m => m.BugReporter)
+)
 
 export default function CoachLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -1,12 +1,18 @@
 import type { Metadata, Viewport } from 'next'
 import { Manrope, DM_Sans, DM_Mono } from 'next/font/google'
-import { ServiceWorkerInit } from '@/components/ServiceWorkerInit'
-import { OfflineIndicator } from '@/components/OfflineIndicator'
-import { InstallPrompt } from '@/components/InstallPrompt'
+import dynamic from 'next/dynamic'
 import './globals.css'
 
-// Force dynamic rendering — required because middleware uses auth/cookies
-export const dynamic = 'force-dynamic'
+// Lazy load non-critical components — code-split into separate chunks
+const ServiceWorkerInit = dynamic(
+  () => import('@/components/ServiceWorkerInit').then(m => m.ServiceWorkerInit)
+)
+const OfflineIndicator = dynamic(
+  () => import('@/components/OfflineIndicator').then(m => m.OfflineIndicator)
+)
+const InstallPrompt = dynamic(
+  () => import('@/components/InstallPrompt').then(m => m.InstallPrompt)
+)
 
 const manrope = Manrope({
   subsets: ['latin'],

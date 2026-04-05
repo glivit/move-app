@@ -1,11 +1,23 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { ClientBottomNav } from '@/components/layout/ClientBottomNav'
 import { ClientSidebar } from '@/components/layout/ClientSidebar'
-import { NotificationPermission } from '@/components/notifications/NotificationPermission'
 import { ActiveWorkoutBar } from '@/components/workout/ActiveWorkoutBar'
-import { SyncStatusIndicator } from '@/components/ui/SyncStatusIndicator'
-import { BugReporter } from '@/components/ui/BugReporter'
+
+// Lazy load non-critical UI components (not needed for initial render)
+const NotificationPermission = dynamic(
+  () => import('@/components/notifications/NotificationPermission').then(m => m.NotificationPermission),
+  { ssr: false }
+)
+const SyncStatusIndicator = dynamic(
+  () => import('@/components/ui/SyncStatusIndicator').then(m => m.SyncStatusIndicator),
+  { ssr: false }
+)
+const BugReporter = dynamic(
+  () => import('@/components/ui/BugReporter').then(m => m.BugReporter),
+  { ssr: false }
+)
 
 export default function ClientLayoutShell({ children }: { children: React.ReactNode }) {
   return (

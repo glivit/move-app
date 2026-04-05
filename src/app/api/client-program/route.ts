@@ -59,16 +59,25 @@ export async function GET(request: NextRequest) {
     const templateDays = templateDaysRes.data
     const completedSessions = completedSessionsRes.data
 
-    // Get exercise counts for each day — all in parallel
-    const days = templateDays ? await Promise.all(
-      templateDays.map(async (day: any) => {
-        const { count } = await adminClient
+    // Get exercise counts for ALL days in a single query (fixes N+1)
+    const dayIds = (templateDays || []).map((d: any) => d.id)
+    const { data: allExercises } = dayIds.length > 0
+      ? await adminClient
           .from('program_template_exercises')
-          .select('*', { count: 'exact', head: true })
-          .eq('template_day_id', day.id)
-        return { ...day, exercise_count: count || 0 }
-      })
-    ) : []
+          .select('template_day_id')
+          .in('template_day_id', dayIds)
+      : { data: [] }
+
+    // Count exercises per day in memory
+    const exerciseCountMap: Record<string, number> = {}
+    for (const ex of allExercises || []) {
+      exerciseCountMap[ex.template_day_id] = (exerciseCountMap[ex.template_day_id] || 0) + 1
+    }
+
+    const days = (templateDays || []).map((day: any) => ({
+      ...day,
+      exercise_count: exerciseCountMap[day.id] || 0,
+    }))
 
     const uniqueCompletedDays = new Set(
       (completedSessions || []).map(s => s.template_day_id)
