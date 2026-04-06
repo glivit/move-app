@@ -13,8 +13,8 @@ import {
 
 interface ClientStatus {
   id: string
-  firstName: string
-  lastName: string
+  fullName: string
+  initials: string
   avatarUrl: string | null
 
   // Workout
@@ -78,7 +78,7 @@ export function ClientStatusGrid() {
         { data: nutritionSummaryData },
         { data: allSessionsData },
       ] = await Promise.all([
-        supabase.from('profiles').select('id, first_name, last_name, avatar_url').eq('role', 'client'),
+        supabase.from('profiles').select('id, full_name, avatar_url').eq('role', 'client'),
         supabase.from('workout_sessions').select('client_id, started_at, completed_at').gte('started_at', weekStart.toISOString()).not('completed_at', 'is', null),
         supabase.from('client_programs').select('client_id, program_templates(days_per_week)').eq('status', 'active'),
         supabase.from('nutrition_plans').select('client_id, calories_target, meals').eq('is_active', true),
@@ -94,6 +94,12 @@ export function ClientStatusGrid() {
       const allSessions = allSessionsData || []
 
       const clientStatuses: ClientStatus[] = profiles.map((p: any) => {
+        const fullName = p.full_name || 'Onbekend'
+        const nameParts = fullName.split(' ')
+        const initials = nameParts.length >= 2
+          ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
+          : fullName.substring(0, 2)
+
         // Workout data
         const clientSessions = sessions.filter((s: any) => s.client_id === p.id)
         const clientProgram = programs.find((pr: any) => pr.client_id === p.id) as any
@@ -133,8 +139,8 @@ export function ClientStatusGrid() {
 
         return {
           id: p.id,
-          firstName: p.first_name || '',
-          lastName: p.last_name || '',
+          fullName,
+          initials: initials.toUpperCase(),
           avatarUrl: p.avatar_url,
           workoutsThisWeek,
           expectedPerWeek,
@@ -153,7 +159,7 @@ export function ClientStatusGrid() {
       // Sort: needs attention first, then alphabetically
       clientStatuses.sort((a, b) => {
         if (a.needsAttention !== b.needsAttention) return a.needsAttention ? -1 : 1
-        return a.firstName.localeCompare(b.firstName, 'nl')
+        return a.fullName.localeCompare(b.fullName, 'nl')
       })
 
       setClients(clientStatuses)
@@ -247,7 +253,7 @@ export function ClientStatusGrid() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((client) => {
-          const initials = `${client.firstName?.[0] || ''}${client.lastName?.[0] || ''}`
+          const initials = client.initials
           const workoutPct = Math.min(100, Math.round((client.workoutsThisWeek / client.expectedPerWeek) * 100))
           const nutritionPct = client.caloriesTarget > 0 ? Math.min(100, Math.round((client.caloriesLogged / client.caloriesTarget) * 100)) : 0
 
@@ -269,7 +275,7 @@ export function ClientStatusGrid() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[15px] font-semibold text-[#1A1917] truncate group-hover:text-[#D46A3A] transition-colors">
-                    {client.firstName} {client.lastName}
+                    {client.fullName}
                   </p>
                   <div className="flex items-center gap-2 mt-0.5">
                     {client.needsAttention && (
