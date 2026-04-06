@@ -9,11 +9,8 @@ import {
   Check,
   Plus,
   Clock,
-  Info,
   ChevronDown,
-  ChevronUp,
   Search,
-  GripVertical,
 } from 'lucide-react'
 import { StepperInput } from '@/components/ui/StepperInput'
 import { ExerciseMedia } from '@/components/ExerciseMedia'
@@ -1145,56 +1142,60 @@ function ActiveWorkoutPage() {
       )}
 
       {/* ═══ TOP BAR ═══════════════════════════════ */}
-      <header className="sticky top-0 bg-white/95 backdrop-blur-xl z-40 border-b border-[#F0F0EE]">
+      <header className="sticky top-0 bg-white/95 backdrop-blur-xl z-40">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <button
             onClick={handleMinimize}
-            className="w-11 h-11 flex items-center justify-center rounded-xl hover:bg-[#F0F0EE] transition-colors touch-manipulation"
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F0F0EE] transition-colors touch-manipulation"
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
-            <X size={20} strokeWidth={1.5} className="text-[#ACACAC]" />
+            <X size={18} strokeWidth={1.5} className="text-[#ACACAC]" />
           </button>
 
-          <div className="flex items-center gap-2 bg-white px-4 py-1.5 rounded-xl border border-[#F0F0EE]">
-            <Clock size={14} strokeWidth={1.5} className="text-[#D46A3A]" />
-            <span className="stat-number text-[20px] text-[#1A1917]">
+          <div className="flex items-center gap-1.5">
+            <Clock size={13} strokeWidth={1.5} className="text-[#D46A3A]" />
+            <span className="stat-number text-[18px] text-[#1A1917] tabular-nums">
               {formatTimer(workoutSeconds)}
             </span>
           </div>
 
-          {/* KG / LBS toggle */}
-          <button
-            onClick={toggleWeightUnit}
-            className="h-9 px-3 rounded-lg bg-[#F8F8F6] border border-[#F0F0EE] text-[11px] font-bold uppercase tracking-[0.06em] text-[#1A1917] active:scale-95 transition-all touch-manipulation"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            {weightUnit.toUpperCase()}
-          </button>
+          <div className="flex items-center gap-2">
+            {/* KG / LBS toggle */}
+            <button
+              onClick={toggleWeightUnit}
+              className="h-8 px-2.5 rounded-lg bg-[#F8F8F6] text-[11px] font-bold uppercase tracking-[0.04em] text-[#ACACAC] active:scale-95 transition-all touch-manipulation"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+            >
+              {weightUnit.toUpperCase()}
+            </button>
 
-          <button
-            onClick={handleFinish}
-            disabled={saving}
-            className={`px-5 h-11 rounded-xl font-semibold text-[12px] uppercase tracking-[0.08em] transition-all touch-manipulation ${
-              saving
-                ? 'bg-[#C0C0C0] text-[#ACACAC] cursor-wait'
-                : 'bg-[#D46A3A] text-white'
-            }`}
-          >
-            {saving ? 'Opslaan...' : 'Klaar'}
-          </button>
+            <button
+              onClick={handleFinish}
+              disabled={saving}
+              className={`px-5 h-10 rounded-xl font-semibold text-[13px] transition-all touch-manipulation ${
+                saving
+                  ? 'bg-[#E0E0DE] text-[#ACACAC] cursor-wait'
+                  : allDone
+                    ? 'bg-[#3D8B5C] text-white'
+                    : 'bg-[#1A1917] text-white'
+              }`}
+            >
+              {saving ? 'Opslaan...' : 'Klaar'}
+            </button>
+          </div>
         </div>
 
         {/* Progress line */}
-        <div className="h-[2px] bg-[#F0F0EE]">
+        <div className="h-[3px] bg-[#F0F0EE]">
           <div
-            className="h-full bg-[#D46A3A] transition-all duration-500"
+            className="h-full bg-[#3D8B5C] transition-all duration-500 ease-out"
             style={{ width: `${totalSets > 0 ? (completedTotal / totalSets) * 100 : 0}%` }}
           />
         </div>
       </header>
 
       {/* ═══ EXERCISE LIST ═══════════════════════════ */}
-      <main className="max-w-lg mx-auto px-4 py-6 pb-24 space-y-3">
+      <main className="max-w-lg mx-auto px-4 py-6 pb-24 space-y-4">
         {exercises.map((ex, exIndex) => {
           const exSets = sets[ex.id] || []
           const exDone = exSets.length > 0 && exSets.every(s => s.completed)
@@ -1227,10 +1228,10 @@ function ActiveWorkoutPage() {
                 </div>
               )}
               <div
-                className={`rounded-2xl transition-all border ${
+                className={`rounded-2xl transition-all ${
                   exDone
-                    ? 'bg-white/60 border-[#F0F0EE]/50'
-                    : 'bg-white border-[#F0F0EE]'
+                    ? 'bg-[#F6FBF7] border border-[#3D8B5C]/15'
+                    : 'bg-white border border-[#F0F0EE]'
                 } ${isSuperset ? 'relative overflow-hidden' : ''} ${isSuperset && !isLastInGroup ? 'mb-0 rounded-b-none border-b-0' : ''} ${isSuperset && !isFirstInGroup ? 'rounded-t-none border-t border-dashed border-t-[#E0E0DE]' : ''}`}
               >
                 {/* Superset color sidebar */}
@@ -1241,11 +1242,11 @@ function ActiveWorkoutPage() {
                   />
                 )}
               {/* Exercise header — sticky on scroll */}
-              <div className={`${isSuperset ? 'pl-7' : 'px-5'} ${!isSuperset ? 'px-5' : 'pr-5'} pt-4 pb-2 sticky top-14 bg-white/95 backdrop-blur-sm z-10 ${isFirstInGroup || !isSuperset ? 'rounded-t-2xl' : ''}`}>
-                <div className="flex items-center justify-between mb-1">
+              <div className={`${isSuperset ? 'pl-7' : 'px-5'} ${!isSuperset ? 'px-5' : 'pr-5'} pt-5 pb-3 sticky top-14 bg-white/95 backdrop-blur-sm z-10 ${isFirstInGroup || !isSuperset ? 'rounded-t-2xl' : ''}`}>
+                <div className="flex items-center justify-between">
                   <button
                     onClick={() => setExpandedExercise(isExpanded ? null : ex.id)}
-                    className="flex items-center gap-2 flex-1 text-left touch-manipulation"
+                    className="flex items-center gap-2.5 flex-1 text-left touch-manipulation min-w-0"
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
                     {isSuperset && (
@@ -1256,49 +1257,48 @@ function ActiveWorkoutPage() {
                         {ssLabel}{ssIndex + 1}
                       </span>
                     )}
-                    <h3
-                      className={`text-[16px] font-semibold leading-tight tracking-[-0.01em] ${
-                        exDone ? 'text-[#ACACAC]' : 'text-[#1A1917]'
-                      }`}
-                    >
-                      {exerciseData.name_nl || exerciseData.name}
-                    </h3>
-                    <Info size={13} strokeWidth={1.5} className="text-[#C0C0C0] flex-shrink-0" />
-                  </button>
-                  <div className="flex items-center gap-1 ml-2">
-                    {/* Reorder buttons */}
-                    <div className="flex flex-col -my-1">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); moveExercise(exIndex, 'up') }}
-                        disabled={exIndex === 0}
-                        className="p-0.5 text-[#D5D5D5] hover:text-[#1A1917] disabled:opacity-20 transition-colors touch-manipulation"
-                        style={{ WebkitTapHighlightColor: 'transparent' }}
+                    {/* Exercise thumbnail */}
+                    {exerciseData.gif_url && (
+                      <div className="w-[36px] h-[36px] rounded-lg bg-[#F8F8F6] flex-shrink-0 overflow-hidden">
+                        <Image
+                          src={exerciseData.gif_url}
+                          alt=""
+                          width={36}
+                          height={36}
+                          unoptimized
+                          loading="lazy"
+                          className="w-full h-full object-cover"
+                          style={{ filter: 'saturate(0.3) contrast(0.95)', mixBlendMode: 'multiply' }}
+                        />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <h3
+                        className={`text-[15px] font-semibold leading-tight tracking-[-0.01em] truncate ${
+                          exDone ? 'text-[#3D8B5C]' : 'text-[#1A1917]'
+                        }`}
                       >
-                        <ChevronUp size={14} strokeWidth={2} />
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); moveExercise(exIndex, 'down') }}
-                        disabled={exIndex === exercises.length - 1}
-                        className="p-0.5 text-[#D5D5D5] hover:text-[#1A1917] disabled:opacity-20 transition-colors touch-manipulation"
-                        style={{ WebkitTapHighlightColor: 'transparent' }}
-                      >
-                        <ChevronDown size={14} strokeWidth={2} />
-                      </button>
+                        {exerciseData.name_nl || exerciseData.name}
+                      </h3>
+                      {/* Meta inline under title */}
+                      <p className="text-[12px] text-[#ACACAC] mt-0.5">
+                        {ex.sets}×{ex.reps_min}{ex.reps_max !== ex.reps_min ? `-${ex.reps_max}` : ''}
+                        {ex.rest_seconds > 0 ? ` · ${ex.rest_seconds}s` : ''}
+                        {ex.rpe_target > 0 ? ` · RPE ${ex.rpe_target}` : ''}
+                      </p>
                     </div>
-                    <span className={`text-[12px] font-medium tabular-nums px-2 py-0.5 rounded-lg ${
-                      exDone ? 'bg-[#D46A3A]/10 text-[#D46A3A]' : 'text-[#ACACAC]'
-                    }`}>
-                      {exCompleted}/{exSets.length}
-                    </span>
+                  </button>
+                  <div className="flex items-center gap-2 ml-3 flex-shrink-0">
+                    {exDone ? (
+                      <div className="w-[28px] h-[28px] rounded-full bg-[#3D8B5C] flex items-center justify-center">
+                        <Check size={14} strokeWidth={3} className="text-white" />
+                      </div>
+                    ) : (
+                      <span className="text-[13px] font-semibold tabular-nums text-[#ACACAC]">
+                        {exCompleted}/{exSets.length}
+                      </span>
+                    )}
                   </div>
-                </div>
-
-                {/* Meta */}
-                <div className="flex items-center gap-2 text-[11px] text-[#ACACAC] uppercase tracking-[0.06em]">
-                  <span>{ex.sets}×{ex.reps_min}{ex.reps_max !== ex.reps_min ? `-${ex.reps_max}` : ''}</span>
-                  {ex.rest_seconds > 0 && <><span>·</span><span>{ex.rest_seconds}s rust</span></>}
-                  {ex.tempo && <><span>·</span><span>{ex.tempo}</span></>}
-                  {ex.rpe_target > 0 && <><span>·</span><span>RPE {ex.rpe_target}</span></>}
                 </div>
               </div>
 
@@ -1307,26 +1307,15 @@ function ActiveWorkoutPage() {
                 <ExerciseInfoPanel exerciseData={exerciseData} />
               )}
 
-              {/* Notes */}
-              <div className="px-5 pb-2">
-                <input
-                  type="text"
-                  value={exerciseNotes[ex.id] || ''}
-                  onChange={(e) => setExerciseNotes(prev => ({ ...prev, [ex.id]: e.target.value }))}
-                  placeholder="Notities..."
-                  className="w-full px-0 py-1 bg-transparent text-[12px] text-[#ACACAC] placeholder-[#C0C0C0] border-none focus:outline-none"
-                />
-              </div>
-
               {/* Sets table */}
-              <div className="px-5 pb-4">
-                {/* Header */}
-                <div className="flex items-center gap-2 mb-2 px-1">
-                  <span className="text-[10px] font-bold text-[#ACACAC] uppercase tracking-[0.1em] w-[32px]">Set</span>
-                  <span className="text-[10px] font-bold text-[#C0C0C0] uppercase tracking-[0.1em] flex-1 text-center">Vorige</span>
-                  <span className="text-[10px] font-bold text-[#ACACAC] uppercase tracking-[0.1em] w-[120px] text-center">{weightUnit.toUpperCase()}</span>
-                  <span className="text-[10px] font-bold text-[#ACACAC] uppercase tracking-[0.1em] w-[106px] text-center">Reps</span>
-                  <span className="w-[44px]" />
+              <div className="px-5 pb-5">
+                {/* Column header */}
+                <div className="flex items-center gap-2 mb-1.5 px-2">
+                  <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] w-[28px] text-center">Set</span>
+                  <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] flex-1 text-center">Vorige</span>
+                  <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] w-[120px] text-center">{weightUnit.toUpperCase()}</span>
+                  <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] w-[106px] text-center">Reps</span>
+                  <span className="w-[40px]" />
                 </div>
 
                 {/* Rows */}
@@ -1354,47 +1343,45 @@ function ActiveWorkoutPage() {
                           displayWeight={displayWeight}
                           toKg={toKg}
                         />
-                        {/* Inline rest timer — redesigned card */}
+                        {/* Inline rest timer */}
                         {isRestActive && activeRestTimer && (
-                          <div className="mx-1 my-2 bg-[#FDF6F0] border border-[#F0E4D8] rounded-xl px-4 py-3">
-                            {/* Progress bar */}
-                            <div className="w-full h-[4px] bg-[#F0E4D8] rounded-full overflow-hidden mb-3">
+                          <div className="mx-2 my-2 rounded-xl overflow-hidden">
+                            {/* Progress bar (full width, thin) */}
+                            <div className="w-full h-[3px] bg-[#F0F0EE]">
                               <div
                                 className="h-full bg-[#D46A3A] rounded-full transition-all duration-1000 ease-linear"
                                 style={{ width: `${((activeRestTimer.total - activeRestTimer.seconds) / activeRestTimer.total) * 100}%` }}
                               />
                             </div>
-                            {/* Timer display + controls */}
-                            <div className="flex items-center justify-between">
+                            {/* Timer row */}
+                            <div className="flex items-center justify-between px-2 py-2">
                               <button
                                 onClick={() => setActiveRestTimer(prev => prev ? { ...prev, seconds: Math.max(0, prev.seconds - 15), total: prev.total } : null)}
-                                className="w-[44px] h-[44px] flex items-center justify-center rounded-lg bg-white/60 text-[13px] font-bold text-[#D46A3A] active:scale-95 transition-all touch-manipulation"
+                                className="px-2.5 py-1.5 rounded-lg text-[12px] font-semibold text-[#ACACAC] hover:bg-[#F8F8F6] active:scale-95 transition-all touch-manipulation"
                                 style={{ WebkitTapHighlightColor: 'transparent' }}
                               >
-                                −15
+                                −15s
                               </button>
-                              <div className="text-center">
-                                <span className="stat-number text-[28px] font-bold text-[#D46A3A] tabular-nums">
+                              <div className="flex items-center gap-2">
+                                <span className="stat-number text-[22px] font-bold text-[#D46A3A] tabular-nums">
                                   {formatTimer(activeRestTimer.seconds)}
                                 </span>
-                                <p className="text-[11px] text-[#B08968] mt-0.5">Rusttijd</p>
+                                <button
+                                  onClick={() => setActiveRestTimer(null)}
+                                  className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.04em] hover:text-[#1A1917] transition-colors touch-manipulation"
+                                  style={{ WebkitTapHighlightColor: 'transparent' }}
+                                >
+                                  Skip
+                                </button>
                               </div>
                               <button
                                 onClick={() => setActiveRestTimer(prev => prev ? { ...prev, seconds: prev.seconds + 15, total: Math.max(prev.total, prev.seconds + 15) } : null)}
-                                className="w-[44px] h-[44px] flex items-center justify-center rounded-lg bg-white/60 text-[13px] font-bold text-[#D46A3A] active:scale-95 transition-all touch-manipulation"
+                                className="px-2.5 py-1.5 rounded-lg text-[12px] font-semibold text-[#ACACAC] hover:bg-[#F8F8F6] active:scale-95 transition-all touch-manipulation"
                                 style={{ WebkitTapHighlightColor: 'transparent' }}
                               >
-                                +15
+                                +15s
                               </button>
                             </div>
-                            {/* Skip button */}
-                            <button
-                              onClick={() => setActiveRestTimer(null)}
-                              className="w-full mt-2 py-2 text-[12px] font-semibold text-[#B08968] uppercase tracking-[0.06em] rounded-lg hover:bg-white/40 transition-colors touch-manipulation"
-                              style={{ WebkitTapHighlightColor: 'transparent' }}
-                            >
-                              Overslaan
-                            </button>
                           </div>
                         )}
                       </div>
@@ -1402,27 +1389,15 @@ function ActiveWorkoutPage() {
                   })}
                 </div>
 
-                {/* Add set + Form check */}
-                <div className="flex gap-2 mt-3">
-                  <button
-                    onClick={() => addSet(ex.id)}
-                    className="flex-1 min-h-[44px] py-3 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#ACACAC] uppercase tracking-[0.06em] rounded-xl hover:bg-[#F8F8F6] transition-colors touch-manipulation"
-                    style={{ WebkitTapHighlightColor: 'transparent' }}
-                  >
-                    <Plus size={13} strokeWidth={2} />
-                    Set toevoegen
-                  </button>
-                  <button
-                    onClick={() => {
-                      const name = exerciseData.name_nl || exerciseData.name
-                      setFormCheckExercise({ id: ex.exercise_id, name })
-                    }}
-                    className="min-h-[44px] py-3 px-4 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#D46A3A] uppercase tracking-[0.06em] rounded-xl hover:bg-[#D46A3A]/10 transition-colors touch-manipulation"
-                    style={{ WebkitTapHighlightColor: 'transparent' }}
-                  >
-                    📹 Form check
-                  </button>
-                </div>
+                {/* Add set */}
+                <button
+                  onClick={() => addSet(ex.id)}
+                  className="w-full mt-2 py-2.5 flex items-center justify-center gap-1.5 text-[12px] font-medium text-[#ACACAC] rounded-xl hover:bg-[#F8F8F6] transition-colors touch-manipulation"
+                  style={{ WebkitTapHighlightColor: 'transparent' }}
+                >
+                  <Plus size={13} strokeWidth={2} />
+                  Set toevoegen
+                </button>
               </div>
             </div>
           </div>
@@ -1441,15 +1416,15 @@ function ActiveWorkoutPage() {
           <button
             onClick={handleFinish}
             disabled={saving}
-            className={`w-full py-4 rounded-2xl font-bold text-[14px] uppercase tracking-[0.08em] flex items-center justify-center gap-2 transition-all ${
+            className={`w-full py-4 rounded-2xl font-semibold text-[15px] flex items-center justify-center gap-2 transition-all shadow-lg ${
               saving
-                ? 'bg-[#C0C0C0] text-[#ACACAC] cursor-wait'
-                : 'bg-[#D46A3A] text-white'
+                ? 'bg-[#E0E0DE] text-[#ACACAC] cursor-wait shadow-none'
+                : 'bg-[#3D8B5C] text-white shadow-[#3D8B5C]/25'
             }`}
           >
             {saving ? (
               <>
-                <div className="w-4 h-4 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
+                <div className="w-4 h-4 border-[1.5px] border-[#C0C0C0] border-t-white rounded-full animate-spin" />
                 Opslaan...
               </>
             ) : (
@@ -1462,10 +1437,10 @@ function ActiveWorkoutPage() {
         )}
 
         {/* Bottom actions */}
-        <div className="mt-2 space-y-2">
+        <div className="mt-4 space-y-3">
           <button
             onClick={() => setShowExercisePicker(true)}
-            className="w-full py-3.5 bg-white text-[#1A1917] rounded-xl font-semibold text-[13px] uppercase tracking-[0.06em] flex items-center justify-center gap-2 transition-all"
+            className="w-full py-3.5 border border-dashed border-[#D5D5D5] text-[#ACACAC] rounded-2xl font-medium text-[13px] flex items-center justify-center gap-2 transition-all hover:border-[#ACACAC] hover:text-[#1A1917]"
           >
             <Plus size={14} strokeWidth={2} />
             Oefening toevoegen
@@ -1473,7 +1448,7 @@ function ActiveWorkoutPage() {
 
           <button
             onClick={() => setShowDiscardConfirm(true)}
-            className="w-full py-3 rounded-xl text-[#C4372A] text-[13px] font-medium hover:bg-[#C4372A]/5 transition-colors"
+            className="w-full py-2.5 text-[#C4372A]/60 text-[12px] font-medium hover:text-[#C4372A] transition-colors"
           >
             Workout verwijderen
           </button>
@@ -1534,7 +1509,16 @@ function SetRowComponent({
 
   const defaultWeight = toDisplay(set.weight_kg) || toDisplay(prefilledWeight) || ''
   const [weight, setWeight] = useState(defaultWeight)
-  const [reps, setReps] = useState(set.actual_reps?.toString() || set.prescribed_reps?.toString() || '')
+
+  // Carry over reps from previous set when previous was weaker than prescribed
+  const getDefaultReps = () => {
+    if (set.actual_reps != null) return set.actual_reps.toString()
+    if (prevSet?.actual_reps != null && prevSet.actual_reps < (set.prescribed_reps || 0)) {
+      return prevSet.actual_reps.toString()
+    }
+    return set.prescribed_reps?.toString() || ''
+  }
+  const [reps, setReps] = useState(getDefaultReps)
 
   // Sync display when unit changes
   useEffect(() => {
@@ -1620,20 +1604,24 @@ function SetRowComponent({
   }, [])
 
   return (
-    <div className={`relative flex items-center gap-2 px-1 py-1.5 rounded-lg transition-all ${set.completed ? 'opacity-40 animate-row-success' : ''}`}>
+    <div className={`relative flex items-center gap-2 px-2 py-2 rounded-xl transition-all ${
+      set.completed
+        ? 'bg-[#E8F5E9]/60'
+        : 'hover:bg-[#FAFAF9]'
+    }`}>
       {/* Set number — long press to change type */}
       <button
         onPointerDown={handleSetNumberPointerDown}
         onPointerUp={handleSetNumberPointerUp}
         onPointerLeave={handleSetNumberPointerUp}
         onContextMenu={(e) => e.preventDefault()}
-        className={`text-[13px] font-bold tabular-nums w-[32px] h-[32px] flex items-center justify-center rounded-md transition-all touch-manipulation select-none ${
+        className={`text-[13px] font-bold tabular-nums w-[28px] h-[28px] flex items-center justify-center rounded-lg transition-all touch-manipulation select-none ${
           currentType !== 'normal'
-            ? `text-[${typeConfig.color}]`
-            : set.completed ? 'text-[#1A1917]' : 'text-[#ACACAC]'
+            ? ''
+            : set.completed ? 'text-[#3D8B5C] bg-[#3D8B5C]/10' : 'text-[#ACACAC]'
         }`}
         style={{
-          backgroundColor: typeConfig.bg,
+          backgroundColor: currentType !== 'normal' ? typeConfig.bg : undefined,
           WebkitTapHighlightColor: 'transparent',
           ...(currentType !== 'normal' ? { color: typeConfig.color } : {}),
         }}
@@ -1701,18 +1689,18 @@ function SetRowComponent({
       />
 
       {/* Check button + inline PR badge */}
-      <div className="flex items-center gap-1 flex-shrink-0">
+      <div className="flex items-center gap-1.5 flex-shrink-0">
         {set.is_pr && (
-          <span className="text-[9px] font-black text-[#D46A3A] uppercase tracking-[0.05em] bg-[#D46A3A]/10 px-1.5 py-0.5 rounded-md animate-pulse">
+          <span className="text-[9px] font-black text-[#D46A3A] uppercase tracking-[0.05em] bg-[#D46A3A]/10 px-1.5 py-0.5 rounded-md">
             PR
           </span>
         )}
         <button
           onClick={handleCompleteClick}
-          className={`w-[44px] h-[44px] flex items-center justify-center rounded-lg transition-all touch-manipulation ${
+          className={`w-[40px] h-[40px] flex items-center justify-center rounded-full transition-all touch-manipulation ${
             set.completed
-              ? 'bg-[#3D8B5C] text-white active:scale-95 animate-check-bounce'
-              : 'bg-[#F8F8F6] text-[#C0C0C0] hover:bg-[#F0F0EE] active:scale-95'
+              ? 'bg-[#3D8B5C] text-white active:scale-90 shadow-sm shadow-[#3D8B5C]/25'
+              : 'border-2 border-[#E0E0DE] text-[#D5D5D5] hover:border-[#ACACAC] hover:text-[#ACACAC] active:scale-90'
           }`}
           style={{ WebkitTapHighlightColor: 'transparent' }}
         >
