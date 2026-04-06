@@ -12,7 +12,7 @@ import {
   ChevronDown,
   Search,
 } from 'lucide-react'
-import { StepperInput } from '@/components/ui/StepperInput'
+// StepperInput removed — plain inputs like Hevy
 import { ExerciseMedia } from '@/components/ExerciseMedia'
 import { notifyWorkoutBarChanged } from '@/components/workout/ActiveWorkoutBar'
 
@@ -1313,8 +1313,8 @@ function ActiveWorkoutPage() {
                 <div className="flex items-center gap-2 mb-1.5 px-2">
                   <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] w-[28px] text-center">Set</span>
                   <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] flex-1 text-center">Vorige</span>
-                  <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] w-[120px] text-center">{weightUnit.toUpperCase()}</span>
-                  <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] w-[106px] text-center">Reps</span>
+                  <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] w-[80px] text-center">{weightUnit.toUpperCase()}</span>
+                  <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] w-[64px] text-center">Reps</span>
                   <span className="w-[40px]" />
                 </div>
 
@@ -1660,32 +1660,36 @@ function SetRowComponent({
         {prevLabel}
       </span>
 
-      {/* Weight input with stepper */}
-      <StepperInput
+      {/* Weight input — plain like Hevy */}
+      <input
         id={`weight-${exerciseId}-${index}`}
-        value={weight}
-        onChange={handleWeightChange}
-        step={weightUnit === 'lbs' ? 5 : 2.5}
-        min={0}
-        max={weightUnit === 'lbs' ? 1100 : 500}
+        type="text"
         inputMode="decimal"
+        value={weight}
+        onChange={(e) => handleWeightChange(e.target.value)}
         placeholder={prefilledWeight ? toDisplay(prefilledWeight) : '—'}
         disabled={set.completed}
-        className="w-[120px] flex-shrink-0"
+        className={`w-[80px] flex-shrink-0 text-center text-[14px] font-medium tabular-nums py-2 rounded-lg border-none focus:outline-none transition-colors ${
+          set.completed
+            ? 'bg-transparent text-[#3D8B5C]'
+            : 'bg-[#F8F8F6] text-[#1A1917] focus:bg-[#F0F0EE] placeholder-[#C0C0C0]'
+        }`}
       />
 
-      {/* Reps input with stepper */}
-      <StepperInput
+      {/* Reps input — plain like Hevy */}
+      <input
         id={`reps-${exerciseId}-${index}`}
-        value={reps}
-        onChange={handleRepsChange}
-        step={1}
-        min={0}
-        max={999}
+        type="text"
         inputMode="numeric"
+        value={reps}
+        onChange={(e) => handleRepsChange(e.target.value)}
         placeholder={set.prescribed_reps?.toString() || '—'}
         disabled={set.completed}
-        className="w-[106px] flex-shrink-0"
+        className={`w-[64px] flex-shrink-0 text-center text-[14px] font-medium tabular-nums py-2 rounded-lg border-none focus:outline-none transition-colors ${
+          set.completed
+            ? 'bg-transparent text-[#3D8B5C]'
+            : 'bg-[#F8F8F6] text-[#1A1917] focus:bg-[#F0F0EE] placeholder-[#C0C0C0]'
+        }`}
       />
 
       {/* Check button + inline PR badge */}
