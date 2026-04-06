@@ -13,6 +13,7 @@ import {
   ChevronDown,
   Search,
 } from 'lucide-react'
+import { StepperInput } from '@/components/ui/StepperInput'
 import { ExerciseMedia } from '@/components/ExerciseMedia'
 import { notifyWorkoutBarChanged } from '@/components/workout/ActiveWorkoutBar'
 
@@ -517,6 +518,30 @@ function ActiveWorkoutPage() {
   useEffect(() => { setsRef.current = sets }, [sets])
   useEffect(() => { sessionRef.current = session }, [session])
 
+  // --- Haptic helper ---
+  const haptic = useCallback((pattern: number | number[]) => {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(pattern)
+    }
+  }, [])
+
+  // --- Audio beep for timer ---
+  const playBeep = useCallback((frequency: number = 880, duration: number = 120) => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.frequency.value = frequency
+      osc.type = 'sine'
+      gain.gain.value = 0.3
+      osc.start()
+      osc.stop(ctx.currentTime + duration / 1000)
+      setTimeout(() => ctx.close(), duration + 50)
+    } catch { /* audio not available */ }
+  }, [])
+
   // --- Workout duration timer ---
   useEffect(() => {
     if (!session) return
@@ -528,17 +553,29 @@ function ActiveWorkoutPage() {
     return () => clearInterval(interval)
   }, [session])
 
-  // --- Inline rest timer countdown ---
+  // --- Inline rest timer countdown with audio beeps ---
   useEffect(() => {
     if (!activeRestTimer || activeRestTimer.seconds <= 0) return
     const interval = setInterval(() => {
       setActiveRestTimer(prev => {
-        if (!prev || prev.seconds <= 1) return null
-        return { ...prev, seconds: prev.seconds - 1 }
+        if (!prev) return null
+        const next = prev.seconds - 1
+        // Beep at 3, 2, 1 seconds
+        if (next > 0 && next <= 3) {
+          playBeep(660, 100)
+          haptic(15)
+        }
+        // Final beep (done) — longer, higher pitch
+        if (next <= 0) {
+          playBeep(1100, 250)
+          haptic([40, 30, 40])
+          return null
+        }
+        return { ...prev, seconds: next }
       })
     }, 1000)
     return () => clearInterval(interval)
-  }, [activeRestTimer])
+  }, [activeRestTimer, playBeep, haptic])
 
   // --- Auto-save ---
   useEffect(() => {
@@ -666,9 +703,12 @@ function ActiveWorkoutPage() {
     loadData()
   }, [dayId, programId, router])
 
-  // --- Complete a set: PR check + rest timer (state is already updated by SetRow) ---
+  // --- Complete a set: PR check + rest timer + haptic + auto-focus ---
   const completeSet = useCallback(async (exerciseId: string, setIndex: number, weight: number | null) => {
     if (!session) return
+
+    // Haptic on set completion
+    haptic(25)
 
     try {
       const exerciseRef = exercises.find(e => e.id === exerciseId)
@@ -688,6 +728,7 @@ function ActiveWorkoutPage() {
 
       // Only update is_pr flag — use functional updater to not overwrite reps/weight
       if (isPR) {
+        haptic([50, 50, 100]) // Strong double-buzz for PR
         setSets(prev => {
           const updated = { ...prev }
           updated[exerciseId] = [...(updated[exerciseId] || [])]
@@ -704,8 +745,21 @@ function ActiveWorkoutPage() {
       if (exerciseRef && exerciseRef.rest_seconds > 0) {
         setActiveRestTimer({ exerciseId, setIndex, seconds: exerciseRef.rest_seconds, total: exerciseRef.rest_seconds })
       }
+
+      // Auto-focus next set's weight field
+      const exSets = sets[exerciseId] || []
+      const nextIndex = setIndex + 1
+      if (nextIndex < exSets.length && !exSets[nextIndex].completed) {
+        setTimeout(() => {
+          const nextInput = document.getElementById(`weight-${exerciseId}-${nextIndex}`)
+          if (nextInput) {
+            nextInput.focus()
+            ;(nextInput as HTMLInputElement).select()
+          }
+        }, 150)
+      }
     } catch (error) { console.error('Error completing set:', error) }
-  }, [session, exercises])
+  }, [session, exercises, haptic, sets])
 
   // --- Add extra set ---
   const addSet = (exerciseId: string) => {
@@ -1021,7 +1075,7 @@ function ActiveWorkoutPage() {
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <button
             onClick={handleMinimize}
-            className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-[#F0F0EE] transition-colors touch-manipulation"
+            className="w-11 h-11 flex items-center justify-center rounded-xl hover:bg-[#F0F0EE] transition-colors touch-manipulation"
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             <X size={20} strokeWidth={1.5} className="text-[#ACACAC]" />
@@ -1037,7 +1091,7 @@ function ActiveWorkoutPage() {
           <button
             onClick={handleFinish}
             disabled={saving}
-            className={`px-5 h-10 rounded-xl font-semibold text-[12px] uppercase tracking-[0.08em] transition-all ${
+            className={`px-5 h-11 rounded-xl font-semibold text-[12px] uppercase tracking-[0.08em] transition-all touch-manipulation ${
               saving
                 ? 'bg-[#C0C0C0] text-[#ACACAC] cursor-wait'
                 : 'bg-[#D46A3A] text-white'
@@ -1131,9 +1185,9 @@ function ActiveWorkoutPage() {
                 <div className="flex items-center gap-2 mb-2 px-1">
                   <span className="text-[10px] font-bold text-[#ACACAC] uppercase tracking-[0.1em] w-[32px]">Set</span>
                   <span className="text-[10px] font-bold text-[#C0C0C0] uppercase tracking-[0.1em] flex-1 text-center">Vorige</span>
-                  <span className="text-[10px] font-bold text-[#ACACAC] uppercase tracking-[0.1em] w-[72px] text-center">KG</span>
-                  <span className="text-[10px] font-bold text-[#ACACAC] uppercase tracking-[0.1em] w-[64px] text-center">Reps</span>
-                  <span className="w-[36px]" />
+                  <span className="text-[10px] font-bold text-[#ACACAC] uppercase tracking-[0.1em] w-[120px] text-center">KG</span>
+                  <span className="text-[10px] font-bold text-[#ACACAC] uppercase tracking-[0.1em] w-[106px] text-center">Reps</span>
+                  <span className="w-[44px]" />
                 </div>
 
                 {/* Rows */}
@@ -1158,20 +1212,46 @@ function ActiveWorkoutPage() {
                           setSets={setSets}
                           exSets={exSets}
                         />
-                        {/* Inline rest timer */}
+                        {/* Inline rest timer — redesigned card */}
                         {isRestActive && activeRestTimer && (
-                          <div className="flex items-center gap-2 px-1 py-1.5">
-                            <div className="flex-1 h-[3px] bg-[#F0F0EE] rounded-full overflow-hidden">
+                          <div className="mx-1 my-2 bg-[#FDF6F0] border border-[#F0E4D8] rounded-xl px-4 py-3">
+                            {/* Progress bar */}
+                            <div className="w-full h-[4px] bg-[#F0E4D8] rounded-full overflow-hidden mb-3">
                               <div
                                 className="h-full bg-[#D46A3A] rounded-full transition-all duration-1000 ease-linear"
                                 style={{ width: `${((activeRestTimer.total - activeRestTimer.seconds) / activeRestTimer.total) * 100}%` }}
                               />
                             </div>
+                            {/* Timer display + controls */}
+                            <div className="flex items-center justify-between">
+                              <button
+                                onClick={() => setActiveRestTimer(prev => prev ? { ...prev, seconds: Math.max(0, prev.seconds - 15), total: prev.total } : null)}
+                                className="w-[44px] h-[44px] flex items-center justify-center rounded-lg bg-white/60 text-[13px] font-bold text-[#D46A3A] active:scale-95 transition-all touch-manipulation"
+                                style={{ WebkitTapHighlightColor: 'transparent' }}
+                              >
+                                −15
+                              </button>
+                              <div className="text-center">
+                                <span className="stat-number text-[28px] font-bold text-[#D46A3A] tabular-nums">
+                                  {formatTimer(activeRestTimer.seconds)}
+                                </span>
+                                <p className="text-[11px] text-[#B08968] mt-0.5">Rusttijd</p>
+                              </div>
+                              <button
+                                onClick={() => setActiveRestTimer(prev => prev ? { ...prev, seconds: prev.seconds + 15, total: Math.max(prev.total, prev.seconds + 15) } : null)}
+                                className="w-[44px] h-[44px] flex items-center justify-center rounded-lg bg-white/60 text-[13px] font-bold text-[#D46A3A] active:scale-95 transition-all touch-manipulation"
+                                style={{ WebkitTapHighlightColor: 'transparent' }}
+                              >
+                                +15
+                              </button>
+                            </div>
+                            {/* Skip button */}
                             <button
                               onClick={() => setActiveRestTimer(null)}
-                              className="stat-number text-[16px] text-[#D46A3A] min-w-[44px] text-right"
+                              className="w-full mt-2 py-2 text-[12px] font-semibold text-[#B08968] uppercase tracking-[0.06em] rounded-lg hover:bg-white/40 transition-colors touch-manipulation"
+                              style={{ WebkitTapHighlightColor: 'transparent' }}
                             >
-                              {formatTimer(activeRestTimer.seconds)}
+                              Overslaan
                             </button>
                           </div>
                         )}
@@ -1184,7 +1264,7 @@ function ActiveWorkoutPage() {
                 <div className="flex gap-2 mt-3">
                   <button
                     onClick={() => addSet(ex.id)}
-                    className="flex-1 py-2.5 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#ACACAC] uppercase tracking-[0.06em] rounded-xl hover:bg-[#F8F8F6] transition-colors touch-manipulation"
+                    className="flex-1 min-h-[44px] py-3 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#ACACAC] uppercase tracking-[0.06em] rounded-xl hover:bg-[#F8F8F6] transition-colors touch-manipulation"
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
                     <Plus size={13} strokeWidth={2} />
@@ -1195,7 +1275,7 @@ function ActiveWorkoutPage() {
                       const name = exerciseData.name_nl || exerciseData.name
                       setFormCheckExercise({ id: ex.exercise_id, name })
                     }}
-                    className="py-2.5 px-4 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#D46A3A] uppercase tracking-[0.06em] rounded-xl hover:bg-[#D46A3A]/10 transition-colors touch-manipulation"
+                    className="min-h-[44px] py-3 px-4 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-[#D46A3A] uppercase tracking-[0.06em] rounded-xl hover:bg-[#D46A3A]/10 transition-colors touch-manipulation"
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
                     📹 Form check
@@ -1363,42 +1443,45 @@ function SetRowComponent({
         {prevLabel}
       </span>
 
-      {/* Weight input */}
-      <input
-        type="number"
-        step="0.5"
-        min="0"
-        inputMode="decimal"
+      {/* Weight input with stepper */}
+      <StepperInput
+        id={`weight-${exerciseId}-${index}`}
         value={weight}
-        onChange={(e) => handleWeightChange(e.target.value)}
+        onChange={handleWeightChange}
+        step={2.5}
+        min={0}
+        max={500}
+        inputMode="decimal"
         placeholder={prefilledWeight ? `${prefilledWeight}` : '—'}
         disabled={set.completed}
-        className="w-[72px] px-2 py-2.5 bg-[#F8F8F6] border border-[#F0F0EE] rounded-lg text-[14px] text-center font-semibold text-[#1A1917] tabular-nums disabled:opacity-40 focus:border-[#D46A3A] focus:outline-none transition-all placeholder:text-[#C0C0C0] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        className="w-[120px] flex-shrink-0"
       />
 
-      {/* Reps input */}
-      <input
-        type="number"
-        min="0"
-        inputMode="numeric"
+      {/* Reps input with stepper */}
+      <StepperInput
+        id={`reps-${exerciseId}-${index}`}
         value={reps}
-        onChange={(e) => handleRepsChange(e.target.value)}
+        onChange={handleRepsChange}
+        step={1}
+        min={0}
+        max={999}
+        inputMode="numeric"
         placeholder={set.prescribed_reps?.toString() || '—'}
         disabled={set.completed}
-        className="w-[64px] px-2 py-2.5 bg-[#F8F8F6] border border-[#F0F0EE] rounded-lg text-[14px] text-center font-semibold text-[#1A1917] tabular-nums disabled:opacity-40 focus:border-[#D46A3A] focus:outline-none transition-all placeholder:text-[#C0C0C0] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        className="w-[106px] flex-shrink-0"
       />
 
       {/* Check button — tap again to undo */}
       <button
         onClick={handleCompleteClick}
-        className={`w-[36px] h-[36px] flex items-center justify-center flex-shrink-0 rounded-lg transition-all touch-manipulation ${
+        className={`w-[44px] h-[44px] flex items-center justify-center flex-shrink-0 rounded-lg transition-all touch-manipulation ${
           set.completed
             ? 'bg-[#3D8B5C] text-white active:scale-95 animate-check-bounce'
             : 'bg-[#F8F8F6] text-[#C0C0C0] hover:bg-[#F0F0EE] active:scale-95'
         }`}
         style={{ WebkitTapHighlightColor: 'transparent' }}
       >
-        <Check size={14} strokeWidth={set.completed ? 3 : 2} />
+        <Check size={16} strokeWidth={set.completed ? 3 : 2} />
       </button>
     </div>
   )

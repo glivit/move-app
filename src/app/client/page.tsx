@@ -165,10 +165,11 @@ export default function ClientDashboard() {
     if (!val || val < 30 || val > 300) return
     setWeightSaving(true)
     try {
+      const today = new Date().toISOString().split('T')[0]
       await fetch('/api/health-metrics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ metric_type: 'weight', value: val, measured_at: new Date().toISOString() }),
+        body: JSON.stringify({ date: today, weight_kg: val }),
       })
       setWeightSaved(true)
       setWeightInput('')

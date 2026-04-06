@@ -112,12 +112,12 @@ export default function NewProgramPage() {
       const { exercises, ...dayData } = templateDay
       const newDayData = {
         ...dayData,
-        program_id: newProgramId,
-        template_id: undefined,
+        template_id: newProgramId,
+        id: undefined,
       }
 
       const { data: newDay, error: dayInsertError } = await supabase
-        .from('program_days')
+        .from('program_template_days')
         .insert(newDayData)
         .select()
 
@@ -130,12 +130,12 @@ export default function NewProgramPage() {
         if (exercises && exercises.length > 0) {
           const newExercises = exercises.map((exercise: any) => ({
             ...exercise,
-            day_id: newDayId,
-            template_exercise_id: undefined,
+            template_day_id: newDayId,
+            id: undefined,
           }))
 
           const { error: exerciseInsertError } = await supabase
-            .from('program_exercises')
+            .from('program_template_exercises')
             .insert(newExercises)
 
           if (exerciseInsertError) throw exerciseInsertError

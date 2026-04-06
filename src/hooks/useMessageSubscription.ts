@@ -71,6 +71,19 @@ export function useMessageSubscription(userId: string, otherUserId: string) {
             setMessages((prev) => {
               // Avoid duplicates (optimistic + realtime)
               if (prev.some((m) => m.id === msg.id)) return prev
+              // Check if there's an optimistic (temp) message matching this real message
+              const tempIdx = prev.findIndex(
+                (m) => m.id.startsWith('temp-') &&
+                       m.sender_id === msg.sender_id &&
+                       m.receiver_id === msg.receiver_id &&
+                       m.content === msg.content
+              )
+              if (tempIdx !== -1) {
+                // Replace optimistic message with real one
+                const updated = [...prev]
+                updated[tempIdx] = msg
+                return updated
+              }
               return [...prev, msg]
             })
           }
@@ -135,10 +148,15 @@ export function useMessageSubscription(userId: string, otherUserId: string) {
         return { error }
       }
 
-      // Replace optimistic with real message
-      setMessages((prev) =>
-        prev.map((m) => (m.id === optimisticMsg.id ? (data as Message) : m))
-      )
+      // Replace optimistic with real message (if realtime hasn't already)
+      setMessages((prev) => {
+        // If realtime already added this message, just remove the temp
+        if (prev.some((m) => m.id === (data as Message).id)) {
+          return prev.filter((m) => m.id !== optimisticMsg.id)
+        }
+        // Otherwise replace the temp message with the real one
+        return prev.map((m) => (m.id === optimisticMsg.id ? (data as Message) : m))
+      })
 
       // Send push notification to the other user (fire & forget)
       sendPushToClient(otherUserId, 'Nieuw bericht', content.substring(0, 100), '/client/messages')

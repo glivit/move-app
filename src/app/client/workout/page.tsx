@@ -331,6 +331,24 @@ export default function WorkoutOverviewPage() {
           )
         })}
       </div>
+
+      {/* Sticky Start CTA for today's workout */}
+      {todayDay && !todayCompleted && (
+        <div className="fixed bottom-24 left-0 right-0 px-5 z-30 pointer-events-none">
+          <div className="max-w-lg mx-auto pointer-events-auto">
+            <button
+              onClick={() => handleStartWorkout(todayDay)}
+              className="w-full flex items-center justify-center gap-2.5 bg-[#1A1917] text-white py-4 rounded-2xl shadow-lg shadow-black/10 active:scale-[0.98] transition-all touch-manipulation hover:bg-[#333]"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+            >
+              <Play size={18} strokeWidth={2.5} fill="white" />
+              <span className="text-[15px] font-bold uppercase tracking-[0.06em]">
+                Start training
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

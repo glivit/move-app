@@ -48,9 +48,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Client niet gevonden' }, { status: 404 })
   }
 
-  // Use magiclink for resends (invite type can fail for existing users).
-  // magiclink always generates a fresh token that works for existing accounts.
-  const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
+  // Try magiclink first (works for existing confirmed users),
+  // then fall back to invite type (works for new/unconfirmed users)
+  let linkData: any = null
+  let linkError: any = null
+
+  // First attempt: magiclink
+  const magicResult = await admin.auth.admin.generateLink({
     type: 'magiclink',
     email: clientProfile.email,
     options: {
@@ -58,12 +62,52 @@ export async function POST(request: NextRequest) {
     },
   })
 
-  if (linkError) {
-    console.error('Resend invite link error:', linkError)
-    return NextResponse.json(
-      { error: `Kon geen nieuwe uitnodiging genereren: ${linkError.message}` },
-      { status: 500 }
-    )
+  if (magicResult.error) {
+    // Fallback: try invite type (creates user if needed)
+    console.log('Magiclink failed, trying invite:', magicResult.error.message)
+    const inviteResult = await admin.auth.admin.generateLink({
+      type: 'invite',
+      email: clientProfile.email,
+      options: {
+        data: {
+          full_name: clientProfile.full_name,
+          role: 'client',
+        },
+        redirectTo: `${appUrl}/auth/callback`,
+      },
+    })
+
+    if (inviteResult.error) {
+      // If invite also fails with "already registered", the magiclink issue is real
+      if (inviteResult.error.message?.includes('already')) {
+        // User exists but magiclink failed — try recovery link as last resort
+        const recoveryResult = await admin.auth.admin.generateLink({
+          type: 'recovery',
+          email: clientProfile.email,
+          options: {
+            redirectTo: `${appUrl}/auth/callback`,
+          },
+        })
+        if (recoveryResult.error) {
+          console.error('All link generation attempts failed:', recoveryResult.error)
+          return NextResponse.json(
+            { error: `Kon geen nieuwe uitnodiging genereren. Probeer later opnieuw.` },
+            { status: 500 }
+          )
+        }
+        linkData = recoveryResult.data
+      } else {
+        console.error('Invite link error:', inviteResult.error)
+        return NextResponse.json(
+          { error: `Kon geen nieuwe uitnodiging genereren: ${inviteResult.error.message}` },
+          { status: 500 }
+        )
+      }
+    } else {
+      linkData = inviteResult.data
+    }
+  } else {
+    linkData = magicResult.data
   }
 
   // Use action_link (goes through Supabase's server-side verification).
