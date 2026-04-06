@@ -11,7 +11,9 @@ import {
   Clock,
   Info,
   ChevronDown,
+  ChevronUp,
   Search,
+  GripVertical,
 } from 'lucide-react'
 import { StepperInput } from '@/components/ui/StepperInput'
 import { ExerciseMedia } from '@/components/ExerciseMedia'
@@ -191,6 +193,8 @@ interface SavedWorkoutState {
   programId: string
   sets: Record<string, SetData[]>
   savedAt: number
+  exerciseNotes?: Record<string, string>
+  exerciseOrder?: string[]
 }
 
 function saveWorkoutState(state: SavedWorkoutState) {
@@ -616,11 +620,15 @@ function ActiveWorkoutPage() {
     return () => clearInterval(interval)
   }, [activeRestTimer, playBeep, haptic])
 
-  // --- Auto-save ---
+  // --- Auto-save (includes notes + exercise order) ---
   useEffect(() => {
     if (!session || !dayId || !programId || Object.keys(sets).length === 0) return
-    saveWorkoutState({ sessionId: session.id, dayId, programId, sets, savedAt: Date.now() })
-  }, [sets, session, dayId, programId])
+    saveWorkoutState({
+      sessionId: session.id, dayId, programId, sets, savedAt: Date.now(),
+      exerciseNotes,
+      exerciseOrder: exercises.map(e => e.id),
+    })
+  }, [sets, session, dayId, programId, exerciseNotes, exercises])
 
   useEffect(() => {
     const persist = () => {
@@ -683,6 +691,19 @@ function ActiveWorkoutPage() {
           if (existingSession && !existingSession.completed_at) {
             setSession({ id: existingSession.id, started_at: existingSession.started_at })
             setSets(saved.sets)
+            // Restore notes
+            if (saved.exerciseNotes) setExerciseNotes(saved.exerciseNotes)
+            // Restore exercise order
+            if (saved.exerciseOrder && saved.exerciseOrder.length > 0) {
+              const orderedExercises = saved.exerciseOrder
+                .map(id => exercisesData.find(e => e.id === id))
+                .filter(Boolean) as ProgramTemplateExercise[]
+              // Add any new exercises not in saved order
+              for (const ex of exercisesData) {
+                if (!orderedExercises.find(o => o.id === ex.id)) orderedExercises.push(ex)
+              }
+              setExercises(orderedExercises)
+            }
             return
           }
           clearWorkoutState()
@@ -799,6 +820,20 @@ function ActiveWorkoutPage() {
       }
     } catch (error) { console.error('Error completing set:', error) }
   }, [session, exercises, haptic, sets])
+
+  // --- Reorder exercises ---
+  const moveExercise = useCallback((fromIndex: number, direction: 'up' | 'down') => {
+    const toIndex = direction === 'up' ? fromIndex - 1 : fromIndex + 1
+    if (toIndex < 0 || toIndex >= exercises.length) return
+    setExercises(prev => {
+      const updated = [...prev]
+      const temp = updated[fromIndex]
+      updated[fromIndex] = updated[toIndex]
+      updated[toIndex] = temp
+      return updated
+    })
+    if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10)
+  }, [exercises.length])
 
   // --- Add extra set ---
   const addSet = (exerciseId: string) => {
@@ -1230,11 +1265,32 @@ function ActiveWorkoutPage() {
                     </h3>
                     <Info size={13} strokeWidth={1.5} className="text-[#C0C0C0] flex-shrink-0" />
                   </button>
-                  <span className={`text-[12px] font-medium tabular-nums ml-2 px-2 py-0.5 rounded-lg ${
-                    exDone ? 'bg-[#D46A3A]/10 text-[#D46A3A]' : 'text-[#ACACAC]'
-                  }`}>
-                    {exCompleted}/{exSets.length}
-                  </span>
+                  <div className="flex items-center gap-1 ml-2">
+                    {/* Reorder buttons */}
+                    <div className="flex flex-col -my-1">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); moveExercise(exIndex, 'up') }}
+                        disabled={exIndex === 0}
+                        className="p-0.5 text-[#D5D5D5] hover:text-[#1A1917] disabled:opacity-20 transition-colors touch-manipulation"
+                        style={{ WebkitTapHighlightColor: 'transparent' }}
+                      >
+                        <ChevronUp size={14} strokeWidth={2} />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); moveExercise(exIndex, 'down') }}
+                        disabled={exIndex === exercises.length - 1}
+                        className="p-0.5 text-[#D5D5D5] hover:text-[#1A1917] disabled:opacity-20 transition-colors touch-manipulation"
+                        style={{ WebkitTapHighlightColor: 'transparent' }}
+                      >
+                        <ChevronDown size={14} strokeWidth={2} />
+                      </button>
+                    </div>
+                    <span className={`text-[12px] font-medium tabular-nums px-2 py-0.5 rounded-lg ${
+                      exDone ? 'bg-[#D46A3A]/10 text-[#D46A3A]' : 'text-[#ACACAC]'
+                    }`}>
+                      {exCompleted}/{exSets.length}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Meta */}

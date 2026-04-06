@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState, useMemo, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import { ChevronLeft, ChevronRight, TrendingUp, Dumbbell, Flame, Trophy, BarChart3, Target } from 'lucide-react'
+import { ChevronLeft, ChevronRight, TrendingUp, Dumbbell, Flame, Trophy, BarChart3, Target, RotateCcw } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -21,6 +22,8 @@ interface WorkoutSession {
   duration_seconds: number | null
   mood_rating: number | null
   notes: string | null
+  template_day_id: string | null
+  program_id: string | null
   workout_sets?: WorkoutSet[]
   program_template_days?: { name: string } | { name: string }[]
 }
@@ -107,6 +110,7 @@ const MOOD_LABELS: Record<number, string> = { 1: '😮‍💨', 2: '😐', 3: '�
 // ─── Component ──────────────────────────────────────────────
 
 export default function WorkoutHistoryPage() {
+  const router = useRouter()
   const [workouts, setWorkouts] = useState<WorkoutSession[]>([])
   const [loading, setLoading] = useState(true)
   const [currentMonth, setCurrentMonth] = useState(new Date())
@@ -123,7 +127,7 @@ export default function WorkoutHistoryPage() {
 
         const { data: sessionsData } = await supabase
           .from('workout_sessions')
-          .select('*, workout_sets(*, exercises(id, name, name_nl)), program_template_days(name)')
+          .select('*, workout_sets(*, exercises(id, name, name_nl)), program_template_days(name), template_day_id, program_id')
           .eq('client_id', authUser.id)
           .not('completed_at', 'is', null)
           .order('completed_at', { ascending: false })
@@ -561,6 +565,18 @@ export default function WorkoutHistoryPage() {
                             </div>
                           ))
                         })()}
+
+                        {/* Repeat workout button */}
+                        {workout.template_day_id && workout.program_id && (
+                          <button
+                            onClick={() => router.push(`/client/workout/active?dayId=${workout.template_day_id}&programId=${workout.program_id}`)}
+                            className="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-[#D46A3A]/20 text-[12px] font-semibold text-[#D46A3A] uppercase tracking-[0.06em] hover:bg-[#D46A3A]/5 transition-colors touch-manipulation"
+                            style={{ WebkitTapHighlightColor: 'transparent' }}
+                          >
+                            <RotateCcw size={14} strokeWidth={2} />
+                            Herhaal training
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
