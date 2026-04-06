@@ -2,6 +2,9 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { NextRequest, NextResponse } from 'next/server'
 import { TEMPLATE_DIETS, getTemplateDiet } from '@/lib/template-diets'
 
+// Force dynamic — never let Vercel/Next.js statically cache this route
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/template-diets
  * List all available template diets (for coach selection UI)
@@ -21,7 +24,7 @@ export async function GET() {
   }))
 
   const response = NextResponse.json(summaries)
-  response.headers.set('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400')
+  response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
   return response
 }
 
