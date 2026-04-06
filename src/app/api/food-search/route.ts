@@ -197,6 +197,11 @@ export async function POST(request: NextRequest) {
 }
 
 function mapLocalProduct(p: any) {
+  // serving_size MUST be string — UI calls .match() on it
+  const servingSize = p.serving_size_g
+    ? `${p.serving_size_g}g`
+    : (typeof p.serving_size === 'string' ? p.serving_size : null)
+
   return {
     source: 'local' as const,
     barcode: p.barcode || null,
@@ -204,7 +209,7 @@ function mapLocalProduct(p: any) {
     brand: p.brand || null,
     image_small: p.image_url || null,
     image: p.image_url || null,
-    serving_size: p.serving_size_g || null,
+    serving_size: servingSize,
     serving_label: p.serving_label || null,
     quantity: null,
     nutriscore: null,
