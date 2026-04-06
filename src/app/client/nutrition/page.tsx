@@ -4,8 +4,9 @@ import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { createClient } from '@/lib/supabase'
 import {
   Check, ChevronLeft, ChevronRight, MessageSquare,
-  Pencil, ChevronDown, ChevronUp, ArrowLeftRight
+  Pencil, ChevronDown, ChevronUp, ArrowLeftRight, ScanBarcode
 } from 'lucide-react'
+import { invalidateCache } from '@/lib/fetcher'
 
 // ─── Types ──────────────────────────────────────────
 
@@ -92,6 +93,11 @@ function calcMacro(food: FoodEntry, key: 'calories' | 'protein' | 'carbs' | 'fat
   return Math.round((food.per100g[key] * food.grams) / 100)
 }
 
+/** Generate a stable meal ID — must match dashboard/route.ts logic */
+function ensureMealId(meal: any, index: number): string {
+  return meal.id || `meal-${index}-${(meal.name || '').toLowerCase().replace(/\s+/g, '-')}`
+}
+
 function formatDate(date: Date) {
   const today = new Date()
   const yesterday = new Date()
@@ -144,6 +150,7 @@ function FoodSearchModal({
   const [searchResults, setSearchResults] = useState<SearchProduct[]>([])
   const [selectedProduct, setSelectedProduct] = useState<SearchProduct | null>(null)
   const [gramsInput, setGramsInput] = useState(String(originalGrams || 100))
+  const [selectedPortion, setSelectedPortion] = useState<string | null>(null)
   const grams = parseInt(gramsInput) || 0
   const [loading, setLoading] = useState(false)
   const [modalTab, setModalTab] = useState<'search' | 'custom'>('search')
@@ -161,6 +168,7 @@ function FoodSearchModal({
       setSearchResults([])
       setSelectedProduct(null)
       setGramsInput(String(originalGrams || 100))
+      setSelectedPortion(null)
     }
   }, [isOpen, originalGrams])
 
@@ -288,6 +296,7 @@ function FoodSearchModal({
         const sumData = await sumRes.json()
         if (sumData.summary) setSummary(sumData.summary)
 
+        invalidateCache('/api/dashboard')
         onClose()
       }
     } catch (err) {
@@ -336,10 +345,19 @@ function FoodSearchModal({
       try {
         const { Html5Qrcode } = await import('html5-qrcode')
         if (stopped) return
+
+        // Wait for the DOM element to appear (it renders conditionally)
+        let attempts = 0
+        while (!document.getElementById('barcode-reader') && attempts < 20) {
+          await new Promise(r => setTimeout(r, 50))
+          attempts++
+        }
+        if (stopped || !document.getElementById('barcode-reader')) return
+
         html5QrCode = new Html5Qrcode('barcode-reader')
         await html5QrCode.start(
           { facingMode: 'environment' },
-          { fps: 10, qrbox: { width: 250, height: 150 } },
+          { fps: 10, qrbox: { width: 250, height: 150 }, aspectRatio: 1.7777 },
           (decodedText: string) => {
             // On successful scan
             html5QrCode.stop().catch(() => {})
@@ -348,12 +366,16 @@ function FoodSearchModal({
           },
           () => {} // ignore scan failures (no barcode in frame)
         )
-      } catch (err) {
+      } catch (err: any) {
         console.error('Scanner error:', err)
         setScanning(false)
-        // Fallback to manual input
-        const code = prompt('Camera niet beschikbaar. Voer de barcode handmatig in:')
-        if (code) lookupBarcode(code)
+        if (err?.message?.includes('Permission') || err?.name === 'NotAllowedError') {
+          const code = prompt('Camera-toegang geweigerd. Voer de barcode handmatig in:')
+          if (code) lookupBarcode(code)
+        } else {
+          const code = prompt('Camera niet beschikbaar. Voer de barcode handmatig in:')
+          if (code) lookupBarcode(code)
+        }
       }
     }
 
@@ -362,7 +384,7 @@ function FoodSearchModal({
     return () => {
       stopped = true
       if (html5QrCode) {
-        html5QrCode.stop().catch(() => {})
+        try { html5QrCode.stop().catch(() => {}) } catch {}
       }
     }
   }, [scanning])
@@ -412,60 +434,42 @@ function FoodSearchModal({
       />
 
       {/* Modal */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-white rounded-t-2xl rounded-b-none flex flex-col max-h-[90vh] z-[51]">
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-white rounded-t-2xl rounded-b-none flex flex-col max-h-[75vh] z-[51]">
         {/* Close handle */}
         <div className="flex justify-center pt-3 pb-1">
           <button onClick={onClose} className="w-10 h-1 bg-[#D5D5D5] rounded-full" aria-label="Sluiten" />
         </div>
-        {/* Tab bar: Search | Nieuw product */}
+        {/* Tab bar: Search | Scan | Nieuw */}
         <div className="flex border-b border-[#F0F0EE]">
           <button
-            onClick={() => setModalTab('search')}
+            onClick={() => { setModalTab('search'); setScanning(false) }}
             className={`flex-1 py-3 text-[13px] font-semibold uppercase tracking-[0.06em] transition-all border-b-2 text-center ${
-              modalTab === 'search' ? 'border-[#1A1917] text-[#1A1917]' : 'border-transparent text-[#C0C0C0]'
+              modalTab === 'search' && !scanning ? 'border-[#1A1917] text-[#1A1917]' : 'border-transparent text-[#C0C0C0]'
             }`}
           >
             Zoeken
           </button>
           <button
-            onClick={() => setModalTab('custom')}
+            onClick={() => { setModalTab('search'); scanning ? stopScanning() : handleBarcodeScan() }}
+            className={`flex-1 py-3 text-[13px] font-semibold uppercase tracking-[0.06em] transition-all border-b-2 text-center flex items-center justify-center gap-1.5 ${
+              scanning ? 'border-[#D46A3A] text-[#D46A3A]' : 'border-transparent text-[#C0C0C0]'
+            }`}
+          >
+            <ScanBarcode strokeWidth={1.8} className="w-4 h-4" />
+            Scan
+          </button>
+          <button
+            onClick={() => { setModalTab('custom'); setScanning(false) }}
             className={`flex-1 py-3 text-[13px] font-semibold uppercase tracking-[0.06em] transition-all border-b-2 text-center ${
               modalTab === 'custom' ? 'border-[#1A1917] text-[#1A1917]' : 'border-transparent text-[#C0C0C0]'
             }`}
           >
-            Nieuw product
+            Nieuw
           </button>
         </div>
 
         {modalTab === 'search' ? (
           <>
-            {/* Search input + barcode button */}
-            <div className="px-4 py-4 border-b border-[#F0F0EE]">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Zoek voedingsmiddel..."
-                  autoFocus
-                  className="flex-1 px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
-                />
-                <button
-                  onClick={scanning ? stopScanning : handleBarcodeScan}
-                  className={`px-3 py-2.5 border rounded-xl transition-colors ${
-                    scanning
-                      ? 'border-[#D46A3A] text-[#D46A3A] bg-[rgba(212,106,58,0.06)]'
-                      : 'border-[#F0F0EE] text-[#ACACAC] hover:text-[#1A1917] hover:border-[#1A1917]'
-                  }`}
-                  title={scanning ? 'Scanner stoppen' : 'Barcode scannen'}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 7V5a2 2 0 0 1 2-2h2" /><path d="M17 3h2a2 2 0 0 1 2 2v2" /><path d="M21 17v2a2 2 0 0 1-2 2h-2" /><path d="M7 21H5a2 2 0 0 1-2-2v-2" />
-                    <line x1="7" y1="8" x2="7" y2="16" /><line x1="10" y1="8" x2="10" y2="16" /><line x1="13" y1="8" x2="13" y2="16" /><line x1="17" y1="8" x2="17" y2="16" />
-                  </svg>
-                </button>
-              </div>
-            </div>
             {/* Camera barcode scanner */}
             {scanning && (
               <div className="px-4 py-4 border-b border-[#F0F0EE] bg-[#1A1917]">
@@ -487,64 +491,80 @@ function FoodSearchModal({
               </div>
             )}
 
+            {/* Search input */}
+            {!scanning && (
+              <div className="px-4 py-3 border-b border-[#F0F0EE]">
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Zoek voedingsmiddel..."
+                  autoFocus
+                  className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[14px] text-[#1A1917] bg-white placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
+                />
+              </div>
+            )}
+
             {/* Results list */}
-            <div className="flex-1 overflow-y-auto">
-              {loading && (
-                <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#C0C0C0] border-t-[#1A1917]" />
-                </div>
-              )}
+            {!scanning && (
+              <div className="flex-1 overflow-y-auto">
+                {loading && (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#C0C0C0] border-t-[#1A1917]" />
+                  </div>
+                )}
 
-              {!loading && searchResults.length === 0 && query && (
-                <div className="py-8 text-center">
-                  <p className="text-[13px] text-[#ACACAC] mb-3">
-                    Geen resultaten voor &ldquo;{query}&rdquo;
-                  </p>
-                  <button
-                    onClick={() => { setModalTab('custom'); setCustomForm(prev => ({ ...prev, name: query })) }}
-                    className="text-[13px] font-medium text-[#D46A3A] hover:underline"
-                  >
-                    Voeg &ldquo;{query}&rdquo; handmatig toe
-                  </button>
-                </div>
-              )}
-
-              {!loading && searchResults.length > 0 && (
-                <div>
-                  {searchResults.map((product, idx) => (
+                {!loading && searchResults.length === 0 && query && (
+                  <div className="py-8 text-center">
+                    <p className="text-[13px] text-[#ACACAC] mb-3">
+                      Geen resultaten voor &ldquo;{query}&rdquo;
+                    </p>
                     <button
-                      key={idx}
-                      onClick={() => setSelectedProduct(product)}
-                      className={`w-full px-4 py-3 border-t border-[#F0F0EE] flex flex-col gap-1 transition-colors ${
-                        selectedProduct === product ? 'bg-[rgba(212,106,58,0.06)]' : 'hover:bg-[#FAFAF8]'
-                      }`}
+                      onClick={() => { setModalTab('custom'); setCustomForm(prev => ({ ...prev, name: query })) }}
+                      className="text-[13px] font-medium text-[#D46A3A] hover:underline"
                     >
-                      <div className="flex items-center gap-2 justify-between">
-                        <div className="flex-1 text-left min-w-0">
-                          <p className="text-[14px] text-[#1A1917] truncate">
-                            {product.name}
-                          </p>
-                          {product.brand && (
-                            <p className="text-[12px] text-[#ACACAC] truncate">
-                              {product.brand}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex gap-2 text-[11px] text-[#C0C0C0]">
-                        <span>{Math.round(product.per100g.calories)} kcal</span>
-                        <span>·</span>
-                        <span>P {product.per100g.protein}g</span>
-                        <span>·</span>
-                        <span>K {product.per100g.carbs}g</span>
-                        <span>·</span>
-                        <span>V {product.per100g.fat}g</span>
-                      </div>
+                      Voeg &ldquo;{query}&rdquo; handmatig toe
                     </button>
-                  ))}
-                </div>
-              )}
-            </div>
+                  </div>
+                )}
+
+                {!loading && searchResults.length > 0 && (
+                  <div>
+                    {searchResults.map((product, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => { setSelectedProduct(product); setSelectedPortion(null) }}
+                        className={`w-full px-4 py-3 border-t border-[#F0F0EE] flex flex-col gap-1 transition-colors ${
+                          selectedProduct === product ? 'bg-[rgba(212,106,58,0.06)]' : 'hover:bg-[#FAFAF8]'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 justify-between">
+                          <div className="flex-1 text-left min-w-0">
+                            <p className="text-[14px] text-[#1A1917] truncate">
+                              {product.name}
+                            </p>
+                            {product.brand && (
+                              <p className="text-[12px] text-[#ACACAC] truncate">
+                                {product.brand}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex gap-2 text-[11px] text-[#C0C0C0]">
+                          <span>{Math.round(product.per100g.calories)} kcal</span>
+                          <span>·</span>
+                          <span>P {product.per100g.protein}g</span>
+                          <span>·</span>
+                          <span>K {product.per100g.carbs}g</span>
+                          <span>·</span>
+                          <span>V {product.per100g.fat}g</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </>
         ) : (
           /* Custom product form */
@@ -643,27 +663,98 @@ function FoodSearchModal({
           </div>
         )}
 
-        {/* Selection and gram input */}
+        {/* Selection: portion picker + gram input */}
         {selectedProduct && modalTab === 'search' && (
-          <div className="border-t border-[#F0F0EE] px-4 py-4 space-y-3">
+          <div className="border-t border-[#F0F0EE] px-4 pt-3 pb-4 space-y-3">
+            {/* Product name + macro preview */}
+            <div>
+              <p className="text-[13px] font-medium text-[#1A1917] truncate">
+                {selectedProduct.name}
+              </p>
+              <p className="text-[11px] text-[#ACACAC] mt-0.5">
+                {Math.round((selectedProduct.per100g.calories * grams) / 100)} kcal
+                {' · '}P {Math.round((selectedProduct.per100g.protein * grams) / 100)}g
+                {' · '}K {Math.round((selectedProduct.per100g.carbs * grams) / 100)}g
+                {' · '}V {Math.round((selectedProduct.per100g.fat * grams) / 100)}g
+              </p>
+            </div>
+
+            {/* Portion quick-select */}
+            <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+              {(() => {
+                // Build portion options based on product context
+                const portions: { label: string; grams: number }[] = []
+                // Add serving_size from OpenFoodFacts if available
+                if (selectedProduct.serving_size) {
+                  const match = selectedProduct.serving_size.match(/(\d+)\s*g/i)
+                  if (match) {
+                    portions.push({ label: '1 portie', grams: parseInt(match[1]) })
+                  }
+                }
+                if (selectedProduct.quantity) {
+                  const match = selectedProduct.quantity.match(/(\d+)\s*g/i)
+                  if (match && !portions.some(p => p.grams === parseInt(match[1]))) {
+                    portions.push({ label: 'Verpakking', grams: parseInt(match[1]) })
+                  }
+                }
+                // Common presets
+                if (!portions.some(p => p.grams === 100)) {
+                  portions.push({ label: '100g', grams: 100 })
+                }
+                if (!portions.some(p => p.grams === 150)) {
+                  portions.push({ label: '150g', grams: 150 })
+                }
+                if (!portions.some(p => p.grams === 200)) {
+                  portions.push({ label: '200g', grams: 200 })
+                }
+                if (!portions.some(p => p.grams === 30)) {
+                  portions.push({ label: '1 scoop', grams: 30 })
+                }
+                // Sort by grams
+                portions.sort((a, b) => a.grams - b.grams)
+
+                return portions.map((p) => (
+                  <button
+                    key={p.label}
+                    onClick={() => {
+                      setGramsInput(String(p.grams))
+                      setSelectedPortion(p.label)
+                    }}
+                    className={`shrink-0 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all border ${
+                      selectedPortion === p.label && grams === p.grams
+                        ? 'border-[#D46A3A] bg-[rgba(212,106,58,0.08)] text-[#D46A3A]'
+                        : 'border-[#F0F0EE] text-[#ACACAC] hover:border-[#C0C0C0]'
+                    }`}
+                  >
+                    {p.label}
+                    {p.label !== `${p.grams}g` && (
+                      <span className="text-[10px] ml-1 opacity-60">{p.grams}g</span>
+                    )}
+                  </button>
+                ))
+              })()}
+            </div>
+
+            {/* Custom gram input + confirm */}
             <div className="flex items-center gap-3">
-              <div className="flex-1">
-                <p className="text-[12px] text-[#ACACAC] mb-1">
-                  Hoeveelheid (gram)
-                </p>
+              <div className="flex items-center gap-2 flex-1">
                 <input
                   type="number"
                   value={gramsInput}
-                  onChange={(e) => setGramsInput(e.target.value.replace(/[^0-9]/g, ''))}
-                  className="w-full px-3 py-2 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] bg-white focus:outline-none focus:border-[#1A1917]"
+                  onChange={(e) => {
+                    setGramsInput(e.target.value.replace(/[^0-9]/g, ''))
+                    setSelectedPortion(null)
+                  }}
+                  className="w-20 px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[14px] text-[#1A1917] text-center bg-white focus:outline-none focus:border-[#1A1917]"
                 />
+                <span className="text-[13px] text-[#ACACAC]">gram</span>
               </div>
               <button
                 onClick={handleConfirm}
                 disabled={savingConfirm || grams < 1}
-                className="px-6 py-2.5 bg-[#1A1917] text-white rounded-xl text-[13px] font-medium disabled:opacity-50"
+                className="flex-1 py-3 bg-[#1A1917] text-white rounded-xl text-[13px] font-semibold uppercase tracking-[0.06em] disabled:opacity-50 transition-colors hover:bg-[#333330]"
               >
-                {savingConfirm ? "Opslaan..." : "Bevestigen"}
+                {savingConfirm ? "Opslaan..." : "Toevoegen"}
               </button>
             </div>
           </div>
@@ -716,7 +807,12 @@ export default function ClientNutritionPage() {
         .single()
 
       if (planData) {
-        setPlan(planData)
+        // Ensure every meal has a stable ID (same logic as dashboard API)
+        const fixedMeals = (planData.meals || []).map((m: any, i: number) => ({
+          ...m,
+          id: ensureMealId(m, i),
+        }))
+        setPlan({ ...planData, meals: fixedMeals })
       }
 
       // Load logs for this date
@@ -789,6 +885,9 @@ export default function ClientNutritionPage() {
         const sumRes = await fetch(`/api/nutrition-log?date=${dateStr}`)
         const sumData = await sumRes.json()
         if (sumData.summary) setSummary(sumData.summary)
+
+        // Invalidate dashboard cache so progress bar updates
+        invalidateCache('/api/dashboard')
       } else {
         // Retry once on failure
         console.error('Nutrition toggle failed:', res.status)
@@ -821,6 +920,8 @@ export default function ClientNutritionPage() {
           const sumRes = await fetch(`/api/nutrition-log?date=${dateStr}`)
           const sumData = await sumRes.json()
           if (sumData.summary) setSummary(sumData.summary)
+
+          invalidateCache('/api/dashboard')
         }
       }
     } catch (err) {
@@ -1000,8 +1101,36 @@ export default function ClientNutritionPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#C0C0C0] border-t-[#1A1917]" />
+      <div className="pb-28 animate-pulse">
+        {/* Back button skeleton */}
+        <div className="h-4 w-12 bg-[#F0F0EE] rounded mb-4 mt-2" />
+        {/* Label + title */}
+        <div className="h-3 w-16 bg-[#F0F0EE] rounded mb-2" />
+        <div className="h-8 w-32 bg-[#F0F0EE] rounded mb-4" />
+        {/* Date nav */}
+        <div className="h-5 w-28 bg-[#F0F0EE] rounded mb-10" />
+        {/* Big calorie number */}
+        <div className="h-14 w-40 bg-[#F0F0EE] rounded mb-2" />
+        <div className="h-4 w-28 bg-[#F0F0EE] rounded mb-5" />
+        <div className="h-[3px] w-full bg-[#F0F0EE] rounded-full mb-14" />
+        {/* Macro row */}
+        <div className="border-t border-[#F0F0EE] pt-6 flex gap-6 mb-12">
+          <div className="h-4 w-20 bg-[#F0F0EE] rounded" />
+          <div className="h-4 w-24 bg-[#F0F0EE] rounded" />
+          <div className="h-4 w-16 bg-[#F0F0EE] rounded" />
+        </div>
+        {/* Meals label */}
+        <div className="h-3 w-24 bg-[#F0F0EE] rounded mb-4" />
+        {/* Meal rows */}
+        {[1, 2, 3].map(i => (
+          <div key={i} className="py-5 border-t border-[#F0F0EE] flex items-center justify-between">
+            <div>
+              <div className="h-4 w-28 bg-[#F0F0EE] rounded mb-1.5" />
+              <div className="h-3 w-20 bg-[#F0F0EE] rounded" />
+            </div>
+            <div className="h-4 w-12 bg-[#F0F0EE] rounded" />
+          </div>
+        ))}
       </div>
     )
   }

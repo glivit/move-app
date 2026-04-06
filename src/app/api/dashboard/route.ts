@@ -194,8 +194,13 @@ export async function GET(request: NextRequest) {
         clientNotes: log?.client_notes || null,
       }
     })
-    const mealsCompleted = mealStatus.filter((m: any) => m.completed).length
-    const mealsTotal = mealStatus.length
+    // Use the computed count from meal matching, but fall back to the
+    // nutrition_daily_summary which is always updated by the POST handler
+    const computedCompleted = mealStatus.filter((m: any) => m.completed).length
+    const mealsCompleted = computedCompleted > 0
+      ? computedCompleted
+      : (todaySummary as any)?.meals_completed || 0
+    const mealsTotal = mealStatus.length || (todaySummary as any)?.meals_planned || 0
 
     // Weight change this month (fetched in parallel above)
     const weightEntries = weightEntriesRes.data
@@ -342,7 +347,12 @@ export async function GET(request: NextRequest) {
           carbs: nutritionPlan.carbs_g,
           fat: nutritionPlan.fat_g,
         },
-        todaySummary: todaySummary || null,
+        consumed: {
+          calories: (todaySummary as any)?.total_calories || 0,
+          protein: (todaySummary as any)?.total_protein || 0,
+          carbs: (todaySummary as any)?.total_carbs || 0,
+          fat: (todaySummary as any)?.total_fat || 0,
+        },
         planId: nutritionPlan.id,
       } : null,
 

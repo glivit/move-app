@@ -58,6 +58,12 @@ interface DashboardData {
       carbs: number | null
       fat: number | null
     }
+    consumed: {
+      calories: number
+      protein: number
+      carbs: number
+      fat: number
+    }
     planId: string
   } | null
   actions: {
@@ -120,6 +126,9 @@ function getWeekDots(scheduleDays: Array<{ dayNumber: number }>, completedDates:
 
 function getCaloriesConsumed(nutrition: DashboardData['nutrition']) {
   if (!nutrition) return 0
+  // Use the consumed totals from the daily summary (most accurate)
+  if (nutrition.consumed?.calories) return nutrition.consumed.calories
+  // Fallback: compute from plan items of completed meals
   return nutrition.meals
     .filter(m => m.completed)
     .reduce((sum, m) => sum + m.items.reduce((s, i) => s + i.calories, 0), 0)
