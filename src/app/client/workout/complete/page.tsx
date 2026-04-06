@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState, useCallback, Suspense } from 'react'
+import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import { ArrowRight, AlertTriangle, ChevronDown, ChevronUp, Trophy } from 'lucide-react'
+import { ArrowRight, AlertTriangle, ChevronDown, ChevronUp, Trophy, Share2, Dumbbell, Clock, Flame, TrendingUp } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -41,12 +41,18 @@ interface ExerciseGroup {
 
 // ─── Animated Counter ─────────────────────
 
-function AnimatedStat({ value, suffix = '' }: { value: number | string; suffix?: string }) {
+function AnimatedStat({ value, suffix = '', delay = 0 }: { value: number | string; suffix?: string; delay?: number }) {
   const numValue = typeof value === 'number' ? value : parseFloat(value) || 0
   const [display, setDisplay] = useState(0)
+  const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    if (numValue === 0) { setDisplay(0); return }
+    const timer = setTimeout(() => setVisible(true), delay)
+    return () => clearTimeout(timer)
+  }, [delay])
+
+  useEffect(() => {
+    if (!visible || numValue === 0) { setDisplay(0); return }
     const startTime = performance.now()
     const isDecimal = !Number.isInteger(numValue)
 
@@ -59,16 +65,53 @@ function AnimatedStat({ value, suffix = '' }: { value: number | string; suffix?:
       if (progress < 1) requestAnimationFrame(animate)
     }
     requestAnimationFrame(animate)
-  }, [numValue])
+  }, [numValue, visible])
 
   return (
     <span
-      className="stat-number-lg text-[#1A1917]"
-      style={{ fontWeight: 800, letterSpacing: '-0.06em', lineHeight: 0.9 }}
+      className={`stat-number text-[#1A1917] transition-opacity duration-500 ${visible ? 'opacity-100' : 'opacity-0'}`}
+      style={{ fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1 }}
     >
       {display}{suffix}
     </span>
   )
+}
+
+// ─── Confetti (enhanced) ─────────────────────
+
+function useConfetti() {
+  return useCallback((intensity: 'subtle' | 'big' = 'subtle') => {
+    const colors = ['#D46A3A', '#3D8B5C', '#F0C040', '#4A7BD4', '#9B59B6']
+    const container = document.body
+    const count = intensity === 'big' ? 30 : 5
+
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div')
+      el.className = 'confetti-particle'
+      el.style.position = 'fixed'
+      el.style.top = '-10px'
+      el.style.left = `${10 + Math.random() * 80}vw`
+      el.style.width = `${4 + Math.random() * 8}px`
+      el.style.height = `${4 + Math.random() * 8}px`
+      el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
+      el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px'
+      el.style.opacity = '1'
+      el.style.zIndex = '9999'
+      el.style.pointerEvents = 'none'
+
+      const rotation = Math.random() * 720
+      const xDrift = (Math.random() - 0.5) * 200
+      const duration = 1.5 + Math.random() * 1.5
+      const delay = Math.random() * 0.6
+
+      el.style.animation = `confettiFall ${duration}s ${delay}s ease-out forwards`
+      el.style.setProperty('--x-drift', `${xDrift}px`)
+      el.style.setProperty('--rotation', `${rotation}deg`)
+
+      container.appendChild(el)
+      setTimeout(() => el.remove(), (duration + delay) * 1000 + 200)
+    }
+  }, [])
 }
 
 // ─── Component ──────────────────────────────────────────────
@@ -89,6 +132,7 @@ function WorkoutCompletePage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('sessionId')
+  const summaryRef = useRef<HTMLDivElement>(null)
 
   const [session, setSession] = useState<WorkoutSessionComplete | null>(null)
   const [loading, setLoading] = useState(true)
@@ -99,26 +143,9 @@ function WorkoutCompletePage() {
   const [exerciseGroups, setExerciseGroups] = useState<ExerciseGroup[]>([])
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [showExerciseDetail, setShowExerciseDetail] = useState(false)
 
-  // Subtle confetti
-  const spawnConfetti = useCallback(() => {
-    const colors = ['#D46A3A', '#3D8B5C', '#F0F0EE']
-    const container = document.body
-    const count = 3 + Math.floor(Math.random() * 3)
-    for (let i = 0; i < count; i++) {
-      const el = document.createElement('div')
-      el.className = 'confetti-particle'
-      el.style.left = `${30 + Math.random() * 40}vw`
-      el.style.width = `${5 + Math.random() * 5}px`
-      el.style.height = `${5 + Math.random() * 5}px`
-      el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
-      el.style.borderRadius = '50%'
-      el.style.animationDelay = `${Math.random() * 0.4}s`
-      el.style.animationDuration = `${1.5 + Math.random() * 0.5}s`
-      container.appendChild(el)
-      setTimeout(() => el.remove(), 3000)
-    }
-  }, [])
+  const spawnConfetti = useConfetti()
 
   useEffect(() => {
     const loadSession = async () => {
@@ -224,7 +251,10 @@ function WorkoutCompletePage() {
 
   const prsCount = session?.workout_sets?.filter((s) => s.is_pr).length || 0
   useEffect(() => {
-    if (prsCount > 0) setTimeout(() => spawnConfetti(), 500)
+    if (prsCount > 0) {
+      setTimeout(() => spawnConfetti('big'), 400)
+      setTimeout(() => spawnConfetti('subtle'), 1200)
+    }
   }, [prsCount, spawnConfetti])
 
   const togglePain = (exerciseId: string) => {
@@ -242,6 +272,33 @@ function WorkoutCompletePage() {
       )
     )
   }
+
+  // --- Share workout summary ---
+  const handleShare = useCallback(async () => {
+    if (!session) return
+    const workoutSets = session.workout_sets || []
+    const totalSets = workoutSets.length
+    const totalVolume = workoutSets.reduce((sum, set) => sum + (set.weight_kg || 0) * (set.actual_reps || 0), 0)
+    const minutes = Math.floor((new Date().getTime() - new Date(session.started_at).getTime()) / 1000 / 60)
+    const prSets = workoutSets.filter(s => s.is_pr)
+
+    let text = `🏋️ MŌVE Workout voltooid!\n\n`
+    text += `⏱ ${minutes} min · 💪 ${totalSets} sets · 🔥 ${totalVolume > 1000 ? (totalVolume / 1000).toFixed(1) + 't' : totalVolume + ' kg'} volume\n`
+    if (prSets.length > 0) {
+      text += `🏆 ${prSets.length} ${prSets.length === 1 ? 'nieuw record' : 'nieuwe records'}!\n`
+    }
+    text += `\n— movestudio.be`
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ text })
+      } catch { /* user cancelled */ }
+    } else {
+      await navigator.clipboard.writeText(text)
+      // Brief visual feedback
+      alert('Gekopieerd naar klembord!')
+    }
+  }, [session])
 
   const handleComplete = async () => {
     if (!session) return
@@ -335,13 +392,16 @@ function WorkoutCompletePage() {
   const startTime = new Date(session.started_at)
   const endTime = new Date()
   const minutes = Math.floor((endTime.getTime() - startTime.getTime()) / 1000 / 60)
+  const prSets = workoutSets.filter(s => s.is_pr)
+  // Estimate calories: ~0.05 kcal per kg × rep (rough strength training estimate)
+  const estCalories = Math.round(totalVolume * 0.05 + minutes * 5)
 
   const moodOptions = [
-    { value: 1, label: 'Zwaar' },
-    { value: 2, label: 'Oké' },
-    { value: 3, label: 'Goed' },
-    { value: 4, label: 'Sterk' },
-    { value: 5, label: 'Top' },
+    { value: 1, label: 'Zwaar', emoji: '😮‍💨' },
+    { value: 2, label: 'Oké', emoji: '😐' },
+    { value: 3, label: 'Goed', emoji: '🙂' },
+    { value: 4, label: 'Sterk', emoji: '💪' },
+    { value: 5, label: 'Top', emoji: '🔥' },
   ]
 
   const painCount = exerciseGroups.filter(g => g.painFlag).length
@@ -349,45 +409,182 @@ function WorkoutCompletePage() {
   return (
     <div className="pb-28">
 
+      {/* Confetti CSS */}
+      <style>{`
+        @keyframes confettiFall {
+          0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(100vh) translateX(var(--x-drift, 0px)) rotate(var(--rotation, 720deg)); opacity: 0; }
+        }
+      `}</style>
+
       {/* ── Header — celebration ── */}
-      <div className="pt-8 pb-2 text-center mb-14">
-        <p className="text-[12px] font-medium text-[#3D8B5C] uppercase tracking-[1.5px] mb-4">
+      <div ref={summaryRef} className="pt-10 pb-6 text-center">
+        {/* Animated checkmark circle */}
+        <div className="mx-auto w-16 h-16 rounded-full bg-[#3D8B5C] flex items-center justify-center mb-5 animate-[scale-in_0.5s_ease-out]">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </div>
+
+        <p className="text-[12px] font-medium text-[#3D8B5C] uppercase tracking-[1.5px] mb-3">
           Voltooid
         </p>
-        <h1 className="text-editorial-h1">
+        <h1 className="text-editorial-h1 mb-2">
           Goed gedaan
         </h1>
+
         {prsCount > 0 && (
-          <div className="mt-4 inline-flex items-center gap-2">
+          <div className="mt-4 inline-flex items-center gap-2 bg-[#D46A3A]/10 px-4 py-2 rounded-full">
             <Trophy size={16} strokeWidth={2} className="text-[#D46A3A]" />
-            <span className="text-[14px] font-semibold text-[#D46A3A]">
-              {prsCount} {prsCount === 1 ? 'nieuw record' : 'nieuwe records'}
+            <span className="text-[14px] font-bold text-[#D46A3A]">
+              {prsCount} {prsCount === 1 ? 'nieuw record' : 'nieuwe records'}!
             </span>
+          </div>
+        )}
+
+        {/* Share button */}
+        <div className="mt-5">
+          <button
+            onClick={handleShare}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#F0F0EE] text-[12px] font-semibold text-[#ACACAC] uppercase tracking-[0.06em] hover:bg-[#F8F8F6] transition-colors touch-manipulation"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+          >
+            <Share2 size={14} strokeWidth={2} />
+            Delen
+          </button>
+        </div>
+      </div>
+
+      {/* ── Stats grid — 2×2 ── */}
+      <div className="grid grid-cols-2 gap-3 mb-8">
+        <div className="bg-[#F8F8F6] rounded-2xl p-5">
+          <div className="flex items-center gap-1.5 mb-2">
+            <Clock size={13} strokeWidth={1.5} className="text-[#ACACAC]" />
+            <p className="text-[10px] text-[#ACACAC] uppercase tracking-[1px] font-medium">Duur</p>
+          </div>
+          <div className="flex items-baseline gap-1">
+            <AnimatedStat value={minutes} delay={200} />
+            <span className="text-[13px] text-[#ACACAC] font-medium">min</span>
+          </div>
+        </div>
+        <div className="bg-[#F8F8F6] rounded-2xl p-5">
+          <div className="flex items-center gap-1.5 mb-2">
+            <Dumbbell size={13} strokeWidth={1.5} className="text-[#ACACAC]" />
+            <p className="text-[10px] text-[#ACACAC] uppercase tracking-[1px] font-medium">Sets</p>
+          </div>
+          <AnimatedStat value={totalSets} delay={400} />
+        </div>
+        <div className="bg-[#F8F8F6] rounded-2xl p-5">
+          <div className="flex items-center gap-1.5 mb-2">
+            <TrendingUp size={13} strokeWidth={1.5} className="text-[#ACACAC]" />
+            <p className="text-[10px] text-[#ACACAC] uppercase tracking-[1px] font-medium">Volume</p>
+          </div>
+          <div className="flex items-baseline gap-1">
+            <AnimatedStat
+              value={totalVolume > 1000 ? +(totalVolume / 1000).toFixed(1) : totalVolume}
+              suffix={totalVolume > 1000 ? 't' : ''}
+              delay={600}
+            />
+            {totalVolume <= 1000 && <span className="text-[13px] text-[#ACACAC] font-medium">kg</span>}
+          </div>
+        </div>
+        <div className="bg-[#F8F8F6] rounded-2xl p-5">
+          <div className="flex items-center gap-1.5 mb-2">
+            <Flame size={13} strokeWidth={1.5} className="text-[#ACACAC]" />
+            <p className="text-[10px] text-[#ACACAC] uppercase tracking-[1px] font-medium">Kcal</p>
+          </div>
+          <div className="flex items-baseline gap-1">
+            <AnimatedStat value={estCalories} delay={800} />
+            <span className="text-[11px] text-[#C0C0C0]">est.</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── PR Records detail ── */}
+      {prSets.length > 0 && (
+        <div className="mb-8 bg-[#FDF6F0] border border-[#F0E4D8] rounded-2xl p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Trophy size={15} strokeWidth={2} className="text-[#D46A3A]" />
+            <p className="text-[12px] font-bold text-[#D46A3A] uppercase tracking-[0.06em]">Persoonlijke Records</p>
+          </div>
+          <div className="space-y-2">
+            {prSets.map((set) => (
+              <div key={set.id} className="flex items-center justify-between py-1.5">
+                <span className="text-[13px] font-medium text-[#1A1917]">
+                  {set.exercises?.name_nl || set.exercises?.name || 'Oefening'}
+                </span>
+                <span className="text-[13px] font-bold text-[#D46A3A] tabular-nums">
+                  {set.weight_kg} kg × {set.actual_reps}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Exercise breakdown (collapsible) ── */}
+      <div className="mb-8">
+        <button
+          onClick={() => setShowExerciseDetail(!showExerciseDetail)}
+          className="w-full flex items-center justify-between py-3 touch-manipulation"
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+        >
+          <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] font-medium">
+            Oefeningen ({exerciseGroups.length})
+          </p>
+          {showExerciseDetail
+            ? <ChevronUp size={16} className="text-[#C0C0C0]" />
+            : <ChevronDown size={16} className="text-[#C0C0C0]" />
+          }
+        </button>
+
+        {showExerciseDetail && (
+          <div className="space-y-3 mt-1">
+            {exerciseGroups.map((group) => {
+              const groupVolume = group.sets.reduce((s, set) => s + (set.weight_kg || 0) * (set.actual_reps || 0), 0)
+              const bestSet = [...group.sets].sort((a, b) => ((b.weight_kg || 0) * (b.actual_reps || 0)) - ((a.weight_kg || 0) * (a.actual_reps || 0)))[0]
+              const hasPR = group.sets.some(s => s.is_pr)
+
+              return (
+                <div key={group.exerciseId} className={`rounded-xl border p-4 ${hasPR ? 'border-[#D46A3A]/30 bg-[#FDF6F0]/50' : 'border-[#F0F0EE] bg-white'}`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[14px] font-semibold text-[#1A1917]">{group.name}</span>
+                      {hasPR && (
+                        <span className="text-[9px] font-black text-[#D46A3A] uppercase bg-[#D46A3A]/10 px-1.5 py-0.5 rounded-md">PR</span>
+                      )}
+                    </div>
+                    <span className="text-[11px] text-[#ACACAC] tabular-nums">{Math.round(groupVolume)} kg vol.</span>
+                  </div>
+                  {/* Mini sets table */}
+                  <div className="space-y-0.5">
+                    {group.sets.map((set) => (
+                      <div key={set.id} className="flex items-center gap-3 py-1">
+                        <span className="text-[11px] text-[#C0C0C0] w-[24px] tabular-nums">S{set.set_number}</span>
+                        <span className={`text-[12px] font-medium tabular-nums ${set.is_pr ? 'text-[#D46A3A] font-bold' : 'text-[#1A1917]'}`}>
+                          {set.weight_kg || 0} kg × {set.actual_reps || 0}
+                        </span>
+                        {set.is_pr && <Trophy size={10} className="text-[#D46A3A]" />}
+                      </div>
+                    ))}
+                  </div>
+                  {/* Best set highlight */}
+                  {bestSet && (
+                    <div className="mt-2 pt-2 border-t border-[#F0F0EE]">
+                      <span className="text-[10px] text-[#ACACAC] uppercase tracking-[0.06em]">
+                        Beste set: {bestSet.weight_kg} kg × {bestSet.actual_reps} ({Math.round((bestSet.weight_kg || 0) * (bestSet.actual_reps || 0))} kg vol.)
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
       </div>
 
-      {/* ── Stats row ── */}
-      <div className="border-t border-[#F0F0EE] pt-8 mt-12">
-        <div className="flex items-center justify-between py-5 border-b border-[#F0F0EE]">
-          <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px]">Minuten</p>
-          <AnimatedStat value={minutes} />
-        </div>
-        <div className="flex items-center justify-between py-5 border-b border-[#F0F0EE]">
-          <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px]">Sets</p>
-          <AnimatedStat value={totalSets} />
-        </div>
-        <div className="flex items-center justify-between py-5">
-          <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px]">Volume</p>
-          <AnimatedStat
-            value={totalVolume > 1000 ? +(totalVolume / 1000).toFixed(1) : totalVolume}
-            suffix={totalVolume > 1000 ? 't' : ''}
-          />
-        </div>
-      </div>
-
       {/* ── Gevoel ── */}
-      <div className="border-t border-[#F0F0EE] pt-8 mt-12 mb-8">
+      <div className="border-t border-[#F0F0EE] pt-8 mb-8">
         <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-4">
           Hoe voelde je je?
         </p>
@@ -396,20 +593,22 @@ function WorkoutCompletePage() {
             <button
               key={m.value}
               onClick={() => setMoodRating(m.value)}
-              className={`flex-1 py-3 text-center rounded-xl text-[13px] font-medium transition-all ${
+              className={`flex-1 py-3 text-center rounded-xl text-[13px] font-medium transition-all touch-manipulation ${
                 moodRating === m.value
-                  ? 'bg-[#1A1917] text-white'
+                  ? 'bg-[#1A1917] text-white scale-105'
                   : 'border border-[#F0F0EE] text-[#ACACAC] hover:border-[#C0C0C0]'
               }`}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              {m.label}
+              <span className="block text-[18px] mb-0.5">{m.emoji}</span>
+              <span className="text-[10px]">{m.label}</span>
             </button>
           ))}
         </div>
       </div>
 
       {/* ── Moeilijkheid ── */}
-      <div className="border-t border-[#F0F0EE] pt-8 mt-12 mb-8">
+      <div className="border-t border-[#F0F0EE] pt-8 mb-8">
         <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-4">
           Moeilijkheidsgraad
         </p>
@@ -418,11 +617,12 @@ function WorkoutCompletePage() {
             <button
               key={level}
               onClick={() => setDifficultyRating(level)}
-              className={`flex-1 py-3 text-center rounded-xl transition-all ${
+              className={`flex-1 min-h-[44px] py-3 text-center rounded-xl transition-all touch-manipulation ${
                 difficultyRating === level
-                  ? 'bg-[#D46A3A] text-white'
+                  ? 'bg-[#D46A3A] text-white scale-105'
                   : 'border border-[#F0F0EE] text-[#ACACAC] hover:border-[#C0C0C0]'
               }`}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               <span className="section-title">
                 {level}
@@ -438,7 +638,7 @@ function WorkoutCompletePage() {
 
       {/* ── Pijn per oefening ── */}
       {exerciseGroups.length > 0 && (
-        <div className="border-t border-[#F0F0EE] pt-8 mt-12 mb-8">
+        <div className="border-t border-[#F0F0EE] pt-8 mb-8">
           <div className="flex items-center justify-between mb-4">
             <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px]">
               Pijn of ongemak?
@@ -457,7 +657,8 @@ function WorkoutCompletePage() {
                   togglePain(group.exerciseId)
                   setExpandedExercise(!group.painFlag ? group.exerciseId : null)
                 }}
-                className="w-full flex items-center gap-3 py-3.5"
+                className="w-full flex items-center gap-3 py-3.5 min-h-[44px] touch-manipulation"
+                style={{ WebkitTapHighlightColor: 'transparent' }}
               >
                 <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
                   group.painFlag ? 'border-[#C4372A] bg-[#C4372A]' : 'border-[#E0E0E0]'
@@ -496,7 +697,7 @@ function WorkoutCompletePage() {
       )}
 
       {/* ── Feedback voor coach ── */}
-      <div className="border-t border-[#F0F0EE] pt-8 mt-12 mb-8">
+      <div className="border-t border-[#F0F0EE] pt-8 mb-8">
         <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-3">
           Feedback voor je coach
         </p>
@@ -509,7 +710,7 @@ function WorkoutCompletePage() {
       </div>
 
       {/* ── Notities ── */}
-      <div className="border-t border-[#F0F0EE] pt-8 mt-12 mb-10">
+      <div className="border-t border-[#F0F0EE] pt-8 mb-10">
         <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-3">
           Notities <span className="normal-case tracking-normal text-[#D5D5D5]">(optioneel)</span>
         </p>
@@ -521,21 +722,26 @@ function WorkoutCompletePage() {
         />
       </div>
 
-      {/* ── CTA ── */}
-      <button
-        onClick={handleComplete}
-        disabled={saving}
-        className="w-full py-4 rounded-xl bg-[#1A1917] text-white font-bold text-[14px] uppercase tracking-[0.06em] flex items-center justify-center gap-2 hover:bg-[#333330] transition-colors disabled:opacity-50"
-      >
-        {saving ? (
-          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-        ) : (
-          <>
-            Opslaan & afsluiten
-            <ArrowRight size={16} strokeWidth={2} />
-          </>
-        )}
-      </button>
+      {/* ── Sticky CTA ── */}
+      <div className="fixed bottom-20 left-0 right-0 px-5 z-30 pointer-events-none">
+        <div className="max-w-lg mx-auto pointer-events-auto">
+          <button
+            onClick={handleComplete}
+            disabled={saving}
+            className="w-full py-4 rounded-2xl bg-[#1A1917] text-white font-bold text-[14px] uppercase tracking-[0.06em] flex items-center justify-center gap-2 shadow-lg shadow-black/10 hover:bg-[#333330] transition-all active:scale-[0.98] disabled:opacity-50 touch-manipulation"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+          >
+            {saving ? (
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              <>
+                Opslaan & afsluiten
+                <ArrowRight size={16} strokeWidth={2} />
+              </>
+            )}
+          </button>
+        </div>
+      </div>
 
       <p className="text-center text-[12px] text-[#D5D5D5] mt-3">
         Je coach ziet deze feedback bij de volgende aanpassing
