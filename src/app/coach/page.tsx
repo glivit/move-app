@@ -1,6 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { PackageBadge } from '@/components/ui/PackageBadge'
-import { ComplianceWidget } from '@/components/coach/ComplianceWidget'
+import { ClientStatusGrid } from '@/components/coach/ClientStatusGrid'
 import Link from 'next/link'
 import {
   ClipboardCheck,
@@ -248,7 +248,7 @@ export default async function CoachDashboard() {
         </div>
       )}
 
-      <ComplianceWidget />
+      <ClientStatusGrid />
 
       {/* Quick Actions */}
       <div>

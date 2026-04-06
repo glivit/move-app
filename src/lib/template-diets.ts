@@ -595,6 +595,80 @@ const hardGainerBulk3400: TemplateDiet = {
 }
 
 // ──────────────────────────────────────────────────────────────
+// 9. GLENN COACH CUT — 2700 kcal / 315g protein
+//    Clean, simpel, hoog eiwit. 6 maaltijden.
+// ──────────────────────────────────────────────────────────────
+
+const glennCoach2700: TemplateDiet = {
+  id: 'tpl-glenn-coach-2700',
+  title: 'Coach Glenn — 2700 kcal',
+  description: 'Hoog eiwit schema. Double Isoclear ochtend, protein toasts, eieren, Muscle Meat kip + rijst, protein pudding XXL.',
+  calories_target: 2700,
+  protein_g: 315,
+  carbs_g: 166,
+  fat_g: 83,
+  tags: ['coach', 'high-protein', 'clean', 'mannen'],
+  meals: [
+    {
+      id: 'meal-0-ochtend-shake',
+      name: 'Ochtend Shake',
+      time: '07:30',
+      foods: [
+        { name: 'ESN Isoclear Whey Berry', brand: 'ESN', grams: 60, per100g: { calories: 365, protein: 90, carbs: 2, fat: 1.5 } },
+        { name: 'Creatine Monohydrate', brand: 'ESN', grams: 10, per100g: { calories: 0, protein: 0, carbs: 0, fat: 0 } },
+      ],
+    },
+    {
+      id: 'meal-1-snack',
+      name: 'Snack',
+      time: '10:00',
+      foods: [
+        { name: 'Upfront Protein Bar Chocolate', brand: 'Upfront Nutrition', grams: 50, per100g: { calories: 383, protein: 42, carbs: 35, fat: 8 } },
+      ],
+    },
+    {
+      id: 'meal-2-middag',
+      name: 'Middag',
+      time: '12:30',
+      foods: [
+        { name: 'Eiwitbrood', brand: 'AH', grams: 100, per100g: { calories: 250, protein: 18, carbs: 10, fat: 14 } },
+        { name: 'Kipfilet Naturel', brand: 'Muscle Meat', grams: 150, per100g: { calories: 110, protein: 23, carbs: 0, fat: 1.5 } },
+      ],
+    },
+    {
+      id: 'meal-3-namiddag',
+      name: 'Namiddag',
+      time: '15:30',
+      foods: [
+        { name: 'Eieren', brand: 'AH', grams: 300, per100g: { calories: 155, protein: 13, carbs: 1.1, fat: 11 } },
+        { name: 'Hüttenkäse', brand: 'AH', grams: 50, per100g: { calories: 92, protein: 12, carbs: 2.5, fat: 3.5 } },
+        { name: 'Tomaat', grams: 150, per100g: { calories: 18, protein: 0.9, carbs: 3.9, fat: 0.2 } },
+      ],
+    },
+    {
+      id: 'meal-4-dinner',
+      name: 'Avondeten',
+      time: '18:30',
+      foods: [
+        { name: 'Kipfilet Naturel', brand: 'Muscle Meat', grams: 300, per100g: { calories: 110, protein: 23, carbs: 0, fat: 1.5 } },
+        { name: 'Witte rijst (droog)', brand: 'AH', grams: 100, per100g: { calories: 360, protein: 7, carbs: 78, fat: 1 } },
+        { name: 'Sweet Chili Saus', brand: 'AH', grams: 30, per100g: { calories: 132, protein: 0.3, carbs: 32, fat: 0.1 } },
+        { name: 'Eieren', brand: 'AH', grams: 120, per100g: { calories: 155, protein: 13, carbs: 1.1, fat: 11 } },
+      ],
+    },
+    {
+      id: 'meal-5-pudding',
+      name: 'Na eten',
+      time: '21:00',
+      foods: [
+        { name: 'Proteïne Pudding Ehrmann', brand: 'Ehrmann', grams: 200, per100g: { calories: 100, protein: 12, carbs: 10, fat: 2 } },
+        { name: 'Proteïne Pudding Melkunie', brand: 'Melkunie', grams: 200, per100g: { calories: 105, protein: 13, carbs: 9, fat: 2 } },
+      ],
+    },
+  ],
+}
+
+// ──────────────────────────────────────────────────────────────
 // Export all templates
 // ──────────────────────────────────────────────────────────────
 
@@ -607,6 +681,7 @@ export const TEMPLATE_DIETS: TemplateDiet[] = [
   veggieCut1800,
   mealprep2200,
   hardGainerBulk3400,
+  glennCoach2700,
 ]
 
 export function getTemplateDiet(id: string): TemplateDiet | undefined {
