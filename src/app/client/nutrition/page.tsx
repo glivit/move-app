@@ -138,6 +138,10 @@ function FoodSearchModal({
   const [tab, setTab] = useState<'search' | 'custom'>('search')
   const [addingProduct, setAddingProduct] = useState<string | null>(null) // product name being added
   const [justAdded, setJustAdded] = useState<Set<string>>(new Set())
+  const [selectedProduct, setSelectedProduct] = useState<SearchProduct | null>(null)
+  const [portionGrams, setPortionGrams] = useState('100')
+  const [selectedPortion, setSelectedPortion] = useState<string | null>(null)
+  const [savingConfirm, setSavingConfirm] = useState(false)
   const [scanning, setScanning] = useState(false)
   const [customForm, setCustomForm] = useState({ name: '', brand: '', barcode: '', calories: '', protein: '', carbs: '', fat: '' })
   const [savingCustom, setSavingCustom] = useState(false)
@@ -152,6 +156,9 @@ function FoodSearchModal({
       setResults([])
       setTab('search')
       setJustAdded(new Set())
+      setSelectedProduct(null)
+      setPortionGrams('100')
+      setSelectedPortion(null)
       setScanning(false)
       setCustomForm({ name: '', brand: '', barcode: '', calories: '', protein: '', carbs: '', fat: '' })
       // Load popular on open
@@ -275,6 +282,80 @@ function FoodSearchModal({
     }
   }
 
+  // Confirm add with custom grams from portion picker
+  async function confirmAdd() {
+    if (!selectedProduct || !plan || !activeMealId || savingConfirm) return
+    setSavingConfirm(true)
+
+    const grams = parseInt(portionGrams) || 100
+    const meal = plan.meals.find(m => m.id === activeMealId)
+    if (!meal) { setSavingConfirm(false); return }
+
+    const existing = logs.get(activeMealId)
+    const currentFoods = existing?.foods_eaten || meal.foods || []
+
+    const newFood: FoodEntry = {
+      id: `${selectedProduct.barcode || selectedProduct.name}-${Date.now()}`,
+      name: selectedProduct.name,
+      brand: selectedProduct.brand,
+      image: selectedProduct.image,
+      grams,
+      per100g: {
+        calories: selectedProduct.per100g.calories,
+        protein: selectedProduct.per100g.protein,
+        carbs: selectedProduct.per100g.carbs,
+        fat: selectedProduct.per100g.fat,
+      },
+    }
+
+    const newFoods = [...currentFoods, newFood]
+
+    try {
+      const res = await fetch('/api/nutrition-log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan_id: plan.id,
+          date: dateStr,
+          meal_id: activeMealId,
+          meal_name: meal.name,
+          completed: existing?.completed || false,
+          foods_eaten: newFoods,
+          client_notes: existing?.client_notes || null,
+        }),
+      })
+
+      if (res.ok) {
+        const newLog: MealLog = {
+          meal_id: activeMealId,
+          meal_name: meal.name,
+          completed: existing?.completed || false,
+          foods_eaten: newFoods,
+          client_notes: existing?.client_notes || null,
+          completed_at: existing?.completed_at || null,
+        }
+        const upd = new Map(logs)
+        upd.set(activeMealId, newLog)
+        setLogs(upd)
+
+        const key = selectedProduct.barcode || selectedProduct.name
+        setJustAdded(prev => new Set(prev).add(key))
+        setTimeout(() => setJustAdded(prev => { const n = new Set(prev); n.delete(key); return n }), 1500)
+
+        setSelectedProduct(null)
+
+        const sumRes = await fetch(`/api/nutrition-log?date=${dateStr}`)
+        const sumData = await sumRes.json()
+        if (sumData.summary) setSummary(sumData.summary)
+        invalidateCache('/api/dashboard')
+      }
+    } catch (err) {
+      console.error('Confirm add error:', err)
+    } finally {
+      setSavingConfirm(false)
+    }
+  }
+
   async function lookupBarcode(code: string) {
     setLoading(true)
     try {
@@ -378,15 +459,17 @@ function FoodSearchModal({
 
   if (!isOpen) return null
 
+  const confirmGrams = parseInt(portionGrams) || 0
+
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col" style={{ animation: 'slideUp 0.25s ease-out' }}>
+    <div className="fixed inset-0 z-50 bg-white flex flex-col" style={{ animation: 'slideUp 0.25s ease-out', paddingTop: 'env(safe-area-inset-top)' }}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-[#F0F0EE]">
-        <button onClick={onClose} className="p-2 -ml-2 text-[#1A1917]">
-          <X strokeWidth={1.5} className="w-5 h-5" />
+      <div className="flex items-center justify-between px-4 pt-2 pb-2 border-b border-[#F0F0EE]">
+        <button onClick={() => { if (selectedProduct) { setSelectedProduct(null) } else { onClose() } }} className="p-2.5 -ml-2 text-[#1A1917] active:bg-[#F5F5F3] rounded-full">
+          {selectedProduct ? <ArrowLeft strokeWidth={1.5} className="w-5 h-5" /> : <X strokeWidth={1.5} className="w-5 h-5" />}
         </button>
-        <h2 className="text-[15px] font-semibold text-[#1A1917]">Voedsel toevoegen</h2>
-        <div className="w-9" /> {/* spacer */}
+        <h2 className="text-[15px] font-semibold text-[#1A1917]">{selectedProduct ? selectedProduct.name : 'Voedsel toevoegen'}</h2>
+        <div className="w-10" /> {/* spacer */}
       </div>
 
       {/* Meal selector */}
@@ -473,7 +556,84 @@ function FoodSearchModal({
 
       {/* Content area */}
       <div className="flex-1 overflow-y-auto">
-        {tab === 'search' && !scanning && (
+        {/* ── Product detail / portion picker ── */}
+        {selectedProduct && tab === 'search' && (
+          <div className="px-4 py-5">
+            {/* Macro preview for selected grams */}
+            <div className="bg-[#FAFAF8] rounded-xl px-4 py-3 mb-5">
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-[20px] font-bold text-[#1A1917]">
+                  {Math.round((selectedProduct.per100g.calories * confirmGrams) / 100)}
+                </span>
+                <span className="text-[13px] text-[#B0B0B0]">kcal</span>
+              </div>
+              <div className="flex gap-3 text-[12px] text-[#8A8A8A]">
+                <span>E {Math.round((selectedProduct.per100g.protein * confirmGrams) / 100)}g</span>
+                <span>K {Math.round((selectedProduct.per100g.carbs * confirmGrams) / 100)}g</span>
+                <span>V {Math.round((selectedProduct.per100g.fat * confirmGrams) / 100)}g</span>
+              </div>
+            </div>
+
+            {/* Portion presets */}
+            <p className="text-[11px] font-semibold text-[#B0B0B0] uppercase tracking-[0.1em] mb-2">Portie</p>
+            <div className="flex gap-2 flex-wrap mb-4">
+              {(() => {
+                const portions: { label: string; grams: number }[] = []
+                if (selectedProduct.serving_size) {
+                  const match = selectedProduct.serving_size.match(/(\d+)\s*g/i)
+                  if (match) portions.push({ label: '1 portie', grams: parseInt(match[1]) })
+                }
+                if (selectedProduct.quantity) {
+                  const match = selectedProduct.quantity.match(/(\d+)\s*g/i)
+                  if (match && !portions.some(p => p.grams === parseInt(match[1])))
+                    portions.push({ label: 'Verpakking', grams: parseInt(match[1]) })
+                }
+                if (!portions.some(p => p.grams === 100)) portions.push({ label: '100g', grams: 100 })
+                if (!portions.some(p => p.grams === 150)) portions.push({ label: '150g', grams: 150 })
+                if (!portions.some(p => p.grams === 200)) portions.push({ label: '200g', grams: 200 })
+                portions.sort((a, b) => a.grams - b.grams)
+
+                return portions.map(p => (
+                  <button
+                    key={p.label}
+                    onClick={() => { setPortionGrams(String(p.grams)); setSelectedPortion(p.label) }}
+                    className={`px-3.5 py-2 rounded-xl text-[13px] font-medium transition-all border ${
+                      selectedPortion === p.label && confirmGrams === p.grams
+                        ? 'border-[#D46A3A] bg-[rgba(212,106,58,0.06)] text-[#D46A3A]'
+                        : 'border-[#F0F0EE] text-[#8A8A8A] hover:border-[#C0C0C0]'
+                    }`}
+                  >
+                    {p.label}
+                    {p.label !== `${p.grams}g` && <span className="text-[10px] ml-1 opacity-60">{p.grams}g</span>}
+                  </button>
+                ))
+              })()}
+            </div>
+
+            {/* Custom gram input */}
+            <div className="flex items-center gap-3 mb-6">
+              <input
+                type="number"
+                value={portionGrams}
+                onChange={(e) => { setPortionGrams(e.target.value.replace(/[^0-9]/g, '')); setSelectedPortion(null) }}
+                className="w-24 px-3 py-2.5 bg-[#F5F5F3] rounded-xl text-[15px] text-[#1A1917] text-center focus:outline-none focus:ring-2 focus:ring-[#1A1917]/10"
+              />
+              <span className="text-[14px] text-[#B0B0B0]">gram</span>
+            </div>
+
+            {/* Confirm button */}
+            <button
+              onClick={confirmAdd}
+              disabled={savingConfirm || confirmGrams < 1}
+              className="w-full py-3.5 bg-[#1A1917] text-white rounded-xl text-[14px] font-semibold transition-colors hover:bg-[#333] disabled:opacity-40"
+            >
+              {savingConfirm ? 'Toevoegen...' : 'Toevoegen'}
+            </button>
+          </div>
+        )}
+
+        {/* ── Search results list ── */}
+        {!selectedProduct && tab === 'search' && !scanning && (
           <>
             {/* Section label */}
             {!loading && results.length > 0 && (
@@ -515,7 +675,6 @@ function FoodSearchModal({
               const key = product.barcode || product.name
               const isAdding = addingProduct === key
               const wasAdded = justAdded.has(key)
-              // Default serving grams for display
               let displayGrams = 100
               if (product.serving_size) {
                 const match = product.serving_size.match(/(\d+)\s*g/i)
@@ -528,21 +687,28 @@ function FoodSearchModal({
                   key={idx}
                   className="flex items-center gap-3 px-4 py-3 border-b border-[#F8F8F6] hover:bg-[#FAFAF8] transition-colors"
                 >
-                  {/* Product info */}
-                  <div className="flex-1 min-w-0">
+                  {/* Product info — tap to open portion picker */}
+                  <button
+                    onClick={() => {
+                      setSelectedProduct(product)
+                      setPortionGrams(String(displayGrams))
+                      setSelectedPortion(displayGrams === 100 ? '100g' : '1 portie')
+                    }}
+                    className="flex-1 min-w-0 text-left"
+                  >
                     <p className="text-[14px] text-[#1A1917] truncate leading-tight">{product.name}</p>
                     <p className="text-[12px] text-[#B0B0B0] mt-0.5">
                       {displayCal} kcal
                       {product.brand && <span> · {product.brand}</span>}
                       <span className="text-[#D0D0D0]"> · {displayGrams}g</span>
                     </p>
-                  </div>
+                  </button>
 
                   {/* Quick-add button */}
                   <button
-                    onClick={() => quickAdd(product)}
+                    onClick={(e) => { e.stopPropagation(); quickAdd(product) }}
                     disabled={isAdding}
-                    className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                    className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all ${
                       wasAdded
                         ? 'bg-[#E8F5E9] text-[#3D8B5C]'
                         : 'bg-[#F5F5F3] text-[#1A1917] hover:bg-[#EBEBEA] active:scale-95'
@@ -760,27 +926,16 @@ function MealDetailPanel({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col" style={{ animation: 'slideUp 0.2s ease-out' }}>
+    <div className="fixed inset-0 z-50 bg-white flex flex-col" style={{ animation: 'slideUp 0.2s ease-out', paddingTop: 'env(safe-area-inset-top)' }}>
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 pt-3 pb-3 border-b border-[#F0F0EE]">
-        <button onClick={onClose} className="p-1.5 -ml-1.5 text-[#1A1917]">
+      <div className="flex items-center gap-3 px-4 pt-2 pb-3 border-b border-[#F0F0EE]">
+        <button onClick={onClose} className="p-2.5 -ml-2 text-[#1A1917] active:bg-[#F5F5F3] rounded-full">
           <ArrowLeft strokeWidth={1.5} className="w-5 h-5" />
         </button>
         <div className="flex-1 min-w-0">
           <h2 className="text-[16px] font-semibold text-[#1A1917] truncate">{meal.name}</h2>
           <p className="text-[12px] text-[#B0B0B0]">{meal.time}</p>
         </div>
-        <button
-          onClick={toggleComplete}
-          disabled={saving}
-          className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all ${
-            isCompleted
-              ? 'bg-[#E8F5E9] text-[#3D8B5C]'
-              : 'bg-[#F5F5F3] text-[#8A8A8A] hover:bg-[#EBEBEA]'
-          }`}
-        >
-          {isCompleted ? 'Voltooid' : 'Voltooien'}
-        </button>
       </div>
 
       {/* Macro summary strip */}
@@ -847,22 +1002,39 @@ function MealDetailPanel({
       </div>
 
       {/* Bottom actions */}
-      <div className="border-t border-[#F0F0EE] px-4 py-3 flex gap-2">
+      <div className="border-t border-[#F0F0EE] px-4 py-3 space-y-2" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
+        {/* Complete toggle — big and obvious */}
         <button
-          onClick={() => onOpenSearch(meal.id)}
-          className="flex-1 py-3 bg-[#1A1917] text-white rounded-xl text-[13px] font-semibold flex items-center justify-center gap-2 hover:bg-[#333] transition-colors"
+          onClick={toggleComplete}
+          disabled={saving}
+          className={`w-full py-3.5 rounded-xl text-[14px] font-semibold flex items-center justify-center gap-2 transition-all ${
+            isCompleted
+              ? 'bg-[#E8F5E9] text-[#3D8B5C]'
+              : 'bg-[#3D8B5C] text-white hover:bg-[#347A4F]'
+          }`}
         >
-          <Plus strokeWidth={2} className="w-4 h-4" />
-          Voeg item toe
+          <Check strokeWidth={2} className="w-4.5 h-4.5" />
+          {isCompleted ? 'Voltooid' : 'Maaltijd voltooien'}
         </button>
-        <button
-          onClick={copyYesterday}
-          disabled={copyingSaving}
-          className="py-3 px-4 bg-[#F5F5F3] rounded-xl text-[13px] font-medium text-[#8A8A8A] hover:bg-[#EBEBEA] transition-colors flex items-center gap-1.5"
-        >
-          <Copy strokeWidth={1.5} className="w-3.5 h-3.5" />
-          {copyingSaving ? '...' : 'Gisteren'}
-        </button>
+
+        {/* Add + copy row */}
+        <div className="flex gap-2">
+          <button
+            onClick={() => onOpenSearch(meal.id)}
+            className="flex-1 py-3 bg-[#F5F5F3] rounded-xl text-[13px] font-semibold flex items-center justify-center gap-2 hover:bg-[#EBEBEA] transition-colors text-[#1A1917]"
+          >
+            <Plus strokeWidth={2} className="w-4 h-4" />
+            Voeg item toe
+          </button>
+          <button
+            onClick={copyYesterday}
+            disabled={copyingSaving}
+            className="py-3 px-4 bg-[#F5F5F3] rounded-xl text-[13px] font-medium text-[#8A8A8A] hover:bg-[#EBEBEA] transition-colors flex items-center gap-1.5"
+          >
+            <Copy strokeWidth={1.5} className="w-3.5 h-3.5" />
+            {copyingSaving ? '...' : 'Gisteren'}
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -1134,41 +1306,43 @@ export default function ClientNutritionPage() {
         })}
       </div>
 
-      {/* ── Guidelines ── */}
-      {plan.guidelines && (
-        <div className="border-t border-[#F0F0EE] pt-5 mt-10 animate-slide-up stagger-5">
-          <p className="text-[11px] text-[#B0B0B0] uppercase tracking-[0.1em] mb-2">Richtlijnen</p>
-          <p className="text-[13px] text-[#8A8A8A] leading-relaxed whitespace-pre-wrap">{plan.guidelines}</p>
+      {/* ── Add food row (inline in meals section) ── */}
+      <div className="animate-slide-up stagger-5">
+        <button
+          onClick={() => { setSearchMealId(meals[0]?.id || null); setSearchOpen(true) }}
+          className="w-full flex items-center gap-3 py-4 border-t border-[#F0F0EE] text-left hover:bg-[#FAFAF8] transition-colors"
+        >
+          <div className="w-5 h-5 rounded-full bg-[#F5F5F3] flex items-center justify-center shrink-0">
+            <Plus strokeWidth={2} className="w-3 h-3 text-[#8A8A8A]" />
+          </div>
+          <span className="text-[14px] font-medium text-[#D46A3A]">Voeg item toe</span>
+        </button>
+      </div>
+
+      {/* ── Submit day (inline, not floating) ── */}
+      {meals.length > 0 && (
+        <div className="mt-8 mb-4 animate-slide-up stagger-6">
+          <button
+            onClick={submitDay}
+            disabled={daySubmitted}
+            className={`w-full py-3 rounded-xl font-semibold text-[13px] uppercase tracking-[0.06em] transition-all ${
+              daySubmitted
+                ? 'bg-[#E8F5E9] text-[#3D8B5C]'
+                : allDone
+                  ? 'bg-[#3D8B5C] text-white hover:bg-[#347A4F]'
+                  : 'bg-[#F5F5F3] text-[#1A1917] hover:bg-[#EBEBEA]'
+            }`}
+          >
+            {daySubmitted ? 'Ingediend ✓' : `Dag indienen (${completedCount}/${meals.length})`}
+          </button>
         </div>
       )}
 
-      {/* ── Global add button (floating) ── */}
-      <button
-        onClick={() => { setSearchMealId(meals[0]?.id || null); setSearchOpen(true) }}
-        className="fixed bottom-24 right-4 w-14 h-14 rounded-full bg-[#1A1917] text-white shadow-lg flex items-center justify-center z-30 hover:bg-[#333] active:scale-95 transition-all"
-        style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}
-      >
-        <Plus strokeWidth={2} className="w-6 h-6" />
-      </button>
-
-      {/* ── Submit day ── */}
-      {meals.length > 0 && (
-        <div className="fixed bottom-20 left-0 right-0 px-4 z-20 pointer-events-none">
-          <div className="max-w-lg mx-auto pointer-events-auto">
-            <button
-              onClick={submitDay}
-              disabled={daySubmitted}
-              className={`w-full py-3.5 rounded-2xl font-semibold text-[13px] uppercase tracking-[0.06em] transition-all shadow-lg ${
-                daySubmitted
-                  ? 'bg-[#3D8B5C] text-white'
-                  : allDone
-                    ? 'bg-[#3D8B5C] text-white hover:bg-[#347A4F]'
-                    : 'bg-[#1A1917] text-white hover:bg-[#333]'
-              }`}
-            >
-              {daySubmitted ? 'Ingediend' : `Dag indienen (${completedCount}/${meals.length})`}
-            </button>
-          </div>
+      {/* ── Guidelines ── */}
+      {plan.guidelines && (
+        <div className="border-t border-[#F0F0EE] pt-5 mt-6 animate-slide-up stagger-7">
+          <p className="text-[11px] text-[#B0B0B0] uppercase tracking-[0.1em] mb-2">Richtlijnen</p>
+          <p className="text-[13px] text-[#8A8A8A] leading-relaxed whitespace-pre-wrap">{plan.guidelines}</p>
         </div>
       )}
 
