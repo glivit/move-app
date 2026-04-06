@@ -147,6 +147,16 @@ interface ProgramTemplateExercise {
   weight_suggestion: number
   notes: string
   exercises: Exercise
+  superset_group_id?: string | null
+}
+
+type SetType = 'normal' | 'warmup' | 'failure' | 'dropset'
+
+const SET_TYPE_CONFIG: Record<SetType, { label: string; short: string; color: string; bg: string }> = {
+  normal:  { label: 'Normaal',  short: '',  color: '#ACACAC', bg: 'transparent' },
+  warmup:  { label: 'Warm-up',  short: 'W', color: '#E8A838', bg: '#FEF3E0' },
+  failure: { label: 'Failure',  short: 'F', color: '#E04040', bg: '#FEECEC' },
+  dropset: { label: 'Drop Set', short: 'D', color: '#7B61FF', bg: '#F0ECFF' },
 }
 
 interface SetData {
@@ -158,6 +168,7 @@ interface SetData {
   is_warmup: boolean
   completed: boolean
   is_pr: boolean
+  set_type?: SetType
 }
 
 interface PreviousSet {
@@ -507,6 +518,12 @@ function ActiveWorkoutPage() {
   const [activeRestTimer, setActiveRestTimer] = useState<{ exerciseId: string; setIndex: number; seconds: number; total: number } | null>(null)
   const [exerciseNotes, setExerciseNotes] = useState<Record<string, string>>({})
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
+  const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('move-weight-unit') as 'kg' | 'lbs') || 'kg'
+    }
+    return 'kg'
+  })
   const [showExercisePicker, setShowExercisePicker] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -517,6 +534,28 @@ function ActiveWorkoutPage() {
   const sessionRef = useRef(session)
   useEffect(() => { setsRef.current = sets }, [sets])
   useEffect(() => { sessionRef.current = session }, [session])
+
+  // --- KG/LBS conversion helpers ---
+  const KG_TO_LBS = 2.20462
+  const toggleWeightUnit = useCallback(() => {
+    setWeightUnit(prev => {
+      const next = prev === 'kg' ? 'lbs' : 'kg'
+      localStorage.setItem('move-weight-unit', next)
+      return next
+    })
+  }, [])
+  const displayWeight = useCallback((kg: number | null): string => {
+    if (kg === null || kg === undefined) return ''
+    if (weightUnit === 'lbs') return (kg * KG_TO_LBS).toFixed(1)
+    return kg.toString()
+  }, [weightUnit])
+  const toKg = useCallback((displayVal: string): number | null => {
+    if (!displayVal) return null
+    const num = parseFloat(displayVal)
+    if (isNaN(num)) return null
+    if (weightUnit === 'lbs') return Math.round((num / KG_TO_LBS) * 100) / 100
+    return num
+  }, [weightUnit])
 
   // --- Haptic helper ---
   const haptic = useCallback((pattern: number | number[]) => {
@@ -849,7 +888,7 @@ function ActiveWorkoutPage() {
           prescribed_reps: safePrescribed,
           actual_reps: safeReps,
           weight_kg: safeWeight === 0 && s.weight_kg == null ? null : safeWeight,
-          is_warmup: s.is_warmup,
+          is_warmup: s.set_type === 'warmup' || s.is_warmup,
           completed: true,
           is_pr: s.is_pr,
         })
@@ -1088,6 +1127,15 @@ function ActiveWorkoutPage() {
             </span>
           </div>
 
+          {/* KG / LBS toggle */}
+          <button
+            onClick={toggleWeightUnit}
+            className="h-9 px-3 rounded-lg bg-[#F8F8F6] border border-[#F0F0EE] text-[11px] font-bold uppercase tracking-[0.06em] text-[#1A1917] active:scale-95 transition-all touch-manipulation"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+          >
+            {weightUnit.toUpperCase()}
+          </button>
+
           <button
             onClick={handleFinish}
             disabled={saving}
@@ -1112,7 +1160,7 @@ function ActiveWorkoutPage() {
 
       {/* ═══ EXERCISE LIST ═══════════════════════════ */}
       <main className="max-w-lg mx-auto px-4 py-6 pb-24 space-y-3">
-        {exercises.map((ex) => {
+        {exercises.map((ex, exIndex) => {
           const exSets = sets[ex.id] || []
           const exDone = exSets.length > 0 && exSets.every(s => s.completed)
           const exCompleted = exSets.filter(s => s.completed).length
@@ -1121,23 +1169,58 @@ function ActiveWorkoutPage() {
           const prevSetsData = previousSets[ex.id] || []
           const prefilledWeight = lastWorkoutWeights[ex.id]
 
+          // Superset detection
+          const ssGroup = (ex as any).superset_group_id
+          const isSuperset = !!ssGroup
+          const ssExercises = isSuperset ? exercises.filter(e => (e as any).superset_group_id === ssGroup) : []
+          const ssIndex = isSuperset ? ssExercises.findIndex(e => e.id === ex.id) : -1
+          const ssLabel = isSuperset ? String.fromCharCode(65 + ssIndex) : '' // A, B, C...
+          const ssColors = ['#D46A3A', '#3D8B5C', '#4A7BD4', '#9B59B6']
+          const ssColor = isSuperset ? ssColors[ssIndex % ssColors.length] : ''
+          const isFirstInGroup = isSuperset && (exIndex === 0 || (exercises[exIndex - 1] as any).superset_group_id !== ssGroup)
+          const isLastInGroup = isSuperset && (exIndex === exercises.length - 1 || (exercises[exIndex + 1] as any).superset_group_id !== ssGroup)
+
           return (
-            <div
-              key={ex.id}
-              className={`rounded-2xl transition-all border ${
-                exDone
-                  ? 'bg-white/60 border-[#F0F0EE]/50'
-                  : 'bg-white border-[#F0F0EE]'
-              }`}
-            >
+            <div key={ex.id}>
+              {/* Superset group header */}
+              {isFirstInGroup && (
+                <div className="flex items-center gap-2 mb-1.5 px-1">
+                  <div className="flex items-center gap-1.5">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 4h8M3 7h8M3 10h8" stroke="#D46A3A" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                    <span className="text-[11px] font-bold text-[#D46A3A] uppercase tracking-[0.08em]">Superset</span>
+                  </div>
+                </div>
+              )}
+              <div
+                className={`rounded-2xl transition-all border ${
+                  exDone
+                    ? 'bg-white/60 border-[#F0F0EE]/50'
+                    : 'bg-white border-[#F0F0EE]'
+                } ${isSuperset ? 'relative overflow-hidden' : ''} ${isSuperset && !isLastInGroup ? 'mb-0 rounded-b-none border-b-0' : ''} ${isSuperset && !isFirstInGroup ? 'rounded-t-none border-t border-dashed border-t-[#E0E0DE]' : ''}`}
+              >
+                {/* Superset color sidebar */}
+                {isSuperset && (
+                  <div
+                    className="absolute left-0 top-0 bottom-0 w-[3px] rounded-l-2xl"
+                    style={{ backgroundColor: ssColor }}
+                  />
+                )}
               {/* Exercise header — sticky on scroll */}
-              <div className="px-5 pt-4 pb-2 sticky top-14 bg-white/95 backdrop-blur-sm z-10 rounded-t-2xl">
+              <div className={`${isSuperset ? 'pl-7' : 'px-5'} ${!isSuperset ? 'px-5' : 'pr-5'} pt-4 pb-2 sticky top-14 bg-white/95 backdrop-blur-sm z-10 ${isFirstInGroup || !isSuperset ? 'rounded-t-2xl' : ''}`}>
                 <div className="flex items-center justify-between mb-1">
                   <button
                     onClick={() => setExpandedExercise(isExpanded ? null : ex.id)}
                     className="flex items-center gap-2 flex-1 text-left touch-manipulation"
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
+                    {isSuperset && (
+                      <span
+                        className="text-[11px] font-black uppercase w-[22px] h-[22px] flex items-center justify-center rounded-md flex-shrink-0"
+                        style={{ backgroundColor: ssColor + '18', color: ssColor }}
+                      >
+                        {ssLabel}{ssIndex + 1}
+                      </span>
+                    )}
                     <h3
                       className={`text-[16px] font-semibold leading-tight tracking-[-0.01em] ${
                         exDone ? 'text-[#ACACAC]' : 'text-[#1A1917]'
@@ -1185,7 +1268,7 @@ function ActiveWorkoutPage() {
                 <div className="flex items-center gap-2 mb-2 px-1">
                   <span className="text-[10px] font-bold text-[#ACACAC] uppercase tracking-[0.1em] w-[32px]">Set</span>
                   <span className="text-[10px] font-bold text-[#C0C0C0] uppercase tracking-[0.1em] flex-1 text-center">Vorige</span>
-                  <span className="text-[10px] font-bold text-[#ACACAC] uppercase tracking-[0.1em] w-[120px] text-center">KG</span>
+                  <span className="text-[10px] font-bold text-[#ACACAC] uppercase tracking-[0.1em] w-[120px] text-center">{weightUnit.toUpperCase()}</span>
                   <span className="text-[10px] font-bold text-[#ACACAC] uppercase tracking-[0.1em] w-[106px] text-center">Reps</span>
                   <span className="w-[44px]" />
                 </div>
@@ -1195,8 +1278,8 @@ function ActiveWorkoutPage() {
                   {exSets.map((set, idx) => {
                     const prevSet = prevSetsData.find(p => p.set_number === idx + 1)
                     const prevLabel = prevSet
-                      ? `${prevSet.weight_kg || 0}×${prevSet.actual_reps || 0}`
-                      : (prefilledWeight && idx === 0 ? `${prefilledWeight} kg` : '—')
+                      ? `${displayWeight(prevSet.weight_kg) || 0}×${prevSet.actual_reps || 0}`
+                      : (prefilledWeight && idx === 0 ? `${displayWeight(prefilledWeight)} ${weightUnit}` : '—')
                     const isRestActive = activeRestTimer?.exerciseId === ex.id && activeRestTimer?.setIndex === idx
 
                     return (
@@ -1211,6 +1294,9 @@ function ActiveWorkoutPage() {
                           exerciseId={ex.id}
                           setSets={setSets}
                           exSets={exSets}
+                          weightUnit={weightUnit}
+                          displayWeight={displayWeight}
+                          toKg={toKg}
                         />
                         {/* Inline rest timer — redesigned card */}
                         {isRestActive && activeRestTimer && (
@@ -1283,6 +1369,7 @@ function ActiveWorkoutPage() {
                 </div>
               </div>
             </div>
+          </div>
           )
         })}
 
@@ -1371,6 +1458,7 @@ function ActiveWorkoutPage() {
 // --- Set row component ---
 function SetRowComponent({
   set, index, prevLabel, prefilledWeight, prevSet, onComplete, exerciseId, setSets, exSets,
+  weightUnit = 'kg', displayWeight, toKg,
 }: {
   set: SetData
   index: number
@@ -1381,22 +1469,38 @@ function SetRowComponent({
   exerciseId: string
   setSets: React.Dispatch<React.SetStateAction<Record<string, SetData[]>>>
   exSets: SetData[]
+  weightUnit?: 'kg' | 'lbs'
+  displayWeight?: (kg: number | null) => string
+  toKg?: (displayVal: string) => number | null
 }) {
-  const defaultWeight = set.weight_kg?.toString() || prefilledWeight?.toString() || ''
+  const toDisplay = displayWeight || ((kg: number | null) => kg?.toString() || '')
+  const fromDisplay = toKg || ((v: string) => v ? parseFloat(v) : null)
+
+  const defaultWeight = toDisplay(set.weight_kg) || toDisplay(prefilledWeight) || ''
   const [weight, setWeight] = useState(defaultWeight)
   const [reps, setReps] = useState(set.actual_reps?.toString() || set.prescribed_reps?.toString() || '')
 
+  // Sync display when unit changes
+  useEffect(() => {
+    if (set.weight_kg != null) {
+      setWeight(toDisplay(set.weight_kg))
+    } else if (prefilledWeight != null && !weight) {
+      setWeight(toDisplay(prefilledWeight))
+    }
+  }, [weightUnit]) // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (!set.completed && set.weight_kg && !weight) {
-      setWeight(set.weight_kg.toString())
+      setWeight(toDisplay(set.weight_kg))
     }
-  }, [set.weight_kg, set.completed, weight])
+  }, [set.weight_kg, set.completed, weight, toDisplay])
 
   const handleWeightChange = useCallback((value: string) => {
     setWeight(value)
+    const kgValue = fromDisplay(value)
     setSets((prev: Record<string, SetData[]>) => {
       const updated = [...(prev[exerciseId] || [])]
-      updated[index] = { ...updated[index], weight_kg: value ? parseFloat(value) : null }
+      updated[index] = { ...updated[index], weight_kg: kgValue }
       return { ...prev, [exerciseId]: updated }
     })
   }, [exerciseId, index, setSets])
@@ -1418,7 +1522,7 @@ function SetRowComponent({
       setSets((prev: Record<string, SetData[]>) => ({ ...prev, [exerciseId]: updatedSets }))
       return
     }
-    const finalWeight = weight ? parseFloat(weight) : null
+    const finalWeight = fromDisplay(weight)
     const finalReps = reps ? parseInt(reps) : set.prescribed_reps
     const updatedSets = [...exSets]
     updatedSets[index] = { ...set, weight_kg: finalWeight, actual_reps: finalReps, completed: true }
@@ -1427,16 +1531,85 @@ function SetRowComponent({
     }
     setSets((prev: Record<string, SetData[]>) => ({ ...prev, [exerciseId]: updatedSets }))
     onComplete(finalWeight)
-  }, [set, weight, reps, exSets, index, exerciseId, onComplete, setSets])
+  }, [set, weight, reps, exSets, index, exerciseId, onComplete, setSets, fromDisplay])
+
+  // --- Set type selector (long press on set number) ---
+  const [showTypeMenu, setShowTypeMenu] = useState(false)
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const currentType: SetType = set.set_type || (set.is_warmup ? 'warmup' : 'normal')
+  const typeConfig = SET_TYPE_CONFIG[currentType]
+
+  const handleSetTypeChange = useCallback((type: SetType) => {
+    setSets((prev: Record<string, SetData[]>) => {
+      const updated = [...(prev[exerciseId] || [])]
+      updated[index] = { ...updated[index], set_type: type, is_warmup: type === 'warmup' }
+      return { ...prev, [exerciseId]: updated }
+    })
+    setShowTypeMenu(false)
+    if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10)
+  }, [exerciseId, index, setSets])
+
+  const handleSetNumberPointerDown = useCallback(() => {
+    longPressTimer.current = setTimeout(() => {
+      setShowTypeMenu(true)
+      if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(20)
+    }, 500)
+  }, [])
+
+  const handleSetNumberPointerUp = useCallback(() => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current)
+      longPressTimer.current = null
+    }
+  }, [])
 
   return (
-    <div className={`flex items-center gap-2 px-1 py-1.5 rounded-lg transition-all ${set.completed ? 'opacity-40 animate-row-success' : ''}`}>
-      {/* Set number */}
-      <span className={`text-[13px] font-bold tabular-nums w-[32px] ${
-        set.completed ? 'text-[#1A1917]' : 'text-[#ACACAC]'
-      }`}>
-        {index + 1}
-      </span>
+    <div className={`relative flex items-center gap-2 px-1 py-1.5 rounded-lg transition-all ${set.completed ? 'opacity-40 animate-row-success' : ''}`}>
+      {/* Set number — long press to change type */}
+      <button
+        onPointerDown={handleSetNumberPointerDown}
+        onPointerUp={handleSetNumberPointerUp}
+        onPointerLeave={handleSetNumberPointerUp}
+        onContextMenu={(e) => e.preventDefault()}
+        className={`text-[13px] font-bold tabular-nums w-[32px] h-[32px] flex items-center justify-center rounded-md transition-all touch-manipulation select-none ${
+          currentType !== 'normal'
+            ? `text-[${typeConfig.color}]`
+            : set.completed ? 'text-[#1A1917]' : 'text-[#ACACAC]'
+        }`}
+        style={{
+          backgroundColor: typeConfig.bg,
+          WebkitTapHighlightColor: 'transparent',
+          ...(currentType !== 'normal' ? { color: typeConfig.color } : {}),
+        }}
+      >
+        {currentType !== 'normal' ? typeConfig.short : (index + 1)}
+      </button>
+
+      {/* Set type popup */}
+      {showTypeMenu && (
+        <>
+          <div className="fixed inset-0 z-50" onClick={() => setShowTypeMenu(false)} />
+          <div className="absolute left-0 top-full mt-1 z-50 bg-white rounded-xl shadow-lg border border-[#F0F0EE] overflow-hidden min-w-[140px]">
+            {(Object.entries(SET_TYPE_CONFIG) as [SetType, typeof typeConfig][]).map(([type, cfg]) => (
+              <button
+                key={type}
+                onClick={() => handleSetTypeChange(type)}
+                className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 text-left text-[13px] font-medium transition-colors touch-manipulation ${
+                  currentType === type ? 'bg-[#F8F8F6]' : 'hover:bg-[#FAFAFA]'
+                }`}
+                style={{ WebkitTapHighlightColor: 'transparent' }}
+              >
+                <span
+                  className="w-[8px] h-[8px] rounded-full flex-shrink-0"
+                  style={{ backgroundColor: cfg.color }}
+                />
+                <span style={{ color: cfg.color }}>{cfg.label}</span>
+                {currentType === type && <Check size={13} strokeWidth={2.5} className="ml-auto text-[#3D8B5C]" />}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Previous */}
       <span className="flex-1 text-[11px] text-[#C0C0C0] text-center truncate tabular-nums">
@@ -1448,11 +1621,11 @@ function SetRowComponent({
         id={`weight-${exerciseId}-${index}`}
         value={weight}
         onChange={handleWeightChange}
-        step={2.5}
+        step={weightUnit === 'lbs' ? 5 : 2.5}
         min={0}
-        max={500}
+        max={weightUnit === 'lbs' ? 1100 : 500}
         inputMode="decimal"
-        placeholder={prefilledWeight ? `${prefilledWeight}` : '—'}
+        placeholder={prefilledWeight ? toDisplay(prefilledWeight) : '—'}
         disabled={set.completed}
         className="w-[120px] flex-shrink-0"
       />
@@ -1471,18 +1644,25 @@ function SetRowComponent({
         className="w-[106px] flex-shrink-0"
       />
 
-      {/* Check button — tap again to undo */}
-      <button
-        onClick={handleCompleteClick}
-        className={`w-[44px] h-[44px] flex items-center justify-center flex-shrink-0 rounded-lg transition-all touch-manipulation ${
-          set.completed
-            ? 'bg-[#3D8B5C] text-white active:scale-95 animate-check-bounce'
-            : 'bg-[#F8F8F6] text-[#C0C0C0] hover:bg-[#F0F0EE] active:scale-95'
-        }`}
-        style={{ WebkitTapHighlightColor: 'transparent' }}
-      >
-        <Check size={16} strokeWidth={set.completed ? 3 : 2} />
-      </button>
+      {/* Check button + inline PR badge */}
+      <div className="flex items-center gap-1 flex-shrink-0">
+        {set.is_pr && (
+          <span className="text-[9px] font-black text-[#D46A3A] uppercase tracking-[0.05em] bg-[#D46A3A]/10 px-1.5 py-0.5 rounded-md animate-pulse">
+            PR
+          </span>
+        )}
+        <button
+          onClick={handleCompleteClick}
+          className={`w-[44px] h-[44px] flex items-center justify-center rounded-lg transition-all touch-manipulation ${
+            set.completed
+              ? 'bg-[#3D8B5C] text-white active:scale-95 animate-check-bounce'
+              : 'bg-[#F8F8F6] text-[#C0C0C0] hover:bg-[#F0F0EE] active:scale-95'
+          }`}
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+        >
+          <Check size={16} strokeWidth={set.completed ? 3 : 2} />
+        </button>
+      </div>
     </div>
   )
 }
