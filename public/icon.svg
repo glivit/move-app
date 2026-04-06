@@ -1,19 +1,25 @@
 <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <!-- Cream background -->
-  <rect width="512" height="512" fill="#EEEBE3" rx="108"/>
+  <!-- White background with rounded corners -->
+  <rect width="512" height="512" fill="#FFFFFF" rx="108"/>
 
-  <!-- M with macron — Cormorant Garamond bold style -->
-  <text
-    x="256"
-    y="310"
-    text-anchor="middle"
-    font-family="'Cormorant Garamond', 'Georgia', serif"
-    font-weight="700"
-    font-size="280"
-    fill="#1A1917"
-    letter-spacing="-8"
-  >M</text>
+  <!-- Macron bar -->
+  <rect x="156" y="108" width="200" height="12" rx="6" fill="#1A1917"/>
 
-  <!-- Macron bar above the M -->
-  <rect x="172" y="120" width="168" height="8" rx="4" fill="#1A1917"/>
+  <!-- M letterform - geometric serif style -->
+  <path d="
+    M 136 400
+    L 136 152
+    L 176 152
+    L 256 310
+    L 336 152
+    L 376 152
+    L 376 400
+    L 340 400
+    L 340 220
+    L 268 364
+    L 244 364
+    L 172 220
+    L 172 400
+    Z
+  " fill="#1A1917"/>
 </svg>

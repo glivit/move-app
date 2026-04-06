@@ -1,4 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#1A1917"/>
-  <text x="16" y="20" font-family="system-ui, sans-serif" font-size="14" font-weight="700" fill="#C8A96E" text-anchor="middle">M</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#FFFFFF" rx="108"/>
+  <rect x="156" y="108" width="200" height="12" rx="6" fill="#1A1917"/>
+  <path d="
+    M 136 400
+    L 136 152
+    L 176 152
+    L 256 310
+    L 336 152
+    L 376 152
+    L 376 400
+    L 340 400
+    L 340 220
+    L 268 364
+    L 244 364
+    L 172 220
+    L 172 400
+    Z
+  " fill="#1A1917"/>
 </svg>
