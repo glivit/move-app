@@ -509,6 +509,92 @@ const mealprep2200: TemplateDiet = {
 }
 
 // ──────────────────────────────────────────────────────────────
+// 8. HARD GAINER BULK — 3400 kcal / 250g protein
+//    Custom: moeilijk bijkomen, hard sporten
+//    Ochtend shake, makkelijke snacks, rest dag ervoor,
+//    pre-workout, easy dinners (AH/Muscle Meat), avond pudding
+// ──────────────────────────────────────────────────────────────
+
+const hardGainerBulk3400: TemplateDiet = {
+  id: 'tpl-hardgainer-3400',
+  title: 'Hard Gainer Bulk — 3400 kcal',
+  description: 'Bulk voor hard gainers. Double Isoclear ochtend, high-kcal snacks, easy dinners via AH & Muscle Meat. Zondag = frietjesdag.',
+  calories_target: 3400,
+  protein_g: 250,
+  carbs_g: 335,
+  fat_g: 120,
+  tags: ['bulk', 'hard-gainer', 'spiermassa', 'mannen', 'high-protein', 'easy-prep'],
+  meals: [
+    {
+      id: 'meal-0-ochtend-shake',
+      name: 'Ochtend Shake',
+      time: '07:30',
+      foods: [
+        // Double scoop ESN Isoclear = 60g poeder
+        { name: 'ESN Isoclear Whey Berry', brand: 'ESN', grams: 60, per100g: { calories: 365, protein: 90, carbs: 2, fat: 1.5 } },
+        // 10g creatine = 0 kcal maar track het
+        { name: 'Creatine Monohydrate', brand: 'ESN', grams: 10, per100g: { calories: 0, protein: 0, carbs: 0, fat: 0 } },
+      ],
+    },
+    {
+      id: 'meal-1-snack-ochtend',
+      name: 'Snack (high kcal)',
+      time: '10:00',
+      foods: [
+        { name: 'Cashewnoten', brand: 'AH', grams: 40, per100g: { calories: 553, protein: 18, carbs: 30, fat: 44 } },
+        { name: 'Banaan', grams: 130, per100g: { calories: 89, protein: 1.1, carbs: 23, fat: 0.3 } },
+        { name: 'Granola Bar Honey', brand: 'AH', grams: 40, per100g: { calories: 445, protein: 8, carbs: 60, fat: 18 } },
+      ],
+    },
+    {
+      id: 'meal-2-middag-rest',
+      name: 'Middag (rest dag ervoor)',
+      time: '12:30',
+      foods: [
+        // Voorbeeld: AH Stoommaaltijd — wissel af!
+        // Butter Chicken, Penne Pollo, Beef Teriyaki, Koreaanse Kip XL...
+        { name: 'AH Stoommaaltijd Butter Chicken', brand: 'Albert Heijn', grams: 500, per100g: { calories: 175, protein: 10, carbs: 20, fat: 5.9 } },
+      ],
+    },
+    {
+      id: 'meal-3-preworkout',
+      name: 'Pre-Workout Snack',
+      time: '16:00',
+      foods: [
+        { name: 'Eiwitbrood', brand: 'AH', grams: 100, per100g: { calories: 250, protein: 18, carbs: 10, fat: 14 } },
+        { name: 'Pindakaas (naturel)', brand: 'AH', grams: 25, per100g: { calories: 588, protein: 25, carbs: 20, fat: 50 } },
+        { name: 'Banaan', grams: 120, per100g: { calories: 89, protein: 1.1, carbs: 23, fat: 0.3 } },
+      ],
+    },
+    {
+      id: 'meal-4-dinner',
+      name: 'Avondeten',
+      time: '18:30',
+      foods: [
+        // Voorbeeld: Pasta + Muscle Meat gehakt — wissel af!
+        // Wraps + shoarma, rijst + teriyaki kip, burgers, steak...
+        { name: 'Volkoren Pasta', grams: 100, per100g: { calories: 348, protein: 13, carbs: 62, fat: 2.5 } },
+        { name: 'Low Fat Rundergehakt 5%', brand: 'Muscle Meat', grams: 200, per100g: { calories: 125, protein: 20.1, carbs: 0, fat: 5 } },
+        { name: 'Passata', grams: 120, per100g: { calories: 24, protein: 1.2, carbs: 4.2, fat: 0.1 } },
+        { name: 'Olijfolie', grams: 10, per100g: { calories: 884, protein: 0, carbs: 0, fat: 100 } },
+        { name: 'Parmezaan', grams: 15, per100g: { calories: 392, protein: 33, carbs: 0, fat: 29 } },
+      ],
+    },
+    {
+      id: 'meal-5-avond-pudding',
+      name: 'Na eten (pudding + kcal)',
+      time: '21:00',
+      foods: [
+        // 2x protein pudding = "XXL"
+        { name: 'Proteïne Pudding Ehrmann', brand: 'Ehrmann', grams: 200, per100g: { calories: 100, protein: 12, carbs: 10, fat: 2 } },
+        { name: 'Proteïne Pudding Melkunie', brand: 'Melkunie', grams: 200, per100g: { calories: 105, protein: 13, carbs: 9, fat: 2 } },
+        { name: 'Rijstwafels Chocolade', brand: 'AH', grams: 30, per100g: { calories: 385, protein: 5, carbs: 62, fat: 12 } },
+      ],
+    },
+  ],
+}
+
+// ──────────────────────────────────────────────────────────────
 // Export all templates
 // ──────────────────────────────────────────────────────────────
 
@@ -520,6 +606,7 @@ export const TEMPLATE_DIETS: TemplateDiet[] = [
   bulk3200,
   veggieCut1800,
   mealprep2200,
+  hardGainerBulk3400,
 ]
 
 export function getTemplateDiet(id: string): TemplateDiet | undefined {

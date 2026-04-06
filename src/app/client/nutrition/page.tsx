@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { createClient } from '@/lib/supabase'
 import {
   ChevronLeft, ChevronRight, Plus, X, Search, ScanBarcode,
-  Check, Trash2, Copy, ArrowLeft
+  Check, Trash2, Copy, ArrowLeft, ShoppingCart, ChevronDown
 } from 'lucide-react'
 import { invalidateCache } from '@/lib/fetcher'
 
@@ -89,6 +89,199 @@ function calcMacro(food: FoodEntry, key: 'calories' | 'protein' | 'carbs' | 'fat
 
 function ensureMealId(meal: any, index: number): string {
   return meal.id || `meal-${index}-${(meal.name || '').toLowerCase().replace(/\s+/g, '-')}`
+}
+
+// ─── Shopping List Component ──────────────────────────────────
+
+interface ShoppingItem {
+  name: string
+  brand?: string | null
+  weeklyGrams: number
+  unit: string
+  category: 'supplements' | 'snacks' | 'maaltijden'
+  checked: boolean
+}
+
+const SUPPLEMENT_KEYWORDS = ['whey', 'isoclear', 'creatine', 'casein', 'protein powder', 'pre-workout', 'bcaa', 'eaa']
+const SNACK_KEYWORDS = ['noten', 'cashew', 'amandel', 'walnot', 'pinda', 'granola', 'bar', 'reep', 'rijstwafel', 'pudding', 'banaan', 'appel', 'fruit', 'yoghurt', 'skyr', 'hüttenkäse', 'borrelnoot']
+
+function categorizeFood(name: string, brand?: string | null): 'supplements' | 'snacks' | 'maaltijden' {
+  const n = `${name} ${brand || ''}`.toLowerCase()
+  if (SUPPLEMENT_KEYWORDS.some(k => n.includes(k))) return 'supplements'
+  if (SNACK_KEYWORDS.some(k => n.includes(k))) return 'snacks'
+  return 'maaltijden'
+}
+
+function gramsToUnit(grams: number, name: string): { amount: string; unit: string } {
+  const n = name.toLowerCase()
+  // Items typically sold in pieces
+  if (n.includes('banaan')) return { amount: String(Math.ceil(grams / 120)), unit: 'stuks' }
+  if (n.includes('appel')) return { amount: String(Math.ceil(grams / 150)), unit: 'stuks' }
+  if (n.includes('ei ') || n === 'ei') return { amount: String(Math.ceil(grams / 60)), unit: 'stuks' }
+  if (n.includes('wrap')) return { amount: String(Math.ceil(grams / 60)), unit: 'stuks' }
+  if (n.includes('broodje') || n.includes('brood')) return { amount: String(Math.ceil(grams / 35)), unit: 'sneden' }
+  if (n.includes('stoommaaltijd')) return { amount: String(Math.ceil(grams / 450)), unit: 'stuks' }
+  if (n.includes('bar') || n.includes('reep')) return { amount: String(Math.ceil(grams / 50)), unit: 'stuks' }
+  if (n.includes('pudding') && (n.includes('ehrmann') || n.includes('melkunie'))) return { amount: String(Math.ceil(grams / 200)), unit: 'bakjes' }
+  // Kg for large amounts
+  if (grams >= 1000) return { amount: (grams / 1000).toFixed(1).replace('.0', ''), unit: 'kg' }
+  return { amount: String(Math.round(grams)), unit: 'g' }
+}
+
+function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
+  const [open, setOpen] = useState(false)
+  const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set())
+
+  const shoppingItems = useMemo(() => {
+    // Aggregate all foods across all meals, multiply by 7 for weekly
+    const foodMap = new Map<string, { name: string; brand?: string | null; totalGrams: number; category: 'supplements' | 'snacks' | 'maaltijden' }>()
+
+    meals.forEach(meal => {
+      (meal.foods || []).forEach(food => {
+        const key = `${food.name}||${food.brand || ''}`
+        const existing = foodMap.get(key)
+        if (existing) {
+          existing.totalGrams += food.grams * 7
+        } else {
+          foodMap.set(key, {
+            name: food.name,
+            brand: food.brand,
+            totalGrams: food.grams * 7,
+            category: categorizeFood(food.name, food.brand),
+          })
+        }
+      })
+    })
+
+    return Array.from(foodMap.values()).sort((a, b) => a.name.localeCompare(b.name, 'nl'))
+  }, [meals])
+
+  const categories = useMemo(() => {
+    const supplements = shoppingItems.filter(i => i.category === 'supplements')
+    const snacks = shoppingItems.filter(i => i.category === 'snacks')
+    const maaltijden = shoppingItems.filter(i => i.category === 'maaltijden')
+    return [
+      { key: 'supplements', label: 'Supplementen', icon: '💊', items: supplements },
+      { key: 'snacks', label: 'Snacks', icon: '🥜', items: snacks },
+      { key: 'maaltijden', label: 'Maaltijden', icon: '🍽️', items: maaltijden },
+    ].filter(c => c.items.length > 0)
+  }, [shoppingItems])
+
+  const totalItems = shoppingItems.length
+  const checkedCount = checkedItems.size
+
+  function toggleItem(key: string) {
+    setCheckedItems(prev => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
+
+  if (meals.length === 0) return null
+
+  return (
+    <div className="border-t border-[#F0F0EE] pt-5 mt-6">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between py-2 group"
+      >
+        <div className="flex items-center gap-2.5">
+          <ShoppingCart strokeWidth={1.5} className="w-4 h-4 text-[#D46A3A]" />
+          <span className="text-[13px] font-semibold text-[#1A1917] tracking-tight">Boodschappenlijst</span>
+          <span className="text-[11px] text-[#B0B0B0] font-medium">
+            {checkedCount > 0 ? `${checkedCount}/${totalItems}` : `${totalItems} items`}
+          </span>
+        </div>
+        <ChevronDown
+          strokeWidth={1.5}
+          className={`w-4 h-4 text-[#C0C0C0] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+
+      {open && (
+        <div className="mt-3 space-y-5 pb-4">
+          {/* Week indicator */}
+          <p className="text-[11px] text-[#B0B0B0] uppercase tracking-[0.1em]">
+            Weekoverzicht — 7 dagen
+          </p>
+
+          {categories.map(cat => (
+            <div key={cat.key}>
+              <div className="flex items-center gap-1.5 mb-2">
+                <span className="text-[13px]">{cat.icon}</span>
+                <span className="text-[12px] font-semibold text-[#8A8A8A] uppercase tracking-[0.06em]">{cat.label}</span>
+              </div>
+              <div className="space-y-0.5">
+                {cat.items.map(item => {
+                  const key = `${item.name}||${item.brand || ''}`
+                  const isChecked = checkedItems.has(key)
+                  const { amount, unit } = gramsToUnit(item.totalGrams, item.name)
+
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => toggleItem(key)}
+                      className={`w-full flex items-center gap-3 py-2.5 px-2 rounded-lg text-left transition-colors ${
+                        isChecked ? 'bg-[#F5F5F3]' : 'hover:bg-[#FAFAF8]'
+                      }`}
+                    >
+                      {/* Checkbox */}
+                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
+                        isChecked
+                          ? 'bg-[#3D8B5C] border-[#3D8B5C]'
+                          : 'border-[#D5D5D5]'
+                      }`}>
+                        {isChecked && <Check strokeWidth={3} className="w-3 h-3 text-white" />}
+                      </div>
+
+                      {/* Product info */}
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-[13px] leading-tight truncate ${
+                          isChecked ? 'line-through text-[#B0B0B0]' : 'text-[#1A1917]'
+                        }`}>
+                          {item.name}
+                        </p>
+                        {item.brand && (
+                          <p className="text-[11px] text-[#B0B0B0] truncate">{item.brand}</p>
+                        )}
+                      </div>
+
+                      {/* Amount */}
+                      <div className="text-right shrink-0">
+                        <span className={`text-[13px] font-medium tabular-nums ${
+                          isChecked ? 'text-[#C0C0C0]' : 'text-[#1A1917]'
+                        }`}>{amount}</span>
+                        <span className={`text-[11px] ml-0.5 ${
+                          isChecked ? 'text-[#D5D5D5]' : 'text-[#B0B0B0]'
+                        }`}>{unit}</span>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
+
+          {/* Progress bar */}
+          {checkedCount > 0 && (
+            <div className="pt-2">
+              <div className="h-1.5 bg-[#F0F0EE] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#3D8B5C] rounded-full transition-all duration-300"
+                  style={{ width: `${(checkedCount / totalItems) * 100}%` }}
+                />
+              </div>
+              <p className="text-[11px] text-[#B0B0B0] mt-1.5 text-center">
+                {checkedCount === totalItems ? 'Alles ingekocht! ✓' : `${checkedCount} van ${totalItems} ingekocht`}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
 }
 
 function formatDate(date: Date) {
@@ -1338,9 +1531,14 @@ export default function ClientNutritionPage() {
         </div>
       )}
 
+      {/* ── Weekly Shopping List ── */}
+      <div className="animate-slide-up stagger-7">
+        <WeeklyShoppingList meals={meals} />
+      </div>
+
       {/* ── Guidelines ── */}
       {plan.guidelines && (
-        <div className="border-t border-[#F0F0EE] pt-5 mt-6 animate-slide-up stagger-7">
+        <div className="border-t border-[#F0F0EE] pt-5 mt-6 animate-slide-up stagger-8">
           <p className="text-[11px] text-[#B0B0B0] uppercase tracking-[0.1em] mb-2">Richtlijnen</p>
           <p className="text-[13px] text-[#8A8A8A] leading-relaxed whitespace-pre-wrap">{plan.guidelines}</p>
         </div>
