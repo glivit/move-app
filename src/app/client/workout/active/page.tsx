@@ -741,24 +741,27 @@ function ExercisePickerModalComponent({
 
     try {
       const supabase = createClient()
-      const { data: inserted, error } = await supabase
-        .from('exercises')
-        .insert({
-          name: newExercise.name_nl.trim(),
+      const { data: { session: authSession } } = await supabase.auth.getSession()
+
+      const res = await fetch('/api/exercises/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authSession?.access_token ? { Authorization: `Bearer ${authSession.access_token}` } : {}),
+        },
+        body: JSON.stringify({
           name_nl: newExercise.name_nl.trim(),
           body_part: newExercise.body_part,
           target_muscle: newExercise.target_muscle.trim(),
           equipment: newExercise.equipment,
-          is_custom: true,
-          is_visible: true,
           category: 'strength',
-        })
-        .select('id, name, name_nl, body_part, target_muscle, equipment, gif_url, video_url, instructions, coach_tips')
-        .single()
+        }),
+      })
 
-      if (error) throw error
-      if (inserted) {
-        onSelect(inserted as Exercise)
+      const result = await res.json()
+      if (!res.ok) throw new Error(result.error || 'Kon oefening niet aanmaken')
+      if (result.exercise) {
+        onSelect(result.exercise as Exercise)
       }
     } catch (err) {
       console.error('Error creating exercise:', err)
@@ -778,7 +781,7 @@ function ExercisePickerModalComponent({
 
   return (
     <div className="fixed inset-0 bg-black/30 z-[80] flex items-end">
-      <div className="w-full max-h-[85vh] bg-white rounded-t-2xl flex flex-col animate-slide-up">
+      <div className="w-full h-[75vh] bg-white rounded-t-2xl flex flex-col animate-slide-up">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#F0F0EE]">
           <h3 className="text-[18px] font-semibold text-[#1A1917] page-title">
@@ -909,14 +912,14 @@ function ExercisePickerModalComponent({
                   <div className="w-6 h-6 border-[1.5px] border-[#D5D5D5] border-t-[#1A1917] rounded-full animate-spin" />
                 </div>
               ) : filteredExercises.length === 0 ? (
-                <div className="text-center py-8 space-y-4">
-                  <p className="text-[14px] text-[#ACACAC]">Geen oefeningen gevonden</p>
+                <div className="flex flex-col items-center justify-center flex-1 min-h-[200px] space-y-4">
+                  <p className="text-[14px] text-[#ACACAC]">Geen oefeningen gevonden voor &ldquo;{searchQuery}&rdquo;</p>
                   <button
                     onClick={handleShowCreateForm}
                     className="inline-flex items-center gap-2 px-5 py-3 bg-[#D46A3A] text-white rounded-xl text-[13px] font-semibold hover:bg-[#C45E30] transition-colors active:scale-[0.98]"
                   >
                     <Plus size={16} strokeWidth={2} />
-                    Maak nieuwe oefening
+                    Maak &ldquo;{searchQuery.trim()}&rdquo; aan
                   </button>
                 </div>
               ) : (
@@ -1369,12 +1372,24 @@ function ActiveWorkoutPage() {
           return
         }
 
-        // Fresh session
+        // Fresh session — prefill with previous session data
         const setsMap: Record<string, SetData[]> = {}
         for (const ex of exercisesData) {
+          const prevSets = apiPreviousSets[ex.id] || []
+          const lastWeight = weightsMap[ex.id]
           const setsList: SetData[] = []
           for (let i = 0; i < ex.sets; i++) {
-            setsList.push({ id: `temp-${ex.id}-${i}`, set_number: i + 1, prescribed_reps: ex.reps_min, actual_reps: null, weight_kg: null, is_warmup: false, completed: false, is_pr: false })
+            const prev = prevSets.find((p: any) => p.set_number === i + 1)
+            setsList.push({
+              id: `temp-${ex.id}-${i}`,
+              set_number: i + 1,
+              prescribed_reps: ex.reps_min,
+              actual_reps: prev?.actual_reps ?? null,
+              weight_kg: prev?.weight_kg ?? lastWeight ?? null,
+              is_warmup: false,
+              completed: false,
+              is_pr: false,
+            })
           }
           setsMap[ex.id] = setsList
         }

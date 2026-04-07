@@ -372,6 +372,8 @@ export default function ProgramEditorPage() {
   const handleAddExercise = async (exercise: Exercise) => {
     if (!activeDay) return
 
+    const isCardio = exercise.category === 'cardio'
+
     try {
       const newSortOrder = Math.max(0, ...activeDay.exercises.map((e) => e.sort_order)) + 1
 
@@ -380,10 +382,10 @@ export default function ProgramEditorPage() {
         .insert({
           template_day_id: activeDay.id,
           exercise_id: exercise.id,
-          sets: 3,
-          reps_min: 8,
-          reps_max: 12,
-          rest_seconds: 90,
+          sets: isCardio ? 1 : 3,
+          reps_min: isCardio ? 20 : 8,
+          reps_max: isCardio ? null : 12,
+          rest_seconds: isCardio ? 0 : 90,
           tempo: null,
           rpe_target: null,
           weight_suggestion: null,
@@ -398,10 +400,10 @@ export default function ProgramEditorPage() {
         const newExerciseWithPrescription: ExerciseWithPrescription = {
           ...exercise,
           prescription_id: data[0].id,
-          sets: 3,
-          reps_min: 8,
-          reps_max: 12,
-          rest_seconds: 90,
+          sets: isCardio ? 1 : 3,
+          reps_min: isCardio ? 20 : 8,
+          reps_max: isCardio ? null : 12,
+          rest_seconds: isCardio ? 0 : 90,
           tempo: null,
           rpe_target: null,
           weight_suggestion: null,

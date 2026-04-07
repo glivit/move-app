@@ -12,6 +12,7 @@ interface Exercise {
   body_part: string
   equipment: string
   gif_url?: string
+  category?: string
 }
 
 interface ExerciseSearchModalProps {
@@ -37,7 +38,7 @@ export function ExerciseSearchModal({ isOpen, onClose, onSelect }: ExerciseSearc
         setLoading(true)
         const { data, error } = await supabase
           .from('exercises')
-          .select('id, name, name_nl, body_part, equipment, gif_url')
+          .select('id, name, name_nl, body_part, equipment, gif_url, category')
           .or(`name.ilike.%${query}%,name_nl.ilike.%${query}%`)
           .limit(20)
 
