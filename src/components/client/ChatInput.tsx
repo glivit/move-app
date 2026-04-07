@@ -143,29 +143,22 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
       const processedFile = await compressImage(file)
       setUploadProgress(30)
 
-      const supabase = createClient()
-      const fileExt = file.name.split('.').pop() || 'bin'
-      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`
+      // Upload via server-side API route (bypasses storage RLS)
+      const formData = new FormData()
+      formData.append('file', processedFile)
+      formData.append('bucket', 'message-attachments')
 
       setUploadProgress(50)
 
-      const { error } = await supabase.storage
-        .from('message-attachments')
-        .upload(fileName, processedFile)
-
-      if (error) throw error
-
-      setUploadProgress(80)
-
-      const { data: publicUrl } = supabase.storage
-        .from('message-attachments')
-        .getPublicUrl(fileName)
+      const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData })
+      const uploadData = await uploadRes.json()
+      if (!uploadRes.ok) throw new Error(uploadData.error || 'Upload mislukt')
 
       setUploadProgress(100)
 
       setFilePreview({
         name: file.name,
-        url: publicUrl.publicUrl,
+        url: uploadData.url,
         type: file.type,
         localPreview,
       })

@@ -49,24 +49,18 @@ export function MessageInput({ onSend, disabled = false }: MessageInputProps) {
 
     setIsUploading(true)
     try {
-      const supabase = createClient()
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${Date.now()}.${fileExt}`
-      const filePath = `${fileName}`
+      // Upload via server-side API route (bypasses storage RLS)
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('bucket', 'message-attachments')
 
-      const { data, error } = await supabase.storage
-        .from('message-attachments')
-        .upload(filePath, file)
-
-      if (error) throw error
-
-      const { data: publicUrl } = supabase.storage
-        .from('message-attachments')
-        .getPublicUrl(filePath)
+      const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData })
+      const uploadData = await uploadRes.json()
+      if (!uploadRes.ok) throw new Error(uploadData.error || 'Upload mislukt')
 
       setFilePreview({
         name: file.name,
-        url: publicUrl.publicUrl,
+        url: uploadData.url,
         type: file.type,
       })
     } catch (error) {

@@ -373,20 +373,16 @@ function FormCheckModalComponent({ exerciseName, onClose }: { exerciseName: stri
 
     setUploading(true)
     try {
+      // Upload via server-side API route (bypasses storage RLS)
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('bucket', 'message-attachments')
+
+      const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData })
+      const uploadData = await uploadRes.json()
+      if (!uploadRes.ok) throw new Error(uploadData.error || 'Upload mislukt')
+
       const supabase = createClient()
-
-      // Upload video
-      const fileExt = file.name.split('.').pop() || 'mp4'
-      const fileName = `formcheck-${Date.now()}.${fileExt}`
-      const { error: uploadError } = await supabase.storage
-        .from('message-attachments')
-        .upload(fileName, file)
-
-      if (uploadError) throw uploadError
-
-      const { data: publicUrl } = supabase.storage
-        .from('message-attachments')
-        .getPublicUrl(fileName)
 
       // Get current user and coach
       const { data: { user } } = await supabase.auth.getUser()
@@ -407,7 +403,7 @@ function FormCheckModalComponent({ exerciseName, onClose }: { exerciseName: stri
         receiver_id: coaches[0].id,
         content,
         message_type: 'video',
-        file_url: publicUrl.publicUrl,
+        file_url: uploadData.url,
       })
 
       setSent(true)

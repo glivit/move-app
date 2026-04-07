@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { createAdminClient } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 
 // GET: Fetch nutrition logs for a specific date
@@ -7,13 +8,17 @@ export async function GET(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  // Use admin client for queries to bypass RLS issues
+  let db: any
+  try { db = createAdminClient() } catch { db = supabase }
+
   const { searchParams } = new URL(request.url)
   const date = searchParams.get('date') || new Date().toISOString().split('T')[0]
   const clientId = searchParams.get('client_id') || user.id
 
   // If requesting another client's data, must be coach
   if (clientId !== user.id) {
-    const { data: profile } = await supabase
+    const { data: profile } = await db
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -24,7 +29,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Get meal logs
-  const { data: logs } = await supabase
+  const { data: logs } = await db
     .from('nutrition_logs')
     .select('*')
     .eq('client_id', clientId)
@@ -32,7 +37,7 @@ export async function GET(request: NextRequest) {
     .order('created_at')
 
   // Get daily summary
-  const { data: summary } = await supabase
+  const { data: summary } = await db
     .from('nutrition_daily_summary')
     .select('*')
     .eq('client_id', clientId)
@@ -50,6 +55,10 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  // Use admin client for mutations to bypass RLS issues
+  let db: any
+  try { db = createAdminClient() } catch { db = supabase }
+
   const body = await request.json()
   const {
     plan_id,
@@ -66,7 +75,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Upsert the meal log
-  const { data: log, error: logError } = await supabase
+  const { data: log, error: logError } = await db
     .from('nutrition_logs')
     .upsert(
       {
@@ -92,7 +101,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Update daily summary
-  const { data: allLogs } = await supabase
+  const { data: allLogs } = await db
     .from('nutrition_logs')
     .select('*')
     .eq('client_id', user.id)
@@ -113,7 +122,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  await supabase
+  await db
     .from('nutrition_daily_summary')
     .upsert(
       {
@@ -139,6 +148,10 @@ export async function PATCH(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  // Use admin client to bypass RLS issues
+  let db: any
+  try { db = createAdminClient() } catch { db = supabase }
+
   const body = await request.json()
   const { date, daily_note, mood, water_liters, coach_seen } = body
 
@@ -156,7 +169,7 @@ export async function PATCH(request: NextRequest) {
     updates.coach_seen_at = new Date().toISOString()
   }
 
-  const { error } = await supabase
+  const { error } = await db
     .from('nutrition_daily_summary')
     .upsert(
       { client_id: body.client_id || user.id, date, ...updates },

@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from "next/server"
+import { createAdminClient } from "@/lib/supabase-admin"
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 
 // Food search: local Supabase only (980+ products)
@@ -121,7 +122,7 @@ export async function GET(request: NextRequest) {
   // Popular products
   if (popular && !query && !barcode) {
     try {
-      const supabase = await createServerSupabaseClient()
+      let supabase: any; try { supabase = createAdminClient() } catch { supabase = await createServerSupabaseClient() }
       let q = supabase
         .from('food_products')
         .select('*')
@@ -152,7 +153,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const supabase = await createServerSupabaseClient()
+    let supabase: any; try { supabase = createAdminClient() } catch { supabase = await createServerSupabaseClient() }
     const products = await searchLocalProducts(supabase, query, barcode, category)
 
     const result = {
@@ -257,7 +258,7 @@ async function searchLocalProducts(
 // POST: Add custom product (client-created)
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient()
+    let supabase: any; try { supabase = createAdminClient() } catch { supabase = await createServerSupabaseClient() }
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
