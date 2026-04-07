@@ -512,7 +512,7 @@ function ActiveWorkoutPage() {
   const [closeConfirm, setCloseConfirm] = useState(false)
   const [prCelebration, setPrCelebration] = useState<string | null>(null)
   const [workoutSeconds, setWorkoutSeconds] = useState(0)
-  const [activeRestTimer, setActiveRestTimer] = useState<{ exerciseId: string; setIndex: number; seconds: number; total: number } | null>(null)
+  const [activeRestTimer, setActiveRestTimer] = useState<{ exerciseId: string; setIndex: number; seconds: number; total: number; endTime: number } | null>(null)
   const [exerciseNotes, setExerciseNotes] = useState<Record<string, string>>({})
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
   const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>(() => {
@@ -589,29 +589,32 @@ function ActiveWorkoutPage() {
     return () => clearInterval(interval)
   }, [session])
 
-  // --- Inline rest timer countdown with audio beeps ---
+  // --- Inline rest timer countdown (endTime-based, survives app-switch) ---
   useEffect(() => {
     if (!activeRestTimer || activeRestTimer.seconds <= 0) return
-    const interval = setInterval(() => {
+    const tick = () => {
       setActiveRestTimer(prev => {
         if (!prev) return null
-        const next = prev.seconds - 1
+        const remaining = Math.ceil((prev.endTime - Date.now()) / 1000)
         // Beep at 3, 2, 1 seconds
-        if (next > 0 && next <= 3) {
+        if (remaining > 0 && remaining <= 3 && remaining !== prev.seconds) {
           playBeep(660, 100)
           haptic(15)
         }
         // Final beep (done) — longer, higher pitch
-        if (next <= 0) {
+        if (remaining <= 0) {
           playBeep(1100, 250)
           haptic([40, 30, 40])
           return null
         }
-        return { ...prev, seconds: next }
+        return { ...prev, seconds: remaining }
       })
-    }, 1000)
+    }
+    // Tick immediately (catches up after background), then every 250ms for smooth updates
+    tick()
+    const interval = setInterval(tick, 250)
     return () => clearInterval(interval)
-  }, [activeRestTimer, playBeep, haptic])
+  }, [activeRestTimer?.endTime, playBeep, haptic])
 
   // --- Auto-save (includes notes + exercise order) ---
   useEffect(() => {
@@ -796,7 +799,7 @@ function ActiveWorkoutPage() {
       }
 
       if (exerciseRef && exerciseRef.rest_seconds > 0) {
-        setActiveRestTimer({ exerciseId, setIndex, seconds: exerciseRef.rest_seconds, total: exerciseRef.rest_seconds })
+        setActiveRestTimer({ exerciseId, setIndex, seconds: exerciseRef.rest_seconds, total: exerciseRef.rest_seconds, endTime: Date.now() + exerciseRef.rest_seconds * 1000 })
       }
 
       // Auto-focus next set's weight field
@@ -1352,7 +1355,7 @@ function ActiveWorkoutPage() {
                             {/* Timer row */}
                             <div className="flex items-center justify-between px-2 py-2">
                               <button
-                                onClick={() => setActiveRestTimer(prev => prev ? { ...prev, seconds: Math.max(0, prev.seconds - 15), total: prev.total } : null)}
+                                onClick={() => setActiveRestTimer(prev => prev ? { ...prev, seconds: Math.max(0, prev.seconds - 15), total: prev.total, endTime: prev.endTime - 15000 } : null)}
                                 className="px-2.5 py-1.5 rounded-lg text-[12px] font-semibold text-[#ACACAC] hover:bg-[#F8F8F6] active:scale-95 transition-all touch-manipulation"
                                 style={{ WebkitTapHighlightColor: 'transparent' }}
                               >
@@ -1371,7 +1374,7 @@ function ActiveWorkoutPage() {
                                 </button>
                               </div>
                               <button
-                                onClick={() => setActiveRestTimer(prev => prev ? { ...prev, seconds: prev.seconds + 15, total: Math.max(prev.total, prev.seconds + 15) } : null)}
+                                onClick={() => setActiveRestTimer(prev => prev ? { ...prev, seconds: prev.seconds + 15, total: Math.max(prev.total, prev.seconds + 15), endTime: prev.endTime + 15000 } : null)}
                                 className="px-2.5 py-1.5 rounded-lg text-[12px] font-semibold text-[#ACACAC] hover:bg-[#F8F8F6] active:scale-95 transition-all touch-manipulation"
                                 style={{ WebkitTapHighlightColor: 'transparent' }}
                               >
@@ -1503,13 +1506,22 @@ function SetRowComponent({
   const toDisplay = displayWeight || ((kg: number | null) => kg?.toString() || '')
   const fromDisplay = toKg || ((v: string) => v ? parseFloat(v) : null)
 
-  const defaultWeight = toDisplay(set.weight_kg) || toDisplay(prefilledWeight) || ''
-  const [weight, setWeight] = useState(defaultWeight)
+  // Smart prefill: cap weight at what previous set actually achieved
+  // (you don't get stronger during a workout — if set 2 was lighter, set 3 should match)
+  const getDefaultWeight = () => {
+    if (set.weight_kg != null) return toDisplay(set.weight_kg)
+    if (prevSet?.completed && prevSet.weight_kg != null && prefilledWeight != null) {
+      const cappedWeight = Math.min(prevSet.weight_kg, prefilledWeight)
+      return toDisplay(cappedWeight)
+    }
+    return toDisplay(prefilledWeight) || ''
+  }
+  const [weight, setWeight] = useState(getDefaultWeight)
 
-  // Carry over reps from previous set when previous was weaker than prescribed
+  // Smart prefill: cap reps at what previous set achieved
   const getDefaultReps = () => {
     if (set.actual_reps != null) return set.actual_reps.toString()
-    if (prevSet?.actual_reps != null && prevSet.actual_reps < (set.prescribed_reps || 0)) {
+    if (prevSet?.completed && prevSet.actual_reps != null && prevSet.actual_reps < (set.prescribed_reps || 0)) {
       return prevSet.actual_reps.toString()
     }
     return set.prescribed_reps?.toString() || ''
@@ -1530,6 +1542,28 @@ function SetRowComponent({
       setWeight(toDisplay(set.weight_kg))
     }
   }, [set.weight_kg, set.completed, weight, toDisplay])
+
+  // Smart prefill: when previous set completes, cap this set's prefill
+  useEffect(() => {
+    if (!set.completed && prevSet?.completed && !set.weight_kg) {
+      // Cap weight at previous set's actual weight
+      if (prevSet.weight_kg != null && prefilledWeight != null) {
+        const capped = Math.min(prevSet.weight_kg, prefilledWeight)
+        setWeight(toDisplay(capped))
+        setSets((prev: Record<string, SetData[]>) => {
+          const updated = [...(prev[exerciseId] || [])]
+          if (updated[index] && !updated[index].weight_kg) {
+            updated[index] = { ...updated[index], weight_kg: capped }
+          }
+          return { ...prev, [exerciseId]: updated }
+        })
+      }
+      // Cap reps at previous set's actual reps
+      if (prevSet.actual_reps != null && prevSet.actual_reps < (set.prescribed_reps || 0) && !set.actual_reps) {
+        setReps(prevSet.actual_reps.toString())
+      }
+    }
+  }, [prevSet?.completed, prevSet?.weight_kg, prevSet?.actual_reps]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleWeightChange = useCallback((value: string) => {
     setWeight(value)
@@ -1656,13 +1690,14 @@ function SetRowComponent({
         {prevLabel}
       </span>
 
-      {/* Weight input — plain like Hevy */}
+      {/* Weight input — plain like Hevy, auto-select on focus */}
       <input
         id={`weight-${exerciseId}-${index}`}
         type="text"
         inputMode="decimal"
         value={weight}
         onChange={(e) => handleWeightChange(e.target.value)}
+        onFocus={(e) => e.target.select()}
         placeholder={prefilledWeight ? toDisplay(prefilledWeight) : '—'}
         disabled={set.completed}
         className={`w-[80px] flex-shrink-0 text-center text-[14px] font-medium tabular-nums py-2 rounded-lg border-none focus:outline-none transition-colors ${
@@ -1672,13 +1707,14 @@ function SetRowComponent({
         }`}
       />
 
-      {/* Reps input — plain like Hevy */}
+      {/* Reps input — plain like Hevy, auto-select on focus */}
       <input
         id={`reps-${exerciseId}-${index}`}
         type="text"
         inputMode="numeric"
         value={reps}
         onChange={(e) => handleRepsChange(e.target.value)}
+        onFocus={(e) => e.target.select()}
         placeholder={set.prescribed_reps?.toString() || '—'}
         disabled={set.completed}
         className={`w-[64px] flex-shrink-0 text-center text-[14px] font-medium tabular-nums py-2 rounded-lg border-none focus:outline-none transition-colors ${
