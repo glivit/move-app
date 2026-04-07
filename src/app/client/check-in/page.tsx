@@ -77,6 +77,26 @@ export default function CheckInPage() {
         return
       }
 
+      // Check if photos or measurements are still missing
+      // → always allow access so the client can complete them (no deadline)
+      const { data: latestCheckin } = await supabase
+        .from('checkins')
+        .select('id, photo_front_url, chest_cm')
+        .eq('client_id', user.id)
+        .order('date', { ascending: false })
+        .limit(1)
+        .single()
+
+      const missingPhotosOrMeasurements = !latestCheckin
+        || !latestCheckin.photo_front_url
+        || !latestCheckin.chest_cm
+
+      // If baseline data is incomplete, always allow — no window restriction
+      if (missingPhotosOrMeasurements) {
+        setCanSubmit(true)
+        return
+      }
+
       // Check if already submitted this month
       const now = new Date()
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
