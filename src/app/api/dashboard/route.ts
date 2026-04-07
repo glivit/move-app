@@ -57,9 +57,9 @@ export async function GET(request: NextRequest) {
       db.from('profiles').select('id, full_name, role, package, start_date, intake_completed')
         .eq('id', user.id).single(),
 
-      // Active program with template days
+      // Active program with template days + schedule map (weekday → template_day_id)
       db.from('client_programs').select(`
-        id, name, start_date, is_active, current_week, template_id,
+        id, name, start_date, is_active, current_week, template_id, schedule,
         program_template_days(id, day_number, name, focus, estimated_duration_min)
       `).eq('client_id', user.id).eq('is_active', true).single(),
 
@@ -124,10 +124,10 @@ export async function GET(request: NextRequest) {
       computeStreak(db, user.id),
 
       // Weight change this month (was sequential before — now parallel)
-      db.from('health_metrics').select('value, measured_at')
-        .eq('client_id', user.id).eq('metric_type', 'weight')
-        .gte('measured_at', monthStart.toISOString())
-        .order('measured_at'),
+      db.from('health_metrics').select('weight_kg, date')
+        .eq('client_id', user.id).not('weight_kg', 'is', null)
+        .gte('date', monthStart.toISOString().split('T')[0])
+        .order('date'),
 
       // Weekly check-in this week (has the client submitted?)
       db.from('weekly_checkins').select('id, date, weight_kg')
@@ -138,10 +138,10 @@ export async function GET(request: NextRequest) {
         .single(),
 
       // Weight logs this week (for 2x/week minimum tracking)
-      db.from('health_metrics').select('id, value, measured_at')
-        .eq('client_id', user.id).eq('metric_type', 'weight')
-        .gte('measured_at', `${weekStartDate}T00:00:00`)
-        .order('measured_at', { ascending: false }),
+      db.from('health_metrics').select('id, weight_kg, date')
+        .eq('client_id', user.id).not('weight_kg', 'is', null)
+        .gte('date', weekStartDate)
+        .order('date', { ascending: false }),
     ])
 
     // ── Compute derived data ──────────────────────────────
@@ -154,21 +154,28 @@ export async function GET(request: NextRequest) {
     const todayWorkouts = todayWorkoutsRes.data || []
     const weekWorkouts = weekWorkoutsRes.data || []
 
-    // Today's day of week (1=Monday, 7=Sunday)
+    // Today's day of week (1=Monday, 7=Sunday) — ISO format
     const todayDow = (() => { const d = new Date().getDay(); return d === 0 ? 7 : d })()
 
-    // Today's scheduled workout from program
-    const todayTemplateDay = program?.program_template_days?.find(
-      (d: any) => d.day_number === todayDow
-    )
+    // Schedule map: weekday number (string) → template_day_id
+    // This is the correct way to determine which workout is on which day.
+    // day_number in program_template_days is just a sort order, NOT a weekday.
+    const schedule = (program?.schedule as Record<string, string>) || {}
+    const templateDays = (program?.program_template_days || []) as any[]
 
-    // Next training day (look ahead up to 7 days)
+    // Today's scheduled workout from program (via schedule map)
+    const todayDayId = schedule[String(todayDow)] || null
+    const todayTemplateDay = todayDayId
+      ? templateDays.find((d: any) => d.id === todayDayId) || null
+      : null
+
+    // Next training day (look ahead up to 7 days via schedule map)
     let nextTrainingDay: any = null
-    if (program?.program_template_days) {
-      const days = program.program_template_days as any[]
-      for (let offset = 1; offset <= 7; offset++) {
-        const checkDow = ((todayDow - 1 + offset) % 7) + 1
-        const found = days.find((d: any) => d.day_number === checkDow)
+    for (let offset = 1; offset <= 7; offset++) {
+      const checkDow = ((todayDow - 1 + offset) % 7) + 1
+      const nextDayId = schedule[String(checkDow)] || null
+      if (nextDayId) {
+        const found = templateDays.find((d: any) => d.id === nextDayId)
         if (found) {
           const dayNames = ['', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
           nextTrainingDay = {
@@ -218,7 +225,7 @@ export async function GET(request: NextRequest) {
     const weightEntries = weightEntriesRes.data
     let weightChangeMonth: number | null = null
     if (weightEntries && weightEntries.length >= 2) {
-      weightChangeMonth = +(weightEntries[weightEntries.length - 1].value - weightEntries[0].value).toFixed(1)
+      weightChangeMonth = +(weightEntries[weightEntries.length - 1].weight_kg - weightEntries[0].weight_kg).toFixed(1)
     }
 
     // Pending prompt question — promptsRes.data is an array (no .single())
@@ -337,12 +344,11 @@ export async function GET(request: NextRequest) {
         } : null,
         completedToday: todayWorkoutDone,
         isRestDay: !todayTemplateDay,
-        // All scheduled training days (day_number → name) for calendar
-        scheduleDays: (program?.program_template_days || []).map((d: any) => ({
-          dayNumber: d.day_number,
-          name: d.name,
-          focus: d.focus,
-        })),
+        // All scheduled training days (weekday → name) for calendar via schedule map
+        scheduleDays: Object.entries(schedule).map(([weekday, dayId]) => {
+          const day = templateDays.find((d: any) => d.id === dayId)
+          return day ? { dayNumber: Number(weekday), name: day.name, focus: day.focus } : null
+        }).filter(Boolean),
         // Recent completed workout dates for calendar dots
         completedDates: (weekWorkouts || [])
           .filter((w: any) => w.completed_at)
@@ -392,8 +398,8 @@ export async function GET(request: NextRequest) {
       weightLog: {
         entriesThisWeek: weightLogCount,
         targetPerWeek: 2,
-        lastValue: lastWeightLog ? lastWeightLog.value : null,
-        lastDate: lastWeightLog ? lastWeightLog.measured_at : null,
+        lastValue: lastWeightLog ? lastWeightLog.weight_kg : null,
+        lastDate: lastWeightLog ? lastWeightLog.date : null,
       },
 
       momentum: {
