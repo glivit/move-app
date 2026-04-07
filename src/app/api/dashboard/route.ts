@@ -57,11 +57,10 @@ export async function GET(request: NextRequest) {
       db.from('profiles').select('id, full_name, role, package, start_date, intake_completed')
         .eq('id', user.id).single(),
 
-      // Active program with template days + schedule map (weekday → template_day_id)
-      db.from('client_programs').select(`
-        id, name, start_date, is_active, current_week, template_id, schedule,
-        program_template_days(id, day_number, name, focus, estimated_duration_min)
-      `).eq('client_id', user.id).eq('is_active', true).single(),
+      // Active program + schedule map (weekday → template_day_id)
+      // NOTE: program_template_days fetched separately — no direct FK to client_programs
+      db.from('client_programs').select('id, name, start_date, is_active, current_week, template_id, schedule')
+        .eq('client_id', user.id).eq('is_active', true).single(),
 
       // Active nutrition plan with meals
       db.from('nutrition_plans').select('id, title, calories_target, protein_g, carbs_g, fat_g, meals')
@@ -154,6 +153,17 @@ export async function GET(request: NextRequest) {
     const todayWorkouts = todayWorkoutsRes.data || []
     const weekWorkouts = weekWorkoutsRes.data || []
 
+    // ── Fetch template days separately (no direct FK from client_programs) ──
+    // This matches the working pattern in /api/client-program/route.ts
+    let templateDays: any[] = []
+    if (program?.template_id) {
+      const { data: days } = await db.from('program_template_days')
+        .select('id, day_number, name, focus, estimated_duration_min')
+        .eq('template_id', program.template_id)
+        .order('sort_order', { ascending: true })
+      templateDays = days || []
+    }
+
     // Today's day of week (1=Monday, 7=Sunday) — ISO format
     const todayDow = (() => { const d = new Date().getDay(); return d === 0 ? 7 : d })()
 
@@ -161,7 +171,6 @@ export async function GET(request: NextRequest) {
     // This is the correct way to determine which workout is on which day.
     // day_number in program_template_days is just a sort order, NOT a weekday.
     const schedule = (program?.schedule as Record<string, string>) || {}
-    const templateDays = (program?.program_template_days || []) as any[]
 
     // Today's scheduled workout from program (via schedule map)
     const todayDayId = schedule[String(todayDow)] || null
