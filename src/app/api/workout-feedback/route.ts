@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { createAdminClient } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(req: NextRequest) {
@@ -6,8 +7,16 @@ export async function GET(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  // Use admin client to bypass RLS for coach queries
+  let db: ReturnType<typeof createAdminClient>
+  try {
+    db = createAdminClient()
+  } catch {
+    db = supabase as any
+  }
+
   // Check coach role
-  const { data: profile } = await supabase
+  const { data: profile } = await db
     .from('profiles')
     .select('role')
     .eq('id', user.id)
@@ -20,7 +29,7 @@ export async function GET(req: NextRequest) {
   const clientId = req.nextUrl.searchParams.get('client_id')
   const unreviewed = req.nextUrl.searchParams.get('unreviewed') === 'true'
 
-  let query = supabase
+  let query = db
     .from('workout_sessions')
     .select(`
       id, client_id, started_at, completed_at, duration_seconds,
@@ -64,6 +73,13 @@ export async function PATCH(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  let db: ReturnType<typeof createAdminClient>
+  try {
+    db = createAdminClient()
+  } catch {
+    db = supabase as any
+  }
+
   const body = await req.json()
   const { session_id, coach_notes } = body
 
@@ -71,7 +87,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: 'session_id required' }, { status: 400 })
   }
 
-  const { error } = await supabase
+  const { error } = await db
     .from('workout_sessions')
     .update({
       coach_seen: true,

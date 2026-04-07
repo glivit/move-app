@@ -1,15 +1,25 @@
 import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { createAdminClient } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 
 /**
  * GET /api/progress
  * Returns all stats for the animated Voortgang overview page.
+ * Uses admin client to bypass RLS (matches /api/client-program pattern).
  */
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    // Use admin client to bypass RLS — queries still filter by user.id
+    let db: ReturnType<typeof createAdminClient>
+    try {
+      db = createAdminClient()
+    } catch {
+      db = supabase as any
+    }
 
     const now = new Date()
     const thirtyDaysAgo = new Date(now)
@@ -26,32 +36,32 @@ export async function GET(request: NextRequest) {
       nutritionLogsRes,
       streakSessions,
     ] = await Promise.all([
-      supabase.from('profiles').select('created_at, start_date').eq('id', user.id).single(),
+      db.from('profiles').select('created_at, start_date').eq('id', user.id).single(),
 
       // All completed workouts
-      supabase.from('workout_sessions').select('id, started_at, completed_at, duration_seconds')
+      db.from('workout_sessions').select('id, started_at, completed_at, duration_seconds')
         .eq('client_id', user.id).not('completed_at', 'is', null)
         .order('started_at', { ascending: false }),
 
       // Last 30 days workouts
-      supabase.from('workout_sessions').select('id, started_at, completed_at, duration_seconds')
+      db.from('workout_sessions').select('id, started_at, completed_at, duration_seconds')
         .eq('client_id', user.id).not('completed_at', 'is', null)
         .gte('started_at', thirtyDaysAgo.toISOString()),
 
       // All PRs
-      supabase.from('personal_records').select('id, exercise_id, record_type, value, achieved_at, exercises(name, name_nl)')
+      db.from('personal_records').select('id, exercise_id, record_type, value, achieved_at, exercises(name, name_nl)')
         .eq('client_id', user.id).order('achieved_at', { ascending: false }),
 
       // All check-ins (for weight/body data)
-      supabase.from('checkins').select('id, date, weight, body_fat_pct, photo_front_url, photo_back_url')
+      db.from('checkins').select('id, date, weight, body_fat_pct, photo_front_url, photo_back_url')
         .eq('client_id', user.id).order('date', { ascending: true }),
 
       // Last 30 days nutrition compliance
-      supabase.from('nutrition_daily_summary').select('date, meals_planned, meals_completed')
+      db.from('nutrition_daily_summary').select('date, meals_planned, meals_completed')
         .eq('client_id', user.id).gte('date', thirtyDaysAgo.toISOString().split('T')[0]),
 
       // For streak computation
-      supabase.from('workout_sessions').select('started_at')
+      db.from('workout_sessions').select('started_at')
         .eq('client_id', user.id).not('completed_at', 'is', null)
         .gte('started_at', ninetyDaysAgo.toISOString())
         .order('started_at', { ascending: false }),
