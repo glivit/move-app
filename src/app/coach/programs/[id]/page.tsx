@@ -972,6 +972,7 @@ export default function ProgramEditorPage() {
                         </div>
                       ) : (
                       /* Strength exercise fields */
+                      <>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {/* Sets */}
                         <div>
@@ -1115,6 +1116,7 @@ export default function ProgramEditorPage() {
                           />
                         </div>
                       </div>
+                      </>
                       )}
 
                       {/* Notes (for strength exercises only — cardio has notes inline) */}
