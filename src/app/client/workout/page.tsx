@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronLeft, ChevronRight, Dumbbell, Clock, Play, Check } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Dumbbell, Clock, Play, Check, Footprints, Timer } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { cachedFetch } from '@/lib/fetcher'
 
@@ -330,6 +330,34 @@ export default function WorkoutOverviewPage() {
             </button>
           )
         })}
+      </div>
+
+      {/* ── Quick cardio ── */}
+      <div className="border-t border-[#F0F0EE] pt-6 mt-6 mb-10">
+        <p
+          className="text-[12px] font-medium text-[#B0B0B0] uppercase tracking-[1.5px] mb-4"
+          style={{ fontFamily: 'var(--font-body)' }}
+        >
+          Cardio
+        </p>
+        <button
+          onClick={() => router.push('/client/workout/cardio')}
+          className="w-full flex items-center gap-4 p-4 bg-[#F8F8F6] rounded-2xl group hover:bg-[#1A1917] transition-all active:scale-[0.98] touch-manipulation"
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+        >
+          <div className="w-12 h-12 bg-[#D46A3A]/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-[#D46A3A]/20 transition-colors">
+            <Footprints size={20} strokeWidth={1.5} className="text-[#D46A3A]" />
+          </div>
+          <div className="flex-1 text-left">
+            <p className="text-[15px] font-semibold text-[#1A1917] group-hover:text-white transition-colors">
+              Start cardio sessie
+            </p>
+            <p className="text-[12px] text-[#ACACAC] mt-0.5 group-hover:text-white/60 transition-colors">
+              Loopband · Stairmaster · Wandelen · Interval
+            </p>
+          </div>
+          <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#D5D5D5] group-hover:text-white/60 transition-colors shrink-0" />
+        </button>
       </div>
 
       {/* Sticky Start CTA for today's workout */}

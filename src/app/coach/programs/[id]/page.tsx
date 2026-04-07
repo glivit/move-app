@@ -28,6 +28,7 @@ interface Exercise {
   body_part: string
   equipment: string
   gif_url?: string
+  category?: string
 }
 
 interface ExerciseWithPrescription extends Exercise {
@@ -130,7 +131,8 @@ export default function ProgramEditorPage() {
                 name_nl,
                 body_part,
                 equipment,
-                gif_url
+                gif_url,
+                category
               )
             )
           `
@@ -924,6 +926,52 @@ export default function ProgramEditorPage() {
                       </div>
 
                       {/* Prescription Fields */}
+                      {exercise.category === 'cardio' ? (
+                        /* Cardio-specific fields */
+                        <div className="grid grid-cols-2 gap-4">
+                          {/* Duration (min) — stored in reps_min */}
+                          <div>
+                            <label className="block text-[11px] font-medium text-[#8E8E93] mb-1 uppercase">
+                              Duur (min)
+                            </label>
+                            <input
+                              type="number"
+                              value={exercise.reps_min}
+                              onChange={(e) =>
+                                handleUpdateExercisePrescription(
+                                  exercise.prescription_id,
+                                  'reps_min',
+                                  parseInt(e.target.value) || 10
+                                )
+                              }
+                              min="1"
+                              placeholder="20"
+                              className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                            />
+                          </div>
+
+                          {/* Notes */}
+                          <div>
+                            <label className="block text-[11px] font-medium text-[#8E8E93] mb-1 uppercase">
+                              Notities
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="bv. helling 12%, 5.5 km/u"
+                              value={exercise.notes || ''}
+                              onChange={(e) =>
+                                handleUpdateExercisePrescription(
+                                  exercise.prescription_id,
+                                  'notes',
+                                  e.target.value || null
+                                )
+                              }
+                              className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                      /* Strength exercise fields */
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {/* Sets */}
                         <div>
@@ -1067,8 +1115,10 @@ export default function ProgramEditorPage() {
                           />
                         </div>
                       </div>
+                      )}
 
-                      {/* Notes */}
+                      {/* Notes (for strength exercises only — cardio has notes inline) */}
+                      {exercise.category !== 'cardio' && (
                       <div className="mt-4">
                         <label className="block text-[11px] font-medium text-[#8E8E93] mb-1 uppercase">
                           Aantekeningen (optioneel)
@@ -1087,6 +1137,7 @@ export default function ProgramEditorPage() {
                           className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors resize-none"
                         />
                       </div>
+                      )}
                     </div>
                     </div>
                     )

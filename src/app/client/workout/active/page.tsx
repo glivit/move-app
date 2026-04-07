@@ -8,13 +8,39 @@ import {
   X,
   Check,
   Plus,
+  Minus,
   Clock,
   ChevronDown,
   Search,
+  Trash2,
+  GripVertical,
+  Play,
+  Pause,
+  RotateCcw,
+  Timer,
+  Zap,
+  Flame,
+  Footprints,
 } from 'lucide-react'
 // StepperInput removed — plain inputs like Hevy
 import { ExerciseMedia } from '@/components/ExerciseMedia'
 import { notifyWorkoutBarChanged } from '@/components/workout/ActiveWorkoutBar'
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 // ─── Exercise Info Panel — large GIF + collapsible text ────
 
@@ -121,6 +147,403 @@ function ExerciseInfoPanelComponent({ exerciseData }: { exerciseData: Exercise }
 
 const ExerciseInfoPanel = memo(ExerciseInfoPanelComponent)
 
+// ─── Cardio Timer Panel — stopwatch + stats ──────────────────
+
+function CardioTimerPanelComponent({
+  exerciseId,
+  exerciseName,
+  onComplete,
+}: {
+  exerciseId: string
+  exerciseName: string
+  onComplete: (durationSeconds: number) => void
+}) {
+  const [running, setRunning] = useState(false)
+  const [elapsed, setElapsed] = useState(0) // seconds
+  const [startTime, setStartTime] = useState<number | null>(null)
+  const [pausedAt, setPausedAt] = useState(0)
+
+  useEffect(() => {
+    if (!running || !startTime) return
+    const tick = () => {
+      setElapsed(Math.floor((Date.now() - startTime) / 1000) + pausedAt)
+    }
+    tick()
+    const interval = setInterval(tick, 250)
+    return () => clearInterval(interval)
+  }, [running, startTime, pausedAt])
+
+  const handleStart = () => {
+    setStartTime(Date.now())
+    setRunning(true)
+  }
+
+  const handlePause = () => {
+    setPausedAt(elapsed)
+    setStartTime(null)
+    setRunning(false)
+  }
+
+  const handleResume = () => {
+    setStartTime(Date.now())
+    setRunning(true)
+  }
+
+  const handleFinish = () => {
+    setRunning(false)
+    onComplete(elapsed)
+  }
+
+  const handleReset = () => {
+    setRunning(false)
+    setElapsed(0)
+    setStartTime(null)
+    setPausedAt(0)
+  }
+
+  const hours = Math.floor(elapsed / 3600)
+  const minutes = Math.floor((elapsed % 3600) / 60)
+  const seconds = elapsed % 60
+
+  // Estimate calories (very rough: ~8-12 kcal/min for cardio)
+  const estimatedCals = Math.round((elapsed / 60) * 9)
+
+  return (
+    <div className="px-5 pb-5">
+      {/* Timer display */}
+      <div className="bg-[#F8F8F6] rounded-2xl p-6 text-center mb-4">
+        <p className="text-[48px] font-bold text-[#1A1917] tabular-nums tracking-tight leading-none">
+          {hours > 0 && `${hours}:`}{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+        </p>
+
+        {/* Stats row */}
+        {elapsed > 0 && (
+          <div className="flex items-center justify-center gap-6 mt-4">
+            <div className="flex items-center gap-1.5">
+              <Flame size={14} strokeWidth={1.5} className="text-[#D46A3A]" />
+              <span className="text-[13px] font-semibold text-[#ACACAC]">
+                ~{estimatedCals} kcal
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Clock size={14} strokeWidth={1.5} className="text-[#D46A3A]" />
+              <span className="text-[13px] font-semibold text-[#ACACAC]">
+                {minutes} min
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Controls */}
+      <div className="flex items-center gap-3">
+        {!running && elapsed === 0 ? (
+          <button
+            onClick={handleStart}
+            className="flex-1 flex items-center justify-center gap-2 py-4 bg-[#3D8B5C] text-white rounded-2xl font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-[#347A50] transition-colors active:scale-[0.98]"
+          >
+            <Play size={18} strokeWidth={2} fill="currentColor" />
+            Start
+          </button>
+        ) : running ? (
+          <button
+            onClick={handlePause}
+            className="flex-1 flex items-center justify-center gap-2 py-4 bg-[#E8A838] text-white rounded-2xl font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-[#D49A30] transition-colors active:scale-[0.98]"
+          >
+            <Pause size={18} strokeWidth={2} />
+            Pauze
+          </button>
+        ) : (
+          <>
+            <button
+              onClick={handleResume}
+              className="flex-1 flex items-center justify-center gap-2 py-4 bg-[#3D8B5C] text-white rounded-2xl font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-[#347A50] transition-colors active:scale-[0.98]"
+            >
+              <Play size={18} strokeWidth={2} fill="currentColor" />
+              Hervat
+            </button>
+            <button
+              onClick={handleReset}
+              className="w-14 h-14 flex items-center justify-center bg-[#F0F0EE] rounded-2xl hover:bg-[#E0E0DE] transition-colors"
+            >
+              <RotateCcw size={18} strokeWidth={1.5} className="text-[#ACACAC]" />
+            </button>
+          </>
+        )}
+
+        {elapsed > 30 && (
+          <button
+            onClick={handleFinish}
+            className="w-14 h-14 flex items-center justify-center bg-[#1A1917] rounded-2xl hover:bg-[#333330] transition-colors"
+          >
+            <Check size={18} strokeWidth={2.5} className="text-white" />
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+const CardioTimerPanel = memo(CardioTimerPanelComponent)
+
+// ─── Interval Timer Panel — work/rest rounds ─────────────────
+
+function IntervalTimerPanelComponent({
+  exerciseId,
+  exerciseName,
+  onComplete,
+}: {
+  exerciseId: string
+  exerciseName: string
+  onComplete: (durationSeconds: number) => void
+}) {
+  const [workSeconds, setWorkSeconds] = useState(30)
+  const [restSeconds, setRestSeconds] = useState(30)
+  const [totalRounds, setTotalRounds] = useState(8)
+  const [currentRound, setCurrentRound] = useState(0)
+  const [phase, setPhase] = useState<'idle' | 'work' | 'rest' | 'done'>('idle')
+  const [timeLeft, setTimeLeft] = useState(0)
+  const [endTime, setEndTime] = useState<number | null>(null)
+  const [totalElapsed, setTotalElapsed] = useState(0)
+  const startTimeRef = useRef<number>(0)
+
+  useEffect(() => {
+    if (phase === 'idle' || phase === 'done' || !endTime) return
+    const tick = () => {
+      const remaining = Math.ceil((endTime - Date.now()) / 1000)
+      if (remaining <= 0) {
+        // Phase complete
+        if (phase === 'work') {
+          if (currentRound >= totalRounds) {
+            setPhase('done')
+            setTimeLeft(0)
+            setTotalElapsed(Math.floor((Date.now() - startTimeRef.current) / 1000))
+          } else {
+            setPhase('rest')
+            setTimeLeft(restSeconds)
+            setEndTime(Date.now() + restSeconds * 1000)
+          }
+        } else if (phase === 'rest') {
+          setCurrentRound(prev => prev + 1)
+          setPhase('work')
+          setTimeLeft(workSeconds)
+          setEndTime(Date.now() + workSeconds * 1000)
+        }
+      } else {
+        setTimeLeft(remaining)
+      }
+    }
+    tick()
+    const interval = setInterval(tick, 100)
+    return () => clearInterval(interval)
+  }, [phase, endTime, currentRound, totalRounds, workSeconds, restSeconds])
+
+  const handleStart = () => {
+    startTimeRef.current = Date.now()
+    setCurrentRound(1)
+    setPhase('work')
+    setTimeLeft(workSeconds)
+    setEndTime(Date.now() + workSeconds * 1000)
+  }
+
+  const handleFinish = () => {
+    setTotalElapsed(Math.floor((Date.now() - startTimeRef.current) / 1000))
+    setPhase('done')
+    onComplete(totalElapsed || Math.floor((Date.now() - startTimeRef.current) / 1000))
+  }
+
+  const displayMinutes = Math.floor(timeLeft / 60)
+  const displaySeconds = timeLeft % 60
+
+  const WORK_PRESETS = [20, 30, 45, 60, 90]
+  const REST_PRESETS = [10, 15, 20, 30, 45, 60]
+  const ROUND_PRESETS = [4, 6, 8, 10, 12]
+
+  if (phase === 'idle') {
+    return (
+      <div className="px-5 pb-5 space-y-5">
+        {/* Work time */}
+        <div>
+          <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.08em] mb-2 block">
+            <Zap size={12} className="inline mr-1 text-[#3D8B5C]" />
+            Werk (sec)
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {WORK_PRESETS.map(s => (
+              <button
+                key={s}
+                onClick={() => setWorkSeconds(s)}
+                className={`px-4 py-2.5 rounded-xl text-[13px] font-semibold transition-all ${
+                  workSeconds === s
+                    ? 'bg-[#3D8B5C] text-white'
+                    : 'bg-[#F8F8F6] text-[#ACACAC] border border-[#F0F0EE]'
+                }`}
+              >
+                {s}s
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Rest time */}
+        <div>
+          <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.08em] mb-2 block">
+            <Pause size={12} className="inline mr-1 text-[#E8A838]" />
+            Rust (sec)
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {REST_PRESETS.map(s => (
+              <button
+                key={s}
+                onClick={() => setRestSeconds(s)}
+                className={`px-4 py-2.5 rounded-xl text-[13px] font-semibold transition-all ${
+                  restSeconds === s
+                    ? 'bg-[#E8A838] text-white'
+                    : 'bg-[#F8F8F6] text-[#ACACAC] border border-[#F0F0EE]'
+                }`}
+              >
+                {s}s
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Rounds */}
+        <div>
+          <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.08em] mb-2 block">
+            <RotateCcw size={12} className="inline mr-1 text-[#D46A3A]" />
+            Rondes
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {ROUND_PRESETS.map(r => (
+              <button
+                key={r}
+                onClick={() => setTotalRounds(r)}
+                className={`px-4 py-2.5 rounded-xl text-[13px] font-semibold transition-all ${
+                  totalRounds === r
+                    ? 'bg-[#D46A3A] text-white'
+                    : 'bg-[#F8F8F6] text-[#ACACAC] border border-[#F0F0EE]'
+                }`}
+              >
+                {r}×
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Summary */}
+        <div className="bg-[#F8F8F6] rounded-xl px-4 py-3 text-center">
+          <p className="text-[12px] text-[#ACACAC]">
+            Totaal: <span className="font-semibold text-[#1A1917]">{totalRounds} rondes</span> · {Math.round((totalRounds * (workSeconds + restSeconds)) / 60)} min
+          </p>
+        </div>
+
+        <button
+          onClick={handleStart}
+          className="w-full flex items-center justify-center gap-2 py-4 bg-[#3D8B5C] text-white rounded-2xl font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-[#347A50] transition-colors active:scale-[0.98]"
+        >
+          <Play size={18} strokeWidth={2} fill="currentColor" />
+          Start interval timer
+        </button>
+      </div>
+    )
+  }
+
+  if (phase === 'done') {
+    const doneMinutes = Math.floor(totalElapsed / 60)
+    const doneCals = Math.round((totalElapsed / 60) * 11)
+    return (
+      <div className="px-5 pb-5">
+        <div className="bg-[#F6FBF7] border border-[#3D8B5C]/15 rounded-2xl p-6 text-center">
+          <div className="w-12 h-12 bg-[#3D8B5C] rounded-full flex items-center justify-center mx-auto mb-3">
+            <Check size={20} strokeWidth={3} className="text-white" />
+          </div>
+          <p className="text-[18px] font-semibold text-[#1A1917]">{totalRounds} rondes klaar!</p>
+          <div className="flex items-center justify-center gap-4 mt-3">
+            <span className="text-[13px] text-[#ACACAC]">{doneMinutes} min</span>
+            <span className="text-[13px] text-[#ACACAC]">~{doneCals} kcal</span>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Active phase (work or rest)
+  const progressPct = phase === 'work'
+    ? ((workSeconds - timeLeft) / workSeconds) * 100
+    : ((restSeconds - timeLeft) / restSeconds) * 100
+
+  return (
+    <div className="px-5 pb-5">
+      <div className={`rounded-2xl p-6 text-center transition-colors duration-300 ${
+        phase === 'work' ? 'bg-[#3D8B5C]/10' : 'bg-[#E8A838]/10'
+      }`}>
+        {/* Phase label */}
+        <p className={`text-[12px] font-bold uppercase tracking-[0.12em] mb-1 ${
+          phase === 'work' ? 'text-[#3D8B5C]' : 'text-[#E8A838]'
+        }`}>
+          {phase === 'work' ? 'WERK' : 'RUST'}
+        </p>
+
+        {/* Big timer */}
+        <p className="text-[56px] font-bold text-[#1A1917] tabular-nums tracking-tight leading-none">
+          {displayMinutes > 0 && `${displayMinutes}:`}{String(displaySeconds).padStart(2, '0')}
+        </p>
+
+        {/* Progress bar */}
+        <div className="h-[4px] bg-white/50 rounded-full mt-4 overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-300 ${
+              phase === 'work' ? 'bg-[#3D8B5C]' : 'bg-[#E8A838]'
+            }`}
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+
+        {/* Round counter */}
+        <p className="text-[13px] font-semibold text-[#ACACAC] mt-3">
+          Ronde {currentRound} / {totalRounds}
+        </p>
+      </div>
+
+      {/* Skip / finish */}
+      <div className="flex items-center gap-3 mt-4">
+        <button
+          onClick={() => {
+            // Skip to next phase
+            if (phase === 'work') {
+              if (currentRound >= totalRounds) {
+                setPhase('done')
+                setTotalElapsed(Math.floor((Date.now() - startTimeRef.current) / 1000))
+              } else {
+                setPhase('rest')
+                setTimeLeft(restSeconds)
+                setEndTime(Date.now() + restSeconds * 1000)
+              }
+            } else {
+              setCurrentRound(prev => prev + 1)
+              setPhase('work')
+              setTimeLeft(workSeconds)
+              setEndTime(Date.now() + workSeconds * 1000)
+            }
+          }}
+          className="flex-1 py-3.5 bg-[#F8F8F6] text-[#ACACAC] rounded-xl font-semibold text-[13px] hover:bg-[#F0F0EE] transition-colors"
+        >
+          Skip →
+        </button>
+        <button
+          onClick={handleFinish}
+          className="px-6 py-3.5 bg-[#1A1917] text-white rounded-xl font-semibold text-[13px] hover:bg-[#333330] transition-colors"
+        >
+          Stop
+        </button>
+      </div>
+    </div>
+  )
+}
+
+const IntervalTimerPanel = memo(IntervalTimerPanelComponent)
+
 interface Exercise {
   id: string
   name: string
@@ -132,6 +555,7 @@ interface Exercise {
   video_url: string | null
   instructions: string
   coach_tips: string
+  category?: string
 }
 
 interface ProgramTemplateExercise {
@@ -174,6 +598,7 @@ interface PreviousSet {
   set_number: number
   weight_kg: number | null
   actual_reps: number | null
+  completed?: boolean
 }
 
 interface WorkoutSession {
@@ -229,6 +654,9 @@ function formatTimer(seconds: number): string {
 
 // ─── Exercise Picker Modal ────────────────────────────────
 
+const BODY_PART_OPTIONS = ['chest', 'back', 'shoulders', 'legs', 'arms', 'core', 'full body']
+const EQUIPMENT_OPTIONS = ['barbell', 'dumbbell', 'machine', 'cable', 'kettlebell', 'body weight', 'band', 'other']
+
 function ExercisePickerModalComponent({
   onSelect,
   onClose,
@@ -240,6 +668,15 @@ function ExercisePickerModalComponent({
   const [exercises, setExercises] = useState<Exercise[]>([])
   const [loading, setLoading] = useState(true)
   const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([])
+  const [showCreateForm, setShowCreateForm] = useState(false)
+  const [creating, setCreating] = useState(false)
+  const [createError, setCreateError] = useState('')
+  const [newExercise, setNewExercise] = useState({
+    name_nl: '',
+    body_part: '',
+    target_muscle: '',
+    equipment: 'body weight',
+  })
 
   useEffect(() => {
     const loadExercises = async () => {
@@ -247,7 +684,7 @@ function ExercisePickerModalComponent({
         const supabase = createClient()
         const { data } = await supabase
           .from('exercises')
-          .select('id, name, name_nl, body_part, target_muscle, equipment, gif_url, video_url, instructions, coach_tips')
+          .select('id, name, name_nl, body_part, target_muscle, equipment, gif_url, video_url, instructions, coach_tips, category')
           .order('name_nl', { ascending: true })
           .limit(500)
         if (data) {
@@ -285,78 +722,268 @@ function ExercisePickerModalComponent({
     onSelect(exercise)
   }, [onSelect])
 
+  const handleCreateExercise = async () => {
+    if (!newExercise.name_nl.trim()) {
+      setCreateError('Vul een naam in')
+      return
+    }
+    if (!newExercise.body_part) {
+      setCreateError('Kies een lichaamsgroep')
+      return
+    }
+    if (!newExercise.target_muscle.trim()) {
+      setCreateError('Vul een doelspier in')
+      return
+    }
+
+    setCreating(true)
+    setCreateError('')
+
+    try {
+      const supabase = createClient()
+      const { data: inserted, error } = await supabase
+        .from('exercises')
+        .insert({
+          name: newExercise.name_nl.trim(),
+          name_nl: newExercise.name_nl.trim(),
+          body_part: newExercise.body_part,
+          target_muscle: newExercise.target_muscle.trim(),
+          equipment: newExercise.equipment,
+          is_custom: true,
+          is_visible: true,
+          category: 'strength',
+        })
+        .select('id, name, name_nl, body_part, target_muscle, equipment, gif_url, video_url, instructions, coach_tips')
+        .single()
+
+      if (error) throw error
+      if (inserted) {
+        onSelect(inserted as Exercise)
+      }
+    } catch (err) {
+      console.error('Error creating exercise:', err)
+      setCreateError(err instanceof Error ? err.message : 'Kon oefening niet aanmaken')
+    } finally {
+      setCreating(false)
+    }
+  }
+
+  // Pre-fill name when switching to create form from search
+  const handleShowCreateForm = () => {
+    if (searchQuery.trim()) {
+      setNewExercise(prev => ({ ...prev, name_nl: searchQuery.trim() }))
+    }
+    setShowCreateForm(true)
+  }
+
   return (
     <div className="fixed inset-0 bg-black/30 z-[80] flex items-end">
       <div className="w-full max-h-[85vh] bg-white rounded-t-2xl flex flex-col animate-slide-up">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#F0F0EE]">
           <h3 className="text-[18px] font-semibold text-[#1A1917] page-title">
-            Oefening toevoegen
+            {showCreateForm ? 'Nieuwe oefening' : 'Oefening toevoegen'}
           </h3>
           <button
-            onClick={onClose}
+            onClick={showCreateForm ? () => setShowCreateForm(false) : onClose}
             className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[#F0F0EE] transition-colors"
           >
             <X size={18} strokeWidth={1.5} className="text-[#ACACAC]" />
           </button>
         </div>
 
-        {/* Search */}
-        <div className="px-5 py-3">
-          <div className="flex items-center gap-2 bg-white rounded-xl px-3.5 py-2.5 focus-within:ring-2 focus-within:ring-[#D46A3A]/30">
-            <Search size={16} strokeWidth={1.5} className="text-[#ACACAC] flex-shrink-0" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Zoek oefening..."
-              autoFocus
-              className="flex-1 bg-transparent text-[14px] text-[#1A1917] placeholder-[#C0C0C0] border-none focus:outline-none"
-            />
-          </div>
-        </div>
+        {showCreateForm ? (
+          /* ─── Create Custom Exercise Form ─── */
+          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+            {/* Name */}
+            <div>
+              <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.08em] mb-1.5 block">
+                Naam oefening
+              </label>
+              <input
+                type="text"
+                value={newExercise.name_nl}
+                onChange={(e) => setNewExercise(prev => ({ ...prev, name_nl: e.target.value }))}
+                placeholder="bv. Bulgarian Split Squat"
+                autoFocus
+                className="w-full bg-[#F8F8F6] rounded-xl px-4 py-3 text-[14px] text-[#1A1917] placeholder-[#C0C0C0] border border-[#F0F0EE] focus:outline-none focus:ring-2 focus:ring-[#D46A3A]/30"
+              />
+            </div>
 
-        {/* Exercise list */}
-        <div className="flex-1 overflow-y-auto px-5 pb-8">
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="w-6 h-6 border-[1.5px] border-[#D5D5D5] border-t-[#1A1917] rounded-full animate-spin" />
+            {/* Body part */}
+            <div>
+              <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.08em] mb-1.5 block">
+                Lichaamsgroep
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {BODY_PART_OPTIONS.map((bp) => (
+                  <button
+                    key={bp}
+                    onClick={() => setNewExercise(prev => ({ ...prev, body_part: bp }))}
+                    className={`px-3 py-2 rounded-lg text-[12px] font-medium transition-all ${
+                      newExercise.body_part === bp
+                        ? 'bg-[#1A1917] text-white'
+                        : 'bg-[#F8F8F6] text-[#ACACAC] border border-[#F0F0EE]'
+                    }`}
+                  >
+                    {bp}
+                  </button>
+                ))}
+              </div>
             </div>
-          ) : filteredExercises.length === 0 ? (
-            <p className="text-center text-[14px] text-[#ACACAC] py-12">Geen oefeningen gevonden</p>
-          ) : (
-            <div className="space-y-1">
-              {filteredExercises.map((ex) => (
-                <button
-                  key={ex.id}
-                  onClick={() => handleSelectExercise(ex)}
-                  className="w-full text-left px-4 py-3.5 rounded-xl hover:bg-white transition-colors flex items-center gap-3"
-                >
-                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden border border-[#F0F0EE]">
-                    {ex.gif_url ? (
-                      <Image src={ex.gif_url} alt="" width={40} height={40} className="w-full h-full object-cover" unoptimized loading="lazy" style={{ filter: 'saturate(0.3)' }} />
-                    ) : (
-                      <span className="text-[10px] text-[#ACACAC] uppercase">{ex.target_muscle?.slice(0, 3)}</span>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-medium text-[#1A1917] truncate">{ex.name_nl || ex.name}</p>
-                    <p className="text-[11px] text-[#ACACAC] mt-0.5">
-                      {ex.target_muscle}{ex.equipment ? ` · ${ex.equipment}` : ''}
-                    </p>
-                  </div>
-                  <Plus size={16} strokeWidth={2} className="text-[#D46A3A] flex-shrink-0" />
-                </button>
-              ))}
+
+            {/* Target muscle */}
+            <div>
+              <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.08em] mb-1.5 block">
+                Doelspier
+              </label>
+              <input
+                type="text"
+                value={newExercise.target_muscle}
+                onChange={(e) => setNewExercise(prev => ({ ...prev, target_muscle: e.target.value }))}
+                placeholder="bv. quadriceps, glutes"
+                className="w-full bg-[#F8F8F6] rounded-xl px-4 py-3 text-[14px] text-[#1A1917] placeholder-[#C0C0C0] border border-[#F0F0EE] focus:outline-none focus:ring-2 focus:ring-[#D46A3A]/30"
+              />
             </div>
-          )}
-        </div>
+
+            {/* Equipment */}
+            <div>
+              <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.08em] mb-1.5 block">
+                Materiaal
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {EQUIPMENT_OPTIONS.map((eq) => (
+                  <button
+                    key={eq}
+                    onClick={() => setNewExercise(prev => ({ ...prev, equipment: eq }))}
+                    className={`px-3 py-2 rounded-lg text-[12px] font-medium transition-all ${
+                      newExercise.equipment === eq
+                        ? 'bg-[#1A1917] text-white'
+                        : 'bg-[#F8F8F6] text-[#ACACAC] border border-[#F0F0EE]'
+                    }`}
+                  >
+                    {eq}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {createError && (
+              <div className="bg-[rgba(196,55,42,0.06)] border border-[rgba(196,55,42,0.1)] rounded-xl px-4 py-3">
+                <p className="text-[13px] text-[#C4372A]">{createError}</p>
+              </div>
+            )}
+
+            {/* Create button */}
+            <button
+              onClick={handleCreateExercise}
+              disabled={creating}
+              className="w-full bg-[#D46A3A] text-white font-semibold text-[13px] uppercase tracking-[0.08em] rounded-2xl py-4 hover:bg-[#C45E30] transition-colors active:scale-[0.98] disabled:opacity-50 mt-2"
+            >
+              {creating ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
+              ) : 'Oefening aanmaken & toevoegen'}
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Search */}
+            <div className="px-5 py-3">
+              <div className="flex items-center gap-2 bg-white rounded-xl px-3.5 py-2.5 focus-within:ring-2 focus-within:ring-[#D46A3A]/30">
+                <Search size={16} strokeWidth={1.5} className="text-[#ACACAC] flex-shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Zoek oefening..."
+                  autoFocus
+                  className="flex-1 bg-transparent text-[14px] text-[#1A1917] placeholder-[#C0C0C0] border-none focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Exercise list */}
+            <div className="flex-1 overflow-y-auto px-5 pb-8">
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="w-6 h-6 border-[1.5px] border-[#D5D5D5] border-t-[#1A1917] rounded-full animate-spin" />
+                </div>
+              ) : filteredExercises.length === 0 ? (
+                <div className="text-center py-8 space-y-4">
+                  <p className="text-[14px] text-[#ACACAC]">Geen oefeningen gevonden</p>
+                  <button
+                    onClick={handleShowCreateForm}
+                    className="inline-flex items-center gap-2 px-5 py-3 bg-[#D46A3A] text-white rounded-xl text-[13px] font-semibold hover:bg-[#C45E30] transition-colors active:scale-[0.98]"
+                  >
+                    <Plus size={16} strokeWidth={2} />
+                    Maak nieuwe oefening
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {filteredExercises.map((ex) => (
+                    <button
+                      key={ex.id}
+                      onClick={() => handleSelectExercise(ex)}
+                      className="w-full text-left px-4 py-3.5 rounded-xl hover:bg-white transition-colors flex items-center gap-3"
+                    >
+                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden border border-[#F0F0EE]">
+                        {ex.gif_url ? (
+                          <Image src={ex.gif_url} alt="" width={40} height={40} className="w-full h-full object-cover" unoptimized loading="lazy" style={{ filter: 'saturate(0.3)' }} />
+                        ) : (
+                          <span className="text-[10px] text-[#ACACAC] uppercase">{ex.target_muscle?.slice(0, 3)}</span>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[14px] font-medium text-[#1A1917] truncate">{ex.name_nl || ex.name}</p>
+                        <p className="text-[11px] text-[#ACACAC] mt-0.5">
+                          {ex.target_muscle}{ex.equipment ? ` · ${ex.equipment}` : ''}
+                        </p>
+                      </div>
+                      <Plus size={16} strokeWidth={2} className="text-[#D46A3A] flex-shrink-0" />
+                    </button>
+                  ))}
+
+                  {/* Always-visible create button at bottom of list */}
+                  <button
+                    onClick={handleShowCreateForm}
+                    className="w-full text-left px-4 py-3.5 rounded-xl hover:bg-[#F8F8F6] transition-colors flex items-center gap-3 border border-dashed border-[#E0E0DE] mt-3"
+                  >
+                    <div className="w-10 h-10 bg-[#F8F8F6] rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Plus size={16} strokeWidth={2} className="text-[#D46A3A]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[14px] font-medium text-[#D46A3A]">Maak nieuwe oefening</p>
+                      <p className="text-[11px] text-[#ACACAC] mt-0.5">Staat je oefening er niet bij?</p>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
 }
 
 const ExercisePickerModal = memo(ExercisePickerModalComponent)
+
+// ─── Sortable Exercise Wrapper ────────────────────────────────
+function SortableExerciseItem({ id, children }: { id: string; children: (dragHandleProps: { listeners: any; attributes: any }) => React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : undefined,
+  }
+  return (
+    <div ref={setNodeRef} style={style}>
+      {children({ listeners, attributes })}
+    </div>
+  )
+}
 
 // ─── Form Check Modal ────────────────────────────────────────
 
@@ -525,6 +1152,10 @@ function ActiveWorkoutPage() {
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [formCheckExercise, setFormCheckExercise] = useState<{ id: string; name: string } | null>(null)
+  const [originalExercises, setOriginalExercises] = useState<ProgramTemplateExercise[]>([])
+  const [showSaveChangesModal, setShowSaveChangesModal] = useState(false)
+  const [savingToTemplate, setSavingToTemplate] = useState(false)
+  const [cardioCompleted, setCardioCompleted] = useState<Record<string, number>>({}) // exerciseId -> duration in seconds
 
   // Refs for auto-save
   const setsRef = useRef(sets)
@@ -666,6 +1297,7 @@ function ActiveWorkoutPage() {
 
         if (!exercisesData?.length) { router.push('/client/workout'); return }
 
+        setOriginalExercises(exercisesData)
         setExercises(exercisesData)
         setLastWorkoutWeights(apiLastWeights)
         setPreviousSets(apiPreviousSets)
@@ -831,6 +1463,29 @@ function ActiveWorkoutPage() {
     if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10)
   }, [exercises.length])
 
+  // --- Remove exercise from workout ---
+  const [confirmRemoveExercise, setConfirmRemoveExercise] = useState<string | null>(null)
+  const removeExercise = useCallback((exerciseId: string) => {
+    setExercises(prev => prev.filter(e => e.id !== exerciseId))
+    setSets(prev => {
+      const { [exerciseId]: _, ...rest } = prev
+      return rest
+    })
+    setConfirmRemoveExercise(null)
+    if (expandedExercise === exerciseId) setExpandedExercise(null)
+  }, [expandedExercise])
+
+  // --- Remove set from exercise ---
+  const removeSet = useCallback((exerciseId: string, setIndex: number) => {
+    setSets(prev => {
+      const current = prev[exerciseId] || []
+      if (current.length <= 1) return prev // keep at least 1 set
+      const updated = current.filter((_, i) => i !== setIndex)
+        .map((s, i) => ({ ...s, set_number: i + 1 }))
+      return { ...prev, [exerciseId]: updated }
+    })
+  }, [])
+
   // --- Add extra set ---
   const addSet = (exerciseId: string) => {
     setSets(prev => {
@@ -883,7 +1538,98 @@ function ActiveWorkoutPage() {
     setShowExercisePicker(false)
   }
 
+  // --- Drag & drop reorder ---
+  const dndSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+  )
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event
+    if (over && active.id !== over.id) {
+      setExercises(prev => {
+        const oldIndex = prev.findIndex(e => e.id === active.id)
+        const newIndex = prev.findIndex(e => e.id === over.id)
+        return arrayMove(prev, oldIndex, newIndex)
+      })
+    }
+  }, [])
+
+  const exerciseIds = useMemo(() => exercises.map(e => e.id), [exercises])
+
+  // --- Detect workout modifications ---
+  const hasWorkoutChanges = useMemo(() => {
+    if (originalExercises.length === 0) return false
+    // Different number of exercises
+    if (exercises.length !== originalExercises.length) return true
+    // Different exercises or different order
+    for (let i = 0; i < exercises.length; i++) {
+      if (exercises[i].id !== originalExercises[i].id) return true
+      // Check if sets count changed
+      const currentSets = sets[exercises[i].id] || []
+      if (currentSets.length !== exercises[i].sets) return true
+    }
+    return false
+  }, [exercises, originalExercises, sets])
+
+  // --- Save changes to template ---
+  const saveChangesToTemplate = async () => {
+    if (!dayId) return
+    setSavingToTemplate(true)
+    try {
+      const supabase = createClient()
+      const { data: { session: authSession } } = await supabase.auth.getSession()
+
+      // Build updated exercises list for the template day
+      const updatedExercises = exercises.map((ex, index) => ({
+        exercise_id: ex.exercise_id,
+        sort_order: index,
+        sets: (sets[ex.id] || []).length || ex.sets,
+        reps_min: ex.reps_min,
+        reps_max: ex.reps_max,
+        rest_seconds: ex.rest_seconds,
+        tempo: ex.tempo || null,
+        rpe_target: ex.rpe_target || null,
+        notes: ex.notes || null,
+      }))
+
+      const res = await fetch('/api/update-template-day', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authSession?.access_token ? { Authorization: `Bearer ${authSession.access_token}` } : {}),
+        },
+        body: JSON.stringify({ dayId, exercises: updatedExercises }),
+      })
+
+      if (!res.ok) {
+        console.error('Failed to save template changes:', await res.text())
+      }
+    } catch (err) {
+      console.error('Error saving template changes:', err)
+    } finally {
+      setSavingToTemplate(false)
+      setShowSaveChangesModal(false)
+      // Continue with normal finish
+      await doFinishWorkout()
+    }
+  }
+
+  const handleFinishOnlyThisTime = async () => {
+    setShowSaveChangesModal(false)
+    await doFinishWorkout()
+  }
+
   const handleFinish = async () => {
+    // If workout was modified, show save-changes modal first
+    if (hasWorkoutChanges) {
+      setShowSaveChangesModal(true)
+      return
+    }
+    await doFinishWorkout()
+  }
+
+  const doFinishWorkout = async () => {
     if (!session || saving) return
     setSaving(true)
     setSaveError(null)
@@ -924,6 +1670,22 @@ function ActiveWorkoutPage() {
           is_pr: s.is_pr,
         })
       }
+    }
+
+    // Add cardio exercises as single sets (duration stored in actual_reps as seconds)
+    for (const [exerciseId, durationSec] of Object.entries(cardioCompleted)) {
+      const exerciseRef = exercises.find(e => e.id === exerciseId)
+      const actualExerciseId = exerciseRef?.exercise_id || exerciseId
+      allSetsToSave.push({
+        exercise_id: actualExerciseId,
+        set_number: 1,
+        prescribed_reps: null,
+        actual_reps: durationSec, // duration in seconds
+        weight_kg: null,
+        is_warmup: false,
+        completed: true,
+        is_pr: false,
+      })
     }
 
     console.log('[handleFinish] Sets to save:', allSetsToSave.length, JSON.stringify(allSetsToSave))
@@ -1053,10 +1815,14 @@ function ActiveWorkoutPage() {
     router.push('/client/workout')
   }
 
-  // Compute totals
-  const totalSets = Object.values(sets).flat().length
-  const completedTotal = Object.values(sets).flat().filter(s => s.completed).length
-  const allDone = totalSets > 0 && completedTotal === totalSets
+  // Compute totals (strength exercises)
+  const strengthExercises = exercises.filter(e => e.exercises?.category !== 'cardio')
+  const cardioExercises = exercises.filter(e => e.exercises?.category === 'cardio')
+  const totalSets = strengthExercises.reduce((acc, e) => acc + (sets[e.id]?.length || 0), 0)
+  const completedTotal = strengthExercises.reduce((acc, e) => acc + (sets[e.id]?.filter(s => s.completed)?.length || 0), 0)
+  const allCardioCompleted = cardioExercises.length === 0 || cardioExercises.every(e => !!cardioCompleted[e.id])
+  const allStrengthDone = strengthExercises.length === 0 || (totalSets > 0 && completedTotal === totalSets)
+  const allDone = exercises.length > 0 && allStrengthDone && allCardioCompleted
 
   if (loading) {
     return (
@@ -1188,18 +1954,21 @@ function ActiveWorkoutPage() {
         <div className="h-[3px] bg-[#F0F0EE]">
           <div
             className="h-full bg-[#3D8B5C] transition-all duration-500 ease-out"
-            style={{ width: `${totalSets > 0 ? (completedTotal / totalSets) * 100 : 0}%` }}
+            style={{ width: `${exercises.length > 0 ? ((completedTotal + Object.keys(cardioCompleted).length) / (totalSets + cardioExercises.length)) * 100 : 0}%` }}
           />
         </div>
       </header>
 
       {/* ═══ EXERCISE LIST ═══════════════════════════ */}
       <main className="max-w-lg mx-auto px-4 py-6 pb-24 space-y-4">
+        <DndContext sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={exerciseIds} strategy={verticalListSortingStrategy}>
         {exercises.map((ex, exIndex) => {
-          const exSets = sets[ex.id] || []
-          const exDone = exSets.length > 0 && exSets.every(s => s.completed)
-          const exCompleted = exSets.filter(s => s.completed).length
           const exerciseData = ex.exercises
+          const exSets = sets[ex.id] || []
+          const isCardio = exerciseData?.category === 'cardio'
+          const exDone = isCardio ? !!cardioCompleted[ex.id] : (exSets.length > 0 && exSets.every(s => s.completed))
+          const exCompleted = isCardio ? (cardioCompleted[ex.id] ? 1 : 0) : exSets.filter(s => s.completed).length
           const isExpanded = expandedExercise === ex.id
           const prevSetsData = previousSets[ex.id] || []
           const prefilledWeight = lastWorkoutWeights[ex.id]
@@ -1216,7 +1985,9 @@ function ActiveWorkoutPage() {
           const isLastInGroup = isSuperset && (exIndex === exercises.length - 1 || (exercises[exIndex + 1] as any).superset_group_id !== ssGroup)
 
           return (
-            <div key={ex.id}>
+            <SortableExerciseItem key={ex.id} id={ex.id}>
+            {({ listeners, attributes }) => (
+            <div>
               {/* Superset group header */}
               {isFirstInGroup && (
                 <div className="flex items-center gap-2 mb-1.5 px-1">
@@ -1243,6 +2014,16 @@ function ActiveWorkoutPage() {
               {/* Exercise header — sticky on scroll */}
               <div className={`${isSuperset ? 'pl-7' : 'px-5'} ${!isSuperset ? 'px-5' : 'pr-5'} pt-5 pb-3 sticky top-14 bg-white/95 backdrop-blur-sm z-10 ${isFirstInGroup || !isSuperset ? 'rounded-t-2xl' : ''}`}>
                 <div className="flex items-center justify-between">
+                  {/* Drag handle */}
+                  <button
+                    {...listeners}
+                    {...attributes}
+                    className="w-[24px] h-[36px] flex items-center justify-center flex-shrink-0 cursor-grab active:cursor-grabbing touch-manipulation -ml-1 mr-1"
+                    style={{ WebkitTapHighlightColor: 'transparent' }}
+                    aria-label="Versleep oefening"
+                  >
+                    <GripVertical size={16} strokeWidth={1.5} className="text-[#D5D5D5]" />
+                  </button>
                   <button
                     onClick={() => setExpandedExercise(isExpanded ? null : ex.id)}
                     className="flex items-center gap-2.5 flex-1 text-left touch-manipulation min-w-0"
@@ -1287,16 +2068,26 @@ function ActiveWorkoutPage() {
                       </p>
                     </div>
                   </button>
-                  <div className="flex items-center gap-2 ml-3 flex-shrink-0">
+                  <div className="flex items-center gap-1.5 ml-3 flex-shrink-0">
                     {exDone ? (
                       <div className="w-[28px] h-[28px] rounded-full bg-[#3D8B5C] flex items-center justify-center">
                         <Check size={14} strokeWidth={3} className="text-white" />
                       </div>
+                    ) : isCardio ? (
+                      <Timer size={16} strokeWidth={1.5} className="text-[#D46A3A]" />
                     ) : (
                       <span className="text-[13px] font-semibold tabular-nums text-[#ACACAC]">
                         {exCompleted}/{exSets.length}
                       </span>
                     )}
+                    {/* Remove exercise button */}
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setConfirmRemoveExercise(ex.id) }}
+                      className="w-[28px] h-[28px] flex items-center justify-center rounded-lg hover:bg-[#FEF0F0] transition-colors touch-manipulation"
+                      style={{ WebkitTapHighlightColor: 'transparent' }}
+                    >
+                      <Trash2 size={13} strokeWidth={1.5} className="text-[#C0C0C0]" />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1306,102 +2097,143 @@ function ActiveWorkoutPage() {
                 <ExerciseInfoPanel exerciseData={exerciseData} />
               )}
 
-              {/* Sets table */}
-              <div className="px-5 pb-5">
-                {/* Column header */}
-                <div className="flex items-center gap-2 mb-1.5 px-2">
-                  <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] w-[28px] text-center">Set</span>
-                  <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] flex-1 text-center">Vorige</span>
-                  <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] w-[80px] text-center">{weightUnit.toUpperCase()}</span>
-                  <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] w-[64px] text-center">Reps</span>
-                  <span className="w-[40px]" />
-                </div>
+              {/* Cardio or Sets */}
+              {exerciseData.category === 'cardio' ? (
+                // ─── Cardio exercise: show timer ───
+                cardioCompleted[ex.id] ? (
+                  <div className="px-5 pb-5">
+                    <div className="bg-[#F6FBF7] border border-[#3D8B5C]/15 rounded-xl p-4 flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#3D8B5C] rounded-full flex items-center justify-center flex-shrink-0">
+                        <Check size={16} strokeWidth={3} className="text-white" />
+                      </div>
+                      <div>
+                        <p className="text-[14px] font-semibold text-[#3D8B5C]">Klaar!</p>
+                        <p className="text-[12px] text-[#ACACAC]">
+                          {Math.floor(cardioCompleted[ex.id] / 60)} min {cardioCompleted[ex.id] % 60}s
+                          {' · '}~{Math.round((cardioCompleted[ex.id] / 60) * 9)} kcal
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (exerciseName => {
+                  const isInterval = (exerciseData.name || '').toLowerCase().includes('interval') ||
+                    (exerciseData.name_nl || '').toLowerCase().includes('interval')
+                  return isInterval ? (
+                    <IntervalTimerPanel
+                      exerciseId={ex.id}
+                      exerciseName={exerciseData.name_nl || exerciseData.name}
+                      onComplete={(duration) => setCardioCompleted(prev => ({ ...prev, [ex.id]: duration }))}
+                    />
+                  ) : (
+                    <CardioTimerPanel
+                      exerciseId={ex.id}
+                      exerciseName={exerciseData.name_nl || exerciseData.name}
+                      onComplete={(duration) => setCardioCompleted(prev => ({ ...prev, [ex.id]: duration }))}
+                    />
+                  )
+                })(exerciseData.name)
+              ) : (
+                // ─── Strength exercise: show sets table ───
+                <div className="px-5 pb-5">
+                  {/* Column header */}
+                  <div className="flex items-center gap-2 mb-1.5 px-2">
+                    <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] w-[28px] text-center">Set</span>
+                    <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] flex-1 text-center">Vorige</span>
+                    <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] w-[80px] text-center">{weightUnit.toUpperCase()}</span>
+                    <span className="text-[10px] font-semibold text-[#C0C0C0] uppercase tracking-[0.08em] w-[64px] text-center">Reps</span>
+                    <span className="w-[40px]" />
+                  </div>
 
-                {/* Rows */}
-                <div className="space-y-1">
-                  {exSets.map((set, idx) => {
-                    const prevSet = prevSetsData.find(p => p.set_number === idx + 1)
-                    const prevLabel = prevSet
-                      ? `${displayWeight(prevSet.weight_kg) || 0}×${prevSet.actual_reps || 0}`
-                      : (prefilledWeight && idx === 0 ? `${displayWeight(prefilledWeight)} ${weightUnit}` : '—')
-                    const isRestActive = activeRestTimer?.exerciseId === ex.id && activeRestTimer?.setIndex === idx
+                  {/* Rows */}
+                  <div className="space-y-1">
+                    {exSets.map((set, idx) => {
+                      const prevSet = prevSetsData.find(p => p.set_number === idx + 1)
+                      const prevLabel = prevSet
+                        ? `${displayWeight(prevSet.weight_kg) || 0}×${prevSet.actual_reps || 0}`
+                        : (prefilledWeight && idx === 0 ? `${displayWeight(prefilledWeight)} ${weightUnit}` : '—')
+                      const isRestActive = activeRestTimer?.exerciseId === ex.id && activeRestTimer?.setIndex === idx
 
-                    return (
-                      <div key={set.id}>
-                        <SetRow
-                          set={set}
-                          index={idx}
-                          prevLabel={prevLabel}
-                          prefilledWeight={prefilledWeight}
-                          prevSet={prevSet}
-                          onComplete={(weight: number | null) => completeSet(ex.id, idx, weight)}
-                          exerciseId={ex.id}
-                          setSets={setSets}
-                          exSets={exSets}
-                          weightUnit={weightUnit}
-                          displayWeight={displayWeight}
-                          toKg={toKg}
-                        />
-                        {/* Inline rest timer */}
-                        {isRestActive && activeRestTimer && (
-                          <div className="mx-2 my-2 rounded-xl overflow-hidden">
-                            {/* Progress bar (full width, thin) */}
-                            <div className="w-full h-[3px] bg-[#F0F0EE]">
-                              <div
-                                className="h-full bg-[#D46A3A] rounded-full transition-all duration-1000 ease-linear"
-                                style={{ width: `${((activeRestTimer.total - activeRestTimer.seconds) / activeRestTimer.total) * 100}%` }}
-                              />
-                            </div>
-                            {/* Timer row */}
-                            <div className="flex items-center justify-between px-2 py-2">
-                              <button
-                                onClick={() => setActiveRestTimer(prev => prev ? { ...prev, seconds: Math.max(0, prev.seconds - 15), total: prev.total, endTime: prev.endTime - 15000 } : null)}
-                                className="px-2.5 py-1.5 rounded-lg text-[12px] font-semibold text-[#ACACAC] hover:bg-[#F8F8F6] active:scale-95 transition-all touch-manipulation"
-                                style={{ WebkitTapHighlightColor: 'transparent' }}
-                              >
-                                −15s
-                              </button>
-                              <div className="flex items-center gap-2">
-                                <span className="stat-number text-[22px] font-bold text-[#D46A3A] tabular-nums">
-                                  {formatTimer(activeRestTimer.seconds)}
-                                </span>
+                      return (
+                        <div key={set.id}>
+                          <SetRow
+                            set={set}
+                            index={idx}
+                            prevLabel={prevLabel}
+                            prefilledWeight={prefilledWeight}
+                            prevSet={prevSet}
+                            onComplete={(weight: number | null) => completeSet(ex.id, idx, weight)}
+                            exerciseId={ex.id}
+                            setSets={setSets}
+                            exSets={exSets}
+                            weightUnit={weightUnit}
+                            displayWeight={displayWeight}
+                            toKg={toKg}
+                          />
+                          {/* Inline rest timer */}
+                          {isRestActive && activeRestTimer && (
+                            <div className="mx-2 my-2 rounded-xl overflow-hidden">
+                              {/* Progress bar (full width, thin) */}
+                              <div className="w-full h-[3px] bg-[#F0F0EE]">
+                                <div
+                                  className="h-full bg-[#D46A3A] rounded-full transition-all duration-1000 ease-linear"
+                                  style={{ width: `${((activeRestTimer.total - activeRestTimer.seconds) / activeRestTimer.total) * 100}%` }}
+                                />
+                              </div>
+                              {/* Timer row */}
+                              <div className="flex items-center justify-between px-2 py-2">
                                 <button
-                                  onClick={() => setActiveRestTimer(null)}
-                                  className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.04em] hover:text-[#1A1917] transition-colors touch-manipulation"
+                                  onClick={() => setActiveRestTimer(prev => prev ? { ...prev, seconds: Math.max(0, prev.seconds - 15), total: prev.total, endTime: prev.endTime - 15000 } : null)}
+                                  className="px-2.5 py-1.5 rounded-lg text-[12px] font-semibold text-[#ACACAC] hover:bg-[#F8F8F6] active:scale-95 transition-all touch-manipulation"
                                   style={{ WebkitTapHighlightColor: 'transparent' }}
                                 >
-                                  Skip
+                                  −15s
+                                </button>
+                                <div className="flex items-center gap-2">
+                                  <span className="stat-number text-[22px] font-bold text-[#D46A3A] tabular-nums">
+                                    {formatTimer(activeRestTimer.seconds)}
+                                  </span>
+                                  <button
+                                    onClick={() => setActiveRestTimer(null)}
+                                    className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.04em] hover:text-[#1A1917] transition-colors touch-manipulation"
+                                    style={{ WebkitTapHighlightColor: 'transparent' }}
+                                  >
+                                    Skip
+                                  </button>
+                                </div>
+                                <button
+                                  onClick={() => setActiveRestTimer(prev => prev ? { ...prev, seconds: prev.seconds + 15, total: Math.max(prev.total, prev.seconds + 15), endTime: prev.endTime + 15000 } : null)}
+                                  className="px-2.5 py-1.5 rounded-lg text-[12px] font-semibold text-[#ACACAC] hover:bg-[#F8F8F6] active:scale-95 transition-all touch-manipulation"
+                                  style={{ WebkitTapHighlightColor: 'transparent' }}
+                                >
+                                  +15s
                                 </button>
                               </div>
-                              <button
-                                onClick={() => setActiveRestTimer(prev => prev ? { ...prev, seconds: prev.seconds + 15, total: Math.max(prev.total, prev.seconds + 15), endTime: prev.endTime + 15000 } : null)}
-                                className="px-2.5 py-1.5 rounded-lg text-[12px] font-semibold text-[#ACACAC] hover:bg-[#F8F8F6] active:scale-95 transition-all touch-manipulation"
-                                style={{ WebkitTapHighlightColor: 'transparent' }}
-                              >
-                                +15s
-                              </button>
                             </div>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
 
-                {/* Add set */}
-                <button
-                  onClick={() => addSet(ex.id)}
-                  className="w-full mt-2 py-2.5 flex items-center justify-center gap-1.5 text-[12px] font-medium text-[#ACACAC] rounded-xl hover:bg-[#F8F8F6] transition-colors touch-manipulation"
-                  style={{ WebkitTapHighlightColor: 'transparent' }}
-                >
-                  <Plus size={13} strokeWidth={2} />
-                  Set toevoegen
-                </button>
-              </div>
+                  {/* Add set */}
+                  <button
+                    onClick={() => addSet(ex.id)}
+                    className="w-full mt-2 py-2.5 flex items-center justify-center gap-1.5 text-[12px] font-medium text-[#ACACAC] rounded-xl hover:bg-[#F8F8F6] transition-colors touch-manipulation"
+                    style={{ WebkitTapHighlightColor: 'transparent' }}
+                  >
+                    <Plus size={13} strokeWidth={2} />
+                    Set toevoegen
+                  </button>
+                </div>
+              )}
             </div>
           </div>
+          )}
+          </SortableExerciseItem>
           )
         })}
+        </SortableContext>
+        </DndContext>
 
         {/* Save error message */}
         {saveError && (
@@ -1453,7 +2285,72 @@ function ActiveWorkoutPage() {
           </button>
         </div>
 
+        {/* Remove exercise confirmation */}
+        {confirmRemoveExercise && (
+          <div className="fixed inset-0 bg-black/30 z-[70] flex items-end">
+            <div className="w-full bg-white p-6 rounded-t-2xl shadow-xl animate-slide-up">
+              <h3 className="text-[20px] font-semibold text-[#1A1917] tracking-[-0.02em] mb-2 page-title">
+                Oefening verwijderen?
+              </h3>
+              <p className="text-[14px] text-[#ACACAC] mb-6">
+                {exercises.find(e => e.id === confirmRemoveExercise)?.exercises?.name_nl || 'Deze oefening'} wordt uit deze workout verwijderd.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setConfirmRemoveExercise(null)}
+                  className="flex-1 bg-[#F8F8F6] text-[#1A1917] py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-white transition-colors"
+                >
+                  Annuleer
+                </button>
+                <button
+                  onClick={() => removeExercise(confirmRemoveExercise)}
+                  className="flex-1 bg-[#C4372A] text-white py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-[#A82D22] transition-colors"
+                >
+                  Verwijderen
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Discard confirmation */}
+        {/* Save changes modal */}
+        {showSaveChangesModal && (
+          <div className="fixed inset-0 bg-black/30 z-[70] flex items-end">
+            <div className="w-full bg-white p-6 rounded-t-2xl shadow-xl animate-slide-up">
+              <h3 className="text-[20px] font-semibold text-[#1A1917] tracking-[-0.02em] mb-2 page-title">
+                Je hebt aanpassingen gemaakt
+              </h3>
+              <p className="text-[14px] text-[#ACACAC] mb-6">
+                Wil je de wijzigingen opslaan in je programma, of alleen voor deze workout?
+              </p>
+              <div className="space-y-3">
+                <button
+                  onClick={saveChangesToTemplate}
+                  disabled={savingToTemplate}
+                  className="w-full bg-[#1A1917] text-white py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-[#333330] transition-colors disabled:opacity-50"
+                >
+                  {savingToTemplate ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
+                  ) : 'Opslaan in programma'}
+                </button>
+                <button
+                  onClick={handleFinishOnlyThisTime}
+                  className="w-full bg-[#F8F8F6] text-[#1A1917] py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] hover:bg-white transition-colors"
+                >
+                  Alleen deze keer
+                </button>
+                <button
+                  onClick={() => setShowSaveChangesModal(false)}
+                  className="w-full py-2.5 text-[#ACACAC] text-[12px] font-medium hover:text-[#1A1917] transition-colors"
+                >
+                  Annuleer
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {showDiscardConfirm && (
           <div className="fixed inset-0 bg-black/30 z-[70] flex items-end">
             <div className="w-full bg-white p-6 rounded-t-2xl shadow-xl animate-slide-up">
