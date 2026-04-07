@@ -89,6 +89,13 @@ interface DashboardData {
     workoutsThisWeek: number
     weightChangeMonth: number | null
   }
+  pendingTodos: Array<{
+    key: string
+    label: string
+    sub: string
+    href: string
+    priority: 'high' | 'medium'
+  }>
   notificationCount: number
 }
 
@@ -200,7 +207,10 @@ export default function ClientDashboard() {
     [training?.scheduleDays, training?.completedDates]
   )
 
-  const isDay1 = momentum ? (momentum.streakDays === 0 && momentum.workoutsThisWeek === 0 && !training?.completedDates?.length) : false
+  // Only show "coach bereidt programma" when there truly is NO program yet
+  // (no scheduled days = no program assigned). Not when program exists but no workouts done.
+  const hasProgram = !!(training?.scheduleDays?.length || training?.today || !training?.isRestDay)
+  const isDay1 = !hasProgram && momentum ? (momentum.streakDays === 0 && momentum.workoutsThisWeek === 0) : false
 
   const caloriesConsumed = useMemo(
     () => getCaloriesConsumed(nutrition ?? null),
@@ -455,6 +465,44 @@ export default function ClientDashboard() {
               </Link>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ═══ PENDING TODOS (photos, measurements, monthly check-in) ═══ */}
+      {!showOnboarding && (data?.pendingTodos || []).length > 0 && (
+        <div className="mb-8 animate-slide-up" style={{ animationDelay: '180ms' }}>
+          <p
+            className="text-[11px] font-semibold text-[#D46A3A] uppercase tracking-[1.5px] mb-3"
+            style={{ fontFamily: 'var(--font-body)' }}
+          >
+            Nog te doen
+          </p>
+          <div className="space-y-2.5">
+            {(data?.pendingTodos || []).map((todo) => (
+              <Link
+                key={todo.key}
+                href={todo.href}
+                className={`flex items-center gap-4 rounded-2xl px-5 py-4 transition-all active:scale-[0.98] group ${
+                  todo.priority === 'high'
+                    ? 'bg-[#FFF8F5] hover:bg-[#FFF0EA] border border-[#F5DDD0]'
+                    : 'bg-[#FAFAF8] hover:bg-[#F5F5F2] border border-[#F0F0EE]'
+                }`}
+              >
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+                  todo.priority === 'high' ? 'bg-[#D46A3A]/10' : 'bg-[#E8E8E5]'
+                }`}>
+                  <div className={`w-4 h-4 rounded-[5px] border-2 ${
+                    todo.priority === 'high' ? 'border-[#D46A3A]' : 'border-[#C0C0C0]'
+                  }`} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[14px] font-semibold text-[#1A1917]">{todo.label}</p>
+                  <p className="text-[12px] text-[#ACACAC] mt-0.5">{todo.sub}</p>
+                </div>
+                <ChevronRight className="h-4 w-4 shrink-0 text-[#D0D0D0] transition-transform group-hover:translate-x-0.5" strokeWidth={2} />
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 

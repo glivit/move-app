@@ -59,12 +59,15 @@ export async function GET(request: NextRequest) {
 
       // Active program + schedule map (weekday → template_day_id)
       // NOTE: program_template_days fetched separately — no direct FK to client_programs
+      // Use .order().limit(1) before .single() to handle multiple active programs gracefully
       db.from('client_programs').select('id, name, start_date, is_active, current_week, template_id, schedule')
-        .eq('client_id', user.id).eq('is_active', true).single(),
+        .eq('client_id', user.id).eq('is_active', true)
+        .order('created_at', { ascending: false }).limit(1).single(),
 
       // Active nutrition plan with meals
       db.from('nutrition_plans').select('id, title, calories_target, protein_g, carbs_g, fat_g, meals')
-        .eq('client_id', user.id).eq('is_active', true).single(),
+        .eq('client_id', user.id).eq('is_active', true)
+        .order('created_at', { ascending: false }).limit(1).single(),
 
       // Today's meal logs
       db.from('nutrition_logs').select('meal_id, meal_name, completed, completed_at, client_notes')
@@ -324,6 +327,46 @@ export async function GET(request: NextRequest) {
       }
     })()
 
+    // ── Pending todos (prominent on dashboard until done) ──
+    const pendingTodos: Array<{ key: string; label: string; sub: string; href: string; priority: 'high' | 'medium' }> = []
+
+    // Photos missing from intake
+    const hasPhotos = !!(intakeForm as any)?.photo_front_url
+    if (!hasPhotos) {
+      pendingTodos.push({
+        key: 'photos',
+        label: 'Voortgangsfoto\'s nemen',
+        sub: 'Nodig voor je startpunt — duurt 2 min',
+        href: '/client/check-in?step=photos',
+        priority: 'high',
+      })
+    }
+
+    // Measurements missing from intake
+    const hasMeasurements = !!(intakeForm as any)?.chest_cm
+    if (!hasMeasurements) {
+      pendingTodos.push({
+        key: 'measurements',
+        label: 'Lichaamsafmetingen invullen',
+        sub: 'Borst, taille, heupen, armen, benen',
+        href: '/client/check-in?step=measurements',
+        priority: 'high',
+      })
+    }
+
+    // Monthly check-in due (photos + measurements refresh every 4 weeks)
+    if (hasPhotos && hasMeasurements && checkInDueInfo) {
+      pendingTodos.push({
+        key: 'monthly-checkin',
+        label: checkInDueInfo.overdue ? 'Maandelijkse check-in is verlopen' : 'Maandelijkse check-in binnenkort',
+        sub: checkInDueInfo.overdue
+          ? 'Neem nieuwe foto\'s en afmetingen'
+          : `Nog ${checkInDueInfo.daysUntil} dag${checkInDueInfo.daysUntil !== 1 ? 'en' : ''}`,
+        href: '/client/check-in',
+        priority: checkInDueInfo.overdue ? 'high' : 'medium',
+      })
+    }
+
     // ── Response ──────────────────────────────────────────
 
     const response = NextResponse.json({
@@ -416,6 +459,8 @@ export async function GET(request: NextRequest) {
         workoutsThisWeek: weekWorkouts.length,
         weightChangeMonth,
       },
+
+      pendingTodos,
 
       // Total notification count for badge
       notificationCount:
