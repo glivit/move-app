@@ -7,10 +7,13 @@ export const dynamic = 'force-dynamic'
  * POST /api/workout-save
  * Saves workout sets using admin client (bypasses RLS).
  * Auth: accepts Bearer token in Authorization header OR Supabase cookies.
+ *
+ * Modes:
+ * - Default (final=true or omitted): DELETE all + INSERT — used when finishing workout
+ * - Auto-save (final=false): DELETE all + INSERT — same pattern but includes incomplete sets
+ *   Protected by client-side mutex to prevent concurrent saves
  */
 export async function POST(request: NextRequest) {
-  console.log('[workout-save] === Request received ===')
-
   try {
     const admin = createAdminClient()
 
@@ -38,19 +41,28 @@ export async function POST(request: NextRequest) {
     }
 
     if (!userId) {
-      console.error('[workout-save] No authenticated user (tried token + cookies)')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-
-    console.log('[workout-save] User authenticated:', userId)
 
     const body = await request.json()
     const { sessionId, sets } = body
 
-    console.log('[workout-save] sessionId:', sessionId, 'sets count:', sets?.length ?? 0)
-
     if (!sessionId) {
       return NextResponse.json({ error: 'sessionId is required' }, { status: 400 })
+    }
+
+    // Validate all exercise_ids are valid UUIDs before doing anything
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    if (sets && sets.length > 0) {
+      for (const s of sets) {
+        if (!s.exercise_id || !UUID_REGEX.test(s.exercise_id)) {
+          console.error('[workout-save] Invalid exercise_id:', s.exercise_id)
+          return NextResponse.json({
+            error: 'Invalid exercise_id',
+            details: `"${s.exercise_id}" is not a valid UUID`,
+          }, { status: 400 })
+        }
+      }
     }
 
     // Verify the session belongs to this user
@@ -61,16 +73,12 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (sessionError || !session) {
-      console.error('[workout-save] Session not found:', sessionError?.message)
       return NextResponse.json({ error: 'Session not found', details: sessionError?.message }, { status: 404 })
     }
 
     if (session.client_id !== userId) {
-      console.error('[workout-save] Session belongs to', session.client_id, 'not', userId)
       return NextResponse.json({ error: 'Not your session' }, { status: 403 })
     }
-
-    console.log('[workout-save] Session verified, deleting old sets...')
 
     // Delete all existing sets for this session
     const { error: deleteError } = await admin
@@ -83,11 +91,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to clear old sets', details: deleteError.message }, { status: 500 })
     }
 
-    console.log('[workout-save] Old sets deleted')
-
     // Insert new sets
     if (sets && sets.length > 0) {
-      // Clamp values to safe DB ranges: weight_kg NUMERIC(6,2), reps INTEGER
       const clampNum = (v: any, max: number) => {
         const n = Number(v)
         if (v == null || isNaN(n) || !isFinite(n)) return null
@@ -106,8 +111,6 @@ export async function POST(request: NextRequest) {
         is_pr: s.is_pr ?? false,
       }))
 
-      console.log('[workout-save] Inserting', setsToInsert.length, 'sets. First:', JSON.stringify(setsToInsert[0]))
-
       const { data: inserted, error: insertError } = await admin
         .from('workout_sets')
         .insert(setsToInsert)
@@ -122,15 +125,12 @@ export async function POST(request: NextRequest) {
         }, { status: 500 })
       }
 
-      console.log('[workout-save] SUCCESS:', inserted?.length ?? 0, 'sets saved for session', sessionId)
-
       return NextResponse.json({
         success: true,
         savedCount: inserted?.length ?? 0,
       })
     }
 
-    console.log('[workout-save] No sets to save')
     return NextResponse.json({ success: true, savedCount: 0 })
   } catch (error: any) {
     console.error('[workout-save] UNEXPECTED ERROR:', error?.message ?? error)

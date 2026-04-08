@@ -1309,9 +1309,45 @@ function ActiveWorkoutPage() {
     }
   }, [dayId, programId])
 
-  // --- Auto-save completed sets to database (crash protection) ---
+  // --- Auto-save ALL sets to database (crash protection) ---
   const dbSaveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const lastDbSaveRef = useRef<string>('')
+  const dbSavingRef = useRef(false)
+
+  // Helper: collect all sets with data for DB save
+  const collectSetsForDB = useCallback(() => {
+    const result: Array<{
+      exercise_id: string
+      set_number: number
+      prescribed_reps: number | null
+      actual_reps: number | null
+      weight_kg: number | null
+      is_warmup: boolean
+      completed: boolean
+      is_pr: boolean
+    }> = []
+
+    for (const [templateExId, exerciseSets] of Object.entries(sets)) {
+      const exerciseRef = exercises.find(e => e.id === templateExId)
+      if (!exerciseRef?.exercise_id) continue
+
+      for (const s of exerciseSets) {
+        // Save sets that have ANY data (weight or reps) — not just completed ones
+        if (s.weight_kg == null && s.actual_reps == null) continue
+        result.push({
+          exercise_id: exerciseRef.exercise_id,
+          set_number: s.set_number,
+          prescribed_reps: s.prescribed_reps != null ? Math.round(Number(s.prescribed_reps) || 0) : null,
+          actual_reps: s.actual_reps != null ? Math.round(Number(s.actual_reps) || 0) : null,
+          weight_kg: s.weight_kg != null ? Math.min(Number(s.weight_kg) || 0, 9999.99) : null,
+          is_warmup: s.is_warmup || false,
+          completed: s.completed || false,
+          is_pr: s.is_pr || false,
+        })
+      }
+    }
+    return result
+  }, [sets, exercises])
 
   useEffect(() => {
     if (!session) return
@@ -1319,58 +1355,37 @@ function ActiveWorkoutPage() {
 
     // Debounce: save to DB 3 seconds after last set change
     dbSaveTimerRef.current = setTimeout(async () => {
+      // Mutex: don't auto-save if a save is already in progress (finish or prior auto-save)
+      if (dbSavingRef.current || saving) return
+      dbSavingRef.current = true
+
       try {
-        const currentExercises = exercises
-        const allCompletedSets: Array<{
-          exercise_id: string
-          set_number: number
-          prescribed_reps: number | null
-          actual_reps: number | null
-          weight_kg: number | null
-          is_warmup: boolean
-          completed: boolean
-          is_pr: boolean
-        }> = []
-
-        for (const [templateExId, exerciseSets] of Object.entries(sets)) {
-          const exerciseRef = currentExercises.find(e => e.id === templateExId)
-          if (!exerciseRef?.exercise_id) continue
-
-          for (const s of exerciseSets) {
-            if (!s.completed || (!s.weight_kg && !s.actual_reps)) continue
-            allCompletedSets.push({
-              exercise_id: exerciseRef.exercise_id,
-              set_number: s.set_number,
-              prescribed_reps: s.prescribed_reps != null ? Math.round(Number(s.prescribed_reps) || 0) : null,
-              actual_reps: s.actual_reps != null ? Math.round(Number(s.actual_reps) || 0) : null,
-              weight_kg: s.weight_kg != null ? Math.min(Number(s.weight_kg) || 0, 9999.99) : null,
-              is_warmup: s.is_warmup || false,
-              completed: true,
-              is_pr: s.is_pr || false,
-            })
-          }
-        }
+        const allSets = collectSetsForDB()
 
         // Only save if data changed
-        const hash = JSON.stringify(allCompletedSets)
-        if (hash === lastDbSaveRef.current || allCompletedSets.length === 0) return
+        const hash = JSON.stringify(allSets)
+        if (hash === lastDbSaveRef.current || allSets.length === 0) return
         lastDbSaveRef.current = hash
 
         const res = await fetch('/api/workout-save', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId: session.id, sets: allCompletedSets }),
+          body: JSON.stringify({ sessionId: session.id, sets: allSets }),
         })
         if (res.ok) {
-          console.log('[auto-save] Saved', allCompletedSets.length, 'completed sets to DB')
+          console.log('[auto-save] Saved', allSets.length, 'sets to DB')
+        } else {
+          console.warn('[auto-save] Server returned', res.status)
         }
       } catch (err) {
         console.warn('[auto-save] DB save failed (will retry):', err)
+      } finally {
+        dbSavingRef.current = false
       }
     }, 3000)
 
     return () => clearTimeout(dbSaveTimerRef.current)
-  }, [sets, session, exercises])
+  }, [sets, session, exercises, saving, collectSetsForDB])
 
   // --- Check for addExercise param ---
   useEffect(() => {
@@ -1555,12 +1570,12 @@ function ActiveWorkoutPage() {
 
       // PR detection: simple client-side check (server also checks via trigger)
       let isPR = false
-      if (weight && weight > 0) {
+      if (weight && weight > 0 && exerciseRef?.exercise_id) {
         try {
           const supabase = createClient()
           const { data: previousBest } = await supabase
             .from('workout_sets').select('weight_kg')
-            .eq('exercise_id', exerciseRef?.exercise_id || '00000000-0000-0000-0000-000000000000').eq('completed', true).eq('is_warmup', false)
+            .eq('exercise_id', exerciseRef.exercise_id).eq('completed', true).eq('is_warmup', false)
             .order('weight_kg', { ascending: false }).limit(1)
           if (!previousBest?.length || (weight > (previousBest[0].weight_kg || 0))) isPR = true
         } catch { /* PR check is non-critical */ }
@@ -1793,6 +1808,9 @@ function ActiveWorkoutPage() {
 
   const doFinishWorkout = async () => {
     if (!session || saving) return
+    // Cancel any pending auto-save to prevent race condition
+    clearTimeout(dbSaveTimerRef.current)
+    dbSavingRef.current = true // Block any new auto-saves
     setSaving(true)
     setSaveError(null)
 
@@ -1923,6 +1941,7 @@ function ActiveWorkoutPage() {
 
     if (!saved) {
       setSaving(false)
+      dbSavingRef.current = false // Allow auto-saves again on failure
       setSaveError(`Opslaan mislukt: ${lastError}`)
       return
     }
