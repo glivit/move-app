@@ -164,7 +164,7 @@ Stuur als Glenn: kort, specifiek, motiverend. Begin met een samenvatting, eindig
 
         const sent = await saveAIDraft(coachId, client.id, message, 'weekly_motivation', {
           clientName: client.full_name || 'Client',
-          workoutsCompleted: completedCount,
+          workoutsCompleted: workoutCount,
           streak,
           prCount,
         })

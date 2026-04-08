@@ -16,6 +16,7 @@ interface FoodEntry {
   brand?: string | null
   image?: string | null
   grams: number
+  checked?: boolean
   per100g: {
     calories: number
     protein: number
@@ -81,6 +82,18 @@ interface SearchProduct {
   }
 }
 
+interface RecentFood {
+  name: string
+  brand?: string | null
+  frequency: number
+  per100g: {
+    calories: number
+    protein: number
+    carbs: number
+    fat: number
+  }
+}
+
 // ─── Helpers ────────────────────────────────────────
 
 function calcMacro(food: FoodEntry, key: 'calories' | 'protein' | 'carbs' | 'fat') {
@@ -91,7 +104,24 @@ function ensureMealId(meal: any, index: number): string {
   return meal.id || `meal-${index}-${(meal.name || '').toLowerCase().replace(/\s+/g, '-')}`
 }
 
-// ─── Shopping List Component ──────────────────────────────────
+function formatDate(date: Date) {
+  const today = new Date()
+  const yesterday = new Date()
+  yesterday.setDate(today.getDate() - 1)
+  const tomorrow = new Date()
+  tomorrow.setDate(today.getDate() + 1)
+
+  if (date.toDateString() === today.toDateString()) return 'Vandaag'
+  if (date.toDateString() === yesterday.toDateString()) return 'Gisteren'
+  if (date.toDateString() === tomorrow.toDateString()) return 'Morgen'
+  return date.toLocaleDateString('nl-BE', { weekday: 'short', day: 'numeric', month: 'short' })
+}
+
+function mealCalories(foods: FoodEntry[]) {
+  return foods.reduce((s, f) => s + calcMacro(f, 'calories'), 0)
+}
+
+// ─── Shopping List Component ──────────────────────────────
 
 interface ShoppingItem {
   name: string
@@ -114,7 +144,6 @@ function categorizeFood(name: string, brand?: string | null): 'supplements' | 's
 
 function gramsToUnit(grams: number, name: string): { amount: string; unit: string } {
   const n = name.toLowerCase()
-  // Items typically sold in pieces
   if (n.includes('banaan')) return { amount: String(Math.ceil(grams / 120)), unit: 'stuks' }
   if (n.includes('appel')) return { amount: String(Math.ceil(grams / 150)), unit: 'stuks' }
   if (n.includes('ei ') || n === 'ei') return { amount: String(Math.ceil(grams / 60)), unit: 'stuks' }
@@ -123,7 +152,6 @@ function gramsToUnit(grams: number, name: string): { amount: string; unit: strin
   if (n.includes('stoommaaltijd')) return { amount: String(Math.ceil(grams / 450)), unit: 'stuks' }
   if (n.includes('bar') || n.includes('reep')) return { amount: String(Math.ceil(grams / 50)), unit: 'stuks' }
   if (n.includes('pudding') && (n.includes('ehrmann') || n.includes('melkunie'))) return { amount: String(Math.ceil(grams / 200)), unit: 'bakjes' }
-  // Kg for large amounts
   if (grams >= 1000) return { amount: (grams / 1000).toFixed(1).replace('.0', ''), unit: 'kg' }
   return { amount: String(Math.round(grams)), unit: 'g' }
 }
@@ -133,7 +161,6 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
   const [checkedItems, setCheckedItems] = useState<Set<string>>(new Set())
 
   const shoppingItems = useMemo(() => {
-    // Aggregate all foods across all meals, multiply by 7 for weekly
     const foodMap = new Map<string, { name: string; brand?: string | null; totalGrams: number; category: 'supplements' | 'snacks' | 'maaltijden' }>()
 
     meals.forEach(meal => {
@@ -202,7 +229,6 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
 
       {open && (
         <div className="mt-3 space-y-5 pb-4">
-          {/* Week indicator */}
           <p className="text-[11px] text-[#B0B0B0] uppercase tracking-[0.1em]">
             Weekoverzicht — 7 dagen
           </p>
@@ -227,7 +253,6 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
                         isChecked ? 'bg-[#F5F5F3]' : 'hover:bg-[#FAFAF8]'
                       }`}
                     >
-                      {/* Checkbox */}
                       <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
                         isChecked
                           ? 'bg-[#3D8B5C] border-[#3D8B5C]'
@@ -236,7 +261,6 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
                         {isChecked && <Check strokeWidth={3} className="w-3 h-3 text-white" />}
                       </div>
 
-                      {/* Product info */}
                       <div className="flex-1 min-w-0">
                         <p className={`text-[13px] leading-tight truncate ${
                           isChecked ? 'line-through text-[#B0B0B0]' : 'text-[#1A1917]'
@@ -248,7 +272,6 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
                         )}
                       </div>
 
-                      {/* Amount */}
                       <div className="text-right shrink-0">
                         <span className={`text-[13px] font-medium tabular-nums ${
                           isChecked ? 'text-[#C0C0C0]' : 'text-[#1A1917]'
@@ -264,7 +287,6 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
             </div>
           ))}
 
-          {/* Progress bar */}
           {checkedCount > 0 && (
             <div className="pt-2">
               <div className="h-1.5 bg-[#F0F0EE] rounded-full overflow-hidden">
@@ -284,103 +306,54 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
   )
 }
 
-function formatDate(date: Date) {
-  const today = new Date()
-  const yesterday = new Date()
-  yesterday.setDate(today.getDate() - 1)
-  const tomorrow = new Date()
-  tomorrow.setDate(today.getDate() + 1)
+// ─── Bottom Sheet Component ──────────────────────────
 
-  if (date.toDateString() === today.toDateString()) return 'Vandaag'
-  if (date.toDateString() === yesterday.toDateString()) return 'Gisteren'
-  if (date.toDateString() === tomorrow.toDateString()) return 'Morgen'
-  return date.toLocaleDateString('nl-BE', { weekday: 'short', day: 'numeric', month: 'short' })
-}
-
-function mealCalories(foods: FoodEntry[]) {
-  return foods.reduce((s, f) => s + calcMacro(f, 'calories'), 0)
-}
-
-// ─── FoodSearchModal (fullscreen) ───────────────────
-
-function FoodSearchModal({
+function AddFoodBottomSheet({
   isOpen,
   onClose,
-  meals,
-  initialMealId,
+  meal,
   plan,
   dateStr,
   logs,
   setLogs,
   setSummary,
+  recentFoods,
 }: {
   isOpen: boolean
   onClose: () => void
-  meals: MealMoment[]
-  initialMealId: string | null
+  meal: MealMoment | null
   plan: NutritionPlan | null
   dateStr: string
   logs: Map<string, MealLog>
   setLogs: (logs: Map<string, MealLog>) => void
   setSummary: (summary: DailySummary | null) => void
+  recentFoods: RecentFood[]
 }) {
-  const [activeMealId, setActiveMealId] = useState<string>(initialMealId || '')
+  const [tab, setTab] = useState<'recent' | 'search'>('recent')
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchProduct[]>([])
   const [loading, setLoading] = useState(false)
-  const [tab, setTab] = useState<'search' | 'custom'>('search')
-  const [addingProduct, setAddingProduct] = useState<string | null>(null) // product name being added
+  const [addingProduct, setAddingProduct] = useState<string | null>(null)
   const [justAdded, setJustAdded] = useState<Set<string>>(new Set())
   const [selectedProduct, setSelectedProduct] = useState<SearchProduct | null>(null)
   const [portionGrams, setPortionGrams] = useState('100')
-  const [selectedPortion, setSelectedPortion] = useState<string | null>(null)
-  const [savingConfirm, setSavingConfirm] = useState(false)
   const [scanning, setScanning] = useState(false)
-  const [customForm, setCustomForm] = useState({ name: '', brand: '', barcode: '', calories: '', protein: '', carbs: '', fat: '' })
-  const [savingCustom, setSavingCustom] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const sheetRef = useRef<HTMLDivElement>(null)
 
-  // Reset on open
   useEffect(() => {
-    if (isOpen) {
-      setActiveMealId(initialMealId || meals[0]?.id || '')
-      setQuery('')
-      setResults([])
-      setTab('search')
-      setJustAdded(new Set())
-      setSelectedProduct(null)
-      setPortionGrams('100')
-      setSelectedPortion(null)
-      setScanning(false)
-      setCustomForm({ name: '', brand: '', barcode: '', calories: '', protein: '', carbs: '', fat: '' })
-      // Load popular on open
-      setLoading(true)
-      fetch('/api/food-search?popular=true')
-        .then(r => r.json())
-        .then(d => { setResults(d.products || []); setLoading(false) })
-        .catch(() => setLoading(false))
-    }
-  }, [isOpen, initialMealId, meals])
-
-  // Autofocus search
-  useEffect(() => {
-    if (isOpen && tab === 'search' && !scanning) {
+    if (isOpen && tab === 'search') {
       setTimeout(() => inputRef.current?.focus(), 100)
     }
-  }, [isOpen, tab, scanning])
+  }, [isOpen, tab])
 
-  // Debounced search
   useEffect(() => {
     if (!isOpen || tab !== 'search') return
     clearTimeout(debounceRef.current)
 
     if (query.trim() === '') {
-      setLoading(true)
-      fetch('/api/food-search?popular=true')
-        .then(r => r.json())
-        .then(d => { setResults(d.products || []); setLoading(false) })
-        .catch(() => setLoading(false))
+      setResults([])
       return
     }
 
@@ -395,31 +368,21 @@ function FoodSearchModal({
     return () => clearTimeout(debounceRef.current)
   }, [query, isOpen, tab])
 
-  // Quick-add: one tap adds at default serving
-  async function quickAdd(product: SearchProduct) {
-    if (!plan || !activeMealId || addingProduct) return
-    const key = product.barcode || product.name
+  async function addFood(product: SearchProduct | RecentFood, grams: number) {
+    if (!plan || !meal || addingProduct) return
+    const key = 'barcode' in product ? (product.barcode || product.name) : product.name
     setAddingProduct(key)
 
-    // Determine default grams from serving_size
-    let defaultGrams = 100
-    if (product.serving_size) {
-      const match = product.serving_size.match(/(\d+)\s*g/i)
-      if (match) defaultGrams = parseInt(match[1])
-    }
-
-    const meal = plan.meals.find(m => m.id === activeMealId)
-    if (!meal) { setAddingProduct(null); return }
-
-    const existing = logs.get(activeMealId)
+    const existing = logs.get(meal.id)
     const currentFoods = existing?.foods_eaten || meal.foods || []
 
     const newFood: FoodEntry = {
-      id: `${product.barcode || product.name}-${Date.now()}`,
+      id: `${key}-${Date.now()}`,
       name: product.name,
       brand: product.brand,
-      image: product.image,
-      grams: defaultGrams,
+      image: 'image' in product ? product.image : undefined,
+      grams,
+      checked: false,
       per100g: {
         calories: product.per100g.calories,
         protein: product.per100g.protein,
@@ -437,615 +400,11 @@ function FoodSearchModal({
         body: JSON.stringify({
           plan_id: plan.id,
           date: dateStr,
-          meal_id: activeMealId,
-          meal_name: meal.name,
-          completed: existing?.completed || false,
-          foods_eaten: newFoods,
-          client_notes: existing?.client_notes || null,
-        }),
-      })
-
-      if (res.ok) {
-        const newLog: MealLog = {
-          meal_id: activeMealId,
-          meal_name: meal.name,
-          completed: existing?.completed || false,
-          foods_eaten: newFoods,
-          client_notes: existing?.client_notes || null,
-          completed_at: existing?.completed_at || null,
-        }
-        const upd = new Map(logs)
-        upd.set(activeMealId, newLog)
-        setLogs(upd)
-
-        // Show check animation
-        setJustAdded(prev => new Set(prev).add(key))
-        setTimeout(() => setJustAdded(prev => { const n = new Set(prev); n.delete(key); return n }), 1500)
-
-        // Refresh summary
-        const sumRes = await fetch(`/api/nutrition-log?date=${dateStr}`)
-        const sumData = await sumRes.json()
-        if (sumData.summary) setSummary(sumData.summary)
-        invalidateCache('/api/dashboard')
-      }
-    } catch (err) {
-      console.error('Quick add error:', err)
-    } finally {
-      setAddingProduct(null)
-    }
-  }
-
-  // Confirm add with custom grams from portion picker
-  async function confirmAdd() {
-    if (!selectedProduct || !plan || !activeMealId || savingConfirm) return
-    setSavingConfirm(true)
-
-    const grams = parseInt(portionGrams) || 100
-    const meal = plan.meals.find(m => m.id === activeMealId)
-    if (!meal) { setSavingConfirm(false); return }
-
-    const existing = logs.get(activeMealId)
-    const currentFoods = existing?.foods_eaten || meal.foods || []
-
-    const newFood: FoodEntry = {
-      id: `${selectedProduct.barcode || selectedProduct.name}-${Date.now()}`,
-      name: selectedProduct.name,
-      brand: selectedProduct.brand,
-      image: selectedProduct.image,
-      grams,
-      per100g: {
-        calories: selectedProduct.per100g.calories,
-        protein: selectedProduct.per100g.protein,
-        carbs: selectedProduct.per100g.carbs,
-        fat: selectedProduct.per100g.fat,
-      },
-    }
-
-    const newFoods = [...currentFoods, newFood]
-
-    try {
-      const res = await fetch('/api/nutrition-log', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          plan_id: plan.id,
-          date: dateStr,
-          meal_id: activeMealId,
-          meal_name: meal.name,
-          completed: existing?.completed || false,
-          foods_eaten: newFoods,
-          client_notes: existing?.client_notes || null,
-        }),
-      })
-
-      if (res.ok) {
-        const newLog: MealLog = {
-          meal_id: activeMealId,
-          meal_name: meal.name,
-          completed: existing?.completed || false,
-          foods_eaten: newFoods,
-          client_notes: existing?.client_notes || null,
-          completed_at: existing?.completed_at || null,
-        }
-        const upd = new Map(logs)
-        upd.set(activeMealId, newLog)
-        setLogs(upd)
-
-        const key = selectedProduct.barcode || selectedProduct.name
-        setJustAdded(prev => new Set(prev).add(key))
-        setTimeout(() => setJustAdded(prev => { const n = new Set(prev); n.delete(key); return n }), 1500)
-
-        setSelectedProduct(null)
-
-        const sumRes = await fetch(`/api/nutrition-log?date=${dateStr}`)
-        const sumData = await sumRes.json()
-        if (sumData.summary) setSummary(sumData.summary)
-        invalidateCache('/api/dashboard')
-      }
-    } catch (err) {
-      console.error('Confirm add error:', err)
-    } finally {
-      setSavingConfirm(false)
-    }
-  }
-
-  async function lookupBarcode(code: string) {
-    setLoading(true)
-    try {
-      const res = await fetch(`/api/food-search?barcode=${encodeURIComponent(code.trim())}`)
-      const data = await res.json()
-      if (data.products?.length > 0) {
-        setResults(data.products)
-        setScanning(false)
-      } else {
-        setResults([])
-        setScanning(false)
-        setTab('custom')
-        setCustomForm(prev => ({ ...prev, barcode: code.trim() }))
-      }
-    } catch {
-      setScanning(false)
-    }
-    setLoading(false)
-  }
-
-  // Barcode scanner effect
-  useEffect(() => {
-    if (!scanning) return
-    let html5QrCode: any = null
-    let stopped = false
-
-    async function startScanner() {
-      try {
-        const { Html5Qrcode } = await import('html5-qrcode')
-        if (stopped) return
-
-        let attempts = 0
-        while (!document.getElementById('barcode-reader') && attempts < 20) {
-          await new Promise(r => setTimeout(r, 50))
-          attempts++
-        }
-        if (stopped || !document.getElementById('barcode-reader')) return
-
-        html5QrCode = new Html5Qrcode('barcode-reader')
-        await html5QrCode.start(
-          { facingMode: 'environment' },
-          { fps: 10, qrbox: { width: 250, height: 150 }, aspectRatio: 1.7777 },
-          (decodedText: string) => {
-            html5QrCode.stop().catch(() => {})
-            lookupBarcode(decodedText)
-          },
-          () => {}
-        )
-      } catch (err: any) {
-        setScanning(false)
-        if (err?.message?.includes('Permission') || err?.name === 'NotAllowedError') {
-          const code = prompt('Camera-toegang geweigerd. Voer de barcode handmatig in:')
-          if (code) lookupBarcode(code)
-        } else {
-          const code = prompt('Camera niet beschikbaar. Voer barcode in:')
-          if (code) lookupBarcode(code)
-        }
-      }
-    }
-
-    startScanner()
-    return () => {
-      stopped = true
-      if (html5QrCode) { try { html5QrCode.stop().catch(() => {}) } catch {} }
-    }
-  }, [scanning])
-
-  async function handleSaveCustomProduct() {
-    if (!customForm.name || !customForm.calories) return
-    setSavingCustom(true)
-    try {
-      const res = await fetch('/api/food-search', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: customForm.name,
-          brand: customForm.brand || null,
-          barcode: customForm.barcode || null,
-          per100g: {
-            calories: parseFloat(customForm.calories) || 0,
-            protein: parseFloat(customForm.protein) || 0,
-            carbs: parseFloat(customForm.carbs) || 0,
-            fat: parseFloat(customForm.fat) || 0,
-          },
-        }),
-      })
-      if (res.ok) {
-        const data = await res.json()
-        if (data.product) {
-          // Switch to search and auto-add the new product
-          setTab('search')
-          setResults([data.product])
-          setCustomForm({ name: '', brand: '', barcode: '', calories: '', protein: '', carbs: '', fat: '' })
-        }
-      }
-    } catch (err) {
-      console.error('Save custom product error:', err)
-    }
-    setSavingCustom(false)
-  }
-
-  if (!isOpen) return null
-
-  const confirmGrams = parseInt(portionGrams) || 0
-
-  return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col" style={{ animation: 'slideUp 0.25s ease-out', paddingTop: 'env(safe-area-inset-top)' }}>
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-2 pb-2 border-b border-[#F0F0EE]">
-        <button onClick={() => { if (selectedProduct) { setSelectedProduct(null) } else { onClose() } }} className="p-2.5 -ml-2 text-[#1A1917] active:bg-[#F5F5F3] rounded-full">
-          {selectedProduct ? <ArrowLeft strokeWidth={1.5} className="w-5 h-5" /> : <X strokeWidth={1.5} className="w-5 h-5" />}
-        </button>
-        <h2 className="text-[15px] font-semibold text-[#1A1917]">{selectedProduct ? selectedProduct.name : 'Voedsel toevoegen'}</h2>
-        <div className="w-10" /> {/* spacer */}
-      </div>
-
-      {/* Meal selector */}
-      <div className="px-4 pt-3 pb-2">
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
-          {meals.map(m => (
-            <button
-              key={m.id}
-              onClick={() => setActiveMealId(m.id)}
-              className={`shrink-0 px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all ${
-                activeMealId === m.id
-                  ? 'bg-[#1A1917] text-white'
-                  : 'bg-[#F5F5F3] text-[#8A8A8A] hover:bg-[#EBEBEA]'
-              }`}
-            >
-              {m.name}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Tab bar + search */}
-      <div className="px-4 pb-2">
-        <div className="flex gap-2 mb-3">
-          <button
-            onClick={() => { setTab('search'); setScanning(false) }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all ${
-              tab === 'search' && !scanning ? 'bg-[#F5F5F3] text-[#1A1917]' : 'text-[#B0B0B0]'
-            }`}
-          >
-            <Search strokeWidth={1.8} className="w-3.5 h-3.5" />
-            Zoeken
-          </button>
-          <button
-            onClick={() => { setTab('search'); setScanning(s => !s) }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all ${
-              scanning ? 'bg-[#FFF3EE] text-[#D46A3A]' : 'text-[#B0B0B0]'
-            }`}
-          >
-            <ScanBarcode strokeWidth={1.8} className="w-3.5 h-3.5" />
-            Scan
-          </button>
-          <button
-            onClick={() => { setTab('custom'); setScanning(false) }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all ${
-              tab === 'custom' ? 'bg-[#F5F5F3] text-[#1A1917]' : 'text-[#B0B0B0]'
-            }`}
-          >
-            <Plus strokeWidth={1.8} className="w-3.5 h-3.5" />
-            Nieuw
-          </button>
-        </div>
-
-        {tab === 'search' && !scanning && (
-          <div className="relative">
-            <Search strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C0C0C0]" />
-            <input
-              ref={inputRef}
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Zoek voedingsmiddel..."
-              className="w-full pl-9 pr-3 py-2.5 bg-[#F5F5F3] rounded-xl text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:ring-2 focus:ring-[#1A1917]/10"
-            />
-            {query && (
-              <button onClick={() => setQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5">
-                <X strokeWidth={1.5} className="w-3.5 h-3.5 text-[#C0C0C0]" />
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Scanner */}
-      {scanning && (
-        <div className="px-4 py-4 bg-[#1A1917]">
-          <div id="barcode-reader" className="w-full rounded-xl overflow-hidden" style={{ minHeight: 200 }} />
-          <p className="text-center text-[12px] text-[#808080] mt-2">Richt de camera op de barcode</p>
-          <button onClick={() => setScanning(false)} className="w-full mt-2 py-2 text-[13px] text-[#D46A3A] font-medium">
-            Annuleren
-          </button>
-        </div>
-      )}
-
-      {/* Content area */}
-      <div className="flex-1 overflow-y-auto">
-        {/* ── Product detail / portion picker ── */}
-        {selectedProduct && tab === 'search' && (
-          <div className="px-4 py-5">
-            {/* Macro preview for selected grams */}
-            <div className="bg-[#FAFAF8] rounded-xl px-4 py-3 mb-5">
-              <div className="flex items-baseline gap-2 mb-1">
-                <span className="text-[20px] font-bold text-[#1A1917]">
-                  {Math.round((selectedProduct.per100g.calories * confirmGrams) / 100)}
-                </span>
-                <span className="text-[13px] text-[#B0B0B0]">kcal</span>
-              </div>
-              <div className="flex gap-3 text-[12px] text-[#8A8A8A]">
-                <span>E {Math.round((selectedProduct.per100g.protein * confirmGrams) / 100)}g</span>
-                <span>K {Math.round((selectedProduct.per100g.carbs * confirmGrams) / 100)}g</span>
-                <span>V {Math.round((selectedProduct.per100g.fat * confirmGrams) / 100)}g</span>
-              </div>
-            </div>
-
-            {/* Portion presets */}
-            <p className="text-[11px] font-semibold text-[#B0B0B0] uppercase tracking-[0.1em] mb-2">Portie</p>
-            <div className="flex gap-2 flex-wrap mb-4">
-              {(() => {
-                const portions: { label: string; grams: number }[] = []
-                if (selectedProduct.serving_size) {
-                  const match = selectedProduct.serving_size.match(/(\d+)\s*g/i)
-                  if (match) portions.push({ label: '1 portie', grams: parseInt(match[1]) })
-                }
-                if (selectedProduct.quantity) {
-                  const match = selectedProduct.quantity.match(/(\d+)\s*g/i)
-                  if (match && !portions.some(p => p.grams === parseInt(match[1])))
-                    portions.push({ label: 'Verpakking', grams: parseInt(match[1]) })
-                }
-                if (!portions.some(p => p.grams === 100)) portions.push({ label: '100g', grams: 100 })
-                if (!portions.some(p => p.grams === 150)) portions.push({ label: '150g', grams: 150 })
-                if (!portions.some(p => p.grams === 200)) portions.push({ label: '200g', grams: 200 })
-                portions.sort((a, b) => a.grams - b.grams)
-
-                return portions.map(p => (
-                  <button
-                    key={p.label}
-                    onClick={() => { setPortionGrams(String(p.grams)); setSelectedPortion(p.label) }}
-                    className={`px-3.5 py-2 rounded-xl text-[13px] font-medium transition-all border ${
-                      selectedPortion === p.label && confirmGrams === p.grams
-                        ? 'border-[#D46A3A] bg-[rgba(212,106,58,0.06)] text-[#D46A3A]'
-                        : 'border-[#F0F0EE] text-[#8A8A8A] hover:border-[#C0C0C0]'
-                    }`}
-                  >
-                    {p.label}
-                    {p.label !== `${p.grams}g` && <span className="text-[10px] ml-1 opacity-60">{p.grams}g</span>}
-                  </button>
-                ))
-              })()}
-            </div>
-
-            {/* Custom gram input */}
-            <div className="flex items-center gap-3 mb-6">
-              <input
-                type="number"
-                value={portionGrams}
-                onChange={(e) => { setPortionGrams(e.target.value.replace(/[^0-9]/g, '')); setSelectedPortion(null) }}
-                className="w-24 px-3 py-2.5 bg-[#F5F5F3] rounded-xl text-[15px] text-[#1A1917] text-center focus:outline-none focus:ring-2 focus:ring-[#1A1917]/10"
-              />
-              <span className="text-[14px] text-[#B0B0B0]">gram</span>
-            </div>
-
-            {/* Confirm button */}
-            <button
-              onClick={confirmAdd}
-              disabled={savingConfirm || confirmGrams < 1}
-              className="w-full py-3.5 bg-[#1A1917] text-white rounded-xl text-[14px] font-semibold transition-colors hover:bg-[#333] disabled:opacity-40"
-            >
-              {savingConfirm ? 'Toevoegen...' : 'Toevoegen'}
-            </button>
-          </div>
-        )}
-
-        {/* ── Search results list ── */}
-        {!selectedProduct && tab === 'search' && !scanning && (
-          <>
-            {/* Section label */}
-            {!loading && results.length > 0 && (
-              <p className="px-4 pt-3 pb-1 text-[11px] font-semibold text-[#B0B0B0] uppercase tracking-[0.1em]">
-                {query ? 'Resultaten' : 'Populair'}
-              </p>
-            )}
-
-            {/* Loading shimmer */}
-            {loading && (
-              <div className="px-4 pt-3 space-y-1">
-                {[1,2,3,4,5].map(i => (
-                  <div key={i} className="flex items-center justify-between py-3 animate-pulse">
-                    <div className="flex-1">
-                      <div className="h-3.5 w-32 bg-[#F0F0EE] rounded mb-1.5" />
-                      <div className="h-2.5 w-48 bg-[#F0F0EE] rounded" />
-                    </div>
-                    <div className="w-8 h-8 rounded-full bg-[#F0F0EE]" />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* No results */}
-            {!loading && results.length === 0 && query && (
-              <div className="py-12 text-center">
-                <p className="text-[13px] text-[#B0B0B0] mb-3">Geen resultaten voor &ldquo;{query}&rdquo;</p>
-                <button
-                  onClick={() => { setTab('custom'); setCustomForm(prev => ({ ...prev, name: query })) }}
-                  className="text-[13px] font-medium text-[#D46A3A]"
-                >
-                  Handmatig toevoegen
-                </button>
-              </div>
-            )}
-
-            {/* Results */}
-            {!loading && results.map((product, idx) => {
-              const key = product.barcode || product.name
-              const isAdding = addingProduct === key
-              const wasAdded = justAdded.has(key)
-              let displayGrams = 100
-              if (product.serving_size) {
-                const match = product.serving_size.match(/(\d+)\s*g/i)
-                if (match) displayGrams = parseInt(match[1])
-              }
-              const displayCal = Math.round((product.per100g.calories * displayGrams) / 100)
-
-              return (
-                <div
-                  key={idx}
-                  className="flex items-center gap-3 px-4 py-3 border-b border-[#F8F8F6] hover:bg-[#FAFAF8] transition-colors"
-                >
-                  {/* Product info — tap to open portion picker */}
-                  <button
-                    onClick={() => {
-                      setSelectedProduct(product)
-                      setPortionGrams(String(displayGrams))
-                      setSelectedPortion(displayGrams === 100 ? '100g' : '1 portie')
-                    }}
-                    className="flex-1 min-w-0 text-left"
-                  >
-                    <p className="text-[14px] text-[#1A1917] truncate leading-tight">{product.name}</p>
-                    <p className="text-[12px] text-[#B0B0B0] mt-0.5">
-                      {displayCal} kcal
-                      {product.brand && <span> · {product.brand}</span>}
-                      <span className="text-[#D0D0D0]"> · {displayGrams}g</span>
-                    </p>
-                  </button>
-
-                  {/* Quick-add button */}
-                  <button
-                    onClick={(e) => { e.stopPropagation(); quickAdd(product) }}
-                    disabled={isAdding}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all ${
-                      wasAdded
-                        ? 'bg-[#E8F5E9] text-[#3D8B5C]'
-                        : 'bg-[#F5F5F3] text-[#1A1917] hover:bg-[#EBEBEA] active:scale-95'
-                    }`}
-                  >
-                    {isAdding ? (
-                      <div className="w-3.5 h-3.5 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
-                    ) : wasAdded ? (
-                      <Check strokeWidth={2} className="w-4 h-4" />
-                    ) : (
-                      <Plus strokeWidth={2} className="w-4 h-4" />
-                    )}
-                  </button>
-                </div>
-              )
-            })}
-          </>
-        )}
-
-        {/* Custom product form */}
-        {tab === 'custom' && (
-          <div className="px-4 py-4 space-y-4">
-            <p className="text-[13px] text-[#B0B0B0]">
-              Nieuw product toevoegen. Vul voedingswaarden per 100g in.
-            </p>
-
-            <div>
-              <label className="text-[11px] font-semibold text-[#B0B0B0] uppercase tracking-[0.1em] block mb-1.5">Naam *</label>
-              <input
-                type="text"
-                value={customForm.name}
-                onChange={(e) => setCustomForm(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="bijv. Griekse yoghurt 0%"
-                className="w-full px-3 py-2.5 bg-[#F5F5F3] rounded-xl text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:ring-2 focus:ring-[#1A1917]/10"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-[11px] font-semibold text-[#B0B0B0] uppercase tracking-[0.1em] block mb-1.5">Merk</label>
-                <input
-                  type="text" value={customForm.brand}
-                  onChange={(e) => setCustomForm(prev => ({ ...prev, brand: e.target.value }))}
-                  placeholder="optioneel"
-                  className="w-full px-3 py-2.5 bg-[#F5F5F3] rounded-xl text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:ring-2 focus:ring-[#1A1917]/10"
-                />
-              </div>
-              <div>
-                <label className="text-[11px] font-semibold text-[#B0B0B0] uppercase tracking-[0.1em] block mb-1.5">Barcode</label>
-                <input
-                  type="text" value={customForm.barcode}
-                  onChange={(e) => setCustomForm(prev => ({ ...prev, barcode: e.target.value }))}
-                  placeholder="optioneel"
-                  className="w-full px-3 py-2.5 bg-[#F5F5F3] rounded-xl text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:ring-2 focus:ring-[#1A1917]/10"
-                />
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-[#F0F0EE]">
-              <p className="text-[11px] font-semibold text-[#B0B0B0] uppercase tracking-[0.1em] mb-3">Per 100g</p>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { key: 'calories', label: 'Calorieën (kcal) *' },
-                  { key: 'protein', label: 'Eiwit (g)' },
-                  { key: 'carbs', label: 'Koolhydraten (g)' },
-                  { key: 'fat', label: 'Vet (g)' },
-                ].map(f => (
-                  <div key={f.key}>
-                    <label className="text-[12px] text-[#B0B0B0] block mb-1">{f.label}</label>
-                    <input
-                      type="number"
-                      value={customForm[f.key as keyof typeof customForm]}
-                      onChange={(e) => setCustomForm(prev => ({ ...prev, [f.key]: e.target.value }))}
-                      placeholder="0"
-                      className="w-full px-3 py-2.5 bg-[#F5F5F3] rounded-xl text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:ring-2 focus:ring-[#1A1917]/10"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <button
-              onClick={handleSaveCustomProduct}
-              disabled={savingCustom || !customForm.name || !customForm.calories}
-              className="w-full py-3 bg-[#1A1917] text-white font-semibold text-[13px] uppercase tracking-[0.06em] hover:bg-[#333] transition-colors disabled:opacity-40 rounded-xl mt-2"
-            >
-              {savingCustom ? 'Opslaan...' : 'Opslaan & selecteren'}
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-// ─── MealDetailPanel (fullscreen overlay) ───────────
-
-function MealDetailPanel({
-  meal,
-  log,
-  plan,
-  dateStr,
-  logs,
-  setLogs,
-  setSummary,
-  onClose,
-  onOpenSearch,
-}: {
-  meal: MealMoment
-  log: MealLog | undefined
-  plan: NutritionPlan
-  dateStr: string
-  logs: Map<string, MealLog>
-  setLogs: (logs: Map<string, MealLog>) => void
-  setSummary: (summary: DailySummary | null) => void
-  onClose: () => void
-  onOpenSearch: (mealId: string) => void
-}) {
-  const [saving, setSaving] = useState(false)
-  const [editingGrams, setEditingGrams] = useState<string | null>(null)
-  const [gramsValue, setGramsValue] = useState('')
-  const [copyingSaving, setCopyingSaving] = useState(false)
-
-  const foods = log?.foods_eaten || meal.foods || []
-  const isCompleted = log?.completed || false
-  const totalCal = foods.reduce((s, f) => s + calcMacro(f, 'calories'), 0)
-  const totalProt = foods.reduce((s, f) => s + calcMacro(f, 'protein'), 0)
-  const totalCarbs = foods.reduce((s, f) => s + calcMacro(f, 'carbs'), 0)
-  const totalFat = foods.reduce((s, f) => s + calcMacro(f, 'fat'), 0)
-
-  async function saveFoods(newFoods: FoodEntry[], completed?: boolean) {
-    setSaving(true)
-    try {
-      const res = await fetch('/api/nutrition-log', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          plan_id: plan.id,
-          date: dateStr,
           meal_id: meal.id,
           meal_name: meal.name,
-          completed: completed !== undefined ? completed : (log?.completed || false),
+          completed: existing?.completed || false,
           foods_eaten: newFoods,
-          client_notes: log?.client_notes || null,
+          client_notes: existing?.client_notes || null,
         }),
       })
 
@@ -1053,180 +412,266 @@ function MealDetailPanel({
         const newLog: MealLog = {
           meal_id: meal.id,
           meal_name: meal.name,
-          completed: completed !== undefined ? completed : (log?.completed || false),
+          completed: existing?.completed || false,
           foods_eaten: newFoods,
-          client_notes: log?.client_notes || null,
-          completed_at: (completed !== undefined ? completed : log?.completed)
-            ? (log?.completed_at || new Date().toISOString())
-            : null,
+          client_notes: existing?.client_notes || null,
+          completed_at: existing?.completed_at || null,
         }
         const upd = new Map(logs)
         upd.set(meal.id, newLog)
         setLogs(upd)
 
+        setJustAdded(prev => new Set(prev).add(key))
+        setTimeout(() => setJustAdded(prev => { const n = new Set(prev); n.delete(key); return n }), 1000)
+
         const sumRes = await fetch(`/api/nutrition-log?date=${dateStr}`)
         const sumData = await sumRes.json()
         if (sumData.summary) setSummary(sumData.summary)
         invalidateCache('/api/dashboard')
       }
     } catch (err) {
-      console.error('Save foods error:', err)
+      console.error('Add food error:', err)
     } finally {
-      setSaving(false)
+      setAddingProduct(null)
     }
   }
 
-  async function toggleComplete() {
-    await saveFoods(foods, !isCompleted)
-  }
+  async function handleDragDown(e: React.TouchEvent) {
+    const startY = e.touches[0].clientY
+    const startTransform = sheetRef.current?.style.transform || 'translateY(0)'
 
-  function deleteFood(foodId: string) {
-    const newFoods = foods.filter(f => f.id !== foodId)
-    saveFoods(newFoods)
-  }
-
-  function updateGrams(foodId: string) {
-    const newGrams = parseInt(gramsValue) || 0
-    if (newGrams < 1) return
-    const newFoods = foods.map(f => f.id === foodId ? { ...f, grams: newGrams } : f)
-    saveFoods(newFoods)
-    setEditingGrams(null)
-  }
-
-  async function copyYesterday() {
-    setCopyingSaving(true)
-    try {
-      const yesterday = new Date(dateStr)
-      yesterday.setDate(yesterday.getDate() - 1)
-      const yesterdayStr = yesterday.toISOString().split('T')[0]
-
-      const res = await fetch(`/api/nutrition-log?date=${yesterdayStr}`)
-      const data = await res.json()
-      const yesterdayLog = (data.logs || []).find((l: any) => l.meal_id === meal.id)
-
-      if (!yesterdayLog || !yesterdayLog.foods_eaten?.length) {
-        alert('Geen voeding gevonden voor gisteren bij deze maaltijd.')
-        setCopyingSaving(false)
-        return
+    const handleTouchMove = (moveEvent: TouchEvent) => {
+      const currentY = moveEvent.touches[0].clientY
+      const diff = currentY - startY
+      if (diff > 0) {
+        if (sheetRef.current) {
+          sheetRef.current.style.transform = `translateY(${diff}px)`
+        }
       }
-
-      await saveFoods(yesterdayLog.foods_eaten)
-    } catch (err) {
-      console.error('Copy yesterday error:', err)
-    } finally {
-      setCopyingSaving(false)
     }
+
+    const handleTouchEnd = (endEvent: TouchEvent) => {
+      const endY = endEvent.changedTouches[0].clientY
+      const diff = endY - startY
+      if (diff > 100) {
+        onClose()
+      } else if (sheetRef.current) {
+        sheetRef.current.style.transform = startTransform
+      }
+      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchend', handleTouchEnd)
+    }
+
+    document.addEventListener('touchmove', handleTouchMove)
+    document.addEventListener('touchend', handleTouchEnd)
   }
+
+  if (!isOpen || !meal) return null
 
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col" style={{ animation: 'slideUp 0.2s ease-out', paddingTop: 'env(safe-area-inset-top)' }}>
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 pt-2 pb-3 border-b border-[#F0F0EE]">
-        <button onClick={onClose} className="p-2.5 -ml-2 text-[#1A1917] active:bg-[#F5F5F3] rounded-full">
-          <ArrowLeft strokeWidth={1.5} className="w-5 h-5" />
-        </button>
-        <div className="flex-1 min-w-0">
-          <h2 className="text-[16px] font-semibold text-[#1A1917] truncate">{meal.name}</h2>
-          <p className="text-[12px] text-[#B0B0B0]">{meal.time}</p>
+    <div className="fixed inset-0 z-50" style={{ pointerEvents: isOpen ? 'auto' : 'none' }}>
+      {/* Overlay */}
+      <div
+        className="absolute inset-0 bg-black/20 transition-opacity duration-300"
+        onClick={onClose}
+        style={{ opacity: isOpen ? 1 : 0 }}
+      />
+
+      {/* Sheet */}
+      <div
+        ref={sheetRef}
+        className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl transition-transform duration-300"
+        style={{
+          maxHeight: '65vh',
+          display: isOpen ? 'flex' : 'none',
+          flexDirection: 'column',
+          transform: 'translateY(0)',
+        }}
+      >
+        {/* Drag handle */}
+        <div
+          onTouchStart={handleDragDown}
+          className="flex justify-center py-3 cursor-grab active:cursor-grabbing"
+        >
+          <div className="w-10 h-1 bg-[#D0D0D0] rounded-full" />
         </div>
-      </div>
 
-      {/* Macro summary strip */}
-      <div className="px-4 py-3 bg-[#FAFAF8] border-b border-[#F0F0EE] flex items-center gap-4 text-[13px]">
-        <span className="font-semibold text-[#1A1917]">{totalCal} kcal</span>
-        <span className="text-[#B0B0B0]">E {totalProt}g</span>
-        <span className="text-[#B0B0B0]">K {totalCarbs}g</span>
-        <span className="text-[#B0B0B0]">V {totalFat}g</span>
-      </div>
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 pb-3 border-b border-[#F0F0EE]">
+          <h2 className="text-[15px] font-semibold text-[#1A1917]">{meal.name} toevoegen</h2>
+          <button onClick={onClose} className="p-1.5 text-[#C0C0C0] hover:text-[#1A1917] transition-colors">
+            <X strokeWidth={1.5} className="w-5 h-5" />
+          </button>
+        </div>
 
-      {/* Food list */}
-      <div className="flex-1 overflow-y-auto">
-        {foods.length === 0 && (
-          <div className="py-12 text-center">
-            <p className="text-[14px] text-[#B0B0B0] mb-1">Nog geen items</p>
-            <p className="text-[12px] text-[#D0D0D0]">Voeg voedsel toe aan deze maaltijd</p>
-          </div>
-        )}
+        {/* Tabs */}
+        <div className="flex gap-2 px-4 py-3 border-b border-[#F0F0EE]">
+          <button
+            onClick={() => setTab('recent')}
+            className={`px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all ${
+              tab === 'recent'
+                ? 'bg-[#F5F5F3] text-[#1A1917]'
+                : 'text-[#B0B0B0]'
+            }`}
+          >
+            Recent
+          </button>
+          <button
+            onClick={() => setTab('search')}
+            className={`px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all ${
+              tab === 'search'
+                ? 'bg-[#F5F5F3] text-[#1A1917]'
+                : 'text-[#B0B0B0]'
+            }`}
+          >
+            Zoeken
+          </button>
+        </div>
 
-        {foods.map(food => {
-          const cal = calcMacro(food, 'calories')
-          const isEditingThis = editingGrams === food.id
-
-          return (
-            <div key={food.id} className="flex items-center gap-3 px-4 py-3.5 border-b border-[#F8F8F6]">
-              <div className="flex-1 min-w-0">
-                <p className="text-[14px] text-[#1A1917] truncate">{food.name}</p>
-                <div className="flex items-center gap-1 mt-0.5">
-                  {isEditingThis ? (
-                    <div className="flex items-center gap-1.5">
-                      <input
-                        type="number"
-                        value={gramsValue}
-                        onChange={(e) => setGramsValue(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === 'Enter') updateGrams(food.id) }}
-                        autoFocus
-                        className="w-16 px-2 py-1 bg-[#F5F5F3] rounded-lg text-[13px] text-[#1A1917] focus:outline-none focus:ring-2 focus:ring-[#1A1917]/10"
-                      />
-                      <span className="text-[12px] text-[#B0B0B0]">g</span>
-                      <button onClick={() => updateGrams(food.id)} className="text-[12px] font-medium text-[#3D8B5C] ml-1">OK</button>
-                      <button onClick={() => setEditingGrams(null)} className="text-[12px] text-[#B0B0B0] ml-1">Annuleer</button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => { setEditingGrams(food.id); setGramsValue(String(food.grams)) }}
-                      className="text-[12px] text-[#B0B0B0] hover:text-[#1A1917] transition-colors"
-                    >
-                      {food.grams}g · {cal} kcal
-                    </button>
-                  )}
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto">
+          {tab === 'recent' && (
+            <div className="divide-y divide-[#F0F0EE]">
+              {recentFoods.length === 0 ? (
+                <div className="py-12 text-center">
+                  <p className="text-[13px] text-[#B0B0B0]">Geen recente items</p>
                 </div>
+              ) : (
+                recentFoods.map((food, idx) => {
+                  const key = food.name
+                  const isAdding = addingProduct === key
+                  const wasAdded = justAdded.has(key)
+                  const displayCal = Math.round(food.per100g.calories)
+
+                  return (
+                    <div key={idx} className="flex items-center gap-3 px-4 py-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[14px] text-[#1A1917] font-medium truncate">{food.name}</p>
+                        <p className="text-[12px] text-[#B0B0B0] mt-0.5">
+                          {displayCal} kcal
+                          {food.brand && <span> · {food.brand}</span>}
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={() => addFood(food, 100)}
+                        disabled={isAdding}
+                        className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                          wasAdded
+                            ? 'bg-[#E8F5E9] text-[#3D8B5C]'
+                            : 'bg-[#F5F5F3] text-[#1A1917] hover:bg-[#EBEBEA] active:scale-95'
+                        }`}
+                      >
+                        {isAdding ? (
+                          <div className="w-3.5 h-3.5 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
+                        ) : wasAdded ? (
+                          <Check strokeWidth={2} className="w-4 h-4" />
+                        ) : (
+                          <Plus strokeWidth={2} className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+                  )
+                })
+              )}
+            </div>
+          )}
+
+          {tab === 'search' && (
+            <div className="px-4 py-3 space-y-3">
+              <div className="relative">
+                <Search strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C0C0C0]" />
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Zoek voedingsmiddel..."
+                  className="w-full pl-9 pr-3 py-2.5 bg-[#F5F5F3] rounded-xl text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:ring-2 focus:ring-[#1A1917]/10"
+                />
+                {query && (
+                  <button onClick={() => setQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5">
+                    <X strokeWidth={1.5} className="w-3.5 h-3.5 text-[#C0C0C0]" />
+                  </button>
+                )}
               </div>
 
-              {/* Delete */}
-              <button
-                onClick={() => deleteFood(food.id)}
-                className="p-2 text-[#D0D0D0] hover:text-[#E53935] transition-colors shrink-0"
-              >
-                <Trash2 strokeWidth={1.5} className="w-4 h-4" />
-              </button>
+              {/* Loading shimmer */}
+              {loading && (
+                <div className="space-y-1">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="flex items-center justify-between py-3 animate-pulse">
+                      <div className="flex-1">
+                        <div className="h-3.5 w-32 bg-[#F0F0EE] rounded mb-1.5" />
+                        <div className="h-2.5 w-48 bg-[#F0F0EE] rounded" />
+                      </div>
+                      <div className="w-8 h-8 rounded-full bg-[#F0F0EE]" />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* No results */}
+              {!loading && results.length === 0 && query && (
+                <div className="py-12 text-center">
+                  <p className="text-[13px] text-[#B0B0B0]">Geen resultaten gevonden</p>
+                </div>
+              )}
+
+              {/* Results */}
+              {!loading && results.map((product, idx) => {
+                const key = product.barcode || product.name
+                const isAdding = addingProduct === key
+                const wasAdded = justAdded.has(key)
+                let displayGrams = 100
+                if (product.serving_size) {
+                  const match = product.serving_size.match(/(\d+)\s*g/i)
+                  if (match) displayGrams = parseInt(match[1])
+                }
+                const displayCal = Math.round((product.per100g.calories * displayGrams) / 100)
+
+                return (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-3 py-3 border-b border-[#F0F0EE]"
+                  >
+                    <button
+                      onClick={() => {
+                        setSelectedProduct(product)
+                        setPortionGrams(String(displayGrams))
+                      }}
+                      className="flex-1 min-w-0 text-left"
+                    >
+                      <p className="text-[14px] text-[#1A1917] truncate leading-tight">{product.name}</p>
+                      <p className="text-[12px] text-[#B0B0B0] mt-0.5">
+                        {displayCal} kcal
+                        {product.brand && <span> · {product.brand}</span>}
+                        <span className="text-[#D0D0D0]"> · {displayGrams}g</span>
+                      </p>
+                    </button>
+
+                    <button
+                      onClick={(e) => { e.stopPropagation(); addFood(product, displayGrams) }}
+                      disabled={isAdding}
+                      className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                        wasAdded
+                          ? 'bg-[#E8F5E9] text-[#3D8B5C]'
+                          : 'bg-[#F5F5F3] text-[#1A1917] hover:bg-[#EBEBEA] active:scale-95'
+                      }`}
+                    >
+                      {isAdding ? (
+                        <div className="w-3.5 h-3.5 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
+                      ) : wasAdded ? (
+                        <Check strokeWidth={2} className="w-4 h-4" />
+                      ) : (
+                        <Plus strokeWidth={2} className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                )
+              })}
             </div>
-          )
-        })}
-      </div>
-
-      {/* Bottom actions */}
-      <div className="border-t border-[#F0F0EE] px-4 py-3 space-y-2" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
-        {/* Complete toggle — big and obvious */}
-        <button
-          onClick={toggleComplete}
-          disabled={saving}
-          className={`w-full py-3.5 rounded-xl text-[14px] font-semibold flex items-center justify-center gap-2 transition-all ${
-            isCompleted
-              ? 'bg-[#E8F5E9] text-[#3D8B5C]'
-              : 'bg-[#3D8B5C] text-white hover:bg-[#347A4F]'
-          }`}
-        >
-          <Check strokeWidth={2} className="w-4.5 h-4.5" />
-          {isCompleted ? 'Voltooid' : 'Maaltijd voltooien'}
-        </button>
-
-        {/* Add + copy row */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => onOpenSearch(meal.id)}
-            className="flex-1 py-3 bg-[#F5F5F3] rounded-xl text-[13px] font-semibold flex items-center justify-center gap-2 hover:bg-[#EBEBEA] transition-colors text-[#1A1917]"
-          >
-            <Plus strokeWidth={2} className="w-4 h-4" />
-            Voeg item toe
-          </button>
-          <button
-            onClick={copyYesterday}
-            disabled={copyingSaving}
-            className="py-3 px-4 bg-[#F5F5F3] rounded-xl text-[13px] font-medium text-[#8A8A8A] hover:bg-[#EBEBEA] transition-colors flex items-center gap-1.5"
-          >
-            <Copy strokeWidth={1.5} className="w-3.5 h-3.5" />
-            {copyingSaving ? '...' : 'Gisteren'}
-          </button>
+          )}
         </div>
       </div>
     </div>
@@ -1241,12 +686,10 @@ export default function ClientNutritionPage() {
   const [summary, setSummary] = useState<DailySummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState(new Date())
-  const [searchOpen, setSearchOpen] = useState(false)
-  const [searchMealId, setSearchMealId] = useState<string | null>(null)
+  const [bottomSheetOpen, setBottomSheetOpen] = useState(false)
+  const [bottomSheetMealId, setBottomSheetMealId] = useState<string | null>(null)
   const [daySubmitted, setDaySubmitted] = useState(false)
-  const [editingFoodId, setEditingFoodId] = useState<string | null>(null)
-  const [editingMealId, setEditingMealId] = useState<string | null>(null)
-  const [editGramsValue, setEditGramsValue] = useState('')
+  const [recentFoods, setRecentFoods] = useState<RecentFood[]>([])
 
   const dateStr = selectedDate.toISOString().split('T')[0]
 
@@ -1280,8 +723,6 @@ export default function ClientNutritionPage() {
         logMap.set(log.meal_id, log)
       }
 
-      // If no logs for today, pre-populate from yesterday's extras
-      // so added items carry over for easy re-checking
       if (logMap.size === 0 && planData) {
         const yesterday = new Date(dateStr)
         yesterday.setDate(yesterday.getDate() - 1)
@@ -1298,12 +739,10 @@ export default function ClientNutritionPage() {
           const meal = fixedMeals.find((m: any) => m.id === yLog.meal_id)
           if (!meal) continue
 
-          // Find extra items (items in yesterday's log not in the plan defaults)
           const planFoodNames = new Set((meal.foods || []).map((f: FoodEntry) => f.name))
           const extras = (yLog.foods_eaten || []).filter((f: FoodEntry) => !planFoodNames.has(f.name))
 
           if (extras.length > 0) {
-            // Merge plan defaults + yesterday's extras, unchecked
             const mergedFoods = [...(meal.foods || []), ...extras]
             logMap.set(meal.id, {
               meal_id: meal.id,
@@ -1319,6 +758,46 @@ export default function ClientNutritionPage() {
 
       setLogs(logMap)
       setSummary(data.summary || null)
+
+      // Load recent foods from last 7 days
+      const recentMap = new Map<string, { frequency: number; per100g: any; brand?: string }>()
+      const today = new Date(dateStr)
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(today)
+        d.setDate(d.getDate() - i)
+        const dStr = d.toISOString().split('T')[0]
+        try {
+          const rRes = await fetch(`/api/nutrition-log?date=${dStr}`)
+          const rData = await rRes.json()
+          for (const log of rData.logs || []) {
+            for (const food of log.foods_eaten || []) {
+              const key = food.name
+              const existing = recentMap.get(key)
+              if (existing) {
+                existing.frequency += 1
+              } else {
+                recentMap.set(key, {
+                  frequency: 1,
+                  per100g: food.per100g,
+                  brand: food.brand,
+                })
+              }
+            }
+          }
+        } catch {}
+      }
+
+      const sortedRecent = Array.from(recentMap.entries())
+        .map(([name, data]) => ({
+          name,
+          brand: data.brand,
+          frequency: data.frequency,
+          per100g: data.per100g,
+        }))
+        .sort((a, b) => b.frequency - a.frequency)
+        .slice(0, 20)
+
+      setRecentFoods(sortedRecent)
     } catch (err) {
       console.error('Load error:', err)
     } finally {
@@ -1338,15 +817,14 @@ export default function ClientNutritionPage() {
 
   const meals = plan?.meals || []
 
-  const completedCount = useMemo(
-    () => Array.from(logs.values()).filter(l => l.completed).length,
-    [logs]
-  )
-
-  const allDone = useMemo(
-    () => meals.length > 0 && completedCount === meals.length,
-    [meals.length, completedCount]
-  )
+  const allMealsComplete = useMemo(() => {
+    if (meals.length === 0) return false
+    return meals.every(meal => {
+      const log = logs.get(meal.id)
+      const foods = log?.foods_eaten || meal.foods || []
+      return foods.every(f => f.checked === true)
+    })
+  }, [meals, logs])
 
   const actualCal = summary?.total_calories || 0
   const actualProt = summary?.total_protein || 0
@@ -1374,9 +852,7 @@ export default function ClientNutritionPage() {
     }
   }
 
-  // ─── Inline meal helpers ─────────────────────────
-
-  async function saveMealFoods(meal: MealMoment, newFoods: FoodEntry[], completed?: boolean) {
+  async function saveMealFoods(meal: MealMoment, newFoods: FoodEntry[]) {
     const existing = logs.get(meal.id)
     try {
       const res = await fetch('/api/nutrition-log', {
@@ -1387,7 +863,7 @@ export default function ClientNutritionPage() {
           date: dateStr,
           meal_id: meal.id,
           meal_name: meal.name,
-          completed: completed !== undefined ? completed : (existing?.completed || false),
+          completed: existing?.completed || false,
           foods_eaten: newFoods,
           client_notes: existing?.client_notes || null,
         }),
@@ -1396,12 +872,10 @@ export default function ClientNutritionPage() {
         const newLog: MealLog = {
           meal_id: meal.id,
           meal_name: meal.name,
-          completed: completed !== undefined ? completed : (existing?.completed || false),
+          completed: existing?.completed || false,
           foods_eaten: newFoods,
           client_notes: existing?.client_notes || null,
-          completed_at: (completed !== undefined ? completed : existing?.completed)
-            ? (existing?.completed_at || new Date().toISOString())
-            : null,
+          completed_at: existing?.completed_at || null,
         }
         const upd = new Map(logs)
         upd.set(meal.id, newLog)
@@ -1417,51 +891,34 @@ export default function ClientNutritionPage() {
     }
   }
 
-  function toggleMealComplete(mealId: string) {
-    const meal = meals.find(m => m.id === mealId)
-    if (!meal) return
-    const existing = logs.get(mealId)
-    const foods = existing?.foods_eaten || meal.foods || []
-    const isCompleted = existing?.completed || false
-    saveMealFoods(meal, foods, !isCompleted)
+  function toggleFoodChecked(meal: MealMoment, foodId: string, foods: FoodEntry[]) {
+    const newFoods = foods.map(f =>
+      f.id === foodId ? { ...f, checked: !f.checked } : f
+    )
+    saveMealFoods(meal, newFoods)
   }
 
-  function deleteFoodFromMeal(meal: MealMoment, foods: FoodEntry[], foodId: string) {
+  function deleteFood(meal: MealMoment, foodId: string, foods: FoodEntry[]) {
     const newFoods = foods.filter(f => f.id !== foodId)
     saveMealFoods(meal, newFoods)
   }
-
-  function saveGramsEdit(meal: MealMoment, foods: FoodEntry[]) {
-    const newGrams = parseInt(editGramsValue) || 0
-    if (newGrams < 1 || !editingFoodId) return
-    const newFoods = foods.map(f => f.id === editingFoodId ? { ...f, grams: newGrams } : f)
-    saveMealFoods(meal, newFoods)
-    setEditingFoodId(null)
-    setEditingMealId(null)
-  }
-
-  // ─── Loading skeleton ─────────────────────────────
 
   if (loading) {
     return (
       <div className="pb-28 animate-pulse">
         <div className="h-4 w-12 bg-[#F0F0EE] rounded mb-6 mt-2" />
-        {/* Date nav skeleton */}
         <div className="flex items-center gap-3 mb-8">
           <div className="w-4 h-4 bg-[#F0F0EE] rounded" />
           <div className="h-5 w-24 bg-[#F0F0EE] rounded" />
           <div className="w-4 h-4 bg-[#F0F0EE] rounded" />
         </div>
-        {/* Calorie ring skeleton */}
         <div className="flex justify-center mb-6">
           <div className="w-40 h-40 rounded-full bg-[#F0F0EE]" />
         </div>
-        {/* Macro row */}
         <div className="flex justify-center gap-6 mb-10">
-          {[1,2,3].map(i => <div key={i} className="h-10 w-16 bg-[#F0F0EE] rounded-lg" />)}
+          {[1, 2, 3].map(i => <div key={i} className="h-10 w-16 bg-[#F0F0EE] rounded-lg" />)}
         </div>
-        {/* Meal rows */}
-        {[1,2,3].map(i => (
+        {[1, 2, 3].map(i => (
           <div key={i} className="flex items-center justify-between py-4 border-t border-[#F0F0EE]">
             <div>
               <div className="h-4 w-28 bg-[#F0F0EE] rounded mb-1.5" />
@@ -1486,9 +943,11 @@ export default function ClientNutritionPage() {
     )
   }
 
+  const currentMeal = meals.find(m => m.id === bottomSheetMealId)
+
   return (
     <div className="pb-28">
-      {/* ── Header ── */}
+      {/* ── Back button ── */}
       <div className="animate-slide-up">
         <button
           onClick={() => window.history.back()}
@@ -1514,12 +973,10 @@ export default function ClientNutritionPage() {
       <div className="flex justify-center mb-6 animate-slide-up stagger-2">
         <div className="relative w-[160px] h-[160px]">
           <svg viewBox="0 0 160 160" className="w-full h-full -rotate-90">
-            {/* Background ring */}
             <circle cx="80" cy="80" r="68" fill="none" stroke="#F0F0EE" strokeWidth="8" />
-            {/* Progress ring */}
             <circle
               cx="80" cy="80" r="68" fill="none"
-              stroke={allDone ? '#3D8B5C' : '#D46A3A'}
+              stroke={allMealsComplete ? '#3D8B5C' : '#D46A3A'}
               strokeWidth="8"
               strokeLinecap="round"
               strokeDasharray={`${(calPct / 100) * 427.26} 427.26`}
@@ -1529,7 +986,7 @@ export default function ClientNutritionPage() {
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span
               className="text-[32px] font-bold leading-none tracking-tight"
-              style={{ color: allDone ? '#3D8B5C' : '#1A1917' }}
+              style={{ color: allMealsComplete ? '#3D8B5C' : '#1A1917' }}
             >
               {actualCal}
             </span>
@@ -1553,12 +1010,12 @@ export default function ClientNutritionPage() {
         ))}
       </div>
 
-      {/* ── Meals — flat list per category ── */}
+      {/* ── Meals ── */}
       <div className="animate-slide-up stagger-4 space-y-5">
         {meals.map(meal => {
           const log = logs.get(meal.id)
-          const isCompleted = log?.completed || false
           const foods = log?.foods_eaten || meal.foods || []
+          const allChecked = foods.length > 0 && foods.every(f => f.checked === true)
           const cal = mealCalories(foods)
 
           return (
@@ -1566,76 +1023,64 @@ export default function ClientNutritionPage() {
               {/* Category header */}
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2.5">
-                  <button
-                    onClick={() => toggleMealComplete(meal.id)}
-                    className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all ${
-                      isCompleted ? 'bg-[#3D8B5C]' : 'border-[1.5px] border-[#E0E0DE] hover:border-[#3D8B5C]'
-                    }`}
-                  >
-                    {isCompleted && <Check strokeWidth={2.5} className="w-3 h-3 text-white" />}
-                  </button>
-                  <span className={`text-[15px] font-semibold ${isCompleted ? 'text-[#B0B0B0]' : 'text-[#1A1917]'}`}>
+                  <span className={`text-[15px] font-semibold ${allChecked ? 'text-[#B0B0B0]' : 'text-[#1A1917]'}`}>
                     {meal.name}
                   </span>
+                  {allChecked && <span className="text-[11px] text-[#3D8B5C] font-medium">✓ Voltooid</span>}
                   <span className="text-[12px] text-[#C0C0C0]">{cal} kcal</span>
                 </div>
                 <button
-                  onClick={() => { setSearchMealId(meal.id); setSearchOpen(true) }}
+                  onClick={() => { setBottomSheetMealId(meal.id); setBottomSheetOpen(true) }}
                   className="w-7 h-7 rounded-full bg-[#F5F5F3] flex items-center justify-center hover:bg-[#EBEBEA] active:scale-95 transition-all"
                 >
                   <Plus strokeWidth={2} className="w-3.5 h-3.5 text-[#8A8A8A]" />
                 </button>
               </div>
 
-              {/* Food items — flat list */}
+              {/* Food items */}
               {foods.length > 0 ? (
-                <div className="ml-[30px] space-y-0.5">
+                <div className="space-y-0.5">
                   {foods.map(food => {
                     const foodCal = calcMacro(food, 'calories')
-                    const isEditing = editingFoodId === food.id && editingMealId === meal.id
+                    const isChecked = food.checked === true
 
                     return (
                       <div
                         key={food.id}
-                        className={`flex items-center gap-2.5 py-2 px-2 rounded-lg group transition-colors ${
-                          isCompleted ? 'opacity-50' : 'hover:bg-[#FAFAF8]'
+                        className={`flex items-center gap-3 py-2 px-2 rounded-lg group transition-colors ${
+                          isChecked ? 'bg-[#F5F5F3]' : 'hover:bg-[#FAFAF8]'
                         }`}
                       >
+                        {/* Checkbox on left */}
+                        <button
+                          onClick={() => toggleFoodChecked(meal, food.id, foods)}
+                          className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                            isChecked
+                              ? 'bg-[#3D8B5C]'
+                              : 'border-[1.5px] border-[#E0E0DE] hover:border-[#3D8B5C]'
+                          }`}
+                        >
+                          {isChecked && <Check strokeWidth={2.5} className="w-3 h-3 text-white" />}
+                        </button>
+
                         {/* Food name + grams */}
                         <div className="flex-1 min-w-0">
-                          {isEditing ? (
-                            <div className="flex items-center gap-1.5">
-                              <input
-                                type="number"
-                                value={editGramsValue}
-                                onChange={(e) => setEditGramsValue(e.target.value)}
-                                onKeyDown={(e) => { if (e.key === 'Enter') saveGramsEdit(meal, foods) }}
-                                autoFocus
-                                className="w-16 px-2 py-1 bg-[#F5F5F3] rounded-lg text-[13px] text-[#1A1917] focus:outline-none focus:ring-2 focus:ring-[#1A1917]/10"
-                              />
-                              <span className="text-[12px] text-[#B0B0B0]">g</span>
-                              <button onClick={() => saveGramsEdit(meal, foods)} className="text-[12px] font-medium text-[#3D8B5C] ml-1">OK</button>
-                              <button onClick={() => { setEditingFoodId(null); setEditingMealId(null) }} className="text-[12px] text-[#B0B0B0] ml-1">✕</button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => { setEditingFoodId(food.id); setEditingMealId(meal.id); setEditGramsValue(String(food.grams)) }}
-                              className="text-left w-full"
-                            >
-                              <p className={`text-[14px] leading-tight truncate ${isCompleted ? 'line-through text-[#C0C0C0]' : 'text-[#1A1917]'}`}>
-                                {food.name}
-                              </p>
-                              <p className="text-[12px] text-[#C0C0C0] mt-0.5">
-                                {food.grams}g · {foodCal} kcal
-                              </p>
-                            </button>
-                          )}
+                          <p className={`text-[14px] leading-tight truncate ${
+                            isChecked ? 'line-through text-[#B0B0B0]' : 'text-[#1A1917]'
+                          }`}>
+                            {food.name}
+                          </p>
+                          <p className={`text-[12px] mt-0.5 ${
+                            isChecked ? 'text-[#D0D0D0]' : 'text-[#C0C0C0]'
+                          }`}>
+                            {food.grams}g · {foodCal} kcal
+                          </p>
                         </div>
 
-                        {/* Delete — visible on hover / always on mobile */}
+                        {/* Delete button — visible on mobile */}
                         <button
-                          onClick={() => deleteFoodFromMeal(meal, foods, food.id)}
-                          className="p-1.5 text-[#E0E0DE] hover:text-[#E53935] transition-colors shrink-0 opacity-0 group-hover:opacity-100 sm:opacity-100"
+                          onClick={() => deleteFood(meal, food.id, foods)}
+                          className="p-1.5 text-[#E0E0DE] hover:text-[#E53935] transition-colors shrink-0"
                         >
                           <Trash2 strokeWidth={1.5} className="w-3.5 h-3.5" />
                         </button>
@@ -1644,7 +1089,7 @@ export default function ClientNutritionPage() {
                   })}
                 </div>
               ) : (
-                <div className="ml-[30px] py-2">
+                <div className="py-2">
                   <p className="text-[13px] text-[#D0D0D0]">Geen items</p>
                 </div>
               )}
@@ -1653,7 +1098,7 @@ export default function ClientNutritionPage() {
         })}
       </div>
 
-      {/* ── Submit day (inline, not floating) ── */}
+      {/* ── Submit day ── */}
       {meals.length > 0 && (
         <div className="mt-8 mb-4 animate-slide-up stagger-6">
           <button
@@ -1662,12 +1107,12 @@ export default function ClientNutritionPage() {
             className={`w-full py-3 rounded-xl font-semibold text-[13px] uppercase tracking-[0.06em] transition-all ${
               daySubmitted
                 ? 'bg-[#E8F5E9] text-[#3D8B5C]'
-                : allDone
+                : allMealsComplete
                   ? 'bg-[#3D8B5C] text-white hover:bg-[#347A4F]'
                   : 'bg-[#F5F5F3] text-[#1A1917] hover:bg-[#EBEBEA]'
             }`}
           >
-            {daySubmitted ? 'Ingediend ✓' : `Dag indienen (${completedCount}/${meals.length})`}
+            {daySubmitted ? 'Ingediend ✓' : 'Dag indienen'}
           </button>
         </div>
       )}
@@ -1685,20 +1130,20 @@ export default function ClientNutritionPage() {
         </div>
       )}
 
-      {/* ── Food Search Modal ── */}
-      <FoodSearchModal
-        isOpen={searchOpen}
-        onClose={() => setSearchOpen(false)}
-        meals={meals}
-        initialMealId={searchMealId}
+      {/* ── Bottom Sheet ── */}
+      <AddFoodBottomSheet
+        isOpen={bottomSheetOpen}
+        onClose={() => setBottomSheetOpen(false)}
+        meal={currentMeal || null}
         plan={plan}
         dateStr={dateStr}
         logs={logs}
         setLogs={setLogs}
         setSummary={setSummary}
+        recentFoods={recentFoods}
       />
 
-      {/* Inline animation keyframes */}
+      {/* ── Animations ── */}
       <style jsx global>{`
         @keyframes slideUp {
           from { transform: translateY(100%); opacity: 0; }
