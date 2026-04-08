@@ -2219,7 +2219,7 @@ function ActiveWorkoutPage() {
                   />
                 )}
               {/* Exercise header — sticky on scroll */}
-              <div className={`${isSuperset ? 'pl-7' : 'px-5'} ${!isSuperset ? 'px-5' : 'pr-5'} pt-5 pb-3 sticky top-14 bg-white/95 backdrop-blur-sm z-10 ${isFirstInGroup || !isSuperset ? 'rounded-t-2xl' : ''}`}>
+              <div className={`${isSuperset ? 'pl-7' : 'px-5'} ${!isSuperset ? 'px-5' : 'pr-5'} pt-5 pb-3 ${isFirstInGroup || !isSuperset ? 'rounded-t-2xl' : ''}`}>
                 <div className="flex items-center justify-between">
                   {/* Drag handle */}
                   <button
@@ -2847,14 +2847,6 @@ function SetRowComponent({
           style={{ WebkitTapHighlightColor: 'transparent' }}
         >
           <Check size={16} strokeWidth={set.completed ? 3 : 2} />
-        <button
-          onClick={() => onDelete(index)}
-          className="w-[40px] h-[40px] flex items-center justify-center rounded-full border-2 border-[#E0E0DE] text-[#D5D5D5] hover:border-[#C4372A] hover:text-[#C4372A] active:scale-90 transition-all touch-manipulation"
-          style={{ WebkitTapHighlightColor: "transparent" }}
-          title="Delete set"
-        >
-          <Trash2 size={16} strokeWidth={1.5} />
-        </button>
         </button>
       </div>
     </div>
