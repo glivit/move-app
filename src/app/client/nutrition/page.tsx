@@ -826,10 +826,28 @@ export default function ClientNutritionPage() {
     })
   }, [meals, logs])
 
-  const actualCal = summary?.total_calories || 0
-  const actualProt = summary?.total_protein || 0
-  const actualCarbs = summary?.total_carbs || 0
-  const actualFat = summary?.total_fat || 0
+  // Calculate macros client-side from checked items for instant feedback
+  const { checkedCal, checkedProt, checkedCarbs, checkedFat } = useMemo(() => {
+    let cal = 0, prot = 0, carbs = 0, fat = 0
+    for (const meal of meals) {
+      const log = logs.get(meal.id)
+      const foods = log?.foods_eaten || meal.foods || []
+      for (const f of foods) {
+        if (f.checked === true) {
+          cal += calcMacro(f, 'calories')
+          prot += calcMacro(f, 'protein')
+          carbs += calcMacro(f, 'carbs')
+          fat += calcMacro(f, 'fat')
+        }
+      }
+    }
+    return { checkedCal: cal, checkedProt: prot, checkedCarbs: carbs, checkedFat: fat }
+  }, [meals, logs])
+
+  const actualCal = checkedCal
+  const actualProt = checkedProt
+  const actualCarbs = checkedCarbs
+  const actualFat = checkedFat
 
   const targetCal = plan?.calories_target || 0
   const targetProt = plan?.protein_g || 0

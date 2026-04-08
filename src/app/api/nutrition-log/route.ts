@@ -100,26 +100,47 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: logError.message }, { status: 500 })
   }
 
-  // Update daily summary
+  // Update daily summary — count calories from individually checked foods
   const { data: allLogs } = await db
     .from('nutrition_logs')
     .select('*')
     .eq('client_id', user.id)
     .eq('date', date)
 
-  const completedLogs = (allLogs || []).filter((l: any) => l.completed)
   let totalCal = 0, totalProt = 0, totalCarbs = 0, totalFat = 0
+  let mealsCompleted = 0
 
   for (const l of allLogs || []) {
-    if (l.completed && Array.isArray(l.foods_eaten)) {
-      for (const f of l.foods_eaten) {
+    if (!Array.isArray(l.foods_eaten)) continue
+    const foods = l.foods_eaten
+    let mealAllChecked = foods.length > 0
+
+    for (const f of foods) {
+      // Count macros for checked individual items
+      if (f.checked === true) {
+        const g = f.grams || 100
+        totalCal += Math.round(((f.per100g?.calories || f.calories || 0) * g) / 100)
+        totalProt += Math.round(((f.per100g?.protein || f.protein || 0) * g) / 100)
+        totalCarbs += Math.round(((f.per100g?.carbs || f.carbs || 0) * g) / 100)
+        totalFat += Math.round(((f.per100g?.fat || f.fat || 0) * g) / 100)
+      } else {
+        mealAllChecked = false
+      }
+    }
+
+    // Also support legacy completed meals (all foods counted)
+    if (l.completed && !foods.some((f: any) => 'checked' in f)) {
+      for (const f of foods) {
         const g = f.grams || 100
         totalCal += Math.round(((f.per100g?.calories || f.calories || 0) * g) / 100)
         totalProt += Math.round(((f.per100g?.protein || f.protein || 0) * g) / 100)
         totalCarbs += Math.round(((f.per100g?.carbs || f.carbs || 0) * g) / 100)
         totalFat += Math.round(((f.per100g?.fat || f.fat || 0) * g) / 100)
       }
+      mealAllChecked = true
     }
+
+    if (mealAllChecked) mealsCompleted++
   }
 
   await db
@@ -129,7 +150,7 @@ export async function POST(request: NextRequest) {
         client_id: user.id,
         date,
         meals_planned: allLogs?.length || 0,
-        meals_completed: completedLogs.length,
+        meals_completed: mealsCompleted,
         total_calories: totalCal,
         total_protein: totalProt,
         total_carbs: totalCarbs,
