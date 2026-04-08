@@ -1098,7 +1098,7 @@ function FormCheckModalComponent({ exerciseName, onClose }: { exerciseName: stri
               <p className="text-[13px] text-[#C4372A] mb-3 text-center">{uploadError}</p>
             )}
             <button
-              onClick={() => { setUploadError(' + chr(39) + chr(39) + '); fileInputRef.current?.click() }}
+              onClick={() => { setUploadError(''); fileInputRef.current?.click() }}
               disabled={uploading}
               className="w-full py-4 rounded-2xl font-bold text-[14px] uppercase tracking-[0.08em] bg-[#D46A3A] text-white flex items-center justify-center gap-2 disabled:opacity-50"
             >
