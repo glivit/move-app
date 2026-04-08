@@ -1,5 +1,5 @@
 import { createAdminClient } from '@/lib/supabase-admin'
-import { generateNudge, sendAIMessage, type NudgeContext } from '@/lib/ai-coach'
+import { generateNudge, saveAIDraft, type NudgeContext } from '@/lib/ai-coach'
 import { sendPushToUser } from '@/lib/push-server'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -162,7 +162,12 @@ Stuur als Glenn: kort, specifiek, motiverend. Begin met een samenvatting, eindig
           message += ` Nieuwe week, nieuwe kansen!`
         }
 
-        const sent = await sendAIMessage(coachId, client.id, message, `weekly-report-${client.id}`)
+        const sent = await saveAIDraft(coachId, client.id, message, 'weekly_motivation', {
+          clientName: client.full_name || 'Client',
+          workoutsCompleted: completedCount,
+          streak,
+          prCount,
+        })
 
         results.push({
           clientId: client.id,
