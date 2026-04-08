@@ -711,6 +711,10 @@ export default function ClientNutritionPage() {
         const fixedMeals = (planData.meals || []).map((m: any, i: number) => ({
           ...m,
           id: ensureMealId(m, i),
+          foods: (m.foods || []).map((f: any, fi: number) => ({
+            ...f,
+            id: f.id || `plan-${i}-food-${fi}-${(f.name || '').replace(/\s+/g, '-').toLowerCase()}`,
+          })),
         }))
         setPlan({ ...planData, meals: fixedMeals })
       }
@@ -718,8 +722,17 @@ export default function ClientNutritionPage() {
       const res = await fetch(`/api/nutrition-log?date=${dateStr}`)
       const data = await res.json()
 
+      // Helper: ensure every food in an array has a unique id
+      function ensureFoodIds(foods: any[], prefix: string): FoodEntry[] {
+        return (foods || []).map((f: any, fi: number) => ({
+          ...f,
+          id: f.id && !f.id.startsWith('plan-') ? f.id : `${prefix}-${fi}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        }))
+      }
+
       const logMap = new Map<string, MealLog>()
       for (const log of data.logs || []) {
+        log.foods_eaten = ensureFoodIds(log.foods_eaten, `log-${log.meal_id}`)
         logMap.set(log.meal_id, log)
       }
 
@@ -733,6 +746,10 @@ export default function ClientNutritionPage() {
         const fixedMeals = (planData.meals || []).map((m: any, i: number) => ({
           ...m,
           id: ensureMealId(m, i),
+          foods: (m.foods || []).map((f: any, fi: number) => ({
+            ...f,
+            id: f.id || `yplan-${i}-food-${fi}-${(f.name || '').replace(/\s+/g, '-').toLowerCase()}`,
+          })),
         }))
 
         for (const yLog of yData.logs || []) {
@@ -740,7 +757,10 @@ export default function ClientNutritionPage() {
           if (!meal) continue
 
           const planFoodNames = new Set((meal.foods || []).map((f: FoodEntry) => f.name))
-          const extras = (yLog.foods_eaten || []).filter((f: FoodEntry) => !planFoodNames.has(f.name))
+          const extras = ensureFoodIds(
+            (yLog.foods_eaten || []).filter((f: FoodEntry) => !planFoodNames.has(f.name)),
+            `extra-${meal.id}`
+          ).map((f: FoodEntry) => ({ ...f, checked: false }))
 
           if (extras.length > 0) {
             const mergedFoods = [...(meal.foods || []), ...extras]
