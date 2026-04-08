@@ -1,5 +1,5 @@
 import { createAdminClient } from '@/lib/supabase-admin'
-import { generateWorkoutFeedback, sendAIMessage, type WorkoutContext } from '@/lib/ai-coach'
+import { generateWorkoutFeedback, saveAIDraft, type WorkoutContext } from '@/lib/ai-coach'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -177,18 +177,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ skipped: true, reason: 'Coach already sent a message recently' })
     }
 
-    // Send AI message as Glenn
-    const sent = await sendAIMessage(
+    // Save as draft for coach review (not auto-sent anymore)
+    const saved = await saveAIDraft(
       coachId,
       session.client_id,
       feedback,
-      `ai-workout-${sessionId}`
+      'workout_feedback',
+      {
+        sessionId,
+        clientName: clientProfile?.full_name || 'Client',
+        dayName: templateDay?.name || 'Training',
+        durationMin,
+        totalSets,
+        totalVolume,
+        prCount,
+      }
     )
 
     return NextResponse.json({
-      success: sent,
+      success: saved,
       feedback,
       sessionId,
+      draft: true,
     })
   } catch (error) {
     console.error('[AI Feedback] Error:', error)

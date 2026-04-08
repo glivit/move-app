@@ -1241,10 +1241,12 @@ export default function ClientNutritionPage() {
   const [summary, setSummary] = useState<DailySummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState(new Date())
-  const [activeMealId, setActiveMealId] = useState<string | null>(null) // open MealDetailPanel
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchMealId, setSearchMealId] = useState<string | null>(null)
   const [daySubmitted, setDaySubmitted] = useState(false)
+  const [editingFoodId, setEditingFoodId] = useState<string | null>(null)
+  const [editingMealId, setEditingMealId] = useState<string | null>(null)
+  const [editGramsValue, setEditGramsValue] = useState('')
 
   const dateStr = selectedDate.toISOString().split('T')[0]
 
@@ -1277,6 +1279,44 @@ export default function ClientNutritionPage() {
       for (const log of data.logs || []) {
         logMap.set(log.meal_id, log)
       }
+
+      // If no logs for today, pre-populate from yesterday's extras
+      // so added items carry over for easy re-checking
+      if (logMap.size === 0 && planData) {
+        const yesterday = new Date(dateStr)
+        yesterday.setDate(yesterday.getDate() - 1)
+        const yesterdayStr = yesterday.toISOString().split('T')[0]
+        const yRes = await fetch(`/api/nutrition-log?date=${yesterdayStr}`)
+        const yData = await yRes.json()
+
+        const fixedMeals = (planData.meals || []).map((m: any, i: number) => ({
+          ...m,
+          id: ensureMealId(m, i),
+        }))
+
+        for (const yLog of yData.logs || []) {
+          const meal = fixedMeals.find((m: any) => m.id === yLog.meal_id)
+          if (!meal) continue
+
+          // Find extra items (items in yesterday's log not in the plan defaults)
+          const planFoodNames = new Set((meal.foods || []).map((f: FoodEntry) => f.name))
+          const extras = (yLog.foods_eaten || []).filter((f: FoodEntry) => !planFoodNames.has(f.name))
+
+          if (extras.length > 0) {
+            // Merge plan defaults + yesterday's extras, unchecked
+            const mergedFoods = [...(meal.foods || []), ...extras]
+            logMap.set(meal.id, {
+              meal_id: meal.id,
+              meal_name: meal.name,
+              completed: false,
+              foods_eaten: mergedFoods,
+              client_notes: null,
+              completed_at: null,
+            })
+          }
+        }
+      }
+
       setLogs(logMap)
       setSummary(data.summary || null)
     } catch (err) {
@@ -1294,7 +1334,6 @@ export default function ClientNutritionPage() {
     const d = new Date(selectedDate)
     d.setDate(d.getDate() + offset)
     setSelectedDate(d)
-    setActiveMealId(null)
   }
 
   const meals = plan?.meals || []
@@ -1335,8 +1374,71 @@ export default function ClientNutritionPage() {
     }
   }
 
-  // Resolve active meal for detail panel
-  const activeMeal = meals.find(m => m.id === activeMealId)
+  // ─── Inline meal helpers ─────────────────────────
+
+  async function saveMealFoods(meal: MealMoment, newFoods: FoodEntry[], completed?: boolean) {
+    const existing = logs.get(meal.id)
+    try {
+      const res = await fetch('/api/nutrition-log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan_id: plan!.id,
+          date: dateStr,
+          meal_id: meal.id,
+          meal_name: meal.name,
+          completed: completed !== undefined ? completed : (existing?.completed || false),
+          foods_eaten: newFoods,
+          client_notes: existing?.client_notes || null,
+        }),
+      })
+      if (res.ok) {
+        const newLog: MealLog = {
+          meal_id: meal.id,
+          meal_name: meal.name,
+          completed: completed !== undefined ? completed : (existing?.completed || false),
+          foods_eaten: newFoods,
+          client_notes: existing?.client_notes || null,
+          completed_at: (completed !== undefined ? completed : existing?.completed)
+            ? (existing?.completed_at || new Date().toISOString())
+            : null,
+        }
+        const upd = new Map(logs)
+        upd.set(meal.id, newLog)
+        setLogs(upd)
+
+        const sumRes = await fetch(`/api/nutrition-log?date=${dateStr}`)
+        const sumData = await sumRes.json()
+        if (sumData.summary) setSummary(sumData.summary)
+        invalidateCache('/api/dashboard')
+      }
+    } catch (err) {
+      console.error('Save meal foods error:', err)
+    }
+  }
+
+  function toggleMealComplete(mealId: string) {
+    const meal = meals.find(m => m.id === mealId)
+    if (!meal) return
+    const existing = logs.get(mealId)
+    const foods = existing?.foods_eaten || meal.foods || []
+    const isCompleted = existing?.completed || false
+    saveMealFoods(meal, foods, !isCompleted)
+  }
+
+  function deleteFoodFromMeal(meal: MealMoment, foods: FoodEntry[], foodId: string) {
+    const newFoods = foods.filter(f => f.id !== foodId)
+    saveMealFoods(meal, newFoods)
+  }
+
+  function saveGramsEdit(meal: MealMoment, foods: FoodEntry[]) {
+    const newGrams = parseInt(editGramsValue) || 0
+    if (newGrams < 1 || !editingFoodId) return
+    const newFoods = foods.map(f => f.id === editingFoodId ? { ...f, grams: newGrams } : f)
+    saveMealFoods(meal, newFoods)
+    setEditingFoodId(null)
+    setEditingMealId(null)
+  }
 
   // ─── Loading skeleton ─────────────────────────────
 
@@ -1451,10 +1553,8 @@ export default function ClientNutritionPage() {
         ))}
       </div>
 
-      {/* ── Meals ── */}
-      <div className="animate-slide-up stagger-4">
-        <p className="text-[11px] font-semibold text-[#B0B0B0] uppercase tracking-[0.12em] mb-3">Maaltijden</p>
-
+      {/* ── Meals — flat list per category ── */}
+      <div className="animate-slide-up stagger-4 space-y-5">
         {meals.map(meal => {
           const log = logs.get(meal.id)
           const isCompleted = log?.completed || false
@@ -1462,54 +1562,95 @@ export default function ClientNutritionPage() {
           const cal = mealCalories(foods)
 
           return (
-            <button
-              key={meal.id}
-              onClick={() => setActiveMealId(meal.id)}
-              className="w-full flex items-center gap-3 py-4 border-t border-[#F0F0EE] hover:bg-[#FAFAF8] transition-colors text-left"
-            >
-              {/* Completion indicator */}
-              <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                isCompleted ? 'bg-[#3D8B5C]' : 'border-[1.5px] border-[#E0E0DE]'
-              }`}>
-                {isCompleted && (
-                  <Check strokeWidth={2.5} className="w-3 h-3 text-white" />
-                )}
+            <div key={meal.id}>
+              {/* Category header */}
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2.5">
+                  <button
+                    onClick={() => toggleMealComplete(meal.id)}
+                    className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                      isCompleted ? 'bg-[#3D8B5C]' : 'border-[1.5px] border-[#E0E0DE] hover:border-[#3D8B5C]'
+                    }`}
+                  >
+                    {isCompleted && <Check strokeWidth={2.5} className="w-3 h-3 text-white" />}
+                  </button>
+                  <span className={`text-[15px] font-semibold ${isCompleted ? 'text-[#B0B0B0]' : 'text-[#1A1917]'}`}>
+                    {meal.name}
+                  </span>
+                  <span className="text-[12px] text-[#C0C0C0]">{cal} kcal</span>
+                </div>
+                <button
+                  onClick={() => { setSearchMealId(meal.id); setSearchOpen(true) }}
+                  className="w-7 h-7 rounded-full bg-[#F5F5F3] flex items-center justify-center hover:bg-[#EBEBEA] active:scale-95 transition-all"
+                >
+                  <Plus strokeWidth={2} className="w-3.5 h-3.5 text-[#8A8A8A]" />
+                </button>
               </div>
 
-              {/* Meal info */}
-              <div className="flex-1 min-w-0">
-                <p className={`text-[15px] font-medium truncate ${isCompleted ? 'text-[#B0B0B0]' : 'text-[#1A1917]'}`}>
-                  {meal.name}
-                </p>
-                <p className="text-[12px] text-[#C0C0C0] mt-0.5">
-                  {meal.time} · {foods.length} {foods.length === 1 ? 'item' : 'items'}
-                </p>
-              </div>
+              {/* Food items — flat list */}
+              {foods.length > 0 ? (
+                <div className="ml-[30px] space-y-0.5">
+                  {foods.map(food => {
+                    const foodCal = calcMacro(food, 'calories')
+                    const isEditing = editingFoodId === food.id && editingMealId === meal.id
 
-              {/* Kcal + arrow */}
-              <div className="shrink-0 flex items-center gap-2">
-                <span className={`text-[14px] font-semibold ${isCompleted ? 'text-[#C0C0C0]' : 'text-[#1A1917]'}`}>
-                  {cal}
-                </span>
-                <span className="text-[11px] text-[#C0C0C0]">kcal</span>
-                <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#D5D5D5]" />
-              </div>
-            </button>
+                    return (
+                      <div
+                        key={food.id}
+                        className={`flex items-center gap-2.5 py-2 px-2 rounded-lg group transition-colors ${
+                          isCompleted ? 'opacity-50' : 'hover:bg-[#FAFAF8]'
+                        }`}
+                      >
+                        {/* Food name + grams */}
+                        <div className="flex-1 min-w-0">
+                          {isEditing ? (
+                            <div className="flex items-center gap-1.5">
+                              <input
+                                type="number"
+                                value={editGramsValue}
+                                onChange={(e) => setEditGramsValue(e.target.value)}
+                                onKeyDown={(e) => { if (e.key === 'Enter') saveGramsEdit(meal, foods) }}
+                                autoFocus
+                                className="w-16 px-2 py-1 bg-[#F5F5F3] rounded-lg text-[13px] text-[#1A1917] focus:outline-none focus:ring-2 focus:ring-[#1A1917]/10"
+                              />
+                              <span className="text-[12px] text-[#B0B0B0]">g</span>
+                              <button onClick={() => saveGramsEdit(meal, foods)} className="text-[12px] font-medium text-[#3D8B5C] ml-1">OK</button>
+                              <button onClick={() => { setEditingFoodId(null); setEditingMealId(null) }} className="text-[12px] text-[#B0B0B0] ml-1">✕</button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => { setEditingFoodId(food.id); setEditingMealId(meal.id); setEditGramsValue(String(food.grams)) }}
+                              className="text-left w-full"
+                            >
+                              <p className={`text-[14px] leading-tight truncate ${isCompleted ? 'line-through text-[#C0C0C0]' : 'text-[#1A1917]'}`}>
+                                {food.name}
+                              </p>
+                              <p className="text-[12px] text-[#C0C0C0] mt-0.5">
+                                {food.grams}g · {foodCal} kcal
+                              </p>
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Delete — visible on hover / always on mobile */}
+                        <button
+                          onClick={() => deleteFoodFromMeal(meal, foods, food.id)}
+                          className="p-1.5 text-[#E0E0DE] hover:text-[#E53935] transition-colors shrink-0 opacity-0 group-hover:opacity-100 sm:opacity-100"
+                        >
+                          <Trash2 strokeWidth={1.5} className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="ml-[30px] py-2">
+                  <p className="text-[13px] text-[#D0D0D0]">Geen items</p>
+                </div>
+              )}
+            </div>
           )
         })}
-      </div>
-
-      {/* ── Add food row (inline in meals section) ── */}
-      <div className="animate-slide-up stagger-5">
-        <button
-          onClick={() => { setSearchMealId(meals[0]?.id || null); setSearchOpen(true) }}
-          className="w-full flex items-center gap-3 py-4 border-t border-[#F0F0EE] text-left hover:bg-[#FAFAF8] transition-colors"
-        >
-          <div className="w-5 h-5 rounded-full bg-[#F5F5F3] flex items-center justify-center shrink-0">
-            <Plus strokeWidth={2} className="w-3 h-3 text-[#8A8A8A]" />
-          </div>
-          <span className="text-[14px] font-medium text-[#D46A3A]">Voeg item toe</span>
-        </button>
       </div>
 
       {/* ── Submit day (inline, not floating) ── */}
@@ -1542,24 +1683,6 @@ export default function ClientNutritionPage() {
           <p className="text-[11px] text-[#B0B0B0] uppercase tracking-[0.1em] mb-2">Richtlijnen</p>
           <p className="text-[13px] text-[#8A8A8A] leading-relaxed whitespace-pre-wrap">{plan.guidelines}</p>
         </div>
-      )}
-
-      {/* ── Meal Detail Panel ── */}
-      {activeMeal && (
-        <MealDetailPanel
-          meal={activeMeal}
-          log={logs.get(activeMeal.id)}
-          plan={plan}
-          dateStr={dateStr}
-          logs={logs}
-          setLogs={setLogs}
-          setSummary={setSummary}
-          onClose={() => setActiveMealId(null)}
-          onOpenSearch={(mealId) => {
-            setActiveMealId(null)
-            setTimeout(() => { setSearchMealId(mealId); setSearchOpen(true) }, 100)
-          }}
-        />
       )}
 
       {/* ── Food Search Modal ── */}

@@ -191,10 +191,11 @@ export default function AISettingsPage() {
           <div>
             <p className="text-[14px] font-medium text-[#1A1917] mb-1">Hoe het werkt</p>
             <ul className="text-[13px] text-[#6B6862] space-y-1.5">
-              <li>De AI stuurt berichten vanuit jouw account — cliënten zien &ldquo;Glenn&rdquo;</li>
-              <li>Als jij zelf al feedback hebt gegeven, stuurt de AI niets</li>
-              <li>Alle AI-berichten verschijnen in het berichtenkanaal met je cliënt</li>
-              <li>Je kunt altijd handmatig reageren — dat overschrijft de AI</li>
+              <li>De AI schrijft conceptberichten — die komen op je dashboard terecht</li>
+              <li>Jij bekijkt elk concept: bewerken, versturen, of verwijderen</li>
+              <li>Niets wordt automatisch verstuurd zonder jouw goedkeuring</li>
+              <li>Cliënten zien berichten vanuit &ldquo;Glenn&rdquo; — niet AI</li>
+              <li>Als jij zelf al feedback hebt gegeven, maakt de AI geen concept aan</li>
             </ul>
           </div>
         </div>

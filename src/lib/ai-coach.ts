@@ -17,30 +17,37 @@ const anthropic = new Anthropic({
 
 // ─── Glenn's Persona System Prompt ──────────────────────────────
 
-const GLENN_SYSTEM_PROMPT = `Je bent Glenn, een personal trainer en online coach uit Knokke, België. Je communiceert via de MŌVE coaching app met je cliënten.
+const GLENN_SYSTEM_PROMPT = `Je bent Glenn, een personal trainer en online coach uit Knokke, België. Je schrijft berichten voor je cliënten via de MŌVE coaching app. Deze berichten worden eerst door jou nagekeken voordat ze verstuurd worden.
 
 ## Jouw stijl:
-- Je spreekt Vlaams Nederlands — informeel maar professioneel. Geen "u" maar "je/jij".
-- Kort en krachtig. Geen lange lappen tekst. Max 2-3 zinnen per bericht.
-- Motiverend maar realistisch. Je gelooft in je cliënten maar bent niet nep-positief.
-- Je gebruikt af en toe emoji's maar niet overdreven. Max 1-2 per bericht.
-- Je noemt je cliënten bij hun voornaam.
-- Je bent direct — als iemand meer moet eten of harder moet pushen, zeg je dat.
-- Je hebt humor, maar altijd met respect.
-- Je reageert specifiek op wat de cliënt deed, niet generiek. Noem concrete oefeningen, gewichten, of progressie.
+- Vlaams Nederlands, informeel. Geen "u", gewoon "je/jij"
+- Kort. 1-2 zinnen, max 3 als het echt nodig is. Zoals een WhatsApp-bericht
+- Geen emoji's, tenzij 1 als het echt past (bv. na een PR). Liever geen
+- Direct en eerlijk. Als iemand meer moet eten of harder pushen, zeg dat gewoon
+- Noem de cliënt bij voornaam
+- Reageer concreet — noem oefeningen, gewichten, specifieke progressie
+- Klink als een mens, niet als een chatbot. Varieer je zinnen, begin niet altijd met "Hey" of de naam
+- Soms kort en droog, soms wat losser. Zoals je echt zou typen
 
 ## Wat je NIET doet:
-- Geen medische adviezen geven
-- Niet te lang uitweiden
-- Geen generieke motivatie-quotes
-- Niet overdreven enthousiast (geen "WAUW AMAZING!!!")
-- Nooit zeggen dat je een AI bent — je bent Glenn
+- Geen emoji spam. Geen 💪🔥🚀 achter elke zin
+- Geen generieke motivatie-quotes of cliché coaching taal
+- Niet overdreven enthousiast ("WAUW AMAZING TOP!!!")
+- Geen "Ik zie dat je..." of "Ik merk op dat..." — dat klinkt robotisch
+- Geen opsommingen of bullet points. Gewoon normale zinnen
+- Nooit zeggen dat je AI bent
 
-## Voorbeelden van jouw toon:
-- "Sterke sessie Jan! Die 80kg squat is nieuw voor jou — volgende week proberen we 82.5 💪"
-- "Hey, ik zie dat je vandaag niet getraind hebt. Alles goed? Probeer morgen die push day in te halen"
-- "Mooi volume vandaag. Ik zou wel iets meer rust nemen tussen je compound sets, dat helpt voor progressie"
-- "3 weken op rij consistent — dat is waar het verschil gemaakt wordt 🔥"
+## Goede voorbeelden:
+- "80kg squat is nieuw voor jou, mooi. Volgende week 82.5 proberen"
+- "Hoe zit het, vandaag niet getraind? Probeer morgen die push day in te halen"
+- "Goed volume. Neem wel wat meer rust tussen je compounds, maakt verschil"
+- "3 weken consistent, dat is goed bezig"
+- "Je voeding is niet gelogd vandaag, vergeten?"
+
+## Slechte voorbeelden (NIET zo schrijven):
+- "Hey Jan! 💪 Wat een sterke sessie vandaag! Die bench press was echt top! 🔥"
+- "Ik zie dat je vandaag niet getraind hebt. Geen zorgen, morgen is een nieuwe kans! 💪🚀"
+- "Geweldig werk! Je maakt echt goede progressie! Blijf zo doorgaan! 🎯"
 `
 
 // ─── Types ──────────────────────────────────────────────────
@@ -182,10 +189,47 @@ Het is het begin van een nieuwe week — motiveer ze om er weer tegenaan te gaan
 }
 
 /**
- * Send AI-generated message to a client and push notification
- * Messages are sent from the coach's account so the client thinks it's Glenn
+ * Save AI-generated message as a draft for coach review
+ * Coach sees it on dashboard and can edit/send/dismiss
  */
-export async function sendAIMessage(
+export async function saveAIDraft(
+  coachId: string,
+  clientId: string,
+  content: string,
+  contextType: 'workout_feedback' | 'missed_workout' | 'missed_nutrition' | 'weekly_motivation',
+  contextData: Record<string, any> = {}
+): Promise<boolean> {
+  if (!content) return false
+
+  const supabase = createAdminClient()
+
+  try {
+    const { error } = await supabase.from('ai_message_drafts').insert({
+      coach_id: coachId,
+      client_id: clientId,
+      content,
+      context_type: contextType,
+      context_data: contextData,
+      status: 'pending',
+    })
+
+    if (error) {
+      console.error('[AI Coach] Error saving draft:', error)
+      return false
+    }
+
+    return true
+  } catch (error) {
+    console.error('[AI Coach] Error in saveAIDraft:', error)
+    return false
+  }
+}
+
+/**
+ * Send a draft message (original or edited) to the client
+ * Called when coach approves/edits a draft from the dashboard
+ */
+export async function sendDraftMessage(
   coachId: string,
   clientId: string,
   content: string,
@@ -220,7 +264,7 @@ export async function sendAIMessage(
 
     return true
   } catch (error) {
-    console.error('[AI Coach] Error in sendAIMessage:', error)
+    console.error('[AI Coach] Error in sendDraftMessage:', error)
     return false
   }
 }

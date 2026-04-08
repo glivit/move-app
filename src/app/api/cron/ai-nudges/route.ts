@@ -1,5 +1,5 @@
 import { createAdminClient } from '@/lib/supabase-admin'
-import { generateNudge, sendAIMessage, type NudgeContext } from '@/lib/ai-coach'
+import { generateNudge, saveAIDraft, type NudgeContext } from '@/lib/ai-coach'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -123,8 +123,12 @@ export async function GET(request: NextRequest) {
       const nudge = await generateNudge(context)
 
       if (nudge) {
-        const sent = await sendAIMessage(coachId, cp.client_id, nudge, `nudge-workout-${cp.client_id}`)
-        results.push({ clientId: cp.client_id, type: 'missed_workout', sent })
+        const saved = await saveAIDraft(coachId, cp.client_id, nudge, 'missed_workout', {
+          scheduledDay: templateDay?.name || 'training',
+          lastWorkoutDaysAgo,
+          clientName,
+        })
+        results.push({ clientId: cp.client_id, type: 'missed_workout', sent: saved })
       }
     }
 
@@ -182,8 +186,10 @@ export async function GET(request: NextRequest) {
 
         const nudge = await generateNudge(context)
         if (nudge) {
-          const sent = await sendAIMessage(coachId, client.id, nudge, `nudge-nutrition-${client.id}`)
-          results.push({ clientId: client.id, type: 'missed_nutrition', sent })
+          const saved = await saveAIDraft(coachId, client.id, nudge, 'missed_nutrition', {
+            clientName: client.full_name || 'Client',
+          })
+          results.push({ clientId: client.id, type: 'missed_nutrition', sent: saved })
         }
       }
     }

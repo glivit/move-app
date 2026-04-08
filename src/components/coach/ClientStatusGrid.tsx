@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase'
 import {
   Dumbbell, UtensilsCrossed, Send, ChevronRight,
   Flame, CheckCircle2, AlertTriangle, MessageCircle,
+  Settings, Calendar, Clock, Pencil,
 } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────
@@ -16,12 +17,15 @@ interface ClientStatus {
   fullName: string
   initials: string
   avatarUrl: string | null
+  package: string
 
   // Workout
   workoutsThisWeek: number
   expectedPerWeek: number
   workedOutToday: boolean
   workoutStreak: number
+  lastWorkoutDaysAgo: number | null
+  scheduledToday: string | null  // template day name if scheduled today
 
   // Nutrition
   hasNutritionPlan: boolean
@@ -30,6 +34,9 @@ interface ClientStatus {
   proteinLogged: number
   proteinTarget: number
   nutritionLoggedToday: boolean
+
+  // Check-in
+  hasPendingCheckin: boolean
 
   // Overall
   needsAttention: boolean
@@ -42,7 +49,6 @@ type FilterMode = 'all' | 'behind' | 'on-track'
 function getWeekStart() {
   const d = new Date()
   const day = d.getDay()
-  // Monday = 1, so offset: if Sunday (0) go back 6, else go back day-1
   d.setDate(d.getDate() - (day === 0 ? 6 : day - 1))
   d.setHours(0, 0, 0, 0)
   return d
@@ -54,7 +60,6 @@ function todayStr() {
 
 function getDayOfWeek(): number {
   const d = new Date().getDay()
-  // Convert: Sunday=7, Mon=1, Tue=2, ...
   return d === 0 ? 7 : d
 }
 
@@ -76,8 +81,8 @@ export function ClientStatusGrid() {
       const supabase = createClient()
       const today = todayStr()
       const weekStart = getWeekStart()
+      const isoDay = getDayOfWeek()
 
-      // Parallel fetches
       const [
         { data: profilesData },
         { data: sessionsData },
@@ -85,13 +90,17 @@ export function ClientStatusGrid() {
         { data: nutritionPlansData },
         { data: nutritionSummaryData },
         { data: allSessionsData },
+        { data: checkinsData },
+        { data: templateDaysData },
       ] = await Promise.all([
-        supabase.from('profiles').select('id, full_name, avatar_url').eq('role', 'client'),
+        supabase.from('profiles').select('id, full_name, avatar_url, package').eq('role', 'client'),
         supabase.from('workout_sessions').select('client_id, started_at, completed_at').gte('started_at', weekStart.toISOString()).not('completed_at', 'is', null),
-        supabase.from('client_programs').select('client_id, program_templates(days_per_week)').eq('status', 'active'),
+        supabase.from('client_programs').select('client_id, schedule').eq('is_active', true),
         supabase.from('nutrition_plans').select('client_id, calories_target, protein_g, meals').eq('is_active', true),
         supabase.from('nutrition_daily_summary').select('client_id, total_calories, total_protein').eq('date', today),
         supabase.from('workout_sessions').select('client_id, started_at, completed_at').not('completed_at', 'is', null).order('started_at', { ascending: false }),
+        supabase.from('checkins').select('client_id').eq('coach_reviewed', false),
+        supabase.from('program_template_days').select('id, name'),
       ])
 
       const profiles = profilesData || []
@@ -100,6 +109,14 @@ export function ClientStatusGrid() {
       const nutritionPlans = nutritionPlansData || []
       const nutritionSummary = nutritionSummaryData || []
       const allSessions = allSessionsData || []
+      const checkins = checkinsData || []
+      const templateDays = templateDaysData || []
+
+      // Build template day name lookup
+      const dayNameMap: Record<string, string> = {}
+      for (const td of templateDays) {
+        dayNameMap[td.id] = td.name
+      }
 
       const clientStatuses: ClientStatus[] = profiles.map((p: any) => {
         const fullName = p.full_name || 'Onbekend'
@@ -108,16 +125,28 @@ export function ClientStatusGrid() {
           ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
           : fullName.substring(0, 2)
 
-        // Workout data
+        // Workout data — use actual schedule for expectedPerWeek
         const clientSessions = sessions.filter((s: any) => s.client_id === p.id)
         const clientProgram = programs.find((pr: any) => pr.client_id === p.id) as any
-        const expectedPerWeek = clientProgram?.program_templates?.days_per_week || 3
+        const schedule = (clientProgram?.schedule || {}) as Record<string, string>
+        const expectedPerWeek = Object.keys(schedule).length || 0
         const workoutsThisWeek = clientSessions.length
         const workedOutToday = clientSessions.some((s: any) => s.completed_at?.startsWith(today))
 
+        // What's scheduled today?
+        const todayDayId = schedule[String(isoDay)]
+        const scheduledToday = todayDayId ? (dayNameMap[todayDayId] || 'Training') : null
+
+        // Last workout days ago
+        const clientAll = allSessions.filter((s: any) => s.client_id === p.id)
+        let lastWorkoutDaysAgo: number | null = null
+        if (clientAll.length > 0) {
+          const lastDate = new Date(clientAll[0].started_at)
+          lastWorkoutDaysAgo = Math.floor((Date.now() - lastDate.getTime()) / (1000 * 60 * 60 * 24))
+        }
+
         // Streak
         let streak = 0
-        const clientAll = allSessions.filter((s: any) => s.client_id === p.id)
         if (clientAll.length > 0) {
           const ws = new Date(weekStart)
           if (workoutsThisWeek > 0) streak = 1
@@ -141,34 +170,39 @@ export function ClientStatusGrid() {
         const proteinTarget = plan?.protein_g || 0
         const nutritionLoggedToday = caloriesLogged > 0
 
-        // Needs attention: behind on workouts OR not logging nutrition
-        // Expected workouts by today: proportional to day of week
+        // Check-in
+        const hasPendingCheckin = checkins.some((c: any) => c.client_id === p.id)
+
+        // Needs attention
         const dayOfWeek = getDayOfWeek()
-        const expectedByNow = Math.floor(expectedPerWeek * dayOfWeek / 7)
-        const workoutBehind = workoutsThisWeek < expectedByNow
+        const expectedByNow = expectedPerWeek > 0 ? Math.floor(expectedPerWeek * dayOfWeek / 7) : 0
+        const workoutBehind = expectedPerWeek > 0 && workoutsThisWeek < expectedByNow
         const nutritionBehind = hasNutritionPlan && !nutritionLoggedToday
-        const needsAttention = workoutBehind || nutritionBehind
+        const needsAttention = workoutBehind || nutritionBehind || hasPendingCheckin
 
         return {
           id: p.id,
           fullName,
           initials: initials.toUpperCase(),
           avatarUrl: p.avatar_url,
+          package: p.package || 'essential',
           workoutsThisWeek,
           expectedPerWeek,
           workedOutToday,
           workoutStreak: streak,
+          lastWorkoutDaysAgo,
+          scheduledToday,
           hasNutritionPlan,
           caloriesLogged,
           caloriesTarget,
           proteinLogged,
           proteinTarget,
           nutritionLoggedToday,
+          hasPendingCheckin,
           needsAttention,
         }
       })
 
-      // Sort: needs attention first, then alphabetically
       clientStatuses.sort((a, b) => {
         if (a.needsAttention !== b.needsAttention) return a.needsAttention ? -1 : 1
         return a.fullName.localeCompare(b.fullName, 'nl')
@@ -189,10 +223,13 @@ export function ClientStatusGrid() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
+      const client = clients.find(c => c.id === clientId)
+      const firstName = client?.fullName.split(' ')[0] || ''
+
       const messages: Record<string, string> = {
-        workout: 'Hey! 💪 Heb je vandaag al getraind? Probeer vandaag je sessie in te plannen. Elke workout telt!',
-        nutrition: 'Hey! 🍽️ Vergeet niet je voeding bij te houden vandaag. Het kost maar 2 minuten en helpt enorm voor je resultaten!',
-        general: 'Hey! 👋 Hoe gaat het? Check even je planning voor vandaag en laat me weten als ik ergens mee kan helpen!',
+        workout: `${firstName}, heb je vandaag al getraind? Probeer je sessie nog in te plannen`,
+        nutrition: `${firstName}, vergeet niet je voeding bij te houden vandaag`,
+        general: `Hey ${firstName}, hoe gaat het? Check even je planning en laat me weten als je ergens mee zit`,
       }
 
       await supabase.from('messages').insert({
@@ -210,7 +247,6 @@ export function ClientStatusGrid() {
     }
   }
 
-  // Filter logic
   const filtered = clients.filter(c => {
     if (filter === 'behind') return c.needsAttention
     if (filter === 'on-track') return !c.needsAttention
@@ -220,28 +256,22 @@ export function ClientStatusGrid() {
   const behindCount = clients.filter(c => c.needsAttention).length
   const onTrackCount = clients.filter(c => !c.needsAttention).length
 
-  // ─── Loading ────────────────────────────────────
-
   if (loading) {
     return (
       <div className="space-y-4">
         <div className="h-6 w-56 bg-[#F0EDE7] rounded animate-pulse" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="h-44 bg-white rounded-2xl border border-[#E8E4DC] animate-pulse" />
-          ))}
-        </div>
+        {[1, 2, 3].map(i => (
+          <div key={i} className="h-32 bg-white rounded-2xl border border-[#E8E4DC] animate-pulse" />
+        ))}
       </div>
     )
   }
-
-  // ─── Render ────────────────────────────────────
 
   return (
     <div>
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-[22px] font-semibold text-[#1A1917] tracking-[-0.02em]" style={{ fontFamily: 'var(--font-display)' }}>
-          Opvolging vandaag
+          Cliënten
         </h2>
         <div className="flex gap-1.5">
           {[
@@ -264,160 +294,117 @@ export function ClientStatusGrid() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="space-y-3">
         {filtered.map((client) => {
           const kcalPct = client.caloriesTarget > 0 ? Math.min(100, Math.round((client.caloriesLogged / client.caloriesTarget) * 100)) : 0
-          const protPct = client.proteinTarget > 0 ? Math.min(100, Math.round((client.proteinLogged / client.proteinTarget) * 100)) : 0
+          const workoutPct = client.expectedPerWeek > 0 ? Math.min(100, Math.round((client.workoutsThisWeek / client.expectedPerWeek) * 100)) : 0
 
           return (
             <div
               key={client.id}
-              className={`bg-white rounded-2xl border p-5 transition-all hover:shadow-md ${
+              className={`bg-white rounded-2xl border transition-all ${
                 client.needsAttention
                   ? 'border-[#FF3B30]/20 shadow-[0_0_0_1px_rgba(255,59,48,0.05)]'
                   : 'border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]'
               }`}
             >
-              {/* Header: Avatar + Name + Quick Send */}
-              <div className="flex items-center gap-3 mb-4">
+              {/* ── Top row: name + badges + actions ── */}
+              <div className="flex items-center gap-3 px-5 py-4">
                 <Link href={`/coach/clients/${client.id}`} className="flex items-center gap-3 flex-1 min-w-0 group">
-                  <div className="w-10 h-10 rounded-full bg-[#F5F2EC] flex items-center justify-center text-[13px] font-semibold text-[#8E8E93] flex-shrink-0 overflow-hidden">
+                  <div className="w-11 h-11 rounded-full bg-[#F5F2EC] flex items-center justify-center text-[13px] font-semibold text-[#8E8E93] flex-shrink-0 overflow-hidden">
                     {client.avatarUrl ? (
-                      <Image src={client.avatarUrl} alt="" width={40} height={40} className="w-full h-full object-cover" unoptimized loading="lazy" />
+                      <Image src={client.avatarUrl} alt="" width={44} height={44} className="w-full h-full object-cover" unoptimized loading="lazy" />
                     ) : client.initials}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[15px] font-semibold text-[#1A1917] truncate group-hover:text-[#D46A3A] transition-colors">
-                      {client.fullName}
-                    </p>
-                    <div className="flex items-center gap-2 mt-0.5">
+                    <div className="flex items-center gap-2">
+                      <p className="text-[16px] font-semibold text-[#1A1917] truncate group-hover:text-[#D46A3A] transition-colors">
+                        {client.fullName}
+                      </p>
                       {client.needsAttention && (
-                        <span className="text-[11px] font-semibold text-[#FF3B30] flex items-center gap-0.5">
+                        <span className="text-[11px] font-semibold text-[#FF3B30] flex items-center gap-0.5 shrink-0">
                           <AlertTriangle size={11} /> Achter
                         </span>
                       )}
                       {client.workoutStreak > 1 && (
-                        <span className="text-[11px] font-semibold text-[#FF9500] flex items-center gap-0.5">
-                          <Flame size={11} /> {client.workoutStreak}w streak
+                        <span className="text-[11px] font-semibold text-[#FF9500] flex items-center gap-0.5 shrink-0">
+                          <Flame size={11} /> {client.workoutStreak}w
+                        </span>
+                      )}
+                      {client.hasPendingCheckin && (
+                        <span className="text-[11px] font-semibold text-[#C47D15] flex items-center gap-0.5 shrink-0">
+                          Check-in
                         </span>
                       )}
                     </div>
+                    <p className="text-[12px] text-[#A09D96] mt-0.5">
+                      {client.lastWorkoutDaysAgo !== null
+                        ? client.lastWorkoutDaysAgo === 0
+                          ? 'Vandaag getraind'
+                          : client.lastWorkoutDaysAgo === 1
+                          ? 'Gisteren getraind'
+                          : `${client.lastWorkoutDaysAgo} dagen geleden getraind`
+                        : 'Nog niet getraind'}
+                      {client.scheduledToday && !client.workedOutToday && (
+                        <span className="text-[#D46A3A]"> · {client.scheduledToday} gepland</span>
+                      )}
+                    </p>
                   </div>
                 </Link>
 
-                {/* Quick prompt button — always visible next to name */}
-                <button
-                  onClick={(e) => { e.stopPropagation(); sendPrompt(client.id, 'general') }}
-                  disabled={sendingPrompt !== null || promptSent.has(`${client.id}-general`)}
-                  className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
-                    promptSent.has(`${client.id}-general`)
-                      ? 'bg-[#34C759]/10'
-                      : 'bg-[#F5F2EC] hover:bg-[#D46A3A]/10 active:scale-95'
-                  }`}
-                  title="Stuur bericht"
-                >
-                  {promptSent.has(`${client.id}-general`) ? (
-                    <CheckCircle2 size={16} className="text-[#34C759]" />
-                  ) : sendingPrompt === `${client.id}-general` ? (
-                    <div className="w-4 h-4 border-2 border-[#D46A3A] border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <MessageCircle size={16} className="text-[#A09D96]" />
-                  )}
-                </button>
-
-                <Link href={`/coach/clients/${client.id}`} className="flex-shrink-0">
-                  <ChevronRight size={16} className="text-[#D5D0C8] hover:text-[#1A1917] transition-colors" strokeWidth={1.5} />
-                </Link>
+                <ChevronRight size={16} className="text-[#D5D0C8] flex-shrink-0" strokeWidth={1.5} />
               </div>
 
-              {/* Workout Row */}
-              <div className="flex items-center gap-3 py-2.5 border-t border-[#F5F2EC]">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                  client.workedOutToday ? 'bg-[#34C759]/10' : 'bg-[#F5F2EC]'
-                }`}>
-                  <Dumbbell size={16} className={client.workedOutToday ? 'text-[#34C759]' : 'text-[#A09D96]'} strokeWidth={1.5} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[12px] font-medium text-[#6B6862]">Workout</span>
-                    <div className="flex items-center gap-2">
-                      {client.workedOutToday ? (
-                        <span className="text-[11px] font-semibold text-[#34C759] flex items-center gap-0.5">
-                          <CheckCircle2 size={11} /> vandaag
-                        </span>
-                      ) : (
-                        <span className="text-[11px] font-medium text-[#A09D96]">
-                          niet vandaag
-                        </span>
-                      )}
-                      <span className="text-[11px] text-[#C5C2BC]">|</span>
+              {/* ── Stats row ── */}
+              <div className="px-5 pb-3 flex items-center gap-6">
+                {/* Workout progress */}
+                <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                  <Dumbbell size={15} className={client.workedOutToday ? 'text-[#34C759] shrink-0' : 'text-[#C5C2BC] shrink-0'} strokeWidth={1.5} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
                       <span className={`text-[12px] font-semibold tabular-nums ${
-                        client.workoutsThisWeek >= client.expectedPerWeek
+                        client.workoutsThisWeek >= client.expectedPerWeek && client.expectedPerWeek > 0
                           ? 'text-[#34C759]'
                           : client.workoutsThisWeek > 0
                           ? 'text-[#FF9500]'
-                          : 'text-[#FF3B30]'
+                          : client.expectedPerWeek > 0
+                          ? 'text-[#FF3B30]'
+                          : 'text-[#A09D96]'
                       }`}>
-                        {client.workoutsThisWeek}/{client.expectedPerWeek} deze week
+                        {client.expectedPerWeek > 0 ? `${client.workoutsThisWeek}/${client.expectedPerWeek} deze week` : 'Geen schema'}
                       </span>
                     </div>
-                  </div>
-                  <div className="h-1.5 bg-[#F5F2EC] rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-500"
-                      style={{
-                        width: `${Math.min(100, Math.round((client.workoutsThisWeek / client.expectedPerWeek) * 100))}%`,
-                        backgroundColor: client.workoutsThisWeek >= client.expectedPerWeek
-                          ? '#34C759'
-                          : client.workoutsThisWeek > 0
-                          ? '#FF9500'
-                          : '#FF3B30',
-                      }}
-                    />
-                  </div>
-                </div>
-                {/* Quick workout prompt */}
-                {!client.workedOutToday && (
-                  <button
-                    onClick={() => sendPrompt(client.id, 'workout')}
-                    disabled={sendingPrompt !== null || promptSent.has(`${client.id}-workout`)}
-                    className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${
-                      promptSent.has(`${client.id}-workout`)
-                        ? 'bg-[#34C759]/10'
-                        : 'bg-[#F5F2EC] hover:bg-[#D46A3A]/10 active:scale-95'
-                    }`}
-                    title="Herinnering workout"
-                  >
-                    {promptSent.has(`${client.id}-workout`) ? (
-                      <CheckCircle2 size={12} className="text-[#34C759]" />
-                    ) : sendingPrompt === `${client.id}-workout` ? (
-                      <div className="w-3 h-3 border-2 border-[#D46A3A] border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <Send size={12} className="text-[#A09D96]" />
+                    {client.expectedPerWeek > 0 && (
+                      <div className="h-1.5 bg-[#F5F2EC] rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: `${workoutPct}%`,
+                            backgroundColor: client.workoutsThisWeek >= client.expectedPerWeek ? '#34C759' : client.workoutsThisWeek > 0 ? '#FF9500' : '#FF3B30',
+                          }}
+                        />
+                      </div>
                     )}
-                  </button>
-                )}
-              </div>
-
-              {/* Nutrition Row — kcal + protein bars */}
-              <div className="flex items-center gap-3 py-2.5 border-t border-[#F5F2EC]">
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                  client.nutritionLoggedToday ? 'bg-[#D46A3A]/10' : 'bg-[#F5F2EC]'
-                }`}>
-                  <UtensilsCrossed size={16} className={client.nutritionLoggedToday ? 'text-[#D46A3A]' : 'text-[#A09D96]'} strokeWidth={1.5} />
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  {client.hasNutritionPlan ? (
-                    <div className="space-y-1.5">
-                      {/* Kcal bar */}
-                      <div>
-                        <div className="flex items-center justify-between mb-0.5">
-                          <span className="text-[11px] font-medium text-[#6B6862]">Kcal</span>
-                          <span className={`text-[11px] font-semibold tabular-nums ${
+
+                {/* Nutrition progress */}
+                <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                  <UtensilsCrossed size={15} className={client.nutritionLoggedToday ? 'text-[#D46A3A] shrink-0' : 'text-[#C5C2BC] shrink-0'} strokeWidth={1.5} />
+                  <div className="flex-1 min-w-0">
+                    {client.hasNutritionPlan ? (
+                      <>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className={`text-[12px] font-semibold tabular-nums ${
                             kcalPct >= 80 ? 'text-[#34C759]' : kcalPct > 0 ? 'text-[#D46A3A]' : 'text-[#A09D96]'
                           }`}>
-                            {client.caloriesLogged}/{client.caloriesTarget}
+                            {client.caloriesLogged}/{client.caloriesTarget} kcal
                           </span>
+                          {client.proteinTarget > 0 && (
+                            <span className="text-[11px] text-[#A09D96] tabular-nums">
+                              {client.proteinLogged}/{client.proteinTarget}g eiwit
+                            </span>
+                          )}
                         </div>
                         <div className="h-1.5 bg-[#F5F2EC] rounded-full overflow-hidden">
                           <div
@@ -428,55 +415,82 @@ export function ClientStatusGrid() {
                             }}
                           />
                         </div>
-                      </div>
-                      {/* Protein bar */}
-                      {client.proteinTarget > 0 && (
-                        <div>
-                          <div className="flex items-center justify-between mb-0.5">
-                            <span className="text-[11px] font-medium text-[#6B6862]">Protein</span>
-                            <span className={`text-[11px] font-semibold tabular-nums ${
-                              protPct >= 80 ? 'text-[#34C759]' : protPct > 0 ? 'text-[#8B5CF6]' : 'text-[#A09D96]'
-                            }`}>
-                              {client.proteinLogged}g/{client.proteinTarget}g
-                            </span>
-                          </div>
-                          <div className="h-1.5 bg-[#F5F2EC] rounded-full overflow-hidden">
-                            <div
-                              className="h-full rounded-full transition-all duration-500"
-                              style={{
-                                width: `${protPct}%`,
-                                backgroundColor: protPct >= 80 ? '#34C759' : protPct > 0 ? '#8B5CF6' : '#E8E4DC',
-                              }}
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <span className="text-[12px] text-[#C5C2BC] italic">Geen voedingsplan</span>
-                  )}
+                      </>
+                    ) : (
+                      <span className="text-[12px] text-[#C5C2BC]">Geen voedingsplan</span>
+                    )}
+                  </div>
                 </div>
-                {/* Quick nutrition prompt */}
-                {client.hasNutritionPlan && !client.nutritionLoggedToday && (
+              </div>
+
+              {/* ── Action buttons ── */}
+              <div className="px-5 py-3 border-t border-[#F5F2EC] flex items-center gap-2">
+                <Link
+                  href={`/coach/clients/${client.id}`}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-[#6B6862] hover:bg-[#F5F2EC] transition-colors"
+                >
+                  <Settings size={13} strokeWidth={1.5} />
+                  Programma
+                </Link>
+                <Link
+                  href={`/coach/clients/${client.id}/nutrition`}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-[#6B6862] hover:bg-[#F5F2EC] transition-colors"
+                >
+                  <UtensilsCrossed size={13} strokeWidth={1.5} />
+                  Voeding
+                </Link>
+                {client.hasPendingCheckin && (
+                  <Link
+                    href={`/coach/check-ins?client=${client.id}`}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold text-[#C47D15] bg-[#C47D15]/8 hover:bg-[#C47D15]/15 transition-colors"
+                  >
+                    <Calendar size={13} strokeWidth={1.5} />
+                    Check-in
+                  </Link>
+                )}
+
+                {/* Quick message — push right */}
+                <div className="ml-auto flex items-center gap-1.5">
+                  {!client.workedOutToday && client.scheduledToday && (
+                    <button
+                      onClick={() => sendPrompt(client.id, 'workout')}
+                      disabled={sendingPrompt !== null || promptSent.has(`${client.id}-workout`)}
+                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
+                        promptSent.has(`${client.id}-workout`)
+                          ? 'bg-[#34C759]/10 text-[#34C759]'
+                          : 'bg-[#F5F2EC] text-[#A09D96] hover:bg-[#D46A3A]/10 hover:text-[#D46A3A]'
+                      }`}
+                      title="Herinnering workout"
+                    >
+                      {promptSent.has(`${client.id}-workout`) ? (
+                        <><CheckCircle2 size={11} /> Verstuurd</>
+                      ) : sendingPrompt === `${client.id}-workout` ? (
+                        <div className="w-3 h-3 border-2 border-[#D46A3A] border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <><Dumbbell size={11} /> Herinnering</>
+                      )}
+                    </button>
+                  )}
+
                   <button
-                    onClick={() => sendPrompt(client.id, 'nutrition')}
-                    disabled={sendingPrompt !== null || promptSent.has(`${client.id}-nutrition`)}
-                    className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${
-                      promptSent.has(`${client.id}-nutrition`)
+                    onClick={() => sendPrompt(client.id, 'general')}
+                    disabled={sendingPrompt !== null || promptSent.has(`${client.id}-general`)}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all ${
+                      promptSent.has(`${client.id}-general`)
                         ? 'bg-[#34C759]/10'
                         : 'bg-[#F5F2EC] hover:bg-[#D46A3A]/10 active:scale-95'
                     }`}
-                    title="Herinnering voeding"
+                    title="Stuur bericht"
                   >
-                    {promptSent.has(`${client.id}-nutrition`) ? (
-                      <CheckCircle2 size={12} className="text-[#34C759]" />
-                    ) : sendingPrompt === `${client.id}-nutrition` ? (
-                      <div className="w-3 h-3 border-2 border-[#D46A3A] border-t-transparent rounded-full animate-spin" />
+                    {promptSent.has(`${client.id}-general`) ? (
+                      <CheckCircle2 size={14} className="text-[#34C759]" />
+                    ) : sendingPrompt === `${client.id}-general` ? (
+                      <div className="w-3.5 h-3.5 border-2 border-[#D46A3A] border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <Send size={12} className="text-[#A09D96]" />
+                      <MessageCircle size={14} className="text-[#A09D96]" />
                     )}
                   </button>
-                )}
+                </div>
               </div>
             </div>
           )
@@ -486,7 +500,7 @@ export function ClientStatusGrid() {
       {filtered.length === 0 && (
         <div className="text-center py-12">
           <p className="text-[14px] text-[#A09D96]">
-            {filter === 'behind' ? 'Geen cliënten achter op schema!' : 'Geen cliënten gevonden.'}
+            {filter === 'behind' ? 'Geen cliënten achter op schema' : 'Geen cliënten gevonden'}
           </p>
         </div>
       )}
