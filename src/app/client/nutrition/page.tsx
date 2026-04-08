@@ -393,6 +393,22 @@ function AddFoodBottomSheet({
 
     const newFoods = [...currentFoods, newFood]
 
+    // Optimistic update: show the food immediately
+    const newLog: MealLog = {
+      meal_id: meal.id,
+      meal_name: meal.name,
+      completed: existing?.completed || false,
+      foods_eaten: newFoods,
+      client_notes: existing?.client_notes || null,
+      completed_at: existing?.completed_at || null,
+    }
+    const upd = new Map(logs)
+    upd.set(meal.id, newLog)
+    setLogs(upd)
+
+    setJustAdded(prev => new Set(prev).add(key))
+    setTimeout(() => setJustAdded(prev => { const n = new Set(prev); n.delete(key); return n }), 1000)
+
     try {
       const res = await fetch('/api/nutrition-log', {
         method: 'POST',
@@ -409,24 +425,6 @@ function AddFoodBottomSheet({
       })
 
       if (res.ok) {
-        const newLog: MealLog = {
-          meal_id: meal.id,
-          meal_name: meal.name,
-          completed: existing?.completed || false,
-          foods_eaten: newFoods,
-          client_notes: existing?.client_notes || null,
-          completed_at: existing?.completed_at || null,
-        }
-        const upd = new Map(logs)
-        upd.set(meal.id, newLog)
-        setLogs(upd)
-
-        setJustAdded(prev => new Set(prev).add(key))
-        setTimeout(() => setJustAdded(prev => { const n = new Set(prev); n.delete(key); return n }), 1000)
-
-        const sumRes = await fetch(`/api/nutrition-log?date=${dateStr}`)
-        const sumData = await sumRes.json()
-        if (sumData.summary) setSummary(sumData.summary)
         invalidateCache('/api/dashboard')
       }
     } catch (err) {
@@ -714,6 +712,7 @@ export default function ClientNutritionPage() {
           foods: (m.foods || []).map((f: any, fi: number) => ({
             ...f,
             id: f.id || `plan-${i}-food-${fi}-${(f.name || '').replace(/\s+/g, '-').toLowerCase()}`,
+            checked: f.checked ?? false,
           })),
         }))
         setPlan({ ...planData, meals: fixedMeals })
@@ -749,6 +748,7 @@ export default function ClientNutritionPage() {
           foods: (m.foods || []).map((f: any, fi: number) => ({
             ...f,
             id: f.id || `yplan-${i}-food-${fi}-${(f.name || '').replace(/\s+/g, '-').toLowerCase()}`,
+            checked: false, // Always unchecked for new day
           })),
         }))
 
@@ -779,32 +779,33 @@ export default function ClientNutritionPage() {
       setLogs(logMap)
       setSummary(data.summary || null)
 
-      // Load recent foods from last 7 days
+      // Load recent foods from last 7 days (parallel fetch for performance)
       const recentMap = new Map<string, { frequency: number; per100g: any; brand?: string }>()
       const today = new Date(dateStr)
-      for (let i = 0; i < 7; i++) {
+      const datePromises = Array.from({ length: 7 }, (_, i) => {
         const d = new Date(today)
         d.setDate(d.getDate() - i)
-        const dStr = d.toISOString().split('T')[0]
-        try {
-          const rRes = await fetch(`/api/nutrition-log?date=${dStr}`)
-          const rData = await rRes.json()
-          for (const log of rData.logs || []) {
-            for (const food of log.foods_eaten || []) {
-              const key = food.name
-              const existing = recentMap.get(key)
-              if (existing) {
-                existing.frequency += 1
-              } else {
-                recentMap.set(key, {
-                  frequency: 1,
-                  per100g: food.per100g,
-                  brand: food.brand,
-                })
-              }
+        return fetch(`/api/nutrition-log?date=${d.toISOString().split('T')[0]}`)
+          .then(r => r.json())
+          .catch(() => ({ logs: [] }))
+      })
+      const recentResults = await Promise.all(datePromises)
+      for (const rData of recentResults) {
+        for (const log of rData.logs || []) {
+          for (const food of log.foods_eaten || []) {
+            const key = food.name
+            const existing = recentMap.get(key)
+            if (existing) {
+              existing.frequency += 1
+            } else {
+              recentMap.set(key, {
+                frequency: 1,
+                per100g: food.per100g,
+                brand: food.brand,
+              })
             }
           }
-        } catch {}
+        }
       }
 
       const sortedRecent = Array.from(recentMap.entries())
@@ -830,6 +831,7 @@ export default function ClientNutritionPage() {
   }, [loadData])
 
   function navigateDate(offset: number) {
+    setBottomSheetOpen(false) // Close bottom sheet when changing day
     const d = new Date(selectedDate)
     d.setDate(d.getDate() + offset)
     setSelectedDate(d)
@@ -890,7 +892,8 @@ export default function ClientNutritionPage() {
     }
   }
 
-  async function saveMealFoods(meal: MealMoment, newFoods: FoodEntry[]) {
+  // Save meal foods to API (background, non-blocking)
+  const saveMealToAPI = useCallback(async (meal: MealMoment, newFoods: FoodEntry[]) => {
     const existing = logs.get(meal.id)
     try {
       const res = await fetch('/api/nutrition-log', {
@@ -907,38 +910,46 @@ export default function ClientNutritionPage() {
         }),
       })
       if (res.ok) {
-        const newLog: MealLog = {
-          meal_id: meal.id,
-          meal_name: meal.name,
-          completed: existing?.completed || false,
-          foods_eaten: newFoods,
-          client_notes: existing?.client_notes || null,
-          completed_at: existing?.completed_at || null,
-        }
-        const upd = new Map(logs)
-        upd.set(meal.id, newLog)
-        setLogs(upd)
-
-        const sumRes = await fetch(`/api/nutrition-log?date=${dateStr}`)
-        const sumData = await sumRes.json()
-        if (sumData.summary) setSummary(sumData.summary)
         invalidateCache('/api/dashboard')
       }
     } catch (err) {
       console.error('Save meal foods error:', err)
     }
+  }, [logs, plan, dateStr])
+
+  // Optimistic update: update state FIRST, then save to API in background
+  function updateMealFoods(meal: MealMoment, newFoods: FoodEntry[]) {
+    const existing = logs.get(meal.id)
+    const newLog: MealLog = {
+      meal_id: meal.id,
+      meal_name: meal.name,
+      completed: existing?.completed || false,
+      foods_eaten: newFoods,
+      client_notes: existing?.client_notes || null,
+      completed_at: existing?.completed_at || null,
+    }
+    const upd = new Map(logs)
+    upd.set(meal.id, newLog)
+    setLogs(upd)
+    // Fire API save in background (don't await)
+    saveMealToAPI(meal, newFoods)
   }
 
-  function toggleFoodChecked(meal: MealMoment, foodId: string, foods: FoodEntry[]) {
+  function toggleFoodChecked(meal: MealMoment, foodId: string) {
+    // Read latest foods from current logs state
+    const existing = logs.get(meal.id)
+    const foods = existing?.foods_eaten || meal.foods || []
     const newFoods = foods.map(f =>
       f.id === foodId ? { ...f, checked: !f.checked } : f
     )
-    saveMealFoods(meal, newFoods)
+    updateMealFoods(meal, newFoods)
   }
 
-  function deleteFood(meal: MealMoment, foodId: string, foods: FoodEntry[]) {
+  function deleteFood(meal: MealMoment, foodId: string) {
+    const existing = logs.get(meal.id)
+    const foods = existing?.foods_eaten || meal.foods || []
     const newFoods = foods.filter(f => f.id !== foodId)
-    saveMealFoods(meal, newFoods)
+    updateMealFoods(meal, newFoods)
   }
 
   if (loading) {
@@ -1091,7 +1102,7 @@ export default function ClientNutritionPage() {
                       >
                         {/* Checkbox on left */}
                         <button
-                          onClick={() => toggleFoodChecked(meal, food.id, foods)}
+                          onClick={() => toggleFoodChecked(meal, food.id)}
                           className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all ${
                             isChecked
                               ? 'bg-[#3D8B5C]'
@@ -1117,7 +1128,7 @@ export default function ClientNutritionPage() {
 
                         {/* Delete button — visible on mobile */}
                         <button
-                          onClick={() => deleteFood(meal, food.id, foods)}
+                          onClick={() => deleteFood(meal, food.id)}
                           className="p-1.5 text-[#E0E0DE] hover:text-[#E53935] transition-colors shrink-0"
                         >
                           <Trash2 strokeWidth={1.5} className="w-3.5 h-3.5" />
