@@ -609,6 +609,19 @@ interface WorkoutSession {
 // --- Auto-save helpers ---
 const STORAGE_KEY = 'move_active_workout'
 
+interface AddedExerciseData {
+  tempId: string
+  exercise_id: string
+  name: string
+  body_part?: string
+  equipment?: string
+  gif_url?: string | null
+  sets: number
+  reps_min: number
+  reps_max: number
+  rest_seconds: number
+}
+
 interface SavedWorkoutState {
   sessionId: string
   dayId: string
@@ -618,6 +631,7 @@ interface SavedWorkoutState {
   exerciseNotes?: Record<string, string>
   exerciseOrder?: string[]
   cardioCompleted?: Record<string, number>
+  addedExercises?: AddedExerciseData[]
 }
 
 function saveWorkoutState(state: SavedWorkoutState) {
@@ -1253,14 +1267,30 @@ function ActiveWorkoutPage() {
     return () => clearInterval(interval)
   }, [activeRestTimer?.endTime, playBeep, haptic])
 
-  // --- Auto-save (includes notes + exercise order + cardio) ---
+  // --- Auto-save (includes notes + exercise order + cardio + added exercises) ---
   useEffect(() => {
     if (!session || !dayId || !programId || Object.keys(sets).length === 0) return
+    // Collect added exercises data so they can be fully restored
+    const addedExercises: AddedExerciseData[] = exercises
+      .filter(e => e.id.startsWith('added-'))
+      .map(e => ({
+        tempId: e.id,
+        exercise_id: e.exercise_id,
+        name: e.exercises?.name || '',
+        body_part: e.exercises?.body_part,
+        equipment: e.exercises?.equipment,
+        gif_url: e.exercises?.gif_url,
+        sets: e.sets,
+        reps_min: e.reps_min,
+        reps_max: e.reps_max,
+        rest_seconds: e.rest_seconds,
+      }))
     saveWorkoutState({
       sessionId: session.id, dayId, programId, sets, savedAt: Date.now(),
       exerciseNotes,
       exerciseOrder: exercises.map(e => e.id),
       cardioCompleted,
+      addedExercises,
     })
   }, [sets, session, dayId, programId, exerciseNotes, exercises, cardioCompleted])
 
@@ -1278,6 +1308,69 @@ function ActiveWorkoutPage() {
       window.removeEventListener('beforeunload', persist)
     }
   }, [dayId, programId])
+
+  // --- Auto-save completed sets to database (crash protection) ---
+  const dbSaveTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const lastDbSaveRef = useRef<string>('')
+
+  useEffect(() => {
+    if (!session) return
+    clearTimeout(dbSaveTimerRef.current)
+
+    // Debounce: save to DB 3 seconds after last set change
+    dbSaveTimerRef.current = setTimeout(async () => {
+      try {
+        const currentExercises = exercises
+        const allCompletedSets: Array<{
+          exercise_id: string
+          set_number: number
+          prescribed_reps: number | null
+          actual_reps: number | null
+          weight_kg: number | null
+          is_warmup: boolean
+          completed: boolean
+          is_pr: boolean
+        }> = []
+
+        for (const [templateExId, exerciseSets] of Object.entries(sets)) {
+          const exerciseRef = currentExercises.find(e => e.id === templateExId)
+          if (!exerciseRef?.exercise_id) continue
+
+          for (const s of exerciseSets) {
+            if (!s.completed || (!s.weight_kg && !s.actual_reps)) continue
+            allCompletedSets.push({
+              exercise_id: exerciseRef.exercise_id,
+              set_number: s.set_number,
+              prescribed_reps: s.prescribed_reps != null ? Math.round(Number(s.prescribed_reps) || 0) : null,
+              actual_reps: s.actual_reps != null ? Math.round(Number(s.actual_reps) || 0) : null,
+              weight_kg: s.weight_kg != null ? Math.min(Number(s.weight_kg) || 0, 9999.99) : null,
+              is_warmup: s.is_warmup || false,
+              completed: true,
+              is_pr: s.is_pr || false,
+            })
+          }
+        }
+
+        // Only save if data changed
+        const hash = JSON.stringify(allCompletedSets)
+        if (hash === lastDbSaveRef.current || allCompletedSets.length === 0) return
+        lastDbSaveRef.current = hash
+
+        const res = await fetch('/api/workout-save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId: session.id, sets: allCompletedSets }),
+        })
+        if (res.ok) {
+          console.log('[auto-save] Saved', allCompletedSets.length, 'completed sets to DB')
+        }
+      } catch (err) {
+        console.warn('[auto-save] DB save failed (will retry):', err)
+      }
+    }, 3000)
+
+    return () => clearTimeout(dbSaveTimerRef.current)
+  }, [sets, session, exercises])
 
   // --- Check for addExercise param ---
   useEffect(() => {
@@ -1330,12 +1423,50 @@ function ActiveWorkoutPage() {
             if (saved.exerciseNotes) setExerciseNotes(saved.exerciseNotes)
             // Restore cardio progress
             if (saved.cardioCompleted) setCardioCompleted(saved.cardioCompleted)
-            // Restore exercise order
+            // Restore exercise order (including added exercises)
             if (saved.exerciseOrder && saved.exerciseOrder.length > 0) {
-              const orderedExercises = saved.exerciseOrder
-                .map(id => exercisesData.find(e => e.id === id))
-                .filter(Boolean) as ProgramTemplateExercise[]
-              // Add any new exercises not in saved order
+              // Rebuild added exercises from saved data
+              const addedExMap = new Map<string, AddedExerciseData>()
+              for (const ae of saved.addedExercises || []) {
+                addedExMap.set(ae.tempId, ae)
+              }
+
+              const orderedExercises: ProgramTemplateExercise[] = []
+              for (const id of saved.exerciseOrder) {
+                // Try find in DB exercises
+                const dbEx = exercisesData.find(e => e.id === id)
+                if (dbEx) {
+                  orderedExercises.push(dbEx)
+                } else if (id.startsWith('added-') && addedExMap.has(id)) {
+                  // Rebuild the added exercise from saved data
+                  const ae = addedExMap.get(id)!
+                  orderedExercises.push({
+                    id: ae.tempId,
+                    exercise_id: ae.exercise_id,
+                    sets: ae.sets,
+                    reps_min: ae.reps_min,
+                    reps_max: ae.reps_max,
+                    rest_seconds: ae.rest_seconds,
+                    tempo: '',
+                    rpe_target: 0,
+                    weight_suggestion: 0,
+                    notes: '',
+                    exercises: {
+                      id: ae.exercise_id,
+                      name: ae.name,
+                      name_nl: ae.name,
+                      body_part: ae.body_part || '',
+                      target_muscle: '',
+                      equipment: ae.equipment || '',
+                      gif_url: ae.gif_url || '',
+                      video_url: null,
+                      instructions: '',
+                      coach_tips: '',
+                    } as Exercise,
+                  })
+                }
+              }
+              // Add any new DB exercises not in saved order
               for (const ex of exercisesData) {
                 if (!orderedExercises.find(o => o.id === ex.id)) orderedExercises.push(ex)
               }
@@ -1429,7 +1560,7 @@ function ActiveWorkoutPage() {
           const supabase = createClient()
           const { data: previousBest } = await supabase
             .from('workout_sets').select('weight_kg')
-            .eq('exercise_id', exerciseRef?.exercise_id || exerciseId).eq('completed', true).eq('is_warmup', false)
+            .eq('exercise_id', exerciseRef?.exercise_id || '00000000-0000-0000-0000-000000000000').eq('completed', true).eq('is_warmup', false)
             .order('weight_kg', { ascending: false }).limit(1)
           if (!previousBest?.length || (weight > (previousBest[0].weight_kg || 0))) isPR = true
         } catch { /* PR check is non-critical */ }
@@ -1679,7 +1810,12 @@ function ActiveWorkoutPage() {
 
     for (const [templateExId, exerciseSets] of Object.entries(sets)) {
       const exerciseRef = exercises.find(e => e.id === templateExId)
-      const actualExerciseId = exerciseRef?.exercise_id || templateExId
+      // CRITICAL: never use templateExId as exercise_id — it may be "added-..." which is not a valid UUID
+      if (!exerciseRef?.exercise_id) {
+        console.warn('[handleFinish] Skipping sets for unknown exercise:', templateExId)
+        continue
+      }
+      const actualExerciseId = exerciseRef.exercise_id
 
       for (const s of exerciseSets) {
         // Skip sets with no data at all
@@ -1706,7 +1842,11 @@ function ActiveWorkoutPage() {
     // Add cardio exercises as single sets (duration stored in actual_reps as seconds)
     for (const [exerciseId, durationSec] of Object.entries(cardioCompleted)) {
       const exerciseRef = exercises.find(e => e.id === exerciseId)
-      const actualExerciseId = exerciseRef?.exercise_id || exerciseId
+      if (!exerciseRef?.exercise_id) {
+        console.warn('[handleFinish] Skipping cardio for unknown exercise:', exerciseId)
+        continue
+      }
+      const actualExerciseId = exerciseRef.exercise_id
       allSetsToSave.push({
         exercise_id: actualExerciseId,
         set_number: 1,
@@ -1814,7 +1954,24 @@ function ActiveWorkoutPage() {
   // --- Minimize workout (persistent bar) ---
   const handleMinimize = () => {
     if (!session || !dayId || !programId) return
-    saveWorkoutState({ sessionId: session.id, dayId, programId, sets, savedAt: Date.now() })
+    const addedExercises: AddedExerciseData[] = exercises
+      .filter(e => e.id.startsWith('added-'))
+      .map(e => ({
+        tempId: e.id,
+        exercise_id: e.exercise_id,
+        name: e.exercises?.name || '',
+        body_part: e.exercises?.body_part,
+        equipment: e.exercises?.equipment,
+        gif_url: e.exercises?.gif_url,
+        sets: e.sets,
+        reps_min: e.reps_min,
+        reps_max: e.reps_max,
+        rest_seconds: e.rest_seconds,
+      }))
+    saveWorkoutState({
+      sessionId: session.id, dayId, programId, sets, savedAt: Date.now(),
+      exerciseNotes, exerciseOrder: exercises.map(e => e.id), cardioCompleted, addedExercises,
+    })
     try {
       localStorage.setItem('move_minimized_workout', JSON.stringify({
         sessionId: session.id,
