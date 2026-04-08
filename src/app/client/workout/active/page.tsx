@@ -617,6 +617,7 @@ interface SavedWorkoutState {
   savedAt: number
   exerciseNotes?: Record<string, string>
   exerciseOrder?: string[]
+  cardioCompleted?: Record<string, number>
 }
 
 function saveWorkoutState(state: SavedWorkoutState) {
@@ -1163,8 +1164,10 @@ function ActiveWorkoutPage() {
   // Refs for auto-save
   const setsRef = useRef(sets)
   const sessionRef = useRef(session)
+  const cardioCompletedRef = useRef(cardioCompleted)
   useEffect(() => { setsRef.current = sets }, [sets])
   useEffect(() => { sessionRef.current = session }, [session])
+  useEffect(() => { cardioCompletedRef.current = cardioCompleted }, [cardioCompleted])
 
   // --- KG/LBS conversion helpers ---
   const KG_TO_LBS = 2.20462
@@ -1250,21 +1253,22 @@ function ActiveWorkoutPage() {
     return () => clearInterval(interval)
   }, [activeRestTimer?.endTime, playBeep, haptic])
 
-  // --- Auto-save (includes notes + exercise order) ---
+  // --- Auto-save (includes notes + exercise order + cardio) ---
   useEffect(() => {
     if (!session || !dayId || !programId || Object.keys(sets).length === 0) return
     saveWorkoutState({
       sessionId: session.id, dayId, programId, sets, savedAt: Date.now(),
       exerciseNotes,
       exerciseOrder: exercises.map(e => e.id),
+      cardioCompleted,
     })
-  }, [sets, session, dayId, programId, exerciseNotes, exercises])
+  }, [sets, session, dayId, programId, exerciseNotes, exercises, cardioCompleted])
 
   useEffect(() => {
     const persist = () => {
       const s = sessionRef.current
       if (!s || !dayId || !programId) return
-      saveWorkoutState({ sessionId: s.id, dayId, programId, sets: setsRef.current, savedAt: Date.now() })
+      saveWorkoutState({ sessionId: s.id, dayId, programId, sets: setsRef.current, savedAt: Date.now(), cardioCompleted: cardioCompletedRef.current })
     }
     const handleVisibility = () => { if (document.visibilityState === 'hidden') persist() }
     document.addEventListener('visibilitychange', handleVisibility)
@@ -1324,6 +1328,8 @@ function ActiveWorkoutPage() {
             setSets(saved.sets)
             // Restore notes
             if (saved.exerciseNotes) setExerciseNotes(saved.exerciseNotes)
+            // Restore cardio progress
+            if (saved.cardioCompleted) setCardioCompleted(saved.cardioCompleted)
             // Restore exercise order
             if (saved.exerciseOrder && saved.exerciseOrder.length > 0) {
               const orderedExercises = saved.exerciseOrder
@@ -1519,6 +1525,16 @@ function ActiveWorkoutPage() {
       return { ...prev, [exerciseId]: [...current, newSet] }
     })
   }
+  const deleteSet = (exerciseId: string, setIndex: number) => {
+    setSets(prev => {
+      const updated = [...(prev[exerciseId] || [])]
+      if (setIndex >= 0 && setIndex < updated.length) {
+        updated.splice(setIndex, 1)
+      }
+      return { ...prev, [exerciseId]: updated }
+    })
+  }
+
 
   // --- Add exercise from picker ---
   const handleAddExercise = (exercise: Exercise) => {
@@ -1848,7 +1864,7 @@ function ActiveWorkoutPage() {
   }
 
   return (
-    <div className="fixed inset-0 bg-white z-50 overflow-y-auto pt-safe">
+    <div className="fixed inset-0 bg-white z-50 flex flex-col overflow-hidden pt-safe">
       {/* PR Celebration */}
       {prCelebration && (
         <>
@@ -1922,7 +1938,7 @@ function ActiveWorkoutPage() {
       )}
 
       {/* ═══ TOP BAR ═══════════════════════════════ */}
-      <header className="sticky top-0 bg-white/95 backdrop-blur-xl z-40">
+      <header className="sticky top-0 bg-white/95 backdrop-blur-xl z-40 flex-shrink-0">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <button
             onClick={handleMinimize}
@@ -1975,7 +1991,7 @@ function ActiveWorkoutPage() {
       </header>
 
       {/* ═══ EXERCISE LIST ═══════════════════════════ */}
-      <main className="max-w-lg mx-auto px-4 py-6 pb-24 space-y-4">
+      <main className="flex-1 overflow-y-auto max-w-lg mx-auto w-full px-4 py-6 pb-24 space-y-4">
         <DndContext sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={exerciseIds} strategy={verticalListSortingStrategy}>
         {exercises.map((ex, exIndex) => {
@@ -2177,6 +2193,7 @@ function ActiveWorkoutPage() {
                             prefilledWeight={prefilledWeight}
                             prevSet={prevSet}
                             onComplete={(weight: number | null) => completeSet(ex.id, idx, weight)}
+                            onDelete={(setIdx: number) => deleteSet(ex.id, setIdx)}
                             exerciseId={ex.id}
                             setSets={setSets}
                             exSets={exSets}
@@ -2399,7 +2416,7 @@ function ActiveWorkoutPage() {
 
 // --- Set row component ---
 function SetRowComponent({
-  set, index, prevLabel, prefilledWeight, prevSet, onComplete, exerciseId, setSets, exSets,
+  set, index, prevLabel, prefilledWeight, prevSet, onComplete, exerciseId, setSets, exSets, onDelete,
   weightUnit = 'kg', displayWeight, toKg,
 }: {
   set: SetData
@@ -2411,6 +2428,7 @@ function SetRowComponent({
   exerciseId: string
   setSets: React.Dispatch<React.SetStateAction<Record<string, SetData[]>>>
   exSets: SetData[]
+  onDelete: (index: number) => void
   weightUnit?: 'kg' | 'lbs'
   displayWeight?: (kg: number | null) => string
   toKg?: (displayVal: string) => number | null
@@ -2653,6 +2671,14 @@ function SetRowComponent({
           style={{ WebkitTapHighlightColor: 'transparent' }}
         >
           <Check size={16} strokeWidth={set.completed ? 3 : 2} />
+        <button
+          onClick={() => onDelete(index)}
+          className="w-[40px] h-[40px] flex items-center justify-center rounded-full border-2 border-[#E0E0DE] text-[#D5D5D5] hover:border-[#C4372A] hover:text-[#C4372A] active:scale-90 transition-all touch-manipulation"
+          style={{ WebkitTapHighlightColor: "transparent" }}
+          title="Delete set"
+        >
+          <Trash2 size={16} strokeWidth={1.5} />
+        </button>
         </button>
       </div>
     </div>
