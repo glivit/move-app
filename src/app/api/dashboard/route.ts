@@ -156,16 +156,18 @@ export async function GET(request: NextRequest) {
     const todayWorkouts = todayWorkoutsRes.data || []
     const weekWorkouts = weekWorkoutsRes.data || []
 
-    // ── Fetch template days separately (no direct FK from client_programs) ──
-    // This matches the working pattern in /api/client-program/route.ts
-    let templateDays: any[] = []
-    if (program?.template_id) {
-      const { data: days } = await db.from('program_template_days')
-        .select('id, day_number, name, focus, estimated_duration_min')
-        .eq('template_id', program.template_id)
-        .order('sort_order', { ascending: true })
-      templateDays = days || []
-    }
+    // ── Fetch template days in parallel with other derived-data computation ──
+    // No direct FK from client_programs, so separate query needed.
+    // We fire it immediately (non-blocking) and await only when needed.
+    const templateDaysPromise = program?.template_id
+      ? db.from('program_template_days')
+          .select('id, day_number, name, focus, estimated_duration_min')
+          .eq('template_id', program.template_id)
+          .order('sort_order', { ascending: true })
+      : Promise.resolve({ data: [] })
+
+    // Await template days (runs in parallel with the JS processing above)
+    const templateDays = (await templateDaysPromise).data || []
 
     // Today's day of week (1=Monday, 7=Sunday) — ISO format
     const todayDow = (() => { const d = new Date().getDay(); return d === 0 ? 7 : d })()

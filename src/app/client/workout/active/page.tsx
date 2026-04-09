@@ -1403,12 +1403,14 @@ function ActiveWorkoutPage() {
         const { data: { user: authUser } } = await supabase.auth.getUser()
         if (!authUser) { router.push('/auth/login'); return }
 
-        const res = await fetch(`/api/client-workout?dayId=${dayId}`)
+        const res = await fetch(`/api/client-workout?dayId=${dayId}&programId=${programId}`)
         if (!res.ok) { router.push('/client/workout'); return }
         const apiData = await res.json()
         const exercisesData = apiData.exercises as ProgramTemplateExercise[]
         const apiLastWeights = apiData.lastWeights || {}
         const apiPreviousSets = apiData.previousSets || {}
+        const apiExistingSession = apiData.existingSession || null
+        const apiExistingSessionSets = apiData.existingSessionSets || []
 
         if (!exercisesData?.length) { router.push('/client/workout'); return }
 
@@ -1426,13 +1428,12 @@ function ActiveWorkoutPage() {
         // Try restore from localStorage
         const saved = loadWorkoutState(dayId, programId)
         if (saved) {
-          const { data: existingSession } = await supabase
-            .from('workout_sessions')
-            .select('id, started_at, completed_at')
-            .eq('id', saved.sessionId)
-            .single()
-          if (existingSession && !existingSession.completed_at) {
-            setSession({ id: existingSession.id, started_at: existingSession.started_at })
+          // Validate session against API-returned incomplete session (no extra round-trip)
+          const matchingSession = apiExistingSession && apiExistingSession.id === saved.sessionId
+            ? apiExistingSession
+            : null
+          if (matchingSession) {
+            setSession({ id: matchingSession.id, started_at: matchingSession.started_at })
             setSets(saved.sets)
             // Restore notes
             if (saved.exerciseNotes) setExerciseNotes(saved.exerciseNotes)
@@ -1492,26 +1493,14 @@ function ActiveWorkoutPage() {
           clearWorkoutState()
         }
 
-        // Check DB for incomplete session
-        const { data: dbSession } = await supabase
-          .from('workout_sessions')
-          .select('id, started_at')
-          .eq('client_id', authUser.id)
-          .eq('template_day_id', dayId)
-          .is('completed_at', null)
-          .order('started_at', { ascending: false })
-          .limit(1)
-          .single()
-
-        if (dbSession) {
-          setSession({ id: dbSession.id, started_at: dbSession.started_at })
-          const { data: dbSets } = await supabase
-            .from('workout_sets').select('*').eq('workout_session_id', dbSession.id)
+        // Use pre-fetched session from API (avoids extra client-side round-trips)
+        if (apiExistingSession) {
+          setSession({ id: apiExistingSession.id, started_at: apiExistingSession.started_at })
           const setsMap: Record<string, SetData[]> = {}
           for (const ex of exercisesData) {
             const setsList: SetData[] = []
             for (let i = 0; i < ex.sets; i++) {
-              const dbSet = dbSets?.find((s: any) => s.exercise_id === ex.exercise_id && s.set_number === i + 1)
+              const dbSet = apiExistingSessionSets?.find((s: any) => s.exercise_id === ex.exercise_id && s.set_number === i + 1)
               if (dbSet) {
                 setsList.push({ id: dbSet.id, set_number: i + 1, prescribed_reps: dbSet.prescribed_reps || ex.reps_min, actual_reps: dbSet.actual_reps, weight_kg: dbSet.weight_kg, is_warmup: dbSet.is_warmup || false, completed: dbSet.completed || false, is_pr: dbSet.is_pr || false })
               } else {

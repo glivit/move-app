@@ -695,12 +695,23 @@ export default function ClientNutritionPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const { data: planData } = await supabase
-        .from('nutrition_plans')
-        .select('*')
-        .eq('client_id', user.id)
-        .eq('is_active', true)
-        .single()
+      // Helper: ensure every food in an array has a unique id
+      function ensureFoodIds(foods: any[], prefix: string): FoodEntry[] {
+        return (foods || []).map((f: any, fi: number) => ({
+          ...f,
+          id: f.id && !f.id.startsWith('plan-') ? f.id : `${prefix}-${fi}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        }))
+      }
+
+      // ── FAST PATH: fetch plan + today's logs in PARALLEL ──
+      const [planRes, logsRes] = await Promise.all([
+        supabase.from('nutrition_plans').select('*')
+          .eq('client_id', user.id).eq('is_active', true).single(),
+        fetch(`/api/nutrition-log?date=${dateStr}`).then(r => r.json()),
+      ])
+
+      const planData = planRes.data
+      let fixedPlan: NutritionPlan | null = null
 
       if (planData) {
         const fixedMeals = (planData.meals || []).map((m: any, i: number) => ({
@@ -712,113 +723,89 @@ export default function ClientNutritionPage() {
             checked: f.checked ?? false,
           })),
         }))
-        setPlan({ ...planData, meals: fixedMeals })
-      }
-
-      const res = await fetch(`/api/nutrition-log?date=${dateStr}`)
-      const data = await res.json()
-
-      // Helper: ensure every food in an array has a unique id
-      function ensureFoodIds(foods: any[], prefix: string): FoodEntry[] {
-        return (foods || []).map((f: any, fi: number) => ({
-          ...f,
-          id: f.id && !f.id.startsWith('plan-') ? f.id : `${prefix}-${fi}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-        }))
+        fixedPlan = { ...planData, meals: fixedMeals }
+        setPlan(fixedPlan)
       }
 
       const logMap = new Map<string, MealLog>()
-      for (const log of data.logs || []) {
+      for (const log of logsRes.logs || []) {
         log.foods_eaten = ensureFoodIds(log.foods_eaten, `log-${log.meal_id}`)
         logMap.set(log.meal_id, log)
       }
 
-      if (logMap.size === 0 && planData) {
+      // ── RENDER IMMEDIATELY with plan + today's logs ──
+      setLogs(logMap)
+      setSummary(logsRes.summary || null)
+      setLoading(false)
+
+      // ── BACKGROUND: yesterday carry-over (only if no logs today) ──
+      if (logMap.size === 0 && planData && fixedPlan) {
         const yesterday = new Date(dateStr)
         yesterday.setDate(yesterday.getDate() - 1)
         const yesterdayStr = yesterday.toISOString().split('T')[0]
-        const yRes = await fetch(`/api/nutrition-log?date=${yesterdayStr}`)
-        const yData = await yRes.json()
+        try {
+          const yData = await fetch(`/api/nutrition-log?date=${yesterdayStr}`).then(r => r.json())
 
-        const fixedMeals = (planData.meals || []).map((m: any, i: number) => ({
-          ...m,
-          id: ensureMealId(m, i),
-          foods: (m.foods || []).map((f: any, fi: number) => ({
-            ...f,
-            id: f.id || `yplan-${i}-food-${fi}-${(f.name || '').replace(/\s+/g, '-').toLowerCase()}`,
-            checked: false, // Always unchecked for new day
-          })),
-        }))
+          const yFixedMeals = (planData.meals || []).map((m: any, i: number) => ({
+            ...m,
+            id: ensureMealId(m, i),
+            foods: (m.foods || []).map((f: any, fi: number) => ({
+              ...f,
+              id: f.id || `yplan-${i}-food-${fi}-${(f.name || '').replace(/\s+/g, '-').toLowerCase()}`,
+              checked: false,
+            })),
+          }))
 
-        for (const yLog of yData.logs || []) {
-          const meal = fixedMeals.find((m: any) => m.id === yLog.meal_id)
-          if (!meal) continue
-
-          const planFoodNames = new Set((meal.foods || []).map((f: FoodEntry) => f.name))
-          const extras = ensureFoodIds(
-            (yLog.foods_eaten || []).filter((f: FoodEntry) => !planFoodNames.has(f.name)),
-            `extra-${meal.id}`
-          ).map((f: FoodEntry) => ({ ...f, checked: false }))
-
-          if (extras.length > 0) {
-            const mergedFoods = [...(meal.foods || []), ...extras]
-            logMap.set(meal.id, {
-              meal_id: meal.id,
-              meal_name: meal.name,
-              completed: false,
-              foods_eaten: mergedFoods,
-              client_notes: null,
-              completed_at: null,
-            })
-          }
-        }
-      }
-
-      setLogs(logMap)
-      setSummary(data.summary || null)
-
-      // Load recent foods from last 7 days (parallel fetch for performance)
-      const recentMap = new Map<string, { frequency: number; per100g: any; brand?: string }>()
-      const today = new Date(dateStr)
-      const datePromises = Array.from({ length: 7 }, (_, i) => {
-        const d = new Date(today)
-        d.setDate(d.getDate() - i)
-        return fetch(`/api/nutrition-log?date=${d.toISOString().split('T')[0]}`)
-          .then(r => r.json())
-          .catch(() => ({ logs: [] }))
-      })
-      const recentResults = await Promise.all(datePromises)
-      for (const rData of recentResults) {
-        for (const log of rData.logs || []) {
-          for (const food of log.foods_eaten || []) {
-            const key = food.name
-            const existing = recentMap.get(key)
-            if (existing) {
-              existing.frequency += 1
-            } else {
-              recentMap.set(key, {
-                frequency: 1,
-                per100g: food.per100g,
-                brand: food.brand,
+          const updatedLogMap = new Map(logMap)
+          for (const yLog of yData.logs || []) {
+            const meal = yFixedMeals.find((m: any) => m.id === yLog.meal_id)
+            if (!meal) continue
+            const planFoodNames = new Set((meal.foods || []).map((f: FoodEntry) => f.name))
+            const extras = ensureFoodIds(
+              (yLog.foods_eaten || []).filter((f: FoodEntry) => !planFoodNames.has(f.name)),
+              `extra-${meal.id}`
+            ).map((f: FoodEntry) => ({ ...f, checked: false }))
+            if (extras.length > 0) {
+              updatedLogMap.set(meal.id, {
+                meal_id: meal.id, meal_name: meal.name, completed: false,
+                foods_eaten: [...(meal.foods || []), ...extras],
+                client_notes: null, completed_at: null,
               })
             }
           }
-        }
+          if (updatedLogMap.size > 0) setLogs(updatedLogMap)
+        } catch {}
       }
 
-      const sortedRecent = Array.from(recentMap.entries())
-        .map(([name, data]) => ({
-          name,
-          brand: data.brand,
-          frequency: data.frequency,
-          per100g: data.per100g,
-        }))
-        .sort((a, b) => b.frequency - a.frequency)
-        .slice(0, 20)
-
-      setRecentFoods(sortedRecent)
+      // ── BACKGROUND: load recent foods (non-blocking) ──
+      try {
+        const today = new Date(dateStr)
+        const datePromises = Array.from({ length: 7 }, (_, i) => {
+          const d = new Date(today)
+          d.setDate(d.getDate() - i)
+          return fetch(`/api/nutrition-log?date=${d.toISOString().split('T')[0]}`)
+            .then(r => r.json()).catch(() => ({ logs: [] }))
+        })
+        const recentResults = await Promise.all(datePromises)
+        const recentMap = new Map<string, { frequency: number; per100g: any; brand?: string }>()
+        for (const rData of recentResults) {
+          for (const log of rData.logs || []) {
+            for (const food of log.foods_eaten || []) {
+              const existing = recentMap.get(food.name)
+              if (existing) { existing.frequency += 1 }
+              else { recentMap.set(food.name, { frequency: 1, per100g: food.per100g, brand: food.brand }) }
+            }
+          }
+        }
+        setRecentFoods(
+          Array.from(recentMap.entries())
+            .map(([name, d]) => ({ name, brand: d.brand, frequency: d.frequency, per100g: d.per100g }))
+            .sort((a, b) => b.frequency - a.frequency)
+            .slice(0, 20)
+        )
+      } catch {}
     } catch (err) {
       console.error('Load error:', err)
-    } finally {
       setLoading(false)
     }
   }, [dateStr])
