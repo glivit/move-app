@@ -1,16 +1,13 @@
-import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { getAuthFast } from '@/lib/auth-fast'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 
 // GET: Fetch nutrition logs for a specific date
 export async function GET(request: NextRequest) {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthFast()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  // Use admin client for queries to bypass RLS issues
-  let db: any
-  try { db = createAdminClient() } catch { db = supabase }
+  const db = createAdminClient()
 
   const { searchParams } = new URL(request.url)
   const date = searchParams.get('date') || new Date().toISOString().split('T')[0]
@@ -51,13 +48,10 @@ export async function GET(request: NextRequest) {
 
 // POST: Log or update a meal completion
 export async function POST(request: NextRequest) {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthFast()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  // Use admin client for mutations to bypass RLS issues
-  let db: any
-  try { db = createAdminClient() } catch { db = supabase }
+  const db = createAdminClient()
 
   const body = await request.json()
   const {
@@ -165,13 +159,10 @@ export async function POST(request: NextRequest) {
 
 // PATCH: Update daily summary (mood, water, daily note)
 export async function PATCH(request: NextRequest) {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthFast()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  // Use admin client to bypass RLS issues
-  let db: any
-  try { db = createAdminClient() } catch { db = supabase }
+  const db = createAdminClient()
 
   const body = await request.json()
   const { date, daily_note, mood, water_liters, coach_seen } = body

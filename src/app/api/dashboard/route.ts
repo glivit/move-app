@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { getAuthFast } from '@/lib/auth-fast'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -10,19 +10,13 @@ import { NextRequest, NextResponse } from 'next/server'
  */
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    // Fast auth: getSession() parses JWT locally (~0ms) vs getUser() network call (~300ms)
+    // Safe because middleware already verified the user
+    const { user } = await getAuthFast()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    // Use admin client to bypass RLS — queries still filter by user.id
-    // This fixes issues with manually-added clients whose RLS chain
-    // (e.g. program_template_days → client_programs) can fail.
-    let db: ReturnType<typeof createAdminClient>
-    try {
-      db = createAdminClient()
-    } catch {
-      db = supabase as any
-    }
+    // Use admin client (singleton) to bypass RLS — queries still filter by user.id
+    const db = createAdminClient()
 
     const today = new Date().toISOString().split('T')[0]
     const now = new Date().toISOString()

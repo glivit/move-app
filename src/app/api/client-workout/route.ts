@@ -1,31 +1,18 @@
-import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { getAuthFast } from '@/lib/auth-fast'
+import { createAdminClient } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 
 // GET: Fetch exercises for a specific workout day
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const { user } = await getAuthFast()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const { searchParams } = new URL(request.url)
     const dayId = searchParams.get('dayId')
+    if (!dayId) return NextResponse.json({ error: 'Missing dayId' }, { status: 400 })
 
-    if (!dayId) {
-      return NextResponse.json({ error: 'Missing dayId' }, { status: 400 })
-    }
-
-    // Use admin client to bypass RLS
-    const { createAdminClient } = await import('@/lib/supabase-admin')
-    let adminClient
-    try {
-      adminClient = createAdminClient()
-    } catch {
-      adminClient = supabase
-    }
+    const adminClient = createAdminClient()
 
     // Fetch exercises for this day with joined exercise details
     const { data: exercisesData, error } = await adminClient

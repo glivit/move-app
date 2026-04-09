@@ -28,12 +28,11 @@ export async function POST(request: NextRequest) {
       if (user) userId = user.id
     }
 
-    // Fallback: try cookie-based auth
+    // Fallback: try cookie-based auth (fast session parse — middleware already verified)
     if (!userId) {
       try {
-        const { createServerSupabaseClient } = await import('@/lib/supabase-server')
-        const supabase = await createServerSupabaseClient()
-        const { data: { user } } = await supabase.auth.getUser()
+        const { getAuthFast } = await import('@/lib/auth-fast')
+        const { user } = await getAuthFast()
         if (user) userId = user.id
       } catch (e: any) {
         console.error('[workout-save] Cookie auth error:', e?.message)

@@ -90,13 +90,13 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/coach', request.url))
     }
 
-    // Client onboarding gate: redirect to /onboarding if intake not completed
+    // Client onboarding gate: skip if intake cookie already set
     if (
       cachedRole === 'client' &&
       pathname.startsWith('/client') &&
       request.cookies.get('move_intake')?.value !== '1'
     ) {
-      // Check DB for intake_completed (only if no cookie yet)
+      // Check DB once, then set cookie (avoids repeat DB calls)
       const { data: intakeCheck } = await supabase
         .from('profiles')
         .select('intake_completed')
@@ -104,12 +104,11 @@ export async function middleware(request: NextRequest) {
         .single()
 
       if (intakeCheck?.intake_completed) {
-        // Set cookie so we don't check again
         supabaseResponse.cookies.set('move_intake', '1', {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'lax',
-          maxAge: 86400, // 24 hours
+          maxAge: 604800, // 7 days (was 24h — too short, caused repeat DB checks)
           path: '/',
         })
       } else {
@@ -157,13 +156,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/onboarding', request.url))
   }
 
-  // Cache intake_completed for clients
+  // Cache intake_completed for clients (7 days to avoid repeat DB checks)
   if (profile.role === 'client' && profile.intake_completed) {
     supabaseResponse.cookies.set('move_intake', '1', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 86400,
+      maxAge: 604800,
       path: '/',
     })
   }
