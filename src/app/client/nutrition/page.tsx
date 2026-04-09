@@ -342,11 +342,8 @@ function AddFoodBottomSheet({
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const sheetRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    if (isOpen && tab === 'search') {
-      setTimeout(() => inputRef.current?.focus(), 100)
-    }
-  }, [isOpen, tab])
+  // No auto-focus on search tab — prevents keyboard from resizing the sheet on iOS
+  // User taps the input field themselves when ready
 
   useEffect(() => {
     if (!isOpen || tab !== 'search') return
@@ -467,7 +464,7 @@ function AddFoodBottomSheet({
   if (!isOpen || !meal) return null
 
   return (
-    <div className="fixed inset-0 z-50" style={{ pointerEvents: isOpen ? 'auto' : 'none' }}>
+    <div className="fixed inset-0 z-50" style={{ pointerEvents: isOpen ? 'auto' : 'none', touchAction: 'none' }}>
       {/* Overlay */}
       <div
         className="absolute inset-0 bg-black/20 transition-opacity duration-300"
@@ -475,12 +472,12 @@ function AddFoodBottomSheet({
         style={{ opacity: isOpen ? 1 : 0 }}
       />
 
-      {/* Sheet */}
+      {/* Sheet — fixed 75% height, doesn't jump with keyboard */}
       <div
         ref={sheetRef}
         className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl transition-transform duration-300"
         style={{
-          maxHeight: '65vh',
+          height: '75%',
           display: isOpen ? 'flex' : 'none',
           flexDirection: 'column',
           transform: 'translateY(0)',
