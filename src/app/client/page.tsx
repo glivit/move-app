@@ -247,16 +247,8 @@ export default function ClientDashboard() {
     return result
   }, [actions])
 
-  // Early returns AFTER all hooks
-  if (loading) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-6 w-6 animate-spin rounded-full border-[1.5px] border-[#C0C0C0] border-t-[#1A1917]" />
-      </div>
-    )
-  }
-
-  if (!data || !training || !actions || !momentum) {
+  // Error state (only after loading completes with no data)
+  if (!loading && !data) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center text-[#999]">
         Er ging iets mis bij het laden.
@@ -267,16 +259,20 @@ export default function ClientDashboard() {
   return (
     <div className="pb-28">
 
-      {/* ═══ GREETING ═════════════════════════════════════ */}
+      {/* ═══ GREETING — always visible, skeleton for name ═════ */}
       <div className="animate-fade-in">
         <div className="flex items-start justify-between">
           <div>
             <p className="mb-1 text-[13px] text-[#ACACAC]">
               {getGreeting()}
             </p>
-            <h1 className="page-title-sm">
-              {firstName}
-            </h1>
+            {loading ? (
+              <div className="h-7 w-28 bg-[#F0F0EE] rounded-lg animate-pulse" />
+            ) : (
+              <h1 className="page-title-sm">
+                {firstName}
+              </h1>
+            )}
           </div>
           <div className="mt-1">
             <NotificationCenter />
@@ -284,32 +280,41 @@ export default function ClientDashboard() {
         </div>
       </div>
 
-      {/* ═══ WEEK STRIP — chunky 36px dots ════════════════ */}
+      {/* ═══ WEEK STRIP — skeleton dots while loading ════════ */}
       <div className="mt-9 mb-12 animate-fade-in" style={{ animationDelay: '80ms' }}>
         <div className="flex items-center justify-between">
-        {weekDots.map((dot, i) => (
-          <button key={i} onClick={() => setSelectedDay(selectedDay === dot.dow ? null : dot.dow)} className="flex flex-col items-center gap-2.5 transition-transform active:scale-90">
-            <span className="text-[11px] font-medium uppercase tracking-[0.5px] text-[#C8C8C8]">
-              {dot.label}
-            </span>
-            {dot.completed ? (
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1A1917]">
-                <svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
-              </div>
-            ) : dot.isToday ? (
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#D46A3A]" style={{ animation: 'pulse-today 2.5s ease-in-out infinite' }}>
-                <div className="h-2 w-2 rounded-full bg-white" />
-              </div>
-            ) : dot.hasTraining ? (
-              <div className="h-9 w-9 rounded-full border-[1.5px] border-[#E2E2E2]" />
-            ) : (
-              <div className="h-[6px] w-[6px] rounded-full bg-[#E5E5E5]" />
-            )}
-          </button>
-        ))}
+        {loading ? (
+          ['M','D','W','D','V','Z','Z'].map((label, i) => (
+            <div key={i} className="flex flex-col items-center gap-2.5">
+              <span className="text-[11px] font-medium uppercase tracking-[0.5px] text-[#C8C8C8]">{label}</span>
+              <div className="h-9 w-9 rounded-full bg-[#F0F0EE] animate-pulse" />
+            </div>
+          ))
+        ) : (
+          weekDots.map((dot, i) => (
+            <button key={i} onClick={() => setSelectedDay(selectedDay === dot.dow ? null : dot.dow)} className="flex flex-col items-center gap-2.5 transition-transform active:scale-90">
+              <span className="text-[11px] font-medium uppercase tracking-[0.5px] text-[#C8C8C8]">
+                {dot.label}
+              </span>
+              {dot.completed ? (
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1A1917]">
+                  <svg width="14" height="14" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                </div>
+              ) : dot.isToday ? (
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#D46A3A]" style={{ animation: 'pulse-today 2.5s ease-in-out infinite' }}>
+                  <div className="h-2 w-2 rounded-full bg-white" />
+                </div>
+              ) : dot.hasTraining ? (
+                <div className="h-9 w-9 rounded-full border-[1.5px] border-[#E2E2E2]" />
+              ) : (
+                <div className="h-[6px] w-[6px] rounded-full bg-[#E5E5E5]" />
+              )}
+            </button>
+          ))
+        )}
         </div>
         {/* Selected day info */}
-        {selectedDay && (() => {
+        {selectedDay && training && (() => {
           const dayInfo = training.scheduleDays?.find(s => s.dayNumber === selectedDay)
           const dayDot = weekDots.find(d => d.dow === selectedDay)
           if (!dayDot) return null
@@ -337,8 +342,33 @@ export default function ClientDashboard() {
         })()}
       </div>
 
+      {/* ═══ SKELETON HERO while loading ═══════════════════ */}
+      {loading && (
+        <div className="mb-14 animate-pulse">
+          <div className="h-3 w-20 bg-[#F0F0EE] rounded mb-4" />
+          <div className="h-8 w-48 bg-[#F0F0EE] rounded-lg mb-3" />
+          <div className="h-4 w-32 bg-[#F0F0EE] rounded mb-10" />
+          <div className="h-14 w-44 bg-[#F0F0EE] rounded-2xl" />
+        </div>
+      )}
+
+      {/* ═══ SKELETON SECONDARY while loading ═════════════ */}
+      {loading && (
+        <div className="animate-pulse space-y-0">
+          {[1, 2].map(i => (
+            <div key={i} className="flex items-center justify-between border-t border-[#F0F0EE] py-[18px]">
+              <div className="flex items-center gap-3">
+                <div className="h-3 w-14 bg-[#F0F0EE] rounded" />
+                <div className="h-4 w-28 bg-[#F0F0EE] rounded" />
+              </div>
+              <div className="h-4 w-4 bg-[#F0F0EE] rounded" />
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* ═══ ONBOARDING ═══════════════════════════════════ */}
-      {showOnboarding && (
+      {!loading && showOnboarding && (
         <Link href="/onboarding" className="mb-8 block animate-slide-up stagger-3">
           <p className="mb-3 eyebrow">
             Profiel voltooien
@@ -354,7 +384,7 @@ export default function ClientDashboard() {
       )}
 
       {/* ═══ DAY 1 EMPTY STATE ════════════════════════════ */}
-      {isDay1 && !showOnboarding && (
+      {!loading && isDay1 && !showOnboarding && (
         <div className="mb-12 animate-slide-up py-8 stagger-3">
           <p className="page-title mb-3">
             Welkom bij MŌVE
@@ -370,7 +400,7 @@ export default function ClientDashboard() {
       )}
 
       {/* ═══ HERO SECTION — no card, bold typography ═══════ */}
-      {!isDay1 && !showOnboarding && (
+      {!loading && training && momentum && !isDay1 && !showOnboarding && (
         <div className="mb-14 animate-slide-up" style={{ animationDelay: '140ms' }}>
 
           {/* Training today — the hero */}
@@ -469,7 +499,7 @@ export default function ClientDashboard() {
       )}
 
       {/* ═══ PENDING TODOS (photos, measurements, monthly check-in) ═══ */}
-      {!showOnboarding && (data?.pendingTodos || []).length > 0 && (
+      {!loading && !showOnboarding && (data?.pendingTodos || []).length > 0 && (
         <div className="mb-8 animate-slide-up" style={{ animationDelay: '180ms' }}>
           <p
             className="text-[11px] font-semibold text-[#D46A3A] uppercase tracking-[1.5px] mb-3"
@@ -507,7 +537,7 @@ export default function ClientDashboard() {
       )}
 
       {/* ═══ CHECK-INS & WEIGHT LOG ══════════════════════════ */}
-      {!isDay1 && !showOnboarding && (
+      {!loading && !isDay1 && !showOnboarding && (
         <div className="mb-8 space-y-3 animate-fade-in" style={{ animationDelay: '220ms' }}>
 
           {/* ── Weekly Check-in Card ────────────────── */}
@@ -614,10 +644,10 @@ export default function ClientDashboard() {
       )}
 
       {/* ═══ SECONDARY — quiet rows ═══════════════════════ */}
-      <div className="animate-fade-in" style={{ animationDelay: '280ms' }}>
+      {!loading && <div className="animate-fade-in" style={{ animationDelay: '280ms' }}>
 
         {/* Tomorrow */}
-        {!isDay1 && !showOnboarding && training.next && primaryAction !== 'rest' && (
+        {!isDay1 && !showOnboarding && training?.next && primaryAction !== 'rest' && (
           <Link href="/client/workout" className="flex items-center justify-between border-t border-[#F0F0EE] py-[18px] group transition-opacity hover:opacity-60">
             <div className="flex items-center gap-3">
               <span className="text-[13px] text-[#C0C0C0]">Morgen</span>
@@ -660,7 +690,7 @@ export default function ClientDashboard() {
             <ChevronRight strokeWidth={1.5} className="h-4 w-4 shrink-0 text-[#D5D5D5] transition-colors group-hover:text-[#1A1917]" />
           </Link>
         ))}
-      </div>
+      </div>}
 
       {/* Pulse animation for today dot */}
       <style jsx global>{`

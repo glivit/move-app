@@ -2022,8 +2022,35 @@ function ActiveWorkoutPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-6 h-6 border-[1.5px] border-[#D5D5D5] border-t-[#1A1917] rounded-full animate-spin" />
+      <div className="fixed inset-0 bg-white z-50 flex flex-col overflow-hidden pt-safe">
+        {/* Skeleton header */}
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[#F0F0EE]">
+          <div className="h-5 w-5 bg-[#F0F0EE] rounded animate-pulse" />
+          <div className="h-4 w-16 bg-[#F0F0EE] rounded animate-pulse" />
+          <div className="h-5 w-5 bg-[#F0F0EE] rounded animate-pulse" />
+        </div>
+        {/* Skeleton exercise blocks */}
+        <div className="flex-1 overflow-hidden px-5 pt-4 animate-pulse">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="mb-6">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-10 w-10 bg-[#F0F0EE] rounded-xl" />
+                <div>
+                  <div className="h-4 w-32 bg-[#F0F0EE] rounded mb-1.5" />
+                  <div className="h-3 w-20 bg-[#F0F0EE] rounded" />
+                </div>
+              </div>
+              {[1, 2, 3].map(j => (
+                <div key={j} className="flex items-center gap-3 py-2.5">
+                  <div className="h-6 w-6 bg-[#F0F0EE] rounded-full" />
+                  <div className="h-4 w-16 bg-[#F0F0EE] rounded" />
+                  <div className="h-4 w-16 bg-[#F0F0EE] rounded" />
+                  <div className="h-4 w-12 bg-[#F0F0EE] rounded" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     )
   }

@@ -81,8 +81,18 @@ export default function WorkoutOverviewPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#C0C0C0] border-t-[#1A1917]" />
+      <div className="pb-28 animate-pulse">
+        <div className="h-7 w-24 bg-[#F0F0EE] rounded-lg mb-6" />
+        <div className="h-4 w-36 bg-[#F0F0EE] rounded mb-8" />
+        {[1, 2, 3].map(i => (
+          <div key={i} className="flex items-center gap-4 py-4 border-t border-[#F0F0EE]">
+            <div className="h-12 w-12 bg-[#F0F0EE] rounded-xl" />
+            <div className="flex-1">
+              <div className="h-4 w-28 bg-[#F0F0EE] rounded mb-1.5" />
+              <div className="h-3 w-20 bg-[#F0F0EE] rounded" />
+            </div>
+          </div>
+        ))}
       </div>
     )
   }
