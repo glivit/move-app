@@ -14,7 +14,7 @@ ALTER TABLE program_templates ADD COLUMN IF NOT EXISTS default_schedule JSONB DE
 -- ─── 3. Message Type uitbreiding ────────────────────────────
 ALTER TABLE messages DROP CONSTRAINT IF EXISTS messages_message_type_check;
 ALTER TABLE messages ADD CONSTRAINT messages_message_type_check
-  CHECK (message_type IN ('text', 'image', 'video', 'file', 'workout_complete', 'system'));
+  CHECK (message_type IN ('text', 'image', 'video', 'voice', 'file', 'workout_complete', 'system'));
 
 -- ─── 4. Performance Indexes ─────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_workout_sessions_coach_unseen

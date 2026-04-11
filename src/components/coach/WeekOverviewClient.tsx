@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useTransition, useEffect } from 'react'
+import { useState, useMemo, useTransition, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
@@ -15,6 +15,8 @@ import {
   X,
 } from 'lucide-react'
 import type { CoachWeekOverview, ClientWeekRow, WeekDay } from '@/lib/coach-week-data'
+import { SwipeableRow } from './SwipeableRow'
+import { isSnoozed, snooze, unsnooze, snoozeKey } from '@/lib/coach-snooze'
 
 interface Props {
   initialData: CoachWeekOverview | null
@@ -40,6 +42,15 @@ export function WeekOverviewClient({ initialData, coachFirstName }: Props) {
   const [composeFor, setComposeFor] = useState<ClientWeekRow | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
+  // Triage state: client IDs that have been cleared/snoozed this session.
+  // We bump this counter to force a re-filter after localStorage changes.
+  const [triageTick, setTriageTick] = useState(0)
+  const [toast, setToast] = useState<null | {
+    kind: 'seen' | 'snoozed'
+    clientId: string
+    clientName: string
+  }>(null)
+
   // Revalidate on mount if no initialData (fallback)
   useEffect(() => {
     if (data) return
@@ -49,18 +60,92 @@ export function WeekOverviewClient({ initialData, coachFirstName }: Props) {
       .catch(() => {})
   }, [data])
 
+  // Auto-dismiss toast after 5s
+  useEffect(() => {
+    if (!toast) return
+    const t = setTimeout(() => setToast(null), 5000)
+    return () => clearTimeout(t)
+  }, [toast])
+
   const summary = data?.summary || { total: 0, needsAttention: 0, onTrack: 0 }
+
+  // Client-side triage commits — optimistic updates + undo toast.
+  const handleMarkSeen = useCallback(async (client: ClientWeekRow) => {
+    // Optimistic: drop attention state so it leaves the "Aandacht" filter
+    setData((prev) => {
+      if (!prev) return prev
+      return {
+        ...prev,
+        clients: prev.clients.map((c) =>
+          c.id === client.id
+            ? {
+                ...c,
+                attention: 'ok',
+                attentionReason: null,
+                unreadFromClient: 0,
+              }
+            : c
+        ),
+        summary: {
+          ...prev.summary,
+          needsAttention:
+            client.attention !== 'ok'
+              ? Math.max(0, prev.summary.needsAttention - 1)
+              : prev.summary.needsAttention,
+          onTrack:
+            client.attention !== 'ok'
+              ? prev.summary.onTrack + 1
+              : prev.summary.onTrack,
+        },
+      }
+    })
+    setToast({ kind: 'seen', clientId: client.id, clientName: client.fullName })
+
+    try {
+      await fetch('/api/coach-seen', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId: client.id }),
+      })
+    } catch (err) {
+      console.error('Mark-seen failed:', err)
+    }
+  }, [])
+
+  const handleSnooze = useCallback((client: ClientWeekRow) => {
+    snooze(snoozeKey.client(client.id))
+    setTriageTick((t) => t + 1)
+    setToast({ kind: 'snoozed', clientId: client.id, clientName: client.fullName })
+  }, [])
+
+  const handleUndo = useCallback(() => {
+    if (!toast) return
+    if (toast.kind === 'snoozed') {
+      unsnooze(snoozeKey.client(toast.clientId))
+      setTriageTick((t) => t + 1)
+    }
+    // For 'seen' we can't reliably un-mark on the server (previous state lost),
+    // so Undo just closes the toast and relies on a next-fetch refresh.
+    setToast(null)
+  }, [toast])
 
   const filtered = useMemo(() => {
     let result = data?.clients || []
     if (filter === 'needs') result = result.filter((c) => c.attention !== 'ok')
     if (filter === 'ok') result = result.filter((c) => c.attention === 'ok')
 
+    // Hide snoozed clients from the "Aandacht" view (they re-appear tomorrow).
+    if (filter === 'needs') {
+      result = result.filter((c) => !isSnoozed(snoozeKey.client(c.id)))
+    }
+
     const q = searchQuery.trim().toLowerCase()
     if (q) result = result.filter((c) => c.fullName.toLowerCase().includes(q))
 
     return result
-  }, [data, filter, searchQuery])
+    // triageTick is referenced so re-renders happen when snoozes change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, filter, searchQuery, triageTick])
 
   const greeting = getGreeting()
 
@@ -159,8 +244,21 @@ export function WeekOverviewClient({ initialData, coachFirstName }: Props) {
       ) : (
         <div className="space-y-2.5">
           {filtered.map((client) => (
-            <ClientRow key={client.id} client={client} onMessage={() => setComposeFor(client)} />
+            <SwipeableRow
+              key={client.id}
+              onSwipeRight={() => handleMarkSeen(client)}
+              onSwipeLeft={() => handleSnooze(client)}
+              rightLabel="Gezien"
+              leftLabel="Later"
+            >
+              <ClientRow client={client} onMessage={() => setComposeFor(client)} />
+            </SwipeableRow>
           ))}
+          {filter === 'needs' && filtered.length > 0 && (
+            <p className="text-center text-[11px] text-[#A09D96] pt-2 pb-1 lg:hidden">
+              Veeg → <span className="text-[#34C759] font-semibold">Gezien</span>  ·  Veeg ← <span className="text-[#6B6862] font-semibold">Later</span>
+            </p>
+          )}
         </div>
       )}
 
@@ -172,6 +270,39 @@ export function WeekOverviewClient({ initialData, coachFirstName }: Props) {
           onSent={() => setComposeFor(null)}
         />
       )}
+
+      {/* Triage undo toast */}
+      {toast && (
+        <div className="fixed left-1/2 -translate-x-1/2 bottom-24 lg:bottom-8 z-40 animate-toast-in">
+          <div className="flex items-center gap-3 bg-[#1A1917] text-white rounded-full pl-4 pr-2 py-2 shadow-xl">
+            <span className="text-[13px]">
+              {toast.kind === 'seen' ? (
+                <>
+                  <span className="font-semibold">{toast.clientName}</span> gemarkeerd als gezien
+                </>
+              ) : (
+                <>
+                  <span className="font-semibold">{toast.clientName}</span> tot morgen verborgen
+                </>
+              )}
+            </span>
+            <button
+              onClick={handleUndo}
+              className="text-[12px] font-semibold px-3 py-1.5 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 transition-all"
+            >
+              Ongedaan
+            </button>
+          </div>
+        </div>
+      )}
+
+      <style jsx>{`
+        @keyframes toast-in {
+          from { opacity: 0; transform: translate(-50%, 20px); }
+          to { opacity: 1; transform: translate(-50%, 0); }
+        }
+        .animate-toast-in { animation: toast-in 220ms cubic-bezier(0.2, 0.9, 0.3, 1); }
+      `}</style>
 
       <style jsx>{`
         .no-scrollbar::-webkit-scrollbar {
@@ -200,7 +331,7 @@ function ClientRow({ client, onMessage }: { client: ClientWeekRow; onMessage: ()
     <div
       className={`relative rounded-2xl border ${accent} shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-all active:scale-[0.995]`}
     >
-      <Link href={`/coach/clients/${client.id}`} className="block px-4 pt-4 pb-2">
+      <Link href={`/coach/clients/${client.id}/week`} className="block px-4 pt-4 pb-2">
         <div className="flex items-center gap-3">
           {/* Avatar */}
           <div className="w-11 h-11 rounded-full bg-[#F0EDE7] flex items-center justify-center text-[13px] font-semibold text-[#6B6862] flex-shrink-0 overflow-hidden">
