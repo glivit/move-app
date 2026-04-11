@@ -1,9 +1,11 @@
 'use client'
 
-import { useState, useMemo, useRef, useEffect } from 'react'
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
+import { useCoachLiveUpdates } from '@/hooks/useCoachLiveUpdates'
 import {
   ArrowLeft,
   CheckCircle2,
@@ -30,10 +32,29 @@ import { isSnoozed, snooze, unsnooze, snoozeKey } from '@/lib/coach-snooze'
 interface Props {
   data: ClientWeekTimeline
   weekOffset: number
+  coachId?: string | null
 }
 
-export function ClientWeekTimelineView({ data, weekOffset }: Props) {
+export function ClientWeekTimelineView({ data, weekOffset, coachId }: Props) {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState<'week' | 'chat'>('week')
+  const [justUpdated, setJustUpdated] = useState(false)
+
+  // Phase 5: realtime refetch. The page is a Server Component so
+  // `router.refresh()` re-runs `fetchClientWeekTimeline()` with the same
+  // params — no extra API endpoint needed.
+  const refetch = useCallback(() => {
+    router.refresh()
+    setJustUpdated(true)
+    window.setTimeout(() => setJustUpdated(false), 1200)
+  }, [router])
+
+  const { connected } = useCoachLiveUpdates({
+    refetch,
+    clientId: data.clientId,
+    coachId: coachId || undefined,
+    disabled: !coachId,
+  })
   const [composeType, setComposeType] = useState<null | { kind: 'general'; sessionId?: undefined } | { kind: 'session'; sessionId: string; session: DaySession; day: TimelineDay }>(null)
   const [messages, setMessages] = useState(data.recentMessages)
 
@@ -134,7 +155,21 @@ export function ClientWeekTimelineView({ data, weekOffset }: Props) {
             <p className="text-[15px] font-semibold text-[#1A1917] truncate leading-tight">
               {data.fullName}
             </p>
-            <p className="text-[11px] text-[#A09D96] truncate">{weekLabel}</p>
+            <p className="text-[11px] text-[#A09D96] truncate flex items-center gap-1.5">
+              <span>{weekLabel}</span>
+              {coachId && (
+                <span
+                  className={`inline-block w-[6px] h-[6px] rounded-full flex-shrink-0 ${
+                    justUpdated
+                      ? 'bg-[#7CB85C] animate-pulse-ring'
+                      : connected
+                      ? 'bg-[#7CB85C]'
+                      : 'bg-[#D0CCC3]'
+                  }`}
+                  title={connected ? 'Live verbonden' : 'Niet verbonden'}
+                />
+              )}
+            </p>
           </div>
 
           <Link
@@ -330,6 +365,13 @@ export function ClientWeekTimelineView({ data, weekOffset }: Props) {
           to { opacity: 1; transform: translate(-50%, 0); }
         }
         .animate-toast-in { animation: toast-in 220ms cubic-bezier(0.2, 0.9, 0.3, 1); }
+
+        @keyframes pulse-ring {
+          0% { box-shadow: 0 0 0 0 rgba(124, 184, 92, 0.55); }
+          70% { box-shadow: 0 0 0 6px rgba(124, 184, 92, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(124, 184, 92, 0); }
+        }
+        .animate-pulse-ring { animation: pulse-ring 1200ms ease-out; }
       `}</style>
     </div>
   )

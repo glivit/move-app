@@ -12,6 +12,7 @@ export const dynamic = 'force-dynamic'
 export default async function CoachDashboard() {
   let initialData = null
   let coachFirstName = 'Coach'
+  let coachId: string | null = null
 
   try {
     const { user, supabase } = await getAuthFast()
@@ -24,6 +25,7 @@ export default async function CoachDashboard() {
         .single()
 
       if (profile?.role === 'coach') {
+        coachId = user.id
         coachFirstName = (profile.full_name || '').split(' ')[0] || 'Coach'
         initialData = await fetchCoachWeekOverview(user.id)
       }
@@ -32,5 +34,11 @@ export default async function CoachDashboard() {
     // Fall through — client component handles refetch
   }
 
-  return <WeekOverviewClient initialData={initialData} coachFirstName={coachFirstName} />
+  return (
+    <WeekOverviewClient
+      initialData={initialData}
+      coachFirstName={coachFirstName}
+      coachId={coachId}
+    />
+  )
 }

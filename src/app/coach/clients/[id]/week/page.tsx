@@ -30,5 +30,5 @@ export default async function ClientWeekPage({ params, searchParams }: Props) {
   const data = await fetchClientWeekTimeline(id, user.id, weekOffset)
   if (!data) notFound()
 
-  return <ClientWeekTimelineView data={data} weekOffset={weekOffset} />
+  return <ClientWeekTimelineView data={data} weekOffset={weekOffset} coachId={user.id} />
 }

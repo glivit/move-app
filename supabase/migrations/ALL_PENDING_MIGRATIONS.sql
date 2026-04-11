@@ -24,3 +24,34 @@ CREATE INDEX IF NOT EXISTS idx_workout_sessions_coach_unseen
 CREATE INDEX IF NOT EXISTS idx_workout_sessions_completed_recent
   ON workout_sessions(completed_at DESC)
   WHERE completed_at IS NOT NULL;
+
+-- ─── 5. Realtime publications (Phase 5: coach live updates) ─
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND tablename = 'workout_sessions'
+  ) THEN
+    EXECUTE 'ALTER PUBLICATION supabase_realtime ADD TABLE workout_sessions';
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND tablename = 'nutrition_daily_summary'
+  ) THEN
+    EXECUTE 'ALTER PUBLICATION supabase_realtime ADD TABLE nutrition_daily_summary';
+  END IF;
+END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND tablename = 'checkins'
+  ) THEN
+    EXECUTE 'ALTER PUBLICATION supabase_realtime ADD TABLE checkins';
+  END IF;
+END $$;

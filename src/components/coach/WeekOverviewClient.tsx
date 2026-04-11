@@ -17,10 +17,12 @@ import {
 import type { CoachWeekOverview, ClientWeekRow, WeekDay } from '@/lib/coach-week-data'
 import { SwipeableRow } from './SwipeableRow'
 import { isSnoozed, snooze, unsnooze, snoozeKey } from '@/lib/coach-snooze'
+import { useCoachLiveUpdates } from '@/hooks/useCoachLiveUpdates'
 
 interface Props {
   initialData: CoachWeekOverview | null
   coachFirstName: string
+  coachId?: string | null
 }
 
 type FilterMode = 'needs' | 'all' | 'ok'
@@ -35,7 +37,7 @@ function getGreeting() {
   return 'Goedenavond'
 }
 
-export function WeekOverviewClient({ initialData, coachFirstName }: Props) {
+export function WeekOverviewClient({ initialData, coachFirstName, coachId }: Props) {
   const [data, setData] = useState<CoachWeekOverview | null>(initialData)
   const [filter, setFilter] = useState<FilterMode>('needs')
   const [, startTransition] = useTransition()
@@ -51,14 +53,38 @@ export function WeekOverviewClient({ initialData, coachFirstName }: Props) {
     clientName: string
   }>(null)
 
+  // Live-update state for subtle "just updated" flash
+  const [justUpdated, setJustUpdated] = useState(false)
+
+  // Refetch strategy — single source of truth, used by both manual reload
+  // fallback and the realtime hook below.
+  const refetch = useCallback(async () => {
+    try {
+      const res = await fetch('/api/coach/week-overview', {
+        cache: 'no-store',
+      })
+      if (!res.ok) return
+      const json = (await res.json()) as CoachWeekOverview
+      setData(json)
+      setJustUpdated(true)
+      window.setTimeout(() => setJustUpdated(false), 1200)
+    } catch {
+      // ignore — next focus/realtime event will retry
+    }
+  }, [])
+
   // Revalidate on mount if no initialData (fallback)
   useEffect(() => {
     if (data) return
-    fetch('/api/coach/week-overview')
-      .then((r) => (r.ok ? r.json() : null))
-      .then((json) => json && setData(json))
-      .catch(() => {})
-  }, [data])
+    refetch()
+  }, [data, refetch])
+
+  // Realtime subscription — Phase 5.
+  const { connected } = useCoachLiveUpdates({
+    refetch,
+    coachId: coachId || undefined,
+    disabled: !coachId,
+  })
 
   // Auto-dismiss toast after 5s
   useEffect(() => {
@@ -196,7 +222,17 @@ export function WeekOverviewClient({ initialData, coachFirstName }: Props) {
             </div>
             <div className="min-w-0">
               <p className="text-[14px] font-semibold text-[#1A1917] truncate">{headlineText}</p>
-              <p className="text-[12px] text-[#A09D96] truncate">
+              <p className="text-[12px] text-[#A09D96] truncate flex items-center gap-1.5">
+                <span
+                  className={`inline-block w-1.5 h-1.5 rounded-full transition-all ${
+                    justUpdated
+                      ? 'bg-[#34C759] animate-pulse-ring'
+                      : connected
+                      ? 'bg-[#34C759]'
+                      : 'bg-[#C5C2BC]'
+                  }`}
+                  title={connected ? 'Live' : 'Offline'}
+                />
                 {summary.total} {summary.total === 1 ? 'cliënt' : 'cliënten'} · {summary.onTrack} op schema
               </p>
             </div>
@@ -301,7 +337,13 @@ export function WeekOverviewClient({ initialData, coachFirstName }: Props) {
           from { opacity: 0; transform: translate(-50%, 20px); }
           to { opacity: 1; transform: translate(-50%, 0); }
         }
+        @keyframes pulse-ring {
+          0% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.55); }
+          70% { box-shadow: 0 0 0 8px rgba(52, 199, 89, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0); }
+        }
         .animate-toast-in { animation: toast-in 220ms cubic-bezier(0.2, 0.9, 0.3, 1); }
+        .animate-pulse-ring { animation: pulse-ring 1200ms ease-out; }
       `}</style>
 
       <style jsx>{`
