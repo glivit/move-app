@@ -33,6 +33,21 @@ export interface WeekDay {
   movedFromDayName: string | null // if the completed session came from a different planned dow
 }
 
+/**
+ * One entry per planned training in the client's program for the week.
+ * Shows what's scheduled (by name) and whether it's been completed.
+ */
+export type ProgramDayStatus = 'done' | 'today' | 'upcoming' | 'missed'
+
+export interface ProgramDayEntry {
+  templateDayId: string
+  name: string               // template day name, e.g. "Push", "Upper A"
+  scheduledDayNumber: number // 1=Mon..7=Sun — where it's planned
+  scheduledDayLabel: string  // "Ma", "Di", ...
+  status: ProgramDayStatus
+  completedOnLabel: string | null // if moved, the dow it was actually done, else null
+}
+
 export interface ClientWeekRow {
   id: string
   fullName: string
@@ -41,6 +56,9 @@ export interface ClientWeekRow {
   packageTier: string | null
 
   week: WeekDay[]
+
+  // Program checklist: one entry per scheduled training this week
+  programDays: ProgramDayEntry[]
 
   // Summary
   plannedThisWeek: number
@@ -309,6 +327,51 @@ export async function fetchCoachWeekOverview(coachId: string): Promise<CoachWeek
       }
     })
 
+    // Program checklist: one entry per scheduled training this week,
+    // showing the template day name + done/today/upcoming/missed status.
+    const dayLabels = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']
+    const programDays: ProgramDayEntry[] = []
+    for (const [dowKey, tid] of Object.entries(schedule)) {
+      if (!tid) continue
+      const scheduledDayNumber = Number(dowKey)
+      if (!Number.isFinite(scheduledDayNumber) || scheduledDayNumber < 1 || scheduledDayNumber > 7) continue
+
+      const name = dayNameMap[tid] || 'Training'
+      const scheduledDayLabel = dayLabels[scheduledDayNumber - 1] || ''
+
+      // Was this specific template day completed somewhere this week?
+      const completedSession = mySessions.find((s) => s.template_day_id === tid)
+
+      let status: ProgramDayStatus
+      let completedOnLabel: string | null = null
+
+      if (completedSession) {
+        status = 'done'
+        const t = new Date(completedSession.started_at)
+        const jsDow = t.getDay() // 0=Sun..6=Sat
+        const completedDow = jsDow === 0 ? 7 : jsDow
+        if (completedDow !== scheduledDayNumber) {
+          completedOnLabel = dayLabels[completedDow - 1] || null
+        }
+      } else if (scheduledDayNumber === todayDayNum) {
+        status = 'today'
+      } else if (scheduledDayNumber > todayDayNum) {
+        status = 'upcoming'
+      } else {
+        status = 'missed'
+      }
+
+      programDays.push({
+        templateDayId: tid,
+        name,
+        scheduledDayNumber,
+        scheduledDayLabel,
+        status,
+        completedOnLabel,
+      })
+    }
+    programDays.sort((a, b) => a.scheduledDayNumber - b.scheduledDayNumber)
+
     // Summary counts
     const plannedThisWeek = Object.keys(schedule).filter((k) => schedule[k]).length
     const doneThisWeek = mySessions.length
@@ -387,6 +450,7 @@ export async function fetchCoachWeekOverview(coachId: string): Promise<CoachWeek
       avatarUrl: p.avatar_url || null,
       packageTier: p.package || null,
       week,
+      programDays,
       plannedThisWeek,
       doneThisWeek,
       missedSoFar,

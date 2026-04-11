@@ -13,8 +13,12 @@ import {
   Sparkles,
   Send,
   X,
+  Dumbbell,
+  Circle,
+  CircleDashed,
+  CircleAlert,
 } from 'lucide-react'
-import type { CoachWeekOverview, ClientWeekRow, WeekDay } from '@/lib/coach-week-data'
+import type { CoachWeekOverview, ClientWeekRow, WeekDay, ProgramDayEntry } from '@/lib/coach-week-data'
 import { SwipeableRow } from './SwipeableRow'
 import { isSnoozed, snooze, unsnooze, snoozeKey } from '@/lib/coach-snooze'
 import { useCoachLiveUpdates } from '@/hooks/useCoachLiveUpdates'
@@ -428,6 +432,23 @@ function ClientRow({ client, onMessage }: { client: ClientWeekRow; onMessage: ()
         </div>
       </div>
 
+      {/* Program checklist */}
+      {client.programDays.length > 0 && (
+        <div className="px-4 pb-3 pt-0.5">
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <Dumbbell size={11} className="text-[#A09D96]" strokeWidth={2} />
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-[#A09D96]">
+              Programma · {client.doneThisWeek}/{client.plannedThisWeek}
+            </span>
+          </div>
+          <ul className="space-y-0.5">
+            {client.programDays.map((pd, i) => (
+              <ProgramDayRow key={`${pd.templateDayId}-${i}`} entry={pd} />
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* Footer: nutrition + message button */}
       <div className="px-4 py-2.5 border-t border-[#F0EDE7] flex items-center gap-3">
         {/* Nutrition */}
@@ -486,6 +507,61 @@ function ClientRow({ client, onMessage }: { client: ClientWeekRow; onMessage: ()
         </button>
       </div>
     </div>
+  )
+}
+
+// ─── Program Day Row ─────────────────────────────────────────
+
+function ProgramDayRow({ entry }: { entry: ProgramDayEntry }) {
+  // Icon + styling per status
+  let icon: React.ReactNode
+  let nameClass = 'text-[#1A1917]'
+  const labelClass = 'text-[#A09D96]'
+  let suffix: string | null = null
+
+  switch (entry.status) {
+    case 'done':
+      icon = <CheckCircle2 size={13} className="text-[#34C759] flex-shrink-0" strokeWidth={2.25} />
+      nameClass = 'text-[#6B6862] line-through decoration-[#C5C2BC] decoration-1'
+      if (entry.completedOnLabel) suffix = `gedaan ${entry.completedOnLabel.toLowerCase()}`
+      break
+    case 'today':
+      icon = <Circle size={13} className="text-[#D46A3A] flex-shrink-0" strokeWidth={2.25} />
+      nameClass = 'text-[#1A1917] font-semibold'
+      suffix = 'vandaag'
+      break
+    case 'upcoming':
+      icon = <CircleDashed size={13} className="text-[#C5C2BC] flex-shrink-0" strokeWidth={2} />
+      nameClass = 'text-[#6B6862]'
+      break
+    case 'missed':
+      icon = <CircleAlert size={13} className="text-[#FF3B30] flex-shrink-0" strokeWidth={2.25} />
+      nameClass = 'text-[#FF3B30] font-medium'
+      suffix = 'gemist'
+      break
+  }
+
+  return (
+    <li className="flex items-center gap-2 text-[12px] leading-tight py-0.5">
+      {icon}
+      <span className={`truncate ${nameClass}`}>{entry.name}</span>
+      <span className={`text-[10px] uppercase tracking-wider tabular-nums ${labelClass}`}>
+        {entry.scheduledDayLabel}
+      </span>
+      {suffix && (
+        <span
+          className={`ml-auto text-[10px] ${
+            entry.status === 'missed'
+              ? 'text-[#FF3B30]'
+              : entry.status === 'today'
+              ? 'text-[#D46A3A] font-semibold'
+              : 'text-[#A09D96]'
+          }`}
+        >
+          {suffix}
+        </span>
+      )}
+    </li>
   )
 }
 
