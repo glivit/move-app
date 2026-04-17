@@ -35,10 +35,12 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
       className="client-app min-h-screen"
       style={{
         // v6 · design-system shared.css .phone achtergrond exact:
-        //   canvas #8E9890 + radial highlight top (w 0.10) + shadow bottom (b 0.25).
+        //   background-color komt uit .client-app class (incl. P3-override voor iPhone
+        //   in globals.css). Hier alleen de radial vignette:
+        //   - highlight top  rgba(255,255,255,0.10)
+        //   - shadow  bottom rgba(0,0,0,0.25)
         // background-attachment: fixed bewust weg — iOS Safari rendert het niet
         // betrouwbaar (jitter bij scroll, platslaat de vignette).
-        background: '#8E9890',
         backgroundImage:
           'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,255,255,0.10), transparent 60%),' +
           'radial-gradient(ellipse 80% 60% at 50% 110%, rgba(0,0,0,0.25), transparent 60%)',
