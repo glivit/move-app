@@ -381,9 +381,28 @@ function AddFoodBottomSheet({
   const [loading, setLoading] = useState(false)
   const [addingProduct, setAddingProduct] = useState<string | null>(null)
   const [justAdded, setJustAdded] = useState<Set<string>>(new Set())
+  const [expandedKey, setExpandedKey] = useState<string | null>(null)
+  const [editGrams, setEditGrams] = useState<number>(100)
   const inputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const sheetRef = useRef<HTMLDivElement>(null)
+
+  // Reset expanded row when closing
+  useEffect(() => {
+    if (!isOpen) {
+      setExpandedKey(null)
+      setEditGrams(100)
+    }
+  }, [isOpen])
+
+  function openEditor(key: string, defaultGrams: number) {
+    if (expandedKey === key) {
+      setExpandedKey(null)
+    } else {
+      setExpandedKey(key)
+      setEditGrams(defaultGrams)
+    }
+  }
 
   useEffect(() => {
     if (!isOpen || tab !== 'search') return
@@ -619,63 +638,175 @@ function AddFoodBottomSheet({
                   const key = food.name
                   const isAdding = addingProduct === key
                   const wasAdded = justAdded.has(key)
-                  const displayCal = Math.round(food.per100g.calories)
+                  const isExpanded = expandedKey === key
+                  const currentGrams = isExpanded ? editGrams : 100
+                  const displayCal = Math.round((food.per100g.calories * currentGrams) / 100)
 
                   return (
                     <div
                       key={idx}
                       style={{
-                        display: 'flex', alignItems: 'center', gap: 12,
-                        padding: '12px 20px',
                         borderBottom: '1px solid rgba(253,253,254,0.06)',
+                        background: isExpanded ? 'rgba(253,253,254,0.04)' : 'transparent',
+                        transition: 'background 160ms',
                       }}
                     >
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{
-                          fontSize: 14, fontWeight: 500, color: '#FDFDFE',
-                          margin: 0, lineHeight: 1.25,
-                          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                        }}>
-                          {food.name}
-                        </p>
-                        <p style={{
-                          fontSize: 12, color: 'rgba(253,253,254,0.52)',
-                          margin: '3px 0 0',
-                        }}>
-                          {displayCal} kcal{food.brand && <span> · {food.brand}</span>}
-                        </p>
-                      </div>
-
-                      <button
-                        onClick={() => addFood(food, 100)}
-                        disabled={isAdding}
+                      <div
+                        onClick={() => openEditor(key, 100)}
                         style={{
-                          width: 36, height: 36,
-                          borderRadius: '50%',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          flexShrink: 0,
-                          background: wasAdded ? '#2FA65A' : 'rgba(253,253,254,0.10)',
-                          color: '#FDFDFE',
-                          border: 'none',
+                          display: 'flex', alignItems: 'center', gap: 12,
+                          padding: '12px 20px',
                           cursor: 'pointer',
                           WebkitTapHighlightColor: 'transparent',
-                          transition: 'all 160ms',
                         }}
                       >
-                        {isAdding ? (
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{
+                            fontSize: 14, fontWeight: 500, color: '#FDFDFE',
+                            margin: 0, lineHeight: 1.25,
+                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                          }}>
+                            {food.name}
+                          </p>
+                          <p style={{
+                            fontSize: 12, color: 'rgba(253,253,254,0.52)',
+                            margin: '3px 0 0',
+                          }}>
+                            {displayCal} kcal · {currentGrams}g{food.brand && <span> · {food.brand}</span>}
+                          </p>
+                        </div>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            if (isExpanded) {
+                              addFood(food, editGrams)
+                              setExpandedKey(null)
+                            } else {
+                              openEditor(key, 100)
+                            }
+                          }}
+                          disabled={isAdding}
+                          style={{
+                            height: 36,
+                            minWidth: 36,
+                            padding: isExpanded ? '0 14px' : 0,
+                            borderRadius: isExpanded ? 18 : '50%',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            gap: 6,
+                            flexShrink: 0,
+                            background: wasAdded ? '#2FA65A' : isExpanded ? '#C0FC01' : 'rgba(253,253,254,0.10)',
+                            color: isExpanded && !wasAdded ? '#1A1917' : '#FDFDFE',
+                            fontSize: 13, fontWeight: 600,
+                            border: 'none',
+                            cursor: 'pointer',
+                            WebkitTapHighlightColor: 'transparent',
+                            transition: 'all 160ms',
+                          }}
+                        >
+                          {isAdding ? (
+                            <div style={{
+                              width: 14, height: 14,
+                              border: '1.5px solid rgba(253,253,254,0.30)',
+                              borderTopColor: '#FDFDFE',
+                              borderRadius: '50%',
+                              animation: 'spin 800ms linear infinite',
+                            }} />
+                          ) : wasAdded ? (
+                            <Check strokeWidth={2} size={16} />
+                          ) : isExpanded ? (
+                            <>Toevoegen</>
+                          ) : (
+                            <Plus strokeWidth={2} size={16} />
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Inline grams editor */}
+                      {isExpanded && (
+                        <div style={{
+                          padding: '0 20px 14px',
+                          display: 'flex', flexDirection: 'column', gap: 10,
+                        }}>
+                          {/* Quick chips */}
+                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                            {[25, 50, 100, 150, 200, 250].map(g => {
+                              const active = editGrams === g
+                              return (
+                                <button
+                                  key={g}
+                                  onClick={(e) => { e.stopPropagation(); setEditGrams(g) }}
+                                  style={{
+                                    padding: '6px 12px',
+                                    borderRadius: 10,
+                                    fontSize: 12, fontWeight: 500,
+                                    background: active ? '#FDFDFE' : 'rgba(253,253,254,0.08)',
+                                    color: active ? '#1A1917' : 'rgba(253,253,254,0.78)',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    WebkitTapHighlightColor: 'transparent',
+                                  }}
+                                >
+                                  {g}g
+                                </button>
+                              )
+                            })}
+                          </div>
+
+                          {/* Stepper */}
                           <div style={{
-                            width: 14, height: 14,
-                            border: '1.5px solid rgba(253,253,254,0.30)',
-                            borderTopColor: '#FDFDFE',
-                            borderRadius: '50%',
-                            animation: 'spin 800ms linear infinite',
-                          }} />
-                        ) : wasAdded ? (
-                          <Check strokeWidth={2} size={16} />
-                        ) : (
-                          <Plus strokeWidth={2} size={16} />
-                        )}
-                      </button>
+                            display: 'flex', alignItems: 'center', gap: 10,
+                            background: 'rgba(253,253,254,0.06)',
+                            borderRadius: 12,
+                            padding: '6px 8px',
+                          }}>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setEditGrams(Math.max(5, editGrams - 5)) }}
+                              style={{
+                                width: 32, height: 32, borderRadius: 10,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                background: 'rgba(253,253,254,0.10)',
+                                color: '#FDFDFE',
+                                border: 'none', cursor: 'pointer',
+                                WebkitTapHighlightColor: 'transparent',
+                              }}
+                            >
+                              <span style={{ fontSize: 18, fontWeight: 400, lineHeight: 1 }}>−</span>
+                            </button>
+                            <input
+                              type="number"
+                              inputMode="numeric"
+                              value={editGrams}
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(e) => {
+                                const v = parseInt(e.target.value)
+                                setEditGrams(Number.isFinite(v) && v > 0 ? v : 1)
+                              }}
+                              style={{
+                                flex: 1, textAlign: 'center',
+                                fontSize: 16, fontWeight: 600, color: '#FDFDFE',
+                                background: 'transparent', border: 'none', outline: 'none',
+                                fontVariantNumeric: 'tabular-nums',
+                                padding: '6px 0',
+                              }}
+                            />
+                            <span style={{ fontSize: 13, color: 'rgba(253,253,254,0.52)', marginRight: 4 }}>g</span>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setEditGrams(editGrams + 5) }}
+                              style={{
+                                width: 32, height: 32, borderRadius: 10,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                background: 'rgba(253,253,254,0.10)',
+                                color: '#FDFDFE',
+                                border: 'none', cursor: 'pointer',
+                                WebkitTapHighlightColor: 'transparent',
+                              }}
+                            >
+                              <span style={{ fontSize: 18, fontWeight: 400, lineHeight: 1 }}>+</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )
                 })
@@ -751,66 +882,178 @@ function AddFoodBottomSheet({
                 const key = product.barcode || product.name
                 const isAdding = addingProduct === key
                 const wasAdded = justAdded.has(key)
-                let displayGrams = 100
+                const isExpanded = expandedKey === key
+                let defaultGrams = 100
                 if (product.serving_size) {
                   const match = product.serving_size.match(/(\d+)\s*g/i)
-                  if (match) displayGrams = parseInt(match[1])
+                  if (match) defaultGrams = parseInt(match[1])
                 }
-                const displayCal = Math.round((product.per100g.calories * displayGrams) / 100)
+                const currentGrams = isExpanded ? editGrams : defaultGrams
+                const displayCal = Math.round((product.per100g.calories * currentGrams) / 100)
 
                 return (
                   <div
                     key={idx}
                     style={{
-                      display: 'flex', alignItems: 'center', gap: 12,
-                      padding: '12px 0',
                       borderBottom: '1px solid rgba(253,253,254,0.06)',
+                      background: isExpanded ? 'rgba(253,253,254,0.04)' : 'transparent',
+                      transition: 'background 160ms',
+                      margin: '0 -20px',
+                      padding: '0 20px',
                     }}
                   >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{
-                        fontSize: 14, color: '#FDFDFE', margin: 0, lineHeight: 1.25,
-                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                      }}>
-                        {product.name}
-                      </p>
-                      <p style={{
-                        fontSize: 12, color: 'rgba(253,253,254,0.52)', margin: '3px 0 0',
-                      }}>
-                        {displayCal} kcal{product.brand && <span> · {product.brand}</span>}
-                        <span style={{ color: 'rgba(253,253,254,0.32)' }}> · {displayGrams}g</span>
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => addFood(product, displayGrams)}
-                      disabled={isAdding}
+                    <div
+                      onClick={() => openEditor(key, defaultGrams)}
                       style={{
-                        width: 36, height: 36,
-                        borderRadius: '50%',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        flexShrink: 0,
-                        background: wasAdded ? '#2FA65A' : 'rgba(253,253,254,0.10)',
-                        color: '#FDFDFE',
-                        border: 'none',
+                        display: 'flex', alignItems: 'center', gap: 12,
+                        padding: '12px 0',
                         cursor: 'pointer',
                         WebkitTapHighlightColor: 'transparent',
                       }}
                     >
-                      {isAdding ? (
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{
+                          fontSize: 14, color: '#FDFDFE', margin: 0, lineHeight: 1.25,
+                          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                        }}>
+                          {product.name}
+                        </p>
+                        <p style={{
+                          fontSize: 12, color: 'rgba(253,253,254,0.52)', margin: '3px 0 0',
+                        }}>
+                          {displayCal} kcal{product.brand && <span> · {product.brand}</span>}
+                          <span style={{ color: 'rgba(253,253,254,0.32)' }}> · {currentGrams}g</span>
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (isExpanded) {
+                            addFood(product, editGrams)
+                            setExpandedKey(null)
+                          } else {
+                            openEditor(key, defaultGrams)
+                          }
+                        }}
+                        disabled={isAdding}
+                        style={{
+                          height: 36,
+                          minWidth: 36,
+                          padding: isExpanded ? '0 14px' : 0,
+                          borderRadius: isExpanded ? 18 : '50%',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          flexShrink: 0,
+                          background: wasAdded ? '#2FA65A' : isExpanded ? '#C0FC01' : 'rgba(253,253,254,0.10)',
+                          color: isExpanded && !wasAdded ? '#1A1917' : '#FDFDFE',
+                          fontSize: 13, fontWeight: 600,
+                          border: 'none',
+                          cursor: 'pointer',
+                          WebkitTapHighlightColor: 'transparent',
+                          transition: 'all 160ms',
+                        }}
+                      >
+                        {isAdding ? (
+                          <div style={{
+                            width: 14, height: 14,
+                            border: '1.5px solid rgba(253,253,254,0.30)',
+                            borderTopColor: '#FDFDFE',
+                            borderRadius: '50%',
+                            animation: 'spin 800ms linear infinite',
+                          }} />
+                        ) : wasAdded ? (
+                          <Check strokeWidth={2} size={16} />
+                        ) : isExpanded ? (
+                          <>Toevoegen</>
+                        ) : (
+                          <Plus strokeWidth={2} size={16} />
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Inline grams editor */}
+                    {isExpanded && (
+                      <div style={{
+                        padding: '0 0 14px',
+                        display: 'flex', flexDirection: 'column', gap: 10,
+                      }}>
+                        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                          {[25, 50, 100, 150, 200, 250].map(g => {
+                            const active = editGrams === g
+                            return (
+                              <button
+                                key={g}
+                                onClick={(e) => { e.stopPropagation(); setEditGrams(g) }}
+                                style={{
+                                  padding: '6px 12px',
+                                  borderRadius: 10,
+                                  fontSize: 12, fontWeight: 500,
+                                  background: active ? '#FDFDFE' : 'rgba(253,253,254,0.08)',
+                                  color: active ? '#1A1917' : 'rgba(253,253,254,0.78)',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  WebkitTapHighlightColor: 'transparent',
+                                }}
+                              >
+                                {g}g
+                              </button>
+                            )
+                          })}
+                        </div>
+
                         <div style={{
-                          width: 14, height: 14,
-                          border: '1.5px solid rgba(253,253,254,0.30)',
-                          borderTopColor: '#FDFDFE',
-                          borderRadius: '50%',
-                          animation: 'spin 800ms linear infinite',
-                        }} />
-                      ) : wasAdded ? (
-                        <Check strokeWidth={2} size={16} />
-                      ) : (
-                        <Plus strokeWidth={2} size={16} />
-                      )}
-                    </button>
+                          display: 'flex', alignItems: 'center', gap: 10,
+                          background: 'rgba(253,253,254,0.06)',
+                          borderRadius: 12,
+                          padding: '6px 8px',
+                        }}>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setEditGrams(Math.max(5, editGrams - 5)) }}
+                            style={{
+                              width: 32, height: 32, borderRadius: 10,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              background: 'rgba(253,253,254,0.10)',
+                              color: '#FDFDFE',
+                              border: 'none', cursor: 'pointer',
+                              WebkitTapHighlightColor: 'transparent',
+                            }}
+                          >
+                            <span style={{ fontSize: 18, fontWeight: 400, lineHeight: 1 }}>−</span>
+                          </button>
+                          <input
+                            type="number"
+                            inputMode="numeric"
+                            value={editGrams}
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => {
+                              const v = parseInt(e.target.value)
+                              setEditGrams(Number.isFinite(v) && v > 0 ? v : 1)
+                            }}
+                            style={{
+                              flex: 1, textAlign: 'center',
+                              fontSize: 16, fontWeight: 600, color: '#FDFDFE',
+                              background: 'transparent', border: 'none', outline: 'none',
+                              fontVariantNumeric: 'tabular-nums',
+                              padding: '6px 0',
+                            }}
+                          />
+                          <span style={{ fontSize: 13, color: 'rgba(253,253,254,0.52)', marginRight: 4 }}>g</span>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setEditGrams(editGrams + 5) }}
+                            style={{
+                              width: 32, height: 32, borderRadius: 10,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              background: 'rgba(253,253,254,0.10)',
+                              color: '#FDFDFE',
+                              border: 'none', cursor: 'pointer',
+                              WebkitTapHighlightColor: 'transparent',
+                            }}
+                          >
+                            <span style={{ fontSize: 18, fontWeight: 400, lineHeight: 1 }}>+</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )
               })}
@@ -840,6 +1083,7 @@ export default function ClientNutritionPage() {
   const [bottomSheetMealId, setBottomSheetMealId] = useState<string | null>(null)
   const [daySubmitted, setDaySubmitted] = useState(false)
   const [recentFoods, setRecentFoods] = useState<RecentFood[]>([])
+  const [editingFood, setEditingFood] = useState<{ mealId: string; foodId: string; grams: number } | null>(null)
 
   const dateStr = selectedDate.toISOString().split('T')[0]
 
@@ -1078,6 +1322,15 @@ export default function ClientNutritionPage() {
     const existing = logs.get(meal.id)
     const foods = existing?.foods_eaten || meal.foods || []
     const newFoods = foods.filter(f => f.id !== foodId)
+    updateMealFoods(meal, newFoods)
+  }
+
+  function updateFoodGrams(meal: MealMoment, foodId: string, grams: number) {
+    const existing = logs.get(meal.id)
+    const foods = existing?.foods_eaten || meal.foods || []
+    const newFoods = foods.map(f =>
+      f.id === foodId ? { ...f, grams: Math.max(1, Math.round(grams)) } : f
+    )
     updateMealFoods(meal, newFoods)
   }
 
@@ -1350,63 +1603,170 @@ export default function ClientNutritionPage() {
               {foods.length > 0 ? (
                 <div>
                   {foods.map(food => {
-                    const foodCal = calcMacro(food, 'calories')
                     const isChecked = food.checked === true
+                    const isEditingThis = editingFood?.mealId === meal.id && editingFood?.foodId === food.id
+                    const displayGrams = isEditingThis ? editingFood.grams : food.grams
+                    const foodCal = Math.round((food.per100g.calories * displayGrams) / 100)
 
                     return (
-                      <div
-                        key={food.id}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 12,
-                          padding: '8px 0',
-                        }}
-                      >
-                        <button
-                          onClick={() => toggleFoodChecked(meal, food.id)}
+                      <div key={food.id}>
+                        <div
                           style={{
-                            width: 20, height: 20, borderRadius: '50%',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            flexShrink: 0,
-                            background: isChecked ? '#2FA65A' : 'transparent',
-                            border: isChecked ? 'none' : '1.5px solid rgba(253,253,254,0.28)',
-                            cursor: 'pointer',
-                            WebkitTapHighlightColor: 'transparent',
-                            transition: 'all 160ms',
+                            display: 'flex', alignItems: 'center', gap: 12,
+                            padding: '8px 0',
                           }}
                         >
-                          {isChecked && <Check strokeWidth={2.5} size={11} style={{ color: '#FDFDFE' }} />}
-                        </button>
+                          <button
+                            onClick={() => toggleFoodChecked(meal, food.id)}
+                            style={{
+                              width: 20, height: 20, borderRadius: '50%',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              flexShrink: 0,
+                              background: isChecked ? '#2FA65A' : 'transparent',
+                              border: isChecked ? 'none' : '1.5px solid rgba(253,253,254,0.28)',
+                              cursor: 'pointer',
+                              WebkitTapHighlightColor: 'transparent',
+                              transition: 'all 160ms',
+                            }}
+                          >
+                            {isChecked && <Check strokeWidth={2.5} size={11} style={{ color: '#FDFDFE' }} />}
+                          </button>
 
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{
-                            fontSize: 14, margin: 0, lineHeight: 1.2,
-                            color: isChecked ? 'rgba(253,253,254,0.44)' : '#FDFDFE',
-                            textDecoration: isChecked ? 'line-through' : 'none',
-                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                          }}>
-                            {food.name}
-                          </p>
-                          <p style={{
-                            fontSize: 12, margin: '3px 0 0',
-                            color: isChecked ? 'rgba(253,253,254,0.30)' : 'rgba(253,253,254,0.52)',
-                            fontVariantNumeric: 'tabular-nums',
-                          }}>
-                            {food.grams}g · {foodCal} kcal
-                          </p>
+                          <div
+                            onClick={() => {
+                              if (isEditingThis) {
+                                setEditingFood(null)
+                              } else {
+                                setEditingFood({ mealId: meal.id, foodId: food.id, grams: food.grams })
+                              }
+                            }}
+                            style={{ flex: 1, minWidth: 0, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
+                          >
+                            <p style={{
+                              fontSize: 14, margin: 0, lineHeight: 1.2,
+                              color: isChecked ? 'rgba(253,253,254,0.44)' : '#FDFDFE',
+                              textDecoration: isChecked ? 'line-through' : 'none',
+                              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                            }}>
+                              {food.name}
+                            </p>
+                            <p style={{
+                              fontSize: 12, margin: '3px 0 0',
+                              color: isChecked ? 'rgba(253,253,254,0.30)' : isEditingThis ? '#C0FC01' : 'rgba(253,253,254,0.52)',
+                              fontVariantNumeric: 'tabular-nums',
+                            }}>
+                              {displayGrams}g · {foodCal} kcal
+                            </p>
+                          </div>
+
+                          <button
+                            onClick={() => deleteFood(meal, food.id)}
+                            style={{
+                              padding: 6,
+                              background: 'transparent', border: 'none', cursor: 'pointer',
+                              color: 'rgba(253,253,254,0.28)',
+                              WebkitTapHighlightColor: 'transparent',
+                              flexShrink: 0,
+                            }}
+                          >
+                            <Trash2 strokeWidth={1.5} size={14} />
+                          </button>
                         </div>
 
-                        <button
-                          onClick={() => deleteFood(meal, food.id)}
-                          style={{
-                            padding: 6,
-                            background: 'transparent', border: 'none', cursor: 'pointer',
-                            color: 'rgba(253,253,254,0.28)',
-                            WebkitTapHighlightColor: 'transparent',
-                            flexShrink: 0,
-                          }}
-                        >
-                          <Trash2 strokeWidth={1.5} size={14} />
-                        </button>
+                        {/* Inline grams editor for existing food */}
+                        {isEditingThis && (
+                          <div style={{
+                            padding: '8px 0 12px 32px',
+                            display: 'flex', flexDirection: 'column', gap: 10,
+                          }}>
+                            {/* Stepper */}
+                            <div style={{
+                              display: 'flex', alignItems: 'center', gap: 10,
+                              background: 'rgba(253,253,254,0.06)',
+                              borderRadius: 12,
+                              padding: '6px 8px',
+                            }}>
+                              <button
+                                onClick={() => setEditingFood({ ...editingFood!, grams: Math.max(1, editingFood!.grams - 5) })}
+                                style={{
+                                  width: 32, height: 32, borderRadius: 10,
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                  background: 'rgba(253,253,254,0.10)',
+                                  color: '#FDFDFE',
+                                  border: 'none', cursor: 'pointer',
+                                  WebkitTapHighlightColor: 'transparent',
+                                }}
+                              >
+                                <span style={{ fontSize: 18, fontWeight: 400, lineHeight: 1 }}>−</span>
+                              </button>
+                              <input
+                                type="number"
+                                inputMode="numeric"
+                                value={editingFood!.grams}
+                                onChange={(e) => {
+                                  const v = parseInt(e.target.value)
+                                  setEditingFood({ ...editingFood!, grams: Number.isFinite(v) && v > 0 ? v : 1 })
+                                }}
+                                style={{
+                                  flex: 1, textAlign: 'center',
+                                  fontSize: 16, fontWeight: 600, color: '#FDFDFE',
+                                  background: 'transparent', border: 'none', outline: 'none',
+                                  fontVariantNumeric: 'tabular-nums',
+                                  padding: '6px 0',
+                                }}
+                              />
+                              <span style={{ fontSize: 13, color: 'rgba(253,253,254,0.52)', marginRight: 4 }}>g</span>
+                              <button
+                                onClick={() => setEditingFood({ ...editingFood!, grams: editingFood!.grams + 5 })}
+                                style={{
+                                  width: 32, height: 32, borderRadius: 10,
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                  background: 'rgba(253,253,254,0.10)',
+                                  color: '#FDFDFE',
+                                  border: 'none', cursor: 'pointer',
+                                  WebkitTapHighlightColor: 'transparent',
+                                }}
+                              >
+                                <span style={{ fontSize: 18, fontWeight: 400, lineHeight: 1 }}>+</span>
+                              </button>
+                            </div>
+
+                            {/* Save / cancel */}
+                            <div style={{ display: 'flex', gap: 8 }}>
+                              <button
+                                onClick={() => setEditingFood(null)}
+                                style={{
+                                  flex: 1, padding: '10px 12px',
+                                  borderRadius: 12,
+                                  fontSize: 13, fontWeight: 500,
+                                  background: 'rgba(253,253,254,0.08)',
+                                  color: 'rgba(253,253,254,0.62)',
+                                  border: 'none', cursor: 'pointer',
+                                  WebkitTapHighlightColor: 'transparent',
+                                }}
+                              >
+                                Annuleren
+                              </button>
+                              <button
+                                onClick={() => {
+                                  updateFoodGrams(meal, food.id, editingFood!.grams)
+                                  setEditingFood(null)
+                                }}
+                                style={{
+                                  flex: 1, padding: '10px 12px',
+                                  borderRadius: 12,
+                                  fontSize: 13, fontWeight: 600,
+                                  background: '#C0FC01',
+                                  color: '#1A1917',
+                                  border: 'none', cursor: 'pointer',
+                                  WebkitTapHighlightColor: 'transparent',
+                                }}
+                              >
+                                Opslaan
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )
                   })}
