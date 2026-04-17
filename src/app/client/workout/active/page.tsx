@@ -2709,27 +2709,30 @@ function SetRowComponent({
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
     >
-      {/* Delete tray onder de set-row — kleurt van muted naar solid rood bij naderen threshold */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          top: 0, right: 0, bottom: 0,
-          width: SWIPE_MAX,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: `rgba(196,55,42,${0.35 + revealPct * 0.5})`,
-          borderRadius: 8,
-          transition: swipeX === 0 ? 'background 160ms' : undefined,
-          pointerEvents: 'none',
-        }}
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FDFDFE" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="3 6 5 6 21 6" />
-          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-          <path d="M10 11v6M14 11v6" />
-          <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
-        </svg>
-      </div>
+      {/* Delete tray onder de set-row — opacity 0 bij rust (alleen zichtbaar als je swipet).
+          Volledig verborgen als er geen swipe is, zodat de tray niet permanent door de row heen lekt. */}
+      {swipeX < 0 && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            top: 0, right: 0, bottom: 0,
+            width: SWIPE_MAX,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: `rgba(196,55,42,${Math.min(0.9, 0.25 + revealPct * 0.6)})`,
+            opacity: revealPct,
+            borderRadius: 8,
+            pointerEvents: 'none',
+          }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FDFDFE" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+          </svg>
+        </div>
+      )}
       <div
         className={`set-row ${set.completed ? 'checked' : ''}`}
         style={{
@@ -2737,7 +2740,6 @@ function SetRowComponent({
           transition: swipeX === 0 ? 'transform 220ms cubic-bezier(0.16,1,0.3,1)' : undefined,
           position: 'relative',
           zIndex: 1,
-          background: 'var(--card, transparent)',
         }}
       >
       {/* Set number — long press to change type */}

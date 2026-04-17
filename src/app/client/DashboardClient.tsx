@@ -446,7 +446,7 @@ function HeroCard({
       <Link href="/client/workout" className="block v6-card" aria-label={`${workoutName} voltooid`}>
         <Arr />
         <div className="eyebrow mb-3">
-          <span className="pulse" style={{ background: '#2FA65A' }} /> Vandaag · Voltooid
+          <span className="pulse" style={{ background: '#C0FC01' }} /> Vandaag · Voltooid
         </div>
         <h2 style={{ fontSize: 22, fontWeight: 300, letterSpacing: '-0.018em', lineHeight: 1.15, marginBottom: 6 }}>
           {workoutName}
@@ -906,9 +906,10 @@ function Slider({ fill, knobRight, label, ticksCount }: { fill: number; knobRigh
           style={{
             height: 3,
             width: `${Math.max(fill, 0.08) * 100}%`,
-            background: isComplete ? '#2FA65A' : 'rgba(253,253,254,0.85)',
+            background: isComplete ? '#C0FC01' : 'rgba(253,253,254,0.85)',
             borderRadius: isComplete ? '1.5px' : '1.5px 0 0 1.5px',
             transition: 'width 320ms cubic-bezier(0.16,1,0.3,1), background 240ms',
+            boxShadow: isComplete ? '0 0 12px rgba(192,252,1,0.32)' : undefined,
           }}
         />
         {!isComplete && (
@@ -940,7 +941,7 @@ function Slider({ fill, knobRight, label, ticksCount }: { fill: number; knobRigh
       </div>
       <div className="cap-row" style={{ marginTop: 10 }}>
         <span className="cap">{knobRight ? 'Voortgang' : 'Workout'}</span>
-        <span className="cap" style={isComplete ? { color: '#2FA65A', fontWeight: 500 } : undefined}>{label}</span>
+        <span className="cap" style={isComplete ? { color: '#C0FC01', fontWeight: 500 } : undefined}>{label}</span>
       </div>
     </div>
   )
