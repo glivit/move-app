@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { Play, Square, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 
 interface MinimizedWorkout {
@@ -119,111 +118,336 @@ export function ActiveWorkoutBar() {
 
   if (!minimized || isOnActiveWorkout || isOnCompleteWorkout) return null
 
+  // v6: warm amber voor "vergeten?" — lime blijft pure event-paint
   const isStale = seconds > 7200
+  const DOT = isStale ? '#E8B948' : '#C0FC01'
+  const INK = '#FDFDFE'
+  const INK_FAINT = 'rgba(253,253,254,0.55)'
+  const DARK = '#474B48'
 
   return (
     <>
-      {/* Compact bar */}
-      <div className="fixed bottom-20 left-4 right-4 z-40 lg:left-[296px] animate-slide-up">
+      {/* v6 · compacte, tap-to-resume bar */}
+      <div
+        className="fixed left-4 right-4 z-40 lg:left-[296px] animate-slide-up"
+        style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}
+      >
         <div className="max-w-lg mx-auto">
-          <div className="bg-[#1A1917] rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.25)] overflow-hidden">
-            <div className="flex items-center gap-2.5 px-3.5 py-2.5">
-              {/* Timer */}
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isStale ? 'bg-[#C47D15]' : 'bg-[var(--color-pop)]'}`} />
-                <span className={`text-[14px] font-bold tabular-nums ${isStale ? 'text-[#C47D15]' : 'text-white'}`}>
+          <div
+            role="group"
+            aria-label="Workout bezig"
+            style={{
+              display: 'flex',
+              alignItems: 'stretch',
+              gap: 0,
+              borderRadius: 18,
+              overflow: 'hidden',
+              background: DARK,
+              boxShadow: '0 8px 24px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.06)',
+            }}
+          >
+            {/* Hoofd-tap zone: hervat */}
+            <button
+              type="button"
+              onClick={handleResume}
+              aria-label="Workout hervatten"
+              style={{
+                flex: 1,
+                minWidth: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '12px 14px',
+                textAlign: 'left',
+                color: INK,
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              {/* Pulse + timer */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                <span
+                  aria-hidden="true"
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    background: DOT,
+                    boxShadow: `0 0 0 3px ${DOT}22`,
+                    animation: 'pulse-dot 1.8s ease-in-out infinite',
+                    flexShrink: 0,
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 600,
+                    letterSpacing: '-0.01em',
+                    fontVariantNumeric: 'tabular-nums',
+                    color: INK,
+                  }}
+                >
                   {formatTimer(seconds)}
                 </span>
-                {isStale && (
-                  <span className="text-[10px] text-[#C47D15] font-medium">Vergeten?</span>
-                )}
               </div>
 
-              {/* Stop button */}
-              <button
-                onClick={() => setShowStopSheet(true)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+              {/* Label */}
+              <span
+                style={{
+                  fontSize: 13,
+                  fontWeight: 400,
+                  color: INK_FAINT,
+                  letterSpacing: '-0.005em',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  flex: 1,
+                  minWidth: 0,
+                }}
               >
-                <Square size={13} strokeWidth={2.5} className="text-[#C4372A]" />
-              </button>
+                {isStale ? 'Nog bezig? · tik om verder' : 'Tik om te hervatten'}
+              </span>
 
-              {/* Finish button */}
-              <button
-                onClick={handleFinish}
-                className="px-3 py-1.5 rounded-lg bg-[#3D8B5C] text-white text-[11px] font-bold uppercase tracking-[0.04em] hover:bg-[#357A51] transition-colors"
+              {/* Chevron */}
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke={INK_FAINT}
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                style={{ flexShrink: 0 }}
               >
-                Afronden
-              </button>
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
 
-              {/* Resume button */}
-              <button
-                onClick={handleResume}
-                className="px-3 py-1.5 rounded-lg bg-[var(--color-pop)] text-white text-[11px] font-bold uppercase tracking-[0.04em] hover:bg-[#C45E30] transition-colors flex items-center gap-1"
+            {/* Vertical divider */}
+            <div style={{ width: 1, background: 'rgba(255,255,255,0.08)', flexShrink: 0 }} aria-hidden="true" />
+
+            {/* Stop / meer-actie */}
+            <button
+              type="button"
+              onClick={() => setShowStopSheet(true)}
+              aria-label="Workout stoppen of afronden"
+              style={{
+                width: 48,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                color: INK_FAINT,
+                WebkitTapHighlightColor: 'transparent',
+                flexShrink: 0,
+              }}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
               >
-                <Play size={10} strokeWidth={3} fill="white" />
-                Hervat
-              </button>
-            </div>
+                <circle cx="12" cy="5" r="1.4" />
+                <circle cx="12" cy="12" r="1.4" />
+                <circle cx="12" cy="19" r="1.4" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Stop/Discard bottom sheet */}
+      {/* v6 · stop-sheet: dark card, rustige hiërarchie */}
       {showStopSheet && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-end" onClick={() => setShowStopSheet(false)}>
-          <div className="w-full bg-white rounded-t-2xl shadow-xl animate-slide-up pb-safe" onClick={e => e.stopPropagation()}>
-            <div className="w-10 h-1 bg-[#DDD9D0] rounded-full mx-auto mt-3" />
-            <div className="p-6">
-              <h3 className="text-[18px] font-semibold text-[#1A1917] mb-1" style={{ fontFamily: 'var(--font-display)' }}>
+        <div
+          className="fixed inset-0 z-50 flex items-end"
+          style={{ background: 'rgba(0,0,0,0.48)', backdropFilter: 'blur(2px)' }}
+          onClick={() => setShowStopSheet(false)}
+        >
+          <div
+            className="w-full animate-slide-up"
+            style={{
+              background: DARK,
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              boxShadow: '0 -8px 32px rgba(0,0,0,0.35)',
+              paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+              color: INK,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Grip */}
+            <div
+              style={{
+                width: 40,
+                height: 4,
+                background: 'rgba(255,255,255,0.18)',
+                borderRadius: 999,
+                margin: '10px auto 0',
+              }}
+              aria-hidden="true"
+            />
+
+            <div style={{ padding: '20px 22px 22px' }}>
+              <h3
+                style={{
+                  fontFamily: 'var(--font-display), Outfit, sans-serif',
+                  fontSize: 20,
+                  fontWeight: 500,
+                  letterSpacing: '-0.02em',
+                  color: INK,
+                  marginBottom: 4,
+                }}
+              >
                 Workout stoppen?
               </h3>
-              <p className="text-[13px] text-[#A09D96] mb-5">
+              <p style={{ fontSize: 13, color: INK_FAINT, marginBottom: 18, letterSpacing: '-0.005em' }}>
                 Kies wat je wilt doen met deze sessie.
               </p>
-              <div className="space-y-2.5">
-                {/* Option 1: Finish properly */}
-                <button
-                  onClick={handleFinish}
-                  className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#3D8B5C]/8 hover:bg-[#3D8B5C]/15 transition-colors text-left"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-[#3D8B5C] flex items-center justify-center flex-shrink-0">
-                    <Play size={16} strokeWidth={2.5} fill="white" className="text-white" />
-                  </div>
-                  <div>
-                    <p className="text-[14px] font-semibold text-[#1A1917]">Afronden & feedback</p>
-                    <p className="text-[12px] text-[#A09D96]">Sla op en geef je coach feedback</p>
-                  </div>
-                </button>
 
-                {/* Option 2: Discard */}
-                <button
-                  onClick={handleDiscard}
-                  disabled={stopping}
-                  className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#C4372A]/5 hover:bg-[#C4372A]/10 transition-colors text-left disabled:opacity-50"
+              {/* Afronden — primaire, positieve actie */}
+              <button
+                type="button"
+                onClick={handleFinish}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  padding: '14px 16px',
+                  borderRadius: 16,
+                  background: '#2FA65A',
+                  color: INK,
+                  border: 'none',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  WebkitTapHighlightColor: 'transparent',
+                  marginBottom: 10,
+                  boxShadow: '0 4px 14px rgba(47,166,90,0.28)',
+                }}
+              >
+                <div
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: 10,
+                    background: 'rgba(255,255,255,0.18)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                  aria-hidden="true"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-[#C4372A] flex items-center justify-center flex-shrink-0">
-                    <X size={16} strokeWidth={2.5} className="text-white" />
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.01em' }}>
+                    Afronden
                   </div>
-                  <div>
-                    <p className="text-[14px] font-semibold text-[#C4372A]">
-                      {stopping ? 'Verwijderen...' : 'Verwijderen'}
-                    </p>
-                    <p className="text-[12px] text-[#A09D96]">Wis deze sessie volledig</p>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.82)', marginTop: 2 }}>
+                    Opslaan en feedback geven
                   </div>
-                </button>
+                </div>
+              </button>
 
-                {/* Cancel */}
-                <button
-                  onClick={() => setShowStopSheet(false)}
-                  className="w-full py-3.5 text-center text-[14px] font-medium text-[#A09D96]"
+              {/* Verwijderen — ingetogen ghost, geen shoutende rood */}
+              <button
+                type="button"
+                onClick={handleDiscard}
+                disabled={stopping}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  padding: '14px 16px',
+                  borderRadius: 16,
+                  background: 'rgba(255,255,255,0.04)',
+                  color: INK,
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  cursor: stopping ? 'not-allowed' : 'pointer',
+                  textAlign: 'left',
+                  WebkitTapHighlightColor: 'transparent',
+                  marginBottom: 10,
+                  opacity: stopping ? 0.6 : 1,
+                }}
+              >
+                <div
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: 10,
+                    background: 'rgba(255,255,255,0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    color: 'rgba(253,253,254,0.72)',
+                  }}
+                  aria-hidden="true"
                 >
-                  Annuleren
-                </button>
-              </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 6h18" />
+                    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  </svg>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 15, fontWeight: 500, letterSpacing: '-0.01em' }}>
+                    {stopping ? 'Verwijderen…' : 'Sessie verwijderen'}
+                  </div>
+                  <div style={{ fontSize: 12, color: INK_FAINT, marginTop: 2 }}>
+                    Wis deze workout volledig
+                  </div>
+                </div>
+              </button>
+
+              {/* Annuleren */}
+              <button
+                type="button"
+                onClick={() => setShowStopSheet(false)}
+                style={{
+                  width: '100%',
+                  padding: '12px 0',
+                  textAlign: 'center',
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: INK_FAINT,
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  marginTop: 4,
+                  WebkitTapHighlightColor: 'transparent',
+                }}
+              >
+                Annuleren
+              </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* pulse keyframes — lokaal want globals heeft 'm mogelijk niet */}
+      <style jsx>{`
+        @keyframes pulse-dot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.55; transform: scale(0.88); }
+        }
+      `}</style>
     </>
   )
 }
