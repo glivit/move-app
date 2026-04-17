@@ -711,17 +711,25 @@ function WorkoutCompletePage() {
           flexShrink: 0,
         }}
       >
-        <span
+        <button
+          type="button"
+          aria-label="Naar home"
+          onClick={() => router.push('/client')}
           style={{
             fontFamily: 'var(--font-sans, Outfit), Outfit, sans-serif',
             fontSize: 22,
             fontWeight: 500,
             letterSpacing: '-0.02em',
             color: '#FDFDFE',
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
           }}
         >
           MŌVE
-        </span>
+        </button>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div
             style={{

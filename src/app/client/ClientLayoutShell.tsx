@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ClientBottomNav } from '@/components/layout/ClientBottomNav'
 import { ClientSidebar } from '@/components/layout/ClientSidebar'
@@ -48,17 +49,21 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
             justifyContent: 'space-between',
           }}
         >
-          <span
+          <Link
+            href="/client"
+            aria-label="Naar home"
             style={{
               fontFamily: 'var(--font-sans, Outfit), Outfit, sans-serif',
               fontSize: 22,
               fontWeight: 500,
               letterSpacing: '-0.02em',
               color: '#FDFDFE',
+              textDecoration: 'none',
+              WebkitTapHighlightColor: 'transparent',
             }}
           >
             MŌVE
-          </span>
+          </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <TopBarAvatar />
             <button className="ico-btn" aria-label="Menu">

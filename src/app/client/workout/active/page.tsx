@@ -2167,7 +2167,12 @@ function ActiveWorkoutPage() {
 
       {/* ═══ TOP BAR ═══════════════════════════════ */}
       <div style={{ padding: 'calc(env(safe-area-inset-top, 0px) + 14px) 5% 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-        <span style={{ fontFamily: 'var(--font-sans, Outfit), Outfit, sans-serif', fontSize: 22, fontWeight: 500, letterSpacing: '-0.02em', color: '#FDFDFE' }}>MŌVE</span>
+        <button
+          type="button"
+          aria-label="Minimaliseer training en ga naar home"
+          onClick={handleMinimize}
+          style={{ fontFamily: 'var(--font-sans, Outfit), Outfit, sans-serif', fontSize: 22, fontWeight: 500, letterSpacing: '-0.02em', color: '#FDFDFE', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
+        >MŌVE</button>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, #646B66, #4a4f4c)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 500, color: '#FDFDFE' }}>G</div>
           <button className="ico-btn" aria-label="Minimize workout" onClick={handleMinimize} style={{ WebkitTapHighlightColor: 'transparent' }}>
