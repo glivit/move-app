@@ -272,7 +272,7 @@ export default function ClientMealPlanPage() {
               display: 'inline-block',
               padding: '12px 22px',
               background: '#C0FC01',
-              color: '#1A1917',
+              color: '#FDFDFE',
               borderRadius: 14,
               fontSize: 13, fontWeight: 600,
               textDecoration: 'none',
@@ -364,7 +364,7 @@ export default function ClientMealPlanPage() {
                     ? 'rgba(71,75,72,0.72)'
                     : 'rgba(71,75,72,0.38)',
                 color: active
-                  ? '#1A1917'
+                  ? '#FDFDFE'
                   : hasContent
                     ? 'rgba(253,253,254,0.82)'
                     : 'rgba(253,253,254,0.38)',

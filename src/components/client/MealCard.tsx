@@ -36,7 +36,7 @@ export function MealCard({ meal }: MealCardProps) {
     : []
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-[#F0F0EE]">
+    <div className="bg-[#A6ADA7] rounded-2xl overflow-hidden border border-[rgba(253,253,254,0.08)]">
       {/* Header - always visible, clickable */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
@@ -64,10 +64,10 @@ export function MealCard({ meal }: MealCardProps) {
 
       {/* Macro pills - always visible */}
       <div className="px-5 pb-3 flex gap-1.5">
-        <div className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#C47D15]/15 text-[#C47D15]">
+        <div className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#C0FC01]/15 text-[#C0FC01]">
           {Math.round(meal.protein)}g
         </div>
-        <div className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#C4372A]/15 text-[#C4372A]">
+        <div className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#B55A4A]/15 text-[#B55A4A]">
           {Math.round(meal.carbs)}g
         </div>
         <div className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#AF52DE]/15 text-[#AF52DE]">

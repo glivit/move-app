@@ -1,5 +1,5 @@
 export default function ClientLoading() {
-  // v6 Orion skeleton — geen v3 #F0F0EE tinten.
+  // v6 Orion skeleton — geen v3 rgba(253,253,254,0.08) tinten.
   // Achtergrond = canvas #8E9890; shimmer blokken op witte transparantie
   // zodat ze op zowel #A6ADA7 (v6-card) als #474B48 (v6-card-dark) overtuigend blijven.
   return (

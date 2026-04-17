@@ -16,11 +16,11 @@ interface TrainingPhase {
 const PHASE_COLORS: Record<string, { color: string; bgColor: string }> = {
   prep: { color: '#3068C4', bgColor: 'rgba(48,104,196,0.06)' },
   hypertrophy: { color: '#AF52DE', bgColor: '#F5EEFA' },
-  strength: { color: '#C47D15', bgColor: 'rgba(196,125,21,0.06)' },
-  power: { color: '#C4372A', bgColor: 'rgba(196,55,42,0.06)' },
-  deload: { color: '#3D8B5C', bgColor: 'rgba(61,139,92,0.06)' },
-  peaking: { color: '#FF2D55', bgColor: '#FFE5EC' },
-  maintenance: { color: '#ACACAC', bgColor: '#E8E4DC' },
+  strength: { color: '#C0FC01', bgColor: 'rgba(196,125,21,0.06)' },
+  power: { color: '#B55A4A', bgColor: 'rgba(196,55,42,0.06)' },
+  deload: { color: '#2FA65A', bgColor: 'rgba(61,139,92,0.06)' },
+  peaking: { color: '#B55A4A', bgColor: '#FFE5EC' },
+  maintenance: { color: 'rgba(253,253,254,0.55)', bgColor: 'rgba(253,253,254,0.14)' },
 }
 
 export function PeriodizationBar() {

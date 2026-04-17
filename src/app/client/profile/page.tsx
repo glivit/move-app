@@ -320,7 +320,7 @@ export default function ProfilePage() {
           style={{
             width: 64, height: 64,
             borderRadius: '50%',
-            background: 'linear-gradient(140deg, #5A5E52, #3D403A)',
+            background: 'linear-gradient(140deg, #5A5E52, #474B48)',
             color: 'rgba(244,242,235,0.94)',
             fontSize: 22, fontWeight: 400,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -420,7 +420,7 @@ export default function ProfilePage() {
             <div
               style={{
                 width: 30, height: 30, borderRadius: '50%',
-                background: 'linear-gradient(140deg, #5A5E52, #3D403A)',
+                background: 'linear-gradient(140deg, #5A5E52, #474B48)',
                 color: 'rgba(244,242,235,0.92)',
                 fontSize: 11, fontWeight: 500,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',

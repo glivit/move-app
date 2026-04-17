@@ -133,15 +133,15 @@ export default function ClientProgramPage() {
     return (
       <div className="space-y-6">
         <div className="animate-slide-up">
-          <div className="h-3 w-16 bg-[#F0F0EE] rounded-full mb-3 animate-shimmer" />
-          <div className="h-8 w-32 bg-[#F0F0EE] rounded-lg mb-2 animate-shimmer" />
-          <div className="h-4 w-48 bg-[#F0F0EE] rounded-full animate-shimmer" />
+          <div className="h-3 w-16 bg-[rgba(253,253,254,0.08)] rounded-full mb-3 animate-shimmer" />
+          <div className="h-8 w-32 bg-[rgba(253,253,254,0.08)] rounded-lg mb-2 animate-shimmer" />
+          <div className="h-4 w-48 bg-[rgba(253,253,254,0.08)] rounded-full animate-shimmer" />
         </div>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-24 bg-[#F0F0EE] rounded-2xl animate-shimmer"
+              className="h-24 bg-[rgba(253,253,254,0.08)] rounded-2xl animate-shimmer"
             />
           ))}
         </div>
@@ -153,23 +153,23 @@ export default function ClientProgramPage() {
     return (
       <div className="space-y-6">
         <div className="mb-8 animate-slide-up">
-          <p className="text-label mb-3 text-[#ACACAC]">Schema</p>
+          <p className="text-label mb-3 text-[rgba(253,253,254,0.55)]">Schema</p>
           <h1
             className="page-title"
           >
             Training
           </h1>
         </div>
-        <div className="bg-white rounded-2xl p-8 border border-[#F0F0EE] text-center animate-slide-up stagger-2">
+        <div className="bg-[#A6ADA7] rounded-2xl p-8 border border-[rgba(253,253,254,0.08)] text-center animate-slide-up stagger-2">
           <Dumbbell
             size={48}
             strokeWidth={1.5}
-            className="text-[#D5D5D5] mx-auto mb-3"
+            className="text-[rgba(253,253,254,0.35)] mx-auto mb-3"
           />
-          <p className="font-medium text-[#1A1917]">
+          <p className="font-medium text-[#FDFDFE]">
             Je trainingsschema wordt opgesteld
           </p>
-          <p className="text-[14px] text-[#ACACAC] mt-2">
+          <p className="text-[14px] text-[rgba(253,253,254,0.55)] mt-2">
             Je coach zal binnenkort een trainingsplan voor je opstellen.
           </p>
         </div>
@@ -181,12 +181,12 @@ export default function ClientProgramPage() {
     <div className="space-y-6">
       {/* Hero Section */}
       <div className="mb-8 animate-slide-up">
-        <p className="text-label mb-3 text-[#ACACAC]">Schema</p>
+        <p className="text-label mb-3 text-[rgba(253,253,254,0.55)]">Schema</p>
         <h1 className="page-title">
           Training
         </h1>
         {program && (
-          <p className="text-[15px] text-[#ACACAC] mt-1">{program.title}</p>
+          <p className="text-[15px] text-[rgba(253,253,254,0.55)] mt-1">{program.title}</p>
         )}
       </div>
 
@@ -196,7 +196,7 @@ export default function ClientProgramPage() {
       </div>
 
       {/* Day Picker */}
-      <div className="bg-white rounded-2xl border border-[#F0F0EE] overflow-hidden animate-slide-up stagger-3">
+      <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] overflow-hidden animate-slide-up stagger-3">
         <DayPicker
           days={dayNames}
           activeDay={activeDay}
@@ -208,12 +208,12 @@ export default function ClientProgramPage() {
       {/* Progress Text */}
       {!isRestDay && (
         <div className="flex items-center justify-between animate-slide-up stagger-4">
-          <p className="text-[14px] text-[#ACACAC]">
+          <p className="text-[14px] text-[rgba(253,253,254,0.55)]">
             {completedCount} van {currentDayExercises.length} voltooid
           </p>
-          <div className="w-24 h-[2px] bg-[#F0F0EE] rounded-full overflow-hidden">
+          <div className="w-24 h-[2px] bg-[rgba(253,253,254,0.08)] rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#3D8B5C] rounded-full transition-all"
+              className="h-full bg-[#2FA65A] rounded-full transition-all"
               style={{
                 width: `${currentDayExercises.length > 0 ? (completedCount / currentDayExercises.length) * 100 : 0}%`,
               }}
@@ -231,19 +231,19 @@ export default function ClientProgramPage() {
 
       {/* Rest Day Message */}
       {isRestDay ? (
-        <div className="bg-white rounded-2xl p-8 border border-[#F0F0EE] text-center animate-slide-up stagger-5">
+        <div className="bg-[#A6ADA7] rounded-2xl p-8 border border-[rgba(253,253,254,0.08)] text-center animate-slide-up stagger-5">
           <Moon
             size={48}
             strokeWidth={1.5}
-            className="text-[#D5D5D5] mx-auto mb-3"
+            className="text-[rgba(253,253,254,0.35)] mx-auto mb-3"
           />
-          <p className="font-medium text-[#1A1917]">
+          <p className="font-medium text-[#FDFDFE]">
             Rustdag — geniet ervan!
           </p>
         </div>
       ) : (
         /* Exercises List */
-        <div className="divide-y divide-[#F0F0EE]">
+        <div className="divide-y divide-[rgba(253,253,254,0.08)]">
           {currentDayExercises.map((exercise, index) => (
             <div
               key={`${activeDay}-${exercise.name}`}
@@ -265,11 +265,11 @@ export default function ClientProgramPage() {
 
       {/* Coach Notes */}
       {program.coach_notes && (
-        <div className="mt-12 mb-12 pl-4 border-l-2 border-[#D46A3A] animate-slide-up" style={{ animationDelay: `${isRestDay ? '300ms' : 260 + currentDayExercises.length * 40 + 40}ms` }}>
-          <p className="text-[13px] text-[#1A1917] font-medium mb-2">
+        <div className="mt-12 mb-12 pl-4 border-l-2 border-[#C0FC01] animate-slide-up" style={{ animationDelay: `${isRestDay ? '300ms' : 260 + currentDayExercises.length * 40 + 40}ms` }}>
+          <p className="text-[13px] text-[#FDFDFE] font-medium mb-2">
             Coach notities
           </p>
-          <p className="text-[14px] text-[#1A1917] whitespace-pre-wrap">
+          <p className="text-[14px] text-[#FDFDFE] whitespace-pre-wrap">
             {program.coach_notes}
           </p>
         </div>

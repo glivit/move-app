@@ -22,7 +22,7 @@ export function ProgressSnapshot({
   const isDeltaDown = weightDelta !== null && weightDelta < 0;
 
   return (
-    <div className="bg-client-surface rounded-2xl p-5 border border-[#F0F0EE]">
+    <div className="bg-client-surface rounded-2xl p-5 border border-[rgba(253,253,254,0.08)]">
       {/* Weight section */}
       {weight !== null ? (
         <div className="flex items-baseline gap-3 mb-4">

@@ -54,8 +54,8 @@ function MediaContent({ message, isOwn }: { message: ChatBubbleProps['message'];
 
   // isOwn = user (dark bubble, light text)
   // !isOwn = coach (light bubble, dark text)
-  const textClass = isOwn ? 'text-[#FDFDFE]' : 'text-[#1A1917]'
-  const accentClass = isOwn ? 'text-[#C0FC01]' : 'text-[#1A1917]'
+  const textClass = isOwn ? 'text-[#FDFDFE]' : 'text-[#FDFDFE]'
+  const accentClass = isOwn ? 'text-[#C0FC01]' : 'text-[#FDFDFE]'
   const subtleClass = isOwn ? 'text-[rgba(253,253,254,0.56)]' : 'text-[rgba(26,25,23,0.48)]'
 
   // Image

@@ -131,7 +131,7 @@ export default function HealthPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-[#1A1917]" />
+        <Loader2 className="w-6 h-6 animate-spin text-[#FDFDFE]" />
       </div>
     )
   }
@@ -140,25 +140,25 @@ export default function HealthPage() {
     <div className="space-y-6 pb-20">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#1A1917]">
+        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#FDFDFE]">
           <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
         </button>
-        <h1 className="text-editorial-h2 text-[#1A1917]">
+        <h1 className="text-editorial-h2 text-[#FDFDFE]">
           Blessures & beperkingen
         </h1>
       </div>
 
       {/* Info Banner */}
       <div className="bg-[#FFF3CD] rounded-2xl p-4 flex gap-3">
-        <AlertTriangle strokeWidth={1.5} className="w-5 h-5 text-[#1A1917] flex-shrink-0 mt-0.5" />
-        <p className="text-[13px] text-[#1A1917]">
+        <AlertTriangle strokeWidth={1.5} className="w-5 h-5 text-[#FDFDFE] flex-shrink-0 mt-0.5" />
+        <p className="text-[13px] text-[#FDFDFE]">
           Deze informatie helpt je coach om een veilig en aangepast trainingsprogramma op te stellen. Wees eerlijk en volledig.
         </p>
       </div>
 
       {/* Injured Body Parts */}
       <div>
-        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Pijnlijke of geblesseerde zones</p>
+        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Pijnlijke of geblesseerde zones</p>
         <div className="flex flex-wrap gap-2">
           {BODY_PARTS.map((part) => {
             const selected = injuredParts.includes(part.id)
@@ -168,8 +168,8 @@ export default function HealthPage() {
                 onClick={() => togglePart(part.id)}
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
-                    ? 'bg-[#C47D15] text-white'
-                    : 'bg-white border border-[#F0F0EE] text-[#1A1917] hover:border-[#C47D15]'
+                    ? 'bg-[#C0FC01] text-white'
+                    : 'bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] text-[#FDFDFE] hover:border-[#C0FC01]'
                 }`}
               >
                 {part.label}
@@ -181,7 +181,7 @@ export default function HealthPage() {
 
       {/* Medical Limitations */}
       <div>
-        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Medische aandoeningen</p>
+        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Medische aandoeningen</p>
         <div className="flex flex-wrap gap-2">
           {LIMITATION_TYPES.map((limit) => {
             const selected = limitations.includes(limit)
@@ -191,8 +191,8 @@ export default function HealthPage() {
                 onClick={() => toggleLimitation(limit)}
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
-                    ? 'bg-[#C4372A] text-white'
-                    : 'bg-white border border-[#F0F0EE] text-[#1A1917] hover:border-[#C4372A]'
+                    ? 'bg-[#B55A4A] text-white'
+                    : 'bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] text-[#FDFDFE] hover:border-[#B55A4A]'
                 }`}
               >
                 {limit}
@@ -204,8 +204,8 @@ export default function HealthPage() {
 
       {/* Activity Level */}
       <div>
-        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Huidig activiteitsniveau</p>
-        <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
+        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Huidig activiteitsniveau</p>
+        <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] divide-y divide-[rgba(253,253,254,0.08)]">
           {[
             { id: 'sedentair', label: 'Sedentair', desc: 'Weinig tot geen beweging' },
             { id: 'licht', label: 'Licht actief', desc: '1-2 keer per week' },
@@ -219,11 +219,11 @@ export default function HealthPage() {
               className="w-full px-5 py-4 flex items-center justify-between hover:bg-[#FAFAFA] transition-colors"
             >
               <div>
-                <p className="text-[15px] text-[#1A1917] text-left">{level.label}</p>
-                <p className="text-[13px] text-[#ACACAC] text-left">{level.desc}</p>
+                <p className="text-[15px] text-[#FDFDFE] text-left">{level.label}</p>
+                <p className="text-[13px] text-[rgba(253,253,254,0.55)] text-left">{level.desc}</p>
               </div>
               {activityLevel === level.id && (
-                <div className="w-6 h-6 rounded-full bg-[#1A1917] flex items-center justify-center flex-shrink-0">
+                <div className="w-6 h-6 rounded-full bg-[#FDFDFE] flex items-center justify-center flex-shrink-0">
                   <Check strokeWidth={2.5} className="w-3.5 h-3.5 text-white" />
                 </div>
               )}
@@ -234,14 +234,14 @@ export default function HealthPage() {
 
       {/* Details */}
       <div>
-        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Extra details</p>
-        <div className="bg-white rounded-2xl border border-[#F0F0EE] p-5">
+        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Extra details</p>
+        <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] p-5">
           <textarea
             value={details}
             onChange={(e) => setDetails(e.target.value)}
             placeholder="Beschrijf eventuele blessures, operaties, of andere relevante gezondheidsinformatie..."
             rows={4}
-            className="w-full text-[15px] text-[#1A1917] bg-transparent placeholder:text-[#C0C0C0] focus:outline-none resize-none"
+            className="w-full text-[15px] text-[#FDFDFE] bg-transparent placeholder:text-[rgba(253,253,254,0.48)] focus:outline-none resize-none"
           />
         </div>
       </div>
@@ -250,7 +250,7 @@ export default function HealthPage() {
       <button
         onClick={handleSave}
         disabled={saving}
-        className="w-full py-3.5 rounded-2xl bg-[#1A1917] text-white font-semibold text-[15px] hover:bg-[#7A5C12] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-3.5 rounded-2xl bg-[#FDFDFE] text-white font-semibold text-[15px] hover:bg-[#7A5C12] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {saving ? (
           <Loader2 className="w-5 h-5 animate-spin" />

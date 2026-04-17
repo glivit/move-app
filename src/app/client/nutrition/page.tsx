@@ -610,7 +610,7 @@ function AddFoodBottomSheet({
                   borderRadius: 10,
                   fontSize: 13, fontWeight: 500,
                   background: active ? '#FDFDFE' : 'rgba(253,253,254,0.08)',
-                  color: active ? '#1A1917' : 'rgba(253,253,254,0.62)',
+                  color: active ? '#FDFDFE' : 'rgba(253,253,254,0.62)',
                   border: 'none',
                   cursor: 'pointer',
                   WebkitTapHighlightColor: 'transparent',
@@ -696,7 +696,7 @@ function AddFoodBottomSheet({
                             gap: 6,
                             flexShrink: 0,
                             background: wasAdded ? '#2FA65A' : isExpanded ? '#C0FC01' : 'rgba(253,253,254,0.10)',
-                            color: isExpanded && !wasAdded ? '#1A1917' : '#FDFDFE',
+                            color: isExpanded && !wasAdded ? '#FDFDFE' : '#FDFDFE',
                             fontSize: 13, fontWeight: 600,
                             border: 'none',
                             cursor: 'pointer',
@@ -741,7 +741,7 @@ function AddFoodBottomSheet({
                                     borderRadius: 10,
                                     fontSize: 12, fontWeight: 500,
                                     background: active ? '#FDFDFE' : 'rgba(253,253,254,0.08)',
-                                    color: active ? '#1A1917' : 'rgba(253,253,254,0.78)',
+                                    color: active ? '#FDFDFE' : 'rgba(253,253,254,0.78)',
                                     border: 'none',
                                     cursor: 'pointer',
                                     WebkitTapHighlightColor: 'transparent',
@@ -945,7 +945,7 @@ function AddFoodBottomSheet({
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           flexShrink: 0,
                           background: wasAdded ? '#2FA65A' : isExpanded ? '#C0FC01' : 'rgba(253,253,254,0.10)',
-                          color: isExpanded && !wasAdded ? '#1A1917' : '#FDFDFE',
+                          color: isExpanded && !wasAdded ? '#FDFDFE' : '#FDFDFE',
                           fontSize: 13, fontWeight: 600,
                           border: 'none',
                           cursor: 'pointer',
@@ -989,7 +989,7 @@ function AddFoodBottomSheet({
                                   borderRadius: 10,
                                   fontSize: 12, fontWeight: 500,
                                   background: active ? '#FDFDFE' : 'rgba(253,253,254,0.08)',
-                                  color: active ? '#1A1917' : 'rgba(253,253,254,0.78)',
+                                  color: active ? '#FDFDFE' : 'rgba(253,253,254,0.78)',
                                   border: 'none',
                                   cursor: 'pointer',
                                   WebkitTapHighlightColor: 'transparent',
@@ -1746,7 +1746,7 @@ export default function ClientNutritionPage() {
                                   borderRadius: 12,
                                   fontSize: 13, fontWeight: 600,
                                   background: '#C0FC01',
-                                  color: '#1A1917',
+                                  color: '#FDFDFE',
                                   border: 'none', cursor: 'pointer',
                                   WebkitTapHighlightColor: 'transparent',
                                 }}
@@ -1831,7 +1831,7 @@ export default function ClientNutritionPage() {
             color: daySubmitted
               ? '#FDFDFE'
               : allMealsComplete
-                ? '#1A1917'
+                ? '#FDFDFE'
                 : '#FDFDFE',
           }}
         >

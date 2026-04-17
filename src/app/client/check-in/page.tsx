@@ -201,21 +201,21 @@ export default function CheckInPage() {
   if (submitted) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4 py-8">
-        <div className="bg-white rounded-2xl border border-[#F0F0EE] p-8 max-w-sm w-full text-center space-y-6 animate-slide-up">
+        <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] p-8 max-w-sm w-full text-center space-y-6 animate-slide-up">
           <div className="flex justify-center">
             <div className="w-20 h-20 rounded-full bg-[rgba(61,139,92,0.08)] flex items-center justify-center animate-scale-in">
-              <CheckCircle className="h-10 w-10 text-[#3D8B5C]" strokeWidth={1.5} />
+              <CheckCircle className="h-10 w-10 text-[#2FA65A]" strokeWidth={1.5} />
             </div>
           </div>
           <div className="space-y-2">
             <h2 className="page-title">
               Check-in ingediend
             </h2>
-            <p className="text-[14px] text-[#ACACAC] leading-relaxed">
+            <p className="text-[14px] text-[rgba(253,253,254,0.55)] leading-relaxed">
               Je coach bekijkt je resultaten binnen 24 uur.
             </p>
           </div>
-          <button onClick={() => router.push('/client')} className="bg-[#1A1917] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#333330] transition-colors active:scale-[0.98] rounded-2xl w-full py-4">
+          <button onClick={() => router.push('/client')} className="bg-[#FDFDFE] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#5A5E5B] transition-colors active:scale-[0.98] rounded-2xl w-full py-4">
             Terug naar dashboard
           </button>
         </div>
@@ -226,19 +226,19 @@ export default function CheckInPage() {
   if (!canSubmit) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4 py-8">
-        <div className="bg-white rounded-2xl border border-[#F0F0EE] p-8 max-w-sm w-full text-center space-y-6 animate-slide-up">
+        <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] p-8 max-w-sm w-full text-center space-y-6 animate-slide-up">
           <div className="flex justify-center">
             <div className="w-20 h-20 rounded-full bg-[rgba(196,125,21,0.08)] flex items-center justify-center">
-              <Calendar className="h-10 w-10 text-[#C47D15]" strokeWidth={1.5} />
+              <Calendar className="h-10 w-10 text-[#C0FC01]" strokeWidth={1.5} />
             </div>
           </div>
           <div className="space-y-2">
             <h2 className="page-title">
               Check-in
             </h2>
-            <p className="text-[14px] text-[#ACACAC] leading-relaxed">{windowMessage}</p>
+            <p className="text-[14px] text-[rgba(253,253,254,0.55)] leading-relaxed">{windowMessage}</p>
           </div>
-          <button onClick={() => router.push('/client')} className="bg-[#1A1917] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#333330] transition-colors active:scale-[0.98] rounded-2xl w-full py-4 text-[13px]">
+          <button onClick={() => router.push('/client')} className="bg-[#FDFDFE] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#5A5E5B] transition-colors active:scale-[0.98] rounded-2xl w-full py-4 text-[13px]">
             Terug naar dashboard
           </button>
         </div>
@@ -254,13 +254,13 @@ export default function CheckInPage() {
         <h1 className="text-editorial-h2">
           {steps[currentStep].title}
         </h1>
-        <p className="text-[14px] text-[#ACACAC] mt-1">{steps[currentStep].description}</p>
+        <p className="text-[14px] text-[rgba(253,253,254,0.55)] mt-1">{steps[currentStep].description}</p>
       </div>
 
       {/* Progress bar — clean thin bar */}
-      <div className="w-full h-[3px] bg-[#F0F0EE] rounded-full overflow-hidden">
+      <div className="w-full h-[3px] bg-[rgba(253,253,254,0.08)] rounded-full overflow-hidden">
         <div
-          className="h-full bg-[#D46A3A] rounded-full transition-all duration-500 animate-progress-fill"
+          className="h-full bg-[#C0FC01] rounded-full transition-all duration-500 animate-progress-fill"
           style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
         />
       </div>
@@ -272,10 +272,10 @@ export default function CheckInPage() {
             key={i}
             className={`w-2.5 h-2.5 rounded-full transition-all ${
               i < currentStep
-                ? 'bg-[#3D8B5C]'
+                ? 'bg-[#2FA65A]'
                 : i === currentStep
-                  ? 'bg-[#D46A3A] scale-125'
-                  : 'bg-[#F0F0EE]'
+                  ? 'bg-[#C0FC01] scale-125'
+                  : 'bg-[rgba(253,253,254,0.08)]'
             }`}
           />
         ))}
@@ -283,7 +283,7 @@ export default function CheckInPage() {
 
       {error && (
         <div className="bg-[rgba(196,55,42,0.06)] border border-[rgba(196,55,42,0.1)] rounded-xl px-4 py-3">
-          <p className="text-[13px] text-[#C4372A]">{error}</p>
+          <p className="text-[13px] text-[#B55A4A]">{error}</p>
         </div>
       )}
 
@@ -323,7 +323,7 @@ export default function CheckInPage() {
         {currentStep > 0 && (
           <button
             onClick={() => setCurrentStep(currentStep - 1)}
-            className="flex-1 px-6 py-4 text-[#ACACAC] font-semibold text-[13px] uppercase tracking-[0.06em] border border-[#F0F0EE] rounded-2xl hover:border-[#C0C0C0] transition-all"
+            className="flex-1 px-6 py-4 text-[rgba(253,253,254,0.55)] font-semibold text-[13px] uppercase tracking-[0.06em] border border-[rgba(253,253,254,0.08)] rounded-2xl hover:border-[rgba(253,253,254,0.48)] transition-all"
           >
             Vorige
           </button>
@@ -331,7 +331,7 @@ export default function CheckInPage() {
         {currentStep < steps.length - 1 ? (
           <button
             onClick={() => setCurrentStep(currentStep + 1)}
-            className="flex-1 bg-[#1A1917] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#333330] transition-colors active:scale-[0.98] rounded-2xl py-4"
+            className="flex-1 bg-[#FDFDFE] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#5A5E5B] transition-colors active:scale-[0.98] rounded-2xl py-4"
           >
             Volgende
           </button>
@@ -339,7 +339,7 @@ export default function CheckInPage() {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="flex-1 bg-[#1A1917] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#333330] transition-colors active:scale-[0.98] rounded-2xl py-4 disabled:opacity-50"
+            className="flex-1 bg-[#FDFDFE] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#5A5E5B] transition-colors active:scale-[0.98] rounded-2xl py-4 disabled:opacity-50"
           >
             {submitting ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />

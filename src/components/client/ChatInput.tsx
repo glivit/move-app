@@ -235,7 +235,7 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
   const PLACEHOLDER = 'rgba(253,253,254,0.38)'
   const WHITE = '#FDFDFE'
   const LIME = '#C0FC01'
-  const INK = '#1A1917'
+  const INK = '#FDFDFE'
 
   return (
     <div style={{ background: DARK, borderTop: `1px solid ${BORDER_TOP}` }}>
@@ -316,14 +316,14 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
             className="flex items-center gap-3 py-2 px-4 rounded-xl"
             style={{ background: 'rgba(232,96,79,0.14)' }}
           >
-            <div className="w-3 h-3 rounded-full animate-pulse" style={{ background: '#E8604F' }} />
-            <span className="text-[13px] font-medium" style={{ color: '#E8604F' }}>
+            <div className="w-3 h-3 rounded-full animate-pulse" style={{ background: '#B55A4A' }} />
+            <span className="text-[13px] font-medium" style={{ color: '#B55A4A' }}>
               Opnemen {formatRecordingTime(recordingTime)}
             </span>
             <button
               onClick={stopRecording}
               className="ml-auto w-8 h-8 rounded-full flex items-center justify-center"
-              style={{ background: '#E8604F' }}
+              style={{ background: '#B55A4A' }}
             >
               <Square size={12} style={{ color: WHITE }} fill={WHITE} />
             </button>

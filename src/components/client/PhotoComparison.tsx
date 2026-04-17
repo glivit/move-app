@@ -118,7 +118,7 @@ export function PhotoComparison() {
                 letterSpacing: '0.06em',
                 textTransform: 'uppercase',
                 background: active ? '#FDFDFE' : 'rgba(253,253,254,0.08)',
-                color: active ? '#1A1917' : 'rgba(253,253,254,0.62)',
+                color: active ? '#FDFDFE' : 'rgba(253,253,254,0.62)',
                 border: 'none',
                 WebkitTapHighlightColor: 'transparent',
                 cursor: 'pointer',
@@ -140,7 +140,7 @@ export function PhotoComparison() {
         }}
       >
         {/* Before */}
-        <div style={{ background: '#2A2E2B', position: 'relative' }}>
+        <div style={{ background: '#474B48', position: 'relative' }}>
           {beforeUrl ? (
             <Image
               src={beforeUrl}
@@ -205,7 +205,7 @@ export function PhotoComparison() {
         </div>
 
         {/* After */}
-        <div style={{ background: '#2A2E2B', position: 'relative' }}>
+        <div style={{ background: '#474B48', position: 'relative' }}>
           {afterUrl ? (
             <Image
               src={afterUrl}

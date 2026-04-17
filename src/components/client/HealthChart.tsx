@@ -23,7 +23,7 @@ export function HealthChart({ data }: Props) {
             <stop offset="100%" stopColor="#7B5EA7" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#ACACAC' }} axisLine={false} tickLine={false} />
+        <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'rgba(253,253,254,0.55)' }} axisLine={false} tickLine={false} />
         <YAxis hide />
         <Tooltip
           contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}

@@ -108,7 +108,7 @@ export default function WeeklyCheckInPage() {
       <div className="space-y-6">
         <SubPageHeader overline="Wekelijks" title="Check-in" backHref="/client" />
         <div className="flex justify-center py-20">
-          <div className="w-6 h-6 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
+          <div className="w-6 h-6 border-[1.5px] border-[rgba(253,253,254,0.48)] border-t-[#FDFDFE] rounded-full animate-spin" />
         </div>
       </div>
     )
@@ -119,12 +119,12 @@ export default function WeeklyCheckInPage() {
     return (
       <div className="space-y-6">
         <SubPageHeader overline="Wekelijks" title="Check-in" backHref="/client" />
-        <div className="bg-white p-8 border border-[#F0F0EE] text-center">
-          <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#3D8B5C] mx-auto mb-3" />
-          <p className="font-semibold text-[#1A1917] text-lg">
+        <div className="bg-white p-8 border border-[rgba(253,253,254,0.08)] text-center">
+          <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#2FA65A] mx-auto mb-3" />
+          <p className="font-semibold text-[#FDFDFE] text-lg">
             {submitted ? 'Check-in verstuurd!' : 'Al ingediend deze week'}
           </p>
-          <p className="text-[14px] text-[#ACACAC] mt-2">
+          <p className="text-[14px] text-[rgba(253,253,254,0.55)] mt-2">
             {submitted
               ? 'Goed bezig! Je coach kan je voortgang bekijken.'
               : 'Je hebt deze week al een check-in gedaan. Volgende week weer!'}
@@ -144,10 +144,10 @@ export default function WeeklyCheckInPage() {
       </div>
 
       {/* ─── GEWICHT ─────────────────────────────────────── */}
-      <div className="bg-white border border-[#F0F0EE] p-5 animate-slide-up stagger-2">
+      <div className="bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] p-5 animate-slide-up stagger-2">
         <div className="flex items-center gap-2 mb-4">
-          <Scale size={18} strokeWidth={1.5} className="text-[#1A1917]" />
-          <span className="text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.06em]">Gewicht</span>
+          <Scale size={18} strokeWidth={1.5} className="text-[#FDFDFE]" />
+          <span className="text-[13px] font-semibold text-[#FDFDFE] uppercase tracking-[0.06em]">Gewicht</span>
         </div>
 
         <div className="flex items-end gap-3">
@@ -158,17 +158,17 @@ export default function WeeklyCheckInPage() {
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
               placeholder="0.0"
-              className="w-full text-[32px] font-bold text-[#1A1917] bg-transparent border-b-2 border-[#F0F0EE] focus:border-[#1A1917] outline-none pb-1 transition-colors placeholder-[#D5D5D5]"
+              className="w-full text-[32px] font-bold text-[#FDFDFE] bg-transparent border-b-2 border-[rgba(253,253,254,0.08)] focus:border-[#FDFDFE] outline-none pb-1 transition-colors placeholder-[rgba(253,253,254,0.35)]"
             />
           </div>
-          <span className="text-[16px] text-[#ACACAC] font-medium pb-2">kg</span>
+          <span className="text-[16px] text-[rgba(253,253,254,0.55)] font-medium pb-2">kg</span>
         </div>
 
         {lastWeight && (
-          <p className="text-[13px] text-[#ACACAC] mt-2">
+          <p className="text-[13px] text-[rgba(253,253,254,0.55)] mt-2">
             Vorige: {lastWeight} kg
             {weightDiff !== null && weightDiff !== 0 && (
-              <span className={`ml-2 font-semibold ${weightDiff < 0 ? 'text-[#3D8B5C]' : 'text-[#C47D15]'}`}>
+              <span className={`ml-2 font-semibold ${weightDiff < 0 ? 'text-[#2FA65A]' : 'text-[#C0FC01]'}`}>
                 {weightDiff > 0 ? '+' : ''}{weightDiff} kg
               </span>
             )}
@@ -177,11 +177,11 @@ export default function WeeklyCheckInPage() {
       </div>
 
       {/* ─── FOTO ────────────────────────────────────────── */}
-      <div className="bg-white border border-[#F0F0EE] p-5 animate-slide-up stagger-3">
+      <div className="bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] p-5 animate-slide-up stagger-3">
         <div className="flex items-center gap-2 mb-4">
-          <Camera size={18} strokeWidth={1.5} className="text-[#1A1917]" />
-          <span className="text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.06em]">Foto vooraanzicht</span>
-          <span className="text-[11px] text-[#ACACAC] ml-auto">optioneel</span>
+          <Camera size={18} strokeWidth={1.5} className="text-[#FDFDFE]" />
+          <span className="text-[13px] font-semibold text-[#FDFDFE] uppercase tracking-[0.06em]">Foto vooraanzicht</span>
+          <span className="text-[11px] text-[rgba(253,253,254,0.55)] ml-auto">optioneel</span>
         </div>
 
         <input
@@ -195,10 +195,10 @@ export default function WeeklyCheckInPage() {
 
         {photoPreview ? (
           <div className="relative">
-            <Image src={photoPreview} alt="Preview" width={400} height={300} className="w-full max-h-[300px] object-cover border border-[#F0F0EE]" unoptimized loading="lazy" />
+            <Image src={photoPreview} alt="Preview" width={400} height={300} className="w-full max-h-[300px] object-cover border border-[rgba(253,253,254,0.08)]" unoptimized loading="lazy" />
             <button
               onClick={() => { setPhoto(null); setPhotoPreview(null) }}
-              className="absolute top-2 right-2 w-8 h-8 bg-[#1A1917]/70 text-white flex items-center justify-center text-[14px]"
+              className="absolute top-2 right-2 w-8 h-8 bg-[#FDFDFE]/70 text-white flex items-center justify-center text-[14px]"
             >
               &times;
             </button>
@@ -206,17 +206,17 @@ export default function WeeklyCheckInPage() {
         ) : (
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full py-8 border-2 border-dashed border-[#F0F0EE] hover:border-[#C0C0C0] transition-colors flex flex-col items-center gap-2"
+            className="w-full py-8 border-2 border-dashed border-[rgba(253,253,254,0.08)] hover:border-[rgba(253,253,254,0.48)] transition-colors flex flex-col items-center gap-2"
           >
-            <Camera size={24} strokeWidth={1.5} className="text-[#ACACAC]" />
-            <span className="text-[13px] text-[#ACACAC]">Tik om foto te nemen</span>
+            <Camera size={24} strokeWidth={1.5} className="text-[rgba(253,253,254,0.55)]" />
+            <span className="text-[13px] text-[rgba(253,253,254,0.55)]">Tik om foto te nemen</span>
           </button>
         )}
       </div>
 
       {/* ─── HOE GAAT HET ────────────────────────────────── */}
-      <div className="bg-white border border-[#F0F0EE] p-5 space-y-6 animate-slide-up stagger-4">
-        <span className="text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.06em]">
+      <div className="bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] p-5 space-y-6 animate-slide-up stagger-4">
+        <span className="text-[13px] font-semibold text-[#FDFDFE] uppercase tracking-[0.06em]">
           Hoe was je week?
         </span>
 
@@ -246,17 +246,17 @@ export default function WeeklyCheckInPage() {
       </div>
 
       {/* ─── NOTITIES ────────────────────────────────────── */}
-      <div className="bg-white border border-[#F0F0EE] p-5 animate-slide-up stagger-5">
-        <label className="block text-[13px] font-semibold text-[#1A1917] uppercase tracking-[0.06em] mb-3">
+      <div className="bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] p-5 animate-slide-up stagger-5">
+        <label className="block text-[13px] font-semibold text-[#FDFDFE] uppercase tracking-[0.06em] mb-3">
           Iets te melden?
-          <span className="text-[11px] text-[#ACACAC] ml-2 normal-case tracking-normal font-normal">optioneel</span>
+          <span className="text-[11px] text-[rgba(253,253,254,0.55)] ml-2 normal-case tracking-normal font-normal">optioneel</span>
         </label>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Hoe voel je je? Pijnklachten? Vragen voor je coach?"
           rows={3}
-          className="w-full px-3 py-2.5 bg-[#F8F8F6] border border-[#F0F0EE] text-[14px] placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917] resize-none"
+          className="w-full px-3 py-2.5 bg-[rgba(253,253,254,0.08)] border border-[rgba(253,253,254,0.08)] text-[14px] placeholder-[rgba(253,253,254,0.48)] focus:outline-none focus:border-[#FDFDFE] resize-none"
         />
       </div>
 
@@ -264,7 +264,7 @@ export default function WeeklyCheckInPage() {
       <button
         onClick={handleSubmit}
         disabled={submitting || !weight.trim()}
-        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#1A1917] text-white font-semibold uppercase tracking-wider text-[15px] hover:bg-[#2A2A28] transition-colors disabled:opacity-40 animate-slide-up stagger-6"
+        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#FDFDFE] text-white font-semibold uppercase tracking-wider text-[15px] hover:bg-[#2A2A28] transition-colors disabled:opacity-40 animate-slide-up stagger-6"
       >
         {submitting ? (
           <>
@@ -293,9 +293,9 @@ function RatingRow({ label, value, onChange, labels }: {
   return (
     <div>
       <div className="flex items-center justify-between mb-2.5">
-        <span className="text-[14px] text-[#1A1917]">{label}</span>
+        <span className="text-[14px] text-[#FDFDFE]">{label}</span>
         {value > 0 && (
-          <span className="text-[12px] text-[#ACACAC]">{labels[value - 1]}</span>
+          <span className="text-[12px] text-[rgba(253,253,254,0.55)]">{labels[value - 1]}</span>
         )}
       </div>
       <div className="flex gap-2">
@@ -305,8 +305,8 @@ function RatingRow({ label, value, onChange, labels }: {
             onClick={() => onChange(n === value ? 0 : n)}
             className={`flex-1 py-2.5 text-[14px] font-semibold transition-all ${
               n <= value
-                ? 'bg-[#1A1917] text-white'
-                : 'bg-[#F8F8F6] text-[#ACACAC] hover:bg-[#F0F0EE]'
+                ? 'bg-[#FDFDFE] text-white'
+                : 'bg-[rgba(253,253,254,0.08)] text-[rgba(253,253,254,0.55)] hover:bg-[rgba(253,253,254,0.08)]'
             }`}
           >
             {n}

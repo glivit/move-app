@@ -11,7 +11,7 @@ interface RestTimerProps {
 
 function playBeep(frequency = 880, duration = 150, volume = 0.3) {
   try {
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
+    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
     const osc = ctx.createOscillator()
     const gain = ctx.createGain()
     osc.connect(gain)
@@ -30,6 +30,12 @@ function triggerVibration(pattern: number | number[]) {
     if ('vibrate' in navigator) navigator.vibrate(pattern)
   } catch {}
 }
+
+// v6 Orion
+const INK = '#FDFDFE'
+const INK_FAINT = 'rgba(253,253,254,0.55)'
+const CHECK = '#2FA65A'
+const AMBER = '#E8B948'
 
 export function RestTimer({ initialSeconds, onComplete, onDismiss }: RestTimerProps) {
   const [secondsLeft, setSecondsLeft] = useState(initialSeconds)
@@ -78,37 +84,96 @@ export function RestTimer({ initialSeconds, onComplete, onDismiss }: RestTimerPr
   const circumference = 2 * Math.PI * radius
   const strokeDashoffset = circumference * (1 - progress / 100)
 
+  const ringStroke = isFinished ? CHECK : secondsLeft <= 3 ? AMBER : INK
+  const numberColor = isFinished ? CHECK : secondsLeft <= 3 ? AMBER : INK
+
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#1A1917]/95 backdrop-blur-xl animate-fade-in">
-      {/* Skip button */}
+    <div
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center animate-fade-in"
+      style={{
+        background: 'rgba(26, 28, 26, 0.92)',
+        backdropFilter: 'blur(20px) saturate(1.1)',
+        WebkitBackdropFilter: 'blur(20px) saturate(1.1)',
+      }}
+    >
+      {/* Skip icon — rustig hoekje */}
       <button
         onClick={onDismiss}
-        className="absolute top-6 right-6 p-3 rounded-full bg-white/10 text-white/70 hover:bg-white/20 transition-colors"
         aria-label="Overslaan"
+        style={{
+          position: 'absolute',
+          top: 'calc(env(safe-area-inset-top, 0px) + 16px)',
+          right: 16,
+          width: 44,
+          height: 44,
+          borderRadius: '50%',
+          background: 'rgba(255,255,255,0.08)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          border: 'none',
+          color: INK_FAINT,
+          cursor: 'pointer',
+          WebkitTapHighlightColor: 'transparent',
+        }}
       >
-        <SkipForward size={20} strokeWidth={1.5} />
+        <SkipForward size={18} strokeWidth={1.6} />
       </button>
 
-      {/* Timer circle */}
-      <div className="relative w-[220px] h-[220px] mb-8">
-        <svg className="w-full h-full -rotate-90" viewBox="0 0 200 200">
+      {/* Timer ring */}
+      <div style={{ position: 'relative', width: 220, height: 220, marginBottom: 32 }}>
+        <svg
+          style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}
+          viewBox="0 0 200 200"
+        >
           <circle cx="100" cy="100" r={radius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="6" />
           <circle
-            cx="100" cy="100" r={radius} fill="none"
-            stroke={isFinished ? '#3D8B5C' : secondsLeft <= 3 ? '#C47D15' : '#1A1917'}
-            strokeWidth="6" strokeLinecap="round"
-            strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
-            className="transition-all duration-1000 ease-linear"
+            cx="100"
+            cy="100"
+            r={radius}
+            fill="none"
+            stroke={ringStroke}
+            strokeWidth="6"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            style={{ transition: 'stroke-dashoffset 1000ms linear, stroke 240ms ease' }}
           />
         </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={`text-[56px] font-bold tabular-nums tracking-tight transition-colors ${
-            isFinished ? 'text-[#3D8B5C]' : secondsLeft <= 3 ? 'text-[#C47D15]' : 'text-white'
-          }`}>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <span
+            style={{
+              fontSize: 56,
+              fontWeight: 500,
+              letterSpacing: '-0.04em',
+              fontVariantNumeric: 'tabular-nums',
+              color: numberColor,
+              fontFamily: 'var(--font-display, Outfit), Outfit, sans-serif',
+              transition: 'color 240ms ease',
+            }}
+          >
             {minutes}:{seconds.toString().padStart(2, '0')}
           </span>
-          <span className="text-[14px] font-medium text-white/50 uppercase tracking-[0.1em]">
-            {isFinished ? 'Klaar!' : 'Rust'}
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 500,
+              color: INK_FAINT,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              marginTop: 4,
+            }}
+          >
+            {isFinished ? 'Klaar' : 'Rust'}
           </span>
         </div>
       </div>
@@ -116,14 +181,36 @@ export function RestTimer({ initialSeconds, onComplete, onDismiss }: RestTimerPr
       {isFinished ? (
         <button
           onClick={onDismiss}
-          className="px-8 py-4 bg-[#3D8B5C] text-white rounded-2xl font-semibold text-[16px] shadow-[0_4px_24px_rgba(61,139,92,0.3)] hover:bg-[#3D8B5C] transition-all"
+          style={{
+            padding: '14px 28px',
+            background: CHECK,
+            color: INK,
+            borderRadius: 18,
+            fontWeight: 600,
+            fontSize: 15,
+            letterSpacing: '-0.01em',
+            boxShadow: '0 6px 22px rgba(47,166,90,0.32)',
+            border: 'none',
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+          }}
         >
           Volgende set
         </button>
       ) : (
         <button
           onClick={onDismiss}
-          className="px-6 py-3 bg-white/10 text-white/70 rounded-xl font-medium text-[14px] hover:bg-white/20 transition-all"
+          style={{
+            padding: '12px 22px',
+            background: 'rgba(255,255,255,0.08)',
+            color: INK_FAINT,
+            borderRadius: 14,
+            fontWeight: 500,
+            fontSize: 14,
+            border: 'none',
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+          }}
         >
           Overslaan
         </button>

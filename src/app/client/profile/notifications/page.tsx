@@ -60,7 +60,7 @@ export default function NotificationsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-[#1A1917]" />
+        <Loader2 className="w-6 h-6 animate-spin text-[#FDFDFE]" />
       </div>
     )
   }
@@ -69,7 +69,7 @@ export default function NotificationsPage() {
     <button
       onClick={onToggle}
       className={`relative w-[51px] h-[31px] rounded-full transition-colors ${
-        enabled ? 'bg-[#3D8B5C]' : 'bg-[#F0F0EE]'
+        enabled ? 'bg-[#2FA65A]' : 'bg-[rgba(253,253,254,0.08)]'
       }`}
     >
       <div
@@ -84,20 +84,20 @@ export default function NotificationsPage() {
     <div className="space-y-6 pb-20">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#1A1917]">
+        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#FDFDFE]">
           <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
         </button>
-        <h1 className="text-editorial-h2 text-[#1A1917]">
+        <h1 className="text-editorial-h2 text-[#FDFDFE]">
           Meldingen
         </h1>
       </div>
 
       {/* Push Notification Toggle */}
-      <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
+      <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] divide-y divide-[rgba(253,253,254,0.08)]">
         <div className="px-5 py-4 flex items-center justify-between">
           <div>
-            <p className="text-[15px] text-[#1A1917] font-medium">Push meldingen</p>
-            <p className="text-[13px] text-[#ACACAC] mt-0.5">
+            <p className="text-[15px] text-[#FDFDFE] font-medium">Push meldingen</p>
+            <p className="text-[13px] text-[rgba(253,253,254,0.55)] mt-0.5">
               {pushEnabled ? 'Meldingen zijn ingeschakeld' : 'Schakel push meldingen in'}
             </p>
           </div>
@@ -106,7 +106,7 @@ export default function NotificationsPage() {
           ) : (
             <button
               onClick={requestPushPermission}
-              className="px-4 py-2 bg-[#1A1917] text-white text-[13px] font-semibold rounded-full"
+              className="px-4 py-2 bg-[#FDFDFE] text-white text-[13px] font-semibold rounded-full"
             >
               Inschakelen
             </button>
@@ -116,19 +116,19 @@ export default function NotificationsPage() {
 
       {/* Notification Categories */}
       <div>
-        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Training</p>
-        <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
+        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Training</p>
+        <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] divide-y divide-[rgba(253,253,254,0.08)]">
           <div className="px-5 py-4 flex items-center justify-between">
             <div>
-              <p className="text-[15px] text-[#1A1917]">Workout herinneringen</p>
-              <p className="text-[13px] text-[#ACACAC] mt-0.5">Dagelijkse training herinnering</p>
+              <p className="text-[15px] text-[#FDFDFE]">Workout herinneringen</p>
+              <p className="text-[13px] text-[rgba(253,253,254,0.55)] mt-0.5">Dagelijkse training herinnering</p>
             </div>
             <Toggle enabled={settings.workoutReminders} onToggle={() => toggleSetting('workoutReminders')} />
           </div>
           <div className="px-5 py-4 flex items-center justify-between">
             <div>
-              <p className="text-[15px] text-[#1A1917]">PR meldingen</p>
-              <p className="text-[13px] text-[#ACACAC] mt-0.5">Vier je persoonlijke records</p>
+              <p className="text-[15px] text-[#FDFDFE]">PR meldingen</p>
+              <p className="text-[13px] text-[rgba(253,253,254,0.55)] mt-0.5">Vier je persoonlijke records</p>
             </div>
             <Toggle enabled={settings.prCelebrations} onToggle={() => toggleSetting('prCelebrations')} />
           </div>
@@ -136,19 +136,19 @@ export default function NotificationsPage() {
       </div>
 
       <div>
-        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Coach</p>
-        <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
+        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Coach</p>
+        <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] divide-y divide-[rgba(253,253,254,0.08)]">
           <div className="px-5 py-4 flex items-center justify-between">
             <div>
-              <p className="text-[15px] text-[#1A1917]">Berichten van coach</p>
-              <p className="text-[13px] text-[#ACACAC] mt-0.5">Nieuwe berichten en feedback</p>
+              <p className="text-[15px] text-[#FDFDFE]">Berichten van coach</p>
+              <p className="text-[13px] text-[rgba(253,253,254,0.55)] mt-0.5">Nieuwe berichten en feedback</p>
             </div>
             <Toggle enabled={settings.coachMessages} onToggle={() => toggleSetting('coachMessages')} />
           </div>
           <div className="px-5 py-4 flex items-center justify-between">
             <div>
-              <p className="text-[15px] text-[#1A1917]">Check-in herinneringen</p>
-              <p className="text-[13px] text-[#ACACAC] mt-0.5">Wekelijkse check-in herinnering</p>
+              <p className="text-[15px] text-[#FDFDFE]">Check-in herinneringen</p>
+              <p className="text-[13px] text-[rgba(253,253,254,0.55)] mt-0.5">Wekelijkse check-in herinnering</p>
             </div>
             <Toggle enabled={settings.checkinReminders} onToggle={() => toggleSetting('checkinReminders')} />
           </div>
@@ -156,12 +156,12 @@ export default function NotificationsPage() {
       </div>
 
       <div>
-        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Voortgang</p>
-        <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
+        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Voortgang</p>
+        <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] divide-y divide-[rgba(253,253,254,0.08)]">
           <div className="px-5 py-4 flex items-center justify-between">
             <div>
-              <p className="text-[15px] text-[#1A1917]">Wekelijks overzicht</p>
-              <p className="text-[13px] text-[#ACACAC] mt-0.5">Je wekelijkse voortgangsrapport</p>
+              <p className="text-[15px] text-[#FDFDFE]">Wekelijks overzicht</p>
+              <p className="text-[13px] text-[rgba(253,253,254,0.55)] mt-0.5">Je wekelijkse voortgangsrapport</p>
             </div>
             <Toggle enabled={settings.weeklyProgress} onToggle={() => toggleSetting('weeklyProgress')} />
           </div>

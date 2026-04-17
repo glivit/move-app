@@ -136,16 +136,16 @@ export default function BookingPage() {
   if (booked) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <div className="w-16 h-16 bg-[#3D8B5C] flex items-center justify-center mb-4">
+        <div className="w-16 h-16 bg-[#2FA65A] flex items-center justify-center mb-4">
           <Check className="w-8 h-8 text-white" strokeWidth={2} />
         </div>
-        <h2 className="text-[22px] font-bold text-[#1A1917] mb-2">Sessie geboekt!</h2>
-        <p className="text-[15px] text-[#ACACAC]">
+        <h2 className="text-[22px] font-bold text-[#FDFDFE] mb-2">Sessie geboekt!</h2>
+        <p className="text-[15px] text-[rgba(253,253,254,0.55)]">
           {selectedSlot && new Date(selectedSlot.datetime).toLocaleDateString('nl-BE', {
             weekday: 'long', day: 'numeric', month: 'long'
           })} om {selectedSlot?.time}
         </p>
-        <p className="text-[13px] text-[#C0C0C0] mt-2">Je wordt doorgestuurd naar je video calls...</p>
+        <p className="text-[13px] text-[rgba(253,253,254,0.48)] mt-2">Je wordt doorgestuurd naar je video calls...</p>
       </div>
     )
   }
@@ -159,9 +159,9 @@ export default function BookingPage() {
 
       {slots.length === 0 ? (
         <div className="bg-white p-12 rounded-2xl text-center animate-slide-up stagger-2">
-          <Calendar strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[#C0C0C0]" />
-          <p className="text-[15px] font-semibold text-[#1A1917] mb-2">Geen beschikbare tijden</p>
-          <p className="text-[13px] text-[#ACACAC]">
+          <Calendar strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[rgba(253,253,254,0.48)]" />
+          <p className="text-[15px] font-semibold text-[#FDFDFE] mb-2">Geen beschikbare tijden</p>
+          <p className="text-[13px] text-[rgba(253,253,254,0.55)]">
             Je coach heeft nog geen beschikbaarheid ingesteld. Neem contact op via berichten.
           </p>
         </div>
@@ -175,11 +175,11 @@ export default function BookingPage() {
                   const d = new Date(prev.year, prev.month - 1)
                   return { year: d.getFullYear(), month: d.getMonth() }
                 })}
-                className="p-2 hover:bg-[#FAFAF8] transition-colors"
+                className="p-2 hover:bg-[rgba(253,253,254,0.10)] transition-colors"
               >
-                <ChevronLeft className="w-4 h-4 text-[#ACACAC]" />
+                <ChevronLeft className="w-4 h-4 text-[rgba(253,253,254,0.55)]" />
               </button>
-              <h3 className="text-[15px] font-semibold text-[#1A1917]">
+              <h3 className="text-[15px] font-semibold text-[#FDFDFE]">
                 {MONTH_NAMES[calendarMonth.month]} {calendarMonth.year}
               </h3>
               <button
@@ -187,16 +187,16 @@ export default function BookingPage() {
                   const d = new Date(prev.year, prev.month + 1)
                   return { year: d.getFullYear(), month: d.getMonth() }
                 })}
-                className="p-2 hover:bg-[#FAFAF8] transition-colors"
+                className="p-2 hover:bg-[rgba(253,253,254,0.10)] transition-colors"
               >
-                <ChevronRight className="w-4 h-4 text-[#ACACAC]" />
+                <ChevronRight className="w-4 h-4 text-[rgba(253,253,254,0.55)]" />
               </button>
             </div>
 
             {/* Day headers */}
             <div className="grid grid-cols-7 gap-1 mb-1">
               {['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'].map(day => (
-                <div key={day} className="text-center text-[11px] font-semibold text-[#C0C0C0] py-1">{day}</div>
+                <div key={day} className="text-center text-[11px] font-semibold text-[rgba(253,253,254,0.48)] py-1">{day}</div>
               ))}
             </div>
 
@@ -215,20 +215,20 @@ export default function BookingPage() {
                     disabled={!day.hasSlots || isPast}
                     className={`aspect-square flex flex-col items-center justify-center text-[13px] transition-all relative ${
                       isSelected
-                        ? 'bg-[#1A1917] text-white font-bold'
+                        ? 'bg-[#FDFDFE] text-white font-bold'
                         : day.hasSlots && !isPast
-                          ? 'text-[#1A1917] hover:bg-[#FAFAF8] font-medium'
+                          ? 'text-[#FDFDFE] hover:bg-[rgba(253,253,254,0.10)] font-medium'
                           : !day.isCurrentMonth
-                            ? 'text-[#F0F0EE]'
-                            : 'text-[#C0C0C0]'
+                            ? 'text-[rgba(253,253,254,0.08)]'
+                            : 'text-[rgba(253,253,254,0.48)]'
                     }`}
                   >
                     {day.date.getDate()}
                     {day.hasSlots && !isPast && !isSelected && (
-                      <div className="w-1 h-1 bg-[#1A1917] absolute bottom-1" />
+                      <div className="w-1 h-1 bg-[#FDFDFE] absolute bottom-1" />
                     )}
                     {isToday && !isSelected && (
-                      <div className="w-1 h-1 bg-[#C47D15] absolute bottom-1" />
+                      <div className="w-1 h-1 bg-[#C0FC01] absolute bottom-1" />
                     )}
                   </button>
                 )
@@ -240,10 +240,10 @@ export default function BookingPage() {
           <div className="space-y-4">
             {selectedDate && (
               <div className="bg-white p-5 rounded-2xl animate-slide-up stagger-3">
-                <h3 className="text-[15px] font-semibold text-[#1A1917] mb-1">
+                <h3 className="text-[15px] font-semibold text-[#FDFDFE] mb-1">
                   {new Date(selectedDate).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}
                 </h3>
-                <p className="text-[12px] text-[#ACACAC] mb-4">{slotsForDate.length} beschikbare tijden</p>
+                <p className="text-[12px] text-[rgba(253,253,254,0.55)] mb-4">{slotsForDate.length} beschikbare tijden</p>
 
                 <div className="grid grid-cols-3 gap-2">
                   {slotsForDate.map(slot => (
@@ -252,8 +252,8 @@ export default function BookingPage() {
                       onClick={() => setSelectedSlot(slot)}
                       className={`py-2.5 px-3 text-[14px] font-medium uppercase tracking-wider transition-all border rounded-xl ${
                         selectedSlot?.datetime === slot.datetime
-                          ? 'bg-[#1A1917] text-white border-[#1A1917]'
-                          : 'bg-white text-[#1A1917] border-[#F0F0EE] hover:border-[#1A1917]/30 hover:bg-[#FAFAF8]'
+                          ? 'bg-[#FDFDFE] text-white border-[#FDFDFE]'
+                          : 'bg-white text-[#FDFDFE] border-[rgba(253,253,254,0.08)] hover:border-[#FDFDFE]/30 hover:bg-[rgba(253,253,254,0.10)]'
                       }`}
                     >
                       {slot.time}
@@ -267,12 +267,12 @@ export default function BookingPage() {
             {selectedSlot && (
               <div className="bg-white p-5 rounded-2xl animate-slide-up stagger-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-[#1A1917]/10 flex items-center justify-center">
-                    <Video className="w-5 h-5 text-[#1A1917]" strokeWidth={1.5} />
+                  <div className="w-10 h-10 bg-[#FDFDFE]/10 flex items-center justify-center">
+                    <Video className="w-5 h-5 text-[#FDFDFE]" strokeWidth={1.5} />
                   </div>
                   <div>
-                    <p className="text-[15px] font-semibold text-[#1A1917]">Video coaching sessie</p>
-                    <p className="text-[13px] text-[#ACACAC]">
+                    <p className="text-[15px] font-semibold text-[#FDFDFE]">Video coaching sessie</p>
+                    <p className="text-[13px] text-[rgba(253,253,254,0.55)]">
                       {new Date(selectedSlot.datetime).toLocaleDateString('nl-BE', {
                         weekday: 'long', day: 'numeric', month: 'long'
                       })} om {selectedSlot.time} — 30 min
@@ -281,21 +281,21 @@ export default function BookingPage() {
                 </div>
 
                 <div className="mb-4">
-                  <label className="text-label text-[#ACACAC] uppercase tracking-[0.12em] block mb-1.5">
+                  <label className="text-label text-[rgba(253,253,254,0.55)] uppercase tracking-[0.12em] block mb-1.5">
                     Notitie (optioneel)
                   </label>
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Waar wil je het over hebben?"
-                    className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917] resize-none h-16"
+                    className="w-full px-3 py-2.5 border border-[rgba(253,253,254,0.08)] rounded-xl text-[13px] text-[#FDFDFE] placeholder-[rgba(253,253,254,0.48)] focus:outline-none focus:border-[#FDFDFE] resize-none h-16"
                   />
                 </div>
 
                 <button
                   onClick={handleBook}
                   disabled={booking}
-                  className="w-full py-3 bg-[#1A1917] text-white font-semibold uppercase tracking-wider text-[14px] hover:bg-[#333330] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-[#FDFDFE] text-white font-semibold uppercase tracking-wider text-[14px] hover:bg-[#5A5E5B] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {booking ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> Boeken...</>

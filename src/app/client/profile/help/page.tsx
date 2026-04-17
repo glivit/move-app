@@ -51,10 +51,10 @@ export default function HelpPage() {
     <div className="space-y-6 pb-20">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#1A1917]">
+        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#FDFDFE]">
           <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
         </button>
-        <h1 className="text-editorial-h2 text-[#1A1917]">
+        <h1 className="text-editorial-h2 text-[#FDFDFE]">
           Help & FAQ
         </h1>
       </div>
@@ -62,7 +62,7 @@ export default function HelpPage() {
       {/* Contact Coach */}
       <a
         href="/client/messages"
-        className="bg-[#1A1917] rounded-2xl p-5 flex items-center gap-4 text-white hover:bg-[#7A5C12] transition-colors"
+        className="bg-[#FDFDFE] rounded-2xl p-5 flex items-center gap-4 text-white hover:bg-[#7A5C12] transition-colors"
       >
         <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
           <MessageSquare strokeWidth={1.5} className="w-6 h-6" />
@@ -75,25 +75,25 @@ export default function HelpPage() {
 
       {/* FAQ */}
       <div>
-        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Veelgestelde vragen</p>
-        <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
+        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Veelgestelde vragen</p>
+        <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] divide-y divide-[rgba(253,253,254,0.08)]">
           {FAQ_ITEMS.map((item, index) => (
             <div key={index}>
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="w-full px-5 py-4 flex items-center justify-between text-left hover:bg-[#FAFAFA] transition-colors"
               >
-                <span className="text-[15px] text-[#1A1917] pr-4">{item.q}</span>
+                <span className="text-[15px] text-[#FDFDFE] pr-4">{item.q}</span>
                 <ChevronDown
                   strokeWidth={1.5}
-                  className={`w-5 h-5 text-[#ACACAC] flex-shrink-0 transition-transform ${
+                  className={`w-5 h-5 text-[rgba(253,253,254,0.55)] flex-shrink-0 transition-transform ${
                     openIndex === index ? 'rotate-180' : ''
                   }`}
                 />
               </button>
               {openIndex === index && (
                 <div className="px-5 pb-4">
-                  <p className="text-[14px] text-[#ACACAC] leading-relaxed">{item.a}</p>
+                  <p className="text-[14px] text-[rgba(253,253,254,0.55)] leading-relaxed">{item.a}</p>
                 </div>
               )}
             </div>
@@ -103,8 +103,8 @@ export default function HelpPage() {
 
       {/* App Version */}
       <div className="text-center pt-4">
-        <p className="text-[13px] text-[#C0C0C0]">MŌVE Coaching App v1.0.0</p>
-        <p className="text-[11px] text-[#C0C0C0] mt-1">Premium Coaching · Knokke</p>
+        <p className="text-[13px] text-[rgba(253,253,254,0.48)]">MŌVE Coaching App v1.0.0</p>
+        <p className="text-[11px] text-[rgba(253,253,254,0.48)] mt-1">Premium Coaching · Knokke</p>
       </div>
     </div>
   )

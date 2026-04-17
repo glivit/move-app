@@ -87,7 +87,7 @@ export default function GoalsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-[#1A1917]" />
+        <Loader2 className="w-6 h-6 animate-spin text-[#FDFDFE]" />
       </div>
     )
   }
@@ -96,18 +96,18 @@ export default function GoalsPage() {
     <div className="space-y-6 pb-20">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#1A1917]">
+        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#FDFDFE]">
           <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
         </button>
-        <h1 className="text-editorial-h2 text-[#1A1917]">
+        <h1 className="text-editorial-h2 text-[#FDFDFE]">
           Mijn doelen
         </h1>
       </div>
 
       {/* Primary Goal */}
       <div>
-        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Hoofddoel</p>
-        <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
+        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Hoofddoel</p>
+        <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] divide-y divide-[rgba(253,253,254,0.08)]">
           {GOAL_OPTIONS.map((goal) => (
             <button
               key={goal.id}
@@ -116,10 +116,10 @@ export default function GoalsPage() {
             >
               <div className="flex items-center gap-3">
                 <span className="text-xl">{goal.emoji}</span>
-                <span className="text-[15px] text-[#1A1917]">{goal.label}</span>
+                <span className="text-[15px] text-[#FDFDFE]">{goal.label}</span>
               </div>
               {primaryGoal === goal.id && (
-                <div className="w-6 h-6 rounded-full bg-[#1A1917] flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-[#FDFDFE] flex items-center justify-center">
                   <Check strokeWidth={2.5} className="w-3.5 h-3.5 text-white" />
                 </div>
               )}
@@ -130,7 +130,7 @@ export default function GoalsPage() {
 
       {/* Secondary Goals */}
       <div>
-        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Nevendoelen (optioneel)</p>
+        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Nevendoelen (optioneel)</p>
         <div className="flex flex-wrap gap-2">
           {GOAL_OPTIONS.filter(g => g.id !== primaryGoal).map((goal) => {
             const selected = secondaryGoals.includes(goal.id)
@@ -140,8 +140,8 @@ export default function GoalsPage() {
                 onClick={() => toggleSecondaryGoal(goal.id)}
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
-                    ? 'bg-[#1A1917] text-white'
-                    : 'bg-white border border-[#F0F0EE] text-[#1A1917] hover:border-[#1A1917]'
+                    ? 'bg-[#FDFDFE] text-white'
+                    : 'bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] text-[#FDFDFE] hover:border-[#FDFDFE]'
                 }`}
               >
                 {goal.emoji} {goal.label}
@@ -153,14 +153,14 @@ export default function GoalsPage() {
 
       {/* Motivation */}
       <div>
-        <p className="text-[13px] font-medium text-[#ACACAC] uppercase tracking-wide px-1 mb-2">Motivatie</p>
-        <div className="bg-white rounded-2xl border border-[#F0F0EE] p-5">
+        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Motivatie</p>
+        <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] p-5">
           <textarea
             value={motivation}
             onChange={(e) => setMotivation(e.target.value)}
             placeholder="Waarom wil je dit bereiken? Wat drijft je?"
             rows={4}
-            className="w-full text-[15px] text-[#1A1917] bg-transparent placeholder:text-[#C0C0C0] focus:outline-none resize-none"
+            className="w-full text-[15px] text-[#FDFDFE] bg-transparent placeholder:text-[rgba(253,253,254,0.48)] focus:outline-none resize-none"
           />
         </div>
       </div>
@@ -169,7 +169,7 @@ export default function GoalsPage() {
       <button
         onClick={handleSave}
         disabled={saving}
-        className="w-full py-3.5 rounded-2xl bg-[#1A1917] text-white font-semibold text-[15px] hover:bg-[#7A5C12] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-3.5 rounded-2xl bg-[#FDFDFE] text-white font-semibold text-[15px] hover:bg-[#7A5C12] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {saving ? (
           <Loader2 className="w-5 h-5 animate-spin" />

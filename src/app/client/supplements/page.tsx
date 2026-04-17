@@ -146,15 +146,15 @@ export default function SupplementsPage() {
     return (
       <div className="space-y-6">
         {/* Hero skeleton */}
-        <div className="animate-shimmer bg-[#F0F0EE] h-40 rounded-2xl" />
+        <div className="animate-shimmer bg-[rgba(253,253,254,0.08)] h-40 rounded-2xl" />
 
         {/* Form skeleton */}
-        <div className="animate-shimmer bg-[#F0F0EE] h-32 rounded-2xl" />
+        <div className="animate-shimmer bg-[rgba(253,253,254,0.08)] h-32 rounded-2xl" />
 
         {/* Cards skeleton */}
         <div className="space-y-4">
           {[1, 2].map(i => (
-            <div key={i} className="animate-shimmer bg-[#F0F0EE] h-24 rounded-2xl" />
+            <div key={i} className="animate-shimmer bg-[rgba(253,253,254,0.08)] h-24 rounded-2xl" />
           ))}
         </div>
       </div>
@@ -166,54 +166,54 @@ export default function SupplementsPage() {
       {/* Hero section with stats */}
       <div className="mb-14 animate-slide-up">
         <p className="text-label mb-3">Supplementen</p>
-        <p className="stat-number-hero text-[#1A1917]">
+        <p className="stat-number-hero text-[#FDFDFE]">
           {totalCount > 0 ? Math.round((loggedCount / totalCount) * 100) : 0}<span className="text-[36px]">%</span>
         </p>
-        <p className="text-[16px] text-[#ACACAC] mt-2">vandaag ingenomen</p>
+        <p className="text-[16px] text-[rgba(253,253,254,0.55)] mt-2">vandaag ingenomen</p>
 
         {/* Thin progress bar */}
         {totalCount > 0 && (
-          <div className="w-full h-[3px] bg-[#F0F0EE] rounded-full mt-5 overflow-hidden">
-            <div className="h-full bg-[#3D8B5C] rounded-full transition-all duration-500" style={{ width: `${totalCount > 0 ? (loggedCount / totalCount) * 100 : 0}%` }} />
+          <div className="w-full h-[3px] bg-[rgba(253,253,254,0.08)] rounded-full mt-5 overflow-hidden">
+            <div className="h-full bg-[#2FA65A] rounded-full transition-all duration-500" style={{ width: `${totalCount > 0 ? (loggedCount / totalCount) * 100 : 0}%` }} />
           </div>
         )}
       </div>
 
       {/* Add form */}
       {showAdd && (
-        <form onSubmit={addSupplement} className="bg-white p-5 rounded-2xl border border-[#F0F0EE] space-y-4 animate-slide-up stagger-2">
-          <h3 className="text-[15px] font-semibold text-[#1A1917]">Nieuw supplement toevoegen</h3>
+        <form onSubmit={addSupplement} className="bg-white p-5 rounded-2xl border border-[rgba(253,253,254,0.08)] space-y-4 animate-slide-up stagger-2">
+          <h3 className="text-[15px] font-semibold text-[#FDFDFE]">Nieuw supplement toevoegen</h3>
 
           <div>
-            <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.12em] block mb-1.5">Naam *</label>
+            <label className="text-[11px] font-semibold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.12em] block mb-1.5">Naam *</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="bijv. Creatine, Vitamine D, Omega-3..."
               required
-              className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl bg-white text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
+              className="w-full px-3 py-2.5 border border-[rgba(253,253,254,0.08)] rounded-xl bg-white text-[14px] text-[#FDFDFE] placeholder-[rgba(253,253,254,0.48)] focus:outline-none focus:border-[#FDFDFE]"
             />
           </div>
 
           <div>
-            <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.12em] block mb-1.5">Dosering</label>
+            <label className="text-[11px] font-semibold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.12em] block mb-1.5">Dosering</label>
             <input
               type="text"
               value={dosage}
               onChange={(e) => setDosage(e.target.value)}
               placeholder="bijv. 5g, 2000 IU, 1 capsule..."
-              className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl bg-white text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917]"
+              className="w-full px-3 py-2.5 border border-[rgba(253,253,254,0.08)] rounded-xl bg-white text-[14px] text-[#FDFDFE] placeholder-[rgba(253,253,254,0.48)] focus:outline-none focus:border-[#FDFDFE]"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.12em] block mb-1.5">Frequentie</label>
+              <label className="text-[11px] font-semibold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.12em] block mb-1.5">Frequentie</label>
               <select
                 value={frequency}
                 onChange={(e) => setFrequency(e.target.value)}
-                className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl bg-white text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917]"
+                className="w-full px-3 py-2.5 border border-[rgba(253,253,254,0.08)] rounded-xl bg-white text-[14px] text-[#FDFDFE] focus:outline-none focus:border-[#FDFDFE]"
               >
                 {FREQUENCY_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -221,11 +221,11 @@ export default function SupplementsPage() {
               </select>
             </div>
             <div>
-              <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.12em] block mb-1.5">Tijdstip</label>
+              <label className="text-[11px] font-semibold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.12em] block mb-1.5">Tijdstip</label>
               <select
                 value={timeOfDay}
                 onChange={(e) => setTimeOfDay(e.target.value)}
-                className="w-full px-3 py-2.5 border border-[#F0F0EE] rounded-xl bg-white text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917]"
+                className="w-full px-3 py-2.5 border border-[rgba(253,253,254,0.08)] rounded-xl bg-white text-[14px] text-[#FDFDFE] focus:outline-none focus:border-[#FDFDFE]"
               >
                 {TIME_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -237,7 +237,7 @@ export default function SupplementsPage() {
           <button
             type="submit"
             disabled={saving || !name.trim()}
-            className="w-full py-3 bg-[#1A1917] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#333330] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 rounded-xl"
+            className="w-full py-3 bg-[#FDFDFE] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#5A5E5B] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 rounded-xl"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Toevoegen
@@ -252,10 +252,10 @@ export default function SupplementsPage() {
             const GroupIcon = group.icon
             return (
               <div key={group.value} className="animate-slide-up" style={{ animationDelay: `${60 + groupIndex * 60}ms` }}>
-                <div className="border-t border-[#F0F0EE] pt-6 mt-10 first:border-t-0 first:pt-0 first:mt-0">
+                <div className="border-t border-[rgba(253,253,254,0.08)] pt-6 mt-10 first:border-t-0 first:pt-0 first:mt-0">
                   <div className="flex items-center gap-2 mb-4">
-                    <GroupIcon className="w-4 h-4 text-[#ACACAC]" strokeWidth={1.5} />
-                    <h3 className="text-label text-[#ACACAC]">{group.label}</h3>
+                    <GroupIcon className="w-4 h-4 text-[rgba(253,253,254,0.55)]" strokeWidth={1.5} />
+                    <h3 className="text-label text-[rgba(253,253,254,0.55)]">{group.label}</h3>
                   </div>
                   {group.items.map((supplement, itemIndex) => {
                     const logged = isLoggedToday(supplement.id)
@@ -264,32 +264,32 @@ export default function SupplementsPage() {
                     return (
                       <div
                         key={supplement.id}
-                        className={`flex items-center gap-3 py-4 ${!isLastItem ? 'border-b border-[#F0F0EE]' : ''} hover:opacity-60 transition-opacity`}
+                        className={`flex items-center gap-3 py-4 ${!isLastItem ? 'border-b border-[rgba(253,253,254,0.08)]' : ''} hover:opacity-60 transition-opacity`}
                       >
                         <button
                           onClick={() => toggleLog(supplement.id)}
                           disabled={toggling}
                           className="w-8 h-8 border-2 flex items-center justify-center shrink-0 transition-all rounded-md"
                           style={{
-                            borderColor: logged ? '#3D8B5C' : '#F0F0EE',
-                            backgroundColor: logged ? '#3D8B5C' : 'transparent',
+                            borderColor: logged ? '#2FA65A' : 'rgba(253,253,254,0.08)',
+                            backgroundColor: logged ? '#2FA65A' : 'transparent',
                           }}
                         >
                           {toggling ? (
-                            <Loader2 className="w-4 h-4 animate-spin text-[#ACACAC]" />
+                            <Loader2 className="w-4 h-4 animate-spin text-[rgba(253,253,254,0.55)]" />
                           ) : logged ? (
                             <Check className="w-4 h-4 text-white" strokeWidth={2.5} />
                           ) : null}
                         </button>
                         <div className="flex-1 min-w-0">
-                          <p className={`text-[15px] font-semibold ${logged ? 'text-[#ACACAC] line-through' : 'text-[#1A1917]'}`}>
+                          <p className={`text-[15px] font-semibold ${logged ? 'text-[rgba(253,253,254,0.55)] line-through' : 'text-[#FDFDFE]'}`}>
                             {supplement.name}
                           </p>
                           <div className="flex items-center gap-2 mt-0.5">
                             {supplement.dosage && (
-                              <span className="text-[12px] text-[#ACACAC]">{supplement.dosage}</span>
+                              <span className="text-[12px] text-[rgba(253,253,254,0.55)]">{supplement.dosage}</span>
                             )}
-                            <span className="text-[12px] text-[#C0C0C0]">{supplement.frequency}</span>
+                            <span className="text-[12px] text-[rgba(253,253,254,0.48)]">{supplement.frequency}</span>
                           </div>
                         </div>
                         <button
@@ -298,7 +298,7 @@ export default function SupplementsPage() {
                               deactivate(supplement.id)
                             }
                           }}
-                          className="p-2 text-[#C0C0C0] hover:text-[#C4372A] transition-colors"
+                          className="p-2 text-[rgba(253,253,254,0.48)] hover:text-[#B55A4A] transition-colors"
                         >
                           <Trash2 className="w-4 h-4" strokeWidth={1.5} />
                         </button>
@@ -311,15 +311,15 @@ export default function SupplementsPage() {
           })}
         </div>
       ) : !showAdd ? (
-        <div className="bg-white p-12 rounded-2xl border border-[#F0F0EE] text-center">
-          <Pill strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[#C0C0C0]" />
-          <p className="text-[15px] font-semibold text-[#1A1917] mb-2">Nog geen supplementen</p>
-          <p className="text-[13px] text-[#ACACAC] mb-4">
+        <div className="bg-white p-12 rounded-2xl border border-[rgba(253,253,254,0.08)] text-center">
+          <Pill strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[rgba(253,253,254,0.48)]" />
+          <p className="text-[15px] font-semibold text-[#FDFDFE] mb-2">Nog geen supplementen</p>
+          <p className="text-[13px] text-[rgba(253,253,254,0.55)] mb-4">
             Voeg je supplementen en medicatie toe om ze dagelijks bij te houden.
           </p>
           <button
             onClick={() => setShowAdd(true)}
-            className="px-5 py-2.5 bg-[#1A1917] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#333330] transition-colors rounded-xl"
+            className="px-5 py-2.5 bg-[#FDFDFE] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#5A5E5B] transition-colors rounded-xl"
           >
             Eerste supplement toevoegen
           </button>

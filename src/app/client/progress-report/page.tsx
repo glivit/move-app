@@ -310,10 +310,10 @@ Bekijk mijn voortgang in Move!`
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8F8F6] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[rgba(253,253,254,0.08)] flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#D46A3A]"></div>
-          <p className="mt-4 text-[#ACACAC]">Voortgangsrapport laden...</p>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#C0FC01]"></div>
+          <p className="mt-4 text-[rgba(253,253,254,0.55)]">Voortgangsrapport laden...</p>
         </div>
       </div>
     )
@@ -321,17 +321,17 @@ Bekijk mijn voortgang in Move!`
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#F8F8F6] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[rgba(253,253,254,0.08)] flex items-center justify-center p-4">
         <div className="text-center max-w-md">
-          <h1 className="text-2xl font-bold text-[#1A1917] mb-2">Oops!</h1>
-          <p className="text-[#ACACAC]">{error}</p>
+          <h1 className="text-2xl font-bold text-[#FDFDFE] mb-2">Oops!</h1>
+          <p className="text-[rgba(253,253,254,0.55)]">{error}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F8F6] py-8 px-4">
+    <div className="min-h-screen bg-[rgba(253,253,254,0.08)] py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -339,15 +339,15 @@ Bekijk mijn voortgang in Move!`
             <h1 className="page-title text-4xl mb-2">
               Voortgangsrapport
             </h1>
-            <p className="text-[#ACACAC]">Volg je vooruitgang en feest je successen</p>
+            <p className="text-[rgba(253,253,254,0.55)]">Volg je vooruitgang en feest je successen</p>
           </div>
         </div>
 
         {/* Period Selector */}
-        <div className="mb-6 bg-white rounded-2xl border border-[#F0F0EE] p-5">
+        <div className="mb-6 bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] p-5">
           <div className="flex items-center gap-2 mb-3">
-            <Calendar className="w-5 h-5 text-[#D46A3A]" />
-            <span className="font-semibold text-[#1A1917]">Periode</span>
+            <Calendar className="w-5 h-5 text-[#C0FC01]" />
+            <span className="font-semibold text-[#FDFDFE]">Periode</span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {PERIOD_OPTIONS.map(option => (
@@ -356,8 +356,8 @@ Bekijk mijn voortgang in Move!`
                 onClick={() => setSelectedPeriod(option.key)}
                 className={`py-2 px-3 rounded-lg font-medium transition-all ${
                   selectedPeriod === option.key
-                    ? 'bg-[#D46A3A] text-white'
-                    : 'bg-[#F8F8F6] text-[#ACACAC] hover:bg-[#F0F0EE]'
+                    ? 'bg-[#C0FC01] text-white'
+                    : 'bg-[rgba(253,253,254,0.08)] text-[rgba(253,253,254,0.55)] hover:bg-[rgba(253,253,254,0.08)]'
                 }`}
               >
                 {option.label}
@@ -367,11 +367,11 @@ Bekijk mijn voortgang in Move!`
         </div>
 
         {/* Report Card Container */}
-        <div ref={reportRef} className="bg-white rounded-2xl border border-[#F0F0EE] p-8 mb-6">
+        <div ref={reportRef} className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] p-8 mb-6">
           {/* Report Header */}
-          <div className="text-center mb-8 pb-6 border-b border-[#F0F0EE]">
-            <h2 className="text-3xl font-bold text-[#1A1917] mb-1">{clientName}</h2>
-            <p className="text-[#ACACAC]">
+          <div className="text-center mb-8 pb-6 border-b border-[rgba(253,253,254,0.08)]">
+            <h2 className="text-3xl font-bold text-[#FDFDFE] mb-1">{clientName}</h2>
+            <p className="text-[rgba(253,253,254,0.55)]">
               {periodLabel} • {reportDate}
             </p>
           </div>
@@ -379,39 +379,39 @@ Bekijk mijn voortgang in Move!`
           {/* Key Metrics */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {/* Total Workouts */}
-            <div className="bg-[#F8F8F6] rounded-xl p-4">
+            <div className="bg-[rgba(253,253,254,0.08)] rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[#ACACAC]">Totaal workouts</span>
-                <TrendingUp className="w-5 h-5 text-[#D46A3A]" />
+                <span className="text-sm font-medium text-[rgba(253,253,254,0.55)]">Totaal workouts</span>
+                <TrendingUp className="w-5 h-5 text-[#C0FC01]" />
               </div>
-              <p className="text-3xl font-bold text-[#1A1917]">{totalWorkouts}</p>
+              <p className="text-3xl font-bold text-[#FDFDFE]">{totalWorkouts}</p>
             </div>
 
             {/* Average Per Week */}
-            <div className="bg-[#F8F8F6] rounded-xl p-4">
+            <div className="bg-[rgba(253,253,254,0.08)] rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[#ACACAC]">Gemiddeld/week</span>
-                <TrendingUp className="w-5 h-5 text-[#D46A3A]" />
+                <span className="text-sm font-medium text-[rgba(253,253,254,0.55)]">Gemiddeld/week</span>
+                <TrendingUp className="w-5 h-5 text-[#C0FC01]" />
               </div>
-              <p className="text-3xl font-bold text-[#1A1917]">{averagePerWeek}</p>
+              <p className="text-3xl font-bold text-[#FDFDFE]">{averagePerWeek}</p>
             </div>
 
             {/* Current Streak */}
-            <div className="bg-[#F8F8F6] rounded-xl p-4">
+            <div className="bg-[rgba(253,253,254,0.08)] rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[#ACACAC]">Huidige streak</span>
-                <Flame className="w-5 h-5 text-[#D46A3A]" />
+                <span className="text-sm font-medium text-[rgba(253,253,254,0.55)]">Huidige streak</span>
+                <Flame className="w-5 h-5 text-[#C0FC01]" />
               </div>
-              <p className="text-3xl font-bold text-[#1A1917]">{currentStreak}d</p>
+              <p className="text-3xl font-bold text-[#FDFDFE]">{currentStreak}d</p>
             </div>
 
             {/* Weight Change */}
-            <div className="bg-[#F8F8F6] rounded-xl p-4">
+            <div className="bg-[rgba(253,253,254,0.08)] rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[#ACACAC]">Gewichtsverandering</span>
-                <Scale className="w-5 h-5 text-[#D46A3A]" />
+                <span className="text-sm font-medium text-[rgba(253,253,254,0.55)]">Gewichtsverandering</span>
+                <Scale className="w-5 h-5 text-[#C0FC01]" />
               </div>
-              <p className={`text-3xl font-bold ${weightChange ? (weightChange < 0 ? 'text-green-600' : 'text-[#1A1917]') : 'text-[#ACACAC]'}`}>
+              <p className={`text-3xl font-bold ${weightChange ? (weightChange < 0 ? 'text-green-600' : 'text-[#FDFDFE]') : 'text-[rgba(253,253,254,0.55)]'}`}>
                 {weightChange ? `${weightChange > 0 ? '+' : ''}${weightChange}kg` : '—'}
               </p>
             </div>
@@ -420,38 +420,38 @@ Bekijk mijn voortgang in Move!`
           {/* Weight Trend Chart */}
           {weightChartData.length > 1 && (
             <div className="mb-8">
-              <h3 className="text-xl font-bold text-[#1A1917] mb-4">Gewichtsverloop</h3>
-              <div className="bg-[#F8F8F6] rounded-xl p-4 h-80">
+              <h3 className="text-xl font-bold text-[#FDFDFE] mb-4">Gewichtsverloop</h3>
+              <div className="bg-[rgba(253,253,254,0.08)] rounded-xl p-4 h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={weightChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#D46A3A" stopOpacity={0.8} />
-                        <stop offset="95%" stopColor="#D46A3A" stopOpacity={0.1} />
+                        <stop offset="5%" stopColor="#C0FC01" stopOpacity={0.8} />
+                        <stop offset="95%" stopColor="#C0FC01" stopOpacity={0.1} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F0F0EE" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(253,253,254,0.08)" />
                     <XAxis
                       dataKey="date"
-                      tick={{ fill: '#ACACAC', fontSize: 12 }}
-                      stroke="#F0F0EE"
+                      tick={{ fill: 'rgba(253,253,254,0.55)', fontSize: 12 }}
+                      stroke="rgba(253,253,254,0.08)"
                     />
                     <YAxis
-                      tick={{ fill: '#ACACAC', fontSize: 12 }}
-                      stroke="#F0F0EE"
+                      tick={{ fill: 'rgba(253,253,254,0.55)', fontSize: 12 }}
+                      stroke="rgba(253,253,254,0.08)"
                     />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: '#fff',
-                        border: '1px solid #F0F0EE',
+                        border: '1px solid rgba(253,253,254,0.08)',
                         borderRadius: '8px',
                       }}
-                      labelStyle={{ color: '#1A1917' }}
+                      labelStyle={{ color: '#FDFDFE' }}
                     />
                     <Area
                       type="monotone"
                       dataKey="weight"
-                      stroke="#D46A3A"
+                      stroke="#C0FC01"
                       fillOpacity={1}
                       fill="url(#colorWeight)"
                     />
@@ -464,31 +464,31 @@ Bekijk mijn voortgang in Move!`
           {/* Weekly Workouts Chart */}
           {weeklyData.length > 0 && (
             <div className="mb-8">
-              <h3 className="text-xl font-bold text-[#1A1917] mb-4">Wekelijkse activiteit</h3>
-              <div className="bg-[#F8F8F6] rounded-xl p-4 h-80">
+              <h3 className="text-xl font-bold text-[#FDFDFE] mb-4">Wekelijkse activiteit</h3>
+              <div className="bg-[rgba(253,253,254,0.08)] rounded-xl p-4 h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={weeklyData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F0F0EE" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(253,253,254,0.08)" />
                     <XAxis
                       dataKey="week"
-                      tick={{ fill: '#ACACAC', fontSize: 12 }}
-                      stroke="#F0F0EE"
+                      tick={{ fill: 'rgba(253,253,254,0.55)', fontSize: 12 }}
+                      stroke="rgba(253,253,254,0.08)"
                     />
                     <YAxis
-                      tick={{ fill: '#ACACAC', fontSize: 12 }}
-                      stroke="#F0F0EE"
+                      tick={{ fill: 'rgba(253,253,254,0.55)', fontSize: 12 }}
+                      stroke="rgba(253,253,254,0.08)"
                     />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: '#fff',
-                        border: '1px solid #F0F0EE',
+                        border: '1px solid rgba(253,253,254,0.08)',
                         borderRadius: '8px',
                       }}
-                      labelStyle={{ color: '#1A1917' }}
+                      labelStyle={{ color: '#FDFDFE' }}
                     />
                     <Bar
                       dataKey="workouts"
-                      fill="#D46A3A"
+                      fill="#C0FC01"
                       radius={[8, 8, 0, 0]}
                     />
                   </BarChart>
@@ -500,27 +500,27 @@ Bekijk mijn voortgang in Move!`
           {/* Top PRs */}
           {prs.length > 0 && (
             <div>
-              <h3 className="text-xl font-bold text-[#1A1917] mb-4 flex items-center gap-2">
-                <Trophy className="w-6 h-6 text-[#D46A3A]" />
+              <h3 className="text-xl font-bold text-[#FDFDFE] mb-4 flex items-center gap-2">
+                <Trophy className="w-6 h-6 text-[#C0FC01]" />
                 Persoonlijke Records
               </h3>
               <div className="space-y-3">
                 {prs.map((pr, index) => (
-                  <div key={pr.id} className="flex items-center justify-between bg-[#F8F8F6] rounded-xl p-4">
+                  <div key={pr.id} className="flex items-center justify-between bg-[rgba(253,253,254,0.08)] rounded-xl p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-[#D46A3A] text-white flex items-center justify-center font-bold text-sm">
+                      <div className="w-8 h-8 rounded-full bg-[#C0FC01] text-white flex items-center justify-center font-bold text-sm">
                         {index + 1}
                       </div>
                       <div>
-                        <p className="font-semibold text-[#1A1917]">{pr.exercises?.name}</p>
-                        <p className="text-sm text-[#ACACAC]">
+                        <p className="font-semibold text-[#FDFDFE]">{pr.exercises?.name}</p>
+                        <p className="text-sm text-[rgba(253,253,254,0.55)]">
                           {new Date(pr.workout_sessions?.started_at).toLocaleDateString('nl-NL')}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-[#1A1917]">{pr.weight_kg} kg</p>
-                      <p className="text-sm text-[#ACACAC]">{pr.reps} reps</p>
+                      <p className="font-bold text-[#FDFDFE]">{pr.weight_kg} kg</p>
+                      <p className="text-sm text-[rgba(253,253,254,0.55)]">{pr.reps} reps</p>
                     </div>
                   </div>
                 ))}
@@ -530,7 +530,7 @@ Bekijk mijn voortgang in Move!`
 
           {prs.length === 0 && weightChartData.length === 0 && weeklyData.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-[#ACACAC] mb-2">Nog geen gegevens beschikbaar voor deze periode</p>
+              <p className="text-[rgba(253,253,254,0.55)] mb-2">Nog geen gegevens beschikbaar voor deze periode</p>
               <p className="text-sm text-[#B5B1AA]">Start met trainingen en loggen van je voortgang</p>
             </div>
           )}
@@ -540,7 +540,7 @@ Bekijk mijn voortgang in Move!`
         <div className="flex gap-4 justify-center">
           <button
             onClick={handleShare}
-            className="flex items-center gap-2 bg-[#D46A3A] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#B85730] transition-colors"
+            className="flex items-center gap-2 bg-[#C0FC01] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#B85730] transition-colors"
           >
             {copied ? (
               <>
@@ -561,7 +561,7 @@ Bekijk mijn voortgang in Move!`
           </button>
           <a
             href="/client/dashboard"
-            className="flex items-center gap-2 bg-[#F8F8F6] text-[#1A1917] px-6 py-3 rounded-xl font-semibold border border-[#F0F0EE] hover:bg-[#F0F0EE] transition-colors"
+            className="flex items-center gap-2 bg-[rgba(253,253,254,0.08)] text-[#FDFDFE] px-6 py-3 rounded-xl font-semibold border border-[rgba(253,253,254,0.08)] hover:bg-[rgba(253,253,254,0.08)] transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
             Terug naar dashboard

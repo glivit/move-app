@@ -24,6 +24,14 @@ interface RingProps {
   color: string;
 }
 
+// v6 Orion — zachte warm neutrals voor macro-semantiek, geen v3 shout-kleuren
+const TRACK = 'rgba(255,255,255,0.14)';
+const INK = '#FDFDFE';
+const INK_FAINT = 'rgba(253,253,254,0.62)';
+const PROTEIN = '#D9A645';   // warm amber (eiwit)
+const CARBS = '#B56A53';     // earthy terracotta (koolhydraten)
+const FAT = '#8A7BA8';       // muted plum (vet)
+
 function MacroRing({ label, current, target, color }: RingProps) {
   const size = 52;
   const strokeWidth = 4;
@@ -33,7 +41,7 @@ function MacroRing({ label, current, target, color }: RingProps) {
   const strokeDashoffset = circumference - circumference * percentage;
 
   return (
-    <div className="flex flex-col items-center">
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         {/* Background track */}
         <circle
@@ -41,7 +49,7 @@ function MacroRing({ label, current, target, color }: RingProps) {
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="#E8E4DC"
+          stroke={TRACK}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
         />
@@ -58,7 +66,7 @@ function MacroRing({ label, current, target, color }: RingProps) {
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
           style={{
-            transition: 'stroke-dashoffset 0.5s ease-out',
+            transition: 'stroke-dashoffset 500ms ease-out',
             transform: 'rotate(-90deg)',
             transformOrigin: `${size / 2}px ${size / 2}px`,
           }}
@@ -69,16 +77,25 @@ function MacroRing({ label, current, target, color }: RingProps) {
           x={size / 2}
           y={size / 2}
           textAnchor="middle"
-          dy="0.3em"
-          className="text-[15px] font-bold text-primary"
-          fill="currentColor"
+          dy="0.32em"
+          fontSize="14"
+          fontWeight="600"
+          fill={INK}
+          style={{ fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.01em' }}
         >
           {Math.round(current)}
         </text>
       </svg>
 
       {/* Label */}
-      <div className="text-[12px] text-client-text-secondary mt-2">
+      <div
+        style={{
+          fontSize: 12,
+          color: INK_FAINT,
+          marginTop: 6,
+          letterSpacing: '-0.005em',
+        }}
+      >
         {label}
       </div>
     </div>
@@ -87,25 +104,10 @@ function MacroRing({ label, current, target, color }: RingProps) {
 
 export function MacroRings({ protein, carbs, fat }: MacroRingsProps) {
   return (
-    <div className="flex justify-center gap-8">
-      <MacroRing
-        label="Eiwit"
-        current={protein.current}
-        target={protein.target}
-        color="#C47D15"
-      />
-      <MacroRing
-        label="Koolh."
-        current={carbs.current}
-        target={carbs.target}
-        color="#C4372A"
-      />
-      <MacroRing
-        label="Vet"
-        current={fat.current}
-        target={fat.target}
-        color="#AF52DE"
-      />
+    <div style={{ display: 'flex', justifyContent: 'center', gap: 32 }}>
+      <MacroRing label="Eiwit" current={protein.current} target={protein.target} color={PROTEIN} />
+      <MacroRing label="Koolh." current={carbs.current} target={carbs.target} color={CARBS} />
+      <MacroRing label="Vet" current={fat.current} target={fat.target} color={FAT} />
     </div>
   );
 }

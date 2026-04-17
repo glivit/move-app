@@ -22,15 +22,25 @@ interface ExerciseCardProps {
   onToggle: () => void
 }
 
+// v6 Orion tokens
+const INK = '#FDFDFE'
+const INK_FAINT = 'rgba(253,253,254,0.62)'
+const INK_MUTED = 'rgba(253,253,254,0.74)'
+const CHECK = '#2FA65A'
+const INNER_SURFACE = 'rgba(31,35,32,0.14)'
+const INNER_BORDER = 'rgba(253,253,254,0.22)'
+
 export function ExerciseCard({
   exercise,
-  index,
   completed,
   onToggle,
 }: ExerciseCardProps) {
   return (
-    <div className="bg-white rounded-2xl border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition-all">
-      <div className="flex items-start gap-3.5 p-5">
+    <div
+      className="v6-card"
+      style={{ padding: '16px 16px 18px', overflow: 'hidden' }}
+    >
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
         {/* Exercise thumbnail */}
         <ExerciseMedia
           name={exercise.name}
@@ -44,57 +54,97 @@ export function ExerciseCard({
         />
 
         {/* Exercise Details */}
-        <div className="flex-1 min-w-0">
+        <div style={{ flex: 1, minWidth: 0 }}>
           <h3
-            className={`text-[16px] font-semibold tracking-[-0.01em] transition-all ${
-              completed
-                ? 'line-through text-[#A09D96]'
-                : 'text-[#1A1917]'
-            }`}
+            style={{
+              fontSize: 16,
+              fontWeight: 600,
+              letterSpacing: '-0.01em',
+              color: completed ? INK_FAINT : INK,
+              textDecoration: completed ? 'line-through' : 'none',
+              transition: 'color 180ms ease, text-decoration-color 180ms ease',
+            }}
           >
             {exercise.nameNl || exercise.name}
           </h3>
 
-          {/* Sets, Reps, Rest */}
-          <p className="text-[13px] text-[#A09D96] mt-1">
+          {/* Sets · reps · rust */}
+          <p
+            style={{
+              fontSize: 13,
+              color: INK_MUTED,
+              marginTop: 4,
+              letterSpacing: '-0.005em',
+            }}
+          >
             {exercise.sets} sets · {exercise.reps} reps · {exercise.rest}s rust
           </p>
 
           {/* Notes */}
           {exercise.notes && (
-            <div className="mt-3 bg-[#EEEBE3] rounded-xl p-3">
-              <p className="text-[13px] text-[#6B6862] italic">
+            <div
+              style={{
+                marginTop: 12,
+                background: INNER_SURFACE,
+                borderRadius: 12,
+                padding: '10px 12px',
+              }}
+            >
+              <p
+                style={{
+                  fontSize: 13,
+                  color: INK_MUTED,
+                  fontStyle: 'italic',
+                  letterSpacing: '-0.005em',
+                }}
+              >
                 {exercise.notes}
               </p>
             </div>
           )}
         </div>
 
-        {/* Right side: checkbox + video */}
-        <div className="flex flex-col items-center gap-2.5 shrink-0">
-          {/* Checkbox */}
+        {/* Right column: checkbox + video */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, flexShrink: 0 }}>
           <button
             onClick={onToggle}
-            className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-200 ${
-              completed
-                ? 'bg-[#3D8B5C]'
-                : 'border-[1.5px] border-[#CCC7BC] hover:border-[#1A1917]'
-            }`}
             aria-label={completed ? 'Markeer als incompleet' : 'Markeer als voltooid'}
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: completed ? CHECK : 'transparent',
+              border: completed ? 'none' : `1.5px solid ${INNER_BORDER}`,
+              cursor: 'pointer',
+              transition: 'background 180ms ease, border-color 180ms ease',
+              WebkitTapHighlightColor: 'transparent',
+            }}
           >
             {completed && <Check size={14} strokeWidth={2.5} className="text-white" />}
           </button>
 
-          {/* Video Button */}
           {exercise.videoUrl && (
             <a
               href={exercise.videoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-7 h-7 rounded-full bg-[#EEEBE3] flex items-center justify-center hover:bg-[#1A1917]/10 transition-colors"
               aria-label="Bekijk video"
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                background: INNER_SURFACE,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: INK,
+                transition: 'background 180ms ease',
+              }}
             >
-              <Play size={13} strokeWidth={1.5} className="text-[#1A1917] ml-0.5" />
+              <Play size={12} strokeWidth={1.8} fill={INK} style={{ marginLeft: 1 }} />
             </a>
           )}
         </div>

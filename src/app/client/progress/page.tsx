@@ -798,7 +798,7 @@ export default function ProgressPage() {
                 fontWeight: active ? 500 : 400,
                 letterSpacing: '-0.005em',
                 background: active ? '#FDFDFE' : 'transparent',
-                color: active ? '#2A2D2B' : 'rgba(253,253,254,0.78)',
+                color: active ? '#474B48' : 'rgba(253,253,254,0.78)',
                 border: active ? '1px solid #FDFDFE' : '1px solid rgba(253,253,254,0.10)',
                 WebkitTapHighlightColor: 'transparent',
                 cursor: 'pointer',
@@ -1963,7 +1963,7 @@ export default function ProgressPage() {
                   padding: '12px 20px',
                   borderRadius: 14,
                   background: '#C0FC01',
-                  color: '#1A1917',
+                  color: '#FDFDFE',
                   fontSize: 13,
                   fontWeight: 600,
                   textDecoration: 'none',
@@ -2077,14 +2077,14 @@ export default function ProgressPage() {
                     padding: '11px 18px 12px 20px',
                     borderRadius: 999,
                     background: '#FDFDFE',
-                    color: '#2A2D2B',
+                    color: '#474B48',
                     fontSize: 13,
                     fontWeight: 500,
                     letterSpacing: '-0.005em',
                   }}
                 >
                   Start check-in
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2A2D2B" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#474B48" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="9 6 15 12 9 18" />
                   </svg>
                 </span>
@@ -2237,7 +2237,7 @@ export default function ProgressPage() {
                           style={{
                             width: 28, height: 28,
                             borderRadius: '50%',
-                            background: 'linear-gradient(140deg, #5A5E52, #3D403A)',
+                            background: 'linear-gradient(140deg, #5A5E52, #474B48)',
                             color: 'rgba(244,242,235,0.94)',
                             fontSize: 10,
                             fontWeight: 500,
@@ -2397,7 +2397,7 @@ export default function ProgressPage() {
                   padding: '12px 20px',
                   borderRadius: 14,
                   background: '#C0FC01',
-                  color: '#1A1917',
+                  color: '#FDFDFE',
                   fontSize: 13,
                   fontWeight: 600,
                   textDecoration: 'none',

@@ -183,42 +183,42 @@ export default function CardioSessionPage() {
   // ─── Exercise selection ───
   if (mode === 'select') {
     return (
-      <div className="min-h-screen bg-white pt-safe">
+      <div className="min-h-screen pt-safe">
         {/* Header */}
-        <header className="sticky top-0 bg-white/95 backdrop-blur-sm z-10 px-5 py-4 flex items-center gap-3 border-b border-[#F0F0EE]">
+        <header className="sticky top-0 z-10 px-5 py-4 flex items-center gap-3 border-b border-[rgba(253,253,254,0.08)]">
           <button
             onClick={() => router.back()}
-            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[#F0F0EE] transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[rgba(253,253,254,0.08)] transition-colors"
           >
-            <ChevronLeft size={20} strokeWidth={1.5} className="text-[#ACACAC]" />
+            <ChevronLeft size={20} strokeWidth={1.5} className="text-[rgba(253,253,254,0.55)]" />
           </button>
-          <h1 className="text-[18px] font-semibold text-[#1A1917] page-title">Cardio sessie</h1>
+          <h1 className="text-[18px] font-semibold text-[#FDFDFE] page-title">Cardio sessie</h1>
         </header>
 
         <main className="max-w-lg mx-auto px-5 py-6">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="w-6 h-6 border-[1.5px] border-[#D5D5D5] border-t-[#1A1917] rounded-full animate-spin" />
+              <div className="w-6 h-6 border-[1.5px] border-[rgba(253,253,254,0.35)] border-t-[#FDFDFE] rounded-full animate-spin" />
             </div>
           ) : (
             <div className="space-y-3">
               {exercises.map(ex => {
                 const nameHasInterval = (ex.name_nl || ex.name || '').toLowerCase().includes('interval')
                 return (
-                  <div key={ex.id} className="bg-[#F8F8F6] rounded-2xl overflow-hidden">
+                  <div key={ex.id} className="bg-[rgba(253,253,254,0.08)] rounded-2xl overflow-hidden">
                     <div className="flex items-center gap-4 p-4">
-                      <div className="w-11 h-11 bg-white rounded-xl flex items-center justify-center flex-shrink-0 border border-[#F0F0EE]">
-                        <Footprints size={18} strokeWidth={1.5} className="text-[#D46A3A]" />
+                      <div className="w-11 h-11 bg-[rgba(253,253,254,0.12)] rounded-xl flex items-center justify-center flex-shrink-0 border border-[rgba(253,253,254,0.08)]">
+                        <Footprints size={18} strokeWidth={1.5} className="text-[#C0FC01]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[14px] font-semibold text-[#1A1917] truncate">{ex.name_nl || ex.name}</p>
-                        <p className="text-[11px] text-[#ACACAC] mt-0.5">{ex.equipment}</p>
+                        <p className="text-[14px] font-semibold text-[#FDFDFE] truncate">{ex.name_nl || ex.name}</p>
+                        <p className="text-[11px] text-[rgba(253,253,254,0.55)] mt-0.5">{ex.equipment}</p>
                       </div>
                     </div>
                     <div className="flex gap-2 px-4 pb-4">
                       <button
                         onClick={() => selectExercise(ex, false)}
-                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-[#3D8B5C] text-white rounded-xl font-semibold text-[12px] uppercase tracking-[0.06em] hover:bg-[#347A50] transition-colors active:scale-[0.98]"
+                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-[#2FA65A] text-white rounded-xl font-semibold text-[12px] uppercase tracking-[0.06em] hover:bg-[#288F4D] transition-colors active:scale-[0.98]"
                       >
                         <Clock size={14} strokeWidth={2} />
                         Steady state
@@ -226,7 +226,7 @@ export default function CardioSessionPage() {
                       {(nameHasInterval || true) && (
                         <button
                           onClick={() => selectExercise(ex, true)}
-                          className="flex-1 flex items-center justify-center gap-2 py-3 bg-[#D46A3A] text-white rounded-xl font-semibold text-[12px] uppercase tracking-[0.06em] hover:bg-[#C45E30] transition-colors active:scale-[0.98]"
+                          className="flex-1 flex items-center justify-center gap-2 py-3 bg-[#C0FC01] text-white rounded-xl font-semibold text-[12px] uppercase tracking-[0.06em] hover:bg-[#A8DD01] transition-colors active:scale-[0.98]"
                         >
                           <Zap size={14} strokeWidth={2} />
                           Interval
@@ -246,34 +246,34 @@ export default function CardioSessionPage() {
   // ─── Steady state timer ───
   if (mode === 'steady') {
     return (
-      <div className="min-h-screen bg-white pt-safe">
-        <header className="sticky top-0 bg-white/95 backdrop-blur-sm z-10 px-5 py-4 flex items-center gap-3 border-b border-[#F0F0EE]">
+      <div className="min-h-screen pt-safe">
+        <header className="sticky top-0 z-10 px-5 py-4 flex items-center gap-3 border-b border-[rgba(253,253,254,0.08)]">
           <button
             onClick={() => { setRunning(false); setMode('select') }}
-            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[#F0F0EE] transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[rgba(253,253,254,0.08)] transition-colors"
           >
-            <ChevronLeft size={20} strokeWidth={1.5} className="text-[#ACACAC]" />
+            <ChevronLeft size={20} strokeWidth={1.5} className="text-[rgba(253,253,254,0.55)]" />
           </button>
-          <h1 className="text-[18px] font-semibold text-[#1A1917] page-title truncate">
+          <h1 className="text-[18px] font-semibold text-[#FDFDFE] page-title truncate">
             {selectedExercise?.name_nl || selectedExercise?.name}
           </h1>
         </header>
 
         <main className="max-w-lg mx-auto px-5 py-8 flex flex-col items-center">
           {/* Big timer */}
-          <div className="w-full bg-[#F8F8F6] rounded-3xl p-10 text-center mb-8">
-            <p className="text-[64px] font-bold text-[#1A1917] tabular-nums tracking-tight leading-none">
+          <div className="w-full bg-[rgba(253,253,254,0.08)] rounded-3xl p-10 text-center mb-8">
+            <p className="text-[64px] font-bold text-[#FDFDFE] tabular-nums tracking-tight leading-none">
               {hours > 0 && `${hours}:`}{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
             </p>
             {elapsed > 0 && (
               <div className="flex items-center justify-center gap-8 mt-6">
                 <div className="flex items-center gap-2">
-                  <Flame size={16} strokeWidth={1.5} className="text-[#D46A3A]" />
-                  <span className="text-[15px] font-semibold text-[#ACACAC]">~{estimatedCals} kcal</span>
+                  <Flame size={16} strokeWidth={1.5} className="text-[#C0FC01]" />
+                  <span className="text-[15px] font-semibold text-[rgba(253,253,254,0.55)]">~{estimatedCals} kcal</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Clock size={16} strokeWidth={1.5} className="text-[#D46A3A]" />
-                  <span className="text-[15px] font-semibold text-[#ACACAC]">{minutes} min</span>
+                  <Clock size={16} strokeWidth={1.5} className="text-[#C0FC01]" />
+                  <span className="text-[15px] font-semibold text-[rgba(253,253,254,0.55)]">{minutes} min</span>
                 </div>
               </div>
             )}
@@ -284,7 +284,7 @@ export default function CardioSessionPage() {
             {!running && elapsed === 0 ? (
               <button
                 onClick={handleStart}
-                className="flex-1 flex items-center justify-center gap-3 py-5 bg-[#3D8B5C] text-white rounded-2xl font-bold text-[16px] uppercase tracking-[0.06em] hover:bg-[#347A50] transition-colors active:scale-[0.98]"
+                className="flex-1 flex items-center justify-center gap-3 py-5 bg-[#2FA65A] text-white rounded-2xl font-bold text-[16px] uppercase tracking-[0.06em] hover:bg-[#288F4D] transition-colors active:scale-[0.98]"
               >
                 <Play size={22} strokeWidth={2} fill="currentColor" />
                 Start
@@ -292,7 +292,7 @@ export default function CardioSessionPage() {
             ) : running ? (
               <button
                 onClick={handlePause}
-                className="flex-1 flex items-center justify-center gap-3 py-5 bg-[#E8A838] text-white rounded-2xl font-bold text-[16px] uppercase tracking-[0.06em] hover:bg-[#D49A30] transition-colors active:scale-[0.98]"
+                className="flex-1 flex items-center justify-center gap-3 py-5 bg-[#E8B948] text-white rounded-2xl font-bold text-[16px] uppercase tracking-[0.06em] hover:bg-[#C9A03D] transition-colors active:scale-[0.98]"
               >
                 <Pause size={22} strokeWidth={2} />
                 Pauze
@@ -301,23 +301,23 @@ export default function CardioSessionPage() {
               <>
                 <button
                   onClick={handleResume}
-                  className="flex-1 flex items-center justify-center gap-3 py-5 bg-[#3D8B5C] text-white rounded-2xl font-bold text-[16px] uppercase tracking-[0.06em] hover:bg-[#347A50] transition-colors active:scale-[0.98]"
+                  className="flex-1 flex items-center justify-center gap-3 py-5 bg-[#2FA65A] text-white rounded-2xl font-bold text-[16px] uppercase tracking-[0.06em] hover:bg-[#288F4D] transition-colors active:scale-[0.98]"
                 >
                   <Play size={22} strokeWidth={2} fill="currentColor" />
                   Hervat
                 </button>
                 <button
                   onClick={() => { setElapsed(0); setPausedAt(0); setStartTime(null) }}
-                  className="w-16 h-16 flex items-center justify-center bg-[#F0F0EE] rounded-2xl hover:bg-[#E0E0DE] transition-colors"
+                  className="w-16 h-16 flex items-center justify-center bg-[rgba(253,253,254,0.08)] rounded-2xl hover:bg-[rgba(253,253,254,0.14)] transition-colors"
                 >
-                  <RotateCcw size={20} strokeWidth={1.5} className="text-[#ACACAC]" />
+                  <RotateCcw size={20} strokeWidth={1.5} className="text-[rgba(253,253,254,0.55)]" />
                 </button>
               </>
             )}
             {elapsed > 30 && (
               <button
                 onClick={() => handleFinish(elapsed)}
-                className="w-16 h-16 flex items-center justify-center bg-[#1A1917] rounded-2xl hover:bg-[#333330] transition-colors"
+                className="w-16 h-16 flex items-center justify-center bg-[#FDFDFE] rounded-2xl hover:bg-[#5A5E5B] transition-colors"
               >
                 <Check size={22} strokeWidth={2.5} className="text-white" />
               </button>
@@ -335,15 +335,15 @@ export default function CardioSessionPage() {
 
     if (phase === 'idle') {
       return (
-        <div className="min-h-screen bg-white pt-safe">
-          <header className="sticky top-0 bg-white/95 backdrop-blur-sm z-10 px-5 py-4 flex items-center gap-3 border-b border-[#F0F0EE]">
+        <div className="min-h-screen pt-safe">
+          <header className="sticky top-0 z-10 px-5 py-4 flex items-center gap-3 border-b border-[rgba(253,253,254,0.08)]">
             <button
               onClick={() => setMode('select')}
-              className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[#F0F0EE] transition-colors"
+              className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[rgba(253,253,254,0.08)] transition-colors"
             >
-              <ChevronLeft size={20} strokeWidth={1.5} className="text-[#ACACAC]" />
+              <ChevronLeft size={20} strokeWidth={1.5} className="text-[rgba(253,253,254,0.55)]" />
             </button>
-            <h1 className="text-[18px] font-semibold text-[#1A1917] page-title truncate">
+            <h1 className="text-[18px] font-semibold text-[#FDFDFE] page-title truncate">
               {selectedExercise?.name_nl || selectedExercise?.name}
             </h1>
           </header>
@@ -351,8 +351,8 @@ export default function CardioSessionPage() {
           <main className="max-w-lg mx-auto px-5 py-6 space-y-6">
             {/* Work time */}
             <div>
-              <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.08em] mb-2.5 block">
-                <Zap size={12} className="inline mr-1 text-[#3D8B5C]" />
+              <label className="text-[11px] font-semibold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.08em] mb-2.5 block">
+                <Zap size={12} className="inline mr-1 text-[#2FA65A]" />
                 Werk (seconden)
               </label>
               <div className="flex flex-wrap gap-2">
@@ -361,7 +361,7 @@ export default function CardioSessionPage() {
                     key={s}
                     onClick={() => setWorkSeconds(s)}
                     className={`px-5 py-3 rounded-xl text-[14px] font-semibold transition-all ${
-                      workSeconds === s ? 'bg-[#3D8B5C] text-white' : 'bg-[#F8F8F6] text-[#ACACAC] border border-[#F0F0EE]'
+                      workSeconds === s ? 'bg-[#2FA65A] text-white' : 'bg-[rgba(253,253,254,0.08)] text-[rgba(253,253,254,0.55)] border border-[rgba(253,253,254,0.08)]'
                     }`}
                   >
                     {s}s
@@ -372,8 +372,8 @@ export default function CardioSessionPage() {
 
             {/* Rest time */}
             <div>
-              <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.08em] mb-2.5 block">
-                <Pause size={12} className="inline mr-1 text-[#E8A838]" />
+              <label className="text-[11px] font-semibold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.08em] mb-2.5 block">
+                <Pause size={12} className="inline mr-1 text-[#E8B948]" />
                 Rust (seconden)
               </label>
               <div className="flex flex-wrap gap-2">
@@ -382,7 +382,7 @@ export default function CardioSessionPage() {
                     key={s}
                     onClick={() => setRestSeconds(s)}
                     className={`px-5 py-3 rounded-xl text-[14px] font-semibold transition-all ${
-                      restSeconds === s ? 'bg-[#E8A838] text-white' : 'bg-[#F8F8F6] text-[#ACACAC] border border-[#F0F0EE]'
+                      restSeconds === s ? 'bg-[#E8B948] text-white' : 'bg-[rgba(253,253,254,0.08)] text-[rgba(253,253,254,0.55)] border border-[rgba(253,253,254,0.08)]'
                     }`}
                   >
                     {s}s
@@ -393,8 +393,8 @@ export default function CardioSessionPage() {
 
             {/* Rounds */}
             <div>
-              <label className="text-[11px] font-semibold text-[#ACACAC] uppercase tracking-[0.08em] mb-2.5 block">
-                <RotateCcw size={12} className="inline mr-1 text-[#D46A3A]" />
+              <label className="text-[11px] font-semibold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.08em] mb-2.5 block">
+                <RotateCcw size={12} className="inline mr-1 text-[#C0FC01]" />
                 Rondes
               </label>
               <div className="flex flex-wrap gap-2">
@@ -403,7 +403,7 @@ export default function CardioSessionPage() {
                     key={r}
                     onClick={() => setTotalRounds(r)}
                     className={`px-5 py-3 rounded-xl text-[14px] font-semibold transition-all ${
-                      totalRounds === r ? 'bg-[#D46A3A] text-white' : 'bg-[#F8F8F6] text-[#ACACAC] border border-[#F0F0EE]'
+                      totalRounds === r ? 'bg-[#C0FC01] text-white' : 'bg-[rgba(253,253,254,0.08)] text-[rgba(253,253,254,0.55)] border border-[rgba(253,253,254,0.08)]'
                     }`}
                   >
                     {r}×
@@ -413,15 +413,15 @@ export default function CardioSessionPage() {
             </div>
 
             {/* Summary */}
-            <div className="bg-[#F8F8F6] rounded-xl px-5 py-4 text-center">
-              <p className="text-[14px] text-[#ACACAC]">
-                Totaal: <span className="font-bold text-[#1A1917]">{totalRounds} rondes</span> · ±{Math.round((totalRounds * (workSeconds + restSeconds)) / 60)} min
+            <div className="bg-[rgba(253,253,254,0.08)] rounded-xl px-5 py-4 text-center">
+              <p className="text-[14px] text-[rgba(253,253,254,0.55)]">
+                Totaal: <span className="font-bold text-[#FDFDFE]">{totalRounds} rondes</span> · ±{Math.round((totalRounds * (workSeconds + restSeconds)) / 60)} min
               </p>
             </div>
 
             <button
               onClick={handleIntervalStart}
-              className="w-full flex items-center justify-center gap-3 py-5 bg-[#3D8B5C] text-white rounded-2xl font-bold text-[16px] uppercase tracking-[0.06em] hover:bg-[#347A50] transition-colors active:scale-[0.98]"
+              className="w-full flex items-center justify-center gap-3 py-5 bg-[#2FA65A] text-white rounded-2xl font-bold text-[16px] uppercase tracking-[0.06em] hover:bg-[#288F4D] transition-colors active:scale-[0.98]"
             >
               <Play size={22} strokeWidth={2} fill="currentColor" />
               Start interval timer
@@ -437,22 +437,22 @@ export default function CardioSessionPage() {
       const doneCals = Math.round((totalElapsed / 60) * 11)
 
       return (
-        <div className="min-h-screen bg-white pt-safe">
+        <div className="min-h-screen pt-safe">
           <main className="max-w-lg mx-auto px-5 py-12 flex flex-col items-center">
-            <div className="w-full bg-[#F6FBF7] border border-[#3D8B5C]/15 rounded-3xl p-10 text-center mb-8">
-              <div className="w-16 h-16 bg-[#3D8B5C] rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-full bg-[rgba(47,166,90,0.10)] border border-[#2FA65A]/15 rounded-3xl p-10 text-center mb-8">
+              <div className="w-16 h-16 bg-[#2FA65A] rounded-full flex items-center justify-center mx-auto mb-4">
                 <Check size={28} strokeWidth={3} className="text-white" />
               </div>
-              <p className="text-[24px] font-bold text-[#1A1917]">{totalRounds} rondes klaar!</p>
-              <p className="text-[15px] font-medium text-[#1A1917] mt-1">{selectedExercise?.name_nl}</p>
+              <p className="text-[24px] font-bold text-[#FDFDFE]">{totalRounds} rondes klaar!</p>
+              <p className="text-[15px] font-medium text-[#FDFDFE] mt-1">{selectedExercise?.name_nl}</p>
               <div className="flex items-center justify-center gap-6 mt-4">
-                <span className="text-[14px] font-semibold text-[#ACACAC]">{doneMinutes} min</span>
-                <span className="text-[14px] font-semibold text-[#ACACAC]">~{doneCals} kcal</span>
+                <span className="text-[14px] font-semibold text-[rgba(253,253,254,0.55)]">{doneMinutes} min</span>
+                <span className="text-[14px] font-semibold text-[rgba(253,253,254,0.55)]">~{doneCals} kcal</span>
               </div>
             </div>
             <button
               onClick={() => { handleFinish(totalElapsed); router.push('/client/workout') }}
-              className="w-full py-5 bg-[#1A1917] text-white rounded-2xl font-bold text-[15px] uppercase tracking-[0.06em] hover:bg-[#333] transition-colors active:scale-[0.98]"
+              className="w-full py-5 bg-[#FDFDFE] text-white rounded-2xl font-bold text-[15px] uppercase tracking-[0.06em] hover:bg-[#5A5E5B] transition-colors active:scale-[0.98]"
             >
               {saving ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
@@ -470,36 +470,36 @@ export default function CardioSessionPage() {
 
     return (
       <div className={`min-h-screen pt-safe transition-colors duration-500 ${
-        phase === 'work' ? 'bg-[#F0FBF3]' : 'bg-[#FFF8F0]'
+        phase === 'work' ? 'bg-[rgba(47,166,90,0.14)]' : 'bg-[rgba(232,185,72,0.14)]'
       }`}>
         <main className="max-w-lg mx-auto px-5 py-12 flex flex-col items-center">
           {/* Phase label */}
           <p className={`text-[14px] font-black uppercase tracking-[0.2em] mb-2 ${
-            phase === 'work' ? 'text-[#3D8B5C]' : 'text-[#E8A838]'
+            phase === 'work' ? 'text-[#2FA65A]' : 'text-[#E8B948]'
           }`}>
             {phase === 'work' ? 'WERK' : 'RUST'}
           </p>
 
           {/* Big timer */}
-          <p className="text-[80px] font-bold text-[#1A1917] tabular-nums tracking-tight leading-none mb-4">
+          <p className="text-[80px] font-bold text-[#FDFDFE] tabular-nums tracking-tight leading-none mb-4">
             {displayMin > 0 && `${displayMin}:`}{String(displaySec).padStart(2, '0')}
           </p>
 
           {/* Progress bar */}
-          <div className="w-full h-[6px] bg-white/50 rounded-full overflow-hidden mb-6">
+          <div className="w-full h-[6px] bg-[rgba(255,255,255,0.14)] rounded-full overflow-hidden mb-6">
             <div
               className={`h-full rounded-full transition-all duration-300 ${
-                phase === 'work' ? 'bg-[#3D8B5C]' : 'bg-[#E8A838]'
+                phase === 'work' ? 'bg-[#2FA65A]' : 'bg-[#E8B948]'
               }`}
               style={{ width: `${progressPct}%` }}
             />
           </div>
 
           {/* Round counter */}
-          <p className="text-[16px] font-bold text-[#ACACAC] mb-2">
+          <p className="text-[16px] font-bold text-[rgba(253,253,254,0.55)] mb-2">
             Ronde {currentRound} / {totalRounds}
           </p>
-          <p className="text-[14px] text-[#C0C0C0] mb-10">
+          <p className="text-[14px] text-[rgba(253,253,254,0.48)] mb-10">
             {selectedExercise?.name_nl}
           </p>
 
@@ -523,7 +523,7 @@ export default function CardioSessionPage() {
                   setEndTime(Date.now() + workSeconds * 1000)
                 }
               }}
-              className="flex-1 py-4 bg-white text-[#ACACAC] rounded-2xl font-semibold text-[14px] hover:bg-[#F8F8F6] transition-colors"
+              className="flex-1 py-4 bg-[rgba(253,253,254,0.08)] text-[rgba(253,253,254,0.55)] rounded-2xl font-semibold text-[14px] hover:bg-[rgba(253,253,254,0.08)] transition-colors"
             >
               Skip →
             </button>
@@ -532,7 +532,7 @@ export default function CardioSessionPage() {
                 setTotalElapsed(Math.floor((Date.now() - startTimeRef.current) / 1000))
                 setPhase('done')
               }}
-              className="px-8 py-4 bg-[#1A1917] text-white rounded-2xl font-semibold text-[14px] hover:bg-[#333330] transition-colors"
+              className="px-8 py-4 bg-[#FDFDFE] text-white rounded-2xl font-semibold text-[14px] hover:bg-[#5A5E5B] transition-colors"
             >
               Stop
             </button>
@@ -545,22 +545,22 @@ export default function CardioSessionPage() {
   // ─── Done screen (steady state) ───
   const doneMinutes = Math.floor(elapsed / 60)
   return (
-    <div className="min-h-screen bg-white pt-safe">
+    <div className="min-h-screen pt-safe">
       <main className="max-w-lg mx-auto px-5 py-12 flex flex-col items-center">
-        <div className="w-full bg-[#F6FBF7] border border-[#3D8B5C]/15 rounded-3xl p-10 text-center mb-8">
-          <div className="w-16 h-16 bg-[#3D8B5C] rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="w-full bg-[rgba(47,166,90,0.10)] border border-[#2FA65A]/15 rounded-3xl p-10 text-center mb-8">
+          <div className="w-16 h-16 bg-[#2FA65A] rounded-full flex items-center justify-center mx-auto mb-4">
             <Check size={28} strokeWidth={3} className="text-white" />
           </div>
-          <p className="text-[24px] font-bold text-[#1A1917]">Cardio klaar!</p>
-          <p className="text-[15px] font-medium text-[#1A1917] mt-1">{selectedExercise?.name_nl}</p>
+          <p className="text-[24px] font-bold text-[#FDFDFE]">Cardio klaar!</p>
+          <p className="text-[15px] font-medium text-[#FDFDFE] mt-1">{selectedExercise?.name_nl}</p>
           <div className="flex items-center justify-center gap-6 mt-4">
-            <span className="text-[14px] font-semibold text-[#ACACAC]">{doneMinutes} min</span>
-            <span className="text-[14px] font-semibold text-[#ACACAC]">~{estimatedCals} kcal</span>
+            <span className="text-[14px] font-semibold text-[rgba(253,253,254,0.55)]">{doneMinutes} min</span>
+            <span className="text-[14px] font-semibold text-[rgba(253,253,254,0.55)]">~{estimatedCals} kcal</span>
           </div>
         </div>
         <button
           onClick={() => router.push('/client/workout')}
-          className="w-full py-5 bg-[#1A1917] text-white rounded-2xl font-bold text-[15px] uppercase tracking-[0.06em] hover:bg-[#333] transition-colors active:scale-[0.98]"
+          className="w-full py-5 bg-[#FDFDFE] text-white rounded-2xl font-bold text-[15px] uppercase tracking-[0.06em] hover:bg-[#5A5E5B] transition-colors active:scale-[0.98]"
         >
           {saving ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />

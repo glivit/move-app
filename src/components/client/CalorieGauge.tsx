@@ -8,6 +8,11 @@ interface CalorieGaugeProps {
   meals: number;
 }
 
+// v6 Orion tokens
+const INK = '#FDFDFE';
+const INK_FAINT = 'rgba(253,253,254,0.62)';
+const TRACK = 'rgba(255,255,255,0.12)';
+
 export function CalorieGauge({ consumed, target, meals }: CalorieGaugeProps) {
   const remaining = Math.max(0, target - consumed);
   const percentage = Math.min(consumed / target, 1);
@@ -23,21 +28,22 @@ export function CalorieGauge({ consumed, target, meals }: CalorieGaugeProps) {
   const strokeDashoffset = circumference - arcLength;
 
   return (
-    <div className="w-full max-w-[300px] mx-auto">
-      <div className="relative flex flex-col items-center">
+    <div style={{ width: '100%', maxWidth: 300, margin: '0 auto' }}>
+      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         {/* SVG Gauge */}
         <svg
           width={size}
           height={size / 2 + 20}
           viewBox={`0 0 ${size} ${size / 2 + 20}`}
-          className="overflow-visible"
+          style={{ overflow: 'visible' }}
         >
           <defs>
+            {/* v6: tonale warm-gradient ipv v3-regenboog */}
             <linearGradient id="calorieGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#FFCC00" />
-              <stop offset="33%" stopColor="#C47D15" />
-              <stop offset="66%" stopColor="#C4372A" />
-              <stop offset="100%" stopColor="#AF52DE" />
+              <stop offset="0%" stopColor="#E8D7A0" />
+              <stop offset="40%" stopColor="#D9A645" />
+              <stop offset="75%" stopColor="#B56A53" />
+              <stop offset="100%" stopColor="#8A7BA8" />
             </linearGradient>
           </defs>
 
@@ -45,7 +51,7 @@ export function CalorieGauge({ consumed, target, meals }: CalorieGaugeProps) {
           <path
             d={`M ${strokeWidth / 2} ${size / 2} A ${radius} ${radius} 0 0 1 ${size - strokeWidth / 2} ${size / 2}`}
             fill="none"
-            stroke="#E8E4DC"
+            stroke={TRACK}
             strokeWidth={strokeWidth}
             strokeLinecap="round"
           />
@@ -59,17 +65,27 @@ export function CalorieGauge({ consumed, target, meals }: CalorieGaugeProps) {
             strokeLinecap="round"
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
-            style={{ transition: 'stroke-dashoffset 0.5s ease-out' }}
+            style={{ transition: 'stroke-dashoffset 500ms ease-out' }}
           />
         </svg>
 
-        {/* Center values - positioned absolutely over the gauge bottom */}
-        <div className="absolute top-24 flex flex-col items-center">
-          <div className="text-center">
-            <div className="text-[56px] font-bold text-primary">
+        {/* Center values */}
+        <div style={{ position: 'absolute', top: 96, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div
+              style={{
+                fontSize: 56,
+                fontWeight: 500,
+                color: INK,
+                letterSpacing: '-0.04em',
+                fontFamily: 'var(--font-display, Outfit), Outfit, sans-serif',
+                fontVariantNumeric: 'tabular-nums',
+                lineHeight: 1,
+              }}
+            >
               {Math.round(remaining)}
             </div>
-            <div className="text-[15px] text-client-text-secondary">
+            <div style={{ fontSize: 14, color: INK_FAINT, marginTop: 6, letterSpacing: '-0.005em' }}>
               kcal over
             </div>
           </div>
@@ -77,25 +93,34 @@ export function CalorieGauge({ consumed, target, meals }: CalorieGaugeProps) {
       </div>
 
       {/* Bottom labels */}
-      <div className="flex justify-between items-end mt-8 px-4">
-        {/* Left: Consumed */}
-        <div className="text-center">
-          <div className="text-[20px] font-bold text-primary">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 32, padding: '0 16px' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div
+            style={{
+              fontSize: 20,
+              fontWeight: 600,
+              color: INK,
+              letterSpacing: '-0.02em',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
             {Math.round(consumed)}
           </div>
-          <div className="text-[13px] text-client-text-secondary">
-            Gegeten
-          </div>
+          <div style={{ fontSize: 13, color: INK_FAINT, marginTop: 2 }}>Gegeten</div>
         </div>
-
-        {/* Right: Meals */}
-        <div className="text-center">
-          <div className="text-[20px] font-bold text-primary">
+        <div style={{ textAlign: 'center' }}>
+          <div
+            style={{
+              fontSize: 20,
+              fontWeight: 600,
+              color: INK,
+              letterSpacing: '-0.02em',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
             {meals}
           </div>
-          <div className="text-[13px] text-client-text-secondary">
-            Maaltijden
-          </div>
+          <div style={{ fontSize: 13, color: INK_FAINT, marginTop: 2 }}>Maaltijden</div>
         </div>
       </div>
     </div>

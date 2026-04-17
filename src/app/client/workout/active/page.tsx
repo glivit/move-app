@@ -65,7 +65,7 @@ function ExerciseInfoPanelComponent({ exerciseData }: { exerciseData: Exercise }
           <>
             {!imgLoaded && (
               <div className="aspect-[4/3] flex items-center justify-center">
-                <div className="w-8 h-8 border-[1.5px] border-[#D5D5D5] border-t-[#1A1917] rounded-full animate-spin" />
+                <div className="w-8 h-8 border-[1.5px] border-[rgba(253,253,254,0.35)] border-t-[#FDFDFE] rounded-full animate-spin" />
               </div>
             )}
             <Image
@@ -581,7 +581,7 @@ interface ProgramTemplateExercise {
 type SetType = 'normal' | 'warmup' | 'failure' | 'dropset'
 
 const SET_TYPE_CONFIG: Record<SetType, { label: string; short: string; color: string; bg: string }> = {
-  normal:  { label: 'Normaal',  short: '',  color: '#ACACAC', bg: 'transparent' },
+  normal:  { label: 'Normaal',  short: '',  color: 'rgba(253,253,254,0.55)', bg: 'transparent' },
   warmup:  { label: 'Warm-up',  short: 'W', color: '#E8A838', bg: '#FEF3E0' },
   failure: { label: 'Failure',  short: 'F', color: '#E04040', bg: '#FEECEC' },
   dropset: { label: 'Drop Set', short: 'D', color: '#7B61FF', bg: '#F0ECFF' },
@@ -906,7 +906,7 @@ function ExercisePickerModalComponent({
 
             {createError && (
               <div className="rounded-xl px-4 py-3" style={{ background: 'rgba(196,55,42,0.10)', border: '1px solid rgba(196,55,42,0.20)' }}>
-                <p className="text-[13px]" style={{ color: '#D66050' }}>{createError}</p>
+                <p className="text-[13px]" style={{ color: '#B55A4A' }}>{createError}</p>
               </div>
             )}
 
@@ -1126,7 +1126,7 @@ function FormCheckModalComponent({ exerciseName, onClose }: { exerciseName: stri
             />
 
             {uploadError && (
-              <p className="text-[13px] mb-3 text-center" style={{ color: '#D66050' }}>{uploadError}</p>
+              <p className="text-[13px] mb-3 text-center" style={{ color: '#B55A4A' }}>{uploadError}</p>
             )}
             <button
               onClick={() => { setUploadError(''); fileInputRef.current?.click() }}
@@ -1169,7 +1169,7 @@ export default function ActiveWorkoutPageWrapper() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-6 h-6 border-[1.5px] border-[#D5D5D5] border-t-[#1A1917] rounded-full animate-spin" />
+        <div className="w-6 h-6 border-[1.5px] border-[rgba(253,253,254,0.35)] border-t-[#FDFDFE] rounded-full animate-spin" />
       </div>
     }>
       <ActiveWorkoutPage />
@@ -2106,7 +2106,7 @@ function ActiveWorkoutPage() {
               <button
                 onClick={confirmClose}
                 className="flex-1 py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors"
-                style={{ background: '#D66050', color: '#FDFDFE' }}
+                style={{ background: '#B55A4A', color: '#FDFDFE' }}
               >
                 Afsluiten
               </button>
@@ -2181,7 +2181,7 @@ function ActiveWorkoutPage() {
           const ssExercises = isSuperset ? exercises.filter(e => (e as any).superset_group_id === ssGroup) : []
           const ssIndex = isSuperset ? ssExercises.findIndex(e => e.id === ex.id) : -1
           const ssLabel = isSuperset ? String.fromCharCode(65 + ssIndex) : '' // A, B, C...
-          const ssColors = ['#D46A3A', '#3D8B5C', '#4A7BD4', '#9B59B6']
+          const ssColors = ['#C0FC01', '#2FA65A', '#4A7BD4', '#9B59B6']
           const ssColor = isSuperset ? ssColors[ssIndex % ssColors.length] : ''
           const isFirstInGroup = isSuperset && (exIndex === 0 || (exercises[exIndex - 1] as any).superset_group_id !== ssGroup)
           const isLastInGroup = isSuperset && (exIndex === exercises.length - 1 || (exercises[exIndex + 1] as any).superset_group_id !== ssGroup)
@@ -2438,7 +2438,7 @@ function ActiveWorkoutPage() {
                 <button
                   onClick={() => removeExercise(confirmRemoveExercise)}
                   className="flex-1 py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors"
-                  style={{ background: '#D66050', color: '#FDFDFE' }}
+                  style={{ background: '#B55A4A', color: '#FDFDFE' }}
                 >
                   Verwijderen
                 </button>
@@ -2506,7 +2506,7 @@ function ActiveWorkoutPage() {
                 <button
                   onClick={discardWorkout}
                   className="flex-1 py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors"
-                  style={{ background: '#D66050', color: '#FDFDFE' }}
+                  style={{ background: '#B55A4A', color: '#FDFDFE' }}
                 >
                   Verwijderen
                 </button>

@@ -184,7 +184,7 @@ export default function ExercisesPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-6 h-6 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
+        <div className="w-6 h-6 border-[1.5px] border-[rgba(253,253,254,0.48)] border-t-[#FDFDFE] rounded-full animate-spin" />
       </div>
     )
   }
@@ -194,19 +194,19 @@ export default function ExercisesPage() {
       <SubPageHeader overline="Training" title="Oefeningen" backHref="/client/progress" />
 
       {/* Summary */}
-      <div className="flex gap-4 mb-6 border-b border-[#F0F0EE] pb-5 animate-slide-up stagger-2">
+      <div className="flex gap-4 mb-6 border-b border-[rgba(253,253,254,0.08)] pb-5 animate-slide-up stagger-2">
         <div className="text-center flex-1">
-          <p className="text-[22px] font-bold text-[#1A1917]">{exerciseStats.length}</p>
+          <p className="text-[22px] font-bold text-[#FDFDFE]">{exerciseStats.length}</p>
           <p className="text-label mt-1">Oefeningen</p>
         </div>
         <div className="text-center flex-1">
-          <p className="text-[22px] font-bold text-[#1A1917]">
+          <p className="text-[22px] font-bold text-[#FDFDFE]">
             {exerciseStats.reduce((sum, s) => sum + s.prCount, 0)}
           </p>
           <p className="text-label mt-1">Records</p>
         </div>
         <div className="text-center flex-1">
-          <p className="text-[22px] font-bold text-[#1A1917]">
+          <p className="text-[22px] font-bold text-[#FDFDFE]">
             {Math.round(exerciseStats.reduce((sum, s) => sum + s.totalVolume, 0) / 1000)}t
           </p>
           <p className="text-label mt-1">Volume</p>
@@ -215,13 +215,13 @@ export default function ExercisesPage() {
 
       {/* Search */}
       <div className="relative mb-4 animate-slide-up stagger-3">
-        <Search size={16} strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#C0C0C0]" />
+        <Search size={16} strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 text-[rgba(253,253,254,0.48)]" />
         <input
           type="text"
           placeholder="Zoek oefening..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-9 pr-4 py-2.5 bg-white border border-[#F0F0EE] text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:border-[#1A1917] outline-none rounded-xl"
+          className="w-full pl-9 pr-4 py-2.5 bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] text-[14px] text-[#FDFDFE] placeholder-[rgba(253,253,254,0.48)] focus:border-[#FDFDFE] outline-none rounded-xl"
         />
       </div>
 
@@ -230,7 +230,7 @@ export default function ExercisesPage() {
         <button
           onClick={() => setSelectedGroup(null)}
           className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 transition-all rounded-xl ${
-            !selectedGroup ? 'bg-[#1A1917] text-white' : 'text-[#ACACAC] hover:text-[#1A1917]'
+            !selectedGroup ? 'bg-[#FDFDFE] text-white' : 'text-[rgba(253,253,254,0.55)] hover:text-[#FDFDFE]'
           }`}
         >
           Alles
@@ -240,7 +240,7 @@ export default function ExercisesPage() {
             key={group}
             onClick={() => setSelectedGroup(selectedGroup === group ? null : group)}
             className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 transition-all rounded-xl ${
-              selectedGroup === group ? 'bg-[#1A1917] text-white' : 'text-[#ACACAC] hover:text-[#1A1917]'
+              selectedGroup === group ? 'bg-[#FDFDFE] text-white' : 'text-[rgba(253,253,254,0.55)] hover:text-[#FDFDFE]'
             }`}
           >
             {group}
@@ -252,7 +252,7 @@ export default function ExercisesPage() {
       <div className="space-y-2 animate-slide-up stagger-5">
         {filtered.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-[14px] text-[#C0C0C0]">Geen oefeningen gevonden</p>
+            <p className="text-[14px] text-[rgba(253,253,254,0.48)]">Geen oefeningen gevonden</p>
           </div>
         ) : (
           filtered.map(stat => (
@@ -263,7 +263,7 @@ export default function ExercisesPage() {
               <div className="flex items-start gap-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-[14px] font-semibold text-[#1A1917] truncate">
+                    <p className="text-[14px] font-semibold text-[#FDFDFE] truncate">
                       {stat.exercise.name_nl || stat.exercise.name}
                     </p>
                     {stat.prCount > 0 && (
@@ -273,34 +273,34 @@ export default function ExercisesPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-[#ACACAC] mt-0.5">
+                  <p className="text-[11px] text-[rgba(253,253,254,0.55)] mt-0.5">
                     {getMuscleGroup(stat.exercise.target_muscle)} · {stat.exercise.target_muscle}
                   </p>
                 </div>
               </div>
 
               {/* Stats row */}
-              <div className="flex gap-4 mt-3 pt-3 border-t border-[#F0F0EE]">
+              <div className="flex gap-4 mt-3 pt-3 border-t border-[rgba(253,253,254,0.08)]">
                 <div>
-                  <p className="text-[15px] font-bold text-[#1A1917] tabular-nums">{stat.bestWeight} kg</p>
-                  <p className="text-[10px] text-[#C0C0C0]">Beste gewicht</p>
+                  <p className="text-[15px] font-bold text-[#FDFDFE] tabular-nums">{stat.bestWeight} kg</p>
+                  <p className="text-[10px] text-[rgba(253,253,254,0.48)]">Beste gewicht</p>
                 </div>
-                <div className="w-px bg-[#F0F0EE]" />
+                <div className="w-px bg-[rgba(253,253,254,0.08)]" />
                 <div>
-                  <p className="text-[15px] font-bold text-[#1A1917] tabular-nums">{stat.totalSets}</p>
-                  <p className="text-[10px] text-[#C0C0C0]">Sets totaal</p>
+                  <p className="text-[15px] font-bold text-[#FDFDFE] tabular-nums">{stat.totalSets}</p>
+                  <p className="text-[10px] text-[rgba(253,253,254,0.48)]">Sets totaal</p>
                 </div>
-                <div className="w-px bg-[#F0F0EE]" />
+                <div className="w-px bg-[rgba(253,253,254,0.08)]" />
                 <div>
-                  <p className="text-[15px] font-bold text-[#1A1917] tabular-nums">{stat.sessions}x</p>
-                  <p className="text-[10px] text-[#C0C0C0]">Sessies</p>
+                  <p className="text-[15px] font-bold text-[#FDFDFE] tabular-nums">{stat.sessions}x</p>
+                  <p className="text-[10px] text-[rgba(253,253,254,0.48)]">Sessies</p>
                 </div>
-                <div className="w-px bg-[#F0F0EE]" />
+                <div className="w-px bg-[rgba(253,253,254,0.08)]" />
                 <div>
-                  <p className="text-[15px] font-bold text-[#1A1917] tabular-nums">
+                  <p className="text-[15px] font-bold text-[#FDFDFE] tabular-nums">
                     {stat.totalVolume >= 1000 ? `${(stat.totalVolume / 1000).toFixed(1)}t` : `${Math.round(stat.totalVolume)} kg`}
                   </p>
-                  <p className="text-[10px] text-[#C0C0C0]">Volume</p>
+                  <p className="text-[10px] text-[rgba(253,253,254,0.48)]">Volume</p>
                 </div>
               </div>
             </div>

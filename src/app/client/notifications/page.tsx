@@ -89,7 +89,7 @@ export default function NotificationsPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917]" />
+        <div className="animate-spin rounded-full h-8 w-8 border-[1.5px] border-[rgba(253,253,254,0.48)] border-t-[#FDFDFE]" />
       </div>
     )
   }
@@ -102,8 +102,8 @@ export default function NotificationsPage() {
     <div className="pb-24 space-y-6">
       {/* Hero Section */}
       <div className="flex items-center gap-3 pt-1 animate-slide-up">
-        <Link href="/client" className="p-2 -ml-2 rounded-xl hover:bg-[#F0F0EE] transition-colors">
-          <ArrowLeft strokeWidth={1.5} className="w-5 h-5 text-[#ACACAC]" />
+        <Link href="/client" className="p-2 -ml-2 rounded-xl hover:bg-[rgba(253,253,254,0.08)] transition-colors">
+          <ArrowLeft strokeWidth={1.5} className="w-5 h-5 text-[rgba(253,253,254,0.55)]" />
         </Link>
         <div>
           <p className="text-label mb-1">Inbox</p>
@@ -116,38 +116,38 @@ export default function NotificationsPage() {
       {/* Empty state */}
       {hasNothing && (
         <div className="text-center py-16 animate-slide-up stagger-2">
-          <div className="w-14 h-14 rounded-full bg-[#F0F0EE] flex items-center justify-center mx-auto mb-4">
-            <Megaphone strokeWidth={1.5} className="w-6 h-6 text-[#C0C0C0]" />
+          <div className="w-14 h-14 rounded-full bg-[rgba(253,253,254,0.08)] flex items-center justify-center mx-auto mb-4">
+            <Megaphone strokeWidth={1.5} className="w-6 h-6 text-[rgba(253,253,254,0.48)]" />
           </div>
-          <p className="text-[15px] text-[#ACACAC]">Geen meldingen</p>
+          <p className="text-[15px] text-[rgba(253,253,254,0.55)]">Geen meldingen</p>
         </div>
       )}
 
       {/* Pending prompts */}
       {prompts.length > 0 && (
         <div className="space-y-3 animate-slide-up stagger-3">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#C0C0C0] px-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[rgba(253,253,254,0.48)] px-1">
             Openstaande vragen
           </p>
           {prompts.map(prompt => (
             <Link
               key={prompt.id}
               href="/client/prompts"
-              className="block rounded-2xl border-2 border-[#333330]/20 bg-white p-5 transition-all hover:border-[#1A1917]/30"
+              className="block rounded-2xl border-2 border-[#5A5E5B]/20 bg-white p-5 transition-all hover:border-[#FDFDFE]/30"
             >
               <div className="flex items-start gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-[#333330]/12 flex items-center justify-center flex-shrink-0">
-                  <FileText strokeWidth={1.5} className="w-5 h-5 text-[#1A1917]" />
+                <div className="w-10 h-10 rounded-xl bg-[#5A5E5B]/12 flex items-center justify-center flex-shrink-0">
+                  <FileText strokeWidth={1.5} className="w-5 h-5 text-[#FDFDFE]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-semibold text-[#1A1917] tracking-[-0.01em]">
+                  <p className="text-[15px] font-semibold text-[#FDFDFE] tracking-[-0.01em]">
                     {prompt.question}
                   </p>
-                  <p className="text-[13px] text-[#1A1917] font-medium mt-1">
+                  <p className="text-[13px] text-[#FDFDFE] font-medium mt-1">
                     Tik om te beantwoorden
                   </p>
                 </div>
-                <ChevronRight strokeWidth={1.5} className="w-5 h-5 text-[#333330] flex-shrink-0 mt-2" />
+                <ChevronRight strokeWidth={1.5} className="w-5 h-5 text-[#5A5E5B] flex-shrink-0 mt-2" />
               </div>
             </Link>
           ))}
@@ -157,7 +157,7 @@ export default function NotificationsPage() {
       {/* Unread broadcasts */}
       {unreadBroadcasts.length > 0 && (
         <div className="space-y-3 animate-slide-up stagger-5">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#C0C0C0] px-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[rgba(253,253,254,0.48)] px-1">
             Nieuw
           </p>
           {unreadBroadcasts.map(b => (
@@ -173,7 +173,7 @@ export default function NotificationsPage() {
       {/* Read broadcasts */}
       {readBroadcasts.length > 0 && (
         <div className="space-y-3 animate-slide-up stagger-7">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#C0C0C0] px-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[rgba(253,253,254,0.48)] px-1">
             Gelezen
           </p>
           {readBroadcasts.map(b => (
@@ -200,22 +200,22 @@ function BroadcastCard({ broadcast, onTap }: {
       onClick={onTap}
       className={`w-full text-left rounded-2xl p-5 transition-all active:scale-[0.98] ${
         isUnread
-          ? 'border-2 border-[#3068C4]/25 bg-white border border-[#F0F0EE]'
-          : 'border border-[#F0F0EE] bg-white'
+          ? 'border-2 border-[#3068C4]/25 bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)]'
+          : 'border border-[rgba(253,253,254,0.08)] bg-white'
       }`}
     >
       <div className="flex items-start gap-3.5">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-          isUnread ? 'bg-[#3068C4]/10' : 'bg-[#F0F0EE]'
+          isUnread ? 'bg-[#3068C4]/10' : 'bg-[rgba(253,253,254,0.08)]'
         }`}>
           <Megaphone strokeWidth={1.5} className={`w-5 h-5 ${
-            isUnread ? 'text-[#3068C4]' : 'text-[#C0C0C0]'
+            isUnread ? 'text-[#3068C4]' : 'text-[rgba(253,253,254,0.48)]'
           }`} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className={`text-[15px] font-semibold tracking-[-0.01em] ${
-              isUnread ? 'text-[#1A1917]' : 'text-[#ACACAC]'
+              isUnread ? 'text-[#FDFDFE]' : 'text-[rgba(253,253,254,0.55)]'
             }`}>
               {broadcast.title}
             </p>
@@ -224,24 +224,24 @@ function BroadcastCard({ broadcast, onTap }: {
             )}
           </div>
 
-          <p className="text-[14px] text-[#ACACAC] mt-1 line-clamp-2">
+          <p className="text-[14px] text-[rgba(253,253,254,0.55)] mt-1 line-clamp-2">
             {broadcast.content}
           </p>
 
           <div className="flex items-center gap-2 mt-2.5">
-            <p className="text-[12px] text-[#C0C0C0]">
+            <p className="text-[12px] text-[rgba(253,253,254,0.48)]">
               {formatDistanceToNow(new Date(broadcast.created_at), { addSuffix: true, locale: nl })}
             </p>
             {broadcast.read && (
               <div className="flex items-center gap-1">
-                <Check strokeWidth={2} className="w-3 h-3 text-[#3D8B5C]" />
-                <span className="text-[11px] text-[#3D8B5C]">Gelezen</span>
+                <Check strokeWidth={2} className="w-3 h-3 text-[#2FA65A]" />
+                <span className="text-[11px] text-[#2FA65A]">Gelezen</span>
               </div>
             )}
           </div>
         </div>
         <ChevronRight strokeWidth={1.5} className={`w-5 h-5 flex-shrink-0 mt-2 ${
-          isUnread ? 'text-[#3068C4]' : 'text-[#C0C0C0]'
+          isUnread ? 'text-[#3068C4]' : 'text-[rgba(253,253,254,0.48)]'
         }`} />
       </div>
     </button>

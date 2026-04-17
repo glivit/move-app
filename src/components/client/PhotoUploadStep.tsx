@@ -326,8 +326,8 @@ export function PhotoUploadStep({ photos, onChange, showSilhouette = true }: Pro
       )}
 
       <div>
-        <h3 className="font-semibold text-[20px] text-[#1A1917]">Foto&apos;s</h3>
-        <p className="text-[13px] text-[#A09D96] mt-1">
+        <h3 className="font-semibold text-[20px] text-[#FDFDFE]">Foto&apos;s</h3>
+        <p className="text-[13px] text-[rgba(253,253,254,0.55)] mt-1">
           Nuchter, zelfde ondergoed, zelfde locatie, ochtendlicht
         </p>
         {completedCount > 0 && (
@@ -356,7 +356,7 @@ export function PhotoUploadStep({ photos, onChange, showSilhouette = true }: Pro
 
               {hasPhoto ? (
                 /* ── Photo taken ── */
-                <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[#1A1917]">
+                <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[#FDFDFE]">
                   <Image src={previews[key]} alt={label} width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
                   <button
                     onClick={() => handleRemove(key)}
@@ -368,7 +368,7 @@ export function PhotoUploadStep({ photos, onChange, showSilhouette = true }: Pro
                     <span className="text-[11px] font-bold text-white uppercase tracking-[0.06em]">
                       {label}
                     </span>
-                    <div className="w-5 h-5 rounded-full bg-[#3D8B5C] flex items-center justify-center">
+                    <div className="w-5 h-5 rounded-full bg-[#2FA65A] flex items-center justify-center">
                       <Check className="w-3 h-3 text-white" strokeWidth={3} />
                     </div>
                   </div>
@@ -381,16 +381,16 @@ export function PhotoUploadStep({ photos, onChange, showSilhouette = true }: Pro
                 >
                   {showSilhouette && (
                     <div className="absolute inset-0 flex items-center justify-center opacity-15 group-hover:opacity-25 transition-opacity">
-                      <Silhouette className="h-[85%] text-[#1A1917]" />
+                      <Silhouette className="h-[85%] text-[#FDFDFE]" />
                     </div>
                   )}
                   <div className="relative z-10 flex flex-col items-center gap-2">
                     <div className="w-12 h-12 rounded-xl bg-white/80 flex items-center justify-center shadow-sm">
-                      <Camera className="h-5 w-5 text-[#6B6862]" strokeWidth={1.5} />
+                      <Camera className="h-5 w-5 text-[rgba(253,253,254,0.68)]" strokeWidth={1.5} />
                     </div>
-                    <span className="text-[11px] font-bold text-[#6B6862] uppercase tracking-[0.06em]">{label}</span>
+                    <span className="text-[11px] font-bold text-[rgba(253,253,254,0.68)] uppercase tracking-[0.06em]">{label}</span>
                   </div>
-                  <p className="relative z-10 text-[9px] text-[#A09D96] mt-2 px-4 text-center">
+                  <p className="relative z-10 text-[9px] text-[rgba(253,253,254,0.55)] mt-2 px-4 text-center">
                     Tik om camera te openen
                   </p>
                 </button>
@@ -401,7 +401,7 @@ export function PhotoUploadStep({ photos, onChange, showSilhouette = true }: Pro
       </div>
 
       <div className="bg-[#F5F2EC] rounded-xl p-3.5">
-        <p className="text-[12px] text-[#6B6862] leading-relaxed">
+        <p className="text-[12px] text-[rgba(253,253,254,0.68)] leading-relaxed">
           <span className="font-semibold">Tip:</span> Zet je telefoon op ooghoogte met de timer (3s). Gebruik dezelfde plek en belichting voor de beste vergelijking.
         </p>
       </div>

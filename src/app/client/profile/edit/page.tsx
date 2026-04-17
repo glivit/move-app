@@ -59,7 +59,7 @@ export default function EditProfilePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-[#1A1917]" />
+        <Loader2 className="w-6 h-6 animate-spin text-[#FDFDFE]" />
       </div>
     )
   }
@@ -68,59 +68,59 @@ export default function EditProfilePage() {
     <div className="space-y-6 pb-20">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#1A1917]">
+        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#FDFDFE]">
           <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
         </button>
-        <h1 className="text-editorial-h2 text-[#1A1917]">
+        <h1 className="text-editorial-h2 text-[#FDFDFE]">
           Persoonlijke gegevens
         </h1>
       </div>
 
       {/* Avatar */}
-      <div className="bg-white rounded-2xl border border-[#F0F0EE] p-6 flex flex-col items-center">
+      <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] p-6 flex flex-col items-center">
         <div className="relative mb-4">
-          <div className="w-24 h-24 rounded-full bg-[#1A1917] text-white flex items-center justify-center text-3xl font-semibold overflow-hidden">
+          <div className="w-24 h-24 rounded-full bg-[#FDFDFE] text-white flex items-center justify-center text-3xl font-semibold overflow-hidden">
             {avatarUrl ? (
               <Image src={avatarUrl} alt={fullName} width={96} height={96} className="w-full h-full object-cover" unoptimized loading="lazy" />
             ) : (
               fullName ? fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '?'
             )}
           </div>
-          <div className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center border border-[#F0F0EE]">
-            <Camera strokeWidth={1.5} className="w-4 h-4 text-[#ACACAC]" />
+          <div className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center border border-[rgba(253,253,254,0.08)]">
+            <Camera strokeWidth={1.5} className="w-4 h-4 text-[rgba(253,253,254,0.55)]" />
           </div>
         </div>
-        <p className="text-[13px] text-[#ACACAC]">Tik om foto te wijzigen</p>
+        <p className="text-[13px] text-[rgba(253,253,254,0.55)]">Tik om foto te wijzigen</p>
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-2xl border border-[#F0F0EE] divide-y divide-[#F0F0EE]">
+      <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] divide-y divide-[rgba(253,253,254,0.08)]">
         <div className="px-5 py-4">
-          <label className="block text-[11px] font-medium text-[#ACACAC] uppercase tracking-wide mb-1">Volledige naam</label>
+          <label className="block text-[11px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide mb-1">Volledige naam</label>
           <input
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="w-full text-[15px] text-[#1A1917] bg-transparent focus:outline-none"
+            className="w-full text-[15px] text-[#FDFDFE] bg-transparent focus:outline-none"
           />
         </div>
         <div className="px-5 py-4">
-          <label className="block text-[11px] font-medium text-[#ACACAC] uppercase tracking-wide mb-1">E-mail</label>
+          <label className="block text-[11px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide mb-1">E-mail</label>
           <input
             type="email"
             value={email}
             disabled
-            className="w-full text-[15px] text-[#ACACAC] bg-transparent cursor-not-allowed"
+            className="w-full text-[15px] text-[rgba(253,253,254,0.55)] bg-transparent cursor-not-allowed"
           />
         </div>
         <div className="px-5 py-4">
-          <label className="block text-[11px] font-medium text-[#ACACAC] uppercase tracking-wide mb-1">Telefoon</label>
+          <label className="block text-[11px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide mb-1">Telefoon</label>
           <input
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="+32 ..."
-            className="w-full text-[15px] text-[#1A1917] bg-transparent placeholder:text-[#C0C0C0] focus:outline-none"
+            className="w-full text-[15px] text-[#FDFDFE] bg-transparent placeholder:text-[rgba(253,253,254,0.48)] focus:outline-none"
           />
         </div>
       </div>
@@ -129,7 +129,7 @@ export default function EditProfilePage() {
       <button
         onClick={handleSave}
         disabled={saving}
-        className="w-full py-3.5 rounded-2xl bg-[#1A1917] text-white font-semibold text-[15px] hover:bg-[#7A5C12] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-3.5 rounded-2xl bg-[#FDFDFE] text-white font-semibold text-[15px] hover:bg-[#7A5C12] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {saving ? (
           <Loader2 className="w-5 h-5 animate-spin" />

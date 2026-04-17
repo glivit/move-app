@@ -301,7 +301,7 @@ export default function PhotoComparisonPage() {
                   letterSpacing: '0.06em',
                   textTransform: 'uppercase',
                   background: active ? '#FDFDFE' : 'rgba(253,253,254,0.08)',
-                  color: active ? '#1A1917' : 'rgba(253,253,254,0.62)',
+                  color: active ? '#FDFDFE' : 'rgba(253,253,254,0.62)',
                   border: 'none',
                   WebkitTapHighlightColor: 'transparent',
                   cursor: 'pointer',
@@ -326,7 +326,7 @@ export default function PhotoComparisonPage() {
               cursor: 'col-resize',
               userSelect: 'none',
               touchAction: 'none',
-              background: '#2A2E2B',
+              background: '#474B48',
             }}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
@@ -383,8 +383,8 @@ export default function PhotoComparisonPage() {
                   gap: 1,
                 }}
               >
-                <ChevronLeft size={12} strokeWidth={2.5} style={{ color: '#1A1917' }} />
-                <ChevronRight size={12} strokeWidth={2.5} style={{ color: '#1A1917' }} />
+                <ChevronLeft size={12} strokeWidth={2.5} style={{ color: '#FDFDFE' }} />
+                <ChevronRight size={12} strokeWidth={2.5} style={{ color: '#FDFDFE' }} />
               </div>
             </div>
 
@@ -432,7 +432,7 @@ export default function PhotoComparisonPage() {
               overflow: 'hidden',
             }}
           >
-            <div style={{ position: 'relative', aspectRatio: '3 / 4', background: '#2A2E2B' }}>
+            <div style={{ position: 'relative', aspectRatio: '3 / 4', background: '#474B48' }}>
               {beforeUrl ? (
                 <NextImage src={beforeUrl} alt="Before" width={400} height={500} style={{ width: '100%', height: '100%', objectFit: 'cover' }} unoptimized loading="lazy" />
               ) : (
@@ -451,7 +451,7 @@ export default function PhotoComparisonPage() {
                 <p style={{ fontSize: 12, color: '#FDFDFE', fontWeight: 500, margin: 0 }}>{formatDate(before.date)}</p>
               </div>
             </div>
-            <div style={{ position: 'relative', aspectRatio: '3 / 4', background: '#2A2E2B' }}>
+            <div style={{ position: 'relative', aspectRatio: '3 / 4', background: '#474B48' }}>
               {afterUrl ? (
                 <NextImage src={afterUrl} alt="After" width={400} height={500} style={{ width: '100%', height: '100%', objectFit: 'cover' }} unoptimized loading="lazy" />
               ) : (
@@ -592,7 +592,7 @@ export default function PhotoComparisonPage() {
               fontWeight: 500,
               letterSpacing: '0.02em',
               background: selecting === 'before' ? '#FDFDFE' : 'rgba(253,253,254,0.08)',
-              color: selecting === 'before' ? '#1A1917' : '#FDFDFE',
+              color: selecting === 'before' ? '#FDFDFE' : '#FDFDFE',
               border: 'none',
               cursor: 'pointer',
               WebkitTapHighlightColor: 'transparent',
@@ -610,7 +610,7 @@ export default function PhotoComparisonPage() {
               fontWeight: 500,
               letterSpacing: '0.02em',
               background: selecting === 'after' ? '#C0FC01' : 'rgba(253,253,254,0.08)',
-              color: selecting === 'after' ? '#1A1917' : '#FDFDFE',
+              color: selecting === 'after' ? '#FDFDFE' : '#FDFDFE',
               border: 'none',
               cursor: 'pointer',
               WebkitTapHighlightColor: 'transparent',
@@ -632,7 +632,7 @@ export default function PhotoComparisonPage() {
             position: 'fixed',
             inset: 0,
             zIndex: 60,
-            background: '#1A1917',
+            background: '#FDFDFE',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

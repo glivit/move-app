@@ -315,9 +315,9 @@ export default function ExerciseProgressionPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8F6F2] p-6">
+      <div className="min-h-screen bg-[rgba(253,253,254,0.08)] p-6">
         <div className="flex items-center justify-center h-96">
-          <Loader className="w-8 h-8 animate-spin text-[#D4682A]" />
+          <Loader className="w-8 h-8 animate-spin text-[#C0FC01]" />
         </div>
       </div>
     )
@@ -325,17 +325,17 @@ export default function ExerciseProgressionPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#F8F6F2] p-6">
+      <div className="min-h-screen bg-[rgba(253,253,254,0.08)] p-6">
         <div className="flex flex-col gap-4">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-[#D4682A] hover:text-[#B5552A] transition-colors"
+            className="flex items-center gap-2 text-[#C0FC01] hover:text-[#B5552A] transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
             Terug
           </button>
-          <div className="bg-white rounded-2xl border border-[#E8E4DD] p-6">
-            <p className="text-[#ACACAC]">{error}</p>
+          <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-6">
+            <p className="text-[rgba(253,253,254,0.55)]">{error}</p>
           </div>
         </div>
       </div>
@@ -343,24 +343,24 @@ export default function ExerciseProgressionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F6F2] p-6">
+    <div className="min-h-screen bg-[rgba(253,253,254,0.08)] p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-4">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-[#D4682A] hover:text-[#B5552A] transition-colors w-fit"
+            className="flex items-center gap-2 text-[#C0FC01] hover:text-[#B5552A] transition-colors w-fit"
           >
             <ChevronLeft className="w-5 h-5" />
             Terug
           </button>
 
-          <div className="bg-white rounded-2xl border border-[#E8E4DD] p-6">
-            <h1 className="text-4xl font-bold text-[#1A1917]">
+          <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-6">
+            <h1 className="text-4xl font-bold text-[#FDFDFE]">
               {exercise?.name}
             </h1>
             {exercise?.muscle_groups && (
-              <p className="text-[#ACACAC] mt-2">
+              <p className="text-[rgba(253,253,254,0.55)] mt-2">
                 {exercise.muscle_groups.join(', ')}
               </p>
             )}
@@ -370,27 +370,27 @@ export default function ExerciseProgressionPage() {
         {/* Personal Records Section */}
         {personalRecords && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-2xl border border-[#E8E4DD] p-6">
+            <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-6">
               <div className="flex items-center gap-3 mb-4">
-                <Trophy className="w-6 h-6 text-[#D4682A]" />
-                <h2 className="text-xl font-bold text-[#1A1917]">
+                <Trophy className="w-6 h-6 text-[#C0FC01]" />
+                <h2 className="text-xl font-bold text-[#FDFDFE]">
                   Persoonlijke Records
                 </h2>
               </div>
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm text-[#ACACAC]">Zwaarste gewicht</p>
-                  <p className="text-3xl font-bold text-[#D4682A]">
+                  <p className="text-sm text-[rgba(253,253,254,0.55)]">Zwaarste gewicht</p>
+                  <p className="text-3xl font-bold text-[#C0FC01]">
                     {personalRecords.weight} kg
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-[#ACACAC]">Herhalingen op PR</p>
-                  <p className="text-2xl font-bold text-[#1A1917]">
+                  <p className="text-sm text-[rgba(253,253,254,0.55)]">Herhalingen op PR</p>
+                  <p className="text-2xl font-bold text-[#FDFDFE]">
                     {personalRecords.reps}x
                   </p>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-[#ACACAC] pt-2">
+                <div className="flex items-center gap-2 text-sm text-[rgba(253,253,254,0.55)] pt-2">
                   <Calendar className="w-4 h-4" />
                   {personalRecords.date}
                 </div>
@@ -398,23 +398,23 @@ export default function ExerciseProgressionPage() {
             </div>
 
             {chartData.length > 0 && (
-              <div className="bg-white rounded-2xl border border-[#E8E4DD] p-6">
+              <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <TrendingUp className="w-6 h-6 text-[#D4682A]" />
-                  <h2 className="text-xl font-bold text-[#1A1917]">
+                  <TrendingUp className="w-6 h-6 text-[#C0FC01]" />
+                  <h2 className="text-xl font-bold text-[#FDFDFE]">
                     Nieuwste week
                   </h2>
                 </div>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-[#ACACAC]">1RM schatting</p>
-                    <p className="text-3xl font-bold text-[#D4682A]">
+                    <p className="text-sm text-[rgba(253,253,254,0.55)]">1RM schatting</p>
+                    <p className="text-3xl font-bold text-[#C0FC01]">
                       {chartData[chartData.length - 1].estimated1rm} kg
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-[#ACACAC]">Totaal volume</p>
-                    <p className="text-2xl font-bold text-[#1A1917]">
+                    <p className="text-sm text-[rgba(253,253,254,0.55)]">Totaal volume</p>
+                    <p className="text-2xl font-bold text-[#FDFDFE]">
                       {chartData[chartData.length - 1].volume} kg
                     </p>
                   </div>
@@ -428,42 +428,42 @@ export default function ExerciseProgressionPage() {
         {chartData.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* 1RM Chart */}
-            <div className="bg-white rounded-2xl border border-[#E8E4DD] p-6">
-              <h2 className="text-xl font-bold text-[#1A1917] mb-4">
+            <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-6">
+              <h2 className="text-xl font-bold text-[#FDFDFE] mb-4">
                 1RM Progressie
               </h2>
               <ResponsiveContainer width="100%" height={300}>
                 <AreaChart data={chartData}>
                   <defs>
                     <linearGradient id="colorEstimated1rm" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#D4682A" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#D4682A" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#C0FC01" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#C0FC01" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="#E8E4DD"
+                    stroke="rgba(253,253,254,0.14)"
                     vertical={false}
                   />
                   <XAxis
                     dataKey="week"
-                    stroke="#ACACAC"
+                    stroke="rgba(253,253,254,0.55)"
                     style={{ fontSize: '12px' }}
                   />
-                  <YAxis stroke="#ACACAC" style={{ fontSize: '12px' }} />
+                  <YAxis stroke="rgba(253,253,254,0.55)" style={{ fontSize: '12px' }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#1A1917',
+                      backgroundColor: '#FDFDFE',
                       border: 'none',
                       borderRadius: '8px',
-                      color: '#F8F6F2',
+                      color: 'rgba(253,253,254,0.08)',
                     }}
                     formatter={(value) => `${value} kg`}
                   />
                   <Area
                     type="monotone"
                     dataKey="estimated1rm"
-                    stroke="#D4682A"
+                    stroke="#C0FC01"
                     strokeWidth={2}
                     fillOpacity={1}
                     fill="url(#colorEstimated1rm)"
@@ -473,38 +473,38 @@ export default function ExerciseProgressionPage() {
             </div>
 
             {/* Volume Chart */}
-            <div className="bg-white rounded-2xl border border-[#E8E4DD] p-6">
-              <h2 className="text-xl font-bold text-[#1A1917] mb-4">
+            <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-6">
+              <h2 className="text-xl font-bold text-[#FDFDFE] mb-4">
                 Volume Progressie
               </h2>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={chartData}>
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="#E8E4DD"
+                    stroke="rgba(253,253,254,0.14)"
                     vertical={false}
                   />
                   <XAxis
                     dataKey="week"
-                    stroke="#ACACAC"
+                    stroke="rgba(253,253,254,0.55)"
                     style={{ fontSize: '12px' }}
                   />
-                  <YAxis stroke="#ACACAC" style={{ fontSize: '12px' }} />
+                  <YAxis stroke="rgba(253,253,254,0.55)" style={{ fontSize: '12px' }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#1A1917',
+                      backgroundColor: '#FDFDFE',
                       border: 'none',
                       borderRadius: '8px',
-                      color: '#F8F6F2',
+                      color: 'rgba(253,253,254,0.08)',
                     }}
                     formatter={(value) => `${value} kg`}
                   />
                   <Line
                     type="monotone"
                     dataKey="volume"
-                    stroke="#D4682A"
+                    stroke="#C0FC01"
                     strokeWidth={2}
-                    dot={{ fill: '#D4682A', r: 4 }}
+                    dot={{ fill: '#C0FC01', r: 4 }}
                     activeDot={{ r: 6 }}
                   />
                 </LineChart>
@@ -515,27 +515,27 @@ export default function ExerciseProgressionPage() {
 
         {/* Progression Suggestions */}
         {suggestions.length > 0 && (
-          <div className="bg-white rounded-2xl border border-[#E8E4DD] p-6">
+          <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-6">
             <div className="flex items-center gap-3 mb-4">
-              <Dumbbell className="w-6 h-6 text-[#D4682A]" />
-              <h2 className="text-xl font-bold text-[#1A1917]">
+              <Dumbbell className="w-6 h-6 text-[#C0FC01]" />
+              <h2 className="text-xl font-bold text-[#FDFDFE]">
                 Progressie suggesties
               </h2>
             </div>
             <div className="space-y-3">
               {suggestions.map((suggestion, idx) => (
-                <div key={idx} className="flex gap-3 p-3 bg-[#F8F6F2] rounded-lg">
+                <div key={idx} className="flex gap-3 p-3 bg-[rgba(253,253,254,0.08)] rounded-lg">
                   <div className="flex-shrink-0">
-                    <div className="flex items-center justify-center h-6 w-6 rounded-full bg-[#D4682A] text-white text-sm font-bold">
+                    <div className="flex items-center justify-center h-6 w-6 rounded-full bg-[#C0FC01] text-white text-sm font-bold">
                       {idx + 1}
                     </div>
                   </div>
                   <div>
-                    <p className="text-[#1A1917] text-sm">
+                    <p className="text-[#FDFDFE] text-sm">
                       {suggestion.suggestion}
                     </p>
                     {suggestion.type && (
-                      <span className="inline-block mt-1 text-xs px-2 py-1 bg-[#D4682A]/10 text-[#D4682A] rounded">
+                      <span className="inline-block mt-1 text-xs px-2 py-1 bg-[#C0FC01]/10 text-[#C0FC01] rounded">
                         {suggestion.type}
                       </span>
                     )}
@@ -548,10 +548,10 @@ export default function ExerciseProgressionPage() {
 
         {/* Recent Sessions */}
         {recentSessions.length > 0 && (
-          <div className="bg-white rounded-2xl border border-[#E8E4DD] p-6">
+          <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-6">
             <div className="flex items-center gap-3 mb-4">
-              <Calendar className="w-6 h-6 text-[#D4682A]" />
-              <h2 className="text-xl font-bold text-[#1A1917]">
+              <Calendar className="w-6 h-6 text-[#C0FC01]" />
+              <h2 className="text-xl font-bold text-[#FDFDFE]">
                 Recente sessies
               </h2>
             </div>
@@ -559,13 +559,13 @@ export default function ExerciseProgressionPage() {
               {recentSessions.map((session) => (
                 <div
                   key={session.sessionId}
-                  className="border border-[#E8E4DD] rounded-lg p-4 hover:bg-[#F8F6F2] transition-colors"
+                  className="border border-[rgba(253,253,254,0.14)] rounded-lg p-4 hover:bg-[rgba(253,253,254,0.08)] transition-colors"
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <p className="font-semibold text-[#1A1917]">
+                    <p className="font-semibold text-[#FDFDFE]">
                       {session.date}
                     </p>
-                    <span className="text-sm text-[#ACACAC] bg-[#F8F6F2] px-3 py-1 rounded-full">
+                    <span className="text-sm text-[rgba(253,253,254,0.55)] bg-[rgba(253,253,254,0.08)] px-3 py-1 rounded-full">
                       Volume: {session.totalVolume} kg
                     </span>
                   </div>
@@ -573,7 +573,7 @@ export default function ExerciseProgressionPage() {
                     {session.sets.map((set, idx) => (
                       <span
                         key={idx}
-                        className="text-xs bg-[#D4682A]/10 text-[#D4682A] px-3 py-2 rounded-lg font-medium"
+                        className="text-xs bg-[#C0FC01]/10 text-[#C0FC01] px-3 py-2 rounded-lg font-medium"
                       >
                         {set.weight}kg × {set.reps}
                       </span>
@@ -587,12 +587,12 @@ export default function ExerciseProgressionPage() {
 
         {/* Empty State */}
         {chartData.length === 0 && (
-          <div className="bg-white rounded-2xl border border-[#E8E4DD] p-12 text-center">
-            <Dumbbell className="w-12 h-12 text-[#ACACAC] mx-auto mb-4 opacity-50" />
-            <p className="text-[#ACACAC] text-lg">
+          <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-12 text-center">
+            <Dumbbell className="w-12 h-12 text-[rgba(253,253,254,0.55)] mx-auto mb-4 opacity-50" />
+            <p className="text-[rgba(253,253,254,0.55)] text-lg">
               Nog geen gegevens beschikbaar voor deze oefening
             </p>
-            <p className="text-sm text-[#ACACAC] mt-2">
+            <p className="text-sm text-[rgba(253,253,254,0.55)] mt-2">
               Voeg deze oefening toe aan je training om progressie bij te houden
             </p>
           </div>
