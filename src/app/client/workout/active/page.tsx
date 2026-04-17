@@ -1703,9 +1703,13 @@ function ActiveWorkoutPage() {
   }
 
   // --- Drag & drop reorder ---
+  // v6 fix: handle heeft nu touch-action: none (CSS .ex-drag) + 32×36 hitbox.
+  // PointerSensor 5px distance ipv 8px voor snellere pickup.
+  // TouchSensor 120ms delay ipv 200ms → directer gevoel; tolerance 8 voorkomt dat
+  // micro-jitter tijdens de tap de drag cancelt.
   const dndSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 8 } })
   )
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
@@ -2644,8 +2648,98 @@ function SetRowComponent({
     }
   }, [])
 
+  // --- Swipe-left-to-delete (v6) ---
+  // Touch start vangt X + Y; als horizontaal verplaatsen duidelijk groter is dan
+  // verticaal (vermijdt scroll-conflict), tonen we de rode delete-tray. Voorbij
+  // threshold trigger onDelete. Snelle flick (velocity > 0.6 px/ms) ook accepteren.
+  const rowShellRef = useRef<HTMLDivElement>(null)
+  const touchStart = useRef<{ x: number; y: number; time: number; locked: 'h' | 'v' | null } | null>(null)
+  const [swipeX, setSwipeX] = useState(0)
+  const SWIPE_THRESHOLD = 84 // px na dewelke we verwijderen
+  const SWIPE_MAX = 120 // px cap zodat je niet eindeloos sleept
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const t = e.touches[0]
+    touchStart.current = { x: t.clientX, y: t.clientY, time: Date.now(), locked: null }
+  }, [])
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!touchStart.current) return
+    const t = e.touches[0]
+    const dx = t.clientX - touchStart.current.x
+    const dy = t.clientY - touchStart.current.y
+    // Lock gesture direction op basis van eerste significante beweging
+    if (!touchStart.current.locked) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return
+      touchStart.current.locked = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v'
+    }
+    if (touchStart.current.locked !== 'h') return
+    // Alleen naar links (dx < 0). Cap op SWIPE_MAX.
+    const clamped = Math.max(-SWIPE_MAX, Math.min(0, dx))
+    setSwipeX(clamped)
+  }, [])
+
+  const handleTouchEnd = useCallback(() => {
+    if (!touchStart.current) {
+      setSwipeX(0)
+      return
+    }
+    const dt = Math.max(1, Date.now() - touchStart.current.time)
+    const velocity = Math.abs(swipeX) / dt // px/ms
+    const flick = velocity > 0.6 && swipeX < -30
+    if (swipeX <= -SWIPE_THRESHOLD || flick) {
+      // haptic + delete
+      if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(15)
+      setSwipeX(-SWIPE_MAX)
+      setTimeout(() => onDelete(index), 120)
+    } else {
+      setSwipeX(0)
+    }
+    touchStart.current = null
+  }, [swipeX, onDelete, index])
+
+  const revealPct = Math.min(1, Math.abs(swipeX) / SWIPE_THRESHOLD)
+
   return (
-    <div className={`set-row ${set.completed ? 'checked' : ''}`}>
+    <div
+      ref={rowShellRef}
+      style={{ position: 'relative', overflow: 'hidden' }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
+    >
+      {/* Delete tray onder de set-row — kleurt van muted naar solid rood bij naderen threshold */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: 0, right: 0, bottom: 0,
+          width: SWIPE_MAX,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: `rgba(196,55,42,${0.35 + revealPct * 0.5})`,
+          borderRadius: 8,
+          transition: swipeX === 0 ? 'background 160ms' : undefined,
+          pointerEvents: 'none',
+        }}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FDFDFE" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+          <path d="M10 11v6M14 11v6" />
+          <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+        </svg>
+      </div>
+      <div
+        className={`set-row ${set.completed ? 'checked' : ''}`}
+        style={{
+          transform: `translateX(${swipeX}px)`,
+          transition: swipeX === 0 ? 'transform 220ms cubic-bezier(0.16,1,0.3,1)' : undefined,
+          position: 'relative',
+          zIndex: 1,
+          background: 'var(--card, transparent)',
+        }}
+      >
       {/* Set number — long press to change type */}
       <div className="c-num">
         <button
@@ -2731,6 +2825,7 @@ function SetRowComponent({
         >
           <svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg>
         </button>
+      </div>
       </div>
     </div>
   )

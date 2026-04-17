@@ -871,15 +871,18 @@ a, button {
   margin-top: 2px;
 }
 .start-cta .ring {
-  width: 44px; height: 44px;
+  width: 52px; height: 52px;
   border-radius: 50%;
   background: #C0FC01;
   display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 14px rgba(192,252,1,0.25);
+  box-shadow: 0 6px 18px rgba(192,252,1,0.32), inset 0 1px 0 rgba(255,255,255,0.35);
   transition: transform 140ms cubic-bezier(0.16,1,0.3,1);
 }
 .start-cta .ring:active { transform: scale(0.95); }
-.start-cta .ring svg { width: 16px; height: 16px; fill: #0E1500; stroke: #0E1500; stroke-width: 2; }
+/* Play-triangle (polygon) → fill. Check (polyline) → stroke only. Beide scherper door inherit + per-element rules. */
+.start-cta .ring svg { width: 22px; height: 22px; color: #0E1500; display: block; }
+.start-cta .ring svg polygon { fill: currentColor; stroke: currentColor; stroke-width: 1.5; stroke-linejoin: round; }
+.start-cta .ring svg polyline { fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ════════════════════════════════════════════════════════════════
  * v6 — Plan · Frosted-glass week-card
@@ -927,26 +930,28 @@ a, button {
 
 .wr-body { flex: 1; min-width: 0; }
 .wr-name {
-  font-size: 14px; font-weight: 400; color: #FDFDFE;
+  font-size: 14px; font-weight: 500; color: #FDFDFE;
   letter-spacing: -0.003em; line-height: 1.2;
 }
+/* v6 readability bump: was 0.44 op frosted glass → hardly legible. 0.72 + 12px. */
 .wr-meta {
-  font-size: 11px; font-weight: 400; color: rgba(253,253,254,0.44);
-  letter-spacing: 0.01em; margin-top: 2px;
+  font-size: 12px; font-weight: 400; color: rgba(253,253,254,0.72);
+  letter-spacing: 0.01em; margin-top: 3px;
 }
 
 .wr-chip {
-  font-size: 11px; font-weight: 400; color: rgba(253,253,254,0.62);
-  padding: 3px 10px; border-radius: 999px;
-  background: rgba(253,253,254,0.08);
+  font-size: 11px; font-weight: 500; color: #FDFDFE;
+  padding: 4px 10px; border-radius: 999px;
+  background: rgba(253,253,254,0.14);
   white-space: nowrap;
+  letter-spacing: 0.01em;
 }
 
 /* Rust-rij — expliciet maar rustig */
 .week-row.rest .wr-date .n,
-.week-row.rest .wr-date .d { color: rgba(253,253,254,0.18); }
-.week-row.rest .wr-name { color: rgba(253,253,254,0.78); font-weight: 300; }
-.week-row.rest .wr-meta { color: rgba(253,253,254,0.18); }
+.week-row.rest .wr-date .d { color: rgba(253,253,254,0.38); }
+.week-row.rest .wr-name { color: rgba(253,253,254,0.88); font-weight: 300; }
+.week-row.rest .wr-meta { color: rgba(253,253,254,0.44); }
 .week-row.rest .wr-chip {
   background: rgba(253,253,254,0.05);
   color: rgba(253,253,254,0.44);
@@ -976,15 +981,18 @@ a, button {
 /* Plan · page-head (onder top-bar op Plan/Coach/Profiel; home heeft géén page-head) */
 .context-head {
   display: flex; justify-content: space-between; align-items: baseline;
-  margin: 20px 0 8px;
+  margin: 20px 0 10px;
   padding: 0 4px;
 }
+/* v6 leesbaarheid: "Komende" was 13px / 0.78 tegen #8E9890 canvas → bumped naar
+ * 14px / 1.0 + uppercase eyebrow pattern zodat het duidelijk een sectie-label is
+ * en niet wegvalt tegen de groene achtergrond. */
 .context-l {
-  font-size: 13px; font-weight: 400; color: rgba(253,253,254,0.78);
-  letter-spacing: -0.003em;
+  font-size: 12px; font-weight: 500; color: #FDFDFE;
+  letter-spacing: 0.08em; text-transform: uppercase;
 }
 .context-r {
-  font-size: 11px; font-weight: 400; color: rgba(253,253,254,0.44);
+  font-size: 11px; font-weight: 400; color: rgba(253,253,254,0.62);
   letter-spacing: 0.06em; text-transform: uppercase;
 }
 
@@ -1047,14 +1055,23 @@ a, button {
   margin-bottom: 14px;
 }
 .ex-drag {
-  width: 12px; height: 18px;
+  /* Visueel blijft 12×18 dots, maar we maken hitbox 32×36 met padding
+   * zodat de handle op mobiel bruikbaar is. touch-action: none voorkomt
+   * dat Safari de drag als scroll claimt → cruciaal voor dnd-kit TouchSensor. */
+  width: 32px; height: 36px;
+  padding: 9px 10px;
+  box-sizing: border-box;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(3, 1fr);
   gap: 3px;
   flex-shrink: 0;
   cursor: grab;
-  opacity: 0.35;
+  opacity: 0.45;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  margin-left: -8px; /* compenseer padding zodat ex-head niet verschuift */
 }
 .ex-drag span {
   width: 2px; height: 2px;
