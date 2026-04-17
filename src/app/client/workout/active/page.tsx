@@ -2199,11 +2199,31 @@ function ActiveWorkoutPage() {
               <div className="ex" style={isSuperset ? { borderLeft: '3px solid #C0FC01', marginLeft: -3 } : {}}>
               {/* Exercise header */}
               <div className="ex-head">
-                {/* Drag handle */}
-                <div className="ex-drag" {...listeners} {...attributes} style={{ WebkitTapHighlightColor: 'transparent' }}>
-                  <span/><span/><span/><span/><span/><span/>
+                {/* Drag-region: zowel de 6-dots handle als de titel triggeren
+                   reorder bij long-press (120ms). Verbeterde hitbox want enkel
+                   de 32×36 dots was te klein op mobiel en slecht discoverable. */}
+                <div
+                  className="ex-handle"
+                  {...listeners}
+                  {...attributes}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 14,
+                    flex: 1,
+                    minWidth: 0,
+                    cursor: 'grab',
+                    touchAction: 'manipulation',
+                    WebkitTapHighlightColor: 'transparent',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
+                  }}
+                >
+                  <div className="ex-drag" aria-hidden="true">
+                    <span/><span/><span/><span/><span/><span/>
+                  </div>
+                  <div className="ex-title">{exerciseData.name_nl || exerciseData.name}</div>
                 </div>
-                <div className="ex-title">{exerciseData.name_nl || exerciseData.name}</div>
                 <button className="ex-kebab" onClick={() => setExpandedExercise(isExpanded ? null : ex.id)} aria-label="Opties" style={{ WebkitTapHighlightColor: 'transparent' }}>
                   <span/>
                 </button>
