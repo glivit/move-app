@@ -544,7 +544,7 @@ function WeekCard({
   }
 
   return (
-    <Link href="/client/progress" className="block v6-card" aria-label={`Deze week: ${done} van ${total} voltooid`}>
+    <Link href="/client/workout" className="block v6-card" aria-label={`Deze week: ${done} van ${total} voltooid`}>
       <Arr />
       <div className="eyebrow mb-3">Deze Week</div>
       <div className="stat-number-lg" style={{ marginBottom: 22 }}>
@@ -892,12 +892,13 @@ function Chevron() {
   )
 }
 
-// Horizontal slider (ticks + fill + knob) — zie design-system/04-homepage-v2.html .slider
+// Horizontal slider — zie design-system/04-homepage-v2.html .slider
+// v6: geen random tick-hoogtes meer (leidde tot de indruk dat het "een standaard
+// lijntje" was dat niets uitdrukt). In plaats daarvan uniforme 3px ticks die de
+// rust van een design-systeem timeline uitstralen. Bij fill === 1 verbergen we
+// de ticks helemaal zodat "Voltooid" 100% solid voelt, met de knob rechts.
 function Slider({ fill, knobRight, label, ticksCount }: { fill: number; knobRight: boolean; label: string; ticksCount: number }) {
-  const ticks = useMemo(
-    () => Array.from({ length: ticksCount }).map(() => 3 + Math.random() * 5),
-    [ticksCount],
-  )
+  const isComplete = fill >= 0.999
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', height: 3 }}>
@@ -905,36 +906,41 @@ function Slider({ fill, knobRight, label, ticksCount }: { fill: number; knobRigh
           style={{
             height: 3,
             width: `${Math.max(fill, 0.08) * 100}%`,
-            background: 'rgba(253,253,254,0.85)',
-            borderRadius: '1.5px 0 0 1.5px',
+            background: isComplete ? '#2FA65A' : 'rgba(253,253,254,0.85)',
+            borderRadius: isComplete ? '1.5px' : '1.5px 0 0 1.5px',
+            transition: 'width 320ms cubic-bezier(0.16,1,0.3,1), background 240ms',
           }}
         />
-        <div
-          style={{
-            width: 10, height: 10, borderRadius: '50%',
-            background: '#FDFDFE',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.18)',
-            margin: '0 -3px',
-            zIndex: 2,
-          }}
-        />
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 2, paddingLeft: 4 }}>
-          {ticks.map((h, i) => (
-            <div
-              key={i}
-              style={{
-                width: 1,
-                height: `${h}px`,
-                background: 'rgba(253,253,254,0.30)',
-                borderRadius: 0.5,
-              }}
-            />
-          ))}
-        </div>
+        {!isComplete && (
+          <div
+            style={{
+              width: 10, height: 10, borderRadius: '50%',
+              background: '#FDFDFE',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.18)',
+              margin: '0 -3px',
+              zIndex: 2,
+            }}
+          />
+        )}
+        {!isComplete && (
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 2, paddingLeft: 4 }}>
+            {Array.from({ length: ticksCount }).map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  width: 1,
+                  height: 3,
+                  background: 'rgba(253,253,254,0.22)',
+                  borderRadius: 0.5,
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
       <div className="cap-row" style={{ marginTop: 10 }}>
         <span className="cap">{knobRight ? 'Voortgang' : 'Workout'}</span>
-        <span className="cap">{label}</span>
+        <span className="cap" style={isComplete ? { color: '#2FA65A', fontWeight: 500 } : undefined}>{label}</span>
       </div>
     </div>
   )

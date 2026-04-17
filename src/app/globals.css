@@ -142,6 +142,19 @@ h1, h2, h3, h4, h5, h6 {
   color: #FDFDFE;
 }
 
+/* Main content padding — op mobiel rekening houden met fixed top bar + safe-area.
+ * Top bar: env(safe-area-inset-top) + 14px top + ~32px logo row + 10px bottom ≈ 56px+inset.
+ * Extra 14px ademruimte zodat de eerste v6-card niet onder de blurred header verdwijnt.
+ * Op lg zetten Tailwind-utilities lg:pt-12 dit over. */
+.client-shell-content {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 70px);
+}
+@media (min-width: 1024px) {
+  .client-shell-content {
+    padding-top: 0; /* lg:pt-12 utility neemt het over */
+  }
+}
+
 .client-app h1,
 .client-app h2,
 .client-app h3 {

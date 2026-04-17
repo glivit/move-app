@@ -81,7 +81,7 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
         {isFocusMode ? (
           children
         ) : (
-          <div className="max-w-lg mx-auto px-6 pt-16 pb-4 lg:max-w-3xl lg:px-8 lg:pt-12">
+          <div className="client-shell-content max-w-lg mx-auto px-6 pb-4 lg:max-w-3xl lg:px-8 lg:pt-12">
             <div className="animate-fade-in">
               {children}
             </div>

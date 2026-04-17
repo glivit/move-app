@@ -1193,7 +1193,7 @@ function ActiveWorkoutPage() {
   const [closeConfirm, setCloseConfirm] = useState(false)
   const [prCelebration, setPrCelebration] = useState<string | null>(null)
   const [workoutSeconds, setWorkoutSeconds] = useState(0)
-  const [activeRestTimer, setActiveRestTimer] = useState<{ exerciseId: string; setIndex: number; seconds: number; total: number; endTime: number } | null>(null)
+  // (v6) Rest-timer verwijderd per Glenn's request — geen UI blok meer na set complete.
   const [exerciseNotes, setExerciseNotes] = useState<Record<string, string>>({})
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
   const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>(() => {
@@ -1276,32 +1276,7 @@ function ActiveWorkoutPage() {
     return () => clearInterval(interval)
   }, [session])
 
-  // --- Inline rest timer countdown (endTime-based, survives app-switch) ---
-  useEffect(() => {
-    if (!activeRestTimer || activeRestTimer.seconds <= 0) return
-    const tick = () => {
-      setActiveRestTimer(prev => {
-        if (!prev) return null
-        const remaining = Math.ceil((prev.endTime - Date.now()) / 1000)
-        // Beep at 3, 2, 1 seconds
-        if (remaining > 0 && remaining <= 3 && remaining !== prev.seconds) {
-          playBeep(660, 100)
-          haptic(15)
-        }
-        // Final beep (done) — longer, higher pitch
-        if (remaining <= 0) {
-          playBeep(1100, 250)
-          haptic([40, 30, 40])
-          return null
-        }
-        return { ...prev, seconds: remaining }
-      })
-    }
-    // Tick immediately (catches up after background), then every 250ms for smooth updates
-    tick()
-    const interval = setInterval(tick, 250)
-    return () => clearInterval(interval)
-  }, [activeRestTimer?.endTime, playBeep, haptic])
+  // (v6) Rest-timer countdown effect verwijderd — timer-UI is weg, dus geen tick-loop meer.
 
   // --- Auto-save (includes notes + exercise order + cardio + added exercises) ---
   useEffect(() => {
@@ -1622,24 +1597,11 @@ function ActiveWorkoutPage() {
         }
       }
 
-      if (exerciseRef && exerciseRef.rest_seconds > 0) {
-        setActiveRestTimer({ exerciseId, setIndex, seconds: exerciseRef.rest_seconds, total: exerciseRef.rest_seconds, endTime: Date.now() + exerciseRef.rest_seconds * 1000 })
-      }
-
-      // Auto-focus next set's weight field
-      const exSets = sets[exerciseId] || []
-      const nextIndex = setIndex + 1
-      if (nextIndex < exSets.length && !exSets[nextIndex].completed) {
-        setTimeout(() => {
-          const nextInput = document.getElementById(`weight-${exerciseId}-${nextIndex}`)
-          if (nextInput) {
-            nextInput.focus()
-            ;(nextInput as HTMLInputElement).select()
-          }
-        }, 150)
-      }
+      // (v6) Rest-timer verwijderd: geen UI-blok meer na set-complete.
+      // (v6) Geen auto-focus meer op reps/weight van volgende set — voelde verwarrend
+      //      omdat iOS keyboard niet automatisch opende; clean laten.
     } catch (error) { console.error('Error completing set:', error) }
-  }, [session, exercises, haptic, sets])
+  }, [session, exercises, haptic])
 
   // --- Reorder exercises ---
   const moveExercise = useCallback((fromIndex: number, direction: 'up' | 'down') => {
@@ -2321,8 +2283,6 @@ function ActiveWorkoutPage() {
                       const prevLabel = prevSet
                         ? `${displayWeight(prevSet.weight_kg) || 0}×${prevSet.actual_reps || 0}`
                         : (prefilledWeight && idx === 0 ? `${displayWeight(prefilledWeight)} ${weightUnit}` : '—')
-                      const isRestActive = activeRestTimer?.exerciseId === ex.id && activeRestTimer?.setIndex === idx
-
                       return (
                         <div key={set.id}>
                           <SetRow
@@ -2340,100 +2300,7 @@ function ActiveWorkoutPage() {
                             displayWeight={displayWeight}
                             toKg={toKg}
                           />
-                          {/* Inline rest timer — lime accent, dark bed */}
-                          {isRestActive && activeRestTimer && (
-                            <div
-                              style={{
-                                margin: '0 20px',
-                                padding: '10px 4px 12px',
-                                borderTop: '1px solid rgba(253,253,254,0.08)',
-                              }}
-                            >
-                              <div
-                                style={{
-                                  width: '100%',
-                                  height: 3,
-                                  borderRadius: 999,
-                                  background: 'rgba(0,0,0,0.15)',
-                                  overflow: 'hidden',
-                                  marginBottom: 10,
-                                }}
-                              >
-                                <div
-                                  style={{
-                                    height: '100%',
-                                    width: `${((activeRestTimer.total - activeRestTimer.seconds) / activeRestTimer.total) * 100}%`,
-                                    background: '#C0FC01',
-                                    borderRadius: 999,
-                                    transition: 'width 1000ms linear',
-                                  }}
-                                />
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <button
-                                  onClick={() => setActiveRestTimer(prev => prev ? { ...prev, seconds: Math.max(0, prev.seconds - 15), total: prev.total, endTime: prev.endTime - 15000 } : null)}
-                                  style={{
-                                    padding: '6px 10px',
-                                    borderRadius: 10,
-                                    fontSize: 12,
-                                    fontWeight: 500,
-                                    color: 'rgba(253,253,254,0.62)',
-                                    background: 'rgba(0,0,0,0.10)',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    WebkitTapHighlightColor: 'transparent',
-                                  }}
-                                >
-                                  −15s
-                                </button>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                  <span
-                                    style={{
-                                      fontSize: 22,
-                                      fontWeight: 600,
-                                      color: '#C0FC01',
-                                      fontFeatureSettings: '"tnum"',
-                                      letterSpacing: '-0.01em',
-                                    }}
-                                  >
-                                    {formatTimer(activeRestTimer.seconds)}
-                                  </span>
-                                  <button
-                                    onClick={() => setActiveRestTimer(null)}
-                                    style={{
-                                      fontSize: 11,
-                                      fontWeight: 500,
-                                      color: 'rgba(253,253,254,0.62)',
-                                      textTransform: 'uppercase',
-                                      letterSpacing: '0.06em',
-                                      background: 'transparent',
-                                      border: 'none',
-                                      cursor: 'pointer',
-                                      WebkitTapHighlightColor: 'transparent',
-                                    }}
-                                  >
-                                    Skip
-                                  </button>
-                                </div>
-                                <button
-                                  onClick={() => setActiveRestTimer(prev => prev ? { ...prev, seconds: prev.seconds + 15, total: Math.max(prev.total, prev.seconds + 15), endTime: prev.endTime + 15000 } : null)}
-                                  style={{
-                                    padding: '6px 10px',
-                                    borderRadius: 10,
-                                    fontSize: 12,
-                                    fontWeight: 500,
-                                    color: 'rgba(253,253,254,0.62)',
-                                    background: 'rgba(0,0,0,0.10)',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    WebkitTapHighlightColor: 'transparent',
-                                  }}
-                                >
-                                  +15s
-                                </button>
-                              </div>
-                            </div>
-                          )}
+                          {/* (v6) Rest-timer UI verwijderd — zie activeRestTimer state comment. */}
                         </div>
                       )
                     })}
