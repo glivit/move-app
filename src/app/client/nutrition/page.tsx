@@ -1539,68 +1539,57 @@ export default function ClientNutritionPage() {
         </div>
       </div>
 
-      {/* ── MEALS CARD ── */}
-      <div className="v6-card-dark animate-slide-up" style={{ marginBottom: 14, padding: '4px 22px 18px' }}>
-        {meals.map((meal, idx) => {
-          const log = logs.get(meal.id)
-          const foods = log?.foods_eaten || meal.foods || []
-          const allChecked = foods.length > 0 && foods.every(f => f.checked === true)
-          const cal = mealCalories(foods)
+      {/* ── MEAL CARDS · one card per meal, per design-system/08-dieet-detail.html ── */}
+      {meals.map((meal) => {
+        const log = logs.get(meal.id)
+        const foods = log?.foods_eaten || meal.foods || []
+        const allChecked = foods.length > 0 && foods.every(f => f.checked === true)
+        const cal = mealCalories(foods)
 
-          return (
-            <div
-              key={meal.id}
-              style={{
-                borderTop: idx === 0 ? 'none' : '1px solid rgba(253,253,254,0.08)',
-                padding: '18px 0 14px',
-              }}
-            >
-              {/* Meal header */}
-              <div style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                marginBottom: foods.length > 0 ? 8 : 0,
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+        return (
+          <div
+            key={meal.id}
+            className="v6-card-dark animate-slide-up"
+            style={{
+              marginBottom: 14,
+              padding: '18px 22px 0',
+              overflow: 'hidden',
+            }}
+          >
+            {/* Meal header */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              gap: 10,
+              marginBottom: foods.length > 0 ? 8 : 0,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+                <span style={{
+                  fontSize: 15, fontWeight: 600,
+                  color: allChecked ? 'rgba(253,253,254,0.52)' : '#FDFDFE',
+                  letterSpacing: '-0.01em',
+                }}>
+                  {meal.name}
+                </span>
+                {allChecked && (
                   <span style={{
-                    fontSize: 15, fontWeight: 600,
-                    color: allChecked ? 'rgba(253,253,254,0.52)' : '#FDFDFE',
-                    letterSpacing: '-0.01em',
+                    fontSize: 10, fontWeight: 600, color: '#2FA65A',
+                    textTransform: 'uppercase', letterSpacing: '0.08em',
                   }}>
-                    {meal.name}
+                    Voltooid
                   </span>
-                  {allChecked && (
-                    <span style={{
-                      fontSize: 10, fontWeight: 600, color: '#2FA65A',
-                      textTransform: 'uppercase', letterSpacing: '0.08em',
-                    }}>
-                      Voltooid
-                    </span>
-                  )}
-                  <span style={{
-                    fontSize: 12, color: 'rgba(253,253,254,0.44)',
-                    fontVariantNumeric: 'tabular-nums',
-                  }}>
-                    {cal} kcal
-                  </span>
-                </div>
-                <button
-                  onClick={() => { setBottomSheetMealId(meal.id); setBottomSheetOpen(true) }}
-                  style={{
-                    width: 28, height: 28, borderRadius: '50%',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'rgba(253,253,254,0.10)',
-                    border: 'none', cursor: 'pointer',
-                    color: '#FDFDFE',
-                    WebkitTapHighlightColor: 'transparent',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Plus strokeWidth={2} size={14} />
-                </button>
+                )}
               </div>
+              <span style={{
+                fontSize: 12, color: 'rgba(253,253,254,0.52)',
+                fontVariantNumeric: 'tabular-nums',
+                flexShrink: 0,
+              }}>
+                {cal} kcal
+              </span>
+            </div>
 
-              {/* Foods */}
-              {foods.length > 0 ? (
+            {/* Foods */}
+            {foods.length > 0 ? (
                 <div>
                   {foods.map(food => {
                     const isChecked = food.checked === true
@@ -1771,18 +1760,51 @@ export default function ClientNutritionPage() {
                     )
                   })}
                 </div>
-              ) : (
-                <p style={{
-                  fontSize: 12, color: 'rgba(253,253,254,0.32)',
-                  margin: '6px 0 0', fontStyle: 'italic',
-                }}>
-                  Geen items
-                </p>
-              )}
-            </div>
-          )
-        })}
-      </div>
+            ) : (
+              <p style={{
+                fontSize: 12, color: 'rgba(253,253,254,0.32)',
+                margin: '6px 0 14px', fontStyle: 'italic',
+              }}>
+                Geen items
+              </p>
+            )}
+
+            {/* Ghost add-food row — per design-system/08-dieet-detail.html */}
+            <button
+              onClick={() => { setBottomSheetMealId(meal.id); setBottomSheetOpen(true) }}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: 8,
+                width: 'calc(100% + 44px)',
+                marginLeft: -22,
+                marginRight: -22,
+                marginTop: 14,
+                padding: '13px 22px',
+                background: 'transparent',
+                borderTop: '1px dashed rgba(253,253,254,0.18)',
+                borderRight: 'none',
+                borderBottom: 'none',
+                borderLeft: 'none',
+                borderBottomLeftRadius: 24,
+                borderBottomRightRadius: 24,
+                cursor: 'pointer',
+                WebkitTapHighlightColor: 'transparent',
+                fontFamily: 'inherit',
+                fontSize: 13,
+                fontWeight: 400,
+                color: 'rgba(253,253,254,0.62)',
+                letterSpacing: '-0.003em',
+                transition: 'background 140ms',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(253,253,254,0.04)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+            >
+              <Plus strokeWidth={2} size={12} />
+              Voedingsmiddel toevoegen
+            </button>
+          </div>
+        )
+      })}
 
       {/* ── Submit day ── */}
       {meals.length > 0 && (

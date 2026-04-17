@@ -253,11 +253,21 @@ function LoginPageInner() {
     setResetLoading(false)
   }
 
-  /* ─── Loading splash ───────────────────────── */
+  /* ─── Loading splash — v6 Orion ───────────────────── */
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#EEEBE3]">
-        <h1 className="text-7xl font-bold tracking-tight text-[#1A1917] animate-fade-in" style={{ fontFamily: 'var(--font-display)' }}>
+      <div
+        className="flex min-h-screen items-center justify-center"
+        style={{ background: '#8E9890' }}
+      >
+        <h1
+          className="text-7xl font-medium tracking-[-0.02em] animate-fade-in"
+          style={{
+            fontFamily: 'var(--font-sans, Outfit), Outfit, sans-serif',
+            color: '#FDFDFE',
+            fontWeight: 500,
+          }}
+        >
           MŌVE
         </h1>
       </div>
@@ -488,8 +498,18 @@ function LoginPageInner() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-[#EEEBE3]">
-        <h1 className="text-7xl font-bold tracking-tight text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
+      <div
+        className="flex min-h-screen items-center justify-center"
+        style={{ background: '#8E9890' }}
+      >
+        <h1
+          className="text-7xl font-medium tracking-[-0.02em]"
+          style={{
+            fontFamily: 'var(--font-sans, Outfit), Outfit, sans-serif',
+            color: '#FDFDFE',
+            fontWeight: 500,
+          }}
+        >
           MŌVE
         </h1>
       </div>
