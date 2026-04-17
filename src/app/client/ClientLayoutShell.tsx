@@ -17,10 +17,7 @@ const SyncStatusIndicator = dynamic(
   () => import('@/components/ui/SyncStatusIndicator').then(m => m.SyncStatusIndicator),
   { ssr: false },
 )
-const BugReporter = dynamic(
-  () => import('@/components/ui/BugReporter').then(m => m.BugReporter),
-  { ssr: false },
-)
+// BugReporter tijdelijk uit — Glenn wil geen drijvende bug-knop op de app.
 
 export default function ClientLayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -80,12 +77,6 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <TopBarAvatar />
-            <button className="ico-btn" aria-label="Menu">
-              <svg viewBox="0 0 24 24">
-                <line x1="4" y1="8" x2="20" y2="8" />
-                <line x1="4" y1="16" x2="20" y2="16" />
-              </svg>
-            </button>
           </div>
         </header>
       )}
@@ -114,9 +105,6 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
 
       {/* Offline sync status indicator */}
       <SyncStatusIndicator />
-
-      {/* Bug reporter for test users */}
-      <BugReporter />
 
       {/* Spacer for bottom nav on mobile */}
       {!isFocusMode && <div className="lg:hidden h-24" />}
