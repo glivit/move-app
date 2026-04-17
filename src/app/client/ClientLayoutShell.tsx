@@ -34,13 +34,14 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
     <div
       className="client-app min-h-screen"
       style={{
-        // v6 · design-system shared.css .phone background: flat canvas + subtiele radial vignette
-        // voor extra diepte zodat frosted-glass cards beter uit de achtergrond komen.
+        // v6 · design-system shared.css .phone achtergrond exact:
+        //   canvas #8E9890 + radial highlight top (w 0.10) + shadow bottom (b 0.25).
+        // background-attachment: fixed bewust weg — iOS Safari rendert het niet
+        // betrouwbaar (jitter bij scroll, platslaat de vignette).
         background: '#8E9890',
         backgroundImage:
-          'radial-gradient(ellipse 80% 40% at 50% -8%, rgba(255,255,255,0.08), transparent 60%),' +
-          'radial-gradient(ellipse 80% 50% at 50% 108%, rgba(0,0,0,0.16), transparent 60%)',
-        backgroundAttachment: 'fixed',
+          'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,255,255,0.10), transparent 60%),' +
+          'radial-gradient(ellipse 80% 60% at 50% 110%, rgba(0,0,0,0.25), transparent 60%)',
       }}
     >
       {/* Desktop sidebar — wordt later gemigreerd naar v6 tokens */}

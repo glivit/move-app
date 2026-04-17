@@ -442,18 +442,23 @@ function HeroCard({
 
   if (state === 'done') {
     const workoutName = training?.today?.name ?? 'Workout'
+    const exCount = training?.today?.exerciseCount
+    const dur = training?.today?.durationMin
+    // Design-system 04-homepage-v2.html: eyebrow = "Vandaag · <dag>"
+    // (geen "Voltooid" hier — de lime-bar + cap "Voltooid" eronder is het
+    // voltooid-signaal; dubbel is ruis).
     return (
       <Link href="/client/workout" className="block v6-card" aria-label={`${workoutName} voltooid`}>
         <Arr />
         <div className="eyebrow mb-3">
-          <span className="pulse" style={{ background: '#C0FC01' }} /> Vandaag · Voltooid
+          <span className="pulse" style={{ background: '#C0FC01' }} /> Vandaag
         </div>
         <h2 style={{ fontSize: 22, fontWeight: 300, letterSpacing: '-0.018em', lineHeight: 1.15, marginBottom: 6 }}>
           {workoutName}
         </h2>
         <p className="meta" style={{ marginBottom: 18 }}>
-          {training?.today?.exerciseCount ? `${training.today.exerciseCount} oefeningen · ` : ''}
-          ~{training?.today?.durationMin ?? 0} min
+          {exCount ? `${exCount} oefeningen · ` : ''}
+          {dur ? `±${dur} min` : 'Voltooid'}
         </p>
         <Slider fill={1} knobRight label="Voltooid" ticksCount={34} />
       </Link>
@@ -503,7 +508,7 @@ function HeroCard({
       </h2>
       <p className="meta" style={{ marginBottom: 18 }}>
         {training?.today?.exerciseCount ? `${training.today.exerciseCount} oefeningen · ` : ''}
-        ~{training?.today?.durationMin ?? 50} min
+        ±{training?.today?.durationMin ?? 50} min
       </p>
       <Slider fill={0} knobRight={false} label="Start workout" ticksCount={34} />
     </Link>
