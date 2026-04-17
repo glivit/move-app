@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MŌVE Design System — 01 Foundations</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       MŌVE DESIGN SYSTEM v4
+
+       Palette: Orion exact — 4 colors only
+       #000000  black
+       #FFFFFF  white
+       #899089  sage
+       #C0FC01  lime (accent)
+
+       Font: Outfit (Google Fonts match for Lufga)
+       Weights: 200 hero numbers · 300 display · 400 everything else · 500 captions only
+
+       Zero warm tones. Zero orange. Zero red.
+       ═══════════════════════════════════════════════════════════ */
+
+    :root {
+      --font: 'Outfit', sans-serif;
+
+      /* ── 4-color Orion palette ── */
+      --black:      #000000;
+      --white:      #FFFFFF;
+      --sage:       #899089;
+      --lime:       #C0FC01;
+
+      /* ── Derived tokens ── */
+      --bg:         #B6B9AE;          /* muted sage surface — sampled from screenshot */
+      --bg-light:   #EEEBE3;          /* fallback for lighter pages                  */
+      --surface:    rgba(195, 198, 190, 0.58);  /* frosted glass — more opaque like ref */
+      --surface-border: rgba(255,255,255, 0.20);
+      --surface-solid: #FFFFFF;
+
+      --ink:        #1A1917;
+      --ink-soft:   #5A5D56;
+      --ink-muted:  #899089;
+      --ink-faint:  #ADB0A9;
+
+      --lime-hover: #B0E800;
+      --lime-glow:  rgba(192, 252, 1, 0.25);
+      --lime-dim:   rgba(192, 252, 1, 0.10);
+
+      /* ── Radius ── */
+      --r-sm:   8px;
+      --r-md:   12px;
+      --r-lg:   16px;
+      --r-xl:   20px;
+      --r-2xl:  24px;
+      --r-pill: 999px;
+
+      /* ── Motion ── */
+      --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-std:  cubic-bezier(0.4, 0, 0.2, 1);
+      --t-fast:  150ms;
+      --t-base:  280ms;
+      --t-slow:  450ms;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font);
+      font-weight: 400;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       LAYOUT
+       ═══════════════════════════════════════════════════ */
+    .page { max-width: 520px; margin: 0 auto; padding: 48px 24px 140px; }
+
+    .header { text-align: center; margin-bottom: 72px; }
+
+    .logo {
+      font-size: 17px;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .logo-dot {
+      display: inline-block;
+      width: 5px; height: 5px;
+      background: var(--lime);
+      border-radius: 50%;
+      vertical-align: super;
+      margin: 0 -1px;
+      position: relative;
+      top: -2px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink-muted);
+      margin-top: 4px;
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: 64px;
+      animation: fadeUp var(--t-slow) var(--ease-out) both;
+    }
+    .section:nth-child(2) { animation-delay: 0ms; }
+    .section:nth-child(3) { animation-delay: 60ms; }
+    .section:nth-child(4) { animation-delay: 120ms; }
+    .section:nth-child(5) { animation-delay: 180ms; }
+    .section:nth-child(6) { animation-delay: 240ms; }
+    .section:nth-child(7) { animation-delay: 300ms; }
+    .section:nth-child(8) { animation-delay: 360ms; }
+    .section:nth-child(9) { animation-delay: 420ms; }
+    .section:nth-child(10) { animation-delay: 480ms; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(0,0,0,0.08);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       CARDS — Orion frosted glass
+
+       Reference: translucent sage bg, heavy backdrop-blur,
+       very thin white border, ~24px radius
+       ═══════════════════════════════════════════════════ */
+    .card {
+      background: var(--surface);
+      backdrop-filter: blur(32px) saturate(1.4);
+      -webkit-backdrop-filter: blur(32px) saturate(1.4);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--r-2xl);
+      padding: 24px;
+      margin-bottom: 12px;
+      /* Subtle inner top highlight — gives glass depth like Orion ref */
+      box-shadow:
+        inset 0 1px 0 0 rgba(255,255,255,0.35),
+        0 1px 3px rgba(0,0,0,0.04);
+      transition: transform var(--t-base) var(--ease-out),
+                  box-shadow var(--t-base) var(--ease-out);
+    }
+
+    .card:hover {
+      transform: translateY(-1px);
+      box-shadow:
+        inset 0 1px 0 0 rgba(255,255,255,0.35),
+        0 8px 32px rgba(0,0,0,0.06);
+    }
+
+    .card-solid {
+      background: var(--surface-solid);
+      backdrop-filter: none;
+      border-color: rgba(0,0,0,0.06);
+    }
+
+    .card-dark {
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      border-color: rgba(255,255,255,0.06);
+      color: var(--white);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       NOTES & TAGS
+       ═══════════════════════════════════════════════════ */
+    .note {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      line-height: 1.65;
+      padding: 14px 16px;
+      background: rgba(0,0,0,0.04);
+      border-radius: var(--r-md);
+    }
+
+    .note strong { font-weight: 500; color: var(--ink); }
+
+    .tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      padding: 3px 10px;
+      border-radius: var(--r-pill);
+      border: 1px solid rgba(0,0,0,0.10);
+      color: var(--ink-soft);
+    }
+
+    .tag-lime {
+      background: var(--lime);
+      border-color: var(--lime);
+      color: var(--black);
+      font-weight: 500;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       1. FONT SPECIMEN
+       ═══════════════════════════════════════════════════ */
+    .font-box {
+      padding: 24px 20px;
+      border-radius: var(--r-xl);
+      border: 1px solid rgba(0,0,0,0.06);
+      background: var(--surface-solid);
+    }
+
+    .font-box-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .font-box-name { font-size: 13px; font-weight: 400; color: var(--ink); }
+    .font-box-meta { font-size: 10px; font-weight: 400; color: var(--ink-muted); }
+
+    .font-hero {
+      font-size: 52px;
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .font-hero sup {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--ink-muted);
+      vertical-align: super;
+      margin-left: 2px;
+    }
+
+    .font-sentence {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+    .font-alpha {
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--ink-muted);
+      margin-top: 12px;
+      letter-spacing: 0.04em;
+    }
+
+    .weight-strip {
+      display: flex;
+      margin-top: 16px;
+      border-radius: var(--r-sm);
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .weight-strip span {
+      flex: 1;
+      padding: 10px 2px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--ink);
+      background: #F6F5F2;
+      border-right: 1px solid rgba(0,0,0,0.04);
+      transition: all var(--t-fast) var(--ease-std);
+      cursor: default;
+    }
+
+    .weight-strip span:last-child { border-right: 0; }
+    .weight-strip span:hover { background: var(--black); color: var(--white); }
+
+    .w-num {
+      display: block;
+      font-size: 8px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      margin-top: 2px;
+    }
+
+    .weight-strip span:hover .w-num { color: rgba(255,255,255,0.35); }
+
+    /* ═══════════════════════════════════════════════════
+       2. TYPE SCALE
+       ═══════════════════════════════════════════════════ */
+    .type-row {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .type-row:last-child { border-bottom: none; }
+
+    .type-meta { flex-shrink: 0; width: 64px; }
+
+    .type-meta-name {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    .type-meta-spec {
+      font-size: 9px;
+      font-weight: 400;
+      color: var(--ink-muted);
+      margin-top: 2px;
+    }
+
+    .type-sample { flex: 1; min-width: 0; color: var(--ink); line-height: 1.15; }
+
+    /* ═══════════════════════════════════════════════════
+       3. ORION CARDS — exact replica
+
+       Checked against reference:
+       - Title: 16px weight 400 (regular, NOT bold)
+       - Number: 44px weight 300 (light)
+       - Sup: 14px weight 400, muted
+       - Arrow circle: 32px, very subtle bg, thin icon
+       - Card bg: translucent sage glass
+       - Bars: thin vertical, muted, one lime active
+       - Percentages: 28px weight 300, % symbol 16px
+       - Pills: ~40px tall, fully rounded, 13px text weight 400
+       ═══════════════════════════════════════════════════ */
+
+    /* ── Card header row ── */
+    .o-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .o-title {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--ink);
+    }
+
+    .card-dark .o-title { color: var(--white); }
+
+    /* ── Arrow circle ── */
+    .o-arrow {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--t-base) var(--ease-out);
+      border: none;
+      outline: none;
+    }
+
+    .o-arrow:hover {
+      background: rgba(0,0,0,0.10);
+      transform: translateY(-1px);
+    }
+
+    .o-arrow:active { transform: scale(0.90); transition-duration: 80ms; }
+
+    .o-arrow svg {
+      width: 13px;
+      height: 13px;
+      stroke: var(--ink-soft);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform var(--t-base) var(--ease-out),
+                  stroke var(--t-fast) var(--ease-std);
+    }
+
+    .o-arrow:hover svg {
+      transform: translate(1.5px, -1.5px);
+      stroke: var(--ink);
+    }
+
+    .card-dark .o-arrow { background: rgba(255,255,255,0.08); }
+    .card-dark .o-arrow:hover { background: rgba(255,255,255,0.14); }
+    .card-dark .o-arrow svg { stroke: rgba(255,255,255,0.5); }
+    .card-dark .o-arrow:hover svg { stroke: var(--white); }
+
+    /* ── Big number ── */
+    .o-num {
+      font-size: 44px;
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .o-num sup {
+      font-size: 14px;
+      font-weight: 400;
+      vertical-align: super;
+      color: var(--ink-muted);
+      margin-left: 2px;
+    }
+
+    .card-dark .o-num { color: var(--white); }
+    .card-dark .o-num sup { color: rgba(255,255,255,0.4); }
+
+    /* ── Bar chart ── */
+    .o-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 80px;
+      margin-top: 16px;
+      padding-right: 2px;
+    }
+
+    .o-bar {
+      flex: 1;
+      min-width: 6px;
+      border-radius: 2px;
+      min-height: 4px;
+      transition: opacity var(--t-base) var(--ease-std);
+    }
+
+    .o-bar-muted {
+      background: var(--ink);
+      opacity: 0.38;
+    }
+
+    .o-bar-active {
+      background: var(--lime);
+      opacity: 1;
+    }
+
+    /* Tiny tick marks after the bars */
+    .o-ticks {
+      display: flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 80px;
+      margin-left: 4px;
+    }
+
+    .o-tick {
+      width: 2px;
+      background: var(--ink);
+      opacity: 0.18;
+      border-radius: 1px;
+    }
+
+    .card-dark .o-bar-muted { background: var(--white); opacity: 0.20; }
+    .card-dark .o-tick { background: var(--white); opacity: 0.15; }
+
+    /* ── Percentage row (Candidates Online) ── */
+    .o-pct-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-top: 14px;
+      padding: 0 4px;
+    }
+
+    .o-pct { text-align: center; }
+
+    .o-pct-value {
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: -0.01em;
+    }
+
+    .o-pct-symbol {
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    .o-pct-abs {
+      font-size: 10px;
+      font-weight: 400;
+      vertical-align: super;
+      color: var(--ink-muted);
+      margin-left: 2px;
+    }
+
+    .card-dark .o-pct-value { color: var(--white); }
+    .card-dark .o-pct-abs { color: rgba(255,255,255,0.35); }
+
+    /* ── Pill selector ── */
+    .o-pills {
+      display: flex;
+      gap: 6px;
+      margin-top: 16px;
+    }
+
+    .pill {
+      flex: 1;
+      height: 40px;
+      border-radius: var(--r-pill);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 400;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: all var(--t-base) var(--ease-out);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pill:hover { transform: translateY(-1px); }
+    .pill:active { transform: scale(0.97); transition-duration: 80ms; }
+
+    .pill-dark {
+      background: var(--ink);
+      color: var(--white);
+    }
+
+    .pill-dark:hover { background: #2a2a28; }
+
+    .pill-white {
+      background: var(--white);
+      color: var(--ink);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
+    }
+
+    .pill-white:hover { background: #F8F8F6; box-shadow: 0 0 0 1px rgba(0,0,0,0.10); }
+
+    .pill-lime {
+      background: var(--lime);
+      color: var(--black);
+    }
+
+    .pill-lime:hover { background: var(--lime-hover); box-shadow: 0 4px 16px var(--lime-glow); }
+
+    .card-dark .pill-dark {
+      background: rgba(255,255,255,0.10);
+      color: var(--white);
+    }
+
+    .card-dark .pill-white {
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.7);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       4. PROGRESS RING
+       ═══════════════════════════════════════════════════ */
+    .ring-wrap {
+      position: relative;
+      width: 150px;
+      height: 150px;
+    }
+
+    .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+
+    .ring-track {
+      fill: none;
+      stroke: rgba(255,255,255,0.06);
+      stroke-width: 5;
+    }
+
+    .ring-value-path {
+      fill: none;
+      stroke: var(--lime);
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-dasharray: 408;
+      stroke-dashoffset: 408;
+      transition: stroke-dashoffset 1200ms var(--ease-out);
+    }
+
+    .ring-value-path.go {
+      stroke-dashoffset: calc(408 - (408 * var(--pct, 0) / 100));
+    }
+
+    .ring-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ring-num {
+      font-size: 36px;
+      font-weight: 300;
+      line-height: 1;
+      color: var(--white);
+    }
+
+    .ring-num span { font-size: 20px; font-weight: 400; }
+
+    .ring-text {
+      font-size: 11px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.40);
+      margin-top: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       5. BUTTONS — exact Orion spec
+
+       All weight 400 (regular). No bold anywhere.
+       Pill shape. Smooth transitions.
+       Three core variants: dark / outline / lime
+       Plus: ghost, surface, glass (on dark), circle icons
+       ═══════════════════════════════════════════════════ */
+    .btn-grid { display: flex; flex-direction: column; gap: 24px; }
+
+    .btn-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-row-label {
+      width: 100%;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: -8px;
+    }
+
+    .btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font);
+      font-weight: 400;          /* ← regular, niet bold */
+      font-size: 14px;
+      line-height: 1;
+      letter-spacing: 0.01em;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      white-space: nowrap;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      overflow: hidden;
+      isolation: isolate;
+      padding: 13px 28px;
+      border-radius: var(--r-pill);
+      transition:
+        transform var(--t-base) var(--ease-out),
+        box-shadow var(--t-base) var(--ease-out),
+        background-color var(--t-fast) var(--ease-std),
+        color var(--t-fast) var(--ease-std);
+    }
+
+    /* Ripple */
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: opacity var(--t-base) var(--ease-out), transform 500ms var(--ease-out);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .btn:active::before {
+      opacity: 1;
+      transform: scale(2.8);
+      transition: opacity 60ms, transform 600ms var(--ease-out);
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn:active {
+      transform: translateY(0.5px) scale(0.98);
+      transition-duration: 80ms;
+    }
+
+    .btn:focus-visible { box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+    .btn:disabled { opacity: 0.30; pointer-events: none; }
+
+    /* Sizes */
+    .btn-sm  { font-size: 12px; padding: 10px 20px; }
+    .btn-lg  { font-size: 15px; padding: 16px 36px; }
+    .btn-xl  { font-size: 16px; padding: 18px 44px; }
+
+    /* ── Dark ── */
+    .btn-dark {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .btn-dark::before {
+      background: radial-gradient(circle at var(--rx,50%) var(--ry,50%), rgba(255,255,255,0.15) 0%, transparent 55%);
+    }
+
+    .btn-dark:hover {
+      background: #1a1a1a;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+
+    .btn-dark:active { background: var(--black); }
+
+    /* Shine sweep */
+    .btn-dark::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 50%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+      transform: skewX(-20deg);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .btn-dark:hover::after { animation: shine 700ms var(--ease-out) forwards; }
+
+    @keyframes shine { to { left: 130%; } }
+
+    /* ── Outline ── */
+    .btn-outline {
+      background: var(--white);
+      color: var(--ink);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+    }
+
+    .btn-outline::before {
+      background: radial-gradient(circle at var(--rx,50%) var(--ry,50%), rgba(0,0,0,0.04) 0%, transparent 55%);
+    }
+
+    .btn-outline:hover {
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.18);
+      background: #FAFAF8;
+    }
+
+    .btn-outline:active { background: #F4F4F2; }
+
+    /* ── Lime ── */
+    .btn-lime {
+      background: var(--lime);
+      color: var(--black);
+    }
+
+    .btn-lime::before {
+      background: radial-gradient(circle at var(--rx,50%) var(--ry,50%), rgba(255,255,255,0.25) 0%, transparent 55%);
+    }
+
+    .btn-lime:hover {
+      background: var(--lime-hover);
+      box-shadow: 0 4px 20px var(--lime-glow);
+    }
+
+    .btn-lime:active { background: #A5D800; }
+
+    /* ── Ghost ── */
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink-soft);
+    }
+
+    .btn-ghost::before {
+      background: radial-gradient(circle at var(--rx,50%) var(--ry,50%), rgba(0,0,0,0.04) 0%, transparent 55%);
+    }
+
+    .btn-ghost:hover { color: var(--ink); background: rgba(0,0,0,0.03); }
+
+    /* ── Surface ── */
+    .btn-surface {
+      background: rgba(0,0,0,0.05);
+      color: var(--ink-soft);
+    }
+
+    .btn-surface::before {
+      background: radial-gradient(circle at var(--rx,50%) var(--ry,50%), rgba(0,0,0,0.04) 0%, transparent 55%);
+    }
+
+    .btn-surface:hover { background: rgba(0,0,0,0.08); color: var(--ink); }
+
+    /* ── Glass (on dark bg) ── */
+    .btn-glass {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--white);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    .btn-glass::before {
+      background: radial-gradient(circle at var(--rx,50%) var(--ry,50%), rgba(255,255,255,0.08) 0%, transparent 55%);
+    }
+
+    .btn-glass:hover {
+      background: rgba(255,255,255,0.14);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
+    }
+
+    /* ── Circle icon buttons ── */
+    .btn-circle {
+      width: 36px; height: 36px;
+      padding: 0;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.05);
+      color: var(--ink-soft);
+    }
+
+    .btn-circle:hover { background: rgba(0,0,0,0.09); color: var(--ink); }
+    .btn-circle:active { transform: scale(0.90); }
+    .btn-circle.sm { width: 30px; height: 30px; }
+    .btn-circle.lg { width: 44px; height: 44px; }
+
+    .btn-circle svg {
+      width: 15px; height: 15px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform var(--t-base) var(--ease-out);
+    }
+
+    .btn-circle:hover svg.arrow-ne { transform: translate(1.5px, -1.5px); }
+
+    /* ═══════════════════════════════════════════════════
+       6. STAT CARDS (MŌVE context, new palette)
+       ═══════════════════════════════════════════════════ */
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .stat {
+      background: var(--surface);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--r-lg);
+      padding: 16px;
+    }
+
+    .stat-label { font-size: 12px; font-weight: 400; color: var(--ink-muted); margin-bottom: 4px; }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-value sup {
+      font-size: 12px;
+      font-weight: 500;
+      vertical-align: super;
+      margin-left: 2px;
+    }
+
+    .stat-value sup.up { color: var(--lime); }
+    .stat-value sup.dn { color: var(--ink-muted); }
+
+    .stat-sub { font-size: 10px; font-weight: 400; color: var(--ink-faint); margin-top: 6px; }
+
+    /* ═══════════════════════════════════════════════════
+       7. SLIDER / PROGRESS BAR (Orion Offers/Responses)
+       ═══════════════════════════════════════════════════ */
+    .o-slider-wrap {
+      margin-top: 14px;
+    }
+
+    .o-slider-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .o-slider-label {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-muted);
+    }
+
+    .o-slider-track {
+      position: relative;
+      height: 6px;
+      background: rgba(0,0,0,0.06);
+      border-radius: 3px;
+      overflow: visible;
+      display: flex;
+    }
+
+    .o-slider-fill {
+      height: 100%;
+      background: var(--ink);
+      border-radius: 3px 0 0 3px;
+      position: relative;
+    }
+
+    .card-dark .o-slider-fill { background: var(--white); }
+    .card-dark .o-slider-track { background: rgba(255,255,255,0.08); }
+
+    .o-slider-thumb {
+      position: absolute;
+      right: -5px;
+      top: -4px;
+      width: 14px;
+      height: 14px;
+      background: var(--ink);
+      border: 2.5px solid var(--white);
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+
+    .card-dark .o-slider-thumb { background: var(--white); border-color: rgba(0,0,0,0.3); }
+
+    /* Ticks on right side */
+    .o-slider-ticks {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding-left: 2px;
+    }
+
+    .o-slider-ticks span {
+      width: 1px;
+      height: 6px;
+      background: var(--ink);
+      opacity: 0.12;
+      border-radius: 0.5px;
+    }
+
+    .card-dark .o-slider-ticks span { background: var(--white); opacity: 0.15; }
+
+    /* ═══════════════════════════════════════════════════
+       PLAYGROUND
+       ═══════════════════════════════════════════════════ */
+    .playground {
+      border-radius: var(--r-2xl);
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .playground-light {
+      background: var(--surface-solid);
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .playground-dark {
+      background: #0A0A0A;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .playground-hint {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      text-align: center;
+    }
+
+    .playground-dark .playground-hint { color: rgba(255,255,255,0.25); }
+
+    /* ── Utility ── */
+    .mt-4  { margin-top: 4px; }
+    .mt-8  { margin-top: 8px; }
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    .mb-8  { margin-bottom: 8px; }
+    .mb-12 { margin-bottom: 12px; }
+    .mb-16 { margin-bottom: 16px; }
+    .flex  { display: flex; }
+    .gap-8 { gap: 8px; }
+    .gap-12 { gap: 12px; }
+    .gap-16 { gap: 16px; }
+    .center { align-items: center; justify-content: center; }
+    .divider { height: 1px; background: rgba(0,0,0,0.06); margin: 4px 0; }
+
+    /* Spinner */
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <div class="header">
+      <div class="logo">M<span class="logo-dot"></span>VE</div>
+      <div class="subtitle">Design System v4</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         1. FONT
+         ═══════════════════════════════════════ -->
+    <div class="section">
+      <div class="section-label">Font</div>
+
+      <div class="note mb-16">
+        <strong>Origineel: Lufga</strong> (SmartDesign). Niet op Google Fonts.<br>
+        <strong>Match: Outfit</strong> — zelfde geometrisch DNA. Eén variable font voor alles.
+      </div>
+
+      <div class="font-box">
+        <div class="font-box-top">
+          <span class="font-box-name">Outfit <span class="tag tag-lime" style="margin-left: 6px;">match</span></span>
+          <span class="font-box-meta">100 – 900</span>
+        </div>
+        <div class="font-hero" style="font-weight: 200;">8,574<sup>+37</sup></div>
+        <div class="font-hero mt-8">0.27<sup>+6</sup></div>
+        <div class="font-sentence mt-12">Jouw training vandaag: Push & Pull — klaar om te beginnen?</div>
+        <div class="font-alpha">AaBbCcGgOoQq 0123456789 €%</div>
+        <div class="weight-strip">
+          <span style="font-weight:200;">Ag<span class="w-num">200</span></span>
+          <span style="font-weight:300;">Ag<span class="w-num">300</span></span>
+          <span style="font-weight:400;">Ag<span class="w-num">400</span></span>
+          <span style="font-weight:500;">Ag<span class="w-num">500</span></span>
+          <span style="font-weight:600;">Ag<span class="w-num">600</span></span>
+          <span style="font-weight:700;">Ag<span class="w-num">700</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         2. TYPE SCALE
+         ═══════════════════════════════════════ -->
+    <div class="section">
+      <div class="section-label">Type Scale</div>
+
+      <div class="card card-solid" style="padding: 20px 24px;">
+        <div class="type-row">
+          <div class="type-meta"><div class="type-meta-name">Hero</div><div class="type-meta-spec">56 / 200</div></div>
+          <div class="type-sample" style="font-size:56px; font-weight:200; letter-spacing:-0.03em;">8,574</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-meta-name">Display</div><div class="type-meta-spec">40 / 300</div></div>
+          <div class="type-sample" style="font-size:40px; font-weight:300; letter-spacing:-0.02em;">Training</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-meta-name">Heading</div><div class="type-meta-spec">28 / 400</div></div>
+          <div class="type-sample" style="font-size:28px; font-weight:400;">Jouw week</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-meta-name">Title</div><div class="type-meta-spec">20 / 400</div></div>
+          <div class="type-sample" style="font-size:20px; font-weight:400;">Voeding overzicht</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-meta-name">Subtitle</div><div class="type-meta-spec">16 / 400</div></div>
+          <div class="type-sample" style="font-size:16px; font-weight:400;">Candidates Online</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-meta-name">Body</div><div class="type-meta-spec">15 / 400</div></div>
+          <div class="type-sample" style="font-size:15px; font-weight:400; color:var(--ink-soft); line-height:1.5;">Je hebt 3 van 5 trainingen voltooid. Ga zo door, je bent goed bezig!</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-meta-name">Small</div><div class="type-meta-spec">13 / 400</div></div>
+          <div class="type-sample" style="font-size:13px; font-weight:400; color:var(--ink-muted);">Laatste activiteit: gisteren 18:42</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-meta-name">Caption</div><div class="type-meta-spec">11 / 500</div></div>
+          <div class="type-sample" style="font-size:11px; font-weight:500; color:var(--ink-muted);">2.140 kcal · 158g eiwit</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-meta-name">Overline</div><div class="type-meta-spec">10 / 500</div></div>
+          <div class="type-sample" style="font-size:10px; font-weight:500; letter-spacing:0.10em; text-transform:uppercase; color:var(--ink-muted);">Programma · 3/5</div>
+        </div>
+      </div>
+
+      <div class="note mt-12">
+        <strong>Regel:</strong> Headings = weight 400. Nummers = 200–300. Alleen overlines/captions = 500. Niets 600+.
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         3. ORION CARDS — 1:1 REPLICA
+         ═══════════════════════════════════════ -->
+    <div class="section" id="orion-cards">
+      <div class="section-label">Orion Cards — 1:1</div>
+
+      <!-- Orion Index -->
+      <div class="card mb-12">
+        <div class="o-header">
+          <div class="o-title">Orion Index</div>
+          <button class="o-arrow">
+            <svg class="arrow-ne" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+          </button>
+        </div>
+        <div class="o-num">0.27<sup>+6</sup></div>
+        <div class="o-slider-wrap">
+          <div class="o-slider-labels">
+            <span class="o-slider-label">Offers</span>
+            <span class="o-slider-label">Responses</span>
+          </div>
+          <div class="o-slider-track">
+            <div class="o-slider-fill" style="width: 38%;">
+              <div class="o-slider-thumb"></div>
+            </div>
+            <div class="o-slider-ticks" id="slider-ticks-1"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vacancies -->
+      <div class="card mb-12">
+        <div class="o-header">
+          <div class="o-title">Vacancies</div>
+          <button class="o-arrow">
+            <svg class="arrow-ne" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+          </button>
+        </div>
+        <div class="o-num">8,574<sup>+37</sup></div>
+        <div style="display:flex; width:100%;">
+          <div class="o-bars" id="bars-1" style="flex:3;"></div>
+          <div class="o-ticks" id="ticks-1" style="flex:1;"></div>
+        </div>
+      </div>
+
+      <!-- Candidates Online -->
+      <div class="card">
+        <div class="o-header">
+          <div class="o-title">Candidates Online</div>
+          <button class="o-arrow">
+            <svg class="arrow-ne" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+          </button>
+        </div>
+        <div class="o-pct-row">
+          <div class="o-pct">
+            <div class="o-pct-value">32<span class="o-pct-symbol">%</span><sup class="o-pct-abs">2 574</sup></div>
+          </div>
+          <div class="o-pct">
+            <div class="o-pct-value">54<span class="o-pct-symbol">%</span><sup class="o-pct-abs">4 131</sup></div>
+          </div>
+          <div class="o-pct">
+            <div class="o-pct-value">14<span class="o-pct-symbol">%</span><sup class="o-pct-abs">998</sup></div>
+          </div>
+        </div>
+        <div class="o-pills">
+          <button class="pill pill-dark">Junior</button>
+          <button class="pill pill-white">Middle</button>
+          <button class="pill pill-lime">Senior</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         4. PROGRESS RING
+         ═══════════════════════════════════════ -->
+    <div class="section">
+      <div class="section-label">Progress Ring</div>
+
+      <div class="playground playground-dark" style="padding: 44px 24px;">
+        <div class="ring-wrap" id="ring-86">
+          <svg class="ring-svg" viewBox="0 0 140 140">
+            <circle class="ring-track" cx="70" cy="70" r="65" />
+            <circle class="ring-value-path" cx="70" cy="70" r="65" style="--pct:86;" />
+          </svg>
+          <div class="ring-center">
+            <div class="ring-num">86<span>%</span></div>
+            <div class="ring-text">Strong Match</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         5. STAT CARDS — MŌVE
+         ═══════════════════════════════════════ -->
+    <div class="section">
+      <div class="section-label">Stat Cards</div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">Trainingen</div>
+          <div class="stat-value">3<sup class="up">+1</sup></div>
+          <div class="stat-sub">van 5 deze week</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Streak</div>
+          <div class="stat-value">14<sup class="up">d</sup></div>
+          <div class="stat-sub">dagen op rij</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Voeding</div>
+          <div class="stat-value">87<sup class="up">%</sup></div>
+          <div class="stat-sub">target bereikt</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Gewicht</div>
+          <div class="stat-value">78.2<sup class="dn">-0.4</sup></div>
+          <div class="stat-sub">kg deze week</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         6. BUTTONS
+         ═══════════════════════════════════════ -->
+    <div class="section" id="buttons-section">
+      <div class="section-label">Buttons</div>
+
+      <div class="card card-solid">
+        <div class="btn-grid">
+
+          <div class="btn-row">
+            <div class="btn-row-label">Core trio (Orion exact)</div>
+            <button class="btn btn-dark">Junior</button>
+            <button class="btn btn-outline">Middle</button>
+            <button class="btn btn-lime">Senior</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="btn-row">
+            <div class="btn-row-label">Formaten</div>
+            <button class="btn btn-dark btn-sm">Klein</button>
+            <button class="btn btn-dark">Medium</button>
+            <button class="btn btn-dark btn-lg">Groot</button>
+            <button class="btn btn-dark btn-xl">Extra groot</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="btn-row">
+            <div class="btn-row-label">Lime varianten</div>
+            <button class="btn btn-lime btn-sm">PR!</button>
+            <button class="btn btn-lime">Bekijk resultaat</button>
+            <button class="btn btn-lime btn-lg">Start training</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="btn-row">
+            <div class="btn-row-label">Subtle</div>
+            <button class="btn btn-ghost">Meer laden</button>
+            <button class="btn btn-surface">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Bericht
+            </button>
+            <button class="btn btn-surface btn-sm">Filter</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="btn-row">
+            <div class="btn-row-label">Icon circles</div>
+            <button class="btn btn-circle sm">
+              <svg class="arrow-ne" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+            </button>
+            <button class="btn btn-circle">
+              <svg class="arrow-ne" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+            </button>
+            <button class="btn btn-circle lg">
+              <svg class="arrow-ne" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+            </button>
+            <button class="btn btn-circle lg" style="background: var(--ink); color: var(--white);">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="btn-row">
+            <div class="btn-row-label">States</div>
+            <button class="btn btn-dark" disabled>Disabled</button>
+            <button class="btn btn-dark"><span class="spinner"></span> Laden…</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dark background -->
+      <div class="playground playground-dark mt-16">
+        <div class="playground-hint">Op donkere achtergrond</div>
+        <div class="flex gap-12 center" style="flex-wrap:wrap;">
+          <button class="btn btn-glass">Terug</button>
+          <button class="btn btn-lime">Verder</button>
+          <button class="btn btn-circle lg" style="background:rgba(255,255,255,0.06); color:white;">
+            <svg class="arrow-ne" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         7. PLAYGROUND
+         ═══════════════════════════════════════ -->
+    <div class="section">
+      <div class="section-label">Playground</div>
+
+      <div class="playground playground-light">
+        <div class="playground-hint">Hover, klik en voel de interacties</div>
+
+        <button class="btn btn-dark btn-xl">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Start mijn training
+        </button>
+
+        <button class="btn btn-outline btn-lg">Bekijk programma</button>
+
+        <button class="btn btn-lime">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Bekijk resultaat
+        </button>
+
+        <div class="flex gap-12 center mt-12">
+          <button class="btn btn-circle lg">
+            <svg class="arrow-ne" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+          </button>
+          <button class="btn btn-circle lg" style="background: var(--lime); color: var(--black);">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <button class="btn btn-circle lg">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+          </button>
+        </div>
+
+        <div class="playground-hint mt-12">Ripple op cursorpositie · Shine sweep op dark hover · Arrow animate op circles</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         8. PALETTE
+         ═══════════════════════════════════════ -->
+    <div class="section">
+      <div class="section-label">Palette</div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div style="background: var(--black); color: var(--white); border-radius: var(--r-lg); padding: 20px 16px;">
+          <div style="font-size: 10px; font-weight: 500; opacity: 0.5; letter-spacing: 0.08em; text-transform: uppercase;">Black</div>
+          <div style="font-size: 20px; font-weight: 300; margin-top: 4px;">#000000</div>
+        </div>
+        <div style="background: var(--white); color: var(--ink); border-radius: var(--r-lg); padding: 20px 16px; border: 1px solid rgba(0,0,0,0.06);">
+          <div style="font-size: 10px; font-weight: 500; opacity: 0.4; letter-spacing: 0.08em; text-transform: uppercase;">White</div>
+          <div style="font-size: 20px; font-weight: 300; margin-top: 4px;">#FFFFFF</div>
+        </div>
+        <div style="background: var(--sage); color: var(--white); border-radius: var(--r-lg); padding: 20px 16px;">
+          <div style="font-size: 10px; font-weight: 500; opacity: 0.6; letter-spacing: 0.08em; text-transform: uppercase;">Sage</div>
+          <div style="font-size: 20px; font-weight: 300; margin-top: 4px;">#899089</div>
+        </div>
+        <div style="background: var(--lime); color: var(--black); border-radius: var(--r-lg); padding: 20px 16px;">
+          <div style="font-size: 10px; font-weight: 500; opacity: 0.5; letter-spacing: 0.08em; text-transform: uppercase;">Lime</div>
+          <div style="font-size: 20px; font-weight: 300; margin-top: 4px;">#C0FC01</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ── Ripple position ──
+    document.querySelectorAll('.btn').forEach(b => {
+      b.addEventListener('pointerdown', e => {
+        const r = b.getBoundingClientRect();
+        b.style.setProperty('--rx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+        b.style.setProperty('--ry', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+      });
+    });
+
+    // ── Bar chart (Vacancies) ──
+    (function() {
+      const el = document.getElementById('bars-1');
+      if (!el) return;
+      // Pattern from ref: ~15 solid bars forming a waveform, lime bar near end of
+      // solid section, then shorter/thinner tick marks trailing off
+      const bars = [
+        {h:10,l:0},{h:22,l:0},{h:36,l:0},{h:28,l:0},{h:44,l:0},{h:32,l:0},
+        {h:52,l:0},{h:40,l:0},{h:58,l:0},{h:46,l:0},{h:64,l:0},{h:54,l:0},
+        {h:14,l:0},{h:26,l:0},{h:18,l:0},{h:76,l:1},{h:32,l:0},{h:22,l:0},
+      ];
+      bars.forEach(b => {
+        const d = document.createElement('div');
+        d.className = b.l ? 'o-bar o-bar-active' : 'o-bar o-bar-muted';
+        d.style.height = b.h + 'px';
+        el.appendChild(d);
+      });
+
+      // Trailing tick marks — thinner, shorter, more uniform
+      const tEl = document.getElementById('ticks-1');
+      if (!tEl) return;
+      for (let i = 0; i < 18; i++) {
+        const t = document.createElement('div');
+        t.className = 'o-tick';
+        t.style.height = (4 + Math.floor(Math.random() * 14)) + 'px';
+        tEl.appendChild(t);
+      }
+    })();
+
+    // ── Slider ticks (Orion Index) ──
+    (function() {
+      const el = document.getElementById('slider-ticks-1');
+      if (!el) return;
+      // Ref shows dense, uniform-height ticks filling the remaining track space
+      for (let i = 0; i < 45; i++) {
+        const t = document.createElement('span');
+        el.appendChild(t);
+      }
+    })();
+
+    // ── Progress ring animation on scroll ──
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.querySelectorAll('.ring-value-path').forEach(c => c.classList.add('go'));
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.ring-wrap').forEach(el => obs.observe(el));
+  </script>
+</body>
+</html>

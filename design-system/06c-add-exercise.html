@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MŌVE — Workout · Oefening toevoegen</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       Workout logger — OEFENING TOEVOEGEN bottom sheet (75%)
+       ────────────────────────────────────────────────────────────
+       Opent vanaf onder. Onderliggende workout-view blijft zichtbaar
+       maar geblurd + gedimd. Zoekbalk, body-part chips, lijst met
+       oefeningen, sticky footer met "+ Eigen oefening maken".
+       ═══════════════════════════════════════════════════════════ */
+
+    /* Onderliggende workout-context — flauw zichtbaar onder sheet. */
+    .ghost-bg {
+      position: absolute; inset: 0;
+      background: var(--bg);
+      z-index: 1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .ghost-bg::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(180deg,
+          rgba(30,31,25,0.18) 0%,
+          rgba(30,31,25,0.42) 65%,
+          rgba(30,31,25,0.58) 100%);
+    }
+    /* Fake workout content achter scherm */
+    .ghost-bg .fake {
+      position: absolute;
+      top: 100px; left: 5%; right: 5%;
+      filter: blur(6px);
+      opacity: 0.55;
+    }
+    .ghost-bg .fake .ex-stub {
+      background: var(--card-dark);
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 10px;
+      height: 96px;
+    }
+    .ghost-bg .fake .ex-stub::before {
+      content: '';
+      display: block;
+      width: 60%; height: 10px;
+      background: rgba(253,253,254,0.14);
+      border-radius: 3px;
+      margin-bottom: 10px;
+    }
+    .ghost-bg .fake .ex-stub::after {
+      content: '';
+      display: block;
+      width: 100%; height: 50px;
+      background: rgba(253,253,254,0.06);
+      border-radius: 10px;
+    }
+
+    /* Top strip — "Annuleer" chevron, alleen waar hij niet gedekt wordt */
+    .ghost-top {
+      position: absolute; top: 0; left: 0; right: 0;
+      padding: 52px 20px 14px;
+      z-index: 2;
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(180deg, rgba(30,31,25,0.45) 0%, rgba(30,31,25,0) 100%);
+    }
+    .ghost-top .label {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      letter-spacing: -0.003em;
+    }
+
+    /* ─── Sheet container ─── */
+    .sheet {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 75%;
+      background: var(--card-dark);
+      border-radius: 28px 28px 0 0;
+      z-index: 20;
+      box-shadow: 0 -24px 60px rgba(0,0,0,0.45);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      opacity: 0; transform: translateY(20px);
+      animation: up var(--t) var(--ease) 120ms forwards;
+    }
+    .sheet::before {
+      content: '';
+      display: block;
+      width: 40px; height: 4px;
+      border-radius: 2px;
+      background: rgba(253,253,254,0.22);
+      margin: 10px auto 2px;
+      flex-shrink: 0;
+    }
+
+    .sheet-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 22px 10px;
+      flex-shrink: 0;
+    }
+    .sheet-title {
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: -0.018em;
+      color: var(--ink);
+      line-height: 1;
+    }
+    .sheet-close {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(253,253,254,0.08);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sheet-close svg { width: 14px; height: 14px; stroke: var(--ink); stroke-width: 2; fill: none; }
+
+    /* ─── Search ─── */
+    .search-wrap {
+      padding: 10px 22px 12px;
+      flex-shrink: 0;
+    }
+    .search {
+      display: flex; align-items: center; gap: 10px;
+      padding: 13px 16px;
+      background: rgba(253,253,254,0.08);
+      border-radius: 14px;
+    }
+    .search svg { width: 15px; height: 15px; stroke: var(--ink-faint); stroke-width: 1.8; fill: none; flex-shrink: 0; }
+    .search input {
+      flex: 1;
+      background: transparent;
+      border: none; outline: none;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.003em;
+    }
+    .search input::placeholder { color: var(--ink-faint); }
+
+    /* ─── Body-part filter chips — horizontal scroll ─── */
+    .chips {
+      display: flex;
+      gap: 6px;
+      padding: 2px 22px 14px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex-shrink: 0;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(253,253,254,0.08);
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      letter-spacing: -0.003em;
+      border: none; cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .chip.on {
+      background: var(--ink);
+      color: #0E1500;
+      font-weight: 500;
+    }
+
+    /* ─── Exercise list ─── */
+    .list {
+      flex: 1; min-height: 0;
+      overflow-y: auto;
+      padding: 4px 22px 100px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .list::-webkit-scrollbar { display: none; }
+
+    .list-group-lbl {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      padding: 14px 2px 8px;
+      display: flex; justify-content: space-between;
+    }
+    .list-group-lbl span:last-child { font-weight: 400; color: var(--ink-ghost); letter-spacing: 0; text-transform: none; }
+
+    .ex-li {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 4px;
+      border-bottom: 1px solid rgba(253,253,254,0.06);
+      cursor: pointer;
+    }
+    .ex-li:last-child { border-bottom: none; }
+
+    .ex-thumb {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: rgba(253,253,254,0.08);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .ex-thumb svg { width: 18px; height: 18px; stroke: var(--ink-soft); stroke-width: 1.6; fill: none; }
+
+    .ex-li-body { flex: 1; min-width: 0; }
+    .ex-li-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+      line-height: 1.2;
+    }
+    .ex-li-meta {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.01em;
+      margin-top: 2px;
+    }
+    .ex-li-add {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(253,253,254,0.08);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .ex-li-add svg { width: 12px; height: 12px; stroke: var(--ink); stroke-width: 2; fill: none; }
+
+    /* Selected preview — bovenaan kan een check appear — subtiel */
+
+    /* ─── Sticky footer — Eigen oefening ─── */
+    .sheet-foot {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      padding: 14px 22px 22px;
+      background: linear-gradient(180deg, rgba(71,75,72,0) 0%, rgba(71,75,72,0.90) 38%, var(--card-dark) 100%);
+      z-index: 2;
+    }
+    .new-ex {
+      width: 100%;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(253,253,254,0.10);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(253,253,254,0.12);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: -0.003em;
+      cursor: pointer;
+    }
+    .new-ex svg { width: 13px; height: 13px; stroke: var(--ink); stroke-width: 2; fill: none; }
+
+    .bnav { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+
+    <!-- Background: blurred fake workout -->
+    <div class="ghost-bg">
+      <div class="fake">
+        <div class="ex-stub"></div>
+        <div class="ex-stub"></div>
+        <div class="ex-stub"></div>
+      </div>
+    </div>
+
+    <!-- Top hint strip above sheet -->
+    <div class="ghost-top">
+      <div class="label">Push &amp; Pull · 14:32</div>
+    </div>
+
+    <!-- ─── Bottom sheet ─── -->
+    <div class="sheet">
+
+      <div class="sheet-head">
+        <div class="sheet-title">Oefening toevoegen</div>
+        <button class="sheet-close" aria-label="Sluit">
+          <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="search-wrap">
+        <div class="search">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+          <input type="text" placeholder="Zoek oefening of spiergroep…" />
+        </div>
+      </div>
+
+      <div class="chips">
+        <button class="chip on">Alles</button>
+        <button class="chip">Benen</button>
+        <button class="chip">Borst</button>
+        <button class="chip">Rug</button>
+        <button class="chip">Schouders</button>
+        <button class="chip">Armen</button>
+        <button class="chip">Core</button>
+        <button class="chip">Cardio</button>
+      </div>
+
+      <div class="list">
+
+        <div class="list-group-lbl"><span>Recent gebruikt</span><span>laatste 2 weken</span></div>
+
+        <div class="ex-li">
+          <div class="ex-thumb">
+            <svg viewBox="0 0 24 24"><circle cx="7" cy="12" r="3"/><circle cx="17" cy="12" r="3"/><line x1="4" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="20" y2="12"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+          </div>
+          <div class="ex-li-body">
+            <div class="ex-li-name">Bulgarian Split Squat</div>
+            <div class="ex-li-meta">Quads · Dumbbell</div>
+          </div>
+          <div class="ex-li-add">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+
+        <div class="ex-li">
+          <div class="ex-thumb">
+            <svg viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="6" rx="1"/><line x1="7" y1="6" x2="7" y2="18"/><line x1="17" y1="6" x2="17" y2="18"/></svg>
+          </div>
+          <div class="ex-li-body">
+            <div class="ex-li-name">Romanian Deadlift</div>
+            <div class="ex-li-meta">Hamstrings · Barbell</div>
+          </div>
+          <div class="ex-li-add">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+
+        <div class="ex-li">
+          <div class="ex-thumb">
+            <svg viewBox="0 0 24 24"><path d="M12 3c-2 0-3 1-3 3v12c0 2 1 3 3 3s3-1 3-3V6c0-2-1-3-3-3z"/><line x1="9" y1="9" x2="4" y2="9"/><line x1="15" y1="9" x2="20" y2="9"/></svg>
+          </div>
+          <div class="ex-li-body">
+            <div class="ex-li-name">Leg Press (Horizontal)</div>
+            <div class="ex-li-meta">Quads · Machine</div>
+          </div>
+          <div class="ex-li-add">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+
+        <div class="list-group-lbl"><span>Alle oefeningen</span><span>A–Z</span></div>
+
+        <div class="ex-li">
+          <div class="ex-thumb">
+            <svg viewBox="0 0 24 24"><path d="M4 12h16"/><path d="M8 7l-4 5 4 5"/><path d="M16 7l4 5-4 5"/></svg>
+          </div>
+          <div class="ex-li-body">
+            <div class="ex-li-name">Adductor Machine</div>
+            <div class="ex-li-meta">Adductoren · Machine</div>
+          </div>
+          <div class="ex-li-add">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+
+        <div class="ex-li">
+          <div class="ex-thumb">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v4"/><path d="M12 17v4"/><path d="M3 12h4"/><path d="M17 12h4"/></svg>
+          </div>
+          <div class="ex-li-body">
+            <div class="ex-li-name">Back Squat (Barbell)</div>
+            <div class="ex-li-meta">Quads · Barbell</div>
+          </div>
+          <div class="ex-li-add">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+
+        <div class="ex-li">
+          <div class="ex-thumb">
+            <svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M5 7h14"/><path d="M5 17h14"/></svg>
+          </div>
+          <div class="ex-li-body">
+            <div class="ex-li-name">Bench Press (Flat)</div>
+            <div class="ex-li-meta">Borst · Barbell</div>
+          </div>
+          <div class="ex-li-add">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+
+        <div class="ex-li">
+          <div class="ex-thumb">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="3"/><path d="M9 9v12"/><path d="M15 9v12"/></svg>
+          </div>
+          <div class="ex-li-body">
+            <div class="ex-li-name">Bicep Curl (Dumbbell)</div>
+            <div class="ex-li-meta">Biceps · Dumbbell</div>
+          </div>
+          <div class="ex-li-add">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+
+        <div class="ex-li">
+          <div class="ex-thumb">
+            <svg viewBox="0 0 24 24"><path d="M6 6l12 12"/><path d="M6 18l12-12"/></svg>
+          </div>
+          <div class="ex-li-body">
+            <div class="ex-li-name">Cable Row (Seated)</div>
+            <div class="ex-li-meta">Rug · Cable</div>
+          </div>
+          <div class="ex-li-add">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="sheet-foot">
+        <button class="new-ex">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Eigen oefening maken
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Reference -->
+  <div class="ref">
+    <h4>06c · Oefening toevoegen</h4>
+    <p>Bottom-sheet, 75% hoog. Onderliggende workout blijft schemerig zichtbaar + geblurd — klant voelt dat hij ín context blijft, niet weggesprongen.</p>
+
+    <div class="lbl">Sheet-structuur</div>
+    <div class="row"><span>Grabber</span><strong>40×4 pill bovenaan</strong></div>
+    <div class="row"><span>Titel</span><strong>22/300</strong></div>
+    <div class="row"><span>Zoekbalk</span><strong>tint-row 14px radius</strong></div>
+    <div class="row"><span>Chips</span><strong>horizontaal scroll, ink = on</strong></div>
+    <div class="row"><span>Secties</span><strong>Recent + Alle (A–Z)</strong></div>
+    <div class="row"><span>Footer</span><strong>sticky, fade naar solid</strong></div>
+
+    <div class="lbl">UX-keuzes</div>
+    <p>Één "Eigen oefening maken" in de footer — altijd bereikbaar, ook na scrollen. "Recent gebruikt" stoomt omhoog wat deze klant vaak doet → 2× sneller dan alfabetisch browsen.</p>
+
+    <div class="lbl">Accent-regel</div>
+    <p>Géén lime in deze sheet — lime is voor <em>gedaan</em>-events, hier ben je aan het <em>kiezen</em>. Actieve chip = ink (wit). Voorkomt visuele verwarring met workout-canvas achter.</p>
+  </div>
+
+</body>
+</html>

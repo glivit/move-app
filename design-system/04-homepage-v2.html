@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MŌVE — Home v6 · Shared-CSS pass</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       Home — page-specifieke componenten.
+       Alles wat shared is staat in shared.css. Als een klasse hier
+       ook op een ander scherm nodig is: verhuis hem naar shared.
+       ═══════════════════════════════════════════════════════════ */
+
+    /* Home heeft geen page-head — logo M + cards. Extra ademing op top: */
+    .top { margin-bottom: 36px; }
+
+    /* ═══════════════════ Card 1 · Vandaag ═══════════════════
+       Push & Pull = workout-label, geen hero. Hero zijn getallen. */
+    .vandaag .name {
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: -0.018em;
+      line-height: 1.1;
+      color: var(--ink);
+      margin: 14px 0 4px;
+    }
+    .vandaag .meta { margin-bottom: 22px; }
+
+    .slider { display: flex; align-items: center; height: 3px; }
+    .slider-fill {
+      height: 3px;
+      background: rgba(253,253,254,0.85);
+      border-radius: 1.5px 0 0 1.5px;
+      width: 60%;
+    }
+    .slider-knob {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--white);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+      margin: 0 -3px;
+      z-index: 2;
+    }
+    .slider-track {
+      flex: 1;
+      display: flex; align-items: center; gap: 2px;
+      padding-left: 4px;
+    }
+    .slider-tick { width: 1px; background: rgba(253,253,254,0.30); border-radius: 0.5px; }
+    .slider-row { margin-top: 10px; }
+
+    /* ═══════════════════ Card 2 · Deze week ═══════════════════ */
+    .week .num {
+      font-size: 52px;
+      font-weight: 200;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: var(--ink);
+      margin: 16px 0 20px;
+    }
+    .week .num sup {
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--ink-faint);
+      vertical-align: top;
+      position: relative;
+      top: 8px;
+      margin-left: 2px;
+      letter-spacing: 0;
+    }
+
+    .dots { display: flex; justify-content: space-between; gap: 4px; }
+    .dc { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+    .dl {
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0;
+      color: var(--ink-faint);
+    }
+    .dl.now { color: var(--ink); font-weight: 500; }
+    .dd {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .dd.done { background: rgba(253,253,254,0.14); }
+    .dd.done svg { stroke: var(--ink-soft); stroke-width: 2; fill: none; width: 11px; height: 11px; }
+    .dd.done.recent { background: var(--lime); }
+    .dd.done.recent svg { stroke: #0E1500; stroke-width: 2.5; width: 12px; height: 12px; }
+    .dd.today {
+      background: rgba(253,253,254,0.10);
+      box-shadow: inset 0 0 0 1.5px var(--ink);
+    }
+    .dd.today::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--ink); }
+    .dd.rest { background: rgba(253,253,254,0.08); font-size: 11px; color: var(--ink-faint); }
+    .dd.empty { background: rgba(253,253,254,0.08); }
+
+    /* ═══════════════════ Card 3 · Dieet (dark) ═══════════════════ */
+    .food-num {
+      font-size: 52px;
+      font-weight: 200;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: var(--ink);
+      font-feature-settings: "tnum";
+    }
+    .food-num span {
+      display: block;
+      font-size: 12px;
+      color: var(--ink-faint);
+      font-weight: 400;
+      margin-top: 6px;
+      letter-spacing: 0.01em;
+      font-feature-settings: "tnum";
+    }
+    .food-row { margin: 16px 0 22px; }
+
+    .macros {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      padding: 14px 0 0;
+      border-top: 1px solid rgba(253,253,254,0.10);
+    }
+    .macro { display: flex; flex-direction: column; gap: 4px; }
+    .m-lbl { font-size: 11px; color: var(--ink-faint); letter-spacing: 0; }
+    .m-val { font-size: 18px; color: var(--ink); font-weight: 300; font-feature-settings: "tnum"; letter-spacing: -0.01em; }
+    .m-val i { font-size: 11px; color: var(--ink-faint); font-style: normal; font-weight: 400; margin-left: 2px; }
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+    <div class="scroll">
+
+      <!-- Top -->
+      <div class="top">
+        <div class="logo">M</div>
+        <div class="top-r">
+          <div class="av">G</div>
+          <button class="ico-btn"><svg viewBox="0 0 24 24"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/></svg></button>
+        </div>
+      </div>
+
+      <!-- Card 1 · Vandaag -->
+      <div class="card c1 vandaag">
+        <div class="arr"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+        <div class="eyebrow"><span class="pulse"></span> Vandaag · Dag 3</div>
+        <div class="name">Push &amp; Pull</div>
+        <div class="meta">5 oefeningen · ±50 min</div>
+        <div class="slider">
+          <div class="slider-fill"></div>
+          <div class="slider-knob"></div>
+          <div class="slider-track" id="t1"></div>
+        </div>
+        <div class="cap-row slider-row cap">
+          <span>Voortgang</span><span>3 / 5 sets</span>
+        </div>
+      </div>
+
+      <!-- Card 2 · Deze week -->
+      <div class="card c2 week">
+        <div class="arr"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+        <div class="eyebrow">Deze Week</div>
+        <div class="num">3<sup>/5</sup></div>
+        <div class="dots">
+          <div class="dc"><div class="dl">Ma</div><div class="dd done"><svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg></div></div>
+          <div class="dc"><div class="dl">Di</div><div class="dd rest">—</div></div>
+          <div class="dc"><div class="dl now">Wo</div><div class="dd today"></div></div>
+          <div class="dc"><div class="dl">Do</div><div class="dd done"><svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg></div></div>
+          <div class="dc"><div class="dl">Vr</div><div class="dd done recent"><svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg></div></div>
+          <div class="dc"><div class="dl">Za</div><div class="dd empty"></div></div>
+          <div class="dc"><div class="dl">Zo</div><div class="dd empty"></div></div>
+        </div>
+      </div>
+
+      <!-- Card 3 · Dieet (dark — doorlopende tracking door de dag) -->
+      <div class="card c3 food dark">
+        <div class="arr"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+        <div class="eyebrow">Dieet</div>
+        <div class="food-row">
+          <div class="food-num">2.340<span>/ 2.700 kcal</span></div>
+        </div>
+        <div class="macros">
+          <div class="macro"><span class="m-lbl">Eiwit</span><span class="m-val">168<i>g</i></span></div>
+          <div class="macro"><span class="m-lbl">Koolh.</span><span class="m-val">220<i>g</i></span></div>
+          <div class="macro"><span class="m-lbl">Vet</span><span class="m-val">68<i>g</i></span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom tab -->
+    <div class="bnav">
+      <div class="tab on">
+        <svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10"/></svg>
+        <span>Home</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Plan</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span>Coach</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/></svg>
+        <span>Profiel</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reference notes -->
+  <div class="ref">
+    <h4>04 · Home · v6</h4>
+    <p>v6 = Glenn's exacte hex-spec + één-vraag-per-card. Meals-row verhuisd naar Dieet-detail. Geen greeting meer. CSS is nu gesplitst — tokens + base in <strong>shared.css</strong>, page-specifieke componenten hier inline.</p>
+
+    <div class="lbl">Home · drie vragen</div>
+    <div class="row"><span>Vandaag</span><strong>wat doe ik nu?</strong></div>
+    <div class="row"><span>Deze Week</span><strong>hoe loop ik?</strong></div>
+    <div class="row"><span>Dieet (dark)</span><strong>lig ik op schema?</strong></div>
+
+    <div class="lbl">Shared tokens</div>
+    <div class="row"><span>Canvas</span><strong>#8E9890</strong></div>
+    <div class="row"><span>Card licht</span><strong>#A6ADA7</strong></div>
+    <div class="row"><span>Card dark</span><strong>#474B48</strong></div>
+    <div class="row"><span>Arrow bg</span><strong>#989F99</strong></div>
+    <div class="row"><span>Ink</span><strong>#FDFDFE</strong></div>
+
+    <div class="lbl">Licht vs Dark card-semantiek</div>
+    <p>Licht = eenmalig execute (workout, week-check). Dark = doorlopende tracking (kcal accumuleert door de dag).</p>
+  </div>
+
+  <script>
+    // Slider ticks
+    (function(){
+      const el = document.getElementById('t1');
+      if (!el) return;
+      for (let i=0;i<34;i++){
+        const t = document.createElement('div');
+        t.className = 'slider-tick';
+        t.style.height = (3 + Math.random()*5) + 'px';
+        el.appendChild(t);
+      }
+    })();
+  </script>
+</body>
+</html>

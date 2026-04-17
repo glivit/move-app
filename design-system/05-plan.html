@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MŌVE — Plan v2</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       Plan v2 — Glenn-feedback pass
+       ────────────────────────────────────────────────────────────
+       Wijzigingen vs v1:
+       · Geen page-title "Plan" — alleen M-logo top + context-eyebrow
+         boven de week-card.
+       · Geen 14-day strip — de week-card IS de week.
+       · Vandaag-card wordt DARK (primaire focus van dit scherm).
+       · Push & Pull kleiner — 22/300, zelfde als home Vandaag.
+       · Geen icoontjes per rij — naam + date + status doen het werk.
+       · Komende dagen samengevoegd in één FROSTED-GLASS card met
+         interne rijen (divider-line), niet losse cards.
+       ═══════════════════════════════════════════════════════════ */
+
+    /* ─── Context eyebrow boven week-card ─── */
+    .context-head {
+      padding: 0 5%;
+      margin: 20px 0 8px;
+      display: flex; justify-content: space-between; align-items: baseline;
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) 380ms forwards;
+    }
+    .context-l {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      letter-spacing: -0.003em;
+    }
+    .context-r {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ─── Hero card · Vandaag (DARK variant) ───
+       Reuses .card.dark. Push & Pull klein (22/300) — zelfde als home,
+       consistent. Geen extra hero-styling nodig buiten de dark treatment. */
+    .vandaag-hero .name {
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: -0.018em;
+      line-height: 1.1;
+      color: var(--ink);
+      margin: 14px 0 4px;
+    }
+    .vandaag-hero .sub {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.01em;
+      margin-bottom: 22px;
+    }
+
+    /* Start-CTA onderin de hero card.
+       Divider op donker: subtiel witte streep. */
+    .start-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid rgba(253,253,254,0.10);
+    }
+    .start-lbl {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.003em;
+    }
+    .start-sub {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.01em;
+      margin-top: 2px;
+    }
+    .start-cta .ring {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--lime);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(192,252,1,0.25);
+    }
+    .start-cta .ring svg {
+      width: 16px; height: 16px;
+      fill: #0E1500;
+      stroke: #0E1500;
+      stroke-width: 2;
+    }
+
+    /* ─── Week-card · frosted glass ───
+       Eén card waarin alle komende dagen als interne rijen staan.
+       Frosted = backdrop-blur op semi-transparante ink, geeft lichte
+       opbouw vanaf canvas. Rust- en peek-dagen ghost-getreated. */
+    .week-card {
+      width: 90%;
+      margin: 0 auto;
+      padding: 6px 4px;
+      border-radius: var(--r-xl);
+      background: rgba(253,253,254,0.10);
+      backdrop-filter: blur(30px) saturate(150%);
+      -webkit-backdrop-filter: blur(30px) saturate(150%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        inset 0 0 0 1px rgba(255,255,255,0.06),
+        0 2px 6px rgba(0,0,0,0.10);
+      opacity: 0; transform: translateY(12px);
+      animation: up var(--t) var(--ease) 460ms forwards;
+      overflow: hidden;
+    }
+
+    .week-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 14px 16px;
+      border-top: 1px solid rgba(253,253,254,0.06);
+      cursor: pointer;
+      transition: background 140ms;
+    }
+    .week-row:first-child { border-top: none; }
+    .week-row:active { background: rgba(253,253,254,0.04); }
+
+    .wr-date {
+      display: flex; align-items: baseline; gap: 6px;
+      min-width: 54px;
+    }
+    .wr-date .d {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .wr-date .n {
+      font-size: 18px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      font-feature-settings: "tnum";
+      line-height: 1;
+    }
+
+    .wr-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .wr-name {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.003em;
+      line-height: 1.2;
+    }
+    .wr-meta {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.01em;
+      margin-top: 2px;
+    }
+
+    .wr-chip {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-muted);
+      letter-spacing: 0;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(253,253,254,0.08);
+      white-space: nowrap;
+    }
+
+    /* Rust-rij — expliciet maar rustig */
+    .week-row.rest .wr-date .n,
+    .week-row.rest .wr-date .d { color: var(--ink-ghost); }
+    .week-row.rest .wr-name { color: var(--ink-soft); font-weight: 300; }
+    .week-row.rest .wr-meta { color: var(--ink-ghost); }
+    .week-row.rest .wr-chip {
+      background: rgba(253,253,254,0.05);
+      color: var(--ink-faint);
+    }
+
+    /* Peek = volgende week indicator, nog faintere rij */
+    .week-row.peek .wr-date .n,
+    .week-row.peek .wr-name { color: var(--ink-faint); font-weight: 300; }
+    .week-row.peek .wr-date .d,
+    .week-row.peek .wr-meta { color: var(--ink-ghost); }
+    .week-row.peek .wr-chip { background: rgba(253,253,254,0.04); color: var(--ink-ghost); }
+
+    /* Mini-footer in de week-card: "Volgende week ›" als navigatie-hint */
+    .week-more {
+      display: flex; justify-content: center; align-items: center; gap: 6px;
+      padding: 12px 16px 14px;
+      border-top: 1px solid rgba(253,253,254,0.06);
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: color 140ms;
+    }
+    .week-more:hover { color: var(--ink-soft); }
+    .week-more svg { width: 10px; height: 10px; stroke: currentColor; stroke-width: 1.8; fill: none; }
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+    <div class="scroll">
+
+      <!-- Top -->
+      <div class="top">
+        <div class="logo">M</div>
+        <div class="top-r">
+          <div class="av">G</div>
+          <button class="ico-btn"><svg viewBox="0 0 24 24"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/></svg></button>
+        </div>
+      </div>
+
+      <!-- Hero · Vandaag (DARK) -->
+      <div class="card c1 dark vandaag-hero">
+        <div class="eyebrow"><span class="pulse"></span> Vandaag</div>
+        <div class="name">Push &amp; Pull</div>
+        <div class="sub">5 oefeningen · ±50 min · Dag 3 van 12</div>
+        <div class="start-row">
+          <div>
+            <div class="start-lbl">Starten</div>
+            <div class="start-sub">Gestart · 3 / 5 sets gedaan</div>
+          </div>
+          <div class="start-cta">
+            <div class="ring">
+              <svg viewBox="0 0 24 24"><polygon points="8 5 19 12 8 19 8 5"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Context eyebrow boven week-card -->
+      <div class="context-head">
+        <div class="context-l">Komende</div>
+        <div class="context-r">Apr 2026</div>
+      </div>
+
+      <!-- Week-card · frosted glass · alle dagen in één container -->
+      <div class="week-card">
+        <div class="week-row">
+          <div class="wr-date"><span class="d">Vr</span><span class="n">18</span></div>
+          <div class="wr-body">
+            <div class="wr-name">Legs &amp; Core</div>
+            <div class="wr-meta">6 oefeningen · ±55 min</div>
+          </div>
+          <div class="wr-chip">Morgen</div>
+        </div>
+
+        <div class="week-row rest">
+          <div class="wr-date"><span class="d">Za</span><span class="n">19</span></div>
+          <div class="wr-body">
+            <div class="wr-name">Rust · actief herstel</div>
+            <div class="wr-meta">Wandeling of mobility</div>
+          </div>
+          <div class="wr-chip">Rust</div>
+        </div>
+
+        <div class="week-row">
+          <div class="wr-date"><span class="d">Zo</span><span class="n">20</span></div>
+          <div class="wr-body">
+            <div class="wr-name">Upper Pull (Repeat)</div>
+            <div class="wr-meta">5 oefeningen · ±45 min</div>
+          </div>
+          <div class="wr-chip">Gepland</div>
+        </div>
+
+        <div class="week-row">
+          <div class="wr-date"><span class="d">Ma</span><span class="n">21</span></div>
+          <div class="wr-body">
+            <div class="wr-name">Push A · Chest focus</div>
+            <div class="wr-meta">Nieuwe cyclus · Dag 1 van 12</div>
+          </div>
+          <div class="wr-chip">Gepland</div>
+        </div>
+
+        <div class="week-row peek">
+          <div class="wr-date"><span class="d">Di</span><span class="n">22</span></div>
+          <div class="wr-body">
+            <div class="wr-name">Rust</div>
+            <div class="wr-meta">Volledige off-dag</div>
+          </div>
+          <div class="wr-chip">Rust</div>
+        </div>
+
+        <div class="week-more">
+          Volgende week
+          <svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom tab (Plan active) -->
+    <div class="bnav">
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10"/></svg>
+        <span>Home</span>
+      </div>
+      <div class="tab on">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Plan</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span>Coach</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/></svg>
+        <span>Profiel</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reference notes -->
+  <div class="ref">
+    <h4>05 · Plan · v2</h4>
+    <p>Glenn-feedback pass. Minder elementen, meer rust. Hero dark = primaire focus. Week-card frosted = alles-in-één-container voor overzicht.</p>
+
+    <div class="lbl">Wijzigingen vs v1</div>
+    <div class="row"><span>Page-title "Plan"</span><strong>verwijderd</strong></div>
+    <div class="row"><span>14-day strip</span><strong>verwijderd</strong></div>
+    <div class="row"><span>Vandaag card</span><strong>light → dark</strong></div>
+    <div class="row"><span>Push &amp; Pull</span><strong>30/250 → 22/300</strong></div>
+    <div class="row"><span>Row icoontjes</span><strong>verwijderd</strong></div>
+    <div class="row"><span>Per-dag cards</span><strong>samengevoegd → 1 frosted card</strong></div>
+
+    <div class="lbl">Nieuwe regel</div>
+    <p><strong>Dark card = primaire focus van dít scherm.</strong> Op home is Vandaag één van drie (blijft licht). Op plan IS Vandaag de ster (wordt dark). Deze regel moet consistent doorlopen naar Workout- en Dieet-detail.</p>
+
+    <div class="lbl">Frosted glass</div>
+    <p>Week-card gebruikt <code>rgba(253,253,254,0.10)</code> + <code>backdrop-filter: blur(30px) saturate(150%)</code>. Op medium-sage canvas geeft dit een lichte opbouw zonder een tweede vaste card-kleur toe te voegen.</p>
+
+    <div class="lbl">Week-more ›</div>
+    <p>Subtiele "Volgende week ›" onderin de week-card neemt de rol van de 14-day strip over zonder visueel lawaai.</p>
+  </div>
+
+</body>
+</html>

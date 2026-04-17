@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MŌVE — Workout logger v4</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       Workout logger v4 — terug op design-systeem palette
+       ────────────────────────────────────────────────────────────
+       Feedback 2026-04-17 #3: geen glass/frosted. Gebruik de vaste
+       palette: card #A6ADA7 op canvas #8E9890. Cleaner, strakker.
+       ═══════════════════════════════════════════════════════════ */
+
+    /* ─── Page-head variant ─── */
+    .page-head.workout-head {
+      align-items: flex-end;
+    }
+    .page-head.workout-head .page-title {
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+    .klaar-link {
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: -0.003em;
+      color: var(--lime);
+      background: transparent;
+      border: none; cursor: pointer;
+      padding: 4px 0;
+    }
+
+    /* ═══════════════════ Exercise card · SOLID LIGHT ═══════════════════
+       background: var(--card) = #A6ADA7. Zelfde als home Vandaag/Week.
+       Geen glass, geen blur. Inset-hoogtepunt + zachte schaduw voor diepte. */
+    .ex {
+      background: var(--card);
+      border-radius: var(--r-xl);
+      padding: 20px 20px 18px;
+      margin-bottom: 6px;
+      width: 90%;
+      margin-left: auto; margin-right: auto;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.14),
+        0 1px 2px rgba(0,0,0,0.10);
+      position: relative;
+      opacity: 0; transform: translateY(12px);
+      animation: up var(--t) var(--ease) forwards;
+      overflow: hidden;
+    }
+    .ex.c1 { animation-delay: 220ms; }
+    .ex.c2 { animation-delay: 300ms; }
+    .ex.c3 { animation-delay: 380ms; }
+
+    /* Head — één strakke lijn: drag, title, kebab */
+    .ex-head {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 14px;
+    }
+    .drag {
+      width: 12px; height: 18px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 3px;
+      flex-shrink: 0;
+      cursor: grab;
+      opacity: 0.35;
+    }
+    .drag span {
+      width: 2px; height: 2px;
+      border-radius: 50%;
+      background: var(--ink);
+    }
+    .ex-title {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+    .kebab {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      background: rgba(253,253,254,0.10);
+    }
+    .kebab span {
+      width: 2px; height: 2px;
+      border-radius: 50%;
+      background: var(--ink-soft);
+      box-shadow: 0 -4px 0 var(--ink-soft), 0 4px 0 var(--ink-soft);
+    }
+
+    /* ─── Sets table — rij = 1 grid met bg op rij zelf ─── */
+    .sets {
+      margin: 0 -20px;
+      display: flex; flex-direction: column;
+    }
+    .sets-head {
+      display: grid;
+      grid-template-columns: 44px 1fr 60px 60px 52px;
+      align-items: center;
+      padding: 0 20px 8px;
+      font-feature-settings: "tnum";
+    }
+    .sets-head .th {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .sets-head .th.num, .sets-head .th.check { text-align: center; }
+
+    .set-row {
+      display: grid;
+      grid-template-columns: 44px 1fr 60px 60px 52px;
+      align-items: center;
+      height: 44px;
+      padding: 0 20px;
+      transition: background 160ms var(--ease);
+      border-top: 1px solid rgba(253,253,254,0.08);
+    }
+    .set-row:first-of-type { border-top: none; }
+
+    .set-row .c-num {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+      font-feature-settings: "tnum";
+      text-align: center;
+    }
+    .set-row .c-prev {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.01em;
+      font-feature-settings: "tnum";
+    }
+    .set-row .c-kg, .set-row .c-reps {
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--ink);
+      text-align: center;
+      font-feature-settings: "tnum";
+      letter-spacing: -0.01em;
+    }
+    .set-row .c-check {
+      display: flex; justify-content: center; align-items: center;
+    }
+    .check-btn {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: rgba(253,253,254,0.14);
+      border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: all 180ms var(--ease);
+    }
+    .check-btn svg {
+      width: 13px; height: 13px;
+      stroke: var(--ink-soft);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    /* Active set — subtiele donkere wash op light card */
+    .set-row.active {
+      background: rgba(0,0,0,0.05);
+      border-top-color: transparent;
+    }
+    .set-row.active + .set-row { border-top-color: transparent; }
+
+    /* Checked — 1 solid groene bar */
+    .set-row.checked {
+      background: var(--check);
+      border-top-color: transparent;
+    }
+    .set-row.checked + .set-row { border-top-color: transparent; }
+    .set-row.checked .c-num,
+    .set-row.checked .c-kg,
+    .set-row.checked .c-reps {
+      color: var(--white);
+    }
+    .set-row.checked .c-prev {
+      color: rgba(255,255,255,0.70);
+    }
+    .set-row.checked .check-btn {
+      background: rgba(0,0,0,0.24);
+    }
+    .set-row.checked .check-btn svg {
+      stroke: var(--white);
+      stroke-width: 2.5;
+    }
+
+    /* ─── Footer-rij · +Set combined met rust-timer ─── */
+    .ex-foot {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(253,253,254,0.10);
+      cursor: pointer;
+      transition: background 140ms;
+    }
+    .ex-foot:hover { background: rgba(253,253,254,0.16); }
+    .ex-foot-l {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.003em;
+    }
+    .ex-foot-l svg { width: 12px; height: 12px; stroke: var(--ink); stroke-width: 2; fill: none; }
+    .ex-foot-r {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.01em;
+      font-feature-settings: "tnum";
+    }
+    .ex-foot-r svg { width: 10px; height: 10px; stroke: var(--ink-faint); stroke-width: 1.8; fill: none; }
+
+    /* ─── Sticky Oefening toevoegen ─── */
+    .add-ex-wrap {
+      position: absolute;
+      bottom: 22px;
+      left: 5%; right: 5%;
+      z-index: 40;
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) 620ms forwards;
+    }
+    .add-ex {
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--r-lg);
+      background: var(--card-dark);
+      border: none;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: -0.003em;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 6px 20px rgba(0,0,0,0.24);
+    }
+    .add-ex svg { width: 13px; height: 13px; stroke: var(--ink); stroke-width: 2; fill: none; }
+
+    /* Workout is modaal — bnav verborgen voor focus */
+    .bnav { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+    <div class="scroll">
+
+      <!-- Standard top — exact zoals home/plan -->
+      <div class="top">
+        <div class="logo">M</div>
+        <div class="top-r">
+          <div class="av">G</div>
+          <button class="ico-btn">
+            <svg viewBox="0 0 24 24"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Page-head — standaard structuur -->
+      <div class="page-head workout-head">
+        <div>
+          <div class="page-title">Push &amp; Pull</div>
+          <div class="page-sub">14:32</div>
+        </div>
+        <button class="klaar-link">Klaar</button>
+      </div>
+
+      <!-- Exercise 1 · Hip Abduction -->
+      <div class="ex c1">
+        <div class="ex-head">
+          <div class="drag"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="ex-title">Hip Abduction (Machine)</div>
+          <div class="kebab"><span></span></div>
+        </div>
+
+        <div class="sets">
+          <div class="sets-head">
+            <div class="th num">SET</div>
+            <div class="th">VORIGE</div>
+            <div class="th num">KG</div>
+            <div class="th num">REPS</div>
+            <div class="th check">✓</div>
+          </div>
+
+          <div class="set-row checked">
+            <div class="c-num">1</div>
+            <div class="c-prev">70 kg · 22</div>
+            <div class="c-kg">70</div>
+            <div class="c-reps">22</div>
+            <div class="c-check">
+              <button class="check-btn"><svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg></button>
+            </div>
+          </div>
+
+          <div class="set-row checked">
+            <div class="c-num">2</div>
+            <div class="c-prev">70 kg · 17</div>
+            <div class="c-kg">70</div>
+            <div class="c-reps">17</div>
+            <div class="c-check">
+              <button class="check-btn"><svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg></button>
+            </div>
+          </div>
+
+          <div class="set-row active">
+            <div class="c-num">3</div>
+            <div class="c-prev">70 kg · 13</div>
+            <div class="c-kg">70</div>
+            <div class="c-reps">13</div>
+            <div class="c-check">
+              <button class="check-btn"><svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg></button>
+            </div>
+          </div>
+
+          <div class="set-row">
+            <div class="c-num">4</div>
+            <div class="c-prev">70 kg · 13</div>
+            <div class="c-kg">70</div>
+            <div class="c-reps">13</div>
+            <div class="c-check">
+              <button class="check-btn"><svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ex-foot">
+          <div class="ex-foot-l">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Set toevoegen
+          </div>
+          <div class="ex-foot-r">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+            90s rust
+          </div>
+        </div>
+      </div>
+
+      <!-- Exercise 2 · Glute Ham Raise -->
+      <div class="ex c2">
+        <div class="ex-head">
+          <div class="drag"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="ex-title">Glute Ham Raise</div>
+          <div class="kebab"><span></span></div>
+        </div>
+
+        <div class="sets">
+          <div class="sets-head">
+            <div class="th num">SET</div>
+            <div class="th">VORIGE</div>
+            <div class="th num">KG</div>
+            <div class="th num">REPS</div>
+            <div class="th check">✓</div>
+          </div>
+
+          <div class="set-row">
+            <div class="c-num">1</div>
+            <div class="c-prev">— · 18</div>
+            <div class="c-kg">—</div>
+            <div class="c-reps">18</div>
+            <div class="c-check">
+              <button class="check-btn"><svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg></button>
+            </div>
+          </div>
+          <div class="set-row">
+            <div class="c-num">2</div>
+            <div class="c-prev">— · 14</div>
+            <div class="c-kg">—</div>
+            <div class="c-reps">14</div>
+            <div class="c-check">
+              <button class="check-btn"><svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg></button>
+            </div>
+          </div>
+          <div class="set-row">
+            <div class="c-num">3</div>
+            <div class="c-prev">— · 12</div>
+            <div class="c-kg">—</div>
+            <div class="c-reps">12</div>
+            <div class="c-check">
+              <button class="check-btn"><svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ex-foot">
+          <div class="ex-foot-l">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Set toevoegen
+          </div>
+          <div class="ex-foot-r">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+            75s rust
+          </div>
+        </div>
+      </div>
+
+      <!-- Exercise 3 · Calf Press -->
+      <div class="ex c3">
+        <div class="ex-head">
+          <div class="drag"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="ex-title">Calf Press (Machine)</div>
+          <div class="kebab"><span></span></div>
+        </div>
+
+        <div class="sets">
+          <div class="sets-head">
+            <div class="th num">SET</div>
+            <div class="th">VORIGE</div>
+            <div class="th num">KG</div>
+            <div class="th num">REPS</div>
+            <div class="th check">✓</div>
+          </div>
+
+          <div class="set-row">
+            <div class="c-num">1</div>
+            <div class="c-prev">100 kg · 20</div>
+            <div class="c-kg">100</div>
+            <div class="c-reps">20</div>
+            <div class="c-check">
+              <button class="check-btn"><svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg></button>
+            </div>
+          </div>
+          <div class="set-row">
+            <div class="c-num">2</div>
+            <div class="c-prev">100 kg · 16</div>
+            <div class="c-kg">100</div>
+            <div class="c-reps">16</div>
+            <div class="c-check">
+              <button class="check-btn"><svg viewBox="0 0 24 24"><polyline points="6 12 10 16 18 8"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ex-foot">
+          <div class="ex-foot-l">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Set toevoegen
+          </div>
+          <div class="ex-foot-r">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+            60s rust
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sticky Oefening toevoegen — solid dark card, in-palette -->
+    <div class="add-ex-wrap">
+      <button class="add-ex">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Oefening toevoegen
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Reference -->
+  <div class="ref">
+    <h4>06 · Workout logger · v4</h4>
+    <p>Terug op palette: SOLID light cards <strong>#A6ADA7</strong> op canvas <strong>#8E9890</strong>. Geen glass. Zelfde taal als home Vandaag/Week.</p>
+
+    <div class="lbl">Cleaner keuzes</div>
+    <div class="row"><span>Page-sub</span><strong>alleen "14:32"</strong></div>
+    <div class="row"><span>Ex-small</span><strong>verwijderd (obvious)</strong></div>
+    <div class="row"><span>Rest-meta rij</span><strong>verplaatst naar footer</strong></div>
+    <div class="row"><span>+Set + Rust</span><strong>samengevoegd in 1 rij</strong></div>
+    <div class="row"><span>Set dividers</span><strong>1px ink-08 tussen rijen</strong></div>
+
+    <div class="lbl">Palette-compliance</div>
+    <div class="row"><span>Canvas</span><strong>#8E9890</strong></div>
+    <div class="row"><span>Ex card</span><strong>#A6ADA7</strong></div>
+    <div class="row"><span>Add-oef pill</span><strong>#474B48</strong></div>
+    <div class="row"><span>Checked rij</span><strong>#2FA65A</strong></div>
+    <div class="row"><span>Klaar</span><strong>#C0FC01 (lime)</strong></div>
+
+    <div class="lbl">States</div>
+    <div class="row"><span>default</span><strong>transparent (cardbg)</strong></div>
+    <div class="row"><span>active</span><strong>black 5%</strong></div>
+    <div class="row"><span>checked</span><strong>--check solid</strong></div>
+
+    <div class="lbl">Typografie</div>
+    <div class="row"><span>Page title</span><strong>22 / 300</strong></div>
+    <div class="row"><span>Page sub</span><strong>13 / 400 faint</strong></div>
+    <div class="row"><span>Ex title</span><strong>15 / 500</strong></div>
+    <div class="row"><span>c-num</span><strong>14 / 500</strong></div>
+    <div class="row"><span>c-kg, c-reps</span><strong>18 / 300 (macro-val)</strong></div>
+    <div class="row"><span>c-prev</span><strong>11 / 400 faint</strong></div>
+    <div class="row"><span>SET header</span><strong>10 / 500 caps</strong></div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,291 @@
+/* ═══════════════════════════════════════════════════════════════
+   MŌVE — Shared design system (v6)
+   ────────────────────────────────────────────────────────────────
+   Één CSS-bron voor alle schermen. Alles wat hier in zit is door
+   iedere pagina herbruikbaar. Pagina-specifieke styles blijven in
+   hun eigen <style>-blok of .css-bestand.
+
+   Tokens verplaatsen? Pas hier aan → verandering is overal door-
+   gevoerd. Voeg GEEN component-varianten toe tenzij ze in minstens
+   2 schermen gebruikt worden (anders is het page-specifiek).
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --font: 'Outfit', sans-serif;
+
+  /* 4-color core palette — strikt */
+  --black: #000000;
+  --white: #FFFFFF;
+  --sage:  #899089;
+  --lime:  #C0FC01;
+
+  /* Semantic set-logger green — Hevy-kalm. Niet voor accent-gebruik elders.
+     Lime = event-paint / nieuwheid. Check = persistent afgevinkt.           */
+  --check: #2FA65A;
+
+  /* Canvas & cards — exacte hex door Glenn (2026-04-17) */
+  --bg:         #8E9890;     /* canvas */
+  --card:       #A6ADA7;     /* lichte cards — LICHTER dan canvas */
+  --card-dark:  #474B48;     /* donkere cards (tracking / bnav) */
+  --arr-bg:     #989F99;     /* arrow-button achtergrond */
+
+  /* Ink — near-white met alpha-tiers voor typografische rust */
+  --ink:        #FDFDFE;
+  --ink-soft:   rgba(253,253,254,0.78);
+  --ink-muted:  rgba(253,253,254,0.62);
+  --ink-faint:  rgba(253,253,254,0.44);
+  --ink-ghost:  rgba(253,253,254,0.18);
+
+  /* Radii */
+  --r-md:   14px;
+  --r-lg:   20px;
+  --r-xl:   24px;
+  --r-2xl:  28px;
+  --r-pill: 999px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --t:    320ms;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+body {
+  font-family: var(--font);
+  font-weight: 400;
+  color: var(--ink);
+  background: #16170F;               /* dieper dan canvas → phone leest als lichter object */
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px 20px;
+  gap: 40px;
+}
+
+/* ───── Phone shell ─────
+   Zelfde afmeting & notch overal zodat prototypes makkelijk naast
+   elkaar vergeleken kunnen worden. */
+.phone {
+  width: 393px; height: 852px;
+  background: var(--bg);
+  border-radius: 52px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.06), 0 40px 100px rgba(0,0,0,0.4);
+  overflow: hidden;
+  position: relative;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255,255,255,0.10), transparent 60%),
+    radial-gradient(ellipse 80% 60% at 50% 110%, rgba(0,0,0,0.25), transparent 60%);
+}
+.phone::before {
+  content: ''; position: absolute;
+  top: 11px; left: 50%; transform: translateX(-50%);
+  width: 126px; height: 37px;
+  background: var(--black);
+  border-radius: 20px;
+  z-index: 100;
+}
+
+.scroll {
+  width: 100%; height: 100%;
+  overflow-y: auto;
+  padding: 66px 0 140px;             /* 140 px bodem = zorg dat laatste card vrij blijft van bnav */
+  -webkit-overflow-scrolling: touch;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ───── Top bar ─────
+   Clean M logo + avatar + hamburger ico-btn. Standaard op élk scherm. */
+.top {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 24px;
+  padding: 0 5%;
+  opacity: 0; transform: translateY(8px);
+  animation: up var(--t) var(--ease) 60ms forwards;
+}
+.logo {
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.top-r { display: flex; gap: 6px; align-items: center; }
+.av {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(140deg, #5A5E52, #3D403A);
+  color: rgba(244,242,235,0.92);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 1px 3px rgba(0,0,0,0.20);
+}
+.ico-btn {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.ico-btn svg { width: 13px; height: 13px; stroke: var(--ink); stroke-width: 1.8; fill: none; }
+
+/* ───── Page header (onder top bar) ─────
+   Voor schermen waar je nog een schermtitel + context nodig hebt
+   (Plan, Coach, Profiel). Home heeft geen page-header. */
+.page-head {
+  padding: 0 5%;
+  margin-bottom: 20px;
+  display: flex; justify-content: space-between; align-items: baseline;
+  opacity: 0; transform: translateY(8px);
+  animation: up var(--t) var(--ease) 140ms forwards;
+}
+.page-title {
+  font-size: 28px;
+  font-weight: 250;
+  letter-spacing: -0.028em;
+  color: var(--ink);
+  line-height: 1;
+}
+.page-sub {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink-faint);
+  letter-spacing: 0.01em;
+}
+
+/* ───── Card base ─────
+   Licht = execute-in-one-go. Dark = ongoing tracking.
+   Card width 90%, centered. Margin-bottom 6 px = fijnere verticale ritme. */
+.card {
+  background: var(--card);
+  border-radius: var(--r-xl);
+  padding: 22px 22px 24px;
+  margin-bottom: 6px;
+  width: 90%;
+  margin-left: auto; margin-right: auto;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
+  position: relative;
+  cursor: pointer;
+  transition: transform 140ms var(--ease);
+  opacity: 0; transform: translateY(12px);
+  animation: up var(--t) var(--ease) forwards;
+}
+.card.dark {
+  background: var(--card-dark);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.22);
+}
+.card:active { transform: scale(0.99); }
+
+/* Card-stagger — hergebruikt via c1/c2/c3/c4/c5. */
+.card.c1 { animation-delay: 220ms; }
+.card.c2 { animation-delay: 300ms; }
+.card.c3 { animation-delay: 380ms; }
+.card.c4 { animation-delay: 460ms; }
+.card.c5 { animation-delay: 540ms; }
+
+/* Arrow-button rechterhoek op kaarten — grote cirkel, #989F99. */
+.arr {
+  position: absolute;
+  top: 18px; right: 18px;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--arr-bg);
+  display: flex; align-items: center; justify-content: center;
+}
+.arr svg { width: 13px; height: 13px; stroke: var(--ink); stroke-width: 1.8; fill: none; }
+
+/* ───── Typografie — componenten ─────
+   Card-titel: Title Case regular (14/300). Géén eyebrow caps. */
+.eyebrow {
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: -0.003em;
+  color: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.eyebrow .pulse {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--lime);
+}
+
+.cap { font-size: 12px; font-weight: 400; color: var(--ink-faint); letter-spacing: 0.01em; }
+.cap-row { display: flex; justify-content: space-between; align-items: center; }
+.cap-row span:last-child { font-feature-settings: "tnum"; }
+
+/* Meta-rij (tussen titel en hoofdinhoud) */
+.meta {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ink-faint);
+  letter-spacing: 0.01em;
+}
+
+/* ───── Bottom tab — donkere card ─────
+   Zelfde op elk scherm. .tab.on geeft actieve sectie aan. */
+.bnav {
+  position: absolute;
+  bottom: 16px; left: 5%; right: 5%;
+  padding: 14px 22px 16px;
+  display: flex; justify-content: space-around; align-items: center;
+  background: var(--card-dark);
+  border-radius: var(--r-2xl);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 6px 22px rgba(0,0,0,0.22);
+  z-index: 50;
+  opacity: 0; transform: translateY(8px);
+  animation: up var(--t) var(--ease) 540ms forwards;
+}
+.tab {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 140ms;
+}
+.tab.on { opacity: 1; }
+.tab svg { width: 20px; height: 20px; stroke: var(--ink); stroke-width: 1.5; fill: none; }
+.tab span { font-size: 11px; font-weight: 400; color: var(--ink); letter-spacing: 0; }
+.tab.on::after { content: ''; width: 3px; height: 3px; border-radius: 50%; background: var(--lime); margin-top: 1px; }
+
+/* ───── Motion ───── */
+@keyframes up { to { opacity: 1; transform: translateY(0); } }
+
+/* ═══════════════════════════════════════════════════════════════
+   Reference panel (dev-zijde, naast de phone)
+   ═══════════════════════════════════════════════════════════════ */
+.ref {
+  max-width: 280px;
+  color: rgba(255,255,255,0.55);
+  font-family: var(--font);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.ref h4 {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 12px;
+}
+.ref p { margin-bottom: 10px; }
+.ref .row {
+  display: flex; justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.12);
+  font-feature-settings: "tnum";
+}
+.ref .row strong { color: rgba(255,255,255,0.85); font-weight: 500; }
+.ref .lbl {
+  display: inline-block;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--lime);
+  margin-top: 18px;
+  margin-bottom: 6px;
+}

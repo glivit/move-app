@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MŌVE — Workout · Herorden</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       Workout logger — HERORDEN-modus
+       ────────────────────────────────────────────────────────────
+       Triggered door long-press op drag-handle. Alle oefening-
+       cards collapsen naar titel-only strips met grote drag-
+       handles. Geen sets, geen kebab, geen accents — alleen
+       sleepbaarheid. Eén card in "grabbed" state (iets opgetild
+       + schaduw) voor feedback.
+       ═══════════════════════════════════════════════════════════ */
+
+    /* Top bar: context + "Klaar" om terug te gaan */
+    .wtop {
+      position: absolute; top: 0; left: 0; right: 0;
+      z-index: 60;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 52px 20px 14px;
+      background: linear-gradient(180deg, rgba(30,31,25,0.55) 0%, rgba(30,31,25,0) 100%);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+    .wtop-l { display: flex; align-items: center; gap: 10px; }
+    .wtop-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+    .wtop-title small {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--lime);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+    .wtop .done {
+      padding: 7px 16px;
+      border-radius: 999px;
+      background: var(--lime);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -0.003em;
+      color: #0E1500;
+      border: none; cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+    }
+
+    .scroll.reorder { padding: 110px 0 40px; }
+
+    /* Helptekst — wat kan ik doen? */
+    .help {
+      padding: 0 5%;
+      margin-bottom: 18px;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      letter-spacing: -0.003em;
+      line-height: 1.45;
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) 120ms forwards;
+    }
+
+    /* ─── Collapsed exercise row ─── */
+    .ex-strip {
+      background: var(--card-dark);
+      border-radius: 18px;
+      padding: 16px 16px 16px 14px;
+      margin-bottom: 8px;
+      width: 90%;
+      margin-left: auto; margin-right: auto;
+      display: flex; align-items: center; gap: 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.20);
+      opacity: 0; transform: translateY(12px);
+      animation: up var(--t) var(--ease) forwards;
+      position: relative;
+    }
+    .ex-strip.s1 { animation-delay: 220ms; }
+    .ex-strip.s2 { animation-delay: 280ms; }
+    .ex-strip.s3 { animation-delay: 340ms; }
+    .ex-strip.s4 { animation-delay: 400ms; }
+    .ex-strip.s5 { animation-delay: 460ms; }
+
+    /* Drag handle — grote duidelijke hitbox in herorden-modus */
+    .handle {
+      width: 22px; height: 30px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 4px;
+      flex-shrink: 0;
+      cursor: grab;
+    }
+    .handle span {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--ink-soft);
+    }
+
+    .strip-body { flex: 1; min-width: 0; }
+    .strip-name {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+    }
+    .strip-meta {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.01em;
+      margin-top: 2px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .strip-meta .dot {
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: var(--ink-ghost);
+    }
+
+    /* Number tag right side — positie in de workout */
+    .strip-pos {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: rgba(253,253,254,0.08);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      letter-spacing: 0;
+      font-feature-settings: "tnum";
+      flex-shrink: 0;
+    }
+
+    /* GRABBED state — één card opgetild tijdens sleep */
+    .ex-strip.grab {
+      background: #575C58;                              /* iets lichter dark */
+      transform: scale(1.02) translateY(0);
+      box-shadow: 0 16px 36px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.14);
+      z-index: 3;
+    }
+    .ex-strip.grab .handle span { background: var(--ink); }
+
+    /* Placeholder-card — ruimte waar grabbed card vandaan komt */
+    .ex-strip.ghost {
+      background: transparent;
+      border: 1.5px dashed rgba(253,253,254,0.22);
+      box-shadow: none;
+    }
+    .ex-strip.ghost .handle span,
+    .ex-strip.ghost .strip-name,
+    .ex-strip.ghost .strip-meta,
+    .ex-strip.ghost .strip-pos {
+      opacity: 0.18;
+    }
+
+    /* Bnav verborgen in deze modus */
+    .bnav { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+
+    <!-- Top -->
+    <div class="wtop">
+      <div class="wtop-l">
+        <div class="wtop-title">
+          Push &amp; Pull
+          <small>Herorden</small>
+        </div>
+      </div>
+      <button class="done">Klaar</button>
+    </div>
+
+    <div class="scroll reorder">
+
+      <div class="help">Houd vast &amp; versleep om de volgorde aan te passen.</div>
+
+      <div class="ex-strip s1">
+        <div class="handle">
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="strip-body">
+          <div class="strip-name">Hip Abduction (Machine)</div>
+          <div class="strip-meta">Glutes <span class="dot"></span> 4 sets</div>
+        </div>
+        <div class="strip-pos">1</div>
+      </div>
+
+      <!-- Set 2 is opgetild (grabbed) -->
+      <div class="ex-strip s2 grab">
+        <div class="handle">
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="strip-body">
+          <div class="strip-name">Calf Press (Machine)</div>
+          <div class="strip-meta">Kuiten <span class="dot"></span> 2 sets</div>
+        </div>
+        <div class="strip-pos">2</div>
+      </div>
+
+      <!-- Placeholder (was op positie 3) -->
+      <div class="ex-strip s3 ghost">
+        <div class="handle">
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="strip-body">
+          <div class="strip-name">Calf Press (Machine)</div>
+          <div class="strip-meta">Kuiten <span class="dot"></span> 2 sets</div>
+        </div>
+        <div class="strip-pos">—</div>
+      </div>
+
+      <div class="ex-strip s4">
+        <div class="handle">
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="strip-body">
+          <div class="strip-name">Glute Ham Raise</div>
+          <div class="strip-meta">Hamstrings <span class="dot"></span> 3 sets</div>
+        </div>
+        <div class="strip-pos">3</div>
+      </div>
+
+      <div class="ex-strip s5">
+        <div class="handle">
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="strip-body">
+          <div class="strip-name">Romanian Deadlift</div>
+          <div class="strip-meta">Hamstrings <span class="dot"></span> 3 sets</div>
+        </div>
+        <div class="strip-pos">4</div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Reference -->
+  <div class="ref">
+    <h4>06b · Workout · Herorden</h4>
+    <p>Long-press op drag-handle activeert deze modus. Oefening-cards collapsen naar titel-strips met grote handles. Eén card toont <em>grabbed</em>-state, onder zit een <em>ghost</em>-placeholder.</p>
+
+    <div class="lbl">Modus-regels</div>
+    <div class="row"><span>Enter-gesture</span><strong>long-press drag</strong></div>
+    <div class="row"><span>Exit</span><strong>"Klaar" pill bovenin</strong></div>
+    <div class="row"><span>Collapse</span><strong>titel + meta + pos, géén sets</strong></div>
+    <div class="row"><span>Accent</span><strong>lime alleen op modus-label</strong></div>
+
+    <div class="lbl">Visuele states</div>
+    <div class="row"><span>default</span><strong>#474B48</strong></div>
+    <div class="row"><span>grab</span><strong>#575C58 + 16px shadow</strong></div>
+    <div class="row"><span>ghost</span><strong>dashed border, 18% opacity</strong></div>
+
+    <div class="lbl">Waarom ghost-placeholder?</div>
+    <p>Je ziet waar de card vandaan komt. Zonder ghost verspringt de lijst visueel en verlies je spatial context.</p>
+  </div>
+
+</body>
+</html>
