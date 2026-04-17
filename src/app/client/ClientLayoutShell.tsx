@@ -31,7 +31,18 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
     pathname?.startsWith('/client/workout/complete')
 
   return (
-    <div className="client-app min-h-screen" style={{ background: '#8E9890' }}>
+    <div
+      className="client-app min-h-screen"
+      style={{
+        // v6 · design-system shared.css .phone background: flat canvas + subtiele radial vignette
+        // voor extra diepte zodat frosted-glass cards beter uit de achtergrond komen.
+        background: '#8E9890',
+        backgroundImage:
+          'radial-gradient(ellipse 80% 40% at 50% -8%, rgba(255,255,255,0.08), transparent 60%),' +
+          'radial-gradient(ellipse 80% 50% at 50% 108%, rgba(0,0,0,0.16), transparent 60%)',
+        backgroundAttachment: 'fixed',
+      }}
+    >
       {/* Desktop sidebar — wordt later gemigreerd naar v6 tokens */}
       {!isFocusMode && <ClientSidebar />}
 

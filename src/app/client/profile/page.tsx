@@ -1,90 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
-import {
-  User,
-  Bell,
-  Target,
-  UtensilsCrossed,
-  AlertCircle,
-  Receipt,
-  HelpCircle,
-  Shield,
-  ChevronRight,
-  LogOut,
-  Moon,
-  Sun,
-  CreditCard,
-} from 'lucide-react'
 
-function DarkModeRow() {
-  const [dark, setDark] = useState(false)
-
-  useEffect(() => {
-    setDark(document.documentElement.classList.contains('dark'))
-  }, [])
-
-  const toggle = () => {
-    const next = !dark
-    setDark(next)
-    if (next) {
-      document.documentElement.classList.add('dark')
-      try { localStorage.setItem('move-dark-mode', 'true') } catch {}
-    } else {
-      document.documentElement.classList.remove('dark')
-      try { localStorage.setItem('move-dark-mode', 'false') } catch {}
-    }
-  }
-
-  return (
-    <button
-      onClick={toggle}
-      style={{
-        width: '100%',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '14px 18px',
-        background: 'transparent', border: 'none', cursor: 'pointer',
-        WebkitTapHighlightColor: 'transparent',
-        color: '#FDFDFE',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        {dark ? (
-          <Sun size={18} strokeWidth={1.5} style={{ color: 'rgba(253,253,254,0.62)' }} />
-        ) : (
-          <Moon size={18} strokeWidth={1.5} style={{ color: 'rgba(253,253,254,0.62)' }} />
-        )}
-        <span style={{ fontSize: 14, color: '#FDFDFE' }}>
-          {dark ? 'Licht modus' : 'Donker modus'}
-        </span>
-      </div>
-      <div
-        style={{
-          position: 'relative',
-          width: 40, height: 22,
-          borderRadius: 999,
-          background: dark ? '#C0FC01' : 'rgba(253,253,254,0.16)',
-          transition: 'background 200ms',
-        }}
-      >
-        <div
-          style={{
-            position: 'absolute', top: 2,
-            width: 18, height: 18, borderRadius: '50%',
-            background: dark ? '#1A1917' : '#FDFDFE',
-            transform: dark ? 'translateX(20px)' : 'translateX(2px)',
-            transition: 'transform 200ms',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.24)',
-          }}
-        />
-      </div>
-    </button>
-  )
-}
-
+// ─── Types ────────────────────────────────────────────────────
 interface Profile {
   id: string
   full_name: string
@@ -95,6 +17,215 @@ interface Profile {
   avatar_url?: string
 }
 
+// ─── Row component · design-system/10-ik.html · row-item ─────
+// grid: leading (icon/avatar) · body (label + optional meta) · value-right · chev
+function Row({
+  href,
+  leading,
+  label,
+  meta,
+  value,
+  trailing,
+}: {
+  href?: string
+  leading: React.ReactNode
+  label: string
+  meta?: string
+  value?: React.ReactNode
+  trailing?: React.ReactNode
+}) {
+  const inner = (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'auto 1fr auto 14px',
+        alignItems: 'center',
+        gap: 14,
+        padding: '14px 0',
+        borderTop: '1px solid rgba(253,253,254,0.08)',
+        cursor: href ? 'pointer' : 'default',
+        WebkitTapHighlightColor: 'transparent',
+      }}
+    >
+      <div
+        style={{
+          width: 24, height: 24,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0,
+        }}
+      >
+        {leading}
+      </div>
+      <div style={{ minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: 15, fontWeight: 400, color: '#FDFDFE',
+            letterSpacing: '-0.003em', lineHeight: 1.2,
+          }}
+        >
+          {label}
+        </div>
+        {meta && (
+          <div
+            style={{
+              fontSize: 11, fontWeight: 400, color: 'rgba(253,253,254,0.52)',
+              letterSpacing: '0.01em', marginTop: 2,
+            }}
+          >
+            {meta}
+          </div>
+        )}
+      </div>
+      <div
+        style={{
+          fontSize: 13, fontWeight: 400, color: 'rgba(253,253,254,0.78)',
+          textAlign: 'right', fontVariantNumeric: 'tabular-nums',
+          minWidth: 0,
+        }}
+      >
+        {trailing ?? value ?? ''}
+      </div>
+      <svg
+        viewBox="0 0 24 24"
+        style={{
+          width: 12, height: 12,
+          stroke: 'rgba(253,253,254,0.44)',
+          strokeWidth: 1.8, fill: 'none',
+          opacity: href ? 1 : 0,
+        }}
+      >
+        <polyline points="9 6 15 12 9 18" />
+      </svg>
+    </div>
+  )
+  if (href) {
+    return (
+      <Link href={href} style={{ textDecoration: 'none', display: 'block' }}>
+        {inner}
+      </Link>
+    )
+  }
+  return inner
+}
+
+// Icon helpers (stroke var(--ink-soft) per 10-ik.html)
+const icoColor = 'rgba(253,253,254,0.78)'
+const icoStyle: React.CSSProperties = {
+  width: 17, height: 17,
+  stroke: icoColor, strokeWidth: 1.6, fill: 'none',
+}
+
+const IcoPlan = () => (
+  <svg viewBox="0 0 24 24" style={icoStyle}><path d="M4 7h16M4 12h16M4 17h10" /></svg>
+)
+const IcoGoals = () => (
+  <svg viewBox="0 0 24 24" style={icoStyle}><circle cx="12" cy="12" r="9" /><polyline points="9 12 11 14 15 10" /></svg>
+)
+const IcoCheckins = () => (
+  <svg viewBox="0 0 24 24" style={icoStyle}><path d="M4 12h16M12 4v16" strokeLinecap="round" /><circle cx="12" cy="12" r="9" /></svg>
+)
+const IcoPackage = () => (
+  <svg viewBox="0 0 24 24" style={icoStyle}><path d="M5 7l7-4 7 4v10l-7 4-7-4z" /><path d="M12 3v18" /></svg>
+)
+const IcoCard = () => (
+  <svg viewBox="0 0 24 24" style={icoStyle}><rect x="3" y="6" width="18" height="13" rx="2" /><path d="M3 10h18" /></svg>
+)
+const IcoInvoice = () => (
+  <svg viewBox="0 0 24 24" style={icoStyle}><path d="M9 17l-5-5 5-5" /><path d="M20 12H4" /></svg>
+)
+const IcoAppearance = () => (
+  <svg viewBox="0 0 24 24" style={icoStyle}>
+    <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" />
+    <circle cx="12" cy="12" r="3.5" />
+  </svg>
+)
+const IcoNotif = () => (
+  <svg viewBox="0 0 24 24" style={icoStyle}>
+    <path d="M6 8a6 6 0 0 1 12 0c0 4 2 5 2 5H4s2-1 2-5" />
+    <path d="M10 18a2 2 0 0 0 4 0" />
+  </svg>
+)
+const IcoDiet = () => (
+  <svg viewBox="0 0 24 24" style={icoStyle}>
+    <path d="M6 3h12l-1 5H7z" /><path d="M7 8v11h10V8" />
+    <line x1="10" y1="12" x2="14" y2="12" />
+  </svg>
+)
+const IcoHealth = () => (
+  <svg viewBox="0 0 24 24" style={icoStyle}>
+    <path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-0.5z" />
+  </svg>
+)
+const IcoPrivacy = () => (
+  <svg viewBox="0 0 24 24" style={icoStyle}>
+    <rect x="4" y="10" width="16" height="11" rx="2" />
+    <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+  </svg>
+)
+const IcoHelp = () => (
+  <svg viewBox="0 0 24 24" style={icoStyle}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M10 9a2 2 0 1 1 3 1.5c-1 0.5-1 1.5-1 2" />
+    <line x1="12" y1="16" x2="12" y2="16.01" />
+  </svg>
+)
+
+// ─── Dark mode toggle (inline row) ────────────────────────────
+function AppearanceValue() {
+  const [dark, setDark] = useState(false)
+  useEffect(() => {
+    setDark(document.documentElement.classList.contains('dark'))
+  }, [])
+  return (
+    <span style={{ fontSize: 13, color: 'rgba(253,253,254,0.78)' }}>
+      {dark ? 'Donker' : 'Auto'}
+    </span>
+  )
+}
+
+// ─── Section label · 10/500 caps /.16em ───────────────────────
+function SectionLabel({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+  return (
+    <div
+      className="animate-slide-up"
+      style={{
+        padding: '18px 4px 8px',
+        fontSize: 10, fontWeight: 500,
+        letterSpacing: '0.16em',
+        textTransform: 'uppercase',
+        color: 'rgba(253,253,254,0.52)',
+        animationDelay: `${delay}ms`,
+        animationFillMode: 'both',
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
+// ─── Format helpers ───────────────────────────────────────────
+function formatMemberSince(dateString: string) {
+  if (!dateString) return ''
+  const d = new Date(dateString)
+  const months = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december']
+  return `${months[d.getMonth()]} ${d.getFullYear()}`
+}
+
+function weeksSince(dateString: string) {
+  if (!dateString) return 0
+  const d = new Date(dateString)
+  const diffMs = Date.now() - d.getTime()
+  return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24 * 7)))
+}
+
+function getInitials(name?: string) {
+  if (!name) return '?'
+  const parts = name.split(' ')
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+  return name.substring(0, 2).toUpperCase()
+}
+
+// ─── Page ─────────────────────────────────────────────────────
 export default function ProfilePage() {
   const router = useRouter()
   const supabase = createClient()
@@ -102,20 +233,6 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const [signingOut, setSigningOut] = useState(false)
-
-  const getInitials = (name?: string) => {
-    if (!name) return '?'
-    const parts = name.split(' ')
-    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-    return name.substring(0, 2).toUpperCase()
-  }
-
-  const formatMemberSince = (dateString: string) => {
-    if (!dateString) return ''
-    const date = new Date(dateString)
-    const months = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december']
-    return `${months[date.getMonth()]} ${date.getFullYear()}`
-  }
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -153,92 +270,72 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="pb-28 animate-fade-in">
-        <div
-          className="rounded-[24px] mb-4"
-          style={{
-            padding: '32px 22px',
-            background: '#474B48',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 6px rgba(0,0,0,0.22)',
-            display: 'flex', flexDirection: 'column', alignItems: 'center',
-          }}
-        >
+        {/* Hero skeleton · left-aligned */}
+        <div style={{ padding: '4px 4px 22px', display: 'flex', alignItems: 'center', gap: 16 }}>
           <div
             className="animate-pulse"
-            style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(253,253,254,0.12)', marginBottom: 14 }}
+            style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(253,253,254,0.12)' }}
           />
-          <div
-            className="animate-pulse"
-            style={{ height: 14, width: 160, borderRadius: 999, background: 'rgba(253,253,254,0.14)', marginBottom: 8 }}
-          />
-          <div
-            className="animate-pulse"
-            style={{ height: 10, width: 120, borderRadius: 999, background: 'rgba(253,253,254,0.08)' }}
-          />
+          <div style={{ flex: 1 }}>
+            <div
+              className="animate-pulse"
+              style={{ height: 18, width: '60%', borderRadius: 6, background: 'rgba(253,253,254,0.14)', marginBottom: 6 }}
+            />
+            <div
+              className="animate-pulse"
+              style={{ height: 11, width: '40%', borderRadius: 999, background: 'rgba(253,253,254,0.08)' }}
+            />
+          </div>
         </div>
-        {[1, 2].map(i => (
-          <div
-            key={i}
-            className="animate-pulse rounded-[20px] mb-4"
-            style={{
-              height: 200,
-              background: '#A6ADA7',
-              opacity: 0.6,
-            }}
-          />
+        {/* Sections skeleton */}
+        {[0, 1, 2].map(i => (
+          <div key={i} style={{ marginBottom: 6 }}>
+            <div
+              className="animate-pulse"
+              style={{ height: 10, width: 90, borderRadius: 999, background: 'rgba(253,253,254,0.10)', margin: '18px 4px 8px' }}
+            />
+            <div
+              className="animate-pulse rounded-[24px]"
+              style={{ height: 180, background: '#A6ADA7', opacity: 0.6 }}
+            />
+          </div>
         ))}
       </div>
     )
   }
 
-  const menuSections: Array<{ items: Array<{ href: string; icon: typeof User; label: string }> }> = [
-    {
-      items: [
-        { href: '/client/profile/edit', icon: User, label: 'Persoonlijke gegevens' },
-        { href: '/client/profile/notifications', icon: Bell, label: 'Meldingen' },
-        { href: '/client/profile/goals', icon: Target, label: 'Doelen' },
-        { href: '/client/profile/diet', icon: UtensilsCrossed, label: 'Voedingsvoorkeuren' },
-        { href: '/client/profile/health', icon: AlertCircle, label: 'Blessures & beperkingen' },
-      ],
-    },
-    {
-      items: [
-        { href: '/client/profile/invoices', icon: Receipt, label: 'Facturen' },
-        { href: '/client/profile/help', icon: HelpCircle, label: 'Help & FAQ' },
-        { href: '/client/profile/privacy', icon: Shield, label: 'Privacy' },
-      ],
-    },
-  ]
+  const weeks = weeksSince(profile?.created_at || '')
 
   return (
     <div className="pb-28">
-      {/* ═══ HEADER — v6-card-dark met avatar ═════════════ */}
+      {/* ── Profile hero · left-aligned per 10-ik.html ── */}
       <div
-        className="v6-card-dark mb-4 animate-fade-in"
+        className="animate-fade-in"
         style={{
-          padding: '28px 22px',
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          padding: '4px 4px 22px',
+          display: 'flex', alignItems: 'center', gap: 16,
         }}
       >
-        {/* Avatar */}
         <div
           style={{
-            width: 84, height: 84,
+            width: 64, height: 64,
             borderRadius: '50%',
-            background: '#1A1917',
-            color: '#FDFDFE',
+            background: 'linear-gradient(140deg, #5A5E52, #3D403A)',
+            color: 'rgba(244,242,235,0.94)',
+            fontSize: 22, fontWeight: 400,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 24, fontWeight: 600,
-            marginBottom: 14,
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 2px 6px rgba(0,0,0,0.18)',
+            letterSpacing: '0.02em',
+            flexShrink: 0,
             overflow: 'hidden',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 8px rgba(0,0,0,0.28)',
           }}
         >
           {profile?.avatar_url ? (
             <Image
               src={profile.avatar_url}
               alt={profile.full_name}
-              width={84}
-              height={84}
+              width={64}
+              height={64}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               unoptimized
               loading="lazy"
@@ -247,144 +344,244 @@ export default function ProfilePage() {
             getInitials(profile?.full_name)
           )}
         </div>
-
-        <h1
-          style={{
-            fontSize: 22, fontWeight: 500,
-            color: '#FDFDFE',
-            letterSpacing: '-0.012em',
-            textAlign: 'center',
-            margin: 0,
-          }}
-        >
-          {profile?.full_name || 'Profiel'}
-        </h1>
-        <p
-          style={{
-            fontSize: 13,
-            color: 'rgba(253,253,254,0.52)',
-            marginTop: 4,
-          }}
-        >
-          Lid sinds {formatMemberSince(profile?.created_at || '')}
-        </p>
-
-        {/* Package pill */}
-        {profile?.package && (
+        <div style={{ minWidth: 0, flex: 1 }}>
           <div
             style={{
-              marginTop: 14,
-              padding: '6px 14px',
-              borderRadius: 999,
-              background: 'rgba(192,252,1,0.14)',
-              color: '#C0FC01',
-              fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
+              fontSize: 22, fontWeight: 300, color: '#FDFDFE',
+              letterSpacing: '-0.02em', lineHeight: 1.1,
+              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             }}
           >
-            {profile.package}
+            {profile?.full_name || 'Profiel'}
           </div>
-        )}
-      </div>
-
-      {/* ═══ MENU SECTIONS — v6-card-dark lists ═════════════ */}
-      {menuSections.map((section, si) => (
-        <div
-          key={si}
-          className={`v6-card-dark mb-4 animate-slide-up ${si === 0 ? 'stagger-2' : 'stagger-3'}`}
-          style={{ padding: '6px 0' }}
-        >
-          {section.items.map((item, i, arr) => {
-            const Icon = item.icon
-            return (
-              <a
-                key={item.href}
-                href={item.href}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '14px 18px',
-                  textDecoration: 'none',
-                  borderTop: i > 0 ? '1px solid rgba(253,253,254,0.08)' : 'none',
-                  WebkitTapHighlightColor: 'transparent',
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <Icon size={18} strokeWidth={1.5} style={{ color: 'rgba(253,253,254,0.62)' }} />
-                  <span style={{ fontSize: 14, color: '#FDFDFE' }}>{item.label}</span>
-                </div>
-                <ChevronRight size={16} strokeWidth={1.5} style={{ color: 'rgba(253,253,254,0.32)' }} />
-                {/* fix unused arr to suppress lint */}
-                {i === arr.length + 9999 ? null : null}
-              </a>
-            )
-          })}
-        </div>
-      ))}
-
-      {/* ═══ WEERGAVE + PAKKET ═════════════════════════════ */}
-      <div className="v6-card-dark mb-4 animate-slide-up stagger-4" style={{ padding: '6px 0' }}>
-        <DarkModeRow />
-        <div
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '14px 18px',
-            borderTop: '1px solid rgba(253,253,254,0.08)',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <CreditCard size={18} strokeWidth={1.5} style={{ color: 'rgba(253,253,254,0.62)' }} />
-            <span style={{ fontSize: 14, color: '#FDFDFE' }}>Pakket</span>
-          </div>
-          <span
+          <div
             style={{
-              fontSize: 12, fontWeight: 600,
-              color: '#FDFDFE',
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
+              fontSize: 12, fontWeight: 400, color: 'rgba(253,253,254,0.52)',
+              letterSpacing: '0.01em', marginTop: 3,
             }}
           >
-            {profile?.package || 'Standaard'}
-          </span>
+            {profile?.package ? `${profile.package} · ` : ''}
+            {weeks > 0 ? `${weeks} ${weeks === 1 ? 'week' : 'weken'} actief` : 'Nieuw lid'}
+          </div>
         </div>
       </div>
 
-      {/* ═══ LOGOUT ═════════════════════════════════════════ */}
+      {/* ── Stats strip · 3-col open · parity met 10-ik.html ── */}
+      <div
+        className="animate-fade-in"
+        style={{
+          padding: '2px 4px 14px',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 10,
+        }}
+      >
+        {[
+          { val: weeks.toString(), lbl: 'Weken' },
+          { val: profile?.package ? 'Actief' : '—', lbl: 'Status' },
+          { val: 'Premium', lbl: 'Plan' },
+        ].map((s, i) => (
+          <div key={i}>
+            <div
+              style={{
+                fontSize: 20, fontWeight: 300,
+                letterSpacing: '-0.01em',
+                color: '#FDFDFE',
+                fontVariantNumeric: 'tabular-nums',
+                lineHeight: 1.1,
+              }}
+            >
+              {s.val}
+            </div>
+            <div
+              style={{
+                fontSize: 9, fontWeight: 500,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: 'rgba(253,253,254,0.52)',
+                marginTop: 3,
+              }}
+            >
+              {s.lbl}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* ─────────── COACHING ─────────── */}
+      <SectionLabel delay={120}>Coaching</SectionLabel>
+      <div
+        className="v6-card animate-slide-up"
+        style={{ padding: '4px 20px', marginBottom: 6, animationDelay: '160ms', animationFillMode: 'both' }}
+      >
+        <Row
+          href="/client/messages"
+          leading={
+            <div
+              style={{
+                width: 30, height: 30, borderRadius: '50%',
+                background: 'linear-gradient(140deg, #5A5E52, #3D403A)',
+                color: 'rgba(244,242,235,0.92)',
+                fontSize: 11, fontWeight: 500,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.10)',
+              }}
+            >
+              C
+            </div>
+          }
+          label="Coach"
+          meta="Je coach · chat"
+          trailing={
+            <span
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 4,
+                padding: '3px 8px', borderRadius: 999,
+                background: 'rgba(47,166,90,0.22)',
+                color: '#C7EAD3',
+                fontSize: 10, fontWeight: 500,
+                letterSpacing: '0.02em',
+              }}
+            >
+              <span
+                style={{
+                  width: 5, height: 5, borderRadius: '50%', background: '#2FA65A',
+                }}
+              />
+              Online
+            </span>
+          }
+        />
+        <Row
+          href="/client/program"
+          leading={<IcoPlan />}
+          label="Mijn plan"
+          meta={profile?.package ? `${profile.package}` : 'Bekijk je trainingsschema'}
+        />
+        <Row
+          href="/client/profile/goals"
+          leading={<IcoGoals />}
+          label="Doelen"
+          meta="Bekijk en update je doelstellingen"
+        />
+        <Row
+          href="/client/weekly-check-in"
+          leading={<IcoCheckins />}
+          label="Check-ins"
+          meta="Wekelijkse voortgang"
+        />
+      </div>
+
+      {/* ─────────── ABONNEMENT ─────────── */}
+      <SectionLabel delay={240}>Abonnement</SectionLabel>
+      <div
+        className="v6-card animate-slide-up"
+        style={{ padding: '4px 20px', marginBottom: 6, animationDelay: '280ms', animationFillMode: 'both' }}
+      >
+        <Row
+          leading={<IcoPackage />}
+          label="Pakket"
+          meta={profile?.package || 'Standaard'}
+          trailing={
+            <span style={{ fontSize: 13, fontWeight: 500, color: '#FDFDFE' }}>
+              {profile?.package || '—'}
+            </span>
+          }
+        />
+        <Row
+          leading={<IcoCard />}
+          label="Betaalmethode"
+          meta="Via je coach beheerd"
+        />
+        <Row
+          href="/client/profile/invoices"
+          leading={<IcoInvoice />}
+          label="Factuurgeschiedenis"
+        />
+      </div>
+
+      {/* ─────────── VOORKEUREN ─────────── */}
+      <SectionLabel delay={360}>Voorkeuren</SectionLabel>
+      <div
+        className="v6-card animate-slide-up"
+        style={{ padding: '4px 20px', marginBottom: 6, animationDelay: '400ms', animationFillMode: 'both' }}
+      >
+        <Row
+          href="/client/profile/edit"
+          leading={<IcoAppearance />}
+          label="Uiterlijk"
+          trailing={<AppearanceValue />}
+        />
+        <Row
+          href="/client/profile/notifications"
+          leading={<IcoNotif />}
+          label="Notificaties"
+          value={<span style={{ fontSize: 13, color: 'rgba(253,253,254,0.78)' }}>Aan</span>}
+        />
+        <Row
+          href="/client/profile/diet"
+          leading={<IcoDiet />}
+          label="Voedingsvoorkeuren"
+        />
+        <Row
+          href="/client/profile/health"
+          leading={<IcoHealth />}
+          label="Blessures & beperkingen"
+        />
+        <Row
+          href="/client/profile/privacy"
+          leading={<IcoPrivacy />}
+          label="Privacy & data"
+        />
+        <Row
+          href="/client/profile/help"
+          leading={<IcoHelp />}
+          label="Help & support"
+        />
+      </div>
+
+      {/* ─────────── UITLOGGEN — subtiel · premium = geen paniek-knop ─────── */}
       <button
         onClick={handleLogout}
         disabled={signingOut}
-        className="animate-slide-up stagger-5"
+        className="animate-fade-in"
         style={{
-          width: '100%',
-          padding: '16px 20px',
-          borderRadius: 20,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-          background: 'rgba(196,55,42,0.12)',
-          color: '#E8604F',
-          fontSize: 14, fontWeight: 600,
+          marginTop: 18,
+          padding: '15px 22px',
+          background: 'transparent',
           border: 'none',
+          width: '100%',
+          display: 'block',
+          textAlign: 'center',
+          fontFamily: 'inherit',
+          fontSize: 14,
+          fontWeight: 400,
+          color: 'rgba(253,253,254,0.52)',
+          letterSpacing: '-0.003em',
           cursor: signingOut ? 'default' : 'pointer',
           WebkitTapHighlightColor: 'transparent',
+          animationDelay: '520ms',
+          animationFillMode: 'both',
           opacity: signingOut ? 0.6 : 1,
-          transition: 'opacity 200ms',
-          marginBottom: 14,
+          transition: 'color 180ms',
         }}
       >
-        <LogOut size={16} strokeWidth={1.5} />
-        {signingOut ? 'Afmelden...' : 'Afmelden'}
+        {signingOut ? 'Uitloggen…' : 'Uitloggen'}
       </button>
 
-      <p
+      {/* ─────────── VERSIE ─────────── */}
+      <div
         style={{
           textAlign: 'center',
-          fontSize: 11,
+          fontSize: 10, fontWeight: 400,
           color: 'rgba(253,253,254,0.32)',
+          letterSpacing: '0.04em',
           padding: '4px 0 16px',
+          fontVariantNumeric: 'tabular-nums',
         }}
       >
-        MŌVE v1.0
-      </p>
+        MŌVE 1.2.4 (build 218)
+      </div>
     </div>
   )
 }

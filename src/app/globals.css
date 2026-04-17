@@ -929,8 +929,9 @@ a, button {
 }
 
 .wr-body { flex: 1; min-width: 0; }
+/* v6 · design-system/05-plan.html parity — weight 400 voelt cleaner, minder visuele ruis */
 .wr-name {
-  font-size: 14px; font-weight: 500; color: #FDFDFE;
+  font-size: 14px; font-weight: 400; color: #FDFDFE;
   letter-spacing: -0.003em; line-height: 1.2;
 }
 /* v6 readability bump: was 0.44 op frosted glass → hardly legible. 0.72 + 12px. */
@@ -939,10 +940,11 @@ a, button {
   letter-spacing: 0.01em; margin-top: 3px;
 }
 
+/* Subtiel pill — voorbeeld gebruikt 0.08, app zat op 0.14 (luider). 0.10 = balans. */
 .wr-chip {
-  font-size: 11px; font-weight: 500; color: #FDFDFE;
+  font-size: 11px; font-weight: 400; color: rgba(253,253,254,0.78);
   padding: 4px 10px; border-radius: 999px;
-  background: rgba(253,253,254,0.14);
+  background: rgba(253,253,254,0.10);
   white-space: nowrap;
   letter-spacing: 0.01em;
 }
