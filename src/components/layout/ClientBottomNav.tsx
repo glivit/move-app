@@ -1,120 +1,85 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useState, memo, useMemo, useCallback } from 'react'
-import { Home, TrendingUp, Plus, MessageCircle, User, X, ClipboardCheck, Dumbbell, Apple, Video } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { useState, memo, useCallback, useEffect, useRef } from 'react'
 
-const navItems = [
-  { href: '/client', label: 'Home', icon: Home },
-  { href: '/client/progress', label: 'Progress', icon: TrendingUp },
-  { href: '#add', label: '', icon: Plus, isCenter: true },
-  { href: '/client/messages', label: 'Chat', icon: MessageCircle },
-  { href: '/client/profile', label: 'Ik', icon: User },
-]
-
-const quickActions = [
-  { href: '/client/nutrition', label: 'Dieet', icon: Apple },
-  { href: '/client/workout', label: 'Workout', icon: Dumbbell },
-  { href: '/client/weekly-check-in', label: 'Check-in', icon: ClipboardCheck },
-  { href: '/client/booking', label: 'Videocall', icon: Video },
+// Vier tabs — "Ik" staat als avatar in de top-bar, niet hier.
+const tabs = [
+  { href: '/client',          label: 'Home' },
+  { href: '/client/workout',  label: 'Workouts' },
+  { href: '/client/nutrition', label: 'Dieet' },
+  { href: '/client/progress', label: 'Progress' },
 ]
 
 function ClientBottomNavComponent() {
   const pathname = usePathname()
-  const [showQuickAdd, setShowQuickAdd] = useState(false)
+  const router = useRouter()
+  const [open, setOpen] = useState(false)
+  const rootRef = useRef<HTMLDivElement>(null)
 
-  // Memoize isActive function
-  const isActive = useCallback((href: string) => {
-    if (href === '/client') return pathname === '/client'
-    if (href === '#add') return false
-    return pathname.startsWith(href)
-  }, [pathname])
+  const isActive = useCallback(
+    (href: string) => (href === '/client' ? pathname === '/client' : pathname.startsWith(href)),
+    [pathname],
+  )
 
-  // Memoize handleQuickAddToggle
-  const handleQuickAddToggle = useCallback(() => {
-    setShowQuickAdd(!showQuickAdd)
-  }, [showQuickAdd])
+  // Close on outside click or Esc.
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e: MouseEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  const handlePillClick = useCallback((e: React.MouseEvent) => {
+    // Click on the outer pill (the + icon area) — toggle.
+    if ((e.target as HTMLElement).closest('.bnav-lbl')) return
+    setOpen(o => !o)
+  }, [])
+
+  const handleLabelClick = useCallback(
+    (href: string) => (e: React.MouseEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      setOpen(false)
+      router.push(href)
+    },
+    [router],
+  )
 
   return (
-    <>
-      {/* Quick Add Overlay — editorial, clean */}
-      {showQuickAdd && (
-        <div className="lg:hidden fixed inset-0 z-50">
-          <div
-            className="absolute inset-0 bg-[#1A1917]/30 backdrop-blur-sm animate-fade-in"
-            onClick={() => setShowQuickAdd(false)}
-          />
-          <div className="absolute bottom-28 left-0 right-0 px-6 animate-slide-up">
-            <div className="bg-white rounded-2xl border border-[#E8E4DC] p-2 max-w-sm mx-auto">
-              {quickActions.map((action) => {
-                const Icon = action.icon
-                return (
-                  <Link
-                    key={action.href}
-                    href={action.href}
-                    onClick={() => setShowQuickAdd(false)}
-                    className="flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-[#F5F2EC] transition-colors"
-                  >
-                    <Icon className="w-5 h-5 text-[#1A1917]" strokeWidth={1.25} />
-                    <span className="text-[14px] font-medium text-[#1A1917]">{action.label}</span>
-                  </Link>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Bottom Nav Bar — minimal, editorial */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-lg border-t border-[#F0F0EE] pb-safe">
-        <div className="max-w-lg mx-auto flex items-center justify-around h-14">
-          {navItems.map((item) => {
-            const Icon = item.icon
-            const active = isActive(item.href)
-
-            if (item.isCenter) {
-              return (
-                <button
-                  key="center-add"
-                  onClick={handleQuickAddToggle}
-                  className="relative"
-                >
-                  <div className={`
-                    w-10 h-10 rounded-xl flex items-center justify-center
-                    transition-all duration-250
-                    ${showQuickAdd
-                      ? 'bg-[#6B6862] rotate-45'
-                      : 'bg-[#1A1917] hover:bg-[#333330]'
-                    }
-                  `}>
-                    {showQuickAdd
-                      ? <X className="w-4 h-4 text-white" strokeWidth={2} />
-                      : <Plus className="w-4 h-4 text-white" strokeWidth={2} />
-                    }
-                  </div>
-                </button>
-              )
-            }
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`
-                  flex flex-col items-center justify-center gap-0.5 min-w-[48px] py-1
-                  transition-all duration-250
-                  ${active ? 'text-[#D46A3A]' : 'text-[#C5C2BC]'}
-                `}
-              >
-                <Icon className="w-[20px] h-[20px]" strokeWidth={active ? 1.75 : 1.25} />
-                <span className="text-[10px] font-semibold tracking-[0.02em]">{item.label}</span>
-              </Link>
-            )
-          })}
-        </div>
-      </nav>
-    </>
+    <div
+      ref={rootRef}
+      className={`bnav-plus lg:hidden ${open ? 'open' : ''}`}
+      role="navigation"
+      aria-label="Navigatie"
+      aria-expanded={open}
+      onClick={handlePillClick}
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+      <div className="bnav-labels">
+        {tabs.map(tab => (
+          <Link
+            key={tab.href}
+            href={tab.href}
+            onClick={handleLabelClick(tab.href)}
+            className={`bnav-lbl ${isActive(tab.href) ? 'on' : ''}`}
+          >
+            {tab.label}
+          </Link>
+        ))}
+      </div>
+    </div>
   )
 }
 

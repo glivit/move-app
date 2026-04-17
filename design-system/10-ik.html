@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MŌVE — Ik</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       10 · Ik — profiel/settings
+       ────────────────────────────────────────────────────────────
+       Clean list-stijl met sectie-grouping. Premium, rustig.
+       Geen decorative colors — alleen ink-tiers.
+       ═══════════════════════════════════════════════════════════ */
+
+    .scroll { padding: 66px 0 110px; }
+
+    /* ─── Avatar hero ─── */
+    .profile-head {
+      padding: 4px 22px 22px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .av-xl {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(140deg, #5A5E52, #3D403A);
+      color: rgba(244,242,235,0.94);
+      font-size: 22px;
+      font-weight: 400;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 2px 6px rgba(0,0,0,0.18);
+      letter-spacing: 0.02em;
+      flex-shrink: 0;
+    }
+    .p-name {
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+    .p-sub {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.01em;
+      margin-top: 3px;
+    }
+
+    /* ─── Quick stats strip ─── */
+    .stats-strip {
+      background: transparent;
+      box-shadow: none;
+      padding: 2px 22px 14px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .stat-cell .val {
+      font-size: 20px;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      font-feature-settings: "tnum";
+      line-height: 1.1;
+    }
+    .stat-cell .lbl {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-top: 3px;
+    }
+
+    /* ─── Section label ─── */
+    .sec-lbl {
+      padding: 18px 5% 8px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      opacity: 0; transform: translateY(6px);
+      animation: up var(--t) var(--ease) forwards;
+    }
+
+    /* ─── List card (rows grouped) ─── */
+    .list-card {
+      padding: 4px 20px;
+    }
+    .row-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto 14px;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 0;
+      border-top: 1px solid rgba(0,0,0,0.08);
+      cursor: pointer;
+    }
+    .row-item:first-child { border-top: none; }
+    .row-item.no-chev { grid-template-columns: auto 1fr auto; }
+    .row-item .lead-av {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(140deg, #5A5E52, #3D403A);
+      color: rgba(244,242,235,0.92);
+      font-size: 11px;
+      font-weight: 500;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+    }
+    .row-item .lead-ico {
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .row-item .lead-ico svg { width: 17px; height: 17px; stroke: var(--ink-soft); stroke-width: 1.6; fill: none; }
+    .row-item .r-label {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.003em;
+      line-height: 1.2;
+    }
+    .row-item .r-meta {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.01em;
+      margin-top: 2px;
+    }
+    .row-item .r-val {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      letter-spacing: 0.005em;
+      text-align: right;
+      font-feature-settings: "tnum";
+    }
+    .row-item .r-val.mono { font-weight: 500; color: var(--ink); }
+    .row-item .chev {
+      width: 12px; height: 12px;
+      stroke: var(--ink-faint);
+      stroke-width: 1.8;
+      fill: none;
+    }
+
+    /* Lime accent pill voor badge-achtige status (coach is active) */
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(47,166,90,0.18);
+      color: #C7EAD3;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+    .status-pill .dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--check);
+    }
+
+    /* Sign-out row */
+    .signout {
+      margin-top: 18px;
+      padding: 15px 22px;
+      background: transparent;
+      border: none;
+      width: 90%;
+      margin-left: auto; margin-right: auto;
+      display: block;
+      text-align: center;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: -0.003em;
+      cursor: pointer;
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) 720ms forwards;
+    }
+
+    /* Version footer */
+    .ver {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--ink-ghost);
+      letter-spacing: 0.04em;
+      padding: 4px 0 0;
+      font-feature-settings: "tnum";
+      opacity: 0;
+      animation: up var(--t) var(--ease) 780ms forwards;
+    }
+
+    /* Stagger */
+    .profile-head { opacity: 0; transform: translateY(8px); animation: up var(--t) var(--ease) 120ms forwards; }
+    .stats-strip { opacity: 0; transform: translateY(8px); animation: up var(--t) var(--ease) 180ms forwards; }
+    .sec-lbl.s1 { animation-delay: 240ms; }
+    .sec-lbl.s2 { animation-delay: 360ms; }
+    .sec-lbl.s3 { animation-delay: 480ms; }
+    .card.c1 { animation-delay: 280ms; }
+    .card.c2 { animation-delay: 400ms; }
+    .card.c3 { animation-delay: 520ms; }
+
+    /* Bottom nav active = Ik */
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+    <div class="scroll">
+
+      <!-- Top -->
+      <div class="top">
+        <div class="logo">MŌVE</div>
+        <div class="top-r">
+          <div class="av">G</div>
+          <button class="ico-btn">
+            <svg viewBox="0 0 24 24"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Profile hero -->
+      <div class="profile-head">
+        <div class="av-xl">G</div>
+        <div>
+          <div class="p-name">Glenn Delille</div>
+          <div class="p-sub">Coaching plan · 12 weken actief</div>
+        </div>
+      </div>
+
+      <!-- Stats strip -->
+      <div class="stats-strip">
+        <div class="stat-cell">
+          <div class="val">34</div>
+          <div class="lbl">Workouts</div>
+        </div>
+        <div class="stat-cell">
+          <div class="val">8</div>
+          <div class="lbl">Records</div>
+        </div>
+        <div class="stat-cell">
+          <div class="val">84%</div>
+          <div class="lbl">Adherence</div>
+        </div>
+      </div>
+
+      <!-- Section: Coaching -->
+      <div class="sec-lbl s1">Coaching</div>
+
+      <div class="card c1 list-card">
+        <div class="row-item">
+          <div class="lead-av">J</div>
+          <div>
+            <div class="r-label">Jeroen</div>
+            <div class="r-meta">Je coach · chat</div>
+          </div>
+          <span class="status-pill"><span class="dot"></span>Online</span>
+          <svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+        </div>
+        <div class="row-item">
+          <div class="lead-ico">
+            <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+          </div>
+          <div>
+            <div class="r-label">Mijn plan</div>
+            <div class="r-meta">Bulk · week 4 van 12</div>
+          </div>
+          <svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+        </div>
+        <div class="row-item">
+          <div class="lead-ico">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/></svg>
+          </div>
+          <div>
+            <div class="r-label">Doelen</div>
+            <div class="r-meta">3 actief · +5 kg spiermassa</div>
+          </div>
+          <svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+        </div>
+        <div class="row-item">
+          <div class="lead-ico">
+            <svg viewBox="0 0 24 24"><path d="M4 12h16M12 4v16" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg>
+          </div>
+          <div>
+            <div class="r-label">Check-ins</div>
+            <div class="r-meta">Week-check-in openstaand</div>
+          </div>
+          <svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+        </div>
+      </div>
+
+      <!-- Section: Abonnement -->
+      <div class="sec-lbl s2">Abonnement</div>
+
+      <div class="card c2 list-card">
+        <div class="row-item">
+          <div class="lead-ico">
+            <svg viewBox="0 0 24 24"><path d="M5 7l7-4 7 4v10l-7 4-7-4z"/><path d="M12 3v18"/></svg>
+          </div>
+          <div>
+            <div class="r-label">Premium Coaching</div>
+            <div class="r-meta">Verlengt 14 mei · €120/m</div>
+          </div>
+          <svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+        </div>
+        <div class="row-item">
+          <div class="lead-ico">
+            <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg>
+          </div>
+          <div>
+            <div class="r-label">Betaalmethode</div>
+            <div class="r-meta">Mastercard •••• 4218</div>
+          </div>
+          <svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+        </div>
+        <div class="row-item">
+          <div class="lead-ico">
+            <svg viewBox="0 0 24 24"><path d="M9 17l-5-5 5-5"/><path d="M20 12H4"/></svg>
+          </div>
+          <div>
+            <div class="r-label">Factuurgeschiedenis</div>
+            <div class="r-meta">3 facturen</div>
+          </div>
+          <svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+        </div>
+      </div>
+
+      <!-- Section: Voorkeuren -->
+      <div class="sec-lbl s3">Voorkeuren</div>
+
+      <div class="card c3 list-card">
+        <div class="row-item">
+          <div class="lead-ico">
+            <svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3.5"/></svg>
+          </div>
+          <div class="r-label">Uiterlijk</div>
+          <div class="r-val">Auto</div>
+          <svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+        </div>
+        <div class="row-item">
+          <div class="lead-ico">
+            <svg viewBox="0 0 24 24"><path d="M6 7v11a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/><line x1="4" y1="7" x2="20" y2="7"/></svg>
+          </div>
+          <div class="r-label">Eenheden</div>
+          <div class="r-val">Metrisch · kg</div>
+          <svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+        </div>
+        <div class="row-item">
+          <div class="lead-ico">
+            <svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 4 2 5 2 5H4s2-1 2-5"/><path d="M10 18a2 2 0 0 0 4 0"/></svg>
+          </div>
+          <div class="r-label">Notificaties</div>
+          <div class="r-val">Aan</div>
+          <svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+        </div>
+        <div class="row-item">
+          <div class="lead-ico">
+            <svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          </div>
+          <div class="r-label">Privacy &amp; data</div>
+          <div class="r-val">&nbsp;</div>
+          <svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+        </div>
+        <div class="row-item">
+          <div class="lead-ico">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 9a2 2 0 1 1 3 1.5c-1 0.5-1 1.5-1 2"/><line x1="12" y1="16" x2="12" y2="16.01"/></svg>
+          </div>
+          <div class="r-label">Help &amp; support</div>
+          <div class="r-val">&nbsp;</div>
+          <svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+        </div>
+      </div>
+
+      <!-- Sign out -->
+      <button class="signout">Uitloggen</button>
+      <div class="ver">MŌVE 1.2.4 (build 218)</div>
+
+    </div>
+
+    <!-- Bnav -->
+    <div class="bnav">
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z"/></svg>
+        <span>Home</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M4 12h3l2-4 4 8 2-4h5"/></svg>
+        <span>Workouts</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M6 3h12l-1 5H7zM7 8v11h10V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+        <span>Dieet</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><polyline points="4 17 9 11 13 15 20 7"/></svg>
+        <span>Progress</span>
+      </div>
+      <div class="tab on">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
+        <span>Ik</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="ref">
+    <h4>10 · Ik</h4>
+    <p>Profiel-tab. Clean list-pattern met sectie-groupings. Apple-style, rustig, geen decoratie.</p>
+    <div class="lbl">Structuur</div>
+    <div class="row"><span>Avatar hero</span><strong>64px + naam + sub</strong></div>
+    <div class="row"><span>Stats-strip</span><strong>3-col open, gelijk aan dieet</strong></div>
+    <div class="row"><span>Sectie-labels</span><strong>10/500 caps /.16em</strong></div>
+    <div class="row"><span>List-cards</span><strong>light, 14px row height</strong></div>
+    <div class="lbl">Row-grid</div>
+    <div class="row"><span>Columns</span><strong>ico · label · val · chev</strong></div>
+    <div class="row"><span>Label</span><strong>15/400 ink</strong></div>
+    <div class="row"><span>Meta (sub)</span><strong>11/400 faint</strong></div>
+    <div class="row"><span>Value (rechts)</span><strong>13 ink-soft</strong></div>
+    <div class="lbl">Coach-row</div>
+    <p>Jeroen krijgt avatar (ipv icon) + status-pill met check-green dot. Enige "levende" rij tussen de settings.</p>
+    <div class="lbl">Uitloggen</div>
+    <p>Onopvallend. Ink-faint, centered, geen rode accent. Premium = geen paniek-knop.</p>
+  </div>
+
+</body>
+</html>

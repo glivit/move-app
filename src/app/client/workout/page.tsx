@@ -1,17 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronLeft, ChevronRight, Dumbbell, Clock, Play, Check, Footprints, Timer } from 'lucide-react'
-import { createClient } from '@/lib/supabase'
 import { cachedFetch } from '@/lib/fetcher'
 
+// ─── Types ─────────────────────────────────────────────────────────────
 interface ClientProgram {
   id: string
   name: string
   current_week: number
   client_id: string
   template_id: string
+  duration_weeks?: number
 }
 
 interface TemplateDay {
@@ -25,74 +25,100 @@ interface TemplateDay {
   exercise_count?: number
 }
 
-const WEEKDAY_LABELS: Record<string, string> = {
-  '1': 'Maandag', '2': 'Dinsdag', '3': 'Woensdag', '4': 'Donderdag',
-  '5': 'Vrijdag', '6': 'Zaterdag', '7': 'Zondag',
+interface ProgramResponse {
+  program?: ClientProgram
+  days?: TemplateDay[]
+  workoutsThisWeek?: number
+  schedule?: Record<string, string>
+  todayDay?: TemplateDay | null
+  todayCompleted?: boolean
+  activeSession?: { setsDone: number; totalSets: number } | null
 }
 
-const WEEKDAY_SHORT: Record<string, string> = {
-  '1': 'Ma', '2': 'Di', '3': 'Wo', '4': 'Do', '5': 'Vr', '6': 'Za', '7': 'Zo',
+// ─── Constants ─────────────────────────────────────────────────────────
+const WEEKDAY_SHORT_NL = ['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za']
+const MONTH_SHORT_NL = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
+
+/**
+ * Compute the next N upcoming days starting from tomorrow.
+ * Returns array with date + optional scheduled template day.
+ */
+function buildUpcoming(
+  schedule: Record<string, string>,
+  days: TemplateDay[],
+  count: number,
+): Array<{ date: Date; day: TemplateDay | null }> {
+  const dayMap = new Map(days.map(d => [d.id, d]))
+  const result: Array<{ date: Date; day: TemplateDay | null }> = []
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  for (let offset = 1; offset <= count; offset++) {
+    const d = new Date(today)
+    d.setDate(d.getDate() + offset)
+    const jsDay = d.getDay()
+    const iso = String(jsDay === 0 ? 7 : jsDay)
+    const templateDayId = schedule[iso]
+    const tmpl = templateDayId ? dayMap.get(templateDayId) || null : null
+    result.push({ date: d, day: tmpl })
+  }
+  return result
 }
 
+function chipLabelFor(date: Date, day: TemplateDay | null): string {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const diff = Math.round((date.getTime() - today.getTime()) / 86400000)
+  if (!day) return 'Rust'
+  if (diff === 1) return 'Morgen'
+  return 'Gepland'
+}
+
+// ─── Page ──────────────────────────────────────────────────────────────
 export default function WorkoutOverviewPage() {
   const router = useRouter()
-  const [program, setProgram] = useState<ClientProgram | null>(null)
-  const [days, setDays] = useState<TemplateDay[]>([])
+  const [data, setData] = useState<ProgramResponse>({})
   const [loading, setLoading] = useState(true)
-  const [workoutsThisWeek, setWorkoutsThisWeek] = useState(0)
-  const [schedule, setSchedule] = useState<Record<string, string>>({})
-  const [todayDay, setTodayDay] = useState<TemplateDay | null>(null)
-  const [todayCompleted, setTodayCompleted] = useState(false)
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await cachedFetch('/api/client-program', { maxAge: 30_000 })
-
-        if (data.program) {
-          setProgram(data.program)
-          setDays(data.days || [])
-          setWorkoutsThisWeek(data.workoutsThisWeek || 0)
-          setSchedule(data.schedule || {})
-          setTodayDay(data.todayDay || null)
-          setTodayCompleted(data.todayCompleted || false)
-        }
+        const res = await cachedFetch('/api/client-program', { maxAge: 30_000 }) as ProgramResponse
+        if (res?.program) setData(res)
       } catch (error) {
         console.error('Error loading program:', error)
       } finally {
         setLoading(false)
       }
     }
-
     loadData()
-  }, [router])
+  }, [])
 
-  const handleStartWorkout = (day: TemplateDay) => {
-    if (!program) return
-    router.push(`/client/workout/active?dayId=${day.id}&programId=${program.id}`)
-  }
+  const { program, days = [], schedule = {}, todayDay, todayCompleted, activeSession } = data
 
-  const getWeekdayForDay = (dayId: string): string | null => {
-    for (const [weekday, templateDayId] of Object.entries(schedule)) {
-      if (templateDayId === dayId) return weekday
-    }
-    return null
-  }
+  // Compute next-month header for context row
+  const monthLabel = useMemo(() => {
+    const t = new Date()
+    return `${MONTH_SHORT_NL[t.getMonth()]} ${t.getFullYear()}`.toUpperCase()
+  }, [])
 
+  const upcoming = useMemo(
+    () => (days.length ? buildUpcoming(schedule, days, 5) : []),
+    [schedule, days],
+  )
+
+  // Loading skeleton
   if (loading) {
     return (
       <div className="pb-28 animate-pulse">
-        <div className="h-7 w-24 bg-[#F0F0EE] rounded-lg mb-6" />
-        <div className="h-4 w-36 bg-[#F0F0EE] rounded mb-8" />
-        {[1, 2, 3].map(i => (
-          <div key={i} className="flex items-center gap-4 py-4 border-t border-[#F0F0EE]">
-            <div className="h-12 w-12 bg-[#F0F0EE] rounded-xl" />
-            <div className="flex-1">
-              <div className="h-4 w-28 bg-[#F0F0EE] rounded mb-1.5" />
-              <div className="h-3 w-20 bg-[#F0F0EE] rounded" />
-            </div>
-          </div>
-        ))}
+        <div
+          className="mb-4 rounded-[24px]"
+          style={{ height: 200, background: 'rgba(253,253,254,0.08)' }}
+        />
+        <div
+          className="rounded-[24px]"
+          style={{ height: 340, background: 'rgba(253,253,254,0.05)' }}
+        />
       </div>
     )
   }
@@ -100,14 +126,12 @@ export default function WorkoutOverviewPage() {
   if (!program) {
     return (
       <div className="pb-28">
-        <h1 className="page-title mb-6">
-          Training
-        </h1>
+        <h1 className="page-title mb-6">Training</h1>
         <div className="py-16 text-center">
-          <p className="text-editorial-h1 mb-3">
+          <p style={{ fontSize: 20, fontWeight: 300, color: '#FDFDFE', marginBottom: 8 }}>
             Geen programma
           </p>
-          <p className="text-[14px] text-[#ACACAC]" style={{ fontFamily: 'var(--font-body)' }}>
+          <p style={{ fontSize: 14, color: 'rgba(253,253,254,0.62)' }}>
             Je coach zal binnenkort een trainingsplan opstellen.
           </p>
         </div>
@@ -115,278 +139,176 @@ export default function WorkoutOverviewPage() {
     )
   }
 
-  const hasSchedule = Object.keys(schedule).length > 0
-  const progressPct = days.length > 0 ? (workoutsThisWeek / days.length) * 100 : 0
-  const jsDay = new Date().getDay()
-  const isoToday = jsDay === 0 ? 7 : jsDay
+  const handleStart = (day: TemplateDay) => {
+    router.push(`/client/workout/active?dayId=${day.id}&programId=${program.id}`)
+  }
+
+  const totalWeeks = program.duration_weeks || 12
+  const dayCountInProgram = days.length || 0
+  const todayDayNumber = todayDay?.day_number || 0
+
+  // Start/resume state copy
+  let startLabel = 'Starten'
+  let startSub = todayDay
+    ? `${todayDay.exercise_count ?? '—'} oefeningen · ±${todayDay.estimated_duration_min} min`
+    : 'Geen training vandaag'
+
+  if (todayCompleted && todayDay) {
+    startLabel = 'Voltooid'
+    startSub = 'Goed gedaan'
+  } else if (activeSession && activeSession.totalSets > 0) {
+    startLabel = 'Hervatten'
+    startSub = `Gestart · ${activeSession.setsDone} / ${activeSession.totalSets} sets gedaan`
+  }
 
   return (
     <div className="pb-28">
+      {/* ─── Hero · Vandaag (DARK) ─── */}
+      <div className="v6-card-dark" style={{ padding: '22px 22px 24px', marginBottom: 6, width: '100%' }}>
+        <div className="eyebrow">
+          {todayDay && !todayCompleted && <span className="pulse" />}
+          {todayDay ? 'Vandaag' : 'Rustdag'}
+        </div>
 
-      {/* ── Back ── */}
-      <button
-        onClick={() => router.push('/client')}
-        className="flex items-center gap-1.5 mb-7 mt-2 group"
-      >
-        <ChevronLeft strokeWidth={1.5} className="w-[18px] h-[18px] text-[#C0C0C0] group-hover:text-[#1A1917] transition-colors" />
-        <span className="text-[14px] text-[#C0C0C0] group-hover:text-[#1A1917] transition-colors" style={{ fontFamily: 'var(--font-body)' }}>
-          Home
-        </span>
-      </button>
-
-      {/* ── Header ── */}
-      <p
-        className="text-[12px] font-medium text-[#B0B0B0] uppercase tracking-[1.5px] mb-2"
-        style={{ fontFamily: 'var(--font-body)' }}
-      >
-        Week {program.current_week}
-      </p>
-      <h1 className="page-title mb-8">
-        {program.name}
-      </h1>
-
-      {/* ── TODAY'S WORKOUT — Hero ── */}
-      {todayDay && !todayCompleted && (
-        <button
-          onClick={() => handleStartWorkout(todayDay)}
-          className="w-full text-left mb-10 group"
-        >
-          <p
-            className="text-[12px] font-medium text-[#D46A3A] uppercase tracking-[1.5px] mb-3"
-            style={{ fontFamily: 'var(--font-body)' }}
-          >
-            Vandaag · {WEEKDAY_LABELS[String(isoToday)] || ''}
-          </p>
-          <p className="text-editorial-h1 mb-1">
-            {todayDay.name}
-          </p>
-          {todayDay.focus && (
-            <p className="text-[14px] text-[#ACACAC] mb-5" style={{ fontFamily: 'var(--font-body)' }}>
-              {todayDay.focus}
-            </p>
-          )}
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <span className="text-[13px] text-[#C0C0C0] flex items-center gap-1.5" style={{ fontFamily: 'var(--font-body)' }}>
-                <Dumbbell size={13} strokeWidth={1.5} />
-                {todayDay.exercise_count} oefeningen
-              </span>
-              <span className="text-[13px] text-[#C0C0C0] flex items-center gap-1.5" style={{ fontFamily: 'var(--font-body)' }}>
-                <Clock size={13} strokeWidth={1.5} />
-                ±{todayDay.estimated_duration_min} min
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2 bg-[#1A1917] px-5 py-2.5 rounded-xl group-hover:bg-[#333] transition-colors">
-              <Play size={14} strokeWidth={2.5} className="text-white" />
-              <span className="text-[12px] font-bold text-white uppercase tracking-[0.06em]">
-                Start
-              </span>
-            </div>
-          </div>
-        </button>
-      )}
-
-      {/* Today completed */}
-      {todayDay && todayCompleted && (
-        <div className="flex items-center gap-3 py-5 border-t border-[#F0F0EE] mb-8">
-          <div className="w-7 h-7 rounded-full bg-[#3D8B5C] flex items-center justify-center shrink-0">
-            <Check strokeWidth={2.5} className="w-3.5 h-3.5 text-white" />
-          </div>
-          <div>
-            <p
-              className="text-[15px] font-medium text-[#1A1917]"
-              style={{ fontFamily: 'var(--font-body)' }}
+        {todayDay ? (
+          <>
+            <div
+              style={{
+                fontSize: 22,
+                fontWeight: 300,
+                letterSpacing: '-0.018em',
+                lineHeight: 1.1,
+                color: '#FDFDFE',
+                margin: '14px 0 4px',
+              }}
             >
-              Training voltooid
-            </p>
-            <p className="text-[12px] text-[#C0C0C0]" style={{ fontFamily: 'var(--font-body)' }}>
-              {todayDay.name} — goed gedaan
-            </p>
-          </div>
-        </div>
-      )}
+              {todayDay.name}
+            </div>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 400,
+                color: 'rgba(253,253,254,0.44)',
+                letterSpacing: '0.01em',
+                marginBottom: 22,
+              }}
+            >
+              {todayDay.exercise_count ?? '—'} oefeningen · ±{todayDay.estimated_duration_min} min
+              {dayCountInProgram > 0 && todayDayNumber > 0 && (
+                <> · Dag {todayDayNumber} van {dayCountInProgram}</>
+              )}
+            </div>
 
-      {/* No workout today (rest day) */}
-      {!todayDay && hasSchedule && (
-        <div className="mb-10">
-          <p className="text-editorial-hero" style={{ fontWeight: 200 }}>
-            Rustdag
-          </p>
-          <p className="text-[14px] text-[#ACACAC] mt-2" style={{ fontFamily: 'var(--font-body)' }}>
-            Geen training ingepland voor vandaag
-          </p>
-        </div>
-      )}
-
-      {/* ── Week progress ── */}
-      <div className="border-t border-[#F0F0EE] pt-6 mb-10">
-        <div className="flex items-center justify-between mb-4">
-          <p
-            className="text-[12px] font-medium text-[#B0B0B0] uppercase tracking-[1.5px]"
-            style={{ fontFamily: 'var(--font-body)' }}
-          >
-            Weekvoortgang
-          </p>
-          <p className="section-title">
-            <span className="text-[#1A1917]">{workoutsThisWeek}</span>
-            <span className="text-[#C0C0C0]">/{days.length}</span>
-          </p>
-        </div>
-
-        {/* Thin progress bar */}
-        <div className="w-full h-[3px] bg-[#F0F0EE] rounded-full overflow-hidden mb-5">
-          <div
-            className="h-full rounded-full bg-[#D46A3A] transition-all duration-500"
-            style={{ width: `${progressPct}%` }}
-          />
-        </div>
-
-        {/* Week dots */}
-        {hasSchedule && (
-          <div className="flex gap-2">
-            {['1', '2', '3', '4', '5', '6', '7'].map(wd => {
-              const isScheduled = !!schedule[wd]
-              const isToday = wd === String(isoToday)
-
-              return (
-                <div key={wd} className="flex-1 text-center">
-                  <div
-                    className={`w-9 h-9 mx-auto rounded-full flex items-center justify-center text-[11px] font-bold uppercase tracking-[0.04em] transition-colors ${
-                      isToday && isScheduled
-                        ? 'bg-[#D46A3A] text-white'
-                        : isToday
-                          ? 'bg-[#1A1917] text-white'
-                          : isScheduled
-                            ? 'bg-[#F0F0EE] text-[#1A1917]'
-                            : 'text-[#D5D5D5]'
-                    }`}
-                  >
-                    {WEEKDAY_SHORT[wd]}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+            <div className="start-row">
+              <div>
+                <div className="start-lbl">{startLabel}</div>
+                <div className="start-sub">{startSub}</div>
+              </div>
+              <div className="start-cta">
+                <button
+                  className="ring"
+                  aria-label={startLabel}
+                  onClick={() => todayDay && handleStart(todayDay)}
+                  style={{ border: 'none', cursor: 'pointer' }}
+                >
+                  {todayCompleted ? (
+                    <svg viewBox="0 0 24 24">
+                      <polyline points="5 12 10 17 20 7" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24">
+                      <polygon points="8 5 19 12 8 19 8 5" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div
+              style={{
+                fontSize: 22,
+                fontWeight: 300,
+                letterSpacing: '-0.018em',
+                color: '#FDFDFE',
+                margin: '14px 0 4px',
+              }}
+            >
+              Rustdag
+            </div>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 400,
+                color: 'rgba(253,253,254,0.44)',
+                letterSpacing: '0.01em',
+              }}
+            >
+              Geen training ingepland voor vandaag
+            </div>
+          </>
         )}
       </div>
 
-      {/* ── All training days ── */}
-      <p
-        className="text-[12px] font-medium text-[#B0B0B0] uppercase tracking-[1.5px] mb-4"
-        style={{ fontFamily: 'var(--font-body)' }}
-      >
-        Alle trainingsdagen
-      </p>
+      {/* ─── Context head · Komende ─── */}
+      <div className="context-head">
+        <div className="context-l">Komende</div>
+        <div className="context-r">
+          {program.name} · Week {program.current_week}/{totalWeeks}
+        </div>
+      </div>
 
-      <div>
-        {days.map((day) => {
-          const weekday = getWeekdayForDay(day.id)
-          const isToday = todayDay?.id === day.id
-
+      {/* ─── Week-card · frosted glass ─── */}
+      <div className="week-card">
+        {upcoming.map(({ date, day }, idx) => {
+          const isRest = !day
+          const isPeek = idx === upcoming.length - 1
+          const rowClass =
+            'week-row' +
+            (isRest ? ' rest' : '') +
+            (isPeek && isRest ? ' peek' : '')
+          const weekdayLbl = WEEKDAY_SHORT_NL[date.getDay()]
+          const dayNum = date.getDate()
+          const chip = chipLabelFor(date, day)
+          const onClick = day ? () => handleStart(day) : undefined
           return (
             <button
-              key={day.id}
-              onClick={() => handleStartWorkout(day)}
-              className="w-full text-left flex items-center gap-4 py-4 border-t border-[#F0F0EE] group"
+              key={idx}
+              className={rowClass}
+              onClick={onClick}
+              style={{ cursor: day ? 'pointer' : 'default' }}
+              type="button"
             >
-              {/* Day number */}
-              <div
-                className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-[13px] font-bold ${
-                  isToday
-                    ? 'bg-[#D46A3A] text-white'
-                    : 'bg-[#F0F0EE] text-[#1A1917] group-hover:bg-[#1A1917] group-hover:text-white'
-                } transition-colors`}
-              >
-                {day.day_number}
+              <div className="wr-date">
+                <span className="d">{weekdayLbl}</span>
+                <span className="n">{dayNum}</span>
               </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p
-                    className="text-[15px] font-medium text-[#1A1917] truncate"
-                    style={{ fontFamily: 'var(--font-body)' }}
-                  >
-                    {day.name}
-                  </p>
-                  {weekday && (
-                    <span
-                      className="text-[10px] text-[#D46A3A] font-bold uppercase tracking-[0.06em]"
-                      style={{ fontFamily: 'var(--font-body)' }}
-                    >
-                      {WEEKDAY_SHORT[weekday]}
-                    </span>
+              <div className="wr-body">
+                <div className="wr-name">
+                  {day ? day.name : 'Rust · actief herstel'}
+                </div>
+                <div className="wr-meta">
+                  {day ? (
+                    <>
+                      {day.exercise_count ?? '—'} oefeningen · ±{day.estimated_duration_min} min
+                    </>
+                  ) : (
+                    'Wandeling of mobility'
                   )}
                 </div>
-                <div className="flex items-center gap-3 mt-0.5">
-                  {day.focus && (
-                    <span className="text-[12px] text-[#C0C0C0]" style={{ fontFamily: 'var(--font-body)' }}>
-                      {day.focus}
-                    </span>
-                  )}
-                  <span className="text-[12px] text-[#C0C0C0] flex items-center gap-1" style={{ fontFamily: 'var(--font-body)' }}>
-                    <Dumbbell size={11} strokeWidth={1.5} />
-                    {day.exercise_count}
-                  </span>
-                  <span className="text-[12px] text-[#C0C0C0] flex items-center gap-1" style={{ fontFamily: 'var(--font-body)' }}>
-                    <Clock size={11} strokeWidth={1.5} />
-                    ±{day.estimated_duration_min}m
-                  </span>
-                </div>
               </div>
-
-              <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#D5D5D5] group-hover:text-[#1A1917] transition-colors shrink-0" />
+              <div className="wr-chip">{chip}</div>
             </button>
           )
         })}
-      </div>
-
-      {/* ── Quick cardio ── */}
-      <div className="border-t border-[#F0F0EE] pt-6 mt-6 mb-10">
-        <p
-          className="text-[12px] font-medium text-[#B0B0B0] uppercase tracking-[1.5px] mb-4"
-          style={{ fontFamily: 'var(--font-body)' }}
-        >
-          Cardio
-        </p>
-        <button
-          onClick={() => router.push('/client/workout/cardio')}
-          className="w-full flex items-center gap-4 p-4 bg-[#F8F8F6] rounded-2xl group hover:bg-[#1A1917] transition-all active:scale-[0.98] touch-manipulation"
-          style={{ WebkitTapHighlightColor: 'transparent' }}
-        >
-          <div className="w-12 h-12 bg-[#D46A3A]/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-[#D46A3A]/20 transition-colors">
-            <Footprints size={20} strokeWidth={1.5} className="text-[#D46A3A]" />
-          </div>
-          <div className="flex-1 text-left">
-            <p className="text-[15px] font-semibold text-[#1A1917] group-hover:text-white transition-colors">
-              Start cardio sessie
-            </p>
-            <p className="text-[12px] text-[#ACACAC] mt-0.5 group-hover:text-white/60 transition-colors">
-              Loopband · Stairmaster · Wandelen · Interval
-            </p>
-          </div>
-          <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#D5D5D5] group-hover:text-white/60 transition-colors shrink-0" />
+        <button className="week-more" type="button">
+          Volgende week
+          <svg viewBox="0 0 24 24">
+            <polyline points="9 6 15 12 9 18" />
+          </svg>
         </button>
       </div>
-
-      {/* Sticky Start CTA for today's workout */}
-      {todayDay && !todayCompleted && (
-        <div className="fixed bottom-24 left-0 right-0 px-5 z-30 pointer-events-none">
-          <div className="max-w-lg mx-auto pointer-events-auto">
-            <button
-              onClick={() => handleStartWorkout(todayDay)}
-              className="w-full flex items-center justify-center gap-2.5 bg-[#1A1917] text-white py-4 rounded-2xl shadow-lg shadow-black/10 active:scale-[0.98] transition-all touch-manipulation hover:bg-[#333]"
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-            >
-              <Play size={18} strokeWidth={2.5} fill="white" />
-              <span className="text-[15px] font-bold uppercase tracking-[0.06em]">
-                Start training
-              </span>
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

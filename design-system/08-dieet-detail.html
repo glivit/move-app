@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MŌVE — Dieet detail</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       08 · Dieet detail — plan-first logging
+       ────────────────────────────────────────────────────────────
+       Vervangt huidige MFP-style screen. Tap check = log, tap row
+       = portie-sheet, kebab = verwijder/vervang/details. Ghost-row
+       onderaan elke maaltijd = + Voedingsmiddel toevoegen.
+       ═══════════════════════════════════════════════════════════ */
+
+    .scroll { padding: 66px 0 110px; }
+
+    /* Page-head weggelaten — context is duidelijk uit tab-nav + hero */
+
+    /* ═══════════ 1 · MACRO HERO · minimal strip ═══════════
+       Geen card, geen hero-getal. Stats-row: alle cijfers zelfde grootte.
+       Progress = 1px hairline. Macros eronder klein en compact.
+       ═══════════════════════════════════════════════════════════════ */
+    .macro-hero {
+      background: transparent;
+      box-shadow: none;
+      padding: 4px 22px 14px;
+    }
+    .mh-num-row {
+      display: flex; align-items: baseline; gap: 6px;
+      margin-bottom: 10px;
+    }
+    .mh-num, .mh-target {
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: -0.015em;
+      line-height: 1.1;
+      font-feature-settings: "tnum";
+    }
+    .mh-num { color: var(--ink); }
+    .mh-target { color: var(--ink-faint); }
+    .mh-target small {
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      margin-left: 4px;
+      color: var(--ink-faint);
+    }
+    /* Subtiel element: hair-thin progress line */
+    .mh-bar {
+      height: 1px;
+      background: rgba(253,253,254,0.16);
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .mh-bar .fill {
+      height: 100%;
+      background: var(--ink);
+      opacity: 0.72;
+    }
+
+    /* Macros klein, compact, zonder scheidslijnen */
+    .macros {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .macro-cell .m-val {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      letter-spacing: 0.005em;
+      font-feature-settings: "tnum";
+      line-height: 1.15;
+    }
+    .macro-cell .m-val small {
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      margin-left: 1px;
+    }
+    .macro-cell .m-val .m-div {
+      color: var(--ink-ghost);
+      margin: 0 2px;
+      font-weight: 300;
+    }
+    .macro-cell .m-val .m-tar {
+      color: var(--ink-faint);
+      font-weight: 300;
+    }
+    .macro-cell .m-lbl {
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--ink-faint);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* ═══════════ 2 · MEAL CARD · light ═══════════ */
+    .meal {
+      padding: 18px 20px 16px;
+    }
+    .meal-head {
+      display: grid;
+      grid-template-columns: 1fr auto 28px;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .meal-name {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+    .meal-kcal {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.01em;
+      font-feature-settings: "tnum";
+    }
+    .meal-macros {
+      grid-column: 1 / 3;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.04em;
+      font-feature-settings: "tnum";
+      margin-top: 1px;
+      text-transform: uppercase;
+    }
+    /* Meal-level status ring */
+    .meal-all {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(0,0,0,0.24);
+      background: transparent;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 160ms var(--ease);
+      padding: 0;
+      grid-row: 1 / 3;
+      grid-column: 3;
+      align-self: center;
+    }
+    .meal-all.done {
+      background: var(--check);
+      border-color: var(--check);
+    }
+    .meal-all.done svg { display: block; }
+    .meal-all svg {
+      display: none;
+      width: 12px; height: 12px;
+      stroke: var(--white);
+      stroke-width: 2.5;
+      fill: none;
+    }
+    .meal-all.partial::before {
+      content: '';
+      width: 10px; height: 1.5px;
+      background: rgba(0,0,0,0.48);
+      border-radius: 1px;
+    }
+
+    /* Items list */
+    .items { margin-top: 14px; }
+    .item {
+      display: grid;
+      grid-template-columns: 22px 1fr auto 18px;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-top: 1px solid rgba(0,0,0,0.10);
+    }
+    .item:first-of-type { border-top: none; padding-top: 4px; }
+
+    .chk {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(0,0,0,0.30);
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 160ms var(--ease);
+    }
+    .chk svg { display: none; width: 11px; height: 11px; stroke: var(--white); stroke-width: 2.5; fill: none; }
+    .chk.on { background: var(--check); border-color: var(--check); }
+    .chk.on svg { display: block; }
+
+    .it-body { min-width: 0; }
+    .it-name {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.003em;
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .it-portion {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.01em;
+      margin-top: 2px;
+      font-feature-settings: "tnum";
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    /* Tap-to-adjust affordance on portion */
+    .it-portion .adj {
+      display: inline-block;
+      padding: 2px 7px;
+      margin-left: 4px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.08);
+      color: var(--ink-soft);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .item .it-kcal {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      letter-spacing: 0.01em;
+      font-feature-settings: "tnum";
+      text-align: right;
+    }
+
+    /* Checked state — subtle color-fade alleen, GEEN strike-through */
+    .item.done .it-name { color: var(--ink-faint); }
+    .item.done .it-portion { opacity: 0.70; }
+    .item.done .it-kcal { color: var(--ink-faint); }
+
+    /* Adjusted portion — kleine lime badge om aan te tonen dat het afwijkt van plan */
+    .it-portion .adj.edited { background: rgba(192,252,1,0.22); color: #2A3B00; }
+
+    .kebab-ico {
+      width: 18px; height: 18px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    .kebab-ico span {
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.38);
+      box-shadow: 0 -5px 0 rgba(0,0,0,0.38), 0 5px 0 rgba(0,0,0,0.38);
+    }
+
+    /* Ghost add row */
+    .add-row {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px;
+      margin: 10px -20px -16px;
+      padding: 13px 20px;
+      border-top: 1px dashed rgba(0,0,0,0.14);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      letter-spacing: -0.003em;
+      transition: background 140ms;
+    }
+    .add-row:hover { background: rgba(0,0,0,0.04); }
+    .add-row svg { width: 12px; height: 12px; stroke: var(--ink-soft); stroke-width: 2; fill: none; }
+
+    /* ═══════════ 3 · Boodschappenlijst ghost ═══════════ */
+    .boodschap {
+      background: rgba(253,253,254,0.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      padding: 16px 18px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+    }
+    .boodschap .b-ico {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(253,253,254,0.10);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .boodschap .b-ico svg { width: 13px; height: 13px; stroke: var(--ink); stroke-width: 1.8; fill: none; }
+    .boodschap .b-body {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.003em;
+    }
+    .boodschap .b-body small {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      margin-top: 1px;
+      letter-spacing: 0.01em;
+    }
+    .boodschap .chev {
+      width: 14px; height: 14px;
+      stroke: var(--ink-faint);
+      stroke-width: 1.8;
+      fill: none;
+    }
+
+    /* ═══════════ 4 · Richtlijnen coach-quote dark ═══════════ */
+    .richt {
+      padding: 20px 22px 20px;
+    }
+    .richt-head {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 14px;
+    }
+    .r-av {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(140deg, #5A5E52, #3D403A);
+      color: rgba(244,242,235,0.92);
+      font-size: 12px;
+      font-weight: 500;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+      letter-spacing: 0.02em;
+    }
+    .r-meta .r-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: -0.003em;
+      line-height: 1.1;
+    }
+    .r-meta .r-role {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--ink-faint);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .r-body {
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--ink-soft);
+      letter-spacing: 0.005em;
+      line-height: 1.55;
+    }
+
+    /* ═══════════ Sticky footer ═══════════ */
+    .dag-foot {
+      position: absolute;
+      bottom: 18px; left: 5%; right: 5%;
+      z-index: 50;
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) 780ms forwards;
+    }
+    .dag-pill {
+      width: 100%;
+      padding: 15px;
+      border-radius: var(--r-lg);
+      background: var(--card-dark);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: -0.003em;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.28);
+    }
+    .dag-pill .chev { stroke: var(--ink); stroke-width: 1.8; fill: none; width: 12px; height: 12px; }
+    .dag-pill .kcal-chip {
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(253,253,254,0.12);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      letter-spacing: 0.01em;
+      font-feature-settings: "tnum";
+    }
+
+    /* Bnav verborgen — detail view is focus-scherm */
+    .bnav { display: none; }
+
+    /* Stagger */
+    .card.m1 { animation-delay: 220ms; }
+    .card.m2 { animation-delay: 300ms; }
+    .card.m3 { animation-delay: 360ms; }
+    .card.m4 { animation-delay: 420ms; }
+    .card.m5 { animation-delay: 480ms; }
+    .card.m6 { animation-delay: 540ms; }
+    .card.m7 { animation-delay: 600ms; }
+    .card.m8 { animation-delay: 660ms; }
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+    <div class="scroll">
+
+      <!-- Standard top -->
+      <div class="top">
+        <div class="logo">MŌVE</div>
+        <div class="top-r">
+          <div class="av">G</div>
+          <button class="ico-btn">
+            <svg viewBox="0 0 24 24"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- 1 · Macro stats-strip — minimal, geen titel -->
+      <div class="card m1 macro-hero">
+        <div class="mh-num-row">
+          <div class="mh-num">1.287</div>
+          <div class="mh-target">/ 3.400<small>kcal</small></div>
+        </div>
+        <div class="mh-bar"><div class="fill" style="width: 37.8%;"></div></div>
+
+        <div class="macros">
+          <div class="macro-cell">
+            <div class="m-val">112<span class="m-div">/</span><span class="m-tar">250</span><small>g</small></div>
+            <div class="m-lbl">Eiwit</div>
+          </div>
+          <div class="macro-cell">
+            <div class="m-val">148<span class="m-div">/</span><span class="m-tar">335</span><small>g</small></div>
+            <div class="m-lbl">Koolh.</div>
+          </div>
+          <div class="macro-cell">
+            <div class="m-val">42<span class="m-div">/</span><span class="m-tar">120</span><small>g</small></div>
+            <div class="m-lbl">Vet</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2 · Meal · Ochtend Shake · DONE -->
+      <div class="card m2 meal">
+        <div class="meal-head">
+          <div class="meal-name">Ochtend Shake</div>
+          <div class="meal-kcal">219 kcal</div>
+          <button class="meal-all done">
+            <svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg>
+          </button>
+          <div class="meal-macros">48E · 6K · 3V</div>
+        </div>
+
+        <div class="items">
+          <div class="item done">
+            <button class="chk on"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></button>
+            <div class="it-body">
+              <div class="it-name">ESN Isoclear Whey Berry</div>
+              <div class="it-portion">60g<span class="adj">portie</span></div>
+            </div>
+            <div class="it-kcal">219 kcal</div>
+            <div class="kebab-ico"><span></span></div>
+          </div>
+
+          <div class="item done">
+            <button class="chk on"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></button>
+            <div class="it-body">
+              <div class="it-name">Creatine Monohydrate</div>
+              <div class="it-portion">10g<span class="adj">portie</span></div>
+            </div>
+            <div class="it-kcal">0 kcal</div>
+            <div class="kebab-ico"><span></span></div>
+          </div>
+
+          <div class="add-row">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Voedingsmiddel toevoegen
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 · Meal · Snack (high kcal) · DONE -->
+      <div class="card m3 meal">
+        <div class="meal-head">
+          <div class="meal-name">Snack (high kcal)</div>
+          <div class="meal-kcal">515 kcal</div>
+          <button class="meal-all done">
+            <svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg>
+          </button>
+          <div class="meal-macros">12E · 72K · 22V</div>
+        </div>
+
+        <div class="items">
+          <div class="item done">
+            <button class="chk on"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></button>
+            <div class="it-body">
+              <div class="it-name">Cashewnoten</div>
+              <div class="it-portion">50g<span class="adj edited">+10g</span></div>
+            </div>
+            <div class="it-kcal">276 kcal</div>
+            <div class="kebab-ico"><span></span></div>
+          </div>
+          <div class="item done">
+            <button class="chk on"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></button>
+            <div class="it-body">
+              <div class="it-name">Banaan</div>
+              <div class="it-portion">130g<span class="adj">portie</span></div>
+            </div>
+            <div class="it-kcal">116 kcal</div>
+            <div class="kebab-ico"><span></span></div>
+          </div>
+          <div class="item done">
+            <button class="chk on"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></button>
+            <div class="it-body">
+              <div class="it-name">Rijstwafels</div>
+              <div class="it-portion">30g<span class="adj">portie</span></div>
+            </div>
+            <div class="it-kcal">123 kcal</div>
+            <div class="kebab-ico"><span></span></div>
+          </div>
+
+          <div class="add-row">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Voedingsmiddel toevoegen
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 · Meal · Lunch · PARTIAL -->
+      <div class="card m4 meal">
+        <div class="meal-head">
+          <div class="meal-name">Lunch</div>
+          <div class="meal-kcal">796 kcal</div>
+          <button class="meal-all partial"></button>
+          <div class="meal-macros">52E · 70K · 17V</div>
+        </div>
+
+        <div class="items">
+          <div class="item done">
+            <button class="chk on"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></button>
+            <div class="it-body">
+              <div class="it-name">Wrap Kip Curry</div>
+              <div class="it-portion">350g<span class="adj">portie</span></div>
+            </div>
+            <div class="it-kcal">620 kcal</div>
+            <div class="kebab-ico"><span></span></div>
+          </div>
+          <div class="item done">
+            <button class="chk on"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></button>
+            <div class="it-body">
+              <div class="it-name">Passata</div>
+              <div class="it-portion">100g<span class="adj">portie</span></div>
+            </div>
+            <div class="it-kcal">29 kcal</div>
+            <div class="kebab-ico"><span></span></div>
+          </div>
+          <div class="item">
+            <button class="chk"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></button>
+            <div class="it-body">
+              <div class="it-name">Olijfolie</div>
+              <div class="it-portion">10g<span class="adj">portie</span></div>
+            </div>
+            <div class="it-kcal">88 kcal</div>
+            <div class="kebab-ico"><span></span></div>
+          </div>
+          <div class="item">
+            <button class="chk"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></button>
+            <div class="it-body">
+              <div class="it-name">Parmezaan</div>
+              <div class="it-portion">15g<span class="adj">portie</span></div>
+            </div>
+            <div class="it-kcal">59 kcal</div>
+            <div class="kebab-ico"><span></span></div>
+          </div>
+
+          <div class="add-row">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Voedingsmiddel toevoegen
+          </div>
+        </div>
+      </div>
+
+      <!-- 5 · Meal · Diner · EMPTY -->
+      <div class="card m5 meal">
+        <div class="meal-head">
+          <div class="meal-name">Diner (Muscle Meat)</div>
+          <div class="meal-kcal">896 kcal</div>
+          <button class="meal-all"></button>
+          <div class="meal-macros">68E · 82K · 28V</div>
+        </div>
+
+        <div class="items">
+          <div class="item">
+            <button class="chk"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></button>
+            <div class="it-body">
+              <div class="it-name">Rundsburgers</div>
+              <div class="it-portion">200g<span class="adj">portie</span></div>
+            </div>
+            <div class="it-kcal">380 kcal</div>
+            <div class="kebab-ico"><span></span></div>
+          </div>
+          <div class="item">
+            <button class="chk"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></button>
+            <div class="it-body">
+              <div class="it-name">Rijst Basmati</div>
+              <div class="it-portion">100g droog<span class="adj">portie</span></div>
+            </div>
+            <div class="it-kcal">360 kcal</div>
+            <div class="kebab-ico"><span></span></div>
+          </div>
+          <div class="item">
+            <button class="chk"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></button>
+            <div class="it-body">
+              <div class="it-name">Broccoli</div>
+              <div class="it-portion">200g<span class="adj">portie</span></div>
+            </div>
+            <div class="it-kcal">68 kcal</div>
+            <div class="kebab-ico"><span></span></div>
+          </div>
+          <div class="item">
+            <button class="chk"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></button>
+            <div class="it-body">
+              <div class="it-name">Olijfolie</div>
+              <div class="it-portion">10g<span class="adj">portie</span></div>
+            </div>
+            <div class="it-kcal">88 kcal</div>
+            <div class="kebab-ico"><span></span></div>
+          </div>
+
+          <div class="add-row">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Voedingsmiddel toevoegen
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 · Meal · Na eten · EMPTY -->
+      <div class="card m6 meal">
+        <div class="meal-head">
+          <div class="meal-name">Na eten (pudding + kcal)</div>
+          <div class="meal-kcal">526 kcal</div>
+          <button class="meal-all"></button>
+          <div class="meal-macros">48E · 40K · 12V</div>
+        </div>
+
+        <div class="items">
+          <div class="item">
+            <button class="chk"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></button>
+            <div class="it-body">
+              <div class="it-name">Proteïne Pudding Ehrmann</div>
+              <div class="it-portion">200g<span class="adj">portie</span></div>
+            </div>
+            <div class="it-kcal">200 kcal</div>
+            <div class="kebab-ico"><span></span></div>
+          </div>
+          <div class="item">
+            <button class="chk"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></button>
+            <div class="it-body">
+              <div class="it-name">Proteïne Pudding Melkunie</div>
+              <div class="it-portion">200g<span class="adj">portie</span></div>
+            </div>
+            <div class="it-kcal">210 kcal</div>
+            <div class="kebab-ico"><span></span></div>
+          </div>
+          <div class="item">
+            <button class="chk"><svg viewBox="0 0 24 24"><polyline points="5 12 10 17 19 8"/></svg></button>
+            <div class="it-body">
+              <div class="it-name">Rijstwafels Chocolade</div>
+              <div class="it-portion">30g<span class="adj">portie</span></div>
+            </div>
+            <div class="it-kcal">116 kcal</div>
+            <div class="kebab-ico"><span></span></div>
+          </div>
+
+          <div class="add-row">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Voedingsmiddel toevoegen
+          </div>
+        </div>
+      </div>
+
+      <!-- 7 · Boodschappenlijst ghost -->
+      <div class="card m7 boodschap">
+        <div class="b-ico">
+          <svg viewBox="0 0 24 24">
+            <path d="M6 6h14l-1.5 9H7L5 3H2"/>
+            <circle cx="9" cy="20" r="1.5"/>
+            <circle cx="18" cy="20" r="1.5"/>
+          </svg>
+        </div>
+        <div class="b-body">
+          Boodschappenlijst
+          <small>16 items · automatisch uit je weekplan</small>
+        </div>
+        <svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+      </div>
+
+      <!-- 8 · Richtlijnen coach quote -->
+      <div class="card dark m8 richt">
+        <div class="richt-head">
+          <div class="r-av">J</div>
+          <div class="r-meta">
+            <div class="r-name">Jeroen</div>
+            <div class="r-role">Coach</div>
+          </div>
+        </div>
+        <div class="r-body">
+          Bulk voor hard gainers. Double Isoclear in de ochtend, high-kcal snacks, easy diners via AH &amp; Muscle Meat. Zondag = frietjesdag.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sticky footer -->
+    <div class="dag-foot">
+      <button class="dag-pill">
+        Dag indienen
+        <span class="kcal-chip">1.287 / 3.400</span>
+        <svg class="chev" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Reference -->
+  <div class="ref">
+    <h4>08 · Dieet detail</h4>
+    <p>Plan-first logging. Tap check = log. Tap row = portie-sheet (08b). Tap kebab = verwijder/vervang. Ghost-row onderaan elke maaltijd = + Voedingsmiddel toevoegen (08c).</p>
+
+    <div class="lbl">Kaart-ritme</div>
+    <div class="row"><span>1 · Macro hero</span><strong>DARK</strong></div>
+    <div class="row"><span>2-6 · Maaltijden</span><strong>LIGHT</strong></div>
+    <div class="row"><span>7 · Boodschap</span><strong>LIGHT ghost</strong></div>
+    <div class="row"><span>8 · Richtlijnen</span><strong>DARK coach-quote</strong></div>
+
+    <div class="lbl">Meal-header</div>
+    <div class="row"><span>markeer-alles</span><strong>26px cirkel</strong></div>
+    <div class="row"><span>empty</span><strong>ink-outline</strong></div>
+    <div class="row"><span>partial</span><strong>dash-indicator</strong></div>
+    <div class="row"><span>done</span><strong>--check fill</strong></div>
+
+    <div class="lbl">Item-row</div>
+    <div class="row"><span>chk-cirkel</span><strong>22px · --check</strong></div>
+    <div class="row"><span>portie-pill</span><strong>"portie" tap-affordance</strong></div>
+    <div class="row"><span>portie edited</span><strong>lime-tint pill "+10g"</strong></div>
+    <div class="row"><span>kcal</span><strong>13 ink-soft tnum</strong></div>
+    <div class="row"><span>kebab</span><strong>verwijder / vervang</strong></div>
+
+    <div class="lbl">Ghost add-row</div>
+    <div class="row"><span>stijl</span><strong>dashed-border-top</strong></div>
+    <div class="row"><span>actie</span><strong>opent 08c sheet</strong></div>
+
+    <div class="lbl">Progress bars</div>
+    <div class="row"><span>kcal-bar</span><strong>3px ink fill</strong></div>
+    <div class="row"><span>macro-bar</span><strong>2px ink fill</strong></div>
+
+    <div class="lbl">Richtlijnen</div>
+    <p>Coach-avatar + naam maakt van een grijze paragraaf een stem. Jeroen wordt herkenbaar.</p>
+
+    <div class="lbl">Sticky Dag indienen</div>
+    <p>Solid card-dark pill met kcal-chip inline. Geen lime (event-paint-regel geldt). Premium-neutraal.</p>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MŌVE — Nav System v2</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       12 · Nav concept v2
+       ────────────────────────────────────────────────────────────
+       Drie states side-by-side om de nav-evolutie te laten zien.
+       "1 nav voor alle screens" — consistent op élk scherm.
+
+       Voorstel in dit bestand:
+         · Drop hamburger rechtsboven. Alle "meer"-content (settings,
+           logout, taal, account, help) woont natuurlijk in Ik-tab.
+         · Avatar blijft — tap op avatar springt direct naar Ik.
+         · Bottom nav gaat van 5-iconen-rij naar een "+" pill die
+           expandeert naar een labels-only pill op tap.
+         · + roteert 90° naar − bij expand.
+
+       Eén nav-systeem = eén ritme overal.
+       ═══════════════════════════════════════════════════════════ */
+
+    body { min-height: 100vh; }
+
+    .stage {
+      min-height: 100vh;
+      padding: 60px 50px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .intro {
+      max-width: 720px;
+      text-align: center;
+      color: var(--ink);
+    }
+    .intro h1 {
+      font-size: 32px;
+      font-weight: 250;
+      letter-spacing: -0.028em;
+      margin-bottom: 8px;
+    }
+    .intro p {
+      color: var(--ink-muted);
+      font-size: 14px;
+      line-height: 1.55;
+      letter-spacing: -0.005em;
+    }
+
+    .trio {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+    }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .col-cap {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .col-title {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+      margin-top: -10px;
+      text-align: center;
+      max-width: 240px;
+    }
+
+    /* phone override for side-by-side */
+    .col .phone { transform: scale(0.78); transform-origin: top center; margin-bottom: -180px; }
+
+    /* ─── Stub content to show scale/context ─── */
+    .stub-top {
+      padding: 0 5%;
+      margin-top: 66px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+    .stub-top .logo {
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+    .stub-r { display: flex; gap: 6px; align-items: center; }
+    .stub-av {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(140deg, #5A5E52, #3D403A);
+      color: rgba(244,242,235,0.92);
+      font-size: 11px;
+      font-weight: 500;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 1px 3px rgba(0,0,0,0.20);
+    }
+    .stub-ham {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .stub-ham svg { width: 13px; height: 13px; stroke: var(--ink); stroke-width: 1.8; fill: none; }
+
+    .stub-body {
+      padding: 0 5%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .stub-card {
+      background: var(--card);
+      border-radius: var(--r-xl);
+      height: 110px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
+    }
+    .stub-card.dark { background: var(--card-dark); height: 180px; }
+
+    /* ─── Nav A: current (icon bnav + hamburger) ─── */
+    .bnav-old {
+      position: absolute;
+      left: 5%; right: 5%;
+      bottom: 20px;
+      background: var(--card-dark);
+      border-radius: 28px;
+      padding: 14px 20px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 6px 18px rgba(0,0,0,0.25);
+    }
+    .bnav-old .item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--ink-muted);
+      letter-spacing: 0.005em;
+    }
+    .bnav-old .item svg { width: 19px; height: 19px; stroke: currentColor; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .bnav-old .item.on { color: var(--ink); }
+    .bnav-old .item .dot {
+      width: 3px; height: 3px; border-radius: 50%;
+      background: var(--lime);
+      box-shadow: 0 0 5px rgba(192,252,1,0.6);
+      margin-top: 1px;
+      opacity: 0;
+    }
+    .bnav-old .item.on .dot { opacity: 1; }
+
+    /* ─── Nav B: collapsed + pill ─── */
+    .bnav-plus {
+      position: absolute;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%);
+      background: var(--card-dark);
+      border-radius: 999px;
+      width: 68px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 22px rgba(0,0,0,0.30);
+      cursor: pointer;
+    }
+    .bnav-plus svg {
+      width: 18px; height: 18px;
+      stroke: var(--ink);
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      fill: none;
+    }
+
+    /* ─── Nav C: expanded labels-only pill ─── */
+    .bnav-open {
+      position: absolute;
+      left: 5%; right: 5%;
+      bottom: 20px;
+      background: var(--card-dark);
+      border-radius: 999px;
+      padding: 0 8px 0 12px;
+      height: 56px;
+      display: grid;
+      grid-template-columns: 36px 1fr 1fr 1fr 1fr;
+      align-items: center;
+      gap: 2px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 22px rgba(0,0,0,0.30);
+    }
+    .bnav-open .close {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    .bnav-open .close svg {
+      width: 18px; height: 18px;
+      stroke: var(--ink);
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      fill: none;
+      transform: rotate(90deg);
+    }
+    .bnav-open .lbl {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink-muted);
+      letter-spacing: -0.005em;
+      text-align: center;
+      cursor: pointer;
+      padding: 10px 0 8px;
+      position: relative;
+    }
+    .bnav-open .lbl.on {
+      color: var(--ink);
+      font-weight: 500;
+    }
+    .bnav-open .lbl.on::after {
+      content: '';
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: var(--lime);
+      box-shadow: 0 0 5px rgba(192,252,1,0.6);
+    }
+
+    /* ─── Notes block ─── */
+    .notes {
+      max-width: 760px;
+      margin-top: 20px;
+      padding: 28px 32px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.04);
+      color: var(--ink-muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .notes h3 { color: var(--ink); font-size: 15px; font-weight: 500; margin-bottom: 12px; letter-spacing: -0.005em; }
+    .notes h4 { color: var(--ink); font-size: 11px; font-weight: 500; margin: 22px 0 8px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.72; }
+    .notes .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; }
+    .notes .row:last-child { border-bottom: none; }
+    .notes strong { color: var(--ink); font-weight: 500; }
+    .notes ul { list-style: none; padding: 0; margin: 8px 0 0; }
+    .notes ul li { padding: 4px 0; font-size: 12px; }
+    .notes ul li::before { content: "— "; color: var(--ink-faint); }
+
+    .overlay-cross {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .overlay-cross::before, .overlay-cross::after {
+      content: '';
+      position: absolute;
+      top: 56%;
+      right: 14%;
+      width: 34px;
+      height: 1.5px;
+      background: rgba(180, 30, 30, 0.70);
+      transform-origin: center;
+    }
+    .overlay-cross::before { transform: rotate(38deg); }
+    .overlay-cross::after  { transform: rotate(-38deg); }
+  </style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div class="intro">
+    <h1>Één nav voor álles</h1>
+    <p>Logo linksboven = altijd <strong>MŌVE</strong>. Geen hamburger rechts — die doublet met de Ik-tab en maakt de top druk. Onder: een "+" pill die open-klapt naar een labels-only bnav. Geen icoontjes. Clean.</p>
+  </div>
+
+  <div class="trio">
+
+    <!-- ── Column 1 : Huidig ── -->
+    <div class="col">
+      <div class="col-cap">Huidig · v1</div>
+      <div class="col-title" style="color: rgba(255,180,180,0.85);">Twee navs — top + bottom — met icoontjes die herhalen wat de tabs al zeggen</div>
+      <div class="phone">
+        <div class="overlay-cross"></div>
+        <div class="stub-top">
+          <div class="logo">MŌVE</div>
+          <div class="stub-r">
+            <div class="stub-av">G</div>
+            <div class="stub-ham">
+              <svg viewBox="0 0 24 24"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="stub-body">
+          <div class="stub-card"></div>
+          <div class="stub-card dark"></div>
+          <div class="stub-card"></div>
+        </div>
+
+        <div class="bnav-old">
+          <div class="item on">
+            <svg viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z"/></svg>
+            Home
+            <div class="dot"></div>
+          </div>
+          <div class="item">
+            <svg viewBox="0 0 24 24"><path d="M4 12h3l2-4 4 8 2-4h5"/></svg>
+            Workouts
+            <div class="dot"></div>
+          </div>
+          <div class="item">
+            <svg viewBox="0 0 24 24"><path d="M6 3h12l-1 5H7zM7 8v11h10V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+            Dieet
+            <div class="dot"></div>
+          </div>
+          <div class="item">
+            <svg viewBox="0 0 24 24"><polyline points="4 17 9 11 13 15 20 7"/></svg>
+            Progress
+            <div class="dot"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Column 2 : Collapsed ── -->
+    <div class="col">
+      <div class="col-cap">Voorstel · collapsed</div>
+      <div class="col-title">Top cleaner (geen hamburger). Bottom-nav rust als een "+" pill — klein, stil, uit de weg.</div>
+      <div class="phone">
+        <div class="stub-top">
+          <div class="logo">MŌVE</div>
+          <div class="stub-r">
+            <div class="stub-av">G</div>
+          </div>
+        </div>
+        <div class="stub-body">
+          <div class="stub-card"></div>
+          <div class="stub-card dark"></div>
+          <div class="stub-card"></div>
+        </div>
+
+        <div class="bnav-plus">
+          <svg viewBox="0 0 24 24">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Column 3 : Expanded ── -->
+    <div class="col">
+      <div class="col-cap">Voorstel · expanded</div>
+      <div class="col-title">Tap op "+" → roteert 90° naar "−" + bnav schuift open met labels. Geen iconen, alleen tekst.</div>
+      <div class="phone">
+        <div class="stub-top">
+          <div class="logo">MŌVE</div>
+          <div class="stub-r">
+            <div class="stub-av">G</div>
+          </div>
+        </div>
+        <div class="stub-body">
+          <div class="stub-card"></div>
+          <div class="stub-card dark"></div>
+          <div class="stub-card"></div>
+        </div>
+
+        <div class="bnav-open">
+          <div class="close">
+            <svg viewBox="0 0 24 24">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </div>
+          <div class="lbl on">Home</div>
+          <div class="lbl">Workouts</div>
+          <div class="lbl">Dieet</div>
+          <div class="lbl">Progress</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Notes -->
+  <div class="notes">
+    <h3>Keuzes &amp; rationale</h3>
+
+    <h4>Top-bar</h4>
+    <div class="row"><span>Logo</span><strong>MŌVE — overal, geen "M"</strong></div>
+    <div class="row"><span>Avatar rechts</span><strong>Blijft · tap → Ik-tab</strong></div>
+    <div class="row"><span>Hamburger</span><strong>Drop</strong></div>
+    <p style="margin-top:10px; font-size:12px;">
+      Alle "meer"-inhoud (settings, account, logout, taal, help, coach-contact) woont natuurlijk in Ik of Chat. Een hamburger naast Ik is een doublure. De top-bar wordt daarmee rustiger en het logo krijgt ruimte. Bij geen avatar → top toont alleen MŌVE, dat voelt al premium.
+    </p>
+
+    <h4>Bottom-nav — twee staten</h4>
+    <div class="row"><span>Collapsed</span><strong>Mini pill, 68 × 44, alleen "+"</strong></div>
+    <div class="row"><span>Expanded</span><strong>Brede pill, 4 labels + close-state "−"</strong></div>
+    <div class="row"><span>Active</span><strong>Witte tekst + lime dot onder label</strong></div>
+    <div class="row"><span>Animatie</span><strong>+ roteert 90° (0.32s · ease-out) · pill-width breidt uit</strong></div>
+    <p style="margin-top:10px; font-size:12px;">
+      Waarom alleen labels (geen iconen)? Bij 4 stabiele tabs — Home / Workouts / Dieet / Progress — winnen woorden. Iconen werken vooral bij &gt;5 opties of in glyph-toolbars. Hier: premium, rustiger, sneller te lezen. Ik zit bovenin als avatar (geen dubbel-entry in bnav).
+    </p>
+
+    <h4>Scroll-gedrag</h4>
+    <ul>
+      <li>Collapsed is de default — pill blijft in beeld, scrollt niet weg</li>
+      <li>Expanded blijft open tot je op close ("−") tikt of een tab kiest</li>
+      <li>Tap op een label → pill collapseert automatisch terug naar "+"</li>
+      <li>Pill blijft altijd centered, nooit full-width, met lucht aan de zijkanten</li>
+    </ul>
+
+    <h4>Waar het raakt</h4>
+    <p style="font-size:12px; margin-top:6px;">
+      Alle 11+ schermen in de design-system gebruiken nu <code>.top</code> met logo + avatar + hamburger, en eigen bnav-componenten. Implementatie: <code>.top</code> versimpelen (hamburger weg), bnav uitfaseren naar dit nieuwe pattern in <code>shared.css</code>. Eén bron, overal hetzelfde.
+    </p>
+  </div>
+
+</div>
+
+</body>
+</html>

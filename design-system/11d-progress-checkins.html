@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MŌVE — Progress · Check-ins</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       11d · Progress · Check-ins
+       ────────────────────────────────────────────────────────────
+       Doel: dialoog met coach — wekelijkse & maandelijkse check-ins
+       Weekly  = light card, compact
+       Monthly = dark card, uitgebreid met foto + coach ✓
+       ═══════════════════════════════════════════════════════════ */
+
+    .scroll { padding: 66px 0 110px; }
+
+    /* Subtabs */
+    .subtabs {
+      padding: 0 5% 18px;
+      display: flex; gap: 6px; overflow-x: auto;
+      scrollbar-width: none;
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) 140ms forwards;
+    }
+    .subtabs::-webkit-scrollbar { display: none; }
+    .subtab {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      border-radius: var(--r-pill);
+      font-size: 13px; font-weight: 400;
+      letter-spacing: -0.005em;
+      color: var(--ink-soft);
+      background: transparent;
+      border: 1px solid rgba(253,253,254,0.10);
+      cursor: pointer;
+    }
+    .subtab.on { background: var(--ink); color: #2A2D2B; border-color: var(--ink); font-weight: 500; }
+
+    /* ─── Due CTA banner ─── */
+    .due-banner {
+      margin: 0 5% 18px;
+      padding: 20px 20px 22px;
+      border-radius: var(--r-xl);
+      background: var(--card-dark);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 18px rgba(0,0,0,0.22);
+      position: relative;
+      overflow: hidden;
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) 220ms forwards;
+    }
+    .due-banner::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -40px;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, rgba(192,252,1,0.10), transparent 60%);
+    }
+    .db-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .db-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--lime);
+      box-shadow: 0 0 10px rgba(192,252,1,0.60);
+    }
+    .db-eye {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .db-title {
+      font-size: 22px;
+      font-weight: 250;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      line-height: 1.15;
+      margin-bottom: 6px;
+      position: relative;
+    }
+    .db-sub {
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--ink-soft);
+      letter-spacing: -0.005em;
+      line-height: 1.45;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .db-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 18px 12px 20px;
+      border-radius: var(--r-pill);
+      background: var(--ink);
+      color: #2A2D2B;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -0.005em;
+      border: none;
+      cursor: pointer;
+      position: relative;
+    }
+    .db-cta svg { width: 11px; height: 11px; stroke: #2A2D2B; stroke-width: 2.2; fill: none; }
+    .db-meta {
+      display: inline-block;
+      margin-left: 12px;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.005em;
+    }
+
+    /* ─── Section cap ─── */
+    .sec-cap {
+      padding: 6px 5% 12px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .sec-cap.mt { padding-top: 14px; }
+
+    /* ─── Monthly check-in — dark, uitgebreid ─── */
+    .ci-monthly {
+      background: var(--card-dark);
+      margin: 0 5% 6px;
+      padding: 20px 22px 22px;
+      border-radius: var(--r-xl);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18);
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) forwards;
+    }
+    .ci-monthly.mm1 { animation-delay: 320ms; }
+    .ci-monthly.mm2 { animation-delay: 400ms; }
+
+    .ci-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .ci-type {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ci-chip {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: var(--r-pill);
+      background: rgba(192,252,1,0.14);
+      color: #D5FF4F;
+    }
+    .ci-date {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.005em;
+    }
+    .ci-num {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    .ci-title {
+      font-size: 17px;
+      font-weight: 400;
+      letter-spacing: -0.012em;
+      color: var(--ink);
+      margin-bottom: 14px;
+      line-height: 1.3;
+    }
+
+    /* Photo + stats side by side */
+    .ci-body {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .ci-photo {
+      aspect-ratio: 3/4;
+      border-radius: 10px;
+      background:
+        linear-gradient(145deg, rgba(0,0,0,0.15), rgba(0,0,0,0.35)),
+        linear-gradient(160deg, #6A6E67, #3A3D37);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+    .ci-photo::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 40%; height: 70%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(ellipse 60% 55% at 50% 38%, rgba(255,255,255,0.10), transparent 60%);
+    }
+    .ci-stats {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .ci-stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 6px 0;
+      border-top: 1px solid rgba(253,253,254,0.06);
+      font-feature-settings: "tnum";
+    }
+    .ci-stat-row:first-child { border-top: none; padding-top: 0; }
+    .ci-sl {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.005em;
+    }
+    .ci-sv {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+    }
+    .ci-sv small {
+      font-size: 10px;
+      color: var(--ink-muted);
+      margin-left: 2px;
+      letter-spacing: 0;
+    }
+
+    /* Coach reply */
+    .ci-reply {
+      display: flex;
+      gap: 10px;
+      padding: 14px 14px 14px 12px;
+      background: rgba(253,253,254,0.04);
+      border-radius: 12px;
+      border: 1px solid rgba(253,253,254,0.06);
+    }
+    .ci-av {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(140deg, #5A5E52, #3D403A);
+      color: rgba(244,242,235,0.94);
+      font-size: 10px;
+      font-weight: 500;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
+    }
+    .ci-rply-head {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .ci-rply-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+    }
+    .ci-rply-time {
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--ink-faint);
+    }
+    .ci-rply-text {
+      font-size: 12px;
+      font-weight: 300;
+      color: var(--ink-soft);
+      line-height: 1.55;
+      letter-spacing: -0.005em;
+    }
+
+    /* ─── Weekly check-in — light, compact ─── */
+    .ci-weekly {
+      background: var(--card);
+      margin: 0 5% 6px;
+      padding: 14px 18px 14px;
+      border-radius: var(--r-lg);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 14px;
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) forwards;
+    }
+    .ci-weekly.w1 { animation-delay: 500ms; }
+    .ci-weekly.w2 { animation-delay: 540ms; }
+    .ci-weekly.w3 { animation-delay: 580ms; }
+    .ci-weekly.w4 { animation-delay: 620ms; }
+
+    .ci-w-ico {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(47,166,90,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ci-w-ico svg {
+      width: 11px; height: 11px;
+      stroke: #6FD598;
+      stroke-width: 2.4;
+      fill: none;
+    }
+    .ci-w-body { min-width: 0; }
+    .ci-w-title {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+      line-height: 1.2;
+    }
+    .ci-w-sub {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      margin-top: 2px;
+      letter-spacing: 0.005em;
+    }
+    .ci-w-date {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+    <div class="scroll">
+
+      <!-- Top bar -->
+      <div class="top">
+        <div class="logo">MŌVE</div>
+        <div class="top-r">
+          <div class="av">GD</div>
+          <button class="ico-btn" aria-label="Menu">
+            <svg viewBox="0 0 24 24"><line x1="4" y1="7"  x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Subtabs -->
+      <div class="subtabs">
+        <button class="subtab">Overzicht</button>
+        <button class="subtab">Kracht</button>
+        <button class="subtab">Lichaam</button>
+        <button class="subtab on">Check-ins</button>
+      </div>
+
+      <!-- Due banner -->
+      <div class="due-banner">
+        <div class="db-top">
+          <div class="db-dot"></div>
+          <div class="db-eye">Staat klaar · vrijdag</div>
+        </div>
+        <div class="db-title">Wekelijkse check-in</div>
+        <div class="db-sub">Hoe voelde deze week? Energie, slaap, honger — jouw input bepaalt wat Jeroen volgende week aanpast.</div>
+        <button class="db-cta">
+          Start check-in
+          <svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+        </button>
+        <span class="db-meta">± 3 min</span>
+      </div>
+
+      <!-- Maandelijks -->
+      <div class="sec-cap">Maandelijks</div>
+
+      <div class="ci-monthly mm1">
+        <div class="ci-head">
+          <div class="ci-type">
+            <span class="ci-chip">Maand</span>
+            <span class="ci-date">maart 2026</span>
+          </div>
+          <span class="ci-num">#3</span>
+        </div>
+        <div class="ci-title">Sterk blok. Je bench sprong 7 kg, taille −1,5 cm.</div>
+
+        <div class="ci-body">
+          <div class="ci-photo"></div>
+          <div class="ci-stats">
+            <div class="ci-stat-row">
+              <div class="ci-sl">Gewicht</div>
+              <div class="ci-sv">84,8 <small>kg · −1,2</small></div>
+            </div>
+            <div class="ci-stat-row">
+              <div class="ci-sl">Taille</div>
+              <div class="ci-sv">82,5 <small>cm · −1,5</small></div>
+            </div>
+            <div class="ci-stat-row">
+              <div class="ci-sl">Workouts</div>
+              <div class="ci-sv">14 <small>/ 16 gepland</small></div>
+            </div>
+            <div class="ci-stat-row">
+              <div class="ci-sl">Adherence</div>
+              <div class="ci-sv">84<small>%</small></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ci-reply">
+          <div class="ci-av">JV</div>
+          <div>
+            <div class="ci-rply-head">
+              <span class="ci-rply-name">Jeroen</span>
+              <span class="ci-rply-time">feedback · 01 apr</span>
+            </div>
+            <div class="ci-rply-text">
+              Je hebt een deficit van ±500 kcal volgehouden en toch progress op bench — dat is exact wat we wilden zien. Voor april voegen we één hypertrofie-blok toe voor armen, die blijven achter op volume. Check je check-in-antwoord over slaap: 6u is te laag.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ci-monthly mm2">
+        <div class="ci-head">
+          <div class="ci-type">
+            <span class="ci-chip">Maand</span>
+            <span class="ci-date">februari 2026</span>
+          </div>
+          <span class="ci-num">#2</span>
+        </div>
+        <div class="ci-title">Recovery-blok. Gewicht stabiel, kracht bouwt door.</div>
+
+        <div class="ci-body">
+          <div class="ci-photo"></div>
+          <div class="ci-stats">
+            <div class="ci-stat-row">
+              <div class="ci-sl">Gewicht</div>
+              <div class="ci-sv">86,0 <small>kg · −0,4</small></div>
+            </div>
+            <div class="ci-stat-row">
+              <div class="ci-sl">Taille</div>
+              <div class="ci-sv">84,0 <small>cm · −0,5</small></div>
+            </div>
+            <div class="ci-stat-row">
+              <div class="ci-sl">Workouts</div>
+              <div class="ci-sv">12 <small>/ 12 gepland</small></div>
+            </div>
+            <div class="ci-stat-row">
+              <div class="ci-sl">Adherence</div>
+              <div class="ci-sv">79<small>%</small></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ci-reply">
+          <div class="ci-av">JV</div>
+          <div>
+            <div class="ci-rply-head">
+              <span class="ci-rply-name">Jeroen</span>
+              <span class="ci-rply-time">feedback · 02 mrt</span>
+            </div>
+            <div class="ci-rply-text">
+              Mooi consistent blok. Je gaf aan dat knie wat zeurde — squat houden we op 80% intensiteit tot einde maart, dan bouwen we terug op. Adherence was 79%, dat mag iets hoger voor de cut.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wekelijks -->
+      <div class="sec-cap mt">Wekelijks · ingeleverd</div>
+
+      <div class="ci-weekly w1">
+        <div class="ci-w-ico">
+          <svg viewBox="0 0 24 24"><polyline points="5 12 10 17 20 7"/></svg>
+        </div>
+        <div class="ci-w-body">
+          <div class="ci-w-title">Week 15 · goed uitgerust, energie hoog</div>
+          <div class="ci-w-sub">Coach reactie · 11 apr</div>
+        </div>
+        <div class="ci-w-date">11 apr</div>
+      </div>
+
+      <div class="ci-weekly w2">
+        <div class="ci-w-ico">
+          <svg viewBox="0 0 24 24"><polyline points="5 12 10 17 20 7"/></svg>
+        </div>
+        <div class="ci-w-body">
+          <div class="ci-w-title">Week 14 · druk weekend, 1 sessie gemist</div>
+          <div class="ci-w-sub">Coach reactie · 04 apr</div>
+        </div>
+        <div class="ci-w-date">04 apr</div>
+      </div>
+
+      <div class="ci-weekly w3">
+        <div class="ci-w-ico">
+          <svg viewBox="0 0 24 24"><polyline points="5 12 10 17 20 7"/></svg>
+        </div>
+        <div class="ci-w-body">
+          <div class="ci-w-title">Week 13 · bench PR gehaald</div>
+          <div class="ci-w-sub">Coach reactie · 28 mrt</div>
+        </div>
+        <div class="ci-w-date">28 mrt</div>
+      </div>
+
+      <div class="ci-weekly w4">
+        <div class="ci-w-ico">
+          <svg viewBox="0 0 24 24"><polyline points="5 12 10 17 20 7"/></svg>
+        </div>
+        <div class="ci-w-body">
+          <div class="ci-w-title">Week 12 · deload, lichte kuit-pijn</div>
+          <div class="ci-w-sub">Coach reactie · 21 mrt</div>
+        </div>
+        <div class="ci-w-date">21 mrt</div>
+      </div>
+
+    </div>
+
+    <!-- Bnav -->
+    <div class="bnav">
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z"/></svg>
+        <span>Home</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M4 12h3l2-4 4 8 2-4h5"/></svg>
+        <span>Workouts</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M6 3h12l-1 5H7zM7 8v11h10V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+        <span>Dieet</span>
+      </div>
+      <div class="tab on">
+        <svg viewBox="0 0 24 24"><polyline points="4 17 9 11 13 15 20 7"/></svg>
+        <span>Progress</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
+        <span>Ik</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="ref">
+    <h4>11d · Progress · Check-ins</h4>
+    <p>Beantwoordt: wat hebben we afgesproken, en wat zegt coach? Dialoog-historiek.</p>
+    <div class="lbl">Due-banner</div>
+    <div class="row"><span>Dark card</span><strong>22/250 titel + lime dot + CTA pill</strong></div>
+    <div class="row"><span>Verdwijnt</span><strong>wanneer week ingeleverd</strong></div>
+    <div class="lbl">Monthly (dark)</div>
+    <div class="row"><span>Layout</span><strong>foto + 4 stats + coach reply</strong></div>
+    <div class="row"><span>Title</span><strong>headline-zin van coach ("Sterk blok...")</strong></div>
+    <div class="row"><span>Chip</span><strong>lime-tinted "MAAND"</strong></div>
+    <div class="lbl">Weekly (light)</div>
+    <div class="row"><span>Layout</span><strong>compact 1-liner · check-ico</strong></div>
+    <div class="row"><span>Ico</span><strong>check-green (2FA65A tint)</strong></div>
+    <div class="lbl">UX-rationale</div>
+    <p>Weekly is hoge frequentie / lage betekenis — visueel gedeprioritiseerd. Monthly is het eigenlijke product — foto, stats en coach-oordeel in één.</p>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MŌVE — Voedingsmiddel toevoegen</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       08c · Voedingsmiddel toevoegen (bottom sheet)
+       ────────────────────────────────────────────────────────────
+       Getriggerd door de "+ Voedingsmiddel toevoegen" ghost-rij in
+       08. Zelfde architectuur als 06c (add-exercise): sheet 78%,
+       zoek + chips + Recent + Alles + sticky "Eigen voeding".
+       ═══════════════════════════════════════════════════════════ */
+
+    /* Ghost context */
+    .ghost-top {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      padding: 52px 20px 14px;
+      z-index: 5;
+    }
+    .ghost-label {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .ghost-scroll {
+      padding: 84px 0 0;
+      filter: blur(5px) saturate(0.7);
+      opacity: 0.70;
+      pointer-events: none;
+    }
+    .ghost-scroll::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(180deg, rgba(142,152,144,0) 0%, rgba(0,0,0,0.28) 60%);
+      z-index: 10;
+      pointer-events: none;
+    }
+    .ghost-card {
+      background: var(--card);
+      border-radius: var(--r-xl);
+      padding: 18px 20px;
+      width: 90%;
+      margin: 0 auto 8px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
+    }
+    .ghost-row {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-top: 1px solid rgba(0,0,0,0.10);
+    }
+    .ghost-row:first-child { border-top: none; }
+    .ghost-row .n { font-size: 14px; color: var(--ink); }
+    .ghost-row .p { font-size: 12px; color: var(--ink-faint); }
+
+    /* ───── Sheet ───── */
+    .sheet {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 78%;
+      background: var(--card-dark);
+      border-radius: 28px 28px 0 0;
+      padding: 0;
+      z-index: 100;
+      display: flex; flex-direction: column;
+      box-shadow: 0 -24px 60px rgba(0,0,0,0.45);
+      opacity: 0; transform: translateY(24px);
+      animation: up var(--t) var(--ease) 140ms forwards;
+      overflow: hidden;
+    }
+    .grabber {
+      width: 44px; height: 5px;
+      border-radius: 999px;
+      background: rgba(253,253,254,0.28);
+      margin: 10px auto 0;
+      flex-shrink: 0;
+    }
+    .sheet-top {
+      display: grid;
+      grid-template-columns: 32px 1fr 32px;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 20px 8px;
+      flex-shrink: 0;
+    }
+    .sheet-x {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(253,253,254,0.08);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sheet-x svg { width: 12px; height: 12px; stroke: var(--ink); stroke-width: 2; fill: none; }
+    .sheet-title-block { text-align: center; }
+    .sheet-title {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+    }
+    .sheet-ctx {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.02em;
+      margin-top: 2px;
+    }
+
+    /* Search */
+    .search {
+      margin: 8px 20px 12px;
+      flex-shrink: 0;
+      display: flex; align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: var(--r-md);
+      background: rgba(253,253,254,0.08);
+    }
+    .search svg { width: 13px; height: 13px; stroke: var(--ink-faint); stroke-width: 2; fill: none; flex-shrink: 0; }
+    .search input {
+      flex: 1;
+      background: transparent;
+      border: none; outline: none;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.003em;
+    }
+    .search input::placeholder { color: var(--ink-faint); }
+    .search .scan {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: rgba(253,253,254,0.10);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    .search .scan svg { stroke: var(--ink-soft); }
+
+    /* Chips */
+    .chips {
+      display: flex; gap: 7px;
+      padding: 4px 20px 14px;
+      flex-shrink: 0;
+      overflow-x: auto;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(253,253,254,0.06);
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      flex-shrink: 0;
+      border: 1px solid transparent;
+    }
+    .chip.on { background: var(--ink); color: #0E1100; font-weight: 500; }
+
+    /* Lists */
+    .list-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 20px 110px;
+    }
+    .list-body::-webkit-scrollbar { display: none; }
+
+    .group-head {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 14px 0 8px;
+    }
+    .group-head h3 {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--ink-faint);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .group-head span {
+      font-size: 10px;
+      color: var(--ink-faint);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+
+    .food {
+      display: grid;
+      grid-template-columns: 34px 1fr 28px;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 0;
+      border-top: 1px solid rgba(253,253,254,0.08);
+      cursor: pointer;
+    }
+    .food:first-of-type { border-top: none; padding-top: 6px; }
+    .food-ico {
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      background: rgba(253,253,254,0.08);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .food-ico svg { width: 15px; height: 15px; stroke: var(--ink-soft); stroke-width: 1.6; fill: none; }
+    .food-body { min-width: 0; }
+    .food-name {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.003em;
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .food-meta {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.01em;
+      margin-top: 2px;
+      font-feature-settings: "tnum";
+    }
+    .food-meta .m {
+      display: inline-block;
+      margin-right: 8px;
+    }
+    .food-add {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(253,253,254,0.10);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .food-add svg { width: 11px; height: 11px; stroke: var(--ink); stroke-width: 2; fill: none; }
+
+    /* Sticky "eigen voeding" */
+    .new-food {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 16px 20px 22px;
+      background: linear-gradient(180deg, rgba(71,75,72,0) 0%, rgba(71,75,72,0.95) 30%, rgba(71,75,72,1) 70%);
+      display: flex; justify-content: center;
+    }
+    .new-food button {
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--r-lg);
+      background: rgba(253,253,254,0.10);
+      border: 1px dashed rgba(253,253,254,0.28);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+      letter-spacing: -0.003em;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .new-food svg { width: 13px; height: 13px; stroke: var(--ink); stroke-width: 2; fill: none; }
+
+    .bnav { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+
+    <div class="ghost-top">
+      <div class="ghost-label">Snack (high kcal) · 515 kcal</div>
+    </div>
+
+    <div class="ghost-scroll">
+      <div class="ghost-card">
+        <div class="ghost-row"><span class="n">Cashewnoten</span><span class="p">40g · 221 kcal</span></div>
+        <div class="ghost-row"><span class="n">Banaan</span><span class="p">130g · 116 kcal</span></div>
+        <div class="ghost-row"><span class="n">Rijstwafels</span><span class="p">30g · 116 kcal</span></div>
+      </div>
+    </div>
+
+    <!-- ═══════════ Sheet ═══════════ -->
+    <div class="sheet">
+      <div class="grabber"></div>
+
+      <div class="sheet-top">
+        <button class="sheet-x"><svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+        <div class="sheet-title-block">
+          <div class="sheet-title">Voedingsmiddel toevoegen</div>
+          <div class="sheet-ctx">voor Snack (high kcal)</div>
+        </div>
+        <div></div>
+      </div>
+
+      <!-- Search -->
+      <div class="search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+        <input type="text" placeholder="Zoek voeding, merk of barcode…" />
+        <div class="scan">
+          <svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="10" rx="1"/><line x1="8" y1="7" x2="8" y2="17"/><line x1="12" y1="7" x2="12" y2="17"/><line x1="16" y1="7" x2="16" y2="17"/></svg>
+        </div>
+      </div>
+
+      <!-- Chips -->
+      <div class="chips">
+        <div class="chip on">Vaak gebruikt</div>
+        <div class="chip">Shakes</div>
+        <div class="chip">Snacks</div>
+        <div class="chip">Maaltijden</div>
+        <div class="chip">Sauzen</div>
+        <div class="chip">Vocht</div>
+      </div>
+
+      <!-- List -->
+      <div class="list-body">
+
+        <div class="group-head">
+          <h3>Jouw recente keuzes</h3>
+          <span>laatste 7 dagen</span>
+        </div>
+
+        <div class="food">
+          <div class="food-ico"><svg viewBox="0 0 24 24"><path d="M6 4h8l4 4v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="14 4 14 8 18 8"/></svg></div>
+          <div class="food-body">
+            <div class="food-name">Cashewnoten ongezouten</div>
+            <div class="food-meta"><span class="m">553 kcal/100g</span><span class="m">18E 27K 44V</span></div>
+          </div>
+          <button class="food-add"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+
+        <div class="food">
+          <div class="food-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M7 12a5 5 0 0 1 10 0"/></svg></div>
+          <div class="food-body">
+            <div class="food-name">ESN Isoclear Whey Berry</div>
+            <div class="food-meta"><span class="m">365 kcal/100g</span><span class="m">85E 7K 2V</span></div>
+          </div>
+          <button class="food-add"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+
+        <div class="food">
+          <div class="food-ico"><svg viewBox="0 0 24 24"><path d="M4 14c2 3 6 5 8 5s6-2 8-5-4-10-8-10-10 7-8 10z"/></svg></div>
+          <div class="food-body">
+            <div class="food-name">Banaan</div>
+            <div class="food-meta"><span class="m">89 kcal/100g</span><span class="m">1E 23K 0V</span></div>
+          </div>
+          <button class="food-add"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+
+        <div class="food">
+          <div class="food-ico"><svg viewBox="0 0 24 24"><rect x="5" y="9" width="14" height="10" rx="1"/><circle cx="12" cy="14" r="2"/></svg></div>
+          <div class="food-body">
+            <div class="food-name">Proteïne Pudding Ehrmann</div>
+            <div class="food-meta"><span class="m">100 kcal/100g</span><span class="m">14E 5K 3V</span></div>
+          </div>
+          <button class="food-add"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+
+        <div class="group-head">
+          <h3>Alle voedingsmiddelen</h3>
+          <span>A – Z</span>
+        </div>
+
+        <div class="food">
+          <div class="food-ico"><svg viewBox="0 0 24 24"><path d="M6 4h8l4 4v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg></div>
+          <div class="food-body">
+            <div class="food-name">Amandelen naturel</div>
+            <div class="food-meta"><span class="m">579 kcal/100g</span><span class="m">21E 22K 49V</span></div>
+          </div>
+          <button class="food-add"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+
+        <div class="food">
+          <div class="food-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg></div>
+          <div class="food-body">
+            <div class="food-name">Avocado</div>
+            <div class="food-meta"><span class="m">160 kcal/100g</span><span class="m">2E 9K 15V</span></div>
+          </div>
+          <button class="food-add"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+
+        <div class="food">
+          <div class="food-ico"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></div>
+          <div class="food-body">
+            <div class="food-name">Boterham volkoren</div>
+            <div class="food-meta"><span class="m">247 kcal/100g</span><span class="m">11E 41K 3V</span></div>
+          </div>
+          <button class="food-add"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+
+      </div>
+
+      <!-- Sticky new food -->
+      <div class="new-food">
+        <button>
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Eigen voeding aanmaken
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Reference -->
+  <div class="ref">
+    <h4>08c · Voedingsmiddel toevoegen</h4>
+    <p>Triggered door de ghost-rij onderaan elke maaltijd in 08. Zelfde architectuur als 06c (add-exercise) — chips, Recent, Alles A–Z, sticky "eigen aanmaken".</p>
+
+    <div class="lbl">Sheet-structuur</div>
+    <div class="row"><span>Hoogte</span><strong>78%</strong></div>
+    <div class="row"><span>Context-sub</span><strong>"voor Snack (high kcal)"</strong></div>
+
+    <div class="lbl">Search</div>
+    <div class="row"><span>Barcode-knop</span><strong>scan-icoon rechts</strong></div>
+    <div class="row"><span>Placeholder</span><strong>"Zoek voeding, merk of barcode…"</strong></div>
+
+    <div class="lbl">Chips</div>
+    <div class="row"><span>Vaak gebruikt</span><strong>default on</strong></div>
+    <div class="row"><span>Categorieën</span><strong>Shakes · Snacks · Maaltijden · Sauzen · Vocht</strong></div>
+
+    <div class="lbl">Food-row</div>
+    <div class="row"><span>Icon</span><strong>34×34 category-ico</strong></div>
+    <div class="row"><span>Naam</span><strong>14/400</strong></div>
+    <div class="row"><span>Macro-meta</span><strong>kcal/100g + EKV</strong></div>
+    <div class="row"><span>Actie</span><strong>+ knop rechts</strong></div>
+
+    <div class="lbl">Nieuwe voeding</div>
+    <p>Dashed-border ghost-pill onderaan met fade-gradient. Opent een form (naam + macro's per 100g + eenheid).</p>
+
+    <div class="lbl">Waarom?</div>
+    <p>MFP heeft een zoekbalk als hoofdingang. MŌVE draait het om: <strong>Vaak gebruikt</strong> first, want je pakt 80% van de tijd dezelfde producten. Scroll door Alles A–Z is de langzame weg.</p>
+  </div>
+
+</body>
+</html>

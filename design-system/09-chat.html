@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MŌVE — Chat met coach</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       09 · Chat — coach ↔ client
+       ────────────────────────────────────────────────────────────
+       Eén-op-één met Jeroen. Simpel. Géén groep, géén reactions.
+       Bubble-stijl: coach = light, client = dark. Lime ALLEEN
+       voor event-paint (system-card nieuwe-PR o.i.d.).
+       ═══════════════════════════════════════════════════════════ */
+
+    .scroll { padding: 94px 0 104px; }
+    .bnav { display: none; }
+
+    /* ─── Chat top (vervangt standaard .top) ─── */
+    .chat-top {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      padding: 52px 5% 14px;
+      display: grid;
+      grid-template-columns: 32px 1fr 32px;
+      align-items: center;
+      gap: 14px;
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg) 72%, rgba(142,152,144,0) 100%);
+      z-index: 40;
+    }
+    .chat-top .back {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+    }
+    .chat-top .back svg { width: 12px; height: 12px; stroke: var(--ink); stroke-width: 1.8; fill: none; }
+    .chat-top .peer { display: flex; align-items: center; gap: 10px; }
+    .chat-top .peer .av-lg {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(140deg, #5A5E52, #3D403A);
+      color: rgba(244,242,235,0.92);
+      font-size: 13px;
+      font-weight: 500;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+    }
+    .chat-top .peer-txt { line-height: 1.15; }
+    .chat-top .peer-name {
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+    .chat-top .peer-status {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.01em;
+      display: inline-flex; align-items: center; gap: 5px;
+      margin-top: 1px;
+    }
+    .chat-top .peer-status .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--check);
+    }
+    .chat-top .info {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+    }
+    .chat-top .info svg { width: 13px; height: 13px; stroke: var(--ink); stroke-width: 1.8; fill: none; }
+
+    /* ─── Thread ─── */
+    .thread { padding: 0 5%; display: flex; flex-direction: column; gap: 10px; }
+
+    /* Date divider */
+    .divider {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin: 14px 0 6px;
+    }
+
+    /* Bubble base */
+    .bubble {
+      max-width: 76%;
+      padding: 11px 14px;
+      border-radius: 18px;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.45;
+      letter-spacing: -0.003em;
+      color: var(--ink);
+      word-wrap: break-word;
+      opacity: 0; transform: translateY(6px);
+      animation: up var(--t) var(--ease) forwards;
+    }
+    .bubble .t {
+      display: block;
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.02em;
+      margin-top: 4px;
+      font-feature-settings: "tnum";
+    }
+    /* Coach = left, light bubble */
+    .bubble.coach {
+      align-self: flex-start;
+      background: var(--card);
+      color: var(--ink);
+      border-top-left-radius: 8px;
+    }
+    .bubble.coach .t { color: var(--ink-faint); }
+    /* Client = right, dark bubble */
+    .bubble.me {
+      align-self: flex-end;
+      background: var(--card-dark);
+      color: var(--ink);
+      border-top-right-radius: 8px;
+    }
+    .bubble.me .t { text-align: right; color: var(--ink-faint); }
+
+    /* Stagger */
+    .bubble.b1 { animation-delay: 120ms; }
+    .bubble.b2 { animation-delay: 180ms; }
+    .bubble.b3 { animation-delay: 240ms; }
+    .bubble.b4 { animation-delay: 300ms; }
+    .bubble.b5 { animation-delay: 360ms; }
+    .bubble.b6 { animation-delay: 420ms; }
+    .bubble.b7 { animation-delay: 480ms; }
+
+    /* Image attachment inside coach bubble */
+    .bubble .img {
+      width: 100%;
+      max-width: 220px;
+      height: 140px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.40) 100%),
+        linear-gradient(140deg, #6e7a6b 0%, #3e4441 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .bubble .img::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.20);
+      backdrop-filter: blur(10px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.24);
+    }
+    .bubble .img::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-38%, -50%);
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 8px 0 8px 12px;
+      border-color: transparent transparent transparent #FDFDFE;
+      z-index: 2;
+    }
+
+    /* Voice-note bubble */
+    .voice {
+      align-self: flex-start;
+      display: flex; align-items: center; gap: 12px;
+      background: var(--card);
+      padding: 10px 14px 10px 10px;
+      border-radius: 18px 18px 18px 8px;
+      max-width: 76%;
+      opacity: 0; transform: translateY(6px);
+      animation: up var(--t) var(--ease) forwards;
+    }
+    .voice .play {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.16);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .voice .play svg { width: 11px; height: 11px; fill: var(--ink); stroke: none; margin-left: 2px; }
+    .voice .wave {
+      display: flex; align-items: center; gap: 2px;
+      height: 22px;
+    }
+    .voice .wave span {
+      display: block;
+      width: 2px;
+      border-radius: 1px;
+      background: rgba(253,253,254,0.50);
+    }
+    .voice .dur {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      font-feature-settings: "tnum";
+      letter-spacing: 0.02em;
+      margin-left: 4px;
+    }
+
+    /* System card (event / PR / workout-completed) */
+    .sys {
+      align-self: center;
+      max-width: 80%;
+      padding: 11px 16px;
+      border-radius: 14px;
+      background: rgba(253,253,254,0.06);
+      border: 1px solid rgba(253,253,254,0.10);
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      letter-spacing: 0.005em;
+      opacity: 0; transform: translateY(6px);
+      animation: up var(--t) var(--ease) forwards;
+    }
+    .sys .dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--lime);
+      box-shadow: 0 0 8px rgba(192,252,1,0.60);
+      flex-shrink: 0;
+    }
+    .sys strong {
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    /* Typing indicator */
+    .typing {
+      align-self: flex-start;
+      padding: 13px 16px;
+      background: var(--card);
+      border-radius: 18px 18px 18px 8px;
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .typing span {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(253,253,254,0.58);
+      animation: bounce 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.15s; }
+    .typing span:nth-child(3) { animation-delay: 0.30s; }
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.58; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    /* ─── Input bar ─── */
+    .input-bar {
+      position: absolute;
+      bottom: 18px; left: 5%; right: 5%;
+      display: grid;
+      grid-template-columns: 36px 1fr 36px;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px 8px 8px;
+      background: var(--card-dark);
+      border-radius: var(--r-pill);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.28);
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) 540ms forwards;
+    }
+    .input-bar .attach, .input-bar .mic {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .input-bar .attach svg, .input-bar .mic svg {
+      width: 15px; height: 15px;
+      stroke: var(--ink);
+      stroke-width: 1.8;
+      fill: none;
+    }
+    .input-bar .txt {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--ink-muted);
+      letter-spacing: -0.003em;
+      padding: 0 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+
+    <!-- Chat top (replaces standard .top) -->
+    <div class="chat-top">
+      <button class="back">
+        <svg viewBox="0 0 24 24"><polyline points="15 6 9 12 15 18"/></svg>
+      </button>
+      <div class="peer">
+        <div class="av-lg">J</div>
+        <div class="peer-txt">
+          <div class="peer-name">Jeroen</div>
+          <div class="peer-status"><span class="dot"></span>Online</div>
+        </div>
+      </div>
+      <button class="info">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="8.01"/><line x1="12" y1="11" x2="12" y2="16"/></svg>
+      </button>
+    </div>
+
+    <div class="scroll">
+      <div class="thread">
+
+        <div class="divider">Gisteren</div>
+
+        <div class="bubble coach b1">
+          Hey Glenn, net je Push &amp; Pull gezien — volume op rugdag is strak. Hoe voelde het?
+          <span class="t">19:42</span>
+        </div>
+
+        <div class="bubble me b2">
+          Goed! Bench voelde iets te licht vandaag, kan volgende keer 2,5kg erbij.
+          <span class="t">19:51</span>
+        </div>
+
+        <div class="bubble coach b3">
+          Top. Gooi er 2,5 kg op de working sets, warm-up houd je gelijk. Ik pas het plan straks aan.
+          <span class="t">19:52</span>
+        </div>
+
+        <div class="divider">Vandaag</div>
+
+        <div class="sys">
+          <span class="dot"></span>
+          <span>Nieuw record · <strong>Deadlift 180 × 5</strong></span>
+        </div>
+
+        <div class="bubble coach b4">
+          <div class="img"></div>
+          Zag je deadlift-video. Bar drift iets voor je kuiten. Volgende keer meer naar de teen toe zetten — scheelt spannings­verlies.
+          <span class="t">14:08</span>
+        </div>
+
+        <div class="bubble me b5">
+          Top, ga ik woensdag proberen. Check-in voor deze week stuur ik zondag.
+          <span class="t">14:14</span>
+        </div>
+
+        <div class="voice" style="animation-delay: 360ms;">
+          <div class="play">
+            <svg viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20"/></svg>
+          </div>
+          <div class="wave">
+            <span style="height: 6px;"></span>
+            <span style="height: 10px;"></span>
+            <span style="height: 14px;"></span>
+            <span style="height: 18px;"></span>
+            <span style="height: 12px;"></span>
+            <span style="height: 20px;"></span>
+            <span style="height: 16px;"></span>
+            <span style="height: 10px;"></span>
+            <span style="height: 14px;"></span>
+            <span style="height: 8px;"></span>
+            <span style="height: 12px;"></span>
+            <span style="height: 16px;"></span>
+            <span style="height: 10px;"></span>
+            <span style="height: 6px;"></span>
+            <span style="height: 4px;"></span>
+            <span style="height: 8px;"></span>
+          </div>
+          <div class="dur">0:24</div>
+        </div>
+
+        <div class="typing" style="animation-delay: 420ms;">
+          <span></span><span></span><span></span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Input bar -->
+    <div class="input-bar">
+      <button class="attach">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <div class="txt">Bericht...</div>
+      <button class="mic">
+        <svg viewBox="0 0 24 24">
+          <rect x="9" y="3" width="6" height="12" rx="3"/>
+          <path d="M5 11a7 7 0 0 0 14 0"/>
+          <line x1="12" y1="18" x2="12" y2="22"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+
+  <div class="ref">
+    <h4>09 · Chat</h4>
+    <p>1-op-1 met Jeroen. Simpel. Geen groep, geen reactions, geen threading.</p>
+    <div class="lbl">Bubble kleuren</div>
+    <div class="row"><span>Coach · links</span><strong>--card light</strong></div>
+    <div class="row"><span>Client · rechts</span><strong>--card-dark</strong></div>
+    <div class="row"><span>System-event</span><strong>ghost + lime dot</strong></div>
+    <div class="lbl">Lime-regel</div>
+    <p>Event-only. Lime dot alleen op system-cards (nieuwe PR, workout voltooid, check-in binnen). Nooit op bubble-bg.</p>
+    <div class="lbl">Bericht types</div>
+    <div class="row"><span>Text</span><strong>bubble + tijd</strong></div>
+    <div class="row"><span>Image</span><strong>thumbnail + play</strong></div>
+    <div class="row"><span>Voice-note</span><strong>wave + duur</strong></div>
+    <div class="row"><span>System card</span><strong>ghost centered</strong></div>
+    <div class="row"><span>Typing</span><strong>3-dot bounce</strong></div>
+    <div class="lbl">Input bar</div>
+    <p>Dark pill, sticky bottom. Attach + tekstveld + mic (send na typen). Geen emoji-knop — keep clean.</p>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MŌVE — Portie aanpassen</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       08b · Portie aanpassen (bottom sheet)
+       ────────────────────────────────────────────────────────────
+       Triggered door tap op rij-body in 08-dieet-detail. Sheet
+       dark 72%, real-time macro-hercalculatie, unit-toggle chips.
+       ═══════════════════════════════════════════════════════════ */
+
+    /* Ghost achter de sheet — dimmed + blur. Hier even een context-
+       paar maaltijden om de diepte te tonen. */
+    .ghost-top {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      padding: 52px 20px 14px;
+      z-index: 5;
+    }
+    .ghost-label {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .ghost-scroll {
+      padding: 84px 0 0;
+      filter: blur(5px) saturate(0.7);
+      opacity: 0.75;
+      pointer-events: none;
+    }
+    .ghost-scroll::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(180deg, rgba(142,152,144,0) 0%, rgba(0,0,0,0.28) 80%);
+      z-index: 10;
+      pointer-events: none;
+    }
+    .ghost-card {
+      background: var(--card);
+      border-radius: var(--r-xl);
+      padding: 18px 20px;
+      width: 90%;
+      margin: 0 auto 8px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
+    }
+    .ghost-row {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-top: 1px solid rgba(0,0,0,0.10);
+    }
+    .ghost-row:first-child { border-top: none; }
+    .ghost-row .n { font-size: 14px; font-weight: 400; color: var(--ink); }
+    .ghost-row .p { font-size: 12px; color: var(--ink-faint); }
+
+    /* ───── Sheet ───── */
+    .sheet {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 72%;
+      background: var(--card-dark);
+      border-radius: 28px 28px 0 0;
+      padding: 0;
+      z-index: 100;
+      display: flex; flex-direction: column;
+      box-shadow: 0 -24px 60px rgba(0,0,0,0.45);
+      opacity: 0; transform: translateY(24px);
+      animation: up var(--t) var(--ease) 140ms forwards;
+      overflow: hidden;
+    }
+    .grabber {
+      width: 44px; height: 5px;
+      border-radius: 999px;
+      background: rgba(253,253,254,0.28);
+      margin: 10px auto 0;
+      flex-shrink: 0;
+    }
+    .sheet-top {
+      display: grid;
+      grid-template-columns: 32px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 20px 10px;
+      flex-shrink: 0;
+    }
+    .sheet-x {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(253,253,254,0.08);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sheet-x svg { width: 12px; height: 12px; stroke: var(--ink); stroke-width: 2; fill: none; }
+    .sheet-title {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--ink-soft);
+      letter-spacing: -0.003em;
+      text-align: center;
+    }
+    .sheet-save {
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--lime);
+      background: transparent;
+      border: none; cursor: pointer;
+      padding: 4px 8px;
+    }
+
+    .sheet-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 22px 120px;
+    }
+    .sheet-body::-webkit-scrollbar { display: none; }
+
+    /* ─── Food-info ─── */
+    .food-name {
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .food-per {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.02em;
+      font-feature-settings: "tnum";
+      margin-bottom: 18px;
+    }
+    .food-per .dot {
+      display: inline-block;
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: var(--ink-ghost);
+      vertical-align: middle;
+      margin: 0 7px 2px;
+    }
+
+    /* ─── Unit toggle ─── */
+    .units {
+      display: flex; gap: 6px;
+      margin-bottom: 22px;
+    }
+    .unit {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(253,253,254,0.06);
+      border: 1px solid transparent;
+      font-family: var(--font);
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      letter-spacing: 0.01em;
+      cursor: pointer;
+    }
+    .unit.on {
+      background: var(--ink);
+      color: #0E1100;
+      font-weight: 500;
+    }
+    .unit.disabled {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    /* ─── Stepper ─── */
+    .stepper {
+      display: grid;
+      grid-template-columns: 52px 1fr 52px;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 14px 0;
+    }
+    .step-btn {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: var(--arr-bg);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 2px 6px rgba(0,0,0,0.24);
+    }
+    .step-btn svg { width: 18px; height: 18px; stroke: var(--ink); stroke-width: 2; fill: none; }
+    .step-val {
+      text-align: center;
+      font-family: var(--font);
+      font-size: 64px;
+      font-weight: 200;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      line-height: 1;
+      font-feature-settings: "tnum";
+    }
+    .step-val small {
+      display: inline-block;
+      font-size: 20px;
+      font-weight: 300;
+      color: var(--ink-faint);
+      letter-spacing: -0.01em;
+      margin-left: 4px;
+      vertical-align: 12px;
+    }
+
+    /* Step-hint row */
+    .step-hint {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin-bottom: 24px;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.02em;
+      font-feature-settings: "tnum";
+    }
+    .step-hint .chip {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(253,253,254,0.06);
+      cursor: pointer;
+      color: var(--ink-soft);
+      font-weight: 400;
+    }
+    .step-hint .chip.edit {
+      background: rgba(192,252,1,0.14);
+      color: var(--lime);
+      font-weight: 500;
+    }
+
+    /* ─── Live macro recalc ─── */
+    .recalc {
+      border-top: 1px solid rgba(253,253,254,0.10);
+      padding-top: 18px;
+    }
+    .recalc-head {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 12px;
+    }
+    .recalc-title {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ink-faint);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .recalc-sum {
+      font-size: 11px;
+      color: var(--lime);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      font-feature-settings: "tnum";
+    }
+    .recalc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 20px;
+    }
+    .rc-cell {
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 6px 0;
+    }
+    .rc-cell .k {
+      font-size: 12px;
+      color: var(--ink-muted);
+      letter-spacing: 0.01em;
+    }
+    .rc-cell .v {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--ink);
+      font-feature-settings: "tnum";
+    }
+    .rc-cell .v small {
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      margin-left: 3px;
+    }
+    .rc-cell .v .was {
+      font-size: 11px;
+      color: var(--ink-faint);
+      text-decoration: line-through;
+      margin-right: 6px;
+      font-weight: 400;
+    }
+
+    /* ─── Sticky bottom quick-actions ─── */
+    .sheet-foot {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 16px 22px 22px;
+      background: linear-gradient(180deg, rgba(71,75,72,0) 0%, rgba(71,75,72,0.95) 30%, rgba(71,75,72,1) 70%);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+    .reset-btn {
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink-muted);
+      background: transparent;
+      border: none; cursor: pointer;
+      padding: 10px 4px;
+      letter-spacing: -0.003em;
+      text-align: left;
+    }
+    .reset-btn svg {
+      width: 12px; height: 12px;
+      stroke: var(--ink-muted);
+      stroke-width: 1.8;
+      fill: none;
+      margin-right: 6px;
+      vertical-align: -1px;
+    }
+    .save-btn {
+      padding: 13px 24px;
+      border-radius: var(--r-lg);
+      background: var(--lime);
+      color: #0E1500;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: -0.003em;
+      border: none; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(192,252,1,0.25);
+    }
+
+    /* Bnav verborgen achter sheet */
+    .bnav { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+
+    <!-- Context bovenin -->
+    <div class="ghost-top">
+      <div class="ghost-label">Ochtend Shake · 219 kcal</div>
+    </div>
+
+    <!-- Ghost background (dimmed dieet-context) -->
+    <div class="ghost-scroll">
+      <div class="ghost-card">
+        <div class="ghost-row">
+          <span class="n">ESN Isoclear Whey Berry</span>
+          <span class="p">60g · 219 kcal</span>
+        </div>
+        <div class="ghost-row">
+          <span class="n">Creatine Monohydrate</span>
+          <span class="p">10g · 0 kcal</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ Portie sheet ═══════════ -->
+    <div class="sheet">
+      <div class="grabber"></div>
+
+      <div class="sheet-top">
+        <button class="sheet-x"><svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+        <div class="sheet-title">Portie aanpassen</div>
+        <button class="sheet-save">Opslaan</button>
+      </div>
+
+      <div class="sheet-body">
+        <div class="food-name">ESN Isoclear Whey Berry</div>
+        <div class="food-per">
+          <span>365 kcal / 100g</span>
+          <span class="dot"></span>
+          <span>85g E · 7g K · 2g V</span>
+        </div>
+
+        <!-- Unit toggle -->
+        <div class="units">
+          <button class="unit on">Gram</button>
+          <button class="unit">Scoop (30g)</button>
+          <button class="unit disabled">Stuk</button>
+        </div>
+
+        <!-- Stepper -->
+        <div class="stepper">
+          <button class="step-btn"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <div class="step-val">75<small>g</small></div>
+          <button class="step-btn"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        </div>
+
+        <!-- Step-hint chips -->
+        <div class="step-hint">
+          <span class="chip">±5g</span>
+          <span class="chip">±25g</span>
+          <span class="chip edit">+15g vs plan</span>
+        </div>
+
+        <!-- Live recalc -->
+        <div class="recalc">
+          <div class="recalc-head">
+            <div class="recalc-title">Voedingswaarde</div>
+            <div class="recalc-sum">+55 kcal vs plan</div>
+          </div>
+
+          <div class="recalc-grid">
+            <div class="rc-cell">
+              <span class="k">Kcal</span>
+              <span class="v"><span class="was">219</span>274</span>
+            </div>
+            <div class="rc-cell">
+              <span class="k">Eiwit</span>
+              <span class="v"><span class="was">51</span>64<small>g</small></span>
+            </div>
+            <div class="rc-cell">
+              <span class="k">Koolh.</span>
+              <span class="v"><span class="was">4</span>5<small>g</small></span>
+            </div>
+            <div class="rc-cell">
+              <span class="k">Vet</span>
+              <span class="v"><span class="was">1</span>2<small>g</small></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sticky foot -->
+      <div class="sheet-foot">
+        <button class="reset-btn">
+          <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 3 3 9 9 9"/></svg>
+          Terug naar plan (60g)
+        </button>
+        <button class="save-btn">Opslaan</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Reference -->
+  <div class="ref">
+    <h4>08b · Portie aanpassen</h4>
+    <p>Triggered door tap op rij-body in 08. Sheet-over-ghost patroon (zelfde taal als 06c). Real-time hercalculatie + "vs plan" delta.</p>
+
+    <div class="lbl">Sheet-structuur</div>
+    <div class="row"><span>Hoogte</span><strong>72%</strong></div>
+    <div class="row"><span>Radius-top</span><strong>28px</strong></div>
+    <div class="row"><span>Ghost-bg</span><strong>blur 5 + dim grad</strong></div>
+    <div class="row"><span>Grabber</span><strong>44×5 ink 28%</strong></div>
+
+    <div class="lbl">Stepper</div>
+    <div class="row"><span>Step-btn</span><strong>52px --arr-bg</strong></div>
+    <div class="row"><span>Waarde</span><strong>64/200 met 20/300 unit</strong></div>
+    <div class="row"><span>Hint-chips</span><strong>±5g · ±25g · delta</strong></div>
+    <div class="row"><span>Delta-chip</span><strong>lime-tint "+15g vs plan"</strong></div>
+
+    <div class="lbl">Units</div>
+    <div class="row"><span>Gram</span><strong>always on</strong></div>
+    <div class="row"><span>Scoop</span><strong>als product serving heeft</strong></div>
+    <div class="row"><span>Stuk</span><strong>disabled indien n.v.t.</strong></div>
+
+    <div class="lbl">Recalc</div>
+    <p>Oud-doorstreept + nieuw-scherp pattern ("<strong>51</strong> → 64g"). Rechts boven: "+55 kcal vs plan" in lime = event-paint.</p>
+
+    <div class="lbl">Sticky foot</div>
+    <div class="row"><span>Reset</span><strong>tekstlink naar plan-waarde</strong></div>
+    <div class="row"><span>Opslaan</span><strong>lime pill primary</strong></div>
+    <div class="row"><span>Fade</span><strong>gradient card-dark</strong></div>
+
+    <div class="lbl">Waarom deze UX?</div>
+    <p>MFP-stijl zoekbalk + scroll is verkeerd frame — MŌVE-klant adjusteert, zoekt niet. Stepper + live delta toont <em>direct</em> wat dit betekent voor macro's. Geen opslaan-zonder-te-zien-wat-veranderde.</p>
+  </div>
+
+</body>
+</html>

@@ -1,109 +1,131 @@
 :root {
-  /* ━━━ MŌVE Editorial Palette ━━━ Aesop-inspired, monochromatic, warm */
+  /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   * MŌVE v6 — Orion palette
+   * Canvas: sage (#8E9890). Cards: licht (#A6ADA7) + dark (#474B48).
+   * Lime (#C0FC01) enkel voor event-paint. Outfit font.
+   * Zie: /design-system/shared.css voor de volledige token-bron.
+   * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-  /* Surfaces — warm cream stone */
-  --color-bg: #EEEBE3;
-  --color-bg-elevated: #F5F2EC;
-  --color-bg-dark: #1A1917;
-  --color-surface: #FFFFFF;
-  --color-surface-warm: #FAF8F3;
-  --color-surface-muted: #E5E1D9;
+  /* 4-color core */
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+  --color-sage:  #899089;
+  --color-lime:  #C0FC01;
+  --color-check: #2FA65A;
 
-  /* Accent — editorial charcoal */
-  --color-accent: #1A1917;
-  --color-accent-dark: #111110;
-  --color-accent-hover: #333330;
-  --color-accent-glow: rgba(26, 25, 23, 0.10);
+  /* Canvas & cards */
+  --color-bg:        #8E9890;   /* canvas */
+  --color-bg-elevated: #A6ADA7; /* licht card */
+  --color-bg-dark:   #474B48;   /* donker card — tracking + bnav */
+  --color-surface:   #A6ADA7;
+  --color-surface-muted: #98A097;
+  --color-arr-bg:    #989F99;
 
-  /* Typography — deep warm */
-  --color-text-primary: #1A1917;
-  --color-text-secondary: #6B6862;
-  --color-text-muted: #A09D96;
-  --color-text-faint: #C5C2BC;
+  /* Ink (near-white + alpha-tiers) */
+  --color-ink:        #FDFDFE;
+  --color-ink-soft:   rgba(253,253,254,0.78);
+  --color-ink-muted:  rgba(253,253,254,0.62);
+  --color-ink-faint:  rgba(253,253,254,0.44);
+  --color-ink-ghost:  rgba(253,253,254,0.18);
 
-  /* Borders — warm stone */
-  --color-border: #DDD9D0;
-  --color-border-subtle: #E8E4DC;
-  --color-border-strong: #CCC7BC;
+  /* Text roles — mapped to ink-tiers voor legacy compat */
+  --color-text-primary:   #FDFDFE;
+  --color-text-secondary: rgba(253,253,254,0.78);
+  --color-text-muted:     rgba(253,253,254,0.62);
+  --color-text-faint:     rgba(253,253,254,0.44);
 
-  /* Status — muted, sophisticated */
-  --color-success: #3D8B5C;
-  --color-warning: #C47D15;
-  --color-error: #C4372A;
+  /* Borders — barely there, alpha op donker */
+  --color-border:         rgba(253,253,254,0.10);
+  --color-border-subtle:  rgba(253,253,254,0.06);
+  --color-border-strong:  rgba(253,253,254,0.18);
 
-  /* Client surfaces */
-  --color-client-bg: #FFFFFF;
-  --color-client-surface: #FFFFFF;
-  --color-client-surface-muted: #E5E1D9;
-  --color-client-border: #DDD9D0;
-  --color-client-border-strong: #CCC7BC;
-  --color-client-text-secondary: #6B6862;
-  --color-client-text-muted: #A09D96;
-  --color-accent-light: rgba(26, 25, 23, 0.04);
-  --color-accent-subtle: rgba(26, 25, 23, 0.08);
-  --color-accent-surface: #EDEAE4;
+  /* Status */
+  --color-success: #2FA65A;
+  --color-warning: #E8A93C;
+  --color-error:   #E06B5C;
 
-  /* Data visualization */
-  --color-data-orange: #C47D15;
-  --color-data-red: #C4372A;
-  --color-data-purple: #7B5EA7;
-  --color-data-green: #3D8B5C;
-  --color-data-blue: #3068C4;
-  --color-data-pink: #B8447A;
-  --color-data-yellow: #D4A12A;
+  /* Client surfaces — alias naar v6 tokens */
+  --color-client-bg:              #8E9890;
+  --color-client-surface:         #A6ADA7;
+  --color-client-surface-muted:   #98A097;
+  --color-client-border:          rgba(253,253,254,0.10);
+  --color-client-border-strong:   rgba(253,253,254,0.18);
+  --color-client-text-secondary:  rgba(253,253,254,0.78);
+  --color-client-text-muted:      rgba(253,253,254,0.62);
+
+  /* Accent-alias — lime voor event-paint only */
+  --color-accent:         #FDFDFE;
+  --color-accent-dark:    #FDFDFE;
+  --color-accent-hover:   rgba(253,253,254,0.88);
+  --color-accent-light:   rgba(253,253,254,0.06);
+  --color-accent-subtle:  rgba(253,253,254,0.10);
+  --color-accent-surface: #98A097;
+
+  /* Pop = lime, maar enkel voor events (nieuwe log, unread dot, recent-done). */
+  --color-pop:        #C0FC01;
+  --color-pop-light:  rgba(192,252,1,0.14);
+  --color-pop-muted:  rgba(192,252,1,0.28);
+  --color-streak:     #C0FC01;
+
+  /* Data viz — rustige alpha-whites; lime enkel voor event-highlight */
+  --color-data-white:  rgba(253,253,254,0.85);
+  --color-data-lime:   #C0FC01;
+  --color-data-muted:  rgba(253,253,254,0.32);
 
   /* Typography */
-  --font-display: 'Manrope', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
-  --font-mono: 'DM Mono', monospace;
+  --font-display: var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
+  --font-body:    var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
+  --font-mono:    'Outfit', monospace;
 
   /* Font Sizes */
-  --text-xs: 0.75rem;
-  --text-sm: 0.8125rem;
+  --text-xs:   0.75rem;
+  --text-sm:   0.8125rem;
   --text-base: 0.9375rem;
-  --text-lg: 1.0625rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
-  --text-4xl: 2.25rem;
-  --text-5xl: 3rem;
+  --text-lg:   1.0625rem;
+  --text-xl:   1.25rem;
+  --text-2xl:  1.5rem;
+  --text-3xl:  1.875rem;
+  --text-4xl:  2.25rem;
+  --text-5xl:  3rem;
   --text-hero: 3.5rem;
 
-  /* Spacing */
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.25rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
+  /* Spacing (8px) */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
   --space-10: 2.5rem;
   --space-12: 3rem;
   --space-16: 4rem;
   --space-20: 5rem;
   --space-24: 6rem;
 
-  /* Border Radius */
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.25rem;
-  --radius-2xl: 1.5rem;
+  /* Radius */
+  --radius-sm:  10px;
+  --radius-md:  14px;
+  --radius-lg:  20px;
+  --radius-xl:  24px;
+  --radius-2xl: 28px;
+  --radius-card: 24px;
   --radius-full: 9999px;
 
-  /* Shadows — tactile, multi-layered for depth */
-  --shadow-sm: 0 1px 2px rgba(26, 25, 23, 0.04), 0 1px 3px rgba(26, 25, 23, 0.02);
-  --shadow-md: 0 2px 4px rgba(26, 25, 23, 0.04), 0 4px 16px rgba(26, 25, 23, 0.06);
-  --shadow-lg: 0 4px 8px rgba(26, 25, 23, 0.04), 0 12px 32px rgba(26, 25, 23, 0.08);
-  --shadow-xl: 0 8px 16px rgba(26, 25, 23, 0.06), 0 20px 48px rgba(26, 25, 23, 0.10);
-  --shadow-card: 0 1px 3px rgba(26, 25, 23, 0.04), 0 4px 12px rgba(26, 25, 23, 0.03);
-  --shadow-card-hover: 0 4px 8px rgba(26, 25, 23, 0.06), 0 12px 28px rgba(26, 25, 23, 0.08);
-  --shadow-inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  /* Shadows — subtiel, op donkere canvas werken inset-highlights ipv drop */
+  --shadow-sm:   inset 0 1px 0 rgba(255,255,255,0.10), 0 1px 2px rgba(0,0,0,0.14);
+  --shadow-md:   inset 0 1px 0 rgba(255,255,255,0.12), 0 2px 6px rgba(0,0,0,0.18);
+  --shadow-lg:   inset 0 1px 0 rgba(255,255,255,0.14), 0 8px 22px rgba(0,0,0,0.22);
+  --shadow-xl:   inset 0 1px 0 rgba(255,255,255,0.16), 0 16px 38px rgba(0,0,0,0.28);
+  --shadow-card: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
+  --shadow-card-dark: inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.22);
+  --shadow-card-hover: inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 12px rgba(0,0,0,0.20);
+  --shadow-elevated: 0 8px 22px rgba(0,0,0,0.28), 0 2px 6px rgba(0,0,0,0.18);
 
-  /* Transitions — premium */
-  --ease-premium: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Motion */
+  --ease-premium:  cubic-bezier(0.4, 0, 0.2, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 280ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 450ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 280ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 450ms cubic-bezier(0.16, 1, 0.3, 1);
 }

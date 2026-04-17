@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MŌVE — Progress · Overzicht</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       11 · Progress — Overzicht (landing)
+       ────────────────────────────────────────────────────────────
+       Doel: "hoe sta ik ervoor deze week?" in één scroll.
+       Subtabs: Overzicht (on) · Kracht · Lichaam · Check-ins
+       ═══════════════════════════════════════════════════════════ */
+
+    .scroll { padding: 66px 0 110px; }
+
+    /* ─── Subtabs ─── */
+    .subtabs {
+      padding: 0 5% 16px;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) 140ms forwards;
+    }
+    .subtabs::-webkit-scrollbar { display: none; }
+    .subtab {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      border-radius: var(--r-pill);
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: -0.005em;
+      color: var(--ink-soft);
+      background: transparent;
+      border: 1px solid rgba(253,253,254,0.10);
+      cursor: pointer;
+      transition: all 140ms var(--ease);
+    }
+    .subtab.on {
+      background: var(--ink);
+      color: #2A2D2B;
+      border-color: var(--ink);
+      font-weight: 500;
+    }
+
+    /* ─── Week hero ─── */
+    .week-hero {
+      padding: 0 5%;
+      margin-bottom: 18px;
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) 220ms forwards;
+    }
+    .wh-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 10px;
+    }
+    .wh-big {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .wh-num {
+      font-size: 52px;
+      font-weight: 200;
+      letter-spacing: -0.035em;
+      color: var(--ink);
+      line-height: 0.95;
+      font-feature-settings: "tnum";
+    }
+    .wh-unit {
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--ink-muted);
+      letter-spacing: -0.01em;
+    }
+    .wh-sub {
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--ink-soft);
+      letter-spacing: -0.005em;
+      line-height: 1.5;
+    }
+    .wh-delta {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--ink);
+      font-weight: 400;
+    }
+    .wh-delta svg { width: 10px; height: 10px; stroke: var(--ink); stroke-width: 2; fill: none; }
+
+    /* Week rhythm — 7 dots */
+    .week-rhythm {
+      margin-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+    }
+    .day {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .day .dl {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .day .dot {
+      width: 100%;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(253,253,254,0.10);
+    }
+    .day.done .dot { background: var(--ink); opacity: 0.85; }
+    .day.today .dl { color: var(--ink); }
+    .day.today .dot { background: rgba(253,253,254,0.24); }
+
+    /* ─── Coach check-in banner ─── */
+    .checkin-banner {
+      background: var(--card-dark);
+      margin: 0 5% 10px;
+      padding: 16px 18px;
+      border-radius: var(--r-lg);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18);
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) 300ms forwards;
+    }
+    .cb-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--lime);
+      flex-shrink: 0;
+      box-shadow: 0 0 12px rgba(192,252,1,0.50);
+    }
+    .cb-text { flex: 1; }
+    .cb-title {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+    }
+    .cb-sub {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      margin-top: 2px;
+      letter-spacing: 0.005em;
+    }
+    .cb-arr {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(253,253,254,0.08);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .cb-arr svg { width: 10px; height: 10px; stroke: var(--ink); stroke-width: 2; fill: none; }
+
+    /* ─── Caps label ─── */
+    .sec-cap {
+      padding: 14px 5% 8px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    /* ─── PR card ─── */
+    .pr-card {
+      background: var(--card);
+      margin: 0 5% 6px;
+      padding: 18px 20px;
+      border-radius: var(--r-xl);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) 380ms forwards;
+    }
+    .pr-ico {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(253,253,254,0.10);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .pr-ico svg { width: 16px; height: 16px; stroke: var(--ink); stroke-width: 1.8; fill: none; }
+    .pr-body { flex: 1; }
+    .pr-lift {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 3px;
+    }
+    .pr-val {
+      font-size: 19px;
+      font-weight: 300;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      font-feature-settings: "tnum";
+    }
+    .pr-val small {
+      font-size: 12px;
+      color: var(--ink-muted);
+      margin-left: 3px;
+      letter-spacing: 0;
+    }
+    .pr-meta {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      margin-top: 2px;
+    }
+    .pr-delta {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+
+    /* ─── Momentum card (kracht snapshot) ─── */
+    .momentum {
+      background: var(--card-dark);
+      margin: 0 5% 6px;
+      padding: 18px 20px 20px;
+      border-radius: var(--r-xl);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18);
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) 460ms forwards;
+    }
+    .mm-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 14px;
+    }
+    .mm-title {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+    }
+    .mm-sub {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+    }
+    .mm-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 0;
+      border-top: 1px solid rgba(253,253,254,0.06);
+    }
+    .mm-row:first-of-type { border-top: none; padding-top: 0; }
+    .mm-name {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      letter-spacing: -0.005em;
+      width: 78px;
+      flex-shrink: 0;
+    }
+    .mm-spark {
+      flex: 1;
+      height: 22px;
+    }
+    .mm-vals {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      min-width: 56px;
+    }
+    .mm-e1 {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink);
+      font-feature-settings: "tnum";
+      letter-spacing: -0.01em;
+    }
+    .mm-e1 small {
+      font-size: 10px;
+      color: var(--ink-faint);
+      margin-left: 2px;
+    }
+    .mm-d {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      margin-top: 1px;
+    }
+    .mm-d.up { color: var(--ink); }
+    .mm-d.flat { color: var(--ink-faint); }
+
+    /* ─── Adherence (dieet) hairline ─── */
+    .adh-card {
+      background: var(--card);
+      margin: 0 5% 6px;
+      padding: 18px 20px 20px;
+      border-radius: var(--r-xl);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) 540ms forwards;
+    }
+    .adh-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 16px;
+    }
+    .adh-title {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+    }
+    .adh-pct {
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      font-feature-settings: "tnum";
+    }
+    .adh-pct small {
+      font-size: 10px;
+      color: var(--ink-faint);
+      margin-left: 2px;
+      letter-spacing: 0;
+    }
+    .adh-week {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 6px;
+      height: 48px;
+    }
+    .adh-bar {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .adh-bar .b {
+      width: 100%;
+      background: var(--ink);
+      opacity: 0.78;
+      border-radius: 2px;
+      min-height: 3px;
+    }
+    .adh-bar .b.skip { background: rgba(253,253,254,0.14); opacity: 1; }
+    .adh-bar .dl {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      text-align: center;
+      margin-top: 6px;
+    }
+    .adh-bar.today .dl { color: var(--ink); }
+
+    /* ─── Streak row ─── */
+    .streak {
+      background: transparent;
+      margin: 10px 5% 0;
+      padding: 16px 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(253,253,254,0.08);
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) 620ms forwards;
+    }
+    .st-cell { display: flex; flex-direction: column; gap: 3px; }
+    .st-num {
+      font-size: 18px;
+      font-weight: 300;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      font-feature-settings: "tnum";
+    }
+    .st-lbl {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+    <div class="scroll">
+
+      <!-- Top bar -->
+      <div class="top">
+        <div class="logo">MŌVE</div>
+        <div class="top-r">
+          <div class="av">GD</div>
+          <button class="ico-btn" aria-label="Menu">
+            <svg viewBox="0 0 24 24"><line x1="4" y1="7"  x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Subtabs -->
+      <div class="subtabs">
+        <button class="subtab on">Overzicht</button>
+        <button class="subtab">Kracht</button>
+        <button class="subtab">Lichaam</button>
+        <button class="subtab">Check-ins</button>
+      </div>
+
+      <!-- Week hero -->
+      <div class="week-hero">
+        <div class="wh-label">Week 16 · deze week</div>
+        <div class="wh-big">
+          <div class="wh-num">4</div>
+          <div class="wh-unit">/ 5 trainingen</div>
+        </div>
+        <div class="wh-sub">
+          Je ligt op koers — nog <strong style="color:var(--ink); font-weight:400">1 sessie</strong> voor vrijdag.
+          <span class="wh-delta">
+            <svg viewBox="0 0 24 24"><polyline points="4 14 10 8 14 12 20 6"/></svg>
+            Hogere intensiteit dan vorige week
+          </span>
+        </div>
+
+        <div class="week-rhythm">
+          <div class="day done"><span class="dl">ma</span><span class="dot"></span></div>
+          <div class="day done"><span class="dl">di</span><span class="dot"></span></div>
+          <div class="day"><span class="dl">wo</span><span class="dot"></span></div>
+          <div class="day done"><span class="dl">do</span><span class="dot"></span></div>
+          <div class="day today"><span class="dl">vr</span><span class="dot"></span></div>
+          <div class="day"><span class="dl">za</span><span class="dot"></span></div>
+          <div class="day done"><span class="dl">zo</span><span class="dot"></span></div>
+        </div>
+      </div>
+
+      <!-- Coach check-in -->
+      <div class="checkin-banner">
+        <div class="cb-dot"></div>
+        <div class="cb-text">
+          <div class="cb-title">Wekelijkse check-in staat klaar</div>
+          <div class="cb-sub">Jeroen wacht op je antwoord · 3 min</div>
+        </div>
+        <div class="cb-arr">
+          <svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+        </div>
+      </div>
+
+      <!-- Latest PR -->
+      <div class="sec-cap">Nieuwste PR</div>
+      <div class="pr-card">
+        <div class="pr-ico">
+          <svg viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 0 1-10 0z"/><line x1="12" y1="12" x2="12" y2="17"/><line x1="9" y1="20" x2="15" y2="20"/></svg>
+        </div>
+        <div class="pr-body">
+          <div class="pr-lift">Bench Press</div>
+          <div class="pr-val">102,5 <small>kg × 3</small></div>
+          <div class="pr-meta">dinsdag · e1RM 109 kg</div>
+        </div>
+        <div class="pr-delta">+2,5 kg</div>
+      </div>
+
+      <!-- Strength momentum -->
+      <div class="sec-cap">Kracht momentum · 8 weken</div>
+      <div class="momentum">
+        <div class="mm-head">
+          <div class="mm-title">Hoofdlifts e1RM</div>
+          <div class="mm-sub">vs. 8 weken terug</div>
+        </div>
+
+        <div class="mm-row">
+          <div class="mm-name">Bench</div>
+          <svg class="mm-spark" viewBox="0 0 120 22" preserveAspectRatio="none">
+            <polyline points="0,16 15,15 30,14 45,13 60,11 75,10 90,8 105,6 120,4"
+              fill="none" stroke="#FDFDFE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+            <circle cx="120" cy="4" r="2.2" fill="#FDFDFE"/>
+          </svg>
+          <div class="mm-vals">
+            <div class="mm-e1">109<small>kg</small></div>
+            <div class="mm-d up">+7 kg</div>
+          </div>
+        </div>
+
+        <div class="mm-row">
+          <div class="mm-name">Squat</div>
+          <svg class="mm-spark" viewBox="0 0 120 22" preserveAspectRatio="none">
+            <polyline points="0,14 15,12 30,13 45,10 60,9 75,8 90,7 105,5 120,3"
+              fill="none" stroke="#FDFDFE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+            <circle cx="120" cy="3" r="2.2" fill="#FDFDFE"/>
+          </svg>
+          <div class="mm-vals">
+            <div class="mm-e1">142<small>kg</small></div>
+            <div class="mm-d up">+12 kg</div>
+          </div>
+        </div>
+
+        <div class="mm-row">
+          <div class="mm-name">Deadlift</div>
+          <svg class="mm-spark" viewBox="0 0 120 22" preserveAspectRatio="none">
+            <polyline points="0,10 15,10 30,9 45,9 60,8 75,9 90,7 105,6 120,6"
+              fill="none" stroke="#FDFDFE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+            <circle cx="120" cy="6" r="2.2" fill="#FDFDFE"/>
+          </svg>
+          <div class="mm-vals">
+            <div class="mm-e1">178<small>kg</small></div>
+            <div class="mm-d up">+6 kg</div>
+          </div>
+        </div>
+
+        <div class="mm-row">
+          <div class="mm-name">Overhead</div>
+          <svg class="mm-spark" viewBox="0 0 120 22" preserveAspectRatio="none">
+            <polyline points="0,12 15,13 30,11 45,12 60,11 75,11 90,10 105,11 120,10"
+              fill="none" stroke="#FDFDFE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.78"/>
+            <circle cx="120" cy="10" r="2.2" fill="#FDFDFE" opacity="0.78"/>
+          </svg>
+          <div class="mm-vals">
+            <div class="mm-e1">62<small>kg</small></div>
+            <div class="mm-d flat">+1 kg</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Adherence (dieet) -->
+      <div class="sec-cap">Dieet adherence · deze week</div>
+      <div class="adh-card">
+        <div class="adh-head">
+          <div class="adh-title">Binnen kcal-budget</div>
+          <div class="adh-pct">86<small>%</small></div>
+        </div>
+        <div class="adh-week">
+          <div class="adh-bar"><div class="b" style="height:88%"></div><div class="dl">ma</div></div>
+          <div class="adh-bar"><div class="b" style="height:74%"></div><div class="dl">di</div></div>
+          <div class="adh-bar"><div class="b" style="height:92%"></div><div class="dl">wo</div></div>
+          <div class="adh-bar"><div class="b" style="height:80%"></div><div class="dl">do</div></div>
+          <div class="adh-bar today"><div class="b" style="height:42%"></div><div class="dl">vr</div></div>
+          <div class="adh-bar"><div class="b skip" style="height:10%"></div><div class="dl">za</div></div>
+          <div class="adh-bar"><div class="b skip" style="height:10%"></div><div class="dl">zo</div></div>
+        </div>
+
+        <div class="streak">
+          <div class="st-cell"><div class="st-num">12</div><div class="st-lbl">Week streak</div></div>
+          <div class="st-cell"><div class="st-num">34</div><div class="st-lbl">Workouts</div></div>
+          <div class="st-cell"><div class="st-num">8</div><div class="st-lbl">Records</div></div>
+          <div class="st-cell"><div class="st-num">84<small style="font-size:10px;color:var(--ink-faint);margin-left:1px;">%</small></div><div class="st-lbl">Adherence</div></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bnav -->
+    <div class="bnav">
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z"/></svg>
+        <span>Home</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M4 12h3l2-4 4 8 2-4h5"/></svg>
+        <span>Workouts</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M6 3h12l-1 5H7zM7 8v11h10V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+        <span>Dieet</span>
+      </div>
+      <div class="tab on">
+        <svg viewBox="0 0 24 24"><polyline points="4 17 9 11 13 15 20 7"/></svg>
+        <span>Progress</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
+        <span>Ik</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="ref">
+    <h4>11 · Progress · Overzicht</h4>
+    <p>Landing van de progress-tab. Beantwoordt: "hoe sta ik ervoor deze week?" in één scroll.</p>
+    <div class="lbl">Subtabs</div>
+    <div class="row"><span>Pattern</span><strong>pill-chips, horizontal</strong></div>
+    <div class="row"><span>Active</span><strong>ink-white bg, dark text</strong></div>
+    <div class="lbl">Content-stack</div>
+    <div class="row"><span>1. Week hero</span><strong>52/200 stat + 7-dot rhythm</strong></div>
+    <div class="row"><span>2. Check-in banner</span><strong>dark pill, lime dot CTA</strong></div>
+    <div class="row"><span>3. Nieuwste PR</span><strong>light card, 1 kernfeit</strong></div>
+    <div class="row"><span>4. Momentum</span><strong>dark card, 4 lifts + spark</strong></div>
+    <div class="row"><span>5. Adherence</span><strong>light card, bar-chart + streaks</strong></div>
+    <div class="lbl">Hierarchy</div>
+    <p>Top = week (korte horizon, hoogste urgentie). Bottom = seizoen-data (lagere urgentie, rustig gepresenteerd).</p>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MŌVE — Progress · Kracht</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       11b · Progress · Kracht (v2)
+       ────────────────────────────────────────────────────────────
+       Hoofdlifts (4) + exercise-search + PR-detail per oefening.
+       Volume-section geschrapt (data zat op verkeerd detail-niveau).
+       ═══════════════════════════════════════════════════════════ */
+
+    .scroll { padding: 66px 0 110px; }
+
+    /* Subtabs */
+    .subtabs {
+      padding: 0 5% 18px;
+      display: flex; gap: 6px; overflow-x: auto;
+      scrollbar-width: none;
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) 140ms forwards;
+    }
+    .subtabs::-webkit-scrollbar { display: none; }
+    .subtab {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      border-radius: var(--r-pill);
+      font-size: 13px; font-weight: 400;
+      letter-spacing: -0.005em;
+      color: var(--ink-soft);
+      background: transparent;
+      border: 1px solid rgba(253,253,254,0.10);
+      cursor: pointer;
+    }
+    .subtab.on { background: var(--ink); color: #2A2D2B; border-color: var(--ink); font-weight: 500; }
+
+    /* Section caps */
+    .sec-cap {
+      padding: 6px 5% 10px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .sec-cap.mt { padding-top: 24px; }
+
+    /* Big lift cards */
+    .lift-grid {
+      padding: 0 5%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .lift-card {
+      background: var(--card);
+      padding: 16px 16px 14px;
+      border-radius: var(--r-xl);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) forwards;
+      min-height: 128px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .lift-card.l1 { animation-delay: 220ms; }
+    .lift-card.l2 { animation-delay: 280ms; }
+    .lift-card.l3 { animation-delay: 340ms; }
+    .lift-card.l4 { animation-delay: 400ms; }
+
+    .lc-name {
+      font-size: 10px; font-weight: 500;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .lc-e1 {
+      font-size: 26px; font-weight: 250;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      font-feature-settings: "tnum";
+      line-height: 1.05;
+      margin-top: 6px;
+    }
+    .lc-e1 small {
+      font-size: 11px; color: var(--ink-muted);
+      margin-left: 2px; letter-spacing: 0; font-weight: 300;
+    }
+    .lc-spark { width: 100%; height: 26px; margin: 6px 0 4px; }
+    .lc-foot {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px; color: var(--ink-muted); font-weight: 400;
+    }
+    .lc-delta { color: var(--ink); font-weight: 500; letter-spacing: -0.005em; }
+    .lc-delta.flat { color: var(--ink-faint); font-weight: 400; }
+
+    /* ─── Search + filter ─── */
+    .search {
+      margin: 0 5% 10px;
+      padding: 11px 16px;
+      border-radius: var(--r-pill);
+      background: rgba(253,253,254,0.06);
+      border: 1px solid rgba(253,253,254,0.10);
+      display: flex; align-items: center; gap: 10px;
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) 460ms forwards;
+    }
+    .search svg {
+      width: 14px; height: 14px;
+      stroke: var(--ink-muted);
+      stroke-width: 1.8; fill: none;
+      flex-shrink: 0;
+    }
+    .search-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--ink);
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: -0.005em;
+      outline: none;
+    }
+    .search-input::placeholder { color: var(--ink-faint); }
+
+    /* Group-filter chips */
+    .chips {
+      padding: 0 5% 12px;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) 520ms forwards;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      border-radius: var(--r-pill);
+      font-size: 11px; font-weight: 400;
+      color: var(--ink-soft);
+      background: transparent;
+      border: 1px solid rgba(253,253,254,0.10);
+      cursor: pointer;
+      letter-spacing: 0.005em;
+    }
+    .chip.on {
+      background: rgba(253,253,254,0.12);
+      color: var(--ink);
+      border-color: rgba(253,253,254,0.18);
+    }
+
+    /* ─── Exercise list ─── */
+    .ex-list {
+      margin: 0 5%;
+      background: var(--card);
+      border-radius: var(--r-xl);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
+      overflow: hidden;
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) 580ms forwards;
+    }
+    .ex-row {
+      display: grid;
+      grid-template-columns: 1fr 64px auto;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      cursor: pointer;
+    }
+    .ex-row:first-of-type { border-top: none; }
+    .ex-name {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+      line-height: 1.25;
+    }
+    .ex-meta {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      margin-top: 2px;
+      letter-spacing: 0.005em;
+    }
+    .ex-spark {
+      width: 100%;
+      height: 22px;
+    }
+    .ex-val {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+      font-feature-settings: "tnum";
+      text-align: right;
+    }
+    .ex-val small {
+      font-size: 10px;
+      color: var(--ink-muted);
+      margin-left: 2px;
+      letter-spacing: 0;
+    }
+
+    /* Page title */
+    .page-title {
+      font-size: 26px;
+      font-weight: 250;
+      letter-spacing: -0.028em;
+      color: var(--ink);
+      padding: 0 5%;
+      margin-bottom: 14px;
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) 200ms forwards;
+    }
+    .page-title small {
+      font-size: 13px;
+      color: var(--ink-faint);
+      margin-left: 8px;
+      font-weight: 300;
+      letter-spacing: -0.005em;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+    <div class="scroll">
+
+      <!-- Top bar -->
+      <div class="top">
+        <div class="logo">MŌVE</div>
+        <div class="top-r">
+          <div class="av">GD</div>
+          <button class="ico-btn" aria-label="Menu">
+            <svg viewBox="0 0 24 24"><line x1="4" y1="7"  x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Subtabs -->
+      <div class="subtabs">
+        <button class="subtab">Overzicht</button>
+        <button class="subtab on">Kracht</button>
+        <button class="subtab">Lichaam</button>
+        <button class="subtab">Check-ins</button>
+      </div>
+
+      <!-- Page title -->
+      <div class="page-title">Hoofdlifts<small>estimated 1RM · 12 weken</small></div>
+
+      <!-- Lift grid -->
+      <div class="lift-grid">
+        <div class="lift-card l1">
+          <div>
+            <div class="lc-name">Bench</div>
+            <div class="lc-e1">109<small>kg</small></div>
+          </div>
+          <svg class="lc-spark" viewBox="0 0 140 26" preserveAspectRatio="none">
+            <polyline points="0,22 12,21 24,20 36,19 48,17 60,15 72,14 84,12 96,10 108,8 120,6 140,4"
+              fill="none" stroke="#FDFDFE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+            <circle cx="140" cy="4" r="2.4" fill="#FDFDFE"/>
+          </svg>
+          <div class="lc-foot">
+            <span>vs. 12w</span>
+            <span class="lc-delta">+9 kg</span>
+          </div>
+        </div>
+
+        <div class="lift-card l2">
+          <div>
+            <div class="lc-name">Squat</div>
+            <div class="lc-e1">142<small>kg</small></div>
+          </div>
+          <svg class="lc-spark" viewBox="0 0 140 26" preserveAspectRatio="none">
+            <polyline points="0,20 12,18 24,18 36,15 48,14 60,13 72,11 84,9 96,8 108,6 120,4 140,3"
+              fill="none" stroke="#FDFDFE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+            <circle cx="140" cy="3" r="2.4" fill="#FDFDFE"/>
+          </svg>
+          <div class="lc-foot">
+            <span>vs. 12w</span>
+            <span class="lc-delta">+14 kg</span>
+          </div>
+        </div>
+
+        <div class="lift-card l3">
+          <div>
+            <div class="lc-name">Deadlift</div>
+            <div class="lc-e1">178<small>kg</small></div>
+          </div>
+          <svg class="lc-spark" viewBox="0 0 140 26" preserveAspectRatio="none">
+            <polyline points="0,14 12,13 24,14 36,12 48,11 60,11 72,9 84,10 96,7 108,6 120,7 140,5"
+              fill="none" stroke="#FDFDFE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+            <circle cx="140" cy="5" r="2.4" fill="#FDFDFE"/>
+          </svg>
+          <div class="lc-foot">
+            <span>vs. 12w</span>
+            <span class="lc-delta">+8 kg</span>
+          </div>
+        </div>
+
+        <div class="lift-card l4">
+          <div>
+            <div class="lc-name">Overhead</div>
+            <div class="lc-e1">62<small>kg</small></div>
+          </div>
+          <svg class="lc-spark" viewBox="0 0 140 26" preserveAspectRatio="none">
+            <polyline points="0,16 12,15 24,14 36,15 48,13 60,14 72,12 84,13 96,11 108,11 120,10 140,10"
+              fill="none" stroke="#FDFDFE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.78"/>
+            <circle cx="140" cy="10" r="2.4" fill="#FDFDFE" opacity="0.78"/>
+          </svg>
+          <div class="lc-foot">
+            <span>vs. 12w</span>
+            <span class="lc-delta flat">+1,5 kg</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alle oefeningen -->
+      <div class="sec-cap mt">Alle oefeningen</div>
+
+      <!-- Search -->
+      <div class="search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.5" y2="16.5"/></svg>
+        <input class="search-input" type="text" placeholder="Zoek een oefening…" />
+      </div>
+
+      <!-- Spiergroep chips -->
+      <div class="chips">
+        <button class="chip on">Alle</button>
+        <button class="chip">Borst</button>
+        <button class="chip">Rug</button>
+        <button class="chip">Benen</button>
+        <button class="chip">Schouders</button>
+        <button class="chip">Armen</button>
+        <button class="chip">Core</button>
+      </div>
+
+      <!-- Exercise list -->
+      <div class="ex-list">
+        <div class="ex-row">
+          <div>
+            <div class="ex-name">Incline Dumbbell Press</div>
+            <div class="ex-meta">Borst · 34× gelogd · laatst 14 apr</div>
+          </div>
+          <svg class="ex-spark" viewBox="0 0 100 22" preserveAspectRatio="none">
+            <polyline points="0,18 14,16 28,14 42,13 56,11 70,9 84,7 100,5"
+              fill="none" stroke="#FDFDFE" stroke-width="1.3" stroke-linecap="round" opacity="0.82"/>
+            <circle cx="100" cy="5" r="1.8" fill="#FDFDFE"/>
+          </svg>
+          <div class="ex-val">42<small>kg</small></div>
+        </div>
+
+        <div class="ex-row">
+          <div>
+            <div class="ex-name">Barbell Row</div>
+            <div class="ex-meta">Rug · 48× gelogd · laatst 11 apr</div>
+          </div>
+          <svg class="ex-spark" viewBox="0 0 100 22" preserveAspectRatio="none">
+            <polyline points="0,16 14,15 28,14 42,12 56,11 70,11 84,9 100,8"
+              fill="none" stroke="#FDFDFE" stroke-width="1.3" stroke-linecap="round" opacity="0.82"/>
+            <circle cx="100" cy="8" r="1.8" fill="#FDFDFE"/>
+          </svg>
+          <div class="ex-val">97<small>kg</small></div>
+        </div>
+
+        <div class="ex-row">
+          <div>
+            <div class="ex-name">Pull-up (gewogen)</div>
+            <div class="ex-meta">Rug · 22× gelogd · laatst 09 apr</div>
+          </div>
+          <svg class="ex-spark" viewBox="0 0 100 22" preserveAspectRatio="none">
+            <polyline points="0,14 14,13 28,12 42,10 56,9 70,9 84,7 100,6"
+              fill="none" stroke="#FDFDFE" stroke-width="1.3" stroke-linecap="round" opacity="0.82"/>
+            <circle cx="100" cy="6" r="1.8" fill="#FDFDFE"/>
+          </svg>
+          <div class="ex-val">+22<small>kg</small></div>
+        </div>
+
+        <div class="ex-row">
+          <div>
+            <div class="ex-name">Romanian Deadlift</div>
+            <div class="ex-meta">Benen · 28× gelogd · laatst 08 apr</div>
+          </div>
+          <svg class="ex-spark" viewBox="0 0 100 22" preserveAspectRatio="none">
+            <polyline points="0,18 14,17 28,16 42,14 56,13 70,11 84,10 100,8"
+              fill="none" stroke="#FDFDFE" stroke-width="1.3" stroke-linecap="round" opacity="0.82"/>
+            <circle cx="100" cy="8" r="1.8" fill="#FDFDFE"/>
+          </svg>
+          <div class="ex-val">142<small>kg</small></div>
+        </div>
+
+        <div class="ex-row">
+          <div>
+            <div class="ex-name">Dumbbell Shoulder Press</div>
+            <div class="ex-meta">Schouders · 30× gelogd · laatst 07 apr</div>
+          </div>
+          <svg class="ex-spark" viewBox="0 0 100 22" preserveAspectRatio="none">
+            <polyline points="0,14 14,13 28,14 42,12 56,13 70,11 84,10 100,10"
+              fill="none" stroke="#FDFDFE" stroke-width="1.3" stroke-linecap="round" opacity="0.72"/>
+            <circle cx="100" cy="10" r="1.8" fill="#FDFDFE" opacity="0.85"/>
+          </svg>
+          <div class="ex-val">28<small>kg</small></div>
+        </div>
+
+        <div class="ex-row">
+          <div>
+            <div class="ex-name">Barbell Curl</div>
+            <div class="ex-meta">Armen · 36× gelogd · laatst 05 apr</div>
+          </div>
+          <svg class="ex-spark" viewBox="0 0 100 22" preserveAspectRatio="none">
+            <polyline points="0,15 14,14 28,13 42,12 56,11 70,10 84,9 100,9"
+              fill="none" stroke="#FDFDFE" stroke-width="1.3" stroke-linecap="round" opacity="0.82"/>
+            <circle cx="100" cy="9" r="1.8" fill="#FDFDFE"/>
+          </svg>
+          <div class="ex-val">42<small>kg</small></div>
+        </div>
+
+        <div class="ex-row">
+          <div>
+            <div class="ex-name">Leg Press</div>
+            <div class="ex-meta">Benen · 24× gelogd · laatst 03 apr</div>
+          </div>
+          <svg class="ex-spark" viewBox="0 0 100 22" preserveAspectRatio="none">
+            <polyline points="0,12 14,11 28,10 42,9 56,8 70,8 84,6 100,6"
+              fill="none" stroke="#FDFDFE" stroke-width="1.3" stroke-linecap="round" opacity="0.82"/>
+            <circle cx="100" cy="6" r="1.8" fill="#FDFDFE"/>
+          </svg>
+          <div class="ex-val">240<small>kg</small></div>
+        </div>
+
+        <div class="ex-row">
+          <div>
+            <div class="ex-name">Hanging Leg Raise</div>
+            <div class="ex-meta">Core · 18× gelogd · laatst 01 apr</div>
+          </div>
+          <svg class="ex-spark" viewBox="0 0 100 22" preserveAspectRatio="none">
+            <polyline points="0,16 14,15 28,15 42,14 56,14 70,13 84,13 100,12"
+              fill="none" stroke="#FDFDFE" stroke-width="1.3" stroke-linecap="round" opacity="0.72"/>
+            <circle cx="100" cy="12" r="1.8" fill="#FDFDFE" opacity="0.85"/>
+          </svg>
+          <div class="ex-val">15<small>reps</small></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bnav -->
+    <div class="bnav">
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z"/></svg>
+        <span>Home</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M4 12h3l2-4 4 8 2-4h5"/></svg>
+        <span>Workouts</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M6 3h12l-1 5H7zM7 8v11h10V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+        <span>Dieet</span>
+      </div>
+      <div class="tab on">
+        <svg viewBox="0 0 24 24"><polyline points="4 17 9 11 13 15 20 7"/></svg>
+        <span>Progress</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
+        <span>Ik</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="ref">
+    <h4>11b · Progress · Kracht (v2)</h4>
+    <p>Volume-sectie geschrapt — zat op fout detail-niveau. In plaats daarvan: exercise-search + list met PR-detail per tap.</p>
+    <div class="lbl">Structuur</div>
+    <div class="row"><span>Top</span><strong>4 hoofdlifts (Bench/Squat/DL/OHP)</strong></div>
+    <div class="row"><span>Mid</span><strong>search + spiergroep-chips</strong></div>
+    <div class="row"><span>Bottom</span><strong>exercise-list met spark + e1RM</strong></div>
+    <div class="lbl">Exercise-row</div>
+    <div class="row"><span>Grid</span><strong>body · 64 spark · val</strong></div>
+    <div class="row"><span>Meta</span><strong>spiergroep · log-count · laatst</strong></div>
+    <div class="row"><span>Val</span><strong>e1RM of max-reps</strong></div>
+    <div class="lbl">Tap-gedrag</div>
+    <p>Tap op een row → lift-detail screen (11e) met rep-max breakdown, trend-chart en sessie-historiek.</p>
+    <div class="lbl">Data-note</div>
+    <p>Sparks in design-fase zijn placeholder. Live: berekend uit gelogde sets (best e1RM per week, Epley-formule).</p>
+  </div>
+
+</body>
+</html>

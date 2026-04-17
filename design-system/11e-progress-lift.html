@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MŌVE — Progress · Lift Detail</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       11e · Progress · Lift-detail
+       ────────────────────────────────────────────────────────────
+       Opent wanneer je in 11b een exercise-row aantikt.
+       Beantwoordt: "wat zijn al mijn PR's op deze lift?"
+
+       Architectuur:
+         · Custom top-bar (back + titel + kebab) — vervangt MŌVE-top
+         · Hero-card (dark): e1RM-groot, delta, trend-chart, range-pills
+         · View-mode chips: Rep-max / Volume / Sessies  (actief: Rep-max)
+         · Rep-max breakdown (light-grid) — 1/2/3/5/8/10/12/15/20 RM
+         · Recente sessies (light) — laatste 4 loggings
+
+       Rep-max = het zwaarste gewicht waar je minstens X reps mee deed.
+       Dit IS de PR-definitie waar Glenn om vroeg.
+       Dat is iets anders dan e1RM (geschatte 1RM via Epley uit élke set).
+       Beide staan op dit scherm: e1RM in de hero, rep-max in de grid.
+       ═══════════════════════════════════════════════════════════ */
+
+    .scroll { padding: 60px 0 140px; }
+
+    /* ─── Custom top-bar (detail) ─── */
+    .d-top {
+      padding: 0 5%;
+      display: grid;
+      grid-template-columns: 32px 1fr 32px;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) 60ms forwards;
+    }
+    .d-top .ico-btn svg { width: 14px; height: 14px; }
+    .d-title {
+      text-align: center;
+      font-size: 15px;
+      font-weight: 400;
+      letter-spacing: -0.005em;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .d-title small {
+      display: block;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 2px;
+      line-height: 1;
+    }
+
+    /* ─── Hero card (dark, large) ─── */
+    .hero-card {
+      background: var(--card-dark);
+      margin: 0 5% 18px;
+      padding: 22px 22px 18px;
+      border-radius: var(--r-xl);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18);
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) 140ms forwards;
+    }
+    .h-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 4px;
+    }
+    .h-cap {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .h-range { display: flex; gap: 4px; }
+    .h-range .r {
+      font-size: 10px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: var(--r-pill);
+      color: var(--ink-muted);
+      letter-spacing: 0.02em;
+      cursor: pointer;
+    }
+    .h-range .r.on {
+      background: rgba(253,253,254,0.12);
+      color: var(--ink);
+    }
+
+    .h-big {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin: 4px 0 14px;
+    }
+    .h-num {
+      font-size: 44px;
+      font-weight: 200;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      font-feature-settings: "tnum";
+      line-height: 1;
+    }
+    .h-num small {
+      font-size: 14px;
+      color: var(--ink-muted);
+      margin-left: 3px;
+      letter-spacing: 0;
+      font-weight: 300;
+    }
+    .h-delta {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      letter-spacing: -0.005em;
+    }
+    .h-delta strong { color: var(--ink); font-weight: 500; }
+    .h-sub {
+      font-size: 11px;
+      color: var(--ink-faint);
+      letter-spacing: -0.002em;
+      margin-top: -8px;
+      margin-bottom: 14px;
+    }
+
+    .h-chart {
+      width: 100%;
+      height: 100px;
+      margin-top: 2px;
+    }
+    .h-foot {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-top: 6px;
+    }
+
+    /* ─── View-mode chips ─── */
+    .vchips {
+      padding: 0 5% 14px;
+      display: flex;
+      gap: 6px;
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) 220ms forwards;
+    }
+    .vchip {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      border-radius: var(--r-pill);
+      font-size: 13px; font-weight: 400;
+      letter-spacing: -0.005em;
+      color: var(--ink-soft);
+      background: transparent;
+      border: 1px solid rgba(253,253,254,0.10);
+      cursor: pointer;
+    }
+    .vchip.on { background: var(--ink); color: #2A2D2B; border-color: var(--ink); font-weight: 500; }
+
+    /* ─── Section cap ─── */
+    .sec-cap {
+      padding: 8px 5% 10px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .sec-cap.mt { padding-top: 22px; }
+
+    /* ─── Rep-max grid (light card, rows) ─── */
+    .rm-card {
+      background: var(--card);
+      margin: 0 5% 6px;
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) 280ms forwards;
+    }
+    .rm-row {
+      display: grid;
+      grid-template-columns: 54px 1fr auto;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    .rm-row:first-child { border-top: none; }
+
+    .rm-rep {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      color: var(--ink-soft);
+      font-feature-settings: "tnum";
+    }
+    .rm-rep strong {
+      font-size: 17px;
+      font-weight: 300;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      margin-right: 2px;
+    }
+
+    .rm-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .rm-wt {
+      font-size: 16px;
+      font-weight: 300;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      font-feature-settings: "tnum";
+      line-height: 1.1;
+    }
+    .rm-wt small {
+      font-size: 10px;
+      color: var(--ink-muted);
+      margin-left: 2px;
+      font-weight: 400;
+    }
+    .rm-meta {
+      font-size: 11px;
+      color: var(--ink-faint);
+      letter-spacing: -0.002em;
+    }
+
+    .rm-delta {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      letter-spacing: -0.005em;
+      font-feature-settings: "tnum";
+      white-space: nowrap;
+    }
+    .rm-delta.flat { color: var(--ink-faint); }
+    .rm-delta.neg { color: var(--ink-faint); }
+
+    /* ─── Recent sessions (light rows) ─── */
+    .ses-card {
+      background: var(--card);
+      margin: 0 5% 6px;
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) 380ms forwards;
+    }
+    .ses-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    .ses-row:first-child { border-top: none; }
+    .ses-date {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 3px;
+    }
+    .ses-sets {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+      font-feature-settings: "tnum";
+    }
+    .ses-sets .sep { color: var(--ink-faint); margin: 0 6px; }
+    .ses-e1rm {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      font-feature-settings: "tnum";
+      text-align: right;
+    }
+    .ses-e1rm small {
+      display: block;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-top: 2px;
+    }
+
+    /* ─── Frame ─── */
+    .viewport {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 0;
+      min-height: 100vh;
+    }
+    .ref {
+      width: 320px;
+      margin-left: 26px;
+      padding: 22px 22px 26px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--ink-muted);
+      align-self: flex-start;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .ref h3 { color: var(--ink); font-size: 14px; font-weight: 500; margin-bottom: 10px; letter-spacing: -0.005em; }
+    .ref h4 { color: var(--ink); font-size: 11px; font-weight: 500; margin: 18px 0 8px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.72; }
+    .ref .lbl { display: inline-block; font-size: 9px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 4px; }
+    .ref .row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 11px; }
+    .ref .row:last-child { border-bottom: none; }
+    .ref strong { color: var(--ink); font-weight: 500; }
+    .ref ul { list-style: none; padding: 0; margin: 0; }
+    .ref ul li { padding: 3px 0; font-size: 11px; }
+    .ref ul li::before { content: "— "; color: var(--ink-faint); }
+  </style>
+</head>
+<body>
+
+<div class="viewport">
+
+  <div class="phone">
+
+    <div class="scroll">
+
+      <!-- Custom top-bar -->
+      <div class="d-top">
+        <button class="ico-btn" aria-label="Terug">
+          <svg viewBox="0 0 24 24"><polyline points="15 6 9 12 15 18"/></svg>
+        </button>
+        <div class="d-title">
+          <small>Borst</small>
+          Bench Press
+        </div>
+        <button class="ico-btn" aria-label="Meer">
+          <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>
+        </button>
+      </div>
+
+      <!-- Hero card -->
+      <div class="hero-card">
+        <div class="h-head">
+          <div class="h-cap">Geschatte 1RM</div>
+          <div class="h-range">
+            <span class="r">1M</span>
+            <span class="r">3M</span>
+            <span class="r on">6M</span>
+            <span class="r">1J</span>
+          </div>
+        </div>
+        <div class="h-big">
+          <div class="h-num">114,2<small>kg</small></div>
+          <div class="h-delta">+ <strong>8,4 kg</strong> sinds oktober</div>
+        </div>
+        <div class="h-sub">Berekend via Epley uit beste set per sessie</div>
+
+        <svg class="h-chart" viewBox="0 0 300 100" preserveAspectRatio="none">
+          <!-- hairline grid -->
+          <line x1="0" y1="25"  x2="300" y2="25"  stroke="rgba(253,253,254,0.06)" stroke-dasharray="2 4"/>
+          <line x1="0" y1="50"  x2="300" y2="50"  stroke="rgba(253,253,254,0.06)" stroke-dasharray="2 4"/>
+          <line x1="0" y1="75"  x2="300" y2="75"  stroke="rgba(253,253,254,0.06)" stroke-dasharray="2 4"/>
+
+          <!-- filled area (ascending trend: 82 → 20) -->
+          <path d="M 0 82 C 18 80, 32 72, 50 70 C 70 68, 85 64, 100 56 C 118 50, 135 54, 155 48 C 175 42, 195 38, 215 34 C 235 30, 255 26, 275 22 L 300 20 L 300 100 L 0 100 Z"
+                fill="url(#hgrad)"/>
+
+          <defs>
+            <linearGradient id="hgrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FDFDFE" stop-opacity="0.22"/>
+              <stop offset="100%" stop-color="#FDFDFE" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+
+          <!-- main line -->
+          <path d="M 0 82 C 18 80, 32 72, 50 70 C 70 68, 85 64, 100 56 C 118 50, 135 54, 155 48 C 175 42, 195 38, 215 34 C 235 30, 255 26, 275 22 L 300 20"
+                fill="none" stroke="#FDFDFE" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+
+          <!-- end dot -->
+          <circle cx="300" cy="20" r="2.8" fill="#FDFDFE"/>
+        </svg>
+        <div class="h-foot">
+          <span>Nov</span>
+          <span>Dec</span>
+          <span>Jan</span>
+          <span>Feb</span>
+          <span>Mrt</span>
+          <span>Apr</span>
+        </div>
+      </div>
+
+      <!-- View mode -->
+      <div class="vchips">
+        <button class="vchip on">Rep-max</button>
+        <button class="vchip">Volume</button>
+        <button class="vchip">Sessies</button>
+      </div>
+
+      <!-- Rep-max breakdown -->
+      <div class="sec-cap">Beste rep-max · alle tijden</div>
+      <div class="rm-card">
+
+        <div class="rm-row">
+          <div class="rm-rep"><strong>1</strong>RM</div>
+          <div class="rm-body">
+            <div class="rm-wt">109<small>kg</small></div>
+            <div class="rm-meta">1 × 109 — 4 apr</div>
+          </div>
+          <div class="rm-delta">+ 4 kg</div>
+        </div>
+
+        <div class="rm-row">
+          <div class="rm-rep"><strong>2</strong>RM</div>
+          <div class="rm-body">
+            <div class="rm-wt">104<small>kg</small></div>
+            <div class="rm-meta">2 × 104 — 28 mrt</div>
+          </div>
+          <div class="rm-delta">+ 2 kg</div>
+        </div>
+
+        <div class="rm-row">
+          <div class="rm-rep"><strong>3</strong>RM</div>
+          <div class="rm-body">
+            <div class="rm-wt">100<small>kg</small></div>
+            <div class="rm-meta">3 × 100 — 11 apr</div>
+          </div>
+          <div class="rm-delta">+ 5 kg</div>
+        </div>
+
+        <div class="rm-row">
+          <div class="rm-rep"><strong>5</strong>RM</div>
+          <div class="rm-body">
+            <div class="rm-wt">95<small>kg</small></div>
+            <div class="rm-meta">5 × 95 — 14 apr</div>
+          </div>
+          <div class="rm-delta">+ 2,5 kg</div>
+        </div>
+
+        <div class="rm-row">
+          <div class="rm-rep"><strong>8</strong>RM</div>
+          <div class="rm-body">
+            <div class="rm-wt">85<small>kg</small></div>
+            <div class="rm-meta">8 × 85 — 7 mrt</div>
+          </div>
+          <div class="rm-delta flat">—</div>
+        </div>
+
+        <div class="rm-row">
+          <div class="rm-rep"><strong>10</strong>RM</div>
+          <div class="rm-body">
+            <div class="rm-wt">80<small>kg</small></div>
+            <div class="rm-meta">10 × 80 — 21 feb</div>
+          </div>
+          <div class="rm-delta">+ 5 kg</div>
+        </div>
+
+        <div class="rm-row">
+          <div class="rm-rep"><strong>12</strong>RM</div>
+          <div class="rm-body">
+            <div class="rm-wt">75<small>kg</small></div>
+            <div class="rm-meta">12 × 75 — 3 feb</div>
+          </div>
+          <div class="rm-delta">+ 2,5 kg</div>
+        </div>
+
+        <div class="rm-row">
+          <div class="rm-rep"><strong>15</strong>RM</div>
+          <div class="rm-body">
+            <div class="rm-wt">65<small>kg</small></div>
+            <div class="rm-meta">15 × 65 — 17 jan</div>
+          </div>
+          <div class="rm-delta flat">—</div>
+        </div>
+
+        <div class="rm-row">
+          <div class="rm-rep"><strong>20</strong>RM</div>
+          <div class="rm-body">
+            <div class="rm-wt">55<small>kg</small></div>
+            <div class="rm-meta">20 × 55 — 9 nov</div>
+          </div>
+          <div class="rm-delta neg">— 5 mnd geleden</div>
+        </div>
+
+      </div>
+
+      <!-- Recent sessions -->
+      <div class="sec-cap mt">Recente sessies</div>
+      <div class="ses-card">
+
+        <div class="ses-row">
+          <div>
+            <div class="ses-date">Di 14 apr</div>
+            <div class="ses-sets">95×5 <span class="sep">·</span> 95×5 <span class="sep">·</span> 90×6</div>
+          </div>
+          <div class="ses-e1rm">
+            111<small>e1RM</small>
+          </div>
+        </div>
+
+        <div class="ses-row">
+          <div>
+            <div class="ses-date">Vr 11 apr</div>
+            <div class="ses-sets">100×3 <span class="sep">·</span> 95×4 <span class="sep">·</span> 90×6</div>
+          </div>
+          <div class="ses-e1rm">
+            110<small>e1RM</small>
+          </div>
+        </div>
+
+        <div class="ses-row">
+          <div>
+            <div class="ses-date">Ma 7 apr</div>
+            <div class="ses-sets">92,5×5 <span class="sep">·</span> 92,5×5 <span class="sep">·</span> 85×7</div>
+          </div>
+          <div class="ses-e1rm">
+            108<small>e1RM</small>
+          </div>
+        </div>
+
+        <div class="ses-row">
+          <div>
+            <div class="ses-date">Do 3 apr</div>
+            <div class="ses-sets">90×6 <span class="sep">·</span> 90×5 <span class="sep">·</span> 82,5×8</div>
+          </div>
+          <div class="ses-e1rm">
+            107<small>e1RM</small>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Reference sidebar -->
+  <div class="ref">
+    <h3>11e · Lift-detail</h3>
+    <p style="margin-bottom:14px;">Opent via tap op exercise-row in 11b. Antwoordt op "wat zijn al mijn PR's op deze lift?" — exact wat Glenn vroeg.</p>
+
+    <div class="lbl">Route</div>
+    <div class="row"><span>Entry</span><strong>Kracht → zoek/tap oefening</strong></div>
+    <div class="row"><span>Back</span><strong>Terug naar Kracht</strong></div>
+
+    <h4>Twee PR-metrics</h4>
+    <div class="row"><span>Hero</span><strong>e1RM (Epley)</strong></div>
+    <div class="row"><span>Grid</span><strong>Rep-max (echt)</strong></div>
+    <p style="margin-top:8px; font-size:11px;">
+      e1RM = <em>schatting</em> uit élke goede set, geeft continue trend.
+      Rep-max = <em>werkelijk</em> beste X-rep set ooit. Beide relevant —
+      hero toont voortgang, grid toont harde records.
+    </p>
+
+    <h4>Rep-ladder</h4>
+    <ul>
+      <li>1 · strength ceiling</li>
+      <li>2-5 · krachttrainings-range</li>
+      <li>8-12 · hypertrofie-range</li>
+      <li>15-20 · uithoudings-range</li>
+    </ul>
+    <p style="margin-top:8px; font-size:11px;">
+      Toont PR's over ál die zones — zo zie je waar je plafond zit
+      en waar je nog kan groeien, niet alleen "1RM of niets".
+    </p>
+
+    <h4>Sessies</h4>
+    <ul>
+      <li>4 laatste loggings (chronologisch)</li>
+      <li>sets als gewicht × reps</li>
+      <li>e1RM per sessie rechts</li>
+      <li>tap row → volledig session-detail</li>
+    </ul>
+
+    <h4>Data note</h4>
+    <p style="margin-top:0; font-size:11px;">
+      Zoals bij 11b: alle cijfers in design-fase zijn placeholder.
+      Live app: grid-rijen filteren op <code>reps = X</code> over alle
+      gelogde sets, neemt <code>MAX(weight)</code> en koppelt de datum.
+      Sparkline in hero: weekly best e1RM uit álle werk-sets.
+    </p>
+  </div>
+
+</div>
+
+</body>
+</html>

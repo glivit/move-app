@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MŌVE — Progress · Lichaam</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="shared.css" />
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       11c · Progress · Lichaam
+       ────────────────────────────────────────────────────────────
+       Doel: "verandert mijn fysiek?" · weight + measurements + photos
+       ═══════════════════════════════════════════════════════════ */
+
+    .scroll { padding: 66px 0 110px; }
+
+    /* Subtabs */
+    .subtabs {
+      padding: 0 5% 18px;
+      display: flex; gap: 6px; overflow-x: auto;
+      scrollbar-width: none;
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) 140ms forwards;
+    }
+    .subtabs::-webkit-scrollbar { display: none; }
+    .subtab {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      border-radius: var(--r-pill);
+      font-size: 13px; font-weight: 400;
+      letter-spacing: -0.005em;
+      color: var(--ink-soft);
+      background: transparent;
+      border: 1px solid rgba(253,253,254,0.10);
+      cursor: pointer;
+      transition: all 140ms var(--ease);
+    }
+    .subtab.on { background: var(--ink); color: #2A2D2B; border-color: var(--ink); font-weight: 500; }
+
+    .sec-cap {
+      padding: 6px 5% 10px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .sec-cap.mt { padding-top: 20px; }
+
+    /* ─── Weight chart card ─── */
+    .weight-card {
+      background: var(--card-dark);
+      margin: 0 5% 6px;
+      padding: 22px 22px 18px;
+      border-radius: var(--r-xl);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18);
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) 220ms forwards;
+    }
+    .wc-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 6px;
+    }
+    .wc-title {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+    .wc-range {
+      display: flex;
+      gap: 4px;
+    }
+    .wc-range .r {
+      font-size: 10px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: var(--r-pill);
+      color: var(--ink-muted);
+      letter-spacing: 0.02em;
+      cursor: pointer;
+    }
+    .wc-range .r.on {
+      background: rgba(253,253,254,0.12);
+      color: var(--ink);
+    }
+    .wc-big {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin: 6px 0 16px;
+    }
+    .wc-num {
+      font-size: 38px;
+      font-weight: 200;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      font-feature-settings: "tnum";
+      line-height: 1;
+    }
+    .wc-num small {
+      font-size: 14px;
+      color: var(--ink-muted);
+      margin-left: 3px;
+      letter-spacing: 0;
+      font-weight: 300;
+    }
+    .wc-delta {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      letter-spacing: -0.005em;
+    }
+    .wc-delta strong { color: var(--ink); font-weight: 500; }
+
+    .wc-chart {
+      width: 100%;
+      height: 100px;
+      margin-top: 4px;
+    }
+    .wc-foot {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-top: 6px;
+    }
+
+    /* ─── Measurements grid ─── */
+    .meas-grid {
+      padding: 0 5%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .meas-card {
+      background: var(--card);
+      padding: 14px 16px;
+      border-radius: var(--r-lg);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) forwards;
+    }
+    .meas-card.m1 { animation-delay: 340ms; }
+    .meas-card.m2 { animation-delay: 380ms; }
+    .meas-card.m3 { animation-delay: 420ms; }
+    .meas-card.m4 { animation-delay: 460ms; }
+    .meas-card.m5 { animation-delay: 500ms; }
+    .meas-card.m6 { animation-delay: 540ms; }
+    .me-lbl {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 4px;
+    }
+    .me-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .me-val {
+      font-size: 20px;
+      font-weight: 300;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      font-feature-settings: "tnum";
+    }
+    .me-val small {
+      font-size: 10px;
+      color: var(--ink-muted);
+      margin-left: 2px;
+      letter-spacing: 0;
+    }
+    .me-d {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-soft);
+      letter-spacing: -0.005em;
+    }
+    .me-d.flat { color: var(--ink-faint); }
+
+    /* ─── Photos row ─── */
+    .photos-card {
+      background: var(--card);
+      margin: 0 5% 6px;
+      padding: 18px 18px 20px;
+      border-radius: var(--r-xl);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) 620ms forwards;
+    }
+    .ph-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 12px;
+    }
+    .ph-title {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--ink);
+    }
+    .ph-more {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--ink-faint);
+      letter-spacing: 0.005em;
+    }
+    .ph-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+    .ph-thumb {
+      aspect-ratio: 3/4;
+      border-radius: 10px;
+      background:
+        linear-gradient(145deg, rgba(0,0,0,0.15), rgba(0,0,0,0.35)),
+        linear-gradient(160deg, #6A6E67, #3A3D37);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+    .ph-thumb::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 40%; height: 70%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(ellipse 60% 55% at 50% 38%, rgba(255,255,255,0.10), transparent 60%);
+    }
+    .ph-date {
+      position: absolute;
+      bottom: 6px; left: 7px;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.78);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    }
+
+    .ph-add {
+      aspect-ratio: 3/4;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.10);
+      border: 1px dashed rgba(253,253,254,0.22);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    .ph-add svg {
+      width: 18px; height: 18px;
+      stroke: var(--ink-soft);
+      stroke-width: 1.5;
+      fill: none;
+    }
+    .ph-add-lbl {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    /* ─── Body-stats summary strip ─── */
+    .body-summary {
+      padding: 0 5%;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      opacity: 0; transform: translateY(10px);
+      animation: up var(--t) var(--ease) 260ms forwards;
+    }
+    .bs-cell { padding: 0 2px; }
+    .bs-val {
+      font-size: 18px;
+      font-weight: 300;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      font-feature-settings: "tnum";
+      line-height: 1.1;
+    }
+    .bs-val small {
+      font-size: 10px;
+      color: var(--ink-muted);
+      margin-left: 2px;
+      letter-spacing: 0;
+    }
+    .bs-lbl {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-top: 3px;
+    }
+
+    .page-title {
+      font-size: 26px;
+      font-weight: 250;
+      letter-spacing: -0.028em;
+      color: var(--ink);
+      padding: 0 5%;
+      margin-bottom: 12px;
+      opacity: 0; transform: translateY(8px);
+      animation: up var(--t) var(--ease) 200ms forwards;
+    }
+    .page-title small {
+      font-size: 13px;
+      color: var(--ink-faint);
+      margin-left: 8px;
+      font-weight: 300;
+      letter-spacing: -0.005em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+    <div class="scroll">
+
+      <!-- Top bar -->
+      <div class="top">
+        <div class="logo">MŌVE</div>
+        <div class="top-r">
+          <div class="av">GD</div>
+          <button class="ico-btn" aria-label="Menu">
+            <svg viewBox="0 0 24 24"><line x1="4" y1="7"  x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Subtabs -->
+      <div class="subtabs">
+        <button class="subtab">Overzicht</button>
+        <button class="subtab">Kracht</button>
+        <button class="subtab on">Lichaam</button>
+        <button class="subtab">Check-ins</button>
+      </div>
+
+      <!-- Weight -->
+      <div class="sec-cap">Gewicht</div>
+      <div class="weight-card">
+        <div class="wc-head">
+          <div class="wc-title">Dagelijks</div>
+          <div class="wc-range">
+            <span class="r">1M</span>
+            <span class="r on">3M</span>
+            <span class="r">6M</span>
+            <span class="r">1J</span>
+          </div>
+        </div>
+        <div class="wc-big">
+          <div class="wc-num">84,2<small>kg</small></div>
+          <div class="wc-delta">— <strong>2,6 kg</strong> sinds januari</div>
+        </div>
+        <svg class="wc-chart" viewBox="0 0 300 100" preserveAspectRatio="none">
+          <!-- hairline grid -->
+          <line x1="0" y1="25"  x2="300" y2="25"  stroke="rgba(253,253,254,0.06)" stroke-dasharray="2 4"/>
+          <line x1="0" y1="50"  x2="300" y2="50"  stroke="rgba(253,253,254,0.06)" stroke-dasharray="2 4"/>
+          <line x1="0" y1="75"  x2="300" y2="75"  stroke="rgba(253,253,254,0.06)" stroke-dasharray="2 4"/>
+
+          <!-- filled area -->
+          <path d="M 0 22 C 20 26, 30 30, 50 28 C 70 26, 85 42, 100 36 C 120 30, 140 48, 160 42 C 180 38, 200 58, 220 54 C 240 52, 260 68, 285 70 L 300 72 L 300 100 L 0 100 Z"
+                fill="url(#grad)"/>
+
+          <defs>
+            <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FDFDFE" stop-opacity="0.22"/>
+              <stop offset="100%" stop-color="#FDFDFE" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+
+          <!-- main line -->
+          <path d="M 0 22 C 20 26, 30 30, 50 28 C 70 26, 85 42, 100 36 C 120 30, 140 48, 160 42 C 180 38, 200 58, 220 54 C 240 52, 260 68, 285 70 L 300 72"
+                fill="none" stroke="#FDFDFE" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>
+
+          <!-- end dot -->
+          <circle cx="300" cy="72" r="2.8" fill="#FDFDFE"/>
+        </svg>
+        <div class="wc-foot">
+          <span>Jan</span>
+          <span>Feb</span>
+          <span>Mrt</span>
+          <span>Apr</span>
+        </div>
+      </div>
+
+      <!-- Body summary strip -->
+      <div style="padding: 14px 5% 0;"></div>
+      <div class="body-summary">
+        <div class="bs-cell">
+          <div class="bs-val">18,2<small>%</small></div>
+          <div class="bs-lbl">Vetpercentage</div>
+        </div>
+        <div class="bs-cell">
+          <div class="bs-val">68,9<small>kg</small></div>
+          <div class="bs-lbl">Lean mass</div>
+        </div>
+        <div class="bs-cell">
+          <div class="bs-val">1,83<small>m</small></div>
+          <div class="bs-lbl">Lengte</div>
+        </div>
+      </div>
+
+      <!-- Measurements -->
+      <div class="sec-cap mt">Maten · laatste meting</div>
+      <div class="meas-grid">
+        <div class="meas-card m1">
+          <div class="me-lbl">Borst</div>
+          <div class="me-row">
+            <div class="me-val">108<small>cm</small></div>
+            <div class="me-d">+2,0</div>
+          </div>
+        </div>
+        <div class="meas-card m2">
+          <div class="me-lbl">Taille</div>
+          <div class="me-row">
+            <div class="me-val">82<small>cm</small></div>
+            <div class="me-d">− 3,5</div>
+          </div>
+        </div>
+        <div class="meas-card m3">
+          <div class="me-lbl">Heup</div>
+          <div class="me-row">
+            <div class="me-val">98<small>cm</small></div>
+            <div class="me-d flat">— 0,5</div>
+          </div>
+        </div>
+        <div class="meas-card m4">
+          <div class="me-lbl">Arm</div>
+          <div class="me-row">
+            <div class="me-val">38<small>cm</small></div>
+            <div class="me-d">+1,5</div>
+          </div>
+        </div>
+        <div class="meas-card m5">
+          <div class="me-lbl">Dij</div>
+          <div class="me-row">
+            <div class="me-val">59<small>cm</small></div>
+            <div class="me-d">+1,0</div>
+          </div>
+        </div>
+        <div class="meas-card m6">
+          <div class="me-lbl">Schouder</div>
+          <div class="me-row">
+            <div class="me-val">122<small>cm</small></div>
+            <div class="me-d">+2,5</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Photos -->
+      <div class="sec-cap mt">Voortgangsfoto's</div>
+      <div class="photos-card">
+        <div class="ph-head">
+          <div class="ph-title">14 foto's · 12 weken</div>
+          <div class="ph-more">Alles tonen</div>
+        </div>
+        <div class="ph-row">
+          <div class="ph-thumb"><span class="ph-date">16 apr</span></div>
+          <div class="ph-thumb"><span class="ph-date">09 apr</span></div>
+          <div class="ph-thumb"><span class="ph-date">02 apr</span></div>
+          <div class="ph-add">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="6" x2="12" y2="18"/><line x1="6" y1="12" x2="18" y2="12"/></svg>
+            <div class="ph-add-lbl">Nieuw</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bnav -->
+    <div class="bnav">
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z"/></svg>
+        <span>Home</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M4 12h3l2-4 4 8 2-4h5"/></svg>
+        <span>Workouts</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><path d="M6 3h12l-1 5H7zM7 8v11h10V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+        <span>Dieet</span>
+      </div>
+      <div class="tab on">
+        <svg viewBox="0 0 24 24"><polyline points="4 17 9 11 13 15 20 7"/></svg>
+        <span>Progress</span>
+      </div>
+      <div class="tab">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0 1 16 0"/></svg>
+        <span>Ik</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="ref">
+    <h4>11c · Progress · Lichaam</h4>
+    <p>Beantwoordt: "verandert mijn fysiek?" — gewichtstrend, maten, voortgangsfoto's.</p>
+    <div class="lbl">Weight-chart</div>
+    <div class="row"><span>Dark card</span><strong>gradient area + hairline grid</strong></div>
+    <div class="row"><span>Range-picker</span><strong>1M / 3M / 6M / 1J</strong></div>
+    <div class="row"><span>Signal</span><strong>"− 2,6 kg sinds januari" i.p.v. %-delta</strong></div>
+    <div class="lbl">Body-summary</div>
+    <div class="row"><span>3-col</span><strong>BF% · Lean mass · Lengte</strong></div>
+    <div class="lbl">Maten</div>
+    <div class="row"><span>2×3 grid</span><strong>6 kern-locaties</strong></div>
+    <div class="row"><span>Delta-teken</span><strong>+, −, — (flat)</strong></div>
+    <div class="lbl">Foto's</div>
+    <div class="row"><span>3-up thumbs</span><strong>laatste 3 + add-tile</strong></div>
+    <div class="row"><span>Full grid</span><strong>via "Alles tonen" link</strong></div>
+    <div class="lbl">UX-rationale</div>
+    <p>Foto's hebben vaak méér signaal dan het weegschaal-cijfer. Daarom prominent — maar onder gewicht, omdat dat dagelijks logbaar is.</p>
+  </div>
+
+</body>
+</html>

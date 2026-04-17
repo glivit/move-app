@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Manrope, DM_Sans, DM_Mono } from 'next/font/google'
+import { Outfit } from 'next/font/google'
 import dynamic from 'next/dynamic'
 import './globals.css'
 
@@ -14,24 +14,11 @@ const InstallPrompt = dynamic(
   () => import('@/components/InstallPrompt').then(m => m.InstallPrompt)
 )
 
-const manrope = Manrope({
+// v6 — Outfit everywhere. Weights: 200 (hero numbers) · 300 (titles) · 400 (body) · 500 (active/emphasis).
+const outfit = Outfit({
   subsets: ['latin'],
-  weight: ['400', '600', '700', '800'],
-  variable: '--font-display',
-  display: 'swap',
-})
-
-const dmSans = DM_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  variable: '--font-body',
-  display: 'swap',
-})
-
-const dmMono = DM_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-mono',
+  weight: ['200', '300', '400', '500', '600'],
+  variable: '--font-sans',
   display: 'swap',
 })
 
@@ -72,22 +59,30 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#1A1917',
+  themeColor: '#8E9890',
   viewportFit: 'cover',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="nl-BE" className={`${manrope.variable} ${dmSans.variable} ${dmMono.variable}`}>
+    <html lang="nl-BE" className={outfit.variable}>
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="MŌVE" />
-        <meta name="msapplication-TileColor" content="#1A1917" />
+        <meta name="msapplication-TileColor" content="#8E9890" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
       </head>
-      <body suppressHydrationWarning className="min-h-screen bg-bg text-text-primary font-body antialiased">
+      <body
+        suppressHydrationWarning
+        className="min-h-screen antialiased"
+        style={{
+          fontFamily: 'var(--font-sans), Outfit, sans-serif',
+          background: '#8E9890',
+          color: '#FDFDFE',
+        }}
+      >
         <ServiceWorkerInit />
         <OfflineIndicator />
         {children}
