@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import { Send, Paperclip, X, Camera, Image as ImageIcon, Film, Mic, Square } from 'lucide-react'
-import { createClient } from '@/lib/supabase'
 
 interface ChatInputProps {
   onSend: (content: string, messageType?: string, fileUrl?: string) => void
@@ -227,19 +226,33 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
     return `${m}:${s.toString().padStart(2, '0')}`
   }
 
+  // v6 tokens
+  const DARK = '#474B48'
+  const INPUT_BG = 'rgba(253,253,254,0.08)'
+  const INPUT_HOVER = 'rgba(253,253,254,0.12)'
+  const BORDER_TOP = 'rgba(253,253,254,0.08)'
+  const MUTED = 'rgba(253,253,254,0.48)'
+  const PLACEHOLDER = 'rgba(253,253,254,0.38)'
+  const WHITE = '#FDFDFE'
+  const LIME = '#C0FC01'
+  const INK = '#1A1917'
+
   return (
-    <div className="bg-white border-t border-[#E8E4DC]">
+    <div style={{ background: DARK, borderTop: `1px solid ${BORDER_TOP}` }}>
       {/* Upload progress */}
       {isUploading && (
         <div className="px-4 pt-3">
           <div className="flex items-center gap-3">
-            <div className="flex-1 h-1 bg-[#E8E4DC] rounded-full overflow-hidden">
+            <div
+              className="flex-1 h-1 rounded-full overflow-hidden"
+              style={{ background: INPUT_BG }}
+            >
               <div
-                className="h-full bg-[var(--color-pop)] rounded-full transition-all duration-300"
-                style={{ width: `${uploadProgress}%` }}
+                className="h-full rounded-full transition-all duration-300"
+                style={{ width: `${uploadProgress}%`, background: LIME }}
               />
             </div>
-            <span className="text-[11px] text-[#A09D96]">Uploaden...</span>
+            <span className="text-[11px]" style={{ color: MUTED }}>Uploaden...</span>
           </div>
         </div>
       )}
@@ -258,19 +271,28 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
                 unoptimized
               />
             ) : filePreview.type.startsWith('video/') ? (
-              <div className="h-20 w-32 rounded-xl bg-[#F0EDE8] flex items-center justify-center">
-                <Film size={24} className="text-[#A09D96]" />
-                <span className="text-[11px] text-[#A09D96] ml-1">Video</span>
+              <div
+                className="h-20 w-32 rounded-xl flex items-center justify-center"
+                style={{ background: INPUT_BG }}
+              >
+                <Film size={24} style={{ color: MUTED }} />
+                <span className="text-[11px] ml-1" style={{ color: MUTED }}>Video</span>
               </div>
             ) : filePreview.type.startsWith('audio/') ? (
-              <div className="h-12 px-4 rounded-xl bg-[#F0EDE8] flex items-center gap-2">
-                <Mic size={16} className="text-[var(--color-pop)]" />
-                <span className="text-[13px] text-[#6B6862]">Spraakbericht</span>
+              <div
+                className="h-12 px-4 rounded-xl flex items-center gap-2"
+                style={{ background: INPUT_BG }}
+              >
+                <Mic size={16} style={{ color: LIME }} />
+                <span className="text-[13px]" style={{ color: WHITE }}>Spraakbericht</span>
               </div>
             ) : (
-              <div className="h-12 px-4 rounded-xl bg-[#F0EDE8] flex items-center gap-2">
-                <Paperclip size={16} className="text-[#A09D96]" />
-                <span className="text-[13px] text-[#6B6862] truncate max-w-[200px]">{filePreview.name}</span>
+              <div
+                className="h-12 px-4 rounded-xl flex items-center gap-2"
+                style={{ background: INPUT_BG }}
+              >
+                <Paperclip size={16} style={{ color: MUTED }} />
+                <span className="text-[13px] truncate max-w-[200px]" style={{ color: WHITE }}>{filePreview.name}</span>
               </div>
             )}
             <button
@@ -278,9 +300,10 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
                 if (filePreview.localPreview) URL.revokeObjectURL(filePreview.localPreview)
                 setFilePreview(null)
               }}
-              className="absolute -top-2 -right-2 w-6 h-6 bg-[#1A1917] rounded-full flex items-center justify-center"
+              className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center"
+              style={{ background: INK, boxShadow: '0 2px 4px rgba(0,0,0,0.32)' }}
             >
-              <X size={12} className="text-white" />
+              <X size={12} style={{ color: WHITE }} />
             </button>
           </div>
         </div>
@@ -289,16 +312,20 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
       {/* Recording indicator */}
       {isRecording && (
         <div className="px-4 pt-3">
-          <div className="flex items-center gap-3 py-2 px-4 bg-red-50 rounded-xl">
-            <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-            <span className="text-[13px] text-red-600 font-medium">
+          <div
+            className="flex items-center gap-3 py-2 px-4 rounded-xl"
+            style={{ background: 'rgba(232,96,79,0.14)' }}
+          >
+            <div className="w-3 h-3 rounded-full animate-pulse" style={{ background: '#E8604F' }} />
+            <span className="text-[13px] font-medium" style={{ color: '#E8604F' }}>
               Opnemen {formatRecordingTime(recordingTime)}
             </span>
             <button
               onClick={stopRecording}
-              className="ml-auto w-8 h-8 bg-red-500 rounded-full flex items-center justify-center"
+              className="ml-auto w-8 h-8 rounded-full flex items-center justify-center"
+              style={{ background: '#E8604F' }}
             >
-              <Square size={12} className="text-white" fill="white" />
+              <Square size={12} style={{ color: WHITE }} fill={WHITE} />
             </button>
           </div>
         </div>
@@ -306,35 +333,25 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
 
       {/* Media menu */}
       {showMediaMenu && !isRecording && (
-        <div className="px-4 pt-3 flex gap-2">
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F5F2EC] hover:bg-[#E8E4DC] transition-colors"
-          >
-            <ImageIcon size={16} className="text-[var(--color-pop)]" />
-            <span className="text-[13px] font-medium text-[#1A1917]">Foto</span>
-          </button>
-          <button
-            onClick={() => cameraInputRef.current?.click()}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F5F2EC] hover:bg-[#E8E4DC] transition-colors"
-          >
-            <Camera size={16} className="text-[var(--color-pop)]" />
-            <span className="text-[13px] font-medium text-[#1A1917]">Camera</span>
-          </button>
-          <button
-            onClick={() => videoInputRef.current?.click()}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F5F2EC] hover:bg-[#E8E4DC] transition-colors"
-          >
-            <Film size={16} className="text-[var(--color-pop)]" />
-            <span className="text-[13px] font-medium text-[#1A1917]">Video</span>
-          </button>
-          <button
-            onClick={startRecording}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F5F2EC] hover:bg-[#E8E4DC] transition-colors"
-          >
-            <Mic size={16} className="text-[var(--color-pop)]" />
-            <span className="text-[13px] font-medium text-[#1A1917]">Audio</span>
-          </button>
+        <div className="px-4 pt-3 flex gap-2 flex-wrap">
+          {[
+            { icon: ImageIcon, label: 'Foto', onClick: () => fileInputRef.current?.click() },
+            { icon: Camera, label: 'Camera', onClick: () => cameraInputRef.current?.click() },
+            { icon: Film, label: 'Video', onClick: () => videoInputRef.current?.click() },
+            { icon: Mic, label: 'Audio', onClick: startRecording },
+          ].map(({ icon: Icon, label, onClick }) => (
+            <button
+              key={label}
+              onClick={onClick}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-colors"
+              style={{ background: INPUT_BG }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = INPUT_HOVER)}
+              onMouseLeave={(e) => (e.currentTarget.style.background = INPUT_BG)}
+            >
+              <Icon size={16} style={{ color: LIME }} />
+              <span className="text-[13px] font-medium" style={{ color: WHITE }}>{label}</span>
+            </button>
+          ))}
         </div>
       )}
 
@@ -349,9 +366,11 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
           <button
             onClick={() => setShowMediaMenu(!showMediaMenu)}
             disabled={loading || isUploading}
-            className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
-              showMediaMenu ? 'bg-[var(--color-pop)] text-white' : 'text-[#A09D96] hover:bg-[#F0EDE8]'
-            }`}
+            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
+            style={{
+              background: showMediaMenu ? LIME : 'transparent',
+              color: showMediaMenu ? INK : MUTED,
+            }}
           >
             {showMediaMenu ? <X size={18} strokeWidth={1.5} /> : <Paperclip size={18} strokeWidth={1.5} />}
           </button>
@@ -364,7 +383,12 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
           onKeyDown={handleKeyDown}
           placeholder={isRecording ? 'Opname bezig...' : 'Typ een bericht...'}
           disabled={loading || isUploading || isRecording}
-          className="flex-1 bg-[#F5F2EC] rounded-2xl px-4 py-2.5 text-[15px] text-[#1A1917] placeholder:text-[#CCC7BC] resize-none min-h-[40px] max-h-[120px] focus:outline-none disabled:opacity-50"
+          className="flex-1 rounded-2xl px-4 py-2.5 text-[15px] resize-none min-h-[40px] max-h-[120px] focus:outline-none disabled:opacity-50 chat-input-textarea"
+          style={{
+            background: INPUT_BG,
+            color: WHITE,
+            border: 'none',
+          }}
           rows={1}
         />
 
@@ -372,12 +396,23 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
           <button
             onClick={handleSend}
             disabled={loading || isUploading}
-            className="w-10 h-10 rounded-full bg-[var(--color-pop)] text-white flex items-center justify-center flex-shrink-0 hover:opacity-90 transition-all disabled:opacity-50 active:scale-95"
+            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all disabled:opacity-50 active:scale-95"
+            style={{
+              background: LIME,
+              color: INK,
+              boxShadow: '0 2px 8px rgba(192,252,1,0.28)',
+            }}
           >
-            <Send size={18} strokeWidth={1.5} />
+            <Send size={18} strokeWidth={1.75} />
           </button>
         )}
       </div>
+
+      <style jsx>{`
+        .chat-input-textarea::placeholder {
+          color: ${PLACEHOLDER};
+        }
+      `}</style>
     </div>
   )
 }

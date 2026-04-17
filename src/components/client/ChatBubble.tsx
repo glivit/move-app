@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Play, FileText, Download, Mic, X } from 'lucide-react'
+import { FileText, Download, Mic, X } from 'lucide-react'
 
 interface ChatBubbleProps {
   message: {
@@ -52,6 +52,12 @@ function MediaContent({ message, isOwn }: { message: ChatBubbleProps['message'];
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const fileUrl = message.image_url
 
+  // isOwn = user (dark bubble, light text)
+  // !isOwn = coach (light bubble, dark text)
+  const textClass = isOwn ? 'text-[#FDFDFE]' : 'text-[#1A1917]'
+  const accentClass = isOwn ? 'text-[#C0FC01]' : 'text-[#1A1917]'
+  const subtleClass = isOwn ? 'text-[rgba(253,253,254,0.56)]' : 'text-[rgba(26,25,23,0.48)]'
+
   // Image
   if (message.type === 'image' && fileUrl) {
     return (
@@ -67,7 +73,7 @@ function MediaContent({ message, isOwn }: { message: ChatBubbleProps['message'];
           loading="lazy"
         />
         {message.content && message.content !== fileUrl.split('/').pop() && (
-          <p className={`text-[15px] mt-2 ${isOwn ? 'text-white' : 'text-[#1A1917]'}`}>
+          <p className={`text-[15px] mt-2 ${textClass}`}>
             {message.content}
           </p>
         )}
@@ -88,7 +94,7 @@ function MediaContent({ message, isOwn }: { message: ChatBubbleProps['message'];
           className="rounded-xl max-w-[260px] max-h-[300px]"
         />
         {message.content && message.content !== fileUrl.split('/').pop() && (
-          <p className={`text-[15px] mt-2 ${isOwn ? 'text-white' : 'text-[#1A1917]'}`}>
+          <p className={`text-[15px] mt-2 ${textClass}`}>
             {message.content}
           </p>
         )}
@@ -100,7 +106,7 @@ function MediaContent({ message, isOwn }: { message: ChatBubbleProps['message'];
   if (message.type === 'voice' && fileUrl) {
     return (
       <div className="flex items-center gap-3 min-w-[180px]">
-        <Mic size={16} className={isOwn ? 'text-white/70' : 'text-[var(--color-pop)]'} />
+        <Mic size={16} className={accentClass} />
         <audio src={fileUrl} controls className="h-8 flex-1" style={{ maxWidth: 200 }} />
       </div>
     )
@@ -115,20 +121,20 @@ function MediaContent({ message, isOwn }: { message: ChatBubbleProps['message'];
         target="_blank"
         rel="noopener noreferrer"
         className={`flex items-center gap-3 px-3 py-2 rounded-xl ${
-          isOwn ? 'bg-white/15' : 'bg-[#F0EDE8]'
+          isOwn ? 'bg-[rgba(253,253,254,0.10)]' : 'bg-[rgba(26,25,23,0.06)]'
         }`}
       >
-        <FileText size={18} className={isOwn ? 'text-white/70' : 'text-[var(--color-pop)]'} />
-        <span className={`text-[13px] font-medium truncate max-w-[160px] ${isOwn ? 'text-white' : 'text-[#1A1917]'}`}>
+        <FileText size={18} className={accentClass} />
+        <span className={`text-[13px] font-medium truncate max-w-[160px] ${textClass}`}>
           {fileName}
         </span>
-        <Download size={14} className={isOwn ? 'text-white/50' : 'text-[#A09D96]'} />
+        <Download size={14} className={subtleClass} />
       </a>
     )
   }
 
   // Text (default)
-  return <p className={`text-[15px] ${isOwn ? 'text-white' : 'text-[#1A1917]'}`}>{message.content}</p>
+  return <p className={`text-[15px] leading-[1.45] ${textClass}`}>{message.content}</p>
 }
 
 export function ChatBubble({ message, isCoach }: ChatBubbleProps) {
@@ -139,10 +145,18 @@ export function ChatBubble({ message, isCoach }: ChatBubbleProps) {
     return (
       <div className="flex justify-start">
         <div className="flex flex-col max-w-[78%]">
-          <div className="bg-white rounded-[20px] rounded-bl-[4px] px-4 py-3 shadow-sm">
+          <div
+            style={{
+              background: '#FDFDFE',
+              borderRadius: '20px',
+              borderBottomLeftRadius: '4px',
+              padding: '12px 16px',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.08)',
+            }}
+          >
             <MediaContent message={message} isOwn={false} />
           </div>
-          <span className="text-[11px] text-[#C5C2BC] mt-1 px-2">{time}</span>
+          <span className="text-[11px] mt-1 px-2" style={{ color: 'rgba(253,253,254,0.56)' }}>{time}</span>
         </div>
       </div>
     )
@@ -151,10 +165,18 @@ export function ChatBubble({ message, isCoach }: ChatBubbleProps) {
   return (
     <div className="flex justify-end">
       <div className="flex flex-col max-w-[78%] items-end">
-        <div className="bg-[var(--color-pop)] rounded-[20px] rounded-br-[4px] px-4 py-3">
+        <div
+          style={{
+            background: '#474B48',
+            borderRadius: '20px',
+            borderBottomRightRadius: '4px',
+            padding: '12px 16px',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.22)',
+          }}
+        >
           <MediaContent message={message} isOwn={true} />
         </div>
-        <span className="text-[11px] text-[#C5C2BC] mt-1 px-2">{time}</span>
+        <span className="text-[11px] mt-1 px-2" style={{ color: 'rgba(253,253,254,0.56)' }}>{time}</span>
       </div>
     </div>
   )

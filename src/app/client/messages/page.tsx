@@ -64,6 +64,13 @@ function groupMessagesByDate(messages: Message[]): GroupedMessages {
   return groups
 }
 
+function getInitials(name: string): string {
+  if (!name) return '?'
+  const parts = name.trim().split(' ')
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+  return name.substring(0, 2).toUpperCase()
+}
+
 export default function ClientMessagesPage() {
   const router = useRouter()
   const [messages, setMessages] = useState<Message[]>([])
@@ -262,19 +269,36 @@ export default function ClientMessagesPage() {
     }
   }
 
+  // v6 tokens
+  const CANVAS = '#8E9890'
+  const DARK = '#474B48'
+  const WHITE = '#FDFDFE'
+  const MUTED = 'rgba(253,253,254,0.56)'
+  const DIVIDER = 'rgba(253,253,254,0.14)'
+  const LIME = '#C0FC01'
+
   if (loading) {
     return (
-      <div className="flex flex-col h-[calc(100dvh-140px)] bg-[#FFFFFF]">
-        <div className="px-4 py-4 border-b border-[#F0F0EE]">
+      <div
+        className="flex flex-col -mx-4 -mt-4"
+        style={{ height: 'calc(100dvh - 140px)', background: CANVAS }}
+      >
+        <div
+          style={{
+            background: DARK,
+            padding: '18px 20px',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18)',
+          }}
+        >
           <div className="animate-pulse space-y-2">
-            <div className="h-5 bg-[#F0F0EE] rounded w-32" />
-            <div className="h-3 bg-[#F0F0EE] rounded w-24" />
+            <div className="h-5 rounded w-32" style={{ background: 'rgba(253,253,254,0.14)' }} />
+            <div className="h-3 rounded w-24" style={{ background: 'rgba(253,253,254,0.08)' }} />
           </div>
         </div>
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-pulse space-y-3">
-            <div className="h-3 bg-[#F0F0EE] rounded w-48 mx-auto" />
-            <div className="h-3 bg-[#F0F0EE] rounded w-64 mx-auto" />
+            <div className="h-3 rounded w-48 mx-auto" style={{ background: 'rgba(253,253,254,0.14)' }} />
+            <div className="h-3 rounded w-64 mx-auto" style={{ background: 'rgba(253,253,254,0.10)' }} />
           </div>
         </div>
       </div>
@@ -283,9 +307,17 @@ export default function ClientMessagesPage() {
 
   if (!currentUserId || !coachId) {
     return (
-      <div className="flex flex-col h-[calc(100dvh-140px)] bg-[#FFFFFF] items-center justify-center">
-        <MessageCircle size={48} className="text-[#C0C0C0] mb-4" />
-        <p className="text-[#C0C0C0]">
+      <div
+        className="flex flex-col items-center justify-center -mx-4 -mt-4"
+        style={{ height: 'calc(100dvh - 140px)', background: CANVAS }}
+      >
+        <div
+          className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+          style={{ background: 'rgba(253,253,254,0.10)' }}
+        >
+          <MessageCircle size={28} style={{ color: MUTED }} strokeWidth={1.5} />
+        </div>
+        <p style={{ color: MUTED, fontSize: 14 }}>
           {!currentUserId ? 'Niet aangemeld' : 'Coach niet beschikbaar'}
         </p>
       </div>
@@ -296,11 +328,64 @@ export default function ClientMessagesPage() {
   const dateKeys = Object.keys(groupedMessages)
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-140px)] bg-[#FFFFFF] -mx-4 -mt-4">
-      {/* Header */}
-      <div className="px-4 py-4 border-b border-[#F0F0EE] animate-slide-up">
-        <h1 className="text-lg font-semibold text-[#1A1917]">{coachName}</h1>
-        <p className="text-xs text-[#C0C0C0] mt-0.5">Je coach</p>
+    <div
+      className="flex flex-col -mx-4 -mt-4"
+      style={{ height: 'calc(100dvh - 140px)', background: CANVAS }}
+    >
+      {/* Header — dark card */}
+      <div
+        className="animate-slide-up"
+        style={{
+          background: DARK,
+          padding: '18px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18)',
+        }}
+      >
+        <div
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: '50%',
+            background: '#1A1917',
+            color: WHITE,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 14,
+            fontWeight: 600,
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+          }}
+        >
+          {getInitials(coachName)}
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h1
+            style={{
+              fontSize: 16,
+              fontWeight: 600,
+              color: WHITE,
+              letterSpacing: '-0.01em',
+              margin: 0,
+            }}
+          >
+            {coachName}
+          </h1>
+          <p style={{ fontSize: 12, color: MUTED, marginTop: 2, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: '#2FA65A',
+                display: 'inline-block',
+              }}
+            />
+            Je coach
+          </p>
+        </div>
       </div>
 
       {/* Messages */}
@@ -311,17 +396,21 @@ export default function ClientMessagesPage() {
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full animate-fade-in">
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-[rgba(212,106,58,0.08)] flex items-center justify-center mx-auto">
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto"
+                style={{ background: 'rgba(192,252,1,0.16)' }}
+              >
                 <MessageCircle
-                  className="w-7 h-7 text-[#D46A3A]"
+                  size={28}
+                  style={{ color: LIME }}
                   strokeWidth={1.5}
                 />
               </div>
               <div className="space-y-1">
-                <p className="section-title">
+                <p style={{ fontSize: 15, fontWeight: 500, color: WHITE }}>
                   Stuur je coach een bericht
                 </p>
-                <p className="text-[13px] text-[#ACACAC]">
+                <p style={{ fontSize: 13, color: 'rgba(253,253,254,0.62)' }}>
                   Reactie binnen 24 uur
                 </p>
               </div>
@@ -333,11 +422,20 @@ export default function ClientMessagesPage() {
               <div key={dateKey} className="space-y-3">
                 {/* Date separator */}
                 <div className="flex items-center gap-3 py-2">
-                  <div className="flex-1 h-px bg-[#F0F0EE]" />
-                  <span className="text-xs text-[#C0C0C0] font-medium px-2">
+                  <div className="flex-1 h-px" style={{ background: DIVIDER }} />
+                  <span
+                    className="px-2"
+                    style={{
+                      fontSize: 11,
+                      color: MUTED,
+                      fontWeight: 500,
+                      letterSpacing: '0.04em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
                     {dateKey}
                   </span>
-                  <div className="flex-1 h-px bg-[#F0F0EE]" />
+                  <div className="flex-1 h-px" style={{ background: DIVIDER }} />
                 </div>
 
                 {/* Messages for this date */}
@@ -362,8 +460,8 @@ export default function ClientMessagesPage() {
         )}
       </div>
 
-      {/* Input - positioned above mobile nav or at bottom on desktop */}
-      <div className="sticky bottom-0 left-0 right-0 bg-white">
+      {/* Input - positioned above mobile nav */}
+      <div className="sticky bottom-0 left-0 right-0">
         <ChatInput onSend={handleSendMessage} loading={sending} />
       </div>
     </div>

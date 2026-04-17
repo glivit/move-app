@@ -3,9 +3,55 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
-import { PhotoComparison } from '@/components/client/PhotoComparison'
 
 // ─── Types ──────────────────────────────────────────────────
+
+interface WeekDay {
+  date: string
+  dayLabel: string
+  trained: boolean
+  isToday: boolean
+  isFuture: boolean
+  kcalPct: number | null
+  withinBudget: boolean | null
+}
+
+interface Measurement {
+  key: string
+  label: string
+  current: number | null
+  delta: number | null
+}
+
+interface PhotoEntry {
+  date: string
+  frontUrl: string | null
+  backUrl: string | null
+}
+
+interface MonthlyCheckIn {
+  id: string
+  date: string
+  weightKg: number | null
+  weightDelta: number | null
+  waistCm: number | null
+  waistDelta: number | null
+  bodyFatPct: number | null
+  photoFrontUrl: string | null
+  photoBackUrl: string | null
+  coachNotes: string | null
+  workoutsInMonth: number
+}
+
+interface WeeklyCheckInHist {
+  id: string
+  date: string
+  weightKg: number | null
+  energyLevel: number | null
+  sleepQuality: number | null
+  nutritionAdherence: number | null
+  notes: string | null
+}
 
 interface ProgressData {
   headline: {
@@ -27,6 +73,11 @@ interface ProgressData {
     weightCurrent: number | null
     weightChange: number | null
     bodyFatData: Array<{ date: string; value: number; label: string }>
+    bodyFatCurrent: number | null
+    heightCm: number | null
+    leanMassCurrent: number | null
+    measurements: Measurement[]
+    photos: PhotoEntry[]
     photoDates: Array<{ date: string; hasFront: boolean; hasBack: boolean }>
     hasPhotos: boolean
   }
@@ -38,6 +89,28 @@ interface ProgressData {
   nutrition: {
     compliance: number | null
     daysTracked: number
+  }
+  week: {
+    target: number
+    done: number
+    days: WeekDay[]
+    kcalTarget: number | null
+    adherence: number | null
+  }
+  weeklyCheckIn: {
+    pending: boolean
+    weekStart: string
+  }
+  checkIns: {
+    monthly: MonthlyCheckIn[]
+    weekly: WeeklyCheckInHist[]
+  }
+  coach: { id: string; name: string } | null
+  summary: {
+    weekStreak: number
+    totalWorkouts: number
+    totalPrs: number
+    adherence: number | null
   }
 }
 
@@ -55,19 +128,82 @@ interface TopLift {
   date: string
 }
 
-interface CheckInRow {
-  id: string
-  date: string
-  weight_kg: number | null
-  body_fat_pct: number | null
-  photo_front_url: string | null
-  photo_back_url: string | null
-  chest_cm: number | null
-  waist_cm: number | null
+interface MomentumLift {
+  exercise: string
+  exerciseId: string
+  bodyPart: string
+  weekly: number[]  // 8 weeks e1RM
+  current: number
+  delta: number
+}
+
+// Full per-exercise aggregation for the Kracht list
+interface ExerciseAgg {
+  exerciseId: string
+  name: string
+  bodyPart: string       // normalised group (Borst/Rug/Benen/Schouders/Armen/Core)
+  rawBodyPart: string    // original db value
+  count: number
+  lastDate: string
+  weekly: number[]       // 12-week e1RM
+  current: number
+  delta: number          // vs. 12w start
+  valueKind: 'e1RM' | 'reps'
 }
 
 type ChartMode = 'duration' | 'volume' | 'sets'
-type ProgressTab = 'kracht' | 'lichaam' | 'checkins'
+type ProgressTab = 'overzicht' | 'kracht' | 'lichaam' | 'checkins'
+type WeightRange = '1M' | '3M' | '6M' | '1J'
+type MuscleFilter = 'Alle' | 'Borst' | 'Rug' | 'Benen' | 'Schouders' | 'Armen' | 'Core'
+
+// ─── Utils ──────────────────────────────────────────────────
+
+// Epley e1RM — capped at 12 reps for sane values
+function e1RM(weight: number, reps: number): number {
+  if (!weight || !reps || reps <= 0) return 0
+  const r = Math.min(reps, 12)
+  return weight * (1 + r / 30)
+}
+
+function weekKey(date: Date): string {
+  const d = new Date(date)
+  d.setHours(0, 0, 0, 0)
+  const dow = d.getDay() // 0=Sun
+  d.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1))
+  return d.toISOString().slice(0, 10)
+}
+
+// Normalise DB body_part → Dutch muscle-group label used in chips
+function normaliseBodyPart(raw: string | null | undefined): MuscleFilter | 'Overig' {
+  if (!raw) return 'Overig'
+  const s = raw.toLowerCase()
+  if (s.includes('chest') || s.includes('borst') || s.includes('pectoral')) return 'Borst'
+  if (s.includes('back') || s.includes('rug') || s.includes('lat')) return 'Rug'
+  if (s.includes('leg') || s.includes('ben') || s.includes('quad') || s.includes('ham') || s.includes('glut') || s.includes('calf') || s.includes('kuit') || s.includes('hip')) return 'Benen'
+  if (s.includes('shoulder') || s.includes('schou') || s.includes('delt')) return 'Schouders'
+  if (s.includes('arm') || s.includes('bicep') || s.includes('tricep') || s.includes('forearm')) return 'Armen'
+  if (s.includes('core') || s.includes('waist') || s.includes('abs') || s.includes('abdom')) return 'Core'
+  return 'Overig'
+}
+
+function formatShortDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('nl-BE', { day: '2-digit', month: 'short' })
+}
+
+function formatMonthYear(iso: string): string {
+  return new Date(iso).toLocaleDateString('nl-BE', { month: 'long', year: 'numeric' })
+}
+
+function getWeekNumber(date: Date): number {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7))
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
+  return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7)
+}
+
+function weekdayNl(date: Date): string {
+  return ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'][date.getDay()]
+}
 
 // ─── Animated Counter ───────────────────────────────────────
 
@@ -118,15 +254,242 @@ function Sparkline({ data, color, height = 48, width = 140 }: {
   )
 }
 
+// Minimal momentum sparkline used inside a row (120×22)
+function MomentumSpark({ data, opacity = 0.92 }: { data: number[]; opacity?: number }) {
+  if (data.length < 2) return <svg style={{ width: '100%', height: 22 }} />
+  const w = 120, h = 22
+  const max = Math.max(...data)
+  const min = Math.min(...data)
+  const range = max - min || 1
+  const pts = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * w
+    const y = h - ((v - min) / range) * (h - 4) - 2
+    return `${x.toFixed(1)},${y.toFixed(1)}`
+  }).join(' ')
+  const lastX = w
+  const lastY = h - ((data[data.length - 1] - min) / range) * (h - 4) - 2
+
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{ width: '100%', height: 22 }}>
+      <polyline
+        points={pts}
+        fill="none"
+        stroke="#FDFDFE"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity={opacity}
+      />
+      <circle cx={lastX} cy={lastY} r="2.2" fill="#FDFDFE" opacity={opacity} />
+    </svg>
+  )
+}
+
+// Check-in stat row (used inside monthly dark card)
+function CheckInStatRow({ label, value, unit, delta, first }: {
+  label: string; value: string; unit: string; delta: string | null; first?: boolean
+}) {
+  return (
+    <div
+      className="flex justify-between items-baseline"
+      style={{
+        padding: first ? '0 0 6px' : '6px 0',
+        borderTop: first ? 'none' : '1px solid rgba(253,253,254,0.06)',
+        fontFeatureSettings: '"tnum"',
+      }}
+    >
+      <span
+        style={{
+          fontSize: 11,
+          fontWeight: 400,
+          color: 'rgba(253,253,254,0.44)',
+          letterSpacing: '0.005em',
+        }}
+      >
+        {label}
+      </span>
+      <span
+        style={{
+          fontSize: 13,
+          fontWeight: 400,
+          color: '#FDFDFE',
+          letterSpacing: '-0.005em',
+        }}
+      >
+        {value}
+        {(unit || delta) && (
+          <small style={{ fontSize: 10, color: 'rgba(253,253,254,0.62)', marginLeft: 2, letterSpacing: 0 }}>
+            {unit}
+            {delta && unit ? ' · ' : ''}
+            {delta}
+          </small>
+        )}
+      </span>
+    </div>
+  )
+}
+
+// Body-summary 3-col cell (BF% / Lean mass / Lengte)
+function BodySummaryCell({ value, unit, label }: { value: string; unit: string; label: string }) {
+  return (
+    <div style={{ padding: '0 2px' }}>
+      <div
+        style={{
+          fontSize: 18,
+          fontWeight: 300,
+          letterSpacing: '-0.015em',
+          color: '#FDFDFE',
+          fontFeatureSettings: '"tnum"',
+          lineHeight: 1.1,
+        }}
+      >
+        {value}
+        {unit && (
+          <small style={{ fontSize: 10, color: 'rgba(253,253,254,0.62)', marginLeft: 2, letterSpacing: 0 }}>
+            {unit}
+          </small>
+        )}
+      </div>
+      <div
+        style={{
+          fontSize: 9,
+          fontWeight: 500,
+          letterSpacing: '0.14em',
+          textTransform: 'uppercase',
+          color: 'rgba(253,253,254,0.44)',
+          marginTop: 3,
+        }}
+      >
+        {label}
+      </div>
+    </div>
+  )
+}
+
+// Weight area chart — dark card, hairline grid, gradient fill
+function WeightAreaChart({ data }: { data: Array<{ date: string; weight: number }> }) {
+  if (data.length < 2) return <svg style={{ width: '100%', height: 100 }} />
+  const w = 300, h = 100
+  const weights = data.map(d => d.weight)
+  const max = Math.max(...weights)
+  const min = Math.min(...weights)
+  const range = max - min || 1
+  const pad = 10
+  const innerH = h - pad * 2
+  const points = data.map((d, i) => {
+    const x = (i / (data.length - 1)) * w
+    const y = pad + innerH - ((d.weight - min) / range) * innerH
+    return { x, y }
+  })
+  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ')
+  const areaPath = `${linePath} L ${w} ${h} L 0 ${h} Z`
+  const last = points[points.length - 1]
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{ width: '100%', height: 100, marginTop: 4 }}>
+      <defs>
+        <linearGradient id="wc-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FDFDFE" stopOpacity="0.22" />
+          <stop offset="100%" stopColor="#FDFDFE" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <line x1="0" y1="25" x2={w} y2="25" stroke="rgba(253,253,254,0.06)" strokeDasharray="2 4" />
+      <line x1="0" y1="50" x2={w} y2="50" stroke="rgba(253,253,254,0.06)" strokeDasharray="2 4" />
+      <line x1="0" y1="75" x2={w} y2="75" stroke="rgba(253,253,254,0.06)" strokeDasharray="2 4" />
+      <path d={areaPath} fill="url(#wc-grad)" />
+      <path d={linePath} fill="none" stroke="#FDFDFE" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" opacity="0.92" />
+      <circle cx={last.x} cy={last.y} r="2.8" fill="#FDFDFE" />
+    </svg>
+  )
+}
+
+// Month labels under the chart, evenly spaced from first to last date
+function monthAxisLabels(data: Array<{ date: string }>, max: number): string[] {
+  if (data.length < 2) return []
+  const first = new Date(data[0].date).getTime()
+  const last = new Date(data[data.length - 1].date).getTime()
+  const span = last - first
+  if (span <= 0) return []
+  const count = Math.min(max, Math.max(2, Math.round(span / (30 * 86400000))))
+  const labels: string[] = []
+  for (let i = 0; i < count; i++) {
+    const t = first + (span * i) / (count - 1)
+    labels.push(new Date(t).toLocaleDateString('nl-BE', { month: 'short' }).replace('.', ''))
+  }
+  return labels
+}
+
+// Lift card 12-week mini spark (140×26, end-dot)
+function LiftSpark({ data, positive = true }: { data: number[]; positive?: boolean }) {
+  if (data.length < 2) return <svg style={{ width: '100%', height: 26 }} />
+  const w = 140, h = 26
+  const max = Math.max(...data)
+  const min = Math.min(...data)
+  const range = max - min || 1
+  const pts = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * w
+    const y = h - ((v - min) / range) * (h - 4) - 2
+    return `${x.toFixed(1)},${y.toFixed(1)}`
+  }).join(' ')
+  const lastX = w
+  const lastY = h - ((data[data.length - 1] - min) / range) * (h - 4) - 2
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{ width: '100%', height: 26 }}>
+      <polyline
+        points={pts}
+        fill="none"
+        stroke="#FDFDFE"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity={positive ? 0.92 : 0.72}
+      />
+      <circle cx={lastX} cy={lastY} r="2.2" fill="#FDFDFE" opacity={positive ? 1 : 0.85} />
+    </svg>
+  )
+}
+
+// Exercise-list row spark (100×22)
+function ExSpark({ data, positive = true }: { data: number[]; positive?: boolean }) {
+  if (data.length < 2) return <svg style={{ width: '100%', height: 22 }} />
+  const w = 100, h = 22
+  const max = Math.max(...data)
+  const min = Math.min(...data)
+  const range = max - min || 1
+  const pts = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * w
+    const y = h - ((v - min) / range) * (h - 4) - 2
+    return `${x.toFixed(1)},${y.toFixed(1)}`
+  }).join(' ')
+  const lastX = w
+  const lastY = h - ((data[data.length - 1] - min) / range) * (h - 4) - 2
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{ width: '100%', height: 22 }}>
+      <polyline
+        points={pts}
+        fill="none"
+        stroke="#FDFDFE"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        opacity={positive ? 0.82 : 0.62}
+      />
+      <circle cx={lastX} cy={lastY} r="1.8" fill="#FDFDFE" opacity={positive ? 1 : 0.85} />
+    </svg>
+  )
+}
+
 // ─── Main Component ─────────────────────────────────────────
 
 export default function ProgressPage() {
   const [data, setData] = useState<ProgressData | null>(null)
   const [weeklyStats, setWeeklyStats] = useState<WeeklyStats[]>([])
   const [topLifts, setTopLifts] = useState<TopLift[]>([])
-  const [checkInRows, setCheckInRows] = useState<CheckInRow[]>([])
+  const [momentum, setMomentum] = useState<MomentumLift[]>([])
+  const [exerciseAgg, setExerciseAgg] = useState<ExerciseAgg[]>([])
   const [chartMode, setChartMode] = useState<ChartMode>('duration')
-  const [tab, setTab] = useState<ProgressTab>('kracht')
+  const [tab, setTab] = useState<ProgressTab>('overzicht')
+  const [weightRange, setWeightRange] = useState<WeightRange>('3M')
+  const [search, setSearch] = useState('')
+  const [muscleFilter, setMuscleFilter] = useState<MuscleFilter>('Alle')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -139,13 +502,13 @@ export default function ProgressPage() {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
 
-        // Weekly chart data (last 12 weeks) + top lifts
+        // Sessions of last 12 weeks (for chart/top-lifts) + 8 weeks (for momentum)
         const twelveWeeksAgo = new Date()
         twelveWeeksAgo.setDate(twelveWeeksAgo.getDate() - 12 * 7)
 
         const { data: sessions } = await supabase
           .from('workout_sessions')
-          .select('id, started_at, completed_at, duration_seconds, workout_sets(exercise_id, weight_kg, actual_reps, is_warmup, exercises(name, name_nl))')
+          .select('id, started_at, completed_at, duration_seconds, workout_sets(exercise_id, weight_kg, actual_reps, is_warmup, exercises(name, name_nl, body_part))')
           .eq('client_id', user.id)
           .not('completed_at', 'is', null)
           .gte('started_at', twelveWeeksAgo.toISOString())
@@ -165,8 +528,26 @@ export default function ProgressPage() {
             weeks[key] = { week: label, duration: 0, volume: 0, sets: 0 }
           }
 
-          // Top lifts aggregation: max weight per exercise_id
+          // Top lifts: max weight per exercise_id
           const lifts: Record<string, TopLift> = {}
+
+          // Per-exercise aggregation: name, body-part, count, last date, weekly e1RM (12w)
+          interface Agg {
+            name: string
+            bodyPart: string
+            count: number
+            lastDate: string
+            weekly: Record<string, number>
+          }
+          const agg: Record<string, Agg> = {}
+
+          // Build 12-week keys (oldest → newest)
+          const twelveWeekKeys: string[] = []
+          for (let i = 11; i >= 0; i--) {
+            const d = new Date(now)
+            d.setDate(d.getDate() - i * 7)
+            twelveWeekKeys.push(weekKey(d))
+          }
 
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           for (const s of sessions as any[]) {
@@ -184,7 +565,6 @@ export default function ProgressPage() {
               }
             }
 
-            // Track max weight per exercise
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             for (const set of sets as any[]) {
               if (set.is_warmup) continue
@@ -193,6 +573,9 @@ export default function ProgressPage() {
               const exId = set.exercise_id as string
               const ex = Array.isArray(set.exercises) ? set.exercises[0] : set.exercises
               const exName = ex?.name_nl || ex?.name || 'Oefening'
+              const bodyPart = ex?.body_part || ''
+
+              // Top lifts
               const existing = lifts[exId]
               if (!existing || (set.weight_kg as number) > existing.weight) {
                 lifts[exId] = {
@@ -201,6 +584,20 @@ export default function ProgressPage() {
                   reps: set.actual_reps,
                   date: s.started_at,
                 }
+              }
+
+              // Per-exercise aggregation (full 12w window)
+              if (!agg[exId]) {
+                agg[exId] = { name: exName, bodyPart, count: 0, lastDate: s.started_at, weekly: {} }
+              }
+              agg[exId].count++
+              if (new Date(s.started_at) > new Date(agg[exId].lastDate)) {
+                agg[exId].lastDate = s.started_at
+              }
+              const wk = weekKey(date)
+              const est = e1RM(set.weight_kg, set.actual_reps)
+              if (!agg[exId].weekly[wk] || est > agg[exId].weekly[wk]) {
+                agg[exId].weekly[wk] = est
               }
             }
           }
@@ -211,17 +608,47 @@ export default function ProgressPage() {
               .sort((a, b) => b.weight - a.weight)
               .slice(0, 6)
           )
+
+          // Build full exercise list with weekly-filled e1RM series
+          const allAgg: ExerciseAgg[] = Object.entries(agg).map(([exerciseId, a]) => {
+            let last = 0
+            const weekly = twelveWeekKeys.map((k) => {
+              if (a.weekly[k]) last = a.weekly[k]
+              return last
+            })
+            const firstNonZero = weekly.find((v) => v > 0) || 0
+            const current = weekly[weekly.length - 1] || 0
+            const normalisedGroup = normaliseBodyPart(a.bodyPart)
+            return {
+              exerciseId,
+              name: a.name,
+              bodyPart: normalisedGroup === 'Overig' ? 'Overig' : normalisedGroup,
+              rawBodyPart: a.bodyPart,
+              count: a.count,
+              lastDate: a.lastDate,
+              weekly,
+              current: Math.round(current),
+              delta: Math.round(current - firstNonZero),
+              valueKind: 'e1RM' as const,
+            }
+          }).filter((m) => m.current > 0)
+
+          setExerciseAgg(allAgg)
+
+          // Top 4 by frequency — for the Hoofdlifts grid and Overzicht momentum
+          const topMomentum: MomentumLift[] = [...allAgg]
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 4)
+            .map((m) => ({
+              exercise: m.name,
+              exerciseId: m.exerciseId,
+              bodyPart: m.bodyPart,
+              weekly: m.weekly.slice(-8), // keep 8-week mini-spark for Overzicht
+              current: m.current,
+              delta: m.delta,
+            }))
+          setMomentum(topMomentum)
         }
-
-        // Check-ins (monthly)
-        const { data: checkins } = await supabase
-          .from('checkins')
-          .select('id, date, weight_kg, body_fat_pct, photo_front_url, photo_back_url, chest_cm, waist_cm')
-          .eq('client_id', user.id)
-          .order('date', { ascending: false })
-          .limit(12)
-
-        if (checkins) setCheckInRows(checkins as CheckInRow[])
       } catch (err) {
         console.error('Progress load error:', err)
       } finally {
@@ -234,45 +661,27 @@ export default function ProgressPage() {
   if (loading) {
     return (
       <div className="pb-28 animate-fade-in">
-        {/* Skeleton: hero card */}
-        <div
-          className="rounded-[24px] mb-4"
-          style={{
-            padding: '22px 22px 24px',
-            background: '#A6ADA7',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
-          }}
-        >
-          <div className="animate-pulse space-y-3">
-            <div className="h-3 w-24 rounded-full" style={{ background: 'rgba(253,253,254,0.18)' }} />
-            <div className="h-14 w-40 rounded-lg" style={{ background: 'rgba(253,253,254,0.24)' }} />
-            <div className="h-3 w-32 rounded-full" style={{ background: 'rgba(253,253,254,0.14)' }} />
-          </div>
-        </div>
-        {/* Skeleton: tabs */}
         <div className="flex gap-1.5 mb-4">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex-1 h-10 rounded-xl" style={{ background: 'rgba(253,253,254,0.08)' }} />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex-1 h-9 rounded-full" style={{ background: 'rgba(253,253,254,0.06)' }} />
           ))}
         </div>
-        {/* Skeleton: content card */}
         <div
-          className="rounded-[24px] mb-4"
+          className="rounded-[24px] mb-4 animate-pulse"
           style={{
             padding: '22px 22px 24px',
-            background: '#474B48',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 6px rgba(0,0,0,0.22)',
+            background: 'transparent',
           }}
         >
-          <div className="animate-pulse space-y-4">
-            <div className="h-3 w-20 rounded-full" style={{ background: 'rgba(253,253,254,0.14)' }} />
-            <div className="flex items-end gap-[3px] h-[90px]">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="flex-1 rounded-t-md" style={{ height: `${30 + (i * 5) % 60}%`, background: 'rgba(253,253,254,0.12)' }} />
-              ))}
-            </div>
+          <div className="space-y-3">
+            <div className="h-3 w-24 rounded-full" style={{ background: 'rgba(253,253,254,0.14)' }} />
+            <div className="h-14 w-40 rounded-lg" style={{ background: 'rgba(253,253,254,0.22)' }} />
+            <div className="h-3 w-48 rounded-full" style={{ background: 'rgba(253,253,254,0.10)' }} />
           </div>
         </div>
+        <div className="rounded-[24px] mb-2 animate-pulse" style={{ height: 64, background: '#474B48' }} />
+        <div className="rounded-[24px] mb-2 animate-pulse" style={{ height: 84, background: '#A6ADA7' }} />
+        <div className="rounded-[24px] mb-2 animate-pulse" style={{ height: 200, background: '#474B48' }} />
       </div>
     )
   }
@@ -300,39 +709,48 @@ export default function ProgressPage() {
     )
   }
 
-  const { headline, body, strength } = data
+  const { body, strength, week, weeklyCheckIn, coach, summary, checkIns } = data
 
-  // Determine the hero number: most motivating metric
-  const getHeroNumber = () => {
-    if (headline.streak >= 3) {
-      return { value: headline.streak, suffix: '', label: 'dagen streak' }
-    }
-    if (body.weightChange !== null && Math.abs(body.weightChange) >= 0.5) {
-      return {
-        value: Math.abs(body.weightChange),
-        suffix: ' kg',
-        prefix: body.weightChange < 0 ? '-' : '+',
-        label: body.weightChange < 0 ? 'afgevallen' : 'aangekomen',
-      }
-    }
-    if (headline.totalWorkouts > 0) {
-      return { value: headline.totalWorkouts, suffix: '', label: 'workouts voltooid' }
-    }
-    return { value: headline.daysOnProgram, suffix: '', label: 'dagen actief' }
-  }
+  const tabs: Array<{ id: ProgressTab; label: string }> = [
+    { id: 'overzicht', label: 'Overzicht' },
+    { id: 'kracht', label: 'Kracht' },
+    { id: 'lichaam', label: 'Lichaam' },
+    { id: 'checkins', label: 'Check-ins' },
+  ]
 
-  const hero = getHeroNumber()
+  // ─── Derived memos (Kracht + Lichaam) ─────────────────
 
-  // Supporting stats text
-  const supportingParts: string[] = []
-  if (headline.daysOnProgram > 0) supportingParts.push(`${headline.daysOnProgram} dagen actief`)
-  if (headline.totalWorkouts > 0 && hero.label !== 'workouts voltooid') {
-    supportingParts.push(`${headline.totalWorkouts} workouts`)
-  }
-  if (headline.totalPrs > 0) supportingParts.push(`${headline.totalPrs} records`)
-  const supportingText = supportingParts.join(' · ')
+  const mainLifts = exerciseAgg.length
+    ? [...exerciseAgg].sort((a, b) => b.count - a.count).slice(0, 4)
+    : []
 
-  // Chart data
+  const filteredExercises = exerciseAgg
+    .filter(e => muscleFilter === 'Alle' || e.bodyPart === muscleFilter)
+    .filter(e => !search.trim() || e.name.toLowerCase().includes(search.trim().toLowerCase()))
+    .sort((a, b) => b.count - a.count)
+
+  // Filter weight data by range (1M/3M/6M/1J)
+  const filteredWeightData = (() => {
+    if (!body.weightData.length) return [] as typeof body.weightData
+    const days = weightRange === '1M' ? 30 : weightRange === '3M' ? 90 : weightRange === '6M' ? 180 : 365
+    const cutoff = Date.now() - days * 86400000
+    const filt = body.weightData.filter(w => new Date(w.date).getTime() >= cutoff)
+    return filt.length >= 2 ? filt : body.weightData
+  })()
+
+  // ─── Overzicht helpers ────────────────────────────────
+
+  const weekNumber = (() => {
+    const d = new Date()
+    const start = new Date(d.getFullYear(), 0, 1)
+    const diff = (d.getTime() - start.getTime()) / 86400000
+    return Math.ceil((diff + start.getDay() + 1) / 7)
+  })()
+
+  const remaining = Math.max(0, week.target - week.done)
+  const latestPr = strength.recentPrs[0]
+
+  // Chart data (Kracht tab)
   const chartData = weeklyStats.map(w => {
     if (chartMode === 'duration') return w.duration
     if (chartMode === 'volume') return Math.round(w.volume / 1000)
@@ -345,50 +763,25 @@ export default function ProgressPage() {
   const weightPositive = body.weightChange !== null && body.weightChange <= 0
   const weightColor = weightPositive ? '#2FA65A' : 'rgba(253,253,254,0.78)'
 
-  const tabs: Array<{ id: ProgressTab; label: string }> = [
-    { id: 'kracht', label: 'Kracht' },
-    { id: 'lichaam', label: 'Lichaam' },
-    { id: 'checkins', label: 'Check-ins' },
-  ]
+  // Caption label style (reused a lot)
+  const capStyle: React.CSSProperties = {
+    padding: '14px 4px 8px',
+    fontSize: 10,
+    fontWeight: 500,
+    letterSpacing: '0.18em',
+    textTransform: 'uppercase',
+    color: 'rgba(253,253,254,0.44)',
+  }
 
   return (
     <div className="pb-28">
 
-      {/* ═══ HERO — v6-card licht met grote number ═════════════════ */}
+      {/* ═══ SUBTABS — pill chips, horizontal scroll ═══════════════ */}
       <div
-        className="v6-card mb-4 animate-fade-in"
-        style={{ paddingBottom: 24 }}
-      >
-        <p
-          className="text-label"
-          style={{ marginBottom: 16, color: '#FDFDFE', opacity: 0.62 }}
-        >
-          Voortgang
-        </p>
-        <p className="stat-number-hero animate-count-up" style={{ lineHeight: 0.95 }}>
-          <AnimatedNumber
-            value={hero.value}
-            prefix={'prefix' in hero ? hero.prefix : ''}
-            suffix={hero.suffix}
-          />
-        </p>
-        <p style={{ fontSize: 15, color: 'rgba(253,253,254,0.78)', marginTop: 10, fontWeight: 400 }}>
-          {hero.label}
-        </p>
-        {supportingText && (
-          <p style={{ fontSize: 12, color: 'rgba(253,253,254,0.52)', marginTop: 14, letterSpacing: 0.01 }}>
-            {supportingText}
-          </p>
-        )}
-      </div>
-
-      {/* ═══ TAB SELECTOR ══════════════════════════════════════════ */}
-      <div
-        className="flex gap-1 mb-4 animate-slide-up stagger-1"
+        className="flex gap-1.5 mb-4 animate-slide-up overflow-x-auto"
         style={{
-          padding: 4,
-          background: 'rgba(253,253,254,0.06)',
-          borderRadius: 14,
+          scrollbarWidth: 'none',
+          paddingBottom: 2,
         }}
       >
         {tabs.map(t => {
@@ -397,17 +790,16 @@ export default function ProgressPage() {
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className="transition-all"
+              className="flex-shrink-0 transition-all"
               style={{
-                flex: 1,
-                padding: '10px 12px',
-                borderRadius: 10,
-                fontSize: 12,
-                fontWeight: 500,
-                letterSpacing: '0.04em',
+                padding: '8px 14px',
+                borderRadius: 999,
+                fontSize: 13,
+                fontWeight: active ? 500 : 400,
+                letterSpacing: '-0.005em',
                 background: active ? '#FDFDFE' : 'transparent',
-                color: active ? '#1A1917' : 'rgba(253,253,254,0.62)',
-                border: 'none',
+                color: active ? '#2A2D2B' : 'rgba(253,253,254,0.78)',
+                border: active ? '1px solid #FDFDFE' : '1px solid rgba(253,253,254,0.10)',
                 WebkitTapHighlightColor: 'transparent',
                 cursor: 'pointer',
               }}
@@ -418,196 +810,791 @@ export default function ProgressPage() {
         })}
       </div>
 
-      {/* ═══ KRACHT TAB ════════════════════════════════════════════ */}
-      {tab === 'kracht' && (
+      {/* ═══ OVERZICHT TAB ═════════════════════════════════════════ */}
+      {tab === 'overzicht' && (
         <>
-          {/* 12 week chart */}
-          {weeklyStats.length > 0 && (
-            <div className="v6-card-dark mb-4 animate-slide-up stagger-2">
-              <div className="flex items-center justify-between" style={{ marginBottom: 14 }}>
-                <p className="text-label" style={{ color: 'rgba(253,253,254,0.44)' }}>
-                  12 weken trend
-                </p>
-                <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)', letterSpacing: '0.02em' }}>
-                  {chartMode === 'duration' ? 'Duur' : chartMode === 'volume' ? 'Volume' : 'Sets'}
-                </span>
-              </div>
+          {/* ─── Week hero ─── */}
+          <div className="mb-4 animate-slide-up stagger-2" style={{ padding: '4px 4px 0' }}>
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 500,
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: 'rgba(253,253,254,0.44)',
+                marginBottom: 10,
+              }}
+            >
+              Week {weekNumber} · deze week
+            </div>
 
-              <div className="flex items-baseline justify-between" style={{ marginBottom: 18 }}>
-                <div>
-                  <span
-                    className="stat-number"
-                    style={{ fontSize: 40, fontWeight: 200, color: '#FDFDFE' }}
+            <div className="flex items-baseline" style={{ gap: 10 }}>
+              <span
+                style={{
+                  fontSize: 52,
+                  fontWeight: 200,
+                  letterSpacing: '-0.035em',
+                  color: '#FDFDFE',
+                  lineHeight: 0.95,
+                  fontFeatureSettings: '"tnum"',
+                }}
+              >
+                <AnimatedNumber value={week.done} />
+              </span>
+              <span style={{ fontSize: 15, fontWeight: 300, color: 'rgba(253,253,254,0.62)', letterSpacing: '-0.01em' }}>
+                / {week.target} trainingen
+              </span>
+            </div>
+
+            <p
+              style={{
+                marginTop: 10,
+                fontSize: 13,
+                fontWeight: 300,
+                color: 'rgba(253,253,254,0.78)',
+                letterSpacing: '-0.005em',
+                lineHeight: 1.5,
+              }}
+            >
+              {remaining === 0 ? (
+                <>Je hebt je weekdoel gehaald. <strong style={{ color: '#FDFDFE', fontWeight: 400 }}>Topprestatie.</strong></>
+              ) : week.done === 0 ? (
+                <>Nog <strong style={{ color: '#FDFDFE', fontWeight: 400 }}>{week.target} sessies</strong> voor zondag.</>
+              ) : (
+                <>
+                  Je ligt op koers — nog <strong style={{ color: '#FDFDFE', fontWeight: 400 }}>
+                    {remaining} {remaining === 1 ? 'sessie' : 'sessies'}
+                  </strong> voor zondag.
+                </>
+              )}
+            </p>
+
+            {/* 7-dot week rhythm */}
+            <div className="flex justify-between" style={{ marginTop: 18, gap: 4 }}>
+              {week.days.map((d) => {
+                const isDone = d.trained
+                const isToday = d.isToday
+                return (
+                  <div key={d.date} className="flex-1 flex flex-col items-center" style={{ gap: 8 }}>
+                    <span
+                      style={{
+                        fontSize: 9,
+                        fontWeight: 500,
+                        letterSpacing: '0.14em',
+                        textTransform: 'uppercase',
+                        color: isToday ? '#FDFDFE' : 'rgba(253,253,254,0.44)',
+                      }}
+                    >
+                      {d.dayLabel}
+                    </span>
+                    <span
+                      style={{
+                        width: '100%',
+                        height: 4,
+                        borderRadius: 2,
+                        background: isDone
+                          ? 'rgba(253,253,254,0.85)'
+                          : isToday
+                            ? 'rgba(253,253,254,0.24)'
+                            : 'rgba(253,253,254,0.10)',
+                        transition: 'background 260ms cubic-bezier(0.16, 1, 0.3, 1)',
+                      }}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* ─── Coach check-in banner ─── */}
+          {weeklyCheckIn.pending && (
+            <Link
+              href="/client/check-in/weekly"
+              className="flex items-center mb-3 animate-slide-up stagger-3"
+              style={{
+                background: '#474B48',
+                padding: '16px 18px',
+                borderRadius: 20,
+                gap: 14,
+                textDecoration: 'none',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18)',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              <span
+                style={{
+                  width: 8, height: 8,
+                  borderRadius: '50%',
+                  background: '#C0FC01',
+                  flexShrink: 0,
+                  boxShadow: '0 0 12px rgba(192,252,1,0.50)',
+                }}
+              />
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: 14, fontWeight: 400, color: '#FDFDFE', letterSpacing: '-0.005em', margin: 0 }}>
+                  Wekelijkse check-in staat klaar
+                </p>
+                <p style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)', marginTop: 2 }}>
+                  {coach?.name ? `${coach.name} wacht op je antwoord · 3 min` : 'Geeft je coach inzicht · 3 min'}
+                </p>
+              </div>
+              <div
+                style={{
+                  width: 28, height: 28,
+                  borderRadius: '50%',
+                  background: 'rgba(253,253,254,0.08)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#FDFDFE" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="9 6 15 12 9 18" />
+                </svg>
+              </div>
+            </Link>
+          )}
+
+          {/* ─── Nieuwste PR ─── */}
+          {latestPr && (
+            <>
+              <div style={capStyle}>Nieuwste PR</div>
+              <div
+                className="flex items-center mb-2 animate-slide-up stagger-3"
+                style={{
+                  background: '#A6ADA7',
+                  padding: '18px 20px',
+                  borderRadius: 24,
+                  gap: 14,
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+                }}
+              >
+                <div
+                  style={{
+                    width: 36, height: 36,
+                    borderRadius: '50%',
+                    background: 'rgba(253,253,254,0.10)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FDFDFE" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M7 4h10v4a5 5 0 0 1-10 0z" />
+                    <line x1="12" y1="12" x2="12" y2="17" />
+                    <line x1="9" y1="20" x2="15" y2="20" />
+                  </svg>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 500,
+                      letterSpacing: '0.16em',
+                      textTransform: 'uppercase',
+                      color: 'rgba(253,253,254,0.44)',
+                      marginBottom: 3,
+                    }}
                   >
-                    {thisWeekVal}
-                  </span>
-                  <span style={{ fontSize: 13, color: 'rgba(253,253,254,0.52)', marginLeft: 8 }}>
-                    {chartLabel} deze week
-                  </span>
+                    {latestPr.exercise}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 19,
+                      fontWeight: 300,
+                      letterSpacing: '-0.015em',
+                      color: '#FDFDFE',
+                      fontFeatureSettings: '"tnum"',
+                    }}
+                  >
+                    {latestPr.value}
+                    <small style={{ fontSize: 12, color: 'rgba(253,253,254,0.62)', marginLeft: 3, letterSpacing: 0 }}>
+                      {latestPr.type === 'weight' ? 'kg' : latestPr.type === 'reps' ? 'reps' : 'kg'}
+                    </small>
+                  </div>
+                  <div style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)', marginTop: 2 }}>
+                    {new Date(latestPr.date).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'short' })}
+                  </div>
                 </div>
               </div>
+            </>
+          )}
 
-              {/* Bars */}
-              <div className="flex items-end gap-[3px]" style={{ height: 90, marginBottom: 10 }}>
-                {chartData.map((val, i) => {
-                  const isCurrentWeek = i === chartData.length - 1
-                  return (
-                    <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
-                      <div
-                        className="w-full rounded-t-md transition-all"
-                        style={{
-                          height: `${Math.max((val / maxVal) * 100, 3)}%`,
-                          background: isCurrentWeek ? '#C0FC01' : 'rgba(253,253,254,0.22)',
-                          transition: 'height 480ms cubic-bezier(0.16, 1, 0.3, 1), background 240ms',
-                        }}
-                      />
+          {/* ─── Kracht momentum ─── */}
+          {momentum.length > 0 && (
+            <>
+              <div style={capStyle}>Kracht momentum · 8 weken</div>
+              <div
+                className="mb-2 animate-slide-up stagger-4"
+                style={{
+                  background: '#474B48',
+                  padding: '18px 20px 20px',
+                  borderRadius: 24,
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18)',
+                }}
+              >
+                <div className="flex items-baseline justify-between" style={{ marginBottom: 14 }}>
+                  <span style={{ fontSize: 14, fontWeight: 400, color: '#FDFDFE', letterSpacing: '-0.005em' }}>
+                    Hoofdlifts e1RM
+                  </span>
+                  <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)' }}>
+                    vs. 8 weken terug
+                  </span>
+                </div>
+
+                {momentum.map((m, i) => (
+                  <div
+                    key={m.exercise}
+                    className="flex items-center"
+                    style={{
+                      gap: 14,
+                      padding: '10px 0',
+                      borderTop: i > 0 ? '1px solid rgba(253,253,254,0.06)' : 'none',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 400,
+                        color: 'rgba(253,253,254,0.78)',
+                        letterSpacing: '-0.005em',
+                        width: 78,
+                        flexShrink: 0,
+                      }}
+                      className="truncate"
+                    >
+                      {m.exercise}
                     </div>
-                  )
-                })}
-              </div>
-
-              {/* Week labels */}
-              <div className="flex gap-[3px]" style={{ marginBottom: 18 }}>
-                {weeklyStats.map((w, i) => (
-                  <div key={i} className="flex-1 text-center">
-                    {i % 4 === 0 && (
-                      <span style={{ fontSize: 9, color: 'rgba(253,253,254,0.38)', letterSpacing: '0.02em' }}>
-                        {w.week}
+                    <div style={{ flex: 1, height: 22 }}>
+                      <MomentumSpark data={m.weekly} opacity={m.delta > 0 ? 0.92 : 0.6} />
+                    </div>
+                    <div className="flex flex-col items-end" style={{ minWidth: 56 }}>
+                      <span
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 400,
+                          color: '#FDFDFE',
+                          fontFeatureSettings: '"tnum"',
+                          letterSpacing: '-0.01em',
+                        }}
+                      >
+                        {m.current}
+                        <small style={{ fontSize: 10, color: 'rgba(253,253,254,0.44)', marginLeft: 2 }}>kg</small>
                       </span>
-                    )}
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 500,
+                          letterSpacing: '0.04em',
+                          marginTop: 1,
+                          color: m.delta > 0 ? '#FDFDFE' : 'rgba(253,253,254,0.44)',
+                        }}
+                      >
+                        {m.delta > 0 ? '+' : ''}{m.delta} kg
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>
+            </>
+          )}
 
-              {/* Mode tabs */}
-              <div className="flex gap-1">
-                {(['duration', 'volume', 'sets'] as ChartMode[]).map(mode => {
-                  const active = chartMode === mode
-                  return (
-                    <button
-                      key={mode}
-                      onClick={() => setChartMode(mode)}
-                      className="transition-all"
+          {/* ─── Dieet adherence ─── */}
+          {week.kcalTarget && (
+            <>
+              <div style={capStyle}>Dieet adherence · deze week</div>
+              <div
+                className="mb-4 animate-slide-up stagger-5"
+                style={{
+                  background: '#A6ADA7',
+                  padding: '18px 20px 20px',
+                  borderRadius: 24,
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+                }}
+              >
+                <div className="flex items-baseline justify-between" style={{ marginBottom: 16 }}>
+                  <span style={{ fontSize: 14, fontWeight: 400, color: '#FDFDFE', letterSpacing: '-0.005em' }}>
+                    Binnen kcal-budget
+                  </span>
+                  {week.adherence !== null ? (
+                    <span
                       style={{
-                        flex: 1,
-                        padding: '9px 12px',
-                        borderRadius: 12,
-                        fontSize: 11,
-                        fontWeight: 500,
-                        letterSpacing: '0.08em',
-                        textTransform: 'uppercase',
-                        background: active ? '#FDFDFE' : 'rgba(253,253,254,0.06)',
-                        color: active ? '#1A1917' : 'rgba(253,253,254,0.62)',
-                        border: 'none',
-                        WebkitTapHighlightColor: 'transparent',
-                        cursor: 'pointer',
+                        fontSize: 22,
+                        fontWeight: 300,
+                        letterSpacing: '-0.02em',
+                        color: '#FDFDFE',
+                        fontFeatureSettings: '"tnum"',
                       }}
                     >
-                      {mode === 'duration' ? 'Duur' : mode === 'volume' ? 'Volume' : 'Sets'}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          )}
+                      <AnimatedNumber value={week.adherence} />
+                      <small style={{ fontSize: 10, color: 'rgba(253,253,254,0.44)', marginLeft: 2, letterSpacing: 0 }}>%</small>
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)' }}>geen data</span>
+                  )}
+                </div>
 
-          {/* Top Lifts — licht card */}
-          {topLifts.length > 0 && (
-            <div className="v6-card mb-4 animate-slide-up stagger-3">
-              <div className="flex items-center justify-between" style={{ marginBottom: 10 }}>
-                <p className="text-label" style={{ color: 'rgba(253,253,254,0.62)' }}>
-                  Top Lifts
-                </p>
-                <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)', letterSpacing: '0.02em' }}>
-                  Laatste 12 weken
-                </span>
-              </div>
-              {topLifts.map((lift, i, arr) => (
+                <div className="flex items-end justify-between" style={{ gap: 6, height: 48 }}>
+                  {week.days.map((d) => {
+                    const hasKcal = d.kcalPct !== null
+                    const height = hasKcal ? Math.min(Math.max(d.kcalPct || 0, 8), 100) : 10
+                    const skip = !hasKcal
+                    return (
+                      <div key={d.date} className="flex-1 flex flex-col justify-end">
+                        <span
+                          style={{
+                            width: '100%',
+                            background: skip ? 'rgba(253,253,254,0.14)' : '#FDFDFE',
+                            opacity: skip ? 1 : d.withinBudget ? 0.9 : 0.5,
+                            borderRadius: 2,
+                            minHeight: 3,
+                            height: `${height}%`,
+                            transition: 'height 420ms cubic-bezier(0.16, 1, 0.3, 1)',
+                          }}
+                        />
+                        <span
+                          style={{
+                            fontSize: 9,
+                            fontWeight: 500,
+                            letterSpacing: '0.14em',
+                            textTransform: 'uppercase',
+                            color: d.isToday ? '#FDFDFE' : 'rgba(253,253,254,0.44)',
+                            textAlign: 'center',
+                            marginTop: 6,
+                          }}
+                        >
+                          {d.dayLabel}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+
+                {/* Streak row */}
                 <div
-                  key={`${lift.exercise}-${i}`}
-                  className="flex items-center justify-between"
+                  className="flex justify-between items-center"
                   style={{
-                    padding: '14px 0',
-                    borderBottom: i < arr.length - 1 ? '1px solid rgba(253,253,254,0.10)' : 'none',
+                    marginTop: 10,
+                    padding: '16px 4px 0',
+                    borderTop: '1px solid rgba(253,253,254,0.12)',
                   }}
                 >
-                  <div className="flex-1 min-w-0">
-                    <p style={{ fontSize: 14, fontWeight: 500, color: '#FDFDFE', margin: 0 }} className="truncate">
-                      {lift.exercise}
-                    </p>
-                    <p style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)', marginTop: 2 }}>
-                      {lift.reps} reps · {new Date(lift.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
-                    </p>
-                  </div>
-                  <span style={{ fontSize: 18, fontWeight: 300, color: '#FDFDFE', fontFeatureSettings: '"tnum"', letterSpacing: '-0.02em' }}>
-                    {lift.weight}
-                    <span style={{ fontSize: 12, color: 'rgba(253,253,254,0.44)', marginLeft: 4, fontWeight: 400 }}>
-                      kg
-                    </span>
-                  </span>
+                  {[
+                    { num: summary.weekStreak, lbl: 'Week streak' },
+                    { num: summary.totalWorkouts, lbl: 'Workouts' },
+                    { num: summary.totalPrs, lbl: 'Records' },
+                    { num: summary.adherence !== null ? `${summary.adherence}%` : '—', lbl: 'Adherence' },
+                  ].map((c) => (
+                    <div key={c.lbl} className="flex flex-col" style={{ gap: 3 }}>
+                      <span
+                        style={{
+                          fontSize: 18,
+                          fontWeight: 300,
+                          letterSpacing: '-0.015em',
+                          color: '#FDFDFE',
+                          fontFeatureSettings: '"tnum"',
+                        }}
+                      >
+                        {c.num}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 9,
+                          fontWeight: 500,
+                          letterSpacing: '0.14em',
+                          textTransform: 'uppercase',
+                          color: 'rgba(253,253,254,0.44)',
+                        }}
+                      >
+                        {c.lbl}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            </>
           )}
 
-          {/* Records */}
-          {strength.recentPrs.length > 0 && (
-            <div className="v6-card mb-4 animate-slide-up stagger-4">
-              <div className="flex items-center justify-between" style={{ marginBottom: 10 }}>
-                <p className="text-label" style={{ color: 'rgba(253,253,254,0.62)' }}>
-                  Recente records
-                </p>
-                {strength.totalPrs > 3 && (
-                  <Link
-                    href="/client/stats"
+          {/* If adherence not available, show a compact streak summary */}
+          {!week.kcalTarget && (
+            <div
+              className="mb-4 animate-slide-up stagger-4"
+              style={{
+                background: '#A6ADA7',
+                padding: '18px 20px',
+                borderRadius: 24,
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+                display: 'flex',
+                justifyContent: 'space-between',
+              }}
+            >
+              {[
+                { num: summary.weekStreak, lbl: 'Week streak' },
+                { num: summary.totalWorkouts, lbl: 'Workouts' },
+                { num: summary.totalPrs, lbl: 'Records' },
+              ].map((c) => (
+                <div key={c.lbl} className="flex flex-col" style={{ gap: 3 }}>
+                  <span
                     style={{
-                      fontSize: 12,
-                      fontWeight: 500,
-                      color: '#C0FC01',
-                      textDecoration: 'none',
-                      letterSpacing: '0.02em',
+                      fontSize: 20,
+                      fontWeight: 300,
+                      letterSpacing: '-0.015em',
+                      color: '#FDFDFE',
+                      fontFeatureSettings: '"tnum"',
                     }}
                   >
-                    Alles bekijken
-                  </Link>
-                )}
-              </div>
-              {strength.recentPrs.slice(0, 3).map((pr, i, arr) => (
-                <div
-                  key={pr.id}
-                  className="flex items-center justify-between"
-                  style={{
-                    padding: '14px 0',
-                    borderBottom: i < arr.length - 1 ? '1px solid rgba(253,253,254,0.10)' : 'none',
-                  }}
-                >
-                  <div className="flex-1 min-w-0">
-                    <p style={{ fontSize: 14, fontWeight: 500, color: '#FDFDFE', margin: 0 }} className="truncate">
-                      {pr.exercise}
-                    </p>
-                    <p style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)', marginTop: 2 }}>
-                      {new Date(pr.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
-                    </p>
-                  </div>
-                  <span style={{ fontSize: 18, fontWeight: 300, color: '#FDFDFE', fontFeatureSettings: '"tnum"', letterSpacing: '-0.02em' }}>
-                    {pr.value}
-                    <span style={{ fontSize: 12, color: 'rgba(253,253,254,0.44)', marginLeft: 4, fontWeight: 400 }}>
-                      {pr.type === 'weight' ? 'kg' : pr.type === 'reps' ? 'reps' : 'kg'}
-                    </span>
+                    {c.num}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 500,
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                      color: 'rgba(253,253,254,0.44)',
+                    }}
+                  >
+                    {c.lbl}
                   </span>
                 </div>
               ))}
             </div>
           )}
+        </>
+      )}
 
-          {/* Empty state */}
-          {topLifts.length === 0 && strength.recentPrs.length === 0 && weeklyStats.every(w => w.sets === 0) && (
-            <div className="v6-card-dark text-center animate-fade-in" style={{ padding: '48px 22px' }}>
-              <p style={{ color: '#FDFDFE', fontSize: 16, fontWeight: 400, marginBottom: 6 }}>
-                Nog geen trainingen
+      {/* ═══ KRACHT TAB ════════════════════════════════════════════ */}
+      {tab === 'kracht' && (
+        <>
+          {/* Page title */}
+          <div
+            className="animate-slide-up stagger-2"
+            style={{
+              padding: '0 4px',
+              marginBottom: 14,
+              fontSize: 26,
+              fontWeight: 250,
+              letterSpacing: '-0.028em',
+              color: '#FDFDFE',
+            }}
+          >
+            Hoofdlifts
+            <small
+              style={{
+                fontSize: 13,
+                color: 'rgba(253,253,254,0.44)',
+                marginLeft: 8,
+                fontWeight: 300,
+                letterSpacing: '-0.005em',
+              }}
+            >
+              estimated 1RM · 12 weken
+            </small>
+          </div>
+
+          {/* Lift grid 2×2 */}
+          {mainLifts.length > 0 ? (
+            <div
+              className="animate-slide-up stagger-3"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 8,
+                marginBottom: 6,
+              }}
+            >
+              {mainLifts.map((lift) => {
+                const positive = lift.delta > 0
+                return (
+                  <div
+                    key={lift.exerciseId}
+                    style={{
+                      background: '#A6ADA7',
+                      padding: '16px 16px 14px',
+                      borderRadius: 24,
+                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+                      minHeight: 128,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <div>
+                      <div
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 500,
+                          letterSpacing: '0.16em',
+                          textTransform: 'uppercase',
+                          color: 'rgba(253,253,254,0.44)',
+                        }}
+                        className="truncate"
+                      >
+                        {lift.name}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 26,
+                          fontWeight: 250,
+                          letterSpacing: '-0.025em',
+                          color: '#FDFDFE',
+                          fontFeatureSettings: '"tnum"',
+                          lineHeight: 1.05,
+                          marginTop: 6,
+                        }}
+                      >
+                        {lift.current}
+                        <small
+                          style={{
+                            fontSize: 11,
+                            color: 'rgba(253,253,254,0.62)',
+                            marginLeft: 2,
+                            letterSpacing: 0,
+                            fontWeight: 300,
+                          }}
+                        >
+                          kg
+                        </small>
+                      </div>
+                    </div>
+                    <div style={{ width: '100%', height: 26, margin: '6px 0 4px' }}>
+                      <LiftSpark data={lift.weekly} positive={positive} />
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        fontSize: 11,
+                        color: 'rgba(253,253,254,0.62)',
+                        fontWeight: 400,
+                      }}
+                    >
+                      <span>vs. 12w</span>
+                      <span
+                        style={{
+                          color: positive ? '#FDFDFE' : 'rgba(253,253,254,0.44)',
+                          fontWeight: positive ? 500 : 400,
+                          letterSpacing: '-0.005em',
+                        }}
+                      >
+                        {positive ? '+' : ''}{lift.delta} kg
+                      </span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+            <div
+              className="animate-fade-in"
+              style={{
+                background: '#A6ADA7',
+                padding: '28px 22px',
+                borderRadius: 24,
+                textAlign: 'center',
+                marginBottom: 6,
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+              }}
+            >
+              <p style={{ color: '#FDFDFE', fontSize: 14, fontWeight: 400 }}>
+                Nog geen kracht-data
               </p>
-              <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 13, maxWidth: 240, margin: '0 auto' }}>
-                Start je eerste workout om hier je kracht progressie te zien.
+              <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 12, marginTop: 4 }}>
+                Log je eerste set om je hoofdlifts te zien.
+              </p>
+            </div>
+          )}
+
+          {/* Alle oefeningen cap */}
+          <div style={{ ...capStyle, padding: '22px 4px 10px' }}>Alle oefeningen</div>
+
+          {/* Search pill */}
+          <div
+            className="animate-slide-up stagger-4"
+            style={{
+              padding: '11px 16px',
+              borderRadius: 999,
+              background: 'rgba(253,253,254,0.06)',
+              border: '1px solid rgba(253,253,254,0.10)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              marginBottom: 10,
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(253,253,254,0.62)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <circle cx="11" cy="11" r="7" />
+              <line x1="20" y1="20" x2="16.5" y2="16.5" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Zoek een oefening…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{
+                flex: 1,
+                background: 'transparent',
+                border: 'none',
+                color: '#FDFDFE',
+                fontSize: 13,
+                fontWeight: 400,
+                letterSpacing: '-0.005em',
+                outline: 'none',
+                fontFamily: 'inherit',
+              }}
+            />
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'rgba(253,253,254,0.62)',
+                  cursor: 'pointer',
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+                aria-label="Leeg zoekopdracht"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {/* Muscle chips */}
+          <div
+            className="animate-slide-up stagger-5 overflow-x-auto"
+            style={{
+              display: 'flex',
+              gap: 6,
+              marginBottom: 12,
+              paddingBottom: 2,
+              scrollbarWidth: 'none',
+            }}
+          >
+            {(['Alle','Borst','Rug','Benen','Schouders','Armen','Core'] as MuscleFilter[]).map((m) => {
+              const active = muscleFilter === m
+              return (
+                <button
+                  key={m}
+                  onClick={() => setMuscleFilter(m)}
+                  style={{
+                    flexShrink: 0,
+                    padding: '6px 12px',
+                    borderRadius: 999,
+                    fontSize: 11,
+                    fontWeight: 400,
+                    color: active ? '#FDFDFE' : 'rgba(253,253,254,0.78)',
+                    background: active ? 'rgba(253,253,254,0.12)' : 'transparent',
+                    border: `1px solid ${active ? 'rgba(253,253,254,0.18)' : 'rgba(253,253,254,0.10)'}`,
+                    cursor: 'pointer',
+                    letterSpacing: '0.005em',
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
+                >
+                  {m}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Exercise list */}
+          {filteredExercises.length > 0 ? (
+            <div
+              className="animate-slide-up stagger-5"
+              style={{
+                background: '#A6ADA7',
+                borderRadius: 24,
+                overflow: 'hidden',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+              }}
+            >
+              {filteredExercises.map((ex, i) => {
+                const isPlus = ex.current > 0 && ex.rawBodyPart.toLowerCase().includes('bodyweight')
+                return (
+                  <div
+                    key={ex.exerciseId}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 64px auto',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: '14px 18px',
+                      borderTop: i > 0 ? '1px solid rgba(0,0,0,0.08)' : 'none',
+                    }}
+                  >
+                    <div style={{ minWidth: 0 }}>
+                      <div
+                        style={{
+                          fontSize: 14,
+                          fontWeight: 400,
+                          color: '#FDFDFE',
+                          letterSpacing: '-0.005em',
+                          lineHeight: 1.25,
+                        }}
+                        className="truncate"
+                      >
+                        {ex.name}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 400,
+                          color: 'rgba(253,253,254,0.44)',
+                          marginTop: 2,
+                          letterSpacing: '0.005em',
+                        }}
+                      >
+                        {ex.bodyPart} · {ex.count}× gelogd · laatst {formatShortDate(ex.lastDate)}
+                      </div>
+                    </div>
+                    <div style={{ width: '100%', height: 22 }}>
+                      <ExSpark data={ex.weekly} positive={ex.delta > 0} />
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 400,
+                        color: '#FDFDFE',
+                        letterSpacing: '-0.005em',
+                        fontFeatureSettings: '"tnum"',
+                        textAlign: 'right',
+                      }}
+                    >
+                      {isPlus ? '+' : ''}{ex.current}
+                      <small
+                        style={{
+                          fontSize: 10,
+                          color: 'rgba(253,253,254,0.62)',
+                          marginLeft: 2,
+                          letterSpacing: 0,
+                        }}
+                      >
+                        kg
+                      </small>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+            <div
+              style={{
+                background: '#A6ADA7',
+                padding: '28px 22px',
+                borderRadius: 24,
+                textAlign: 'center',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+              }}
+            >
+              <p style={{ color: '#FDFDFE', fontSize: 14, fontWeight: 400 }}>
+                {search ? 'Geen oefeningen gevonden' : 'Geen oefeningen in deze groep'}
+              </p>
+              <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 12, marginTop: 4 }}>
+                {search ? 'Probeer een andere zoekterm.' : 'Kies een andere spiergroep of start een workout.'}
               </p>
             </div>
           )}
@@ -618,157 +1605,349 @@ export default function ProgressPage() {
       {tab === 'lichaam' && (
         <>
           {/* Weight card */}
-          {body.weightData.length >= 2 && (
-            <Link
-              href="/client/measurements"
-              className="v6-card block mb-4 animate-slide-up stagger-2"
-              style={{ textDecoration: 'none' }}
-            >
-              <div className="flex items-center justify-between" style={{ marginBottom: 14 }}>
-                <p className="text-label" style={{ color: 'rgba(253,253,254,0.62)' }}>
-                  Gewicht
-                </p>
-                <div
-                  style={{
-                    width: 32, height: 32,
-                    borderRadius: '50%',
-                    background: 'rgba(253,253,254,0.14)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FDFDFE" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="9 18 15 12 9 6" />
-                  </svg>
-                </div>
-              </div>
-
-              <div className="flex items-end justify-between">
-                <div>
-                  <p style={{ lineHeight: 1, margin: 0 }}>
-                    <span
-                      className="stat-number"
-                      style={{ fontSize: 42, fontWeight: 200, color: '#FDFDFE' }}
-                    >
-                      {body.weightCurrent}
-                    </span>
-                    <span style={{ fontSize: 14, color: 'rgba(253,253,254,0.62)', marginLeft: 4, fontWeight: 400 }}>
-                      kg
-                    </span>
-                  </p>
-                  {body.weightChange !== null && (
-                    <p
-                      style={{
-                        fontSize: 13,
-                        marginTop: 10,
-                        fontWeight: 500,
-                        color: weightColor,
-                      }}
-                    >
-                      {body.weightChange > 0 ? '+' : ''}{body.weightChange} kg
-                      <span style={{ fontWeight: 400, color: 'rgba(253,253,254,0.44)', marginLeft: 6 }}>
-                        totaal
-                      </span>
-                    </p>
-                  )}
-                </div>
-                <Sparkline
-                  data={body.weightData.map(w => w.weight)}
-                  color={weightColor}
-                />
-              </div>
-            </Link>
-          )}
-
-          {/* Body fat card */}
-          {body.bodyFatData.length >= 2 && (
-            <div className="v6-card-dark mb-4 animate-slide-up stagger-3">
-              <div className="flex items-center justify-between" style={{ marginBottom: 14 }}>
-                <p className="text-label" style={{ color: 'rgba(253,253,254,0.44)' }}>
-                  Vetpercentage
-                </p>
-              </div>
-              <div className="flex items-end justify-between">
-                <div>
-                  <p style={{ lineHeight: 1, margin: 0 }}>
-                    <span
-                      className="stat-number"
-                      style={{ fontSize: 42, fontWeight: 200, color: '#FDFDFE' }}
-                    >
-                      {body.bodyFatData[body.bodyFatData.length - 1].value}
-                    </span>
-                    <span style={{ fontSize: 14, color: 'rgba(253,253,254,0.62)', marginLeft: 4, fontWeight: 400 }}>
-                      %
-                    </span>
-                  </p>
-                  {(() => {
-                    const start = body.bodyFatData[0].value
-                    const current = body.bodyFatData[body.bodyFatData.length - 1].value
-                    const change = +(current - start).toFixed(1)
-                    const positive = change <= 0
-                    return (
-                      <p
-                        style={{
-                          fontSize: 13,
-                          marginTop: 10,
-                          fontWeight: 500,
-                          color: positive ? '#2FA65A' : 'rgba(253,253,254,0.78)',
-                        }}
-                      >
-                        {change > 0 ? '+' : ''}{change}%
-                        <span style={{ fontWeight: 400, color: 'rgba(253,253,254,0.44)', marginLeft: 6 }}>
-                          totaal
-                        </span>
-                      </p>
-                    )
-                  })()}
-                </div>
-                <Sparkline
-                  data={body.bodyFatData.map(w => w.value)}
-                  color="#C0FC01"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Photo comparison */}
-          {body.hasPhotos && (
-            <div className="v6-card-dark mb-4 animate-slide-up stagger-4">
-              <div className="flex items-center justify-between" style={{ marginBottom: 14 }}>
-                <p className="text-label" style={{ color: 'rgba(253,253,254,0.62)' }}>
-                  Foto&rsquo;s
-                </p>
-              </div>
-              <PhotoComparison />
-              <Link
-                href="/client/progress/photos"
+          {body.weightData.length >= 2 ? (
+            <>
+              <div style={capStyle}>Gewicht</div>
+              <div
+                className="animate-slide-up stagger-2 mb-2"
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 10,
-                  marginTop: 14,
-                  padding: '14px 0',
-                  borderRadius: 14,
-                  background: '#FDFDFE',
-                  color: '#1A1917',
-                  fontSize: 13,
-                  fontWeight: 500,
-                  textDecoration: 'none',
-                  letterSpacing: '0.02em',
-                  WebkitTapHighlightColor: 'transparent',
+                  background: '#474B48',
+                  padding: '22px 22px 18px',
+                  borderRadius: 24,
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18)',
                 }}
               >
-                Alle foto&rsquo;s bekijken
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1A1917" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="9 18 15 12 9 6" />
-                </svg>
-              </Link>
+                <div className="flex items-baseline justify-between" style={{ marginBottom: 6 }}>
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 500,
+                      letterSpacing: '0.16em',
+                      textTransform: 'uppercase',
+                      color: 'rgba(253,253,254,0.44)',
+                    }}
+                  >
+                    Dagelijks
+                  </span>
+                  <div className="flex" style={{ gap: 4 }}>
+                    {(['1M','3M','6M','1J'] as WeightRange[]).map((r) => {
+                      const active = weightRange === r
+                      return (
+                        <button
+                          key={r}
+                          onClick={() => setWeightRange(r)}
+                          style={{
+                            fontSize: 10,
+                            fontWeight: 500,
+                            padding: '3px 8px',
+                            borderRadius: 999,
+                            color: active ? '#FDFDFE' : 'rgba(253,253,254,0.62)',
+                            background: active ? 'rgba(253,253,254,0.12)' : 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            letterSpacing: '0.02em',
+                            WebkitTapHighlightColor: 'transparent',
+                          }}
+                        >
+                          {r}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="flex items-baseline" style={{ gap: 10, margin: '6px 0 16px' }}>
+                  <span
+                    style={{
+                      fontSize: 38,
+                      fontWeight: 200,
+                      letterSpacing: '-0.03em',
+                      color: '#FDFDFE',
+                      fontFeatureSettings: '"tnum"',
+                      lineHeight: 1,
+                    }}
+                  >
+                    {body.weightCurrent?.toString().replace('.', ',')}
+                    <small
+                      style={{
+                        fontSize: 14,
+                        color: 'rgba(253,253,254,0.62)',
+                        marginLeft: 3,
+                        letterSpacing: 0,
+                        fontWeight: 300,
+                      }}
+                    >
+                      kg
+                    </small>
+                  </span>
+                  {body.weightChange !== null && (
+                    <span
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 400,
+                        color: 'rgba(253,253,254,0.78)',
+                        letterSpacing: '-0.005em',
+                      }}
+                    >
+                      {body.weightChange === 0 ? '—' : body.weightChange > 0 ? '+' : '−'}{' '}
+                      <strong style={{ color: '#FDFDFE', fontWeight: 500 }}>
+                        {Math.abs(body.weightChange).toString().replace('.', ',')} kg
+                      </strong>
+                      <span style={{ color: 'rgba(253,253,254,0.44)', marginLeft: 6 }}>
+                        sinds start
+                      </span>
+                    </span>
+                  )}
+                </div>
+
+                <WeightAreaChart data={filteredWeightData} />
+
+                <div
+                  className="flex justify-between"
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 500,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(253,253,254,0.44)',
+                    marginTop: 6,
+                  }}
+                >
+                  {monthAxisLabels(filteredWeightData, 5).map((lbl, i) => (
+                    <span key={`${lbl}-${i}`}>{lbl}</span>
+                  ))}
+                </div>
+              </div>
+            </>
+          ) : null}
+
+          {/* Body summary 3-col */}
+          {(body.bodyFatCurrent !== null || body.leanMassCurrent !== null || body.heightCm !== null) && (
+            <div
+              className="animate-slide-up stagger-3"
+              style={{
+                padding: '14px 0 0',
+                marginBottom: 20,
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr 1fr',
+                gap: 10,
+              }}
+            >
+              <BodySummaryCell
+                value={body.bodyFatCurrent !== null ? body.bodyFatCurrent.toString().replace('.', ',') : '—'}
+                unit={body.bodyFatCurrent !== null ? '%' : ''}
+                label="Vetpercentage"
+              />
+              <BodySummaryCell
+                value={body.leanMassCurrent !== null ? body.leanMassCurrent.toString().replace('.', ',') : '—'}
+                unit={body.leanMassCurrent !== null ? 'kg' : ''}
+                label="Lean mass"
+              />
+              <BodySummaryCell
+                value={body.heightCm !== null ? (body.heightCm / 100).toFixed(2).replace('.', ',') : '—'}
+                unit={body.heightCm !== null ? 'm' : ''}
+                label="Lengte"
+              />
             </div>
+          )}
+
+          {/* Measurements */}
+          {body.measurements.some((m) => m.current !== null) && (
+            <>
+              <div style={{ ...capStyle, padding: '14px 4px 10px' }}>Maten · laatste meting</div>
+              <div
+                className="animate-slide-up stagger-4"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: 6,
+                }}
+              >
+                {body.measurements.map((m) => {
+                  const hasVal = m.current !== null
+                  const flat = m.delta === 0 || m.delta === null
+                  const deltaSign = m.delta === null ? '' : m.delta > 0 ? '+' : m.delta < 0 ? '−' : '—'
+                  const deltaVal = m.delta === null
+                    ? ''
+                    : Math.abs(m.delta).toString().replace('.', ',')
+                  return (
+                    <div
+                      key={m.key}
+                      style={{
+                        background: '#A6ADA7',
+                        padding: '14px 16px',
+                        borderRadius: 18,
+                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: 9,
+                          fontWeight: 500,
+                          letterSpacing: '0.16em',
+                          textTransform: 'uppercase',
+                          color: 'rgba(253,253,254,0.44)',
+                          marginBottom: 4,
+                        }}
+                      >
+                        {m.label}
+                      </div>
+                      <div className="flex items-baseline justify-between">
+                        <div
+                          style={{
+                            fontSize: 20,
+                            fontWeight: 300,
+                            letterSpacing: '-0.015em',
+                            color: '#FDFDFE',
+                            fontFeatureSettings: '"tnum"',
+                          }}
+                        >
+                          {hasVal ? m.current!.toString().replace('.', ',') : '—'}
+                          {hasVal && (
+                            <small style={{ fontSize: 10, color: 'rgba(253,253,254,0.62)', marginLeft: 2, letterSpacing: 0 }}>
+                              cm
+                            </small>
+                          )}
+                        </div>
+                        {m.delta !== null && (
+                          <div
+                            style={{
+                              fontSize: 11,
+                              fontWeight: 400,
+                              color: flat ? 'rgba(253,253,254,0.44)' : 'rgba(253,253,254,0.78)',
+                              letterSpacing: '-0.005em',
+                            }}
+                          >
+                            {deltaSign} {deltaVal}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
+          )}
+
+          {/* Photos */}
+          {body.photos.length > 0 && (
+            <>
+              <div style={{ ...capStyle, padding: '20px 4px 10px' }}>Voortgangsfoto&rsquo;s</div>
+              <div
+                className="animate-slide-up stagger-5"
+                style={{
+                  background: '#A6ADA7',
+                  padding: '18px 18px 20px',
+                  borderRadius: 24,
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+                }}
+              >
+                <div className="flex items-baseline justify-between" style={{ marginBottom: 12 }}>
+                  <span style={{ fontSize: 14, fontWeight: 400, color: '#FDFDFE' }}>
+                    {body.photos.length} foto&rsquo;s · {body.photos.length >= 2
+                      ? `${Math.round((new Date(body.photos[0].date).getTime() - new Date(body.photos[body.photos.length - 1].date).getTime()) / (86400000 * 7))} weken`
+                      : 'nu'}
+                  </span>
+                  <Link
+                    href="/client/progress/photos"
+                    style={{ fontSize: 11, fontWeight: 400, color: 'rgba(253,253,254,0.62)', textDecoration: 'none' }}
+                  >
+                    Alles tonen
+                  </Link>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+                  {body.photos.slice(0, 3).map((p) => {
+                    const url = p.frontUrl || p.backUrl || ''
+                    return (
+                      <div
+                        key={p.date}
+                        style={{
+                          aspectRatio: '3/4',
+                          borderRadius: 10,
+                          background: url ? `center / cover url(${url})` : 'linear-gradient(160deg, #6A6E67, #3A3D37)',
+                          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+                          position: 'relative',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <span
+                          style={{
+                            position: 'absolute',
+                            bottom: 6, left: 7,
+                            fontSize: 9,
+                            fontWeight: 500,
+                            letterSpacing: '0.10em',
+                            textTransform: 'uppercase',
+                            color: 'rgba(255,255,255,0.92)',
+                            textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                          }}
+                        >
+                          {formatShortDate(p.date)}
+                        </span>
+                      </div>
+                    )
+                  })}
+                  {/* Fill with empty slots up to 3 placeholders */}
+                  {Array.from({ length: Math.max(0, 3 - body.photos.length) }).map((_, i) => (
+                    <div
+                      key={`empty-${i}`}
+                      style={{
+                        aspectRatio: '3/4',
+                        borderRadius: 10,
+                        background: 'rgba(0,0,0,0.08)',
+                        border: '1px dashed rgba(253,253,254,0.16)',
+                      }}
+                    />
+                  ))}
+                  <Link
+                    href="/client/check-in"
+                    style={{
+                      aspectRatio: '3/4',
+                      borderRadius: 10,
+                      background: 'rgba(0,0,0,0.10)',
+                      border: '1px dashed rgba(253,253,254,0.22)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 4,
+                      textDecoration: 'none',
+                      WebkitTapHighlightColor: 'transparent',
+                    }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(253,253,254,0.78)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="12" y1="6" x2="12" y2="18" />
+                      <line x1="6" y1="12" x2="18" y2="12" />
+                    </svg>
+                    <span
+                      style={{
+                        fontSize: 9,
+                        fontWeight: 500,
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                        color: 'rgba(253,253,254,0.62)',
+                      }}
+                    >
+                      Nieuw
+                    </span>
+                  </Link>
+                </div>
+              </div>
+            </>
           )}
 
           {/* Empty state */}
-          {body.weightData.length < 2 && body.bodyFatData.length < 2 && !body.hasPhotos && (
-            <div className="v6-card-dark text-center animate-fade-in" style={{ padding: '48px 22px' }}>
+          {body.weightData.length < 2 && !body.measurements.some((m) => m.current !== null) && body.photos.length === 0 && (
+            <div
+              className="animate-fade-in"
+              style={{
+                background: '#474B48',
+                padding: '48px 22px',
+                borderRadius: 24,
+                textAlign: 'center',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18)',
+              }}
+            >
               <p style={{ color: '#FDFDFE', fontSize: 16, fontWeight: 400, marginBottom: 6 }}>
                 Nog geen metingen
               </p>
@@ -802,110 +1981,432 @@ export default function ProgressPage() {
       {/* ═══ CHECK-INS TAB ═════════════════════════════════════════ */}
       {tab === 'checkins' && (
         <>
-          {/* New check-in CTA */}
-          <Link
-            href="/client/check-in"
-            className="v6-card block mb-4 animate-slide-up stagger-2"
-            style={{ textDecoration: 'none' }}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-label" style={{ marginBottom: 6, color: 'rgba(253,253,254,0.62)' }}>
-                  Maandelijkse check-in
-                </p>
-                <p style={{ fontSize: 16, fontWeight: 500, color: '#FDFDFE', margin: 0 }}>
-                  Nieuwe check-in starten
-                </p>
-                <p style={{ fontSize: 12, color: 'rgba(253,253,254,0.52)', marginTop: 4 }}>
-                  Foto&rsquo;s, metingen en meer
-                </p>
+          {/* Due banner — only when weekly check-in still pending */}
+          {weeklyCheckIn.pending && (
+            <Link
+              href="/client/check-in/weekly"
+              className="animate-slide-up stagger-2"
+              style={{
+                display: 'block',
+                textDecoration: 'none',
+                padding: '20px 20px 22px',
+                borderRadius: 24,
+                background: '#474B48',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 18px rgba(0,0,0,0.22)',
+                position: 'relative',
+                overflow: 'hidden',
+                marginBottom: 18,
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              {/* Lime radial glow */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: -30, right: -40,
+                  width: 160, height: 160,
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle at center, rgba(192,252,1,0.10), transparent 60%)',
+                  pointerEvents: 'none',
+                }}
+              />
+
+              {/* Dot + eye */}
+              <div
+                className="flex items-center"
+                style={{ gap: 8, marginBottom: 10, position: 'relative' }}
+              >
+                <span
+                  style={{
+                    width: 6, height: 6,
+                    borderRadius: '50%',
+                    background: '#C0FC01',
+                    boxShadow: '0 0 10px rgba(192,252,1,0.60)',
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 500,
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(253,253,254,0.44)',
+                  }}
+                >
+                  Staat klaar · {weekdayNl(new Date())}
+                </span>
+              </div>
+
+              {/* Title + sub */}
+              <div
+                style={{
+                  fontSize: 22,
+                  fontWeight: 250,
+                  letterSpacing: '-0.025em',
+                  color: '#FDFDFE',
+                  lineHeight: 1.15,
+                  marginBottom: 6,
+                  position: 'relative',
+                }}
+              >
+                Wekelijkse check-in
               </div>
               <div
                 style={{
-                  width: 44, height: 44,
-                  borderRadius: '50%',
-                  background: '#C0FC01',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexShrink: 0,
+                  fontSize: 13,
+                  fontWeight: 300,
+                  color: 'rgba(253,253,254,0.78)',
+                  letterSpacing: '-0.005em',
+                  lineHeight: 1.45,
+                  marginBottom: 16,
+                  position: 'relative',
                 }}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1917" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
+                {coach?.name
+                  ? `Hoe voelde deze week? Energie, slaap, honger — jouw input bepaalt wat ${coach.name} volgende week aanpast.`
+                  : 'Hoe voelde deze week? Energie, slaap en honger — je coach gebruikt je input voor de volgende week.'}
               </div>
-            </div>
-          </Link>
 
-          {/* Check-in history */}
-          {checkInRows.length > 0 ? (
-            <div className="v6-card-dark mb-4 animate-slide-up stagger-3">
-              <div className="flex items-center justify-between" style={{ marginBottom: 10 }}>
-                <p className="text-label" style={{ color: 'rgba(253,253,254,0.44)' }}>
-                  Geschiedenis
-                </p>
-                <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)', letterSpacing: '0.02em' }}>
-                  {checkInRows.length} {checkInRows.length === 1 ? 'check-in' : 'check-ins'}
+              {/* CTA pill + meta */}
+              <div style={{ position: 'relative' }}>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '11px 18px 12px 20px',
+                    borderRadius: 999,
+                    background: '#FDFDFE',
+                    color: '#2A2D2B',
+                    fontSize: 13,
+                    fontWeight: 500,
+                    letterSpacing: '-0.005em',
+                  }}
+                >
+                  Start check-in
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#2A2D2B" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 6 15 12 9 18" />
+                  </svg>
+                </span>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    marginLeft: 12,
+                    fontSize: 11,
+                    fontWeight: 400,
+                    color: 'rgba(253,253,254,0.44)',
+                    letterSpacing: '0.005em',
+                  }}
+                >
+                  ± 3 min
                 </span>
               </div>
-              {checkInRows.map((ci, i, arr) => {
-                const hasPhoto = !!(ci.photo_front_url || ci.photo_back_url)
-                const dateStr = new Date(ci.date).toLocaleDateString('nl-BE', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                })
+            </Link>
+          )}
+
+          {/* Maandelijks */}
+          {checkIns.monthly.length > 0 && (
+            <>
+              <div style={{ ...capStyle, padding: '6px 4px 12px' }}>Maandelijks</div>
+              {checkIns.monthly.map((ci, i) => {
+                const weightDeltaStr = ci.weightDelta !== null
+                  ? `${ci.weightDelta > 0 ? '+' : ci.weightDelta < 0 ? '−' : ''}${Math.abs(ci.weightDelta).toString().replace('.', ',')}`
+                  : null
+                const waistDeltaStr = ci.waistDelta !== null
+                  ? `${ci.waistDelta > 0 ? '+' : ci.waistDelta < 0 ? '−' : ''}${Math.abs(ci.waistDelta).toString().replace('.', ',')}`
+                  : null
+                const photoUrl = ci.photoFrontUrl || ci.photoBackUrl || null
+                const num = checkIns.monthly.length - i
                 return (
                   <div
                     key={ci.id}
-                    className="flex items-center gap-3"
+                    className="animate-slide-up"
                     style={{
-                      padding: '14px 0',
-                      borderBottom: i < arr.length - 1 ? '1px solid rgba(253,253,254,0.08)' : 'none',
+                      background: '#474B48',
+                      padding: '20px 22px 22px',
+                      borderRadius: 24,
+                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18)',
+                      marginBottom: 6,
                     }}
                   >
-                    {/* Thumbnail or placeholder */}
-                    <div
-                      style={{
-                        width: 44, height: 44,
-                        borderRadius: 12,
-                        background: hasPhoto && ci.photo_front_url
-                          ? `center / cover url(${ci.photo_front_url})`
-                          : 'rgba(253,253,254,0.08)',
-                        flexShrink: 0,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      }}
-                    >
-                      {!hasPhoto && (
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(253,253,254,0.32)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                          <circle cx="12" cy="13" r="4" />
-                        </svg>
-                      )}
+                    <div className="flex items-center justify-between" style={{ marginBottom: 14 }}>
+                      <div className="flex items-center" style={{ gap: 8 }}>
+                        <span
+                          style={{
+                            fontSize: 9,
+                            fontWeight: 500,
+                            letterSpacing: '0.16em',
+                            textTransform: 'uppercase',
+                            padding: '3px 8px',
+                            borderRadius: 999,
+                            background: 'rgba(192,252,1,0.14)',
+                            color: '#D5FF4F',
+                          }}
+                        >
+                          Maand
+                        </span>
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 400,
+                            color: 'rgba(253,253,254,0.44)',
+                            letterSpacing: '0.005em',
+                          }}
+                        >
+                          {formatMonthYear(ci.date)}
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          fontSize: 9,
+                          fontWeight: 500,
+                          letterSpacing: '0.16em',
+                          textTransform: 'uppercase',
+                          color: 'rgba(253,253,254,0.44)',
+                        }}
+                      >
+                        #{num}
+                      </span>
                     </div>
 
-                    <div className="flex-1 min-w-0">
-                      <p style={{ fontSize: 14, fontWeight: 500, color: '#FDFDFE', margin: 0 }}>
-                        {dateStr}
-                      </p>
-                      <p style={{ fontSize: 11, color: 'rgba(253,253,254,0.52)', marginTop: 2 }}>
-                        {ci.weight_kg ? `${ci.weight_kg} kg` : '—'}
-                        {ci.body_fat_pct ? ` · ${ci.body_fat_pct}% vet` : ''}
-                        {hasPhoto ? ' · foto' : ''}
-                      </p>
+                    {/* Photo + stats side by side */}
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '92px 1fr',
+                        gap: 14,
+                        marginBottom: ci.coachNotes ? 16 : 0,
+                      }}
+                    >
+                      <div
+                        style={{
+                          aspectRatio: '3/4',
+                          borderRadius: 10,
+                          background: photoUrl
+                            ? `center / cover url(${photoUrl})`
+                            : 'linear-gradient(160deg, #6A6E67, #3A3D37)',
+                          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+                          position: 'relative',
+                          overflow: 'hidden',
+                        }}
+                      />
+                      <div
+                        className="flex flex-col justify-between"
+                      >
+                        <CheckInStatRow
+                          label="Gewicht"
+                          value={ci.weightKg !== null ? ci.weightKg.toString().replace('.', ',') : '—'}
+                          unit="kg"
+                          delta={weightDeltaStr}
+                          first
+                        />
+                        <CheckInStatRow
+                          label="Taille"
+                          value={ci.waistCm !== null ? ci.waistCm.toString().replace('.', ',') : '—'}
+                          unit="cm"
+                          delta={waistDeltaStr}
+                        />
+                        <CheckInStatRow
+                          label="Workouts"
+                          value={ci.workoutsInMonth.toString()}
+                          unit=""
+                          delta={null}
+                        />
+                        <CheckInStatRow
+                          label="Vetpercentage"
+                          value={ci.bodyFatPct !== null ? ci.bodyFatPct.toString().replace('.', ',') : '—'}
+                          unit={ci.bodyFatPct !== null ? '%' : ''}
+                          delta={null}
+                        />
+                      </div>
                     </div>
+
+                    {/* Coach reply */}
+                    {ci.coachNotes && (
+                      <div
+                        className="flex"
+                        style={{
+                          gap: 10,
+                          padding: '14px 14px 14px 12px',
+                          background: 'rgba(253,253,254,0.04)',
+                          borderRadius: 12,
+                          border: '1px solid rgba(253,253,254,0.06)',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 28, height: 28,
+                            borderRadius: '50%',
+                            background: 'linear-gradient(140deg, #5A5E52, #3D403A)',
+                            color: 'rgba(244,242,235,0.94)',
+                            fontSize: 10,
+                            fontWeight: 500,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14)',
+                          }}
+                        >
+                          {coach?.name ? coach.name.split(' ').map((s) => s[0]).join('').slice(0, 2).toUpperCase() : 'JV'}
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <div className="flex items-baseline" style={{ gap: 8, marginBottom: 4 }}>
+                            <span
+                              style={{
+                                fontSize: 12,
+                                fontWeight: 500,
+                                color: '#FDFDFE',
+                                letterSpacing: '-0.005em',
+                              }}
+                            >
+                              {coach?.name?.split(' ')[0] || 'Coach'}
+                            </span>
+                            <span style={{ fontSize: 10, fontWeight: 400, color: 'rgba(253,253,254,0.44)' }}>
+                              feedback · {formatShortDate(ci.date)}
+                            </span>
+                          </div>
+                          <div
+                            style={{
+                              fontSize: 12,
+                              fontWeight: 300,
+                              color: 'rgba(253,253,254,0.78)',
+                              lineHeight: 1.55,
+                              letterSpacing: '-0.005em',
+                              whiteSpace: 'pre-wrap',
+                            }}
+                          >
+                            {ci.coachNotes}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )
               })}
-            </div>
-          ) : (
-            <div className="v6-card-dark text-center animate-fade-in" style={{ padding: '48px 22px' }}>
+            </>
+          )}
+
+          {/* Wekelijks */}
+          {checkIns.weekly.length > 0 && (
+            <>
+              <div style={{ ...capStyle, padding: '20px 4px 12px' }}>Wekelijks · ingeleverd</div>
+              {checkIns.weekly.map((w) => {
+                const d = new Date(w.date)
+                const wkNum = getWeekNumber(d)
+                const title = w.notes
+                  ? `Week ${wkNum} · ${w.notes.slice(0, 52)}${w.notes.length > 52 ? '…' : ''}`
+                  : `Week ${wkNum} · check-in ingeleverd`
+                return (
+                  <div
+                    key={w.id}
+                    className="animate-slide-up"
+                    style={{
+                      background: '#A6ADA7',
+                      padding: '14px 18px',
+                      borderRadius: 18,
+                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+                      display: 'grid',
+                      gridTemplateColumns: 'auto 1fr auto',
+                      alignItems: 'center',
+                      gap: 14,
+                      marginBottom: 6,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 28, height: 28,
+                        borderRadius: '50%',
+                        background: 'rgba(47,166,90,0.18)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#6FD598" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="5 12 10 17 20 7" />
+                      </svg>
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <div
+                        className="truncate"
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 400,
+                          color: '#FDFDFE',
+                          letterSpacing: '-0.005em',
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        {title}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 400,
+                          color: 'rgba(253,253,254,0.44)',
+                          marginTop: 2,
+                          letterSpacing: '0.005em',
+                        }}
+                      >
+                        {w.energyLevel !== null ? `energie ${w.energyLevel}/10` : 'ingeleverd'}
+                        {w.sleepQuality !== null ? ` · slaap ${w.sleepQuality}/10` : ''}
+                      </div>
+                    </div>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 500,
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                        color: 'rgba(253,253,254,0.44)',
+                      }}
+                    >
+                      {formatShortDate(w.date)}
+                    </span>
+                  </div>
+                )
+              })}
+            </>
+          )}
+
+          {/* Empty state */}
+          {!weeklyCheckIn.pending && checkIns.monthly.length === 0 && checkIns.weekly.length === 0 && (
+            <div
+              className="animate-fade-in"
+              style={{
+                background: '#474B48',
+                padding: '48px 22px',
+                borderRadius: 24,
+                textAlign: 'center',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18)',
+              }}
+            >
               <p style={{ color: '#FDFDFE', fontSize: 16, fontWeight: 400, marginBottom: 6 }}>
                 Nog geen check-ins
               </p>
-              <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 13, maxWidth: 260, margin: '0 auto' }}>
+              <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 13, maxWidth: 260, margin: '0 auto 18px' }}>
                 Je eerste check-in toont je startpunt en voortgang.
               </p>
+              <Link
+                href="/client/check-in"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '12px 20px',
+                  borderRadius: 14,
+                  background: '#C0FC01',
+                  color: '#1A1917',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  letterSpacing: '0.02em',
+                  WebkitTapHighlightColor: 'transparent',
+                }}
+              >
+                Start check-in
+              </Link>
             </div>
           )}
         </>
