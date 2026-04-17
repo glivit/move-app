@@ -142,6 +142,23 @@ h1, h2, h3, h4, h5, h6 {
   color: #FDFDFE;
 }
 
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Display P3 canvas-correctie
+ * iPhone/iPad (en P3-capable Macs) renderen sRGB #8E9890 met meer groen-
+ * saturatie waardoor de sage-grijze canvas als olive/mosgroen leest.
+ * Op P3-displays pinnen we de canvas via een native P3-triplet dat visueel
+ * overeenkomt met de sRGB design-intent (Mac mockups, Figma exports).
+ * sRGB ref: rgb(142 152 144)  →  P3 equivalent met iets minder groen.
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@media (color-gamut: p3) {
+  body {
+    background-color: color(display-p3 0.552 0.579 0.560);
+  }
+  .client-app {
+    background-color: color(display-p3 0.552 0.579 0.560);
+  }
+}
+
 /* Main content padding — op mobiel rekening houden met fixed top bar + safe-area.
  * Top bar: env(safe-area-inset-top) + 14px top + ~32px logo row + 10px bottom ≈ 56px+inset.
  * Extra 14px ademruimte zodat de eerste v6-card niet onder de blurred header verdwijnt.

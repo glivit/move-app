@@ -137,6 +137,18 @@ export async function fetchDashboardData(userId: string) {
     ? templateDays.find((d: any) => d.id === todayDayId) || null
     : null
 
+  // Exercise count voor vandaag (voor home-card meta-regel
+  // "N oefeningen · ±<min> min" — matcht design-system 04-homepage-v2).
+  // Eén count-query, alleen als er vandaag een template-day is.
+  let todayExerciseCount: number | null = null
+  if (todayTemplateDay?.id) {
+    const { count } = await db
+      .from('program_template_exercises')
+      .select('id', { count: 'exact', head: true })
+      .eq('template_day_id', todayTemplateDay.id)
+    todayExerciseCount = typeof count === 'number' ? count : null
+  }
+
   let nextTrainingDay: any = null
   for (let offset = 1; offset <= 7; offset++) {
     const checkDow = ((todayDow - 1 + offset) % 7) + 1
@@ -298,7 +310,7 @@ export async function fetchDashboardData(userId: string) {
         name: todayTemplateDay.name,
         focus: todayTemplateDay.focus,
         durationMin: todayTemplateDay.estimated_duration_min,
-        exerciseCount: null,
+        exerciseCount: todayExerciseCount,
         completed: todayWorkoutDone,
       } : null,
       next: nextTrainingDay ? {
