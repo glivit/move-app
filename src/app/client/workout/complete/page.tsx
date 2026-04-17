@@ -27,7 +27,7 @@ interface WorkoutSet {
 interface WorkoutSessionComplete {
   id: string
   started_at: string
-  program_template_id: string | null
+  template_day_id: string | null
   workout_sets: WorkoutSet[]
 }
 
@@ -158,11 +158,15 @@ function WorkoutCompletePage() {
           return
         }
         const supabase = createClient()
-        const { data: sessionData } = await supabase
+        const { data: sessionData, error: sessionErr } = await supabase
           .from('workout_sessions')
-          .select('id, started_at, program_template_id, workout_sets(*, exercises(id, name, name_nl))')
+          .select('id, started_at, template_day_id, workout_sets(*, exercises(id, name, name_nl))')
           .eq('id', sessionId)
           .single()
+
+        if (sessionErr) {
+          console.error('[complete] Session load error:', sessionErr.message, sessionErr.details)
+        }
 
         if (!sessionData) {
           setLoading(false)
@@ -216,7 +220,7 @@ function WorkoutCompletePage() {
                   if (!insertErr) {
                     const { data: refreshed } = await supabase
                       .from('workout_sessions')
-                      .select('id, started_at, program_template_id, workout_sets(*, exercises(id, name, name_nl))')
+                      .select('id, started_at, template_day_id, workout_sets(*, exercises(id, name, name_nl))')
                       .eq('id', sessionId)
                       .single()
                     if (refreshed) {
@@ -241,30 +245,32 @@ function WorkoutCompletePage() {
         setSession({ ...sd, workout_sets: workoutSets })
 
         // ── Program name for page-head sub ──
-        if (sd.program_template_id) {
-          const { data: tpl } = await supabase
-            .from('program_templates')
-            .select('name, program_id')
-            .eq('id', sd.program_template_id)
+        if (sd.template_day_id) {
+          // Get this template day (name + parent template) plus siblings to determine "next workout"
+          const { data: dayRow } = await supabase
+            .from('program_template_days')
+            .select('id, name, day_number, template_id, program_templates(name)')
+            .eq('id', sd.template_day_id)
             .single()
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const tplAny = tpl as any
-          if (tplAny?.name) setProgramName(tplAny.name)
+          const dayAny = dayRow as any
+          const tplName = dayAny?.program_templates?.name as string | undefined
+          if (tplName) setProgramName(tplName)
 
-          // ── Next workout: next template in same program by day_order ──
-          if (tplAny?.program_id) {
-            const { data: templates } = await supabase
-              .from('program_templates')
-              .select('id, name, day_order, program_template_exercises(id)')
-              .eq('program_id', tplAny.program_id)
-              .order('day_order', { ascending: true })
-            if (templates && templates.length > 0) {
-              const idx = templates.findIndex((t) => t.id === sd.program_template_id)
+          // ── Next workout: next day in same template by day_number ──
+          if (dayAny?.template_id) {
+            const { data: days } = await supabase
+              .from('program_template_days')
+              .select('id, name, day_number, program_template_exercises(id)')
+              .eq('template_id', dayAny.template_id)
+              .order('day_number', { ascending: true })
+            if (days && days.length > 0) {
+              const idx = days.findIndex((t) => t.id === sd.template_day_id)
               const next =
-                idx >= 0 && idx + 1 < templates.length
-                  ? templates[idx + 1]
-                  : templates[0]
-              if (next && next.id !== sd.program_template_id) {
+                idx >= 0 && idx + 1 < days.length
+                  ? days[idx + 1]
+                  : days[0]
+              if (next && next.id !== sd.template_day_id) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const exCount = ((next as any).program_template_exercises || []).length
                 setNextWorkout({
@@ -311,9 +317,9 @@ function WorkoutCompletePage() {
             for (const g of groups) {
               const { data: hist } = await sbAny
                 .from('workout_sets')
-                .select('weight_kg, actual_reps, workout_session_id, workout_sessions!inner(user_id, started_at, completed_at)')
+                .select('weight_kg, actual_reps, workout_session_id, workout_sessions!inner(client_id, started_at, completed_at)')
                 .eq('exercise_id', g.exerciseId)
-                .eq('workout_sessions.user_id', user.id)
+                .eq('workout_sessions.client_id', user.id)
                 .not('workout_sessions.completed_at', 'is', null)
                 .order('workout_sessions(started_at)', { ascending: false })
                 .limit(60)
@@ -399,7 +405,7 @@ function WorkoutCompletePage() {
             const { data: recent } = await supabase
               .from('workout_sessions')
               .select('id, started_at, completed_at, workout_sets(weight_kg, actual_reps)')
-              .eq('user_id', user.id)
+              .eq('client_id', user.id)
               .not('completed_at', 'is', null)
               .order('started_at', { ascending: false })
               .limit(6)
