@@ -3,8 +3,8 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { createClient } from '@/lib/supabase'
 import {
-  ChevronLeft, ChevronRight, Plus, X, Search, ScanBarcode,
-  Check, Trash2, Copy, ArrowLeft, ShoppingCart, ChevronDown
+  ChevronLeft, ChevronRight, Plus, X, Search,
+  Check, Trash2, ShoppingCart, ChevronDown
 } from 'lucide-react'
 import { invalidateCache } from '@/lib/fetcher'
 
@@ -123,15 +123,6 @@ function mealCalories(foods: FoodEntry[]) {
 
 // ─── Shopping List Component ──────────────────────────────
 
-interface ShoppingItem {
-  name: string
-  brand?: string | null
-  weeklyGrams: number
-  unit: string
-  category: 'supplements' | 'snacks' | 'maaltijden'
-  checked: boolean
-}
-
 const SUPPLEMENT_KEYWORDS = ['whey', 'isoclear', 'creatine', 'casein', 'protein powder', 'pre-workout', 'bcaa', 'eaa']
 const SNACK_KEYWORDS = ['noten', 'cashew', 'amandel', 'walnot', 'pinda', 'granola', 'bar', 'reep', 'rijstwafel', 'pudding', 'banaan', 'appel', 'fruit', 'yoghurt', 'skyr', 'hüttenkäse', 'borrelnoot']
 
@@ -188,9 +179,9 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
     const snacks = shoppingItems.filter(i => i.category === 'snacks')
     const maaltijden = shoppingItems.filter(i => i.category === 'maaltijden')
     return [
-      { key: 'supplements', label: 'Supplementen', icon: '💊', items: supplements },
-      { key: 'snacks', label: 'Snacks', icon: '🥜', items: snacks },
-      { key: 'maaltijden', label: 'Maaltijden', icon: '🍽️', items: maaltijden },
+      { key: 'supplements', label: 'Supplementen', items: supplements },
+      { key: 'snacks', label: 'Snacks', items: snacks },
+      { key: 'maaltijden', label: 'Maaltijden', items: maaltijden },
     ].filter(c => c.items.length > 0)
   }, [shoppingItems])
 
@@ -209,38 +200,61 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
   if (meals.length === 0) return null
 
   return (
-    <div className="border-t border-[#F0F0EE] pt-5 mt-6">
+    <div className="v6-card-dark">
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between py-2 group"
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          background: 'transparent',
+          border: 'none',
+          padding: 0,
+          cursor: 'pointer',
+          WebkitTapHighlightColor: 'transparent',
+        }}
       >
-        <div className="flex items-center gap-2.5">
-          <ShoppingCart strokeWidth={1.5} className="w-4 h-4 text-[#D46A3A]" />
-          <span className="text-[13px] font-semibold text-[#1A1917] tracking-tight">Boodschappenlijst</span>
-          <span className="text-[11px] text-[#B0B0B0] font-medium">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <ShoppingCart strokeWidth={1.5} size={16} style={{ color: '#C0FC01' }} />
+          <span style={{ fontSize: 14, fontWeight: 600, color: '#FDFDFE', letterSpacing: '-0.01em' }}>
+            Boodschappenlijst
+          </span>
+          <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.52)', fontWeight: 500 }}>
             {checkedCount > 0 ? `${checkedCount}/${totalItems}` : `${totalItems} items`}
           </span>
         </div>
         <ChevronDown
           strokeWidth={1.5}
-          className={`w-4 h-4 text-[#C0C0C0] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          size={16}
+          style={{
+            color: 'rgba(253,253,254,0.52)',
+            transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 200ms',
+          }}
         />
       </button>
 
       {open && (
-        <div className="mt-3 space-y-5 pb-4">
-          <p className="text-[11px] text-[#B0B0B0] uppercase tracking-[0.1em]">
+        <div style={{ marginTop: 16 }}>
+          <p style={{
+            fontSize: 10, color: 'rgba(253,253,254,0.52)',
+            textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 14px',
+          }}>
             Weekoverzicht — 7 dagen
           </p>
 
-          {categories.map(cat => (
-            <div key={cat.key}>
-              <div className="flex items-center gap-1.5 mb-2">
-                <span className="text-[13px]">{cat.icon}</span>
-                <span className="text-[12px] font-semibold text-[#8A8A8A] uppercase tracking-[0.06em]">{cat.label}</span>
+          {categories.map((cat, ci) => (
+            <div key={cat.key} style={{ marginBottom: ci < categories.length - 1 ? 18 : 0 }}>
+              <div style={{
+                fontSize: 11, fontWeight: 600, color: 'rgba(253,253,254,0.62)',
+                textTransform: 'uppercase', letterSpacing: '0.06em',
+                marginBottom: 8,
+              }}>
+                {cat.label}
               </div>
-              <div className="space-y-0.5">
-                {cat.items.map(item => {
+              <div>
+                {cat.items.map((item, ii) => {
                   const key = `${item.name}||${item.brand || ''}`
                   const isChecked = checkedItems.has(key)
                   const { amount, unit } = gramsToUnit(item.totalGrams, item.name)
@@ -249,36 +263,59 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
                     <button
                       key={key}
                       onClick={() => toggleItem(key)}
-                      className={`w-full flex items-center gap-3 py-2.5 px-2 rounded-lg text-left transition-colors ${
-                        isChecked ? 'bg-[#F5F5F3]' : 'hover:bg-[#FAFAF8]'
-                      }`}
+                      style={{
+                        width: '100%',
+                        display: 'flex', alignItems: 'center', gap: 12,
+                        padding: '10px 2px',
+                        borderTop: ii === 0 ? 'none' : '1px solid rgba(253,253,254,0.08)',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        WebkitTapHighlightColor: 'transparent',
+                        textAlign: 'left',
+                      }}
                     >
-                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
-                        isChecked
-                          ? 'bg-[#3D8B5C] border-[#3D8B5C]'
-                          : 'border-[#D5D5D5]'
-                      }`}>
-                        {isChecked && <Check strokeWidth={3} className="w-3 h-3 text-white" />}
+                      <div style={{
+                        width: 18, height: 18, borderRadius: 5,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        flexShrink: 0,
+                        background: isChecked ? '#2FA65A' : 'transparent',
+                        border: isChecked ? 'none' : '1.5px solid rgba(253,253,254,0.28)',
+                        transition: 'all 160ms',
+                      }}>
+                        {isChecked && <Check strokeWidth={3} size={11} style={{ color: '#FDFDFE' }} />}
                       </div>
 
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-[13px] leading-tight truncate ${
-                          isChecked ? 'line-through text-[#B0B0B0]' : 'text-[#1A1917]'
-                        }`}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{
+                          fontSize: 13, margin: 0, lineHeight: 1.2,
+                          color: isChecked ? 'rgba(253,253,254,0.40)' : '#FDFDFE',
+                          textDecoration: isChecked ? 'line-through' : 'none',
+                          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                        }}>
                           {item.name}
                         </p>
                         {item.brand && (
-                          <p className="text-[11px] text-[#B0B0B0] truncate">{item.brand}</p>
+                          <p style={{
+                            fontSize: 11, margin: '2px 0 0',
+                            color: 'rgba(253,253,254,0.44)',
+                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                          }}>
+                            {item.brand}
+                          </p>
                         )}
                       </div>
 
-                      <div className="text-right shrink-0">
-                        <span className={`text-[13px] font-medium tabular-nums ${
-                          isChecked ? 'text-[#C0C0C0]' : 'text-[#1A1917]'
-                        }`}>{amount}</span>
-                        <span className={`text-[11px] ml-0.5 ${
-                          isChecked ? 'text-[#D5D5D5]' : 'text-[#B0B0B0]'
-                        }`}>{unit}</span>
+                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                        <span style={{
+                          fontSize: 13, fontWeight: 500,
+                          color: isChecked ? 'rgba(253,253,254,0.40)' : '#FDFDFE',
+                          fontVariantNumeric: 'tabular-nums',
+                        }}>{amount}</span>
+                        <span style={{
+                          fontSize: 11, marginLeft: 2,
+                          color: isChecked ? 'rgba(253,253,254,0.30)' : 'rgba(253,253,254,0.52)',
+                        }}>{unit}</span>
                       </div>
                     </button>
                   )
@@ -288,15 +325,25 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
           ))}
 
           {checkedCount > 0 && (
-            <div className="pt-2">
-              <div className="h-1.5 bg-[#F0F0EE] rounded-full overflow-hidden">
+            <div style={{ marginTop: 14 }}>
+              <div style={{
+                height: 4, borderRadius: 999, overflow: 'hidden',
+                background: 'rgba(253,253,254,0.10)',
+              }}>
                 <div
-                  className="h-full bg-[#3D8B5C] rounded-full transition-all duration-300"
-                  style={{ width: `${(checkedCount / totalItems) * 100}%` }}
+                  style={{
+                    height: '100%',
+                    width: `${(checkedCount / totalItems) * 100}%`,
+                    background: '#2FA65A',
+                    transition: 'width 300ms',
+                  }}
                 />
               </div>
-              <p className="text-[11px] text-[#B0B0B0] mt-1.5 text-center">
-                {checkedCount === totalItems ? 'Alles ingekocht! ✓' : `${checkedCount} van ${totalItems} ingekocht`}
+              <p style={{
+                fontSize: 11, color: 'rgba(253,253,254,0.52)',
+                margin: '8px 0 0', textAlign: 'center',
+              }}>
+                {checkedCount === totalItems ? 'Alles ingekocht' : `${checkedCount} van ${totalItems} ingekocht`}
               </p>
             </div>
           )}
@@ -316,7 +363,6 @@ function AddFoodBottomSheet({
   dateStr,
   logs,
   setLogs,
-  setSummary,
   recentFoods,
 }: {
   isOpen: boolean
@@ -335,15 +381,9 @@ function AddFoodBottomSheet({
   const [loading, setLoading] = useState(false)
   const [addingProduct, setAddingProduct] = useState<string | null>(null)
   const [justAdded, setJustAdded] = useState<Set<string>>(new Set())
-  const [selectedProduct, setSelectedProduct] = useState<SearchProduct | null>(null)
-  const [portionGrams, setPortionGrams] = useState('100')
-  const [scanning, setScanning] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const sheetRef = useRef<HTMLDivElement>(null)
-
-  // No auto-focus on search tab — prevents keyboard from resizing the sheet on iOS
-  // User taps the input field themselves when ready
 
   useEffect(() => {
     if (!isOpen || tab !== 'search') return
@@ -390,7 +430,6 @@ function AddFoodBottomSheet({
 
     const newFoods = [...currentFoods, newFood]
 
-    // Optimistic update: show the food immediately
     const newLog: MealLog = {
       meal_id: meal.id,
       meal_name: meal.name,
@@ -467,69 +506,113 @@ function AddFoodBottomSheet({
     <div className="fixed inset-0 z-50" style={{ pointerEvents: isOpen ? 'auto' : 'none', touchAction: 'none' }}>
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/20 transition-opacity duration-300"
         onClick={onClose}
-        style={{ opacity: isOpen ? 1 : 0 }}
+        style={{
+          position: 'absolute', inset: 0,
+          background: 'rgba(0,0,0,0.52)',
+          opacity: isOpen ? 1 : 0,
+          transition: 'opacity 300ms',
+        }}
       />
 
-      {/* Sheet — fixed 75% height, doesn't jump with keyboard */}
+      {/* Sheet — v6 dark card style */}
       <div
         ref={sheetRef}
-        className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl transition-transform duration-300"
         style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          background: '#474B48',
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 -4px 24px rgba(0,0,0,0.32)',
           height: '75%',
           display: isOpen ? 'flex' : 'none',
           flexDirection: 'column',
           transform: 'translateY(0)',
+          transition: 'transform 300ms',
         }}
       >
         {/* Drag handle */}
         <div
           onTouchStart={handleDragDown}
-          className="flex justify-center py-3 cursor-grab active:cursor-grabbing"
+          style={{
+            display: 'flex', justifyContent: 'center',
+            padding: '12px 0',
+            cursor: 'grab',
+          }}
         >
-          <div className="w-10 h-1 bg-[#D0D0D0] rounded-full" />
+          <div style={{
+            width: 40, height: 4,
+            borderRadius: 999,
+            background: 'rgba(253,253,254,0.22)',
+          }} />
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-4 pb-3 border-b border-[#F0F0EE]">
-          <h2 className="text-[15px] font-semibold text-[#1A1917]">{meal.name} toevoegen</h2>
-          <button onClick={onClose} className="p-1.5 text-[#C0C0C0] hover:text-[#1A1917] transition-colors">
-            <X strokeWidth={1.5} className="w-5 h-5" />
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 20px 14px',
+          borderBottom: '1px solid rgba(253,253,254,0.08)',
+        }}>
+          <h2 style={{
+            fontSize: 15, fontWeight: 600, color: '#FDFDFE',
+            margin: 0, letterSpacing: '-0.01em',
+          }}>
+            {meal.name} toevoegen
+          </h2>
+          <button
+            onClick={onClose}
+            style={{
+              padding: 6,
+              background: 'transparent',
+              border: 'none',
+              color: 'rgba(253,253,254,0.52)',
+              cursor: 'pointer',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            <X strokeWidth={1.5} size={20} />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 px-4 py-3 border-b border-[#F0F0EE]">
-          <button
-            onClick={() => setTab('recent')}
-            className={`px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all ${
-              tab === 'recent'
-                ? 'bg-[#F5F5F3] text-[#1A1917]'
-                : 'text-[#B0B0B0]'
-            }`}
-          >
-            Recent
-          </button>
-          <button
-            onClick={() => setTab('search')}
-            className={`px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all ${
-              tab === 'search'
-                ? 'bg-[#F5F5F3] text-[#1A1917]'
-                : 'text-[#B0B0B0]'
-            }`}
-          >
-            Zoeken
-          </button>
+        <div style={{
+          display: 'flex', gap: 8,
+          padding: '14px 20px',
+          borderBottom: '1px solid rgba(253,253,254,0.08)',
+        }}>
+          {(['recent', 'search'] as const).map(t => {
+            const active = tab === t
+            return (
+              <button
+                key={t}
+                onClick={() => setTab(t)}
+                style={{
+                  padding: '8px 14px',
+                  borderRadius: 10,
+                  fontSize: 13, fontWeight: 500,
+                  background: active ? '#FDFDFE' : 'rgba(253,253,254,0.08)',
+                  color: active ? '#1A1917' : 'rgba(253,253,254,0.62)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  WebkitTapHighlightColor: 'transparent',
+                  transition: 'all 160ms',
+                }}
+              >
+                {t === 'recent' ? 'Recent' : 'Zoeken'}
+              </button>
+            )
+          })}
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto">
+        <div style={{ flex: 1, overflowY: 'auto' }}>
           {tab === 'recent' && (
-            <div className="divide-y divide-[#F0F0EE]">
+            <div>
               {recentFoods.length === 0 ? (
-                <div className="py-12 text-center">
-                  <p className="text-[13px] text-[#B0B0B0]">Geen recente items</p>
+                <div style={{ padding: '48px 20px', textAlign: 'center' }}>
+                  <p style={{ fontSize: 13, color: 'rgba(253,253,254,0.52)', margin: 0 }}>
+                    Geen recente items
+                  </p>
                 </div>
               ) : (
                 recentFoods.map((food, idx) => {
@@ -539,30 +622,58 @@ function AddFoodBottomSheet({
                   const displayCal = Math.round(food.per100g.calories)
 
                   return (
-                    <div key={idx} className="flex items-center gap-3 px-4 py-3">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[14px] text-[#1A1917] font-medium truncate">{food.name}</p>
-                        <p className="text-[12px] text-[#B0B0B0] mt-0.5">
-                          {displayCal} kcal
-                          {food.brand && <span> · {food.brand}</span>}
+                    <div
+                      key={idx}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 12,
+                        padding: '12px 20px',
+                        borderBottom: '1px solid rgba(253,253,254,0.06)',
+                      }}
+                    >
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{
+                          fontSize: 14, fontWeight: 500, color: '#FDFDFE',
+                          margin: 0, lineHeight: 1.25,
+                          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                        }}>
+                          {food.name}
+                        </p>
+                        <p style={{
+                          fontSize: 12, color: 'rgba(253,253,254,0.52)',
+                          margin: '3px 0 0',
+                        }}>
+                          {displayCal} kcal{food.brand && <span> · {food.brand}</span>}
                         </p>
                       </div>
 
                       <button
                         onClick={() => addFood(food, 100)}
                         disabled={isAdding}
-                        className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all ${
-                          wasAdded
-                            ? 'bg-[#E8F5E9] text-[#3D8B5C]'
-                            : 'bg-[#F5F5F3] text-[#1A1917] hover:bg-[#EBEBEA] active:scale-95'
-                        }`}
+                        style={{
+                          width: 36, height: 36,
+                          borderRadius: '50%',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          flexShrink: 0,
+                          background: wasAdded ? '#2FA65A' : 'rgba(253,253,254,0.10)',
+                          color: '#FDFDFE',
+                          border: 'none',
+                          cursor: 'pointer',
+                          WebkitTapHighlightColor: 'transparent',
+                          transition: 'all 160ms',
+                        }}
                       >
                         {isAdding ? (
-                          <div className="w-3.5 h-3.5 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
+                          <div style={{
+                            width: 14, height: 14,
+                            border: '1.5px solid rgba(253,253,254,0.30)',
+                            borderTopColor: '#FDFDFE',
+                            borderRadius: '50%',
+                            animation: 'spin 800ms linear infinite',
+                          }} />
                         ) : wasAdded ? (
-                          <Check strokeWidth={2} className="w-4 h-4" />
+                          <Check strokeWidth={2} size={16} />
                         ) : (
-                          <Plus strokeWidth={2} className="w-4 h-4" />
+                          <Plus strokeWidth={2} size={16} />
                         )}
                       </button>
                     </div>
@@ -573,47 +684,69 @@ function AddFoodBottomSheet({
           )}
 
           {tab === 'search' && (
-            <div className="px-4 py-3 space-y-3">
-              <div className="relative">
-                <Search strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C0C0C0]" />
+            <div style={{ padding: '14px 20px' }}>
+              <div style={{ position: 'relative', marginBottom: 12 }}>
+                <Search strokeWidth={1.5} size={16} style={{
+                  position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
+                  color: 'rgba(253,253,254,0.44)',
+                }} />
                 <input
                   ref={inputRef}
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Zoek voedingsmiddel..."
-                  className="w-full pl-9 pr-3 py-2.5 bg-[#F5F5F3] rounded-xl text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:ring-2 focus:ring-[#1A1917]/10"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px 10px 36px',
+                    background: 'rgba(253,253,254,0.08)',
+                    borderRadius: 12,
+                    fontSize: 14, color: '#FDFDFE',
+                    border: 'none',
+                    outline: 'none',
+                  }}
                 />
                 {query && (
-                  <button onClick={() => setQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5">
-                    <X strokeWidth={1.5} className="w-3.5 h-3.5 text-[#C0C0C0]" />
+                  <button
+                    onClick={() => setQuery('')}
+                    style={{
+                      position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
+                      padding: 4,
+                      background: 'transparent', border: 'none',
+                      cursor: 'pointer', color: 'rgba(253,253,254,0.44)',
+                      WebkitTapHighlightColor: 'transparent',
+                    }}
+                  >
+                    <X strokeWidth={1.5} size={14} />
                   </button>
                 )}
               </div>
 
-              {/* Loading shimmer */}
               {loading && (
-                <div className="space-y-1">
+                <div>
                   {[1, 2, 3].map(i => (
-                    <div key={i} className="flex items-center justify-between py-3 animate-pulse">
-                      <div className="flex-1">
-                        <div className="h-3.5 w-32 bg-[#F0F0EE] rounded mb-1.5" />
-                        <div className="h-2.5 w-48 bg-[#F0F0EE] rounded" />
+                    <div key={i} style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      padding: '12px 0', opacity: 0.5,
+                    }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ height: 14, width: 128, background: 'rgba(253,253,254,0.10)', borderRadius: 4, marginBottom: 6 }} />
+                        <div style={{ height: 10, width: 192, background: 'rgba(253,253,254,0.08)', borderRadius: 4 }} />
                       </div>
-                      <div className="w-8 h-8 rounded-full bg-[#F0F0EE]" />
+                      <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(253,253,254,0.10)' }} />
                     </div>
                   ))}
                 </div>
               )}
 
-              {/* No results */}
               {!loading && results.length === 0 && query && (
-                <div className="py-12 text-center">
-                  <p className="text-[13px] text-[#B0B0B0]">Geen resultaten gevonden</p>
+                <div style={{ padding: '48px 0', textAlign: 'center' }}>
+                  <p style={{ fontSize: 13, color: 'rgba(253,253,254,0.52)', margin: 0 }}>
+                    Geen resultaten
+                  </p>
                 </div>
               )}
 
-              {/* Results */}
               {!loading && results.map((product, idx) => {
                 const key = product.barcode || product.name
                 const isAdding = addingProduct === key
@@ -628,38 +761,54 @@ function AddFoodBottomSheet({
                 return (
                   <div
                     key={idx}
-                    className="flex items-center gap-3 py-3 border-b border-[#F0F0EE]"
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12,
+                      padding: '12px 0',
+                      borderBottom: '1px solid rgba(253,253,254,0.06)',
+                    }}
                   >
-                    <button
-                      onClick={() => {
-                        setSelectedProduct(product)
-                        setPortionGrams(String(displayGrams))
-                      }}
-                      className="flex-1 min-w-0 text-left"
-                    >
-                      <p className="text-[14px] text-[#1A1917] truncate leading-tight">{product.name}</p>
-                      <p className="text-[12px] text-[#B0B0B0] mt-0.5">
-                        {displayCal} kcal
-                        {product.brand && <span> · {product.brand}</span>}
-                        <span className="text-[#D0D0D0]"> · {displayGrams}g</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{
+                        fontSize: 14, color: '#FDFDFE', margin: 0, lineHeight: 1.25,
+                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                      }}>
+                        {product.name}
                       </p>
-                    </button>
+                      <p style={{
+                        fontSize: 12, color: 'rgba(253,253,254,0.52)', margin: '3px 0 0',
+                      }}>
+                        {displayCal} kcal{product.brand && <span> · {product.brand}</span>}
+                        <span style={{ color: 'rgba(253,253,254,0.32)' }}> · {displayGrams}g</span>
+                      </p>
+                    </div>
 
                     <button
-                      onClick={(e) => { e.stopPropagation(); addFood(product, displayGrams) }}
+                      onClick={() => addFood(product, displayGrams)}
                       disabled={isAdding}
-                      className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all ${
-                        wasAdded
-                          ? 'bg-[#E8F5E9] text-[#3D8B5C]'
-                          : 'bg-[#F5F5F3] text-[#1A1917] hover:bg-[#EBEBEA] active:scale-95'
-                      }`}
+                      style={{
+                        width: 36, height: 36,
+                        borderRadius: '50%',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        flexShrink: 0,
+                        background: wasAdded ? '#2FA65A' : 'rgba(253,253,254,0.10)',
+                        color: '#FDFDFE',
+                        border: 'none',
+                        cursor: 'pointer',
+                        WebkitTapHighlightColor: 'transparent',
+                      }}
                     >
                       {isAdding ? (
-                        <div className="w-3.5 h-3.5 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
+                        <div style={{
+                          width: 14, height: 14,
+                          border: '1.5px solid rgba(253,253,254,0.30)',
+                          borderTopColor: '#FDFDFE',
+                          borderRadius: '50%',
+                          animation: 'spin 800ms linear infinite',
+                        }} />
                       ) : wasAdded ? (
-                        <Check strokeWidth={2} className="w-4 h-4" />
+                        <Check strokeWidth={2} size={16} />
                       ) : (
-                        <Plus strokeWidth={2} className="w-4 h-4" />
+                        <Plus strokeWidth={2} size={16} />
                       )}
                     </button>
                   </div>
@@ -669,6 +818,12 @@ function AddFoodBottomSheet({
           )}
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   )
 }
@@ -695,7 +850,6 @@ export default function ClientNutritionPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      // Helper: ensure every food in an array has a unique id
       function ensureFoodIds(foods: any[], prefix: string): FoodEntry[] {
         return (foods || []).map((f: any, fi: number) => ({
           ...f,
@@ -703,7 +857,6 @@ export default function ClientNutritionPage() {
         }))
       }
 
-      // ── FAST PATH: fetch plan + today's logs in PARALLEL ──
       const [planRes, logsRes] = await Promise.all([
         supabase.from('nutrition_plans').select('*')
           .eq('client_id', user.id).eq('is_active', true).single(),
@@ -733,12 +886,10 @@ export default function ClientNutritionPage() {
         logMap.set(log.meal_id, log)
       }
 
-      // ── RENDER IMMEDIATELY with plan + today's logs ──
       setLogs(logMap)
       setSummary(logsRes.summary || null)
       setLoading(false)
 
-      // ── BACKGROUND: yesterday carry-over (only if no logs today) ──
       if (logMap.size === 0 && planData && fixedPlan) {
         const yesterday = new Date(dateStr)
         yesterday.setDate(yesterday.getDate() - 1)
@@ -777,7 +928,6 @@ export default function ClientNutritionPage() {
         } catch {}
       }
 
-      // ── BACKGROUND: load recent foods (non-blocking) ──
       try {
         const today = new Date(dateStr)
         const datePromises = Array.from({ length: 7 }, (_, i) => {
@@ -815,7 +965,7 @@ export default function ClientNutritionPage() {
   }, [loadData])
 
   function navigateDate(offset: number) {
-    setBottomSheetOpen(false) // Close bottom sheet when changing day
+    setBottomSheetOpen(false)
     const d = new Date(selectedDate)
     d.setDate(d.getDate() + offset)
     setSelectedDate(d)
@@ -832,7 +982,6 @@ export default function ClientNutritionPage() {
     })
   }, [meals, logs])
 
-  // Calculate macros client-side from checked items for instant feedback
   const { checkedCal, checkedProt, checkedCarbs, checkedFat } = useMemo(() => {
     let cal = 0, prot = 0, carbs = 0, fat = 0
     for (const meal of meals) {
@@ -876,7 +1025,6 @@ export default function ClientNutritionPage() {
     }
   }
 
-  // Save meal foods to API (background, non-blocking)
   const saveMealToAPI = useCallback(async (meal: MealMoment, newFoods: FoodEntry[]) => {
     const existing = logs.get(meal.id)
     try {
@@ -901,7 +1049,6 @@ export default function ClientNutritionPage() {
     }
   }, [logs, plan, dateStr])
 
-  // Optimistic update: update state FIRST, then save to API in background
   function updateMealFoods(meal: MealMoment, newFoods: FoodEntry[]) {
     const existing = logs.get(meal.id)
     const newLog: MealLog = {
@@ -915,12 +1062,10 @@ export default function ClientNutritionPage() {
     const upd = new Map(logs)
     upd.set(meal.id, newLog)
     setLogs(upd)
-    // Fire API save in background (don't await)
     saveMealToAPI(meal, newFoods)
   }
 
   function toggleFoodChecked(meal: MealMoment, foodId: string) {
-    // Read latest foods from current logs state
     const existing = logs.get(meal.id)
     const foods = existing?.foods_eaten || meal.foods || []
     const newFoods = foods.map(f =>
@@ -938,28 +1083,16 @@ export default function ClientNutritionPage() {
 
   if (loading) {
     return (
-      <div className="pb-28 animate-pulse">
-        <div className="h-4 w-12 bg-[#F0F0EE] rounded mb-6 mt-2" />
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-4 h-4 bg-[#F0F0EE] rounded" />
-          <div className="h-5 w-24 bg-[#F0F0EE] rounded" />
-          <div className="w-4 h-4 bg-[#F0F0EE] rounded" />
-        </div>
-        <div className="flex justify-center mb-6">
-          <div className="w-40 h-40 rounded-full bg-[#F0F0EE]" />
-        </div>
-        <div className="flex justify-center gap-6 mb-10">
-          {[1, 2, 3].map(i => <div key={i} className="h-10 w-16 bg-[#F0F0EE] rounded-lg" />)}
-        </div>
-        {[1, 2, 3].map(i => (
-          <div key={i} className="flex items-center justify-between py-4 border-t border-[#F0F0EE]">
-            <div>
-              <div className="h-4 w-28 bg-[#F0F0EE] rounded mb-1.5" />
-              <div className="h-3 w-20 bg-[#F0F0EE] rounded" />
-            </div>
-            <div className="h-4 w-14 bg-[#F0F0EE] rounded" />
-          </div>
-        ))}
+      <div className="pb-28" style={{ animation: 'pulse 1.8s ease-in-out infinite' }}>
+        <div className="v6-card-dark" style={{ marginBottom: 14, minHeight: 260 }} />
+        <div className="v6-card-dark" style={{ marginBottom: 14, minHeight: 160 }} />
+        <div className="v6-card-dark" style={{ minHeight: 120 }} />
+        <style jsx>{`
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.65; }
+          }
+        `}</style>
       </div>
     )
   }
@@ -967,112 +1100,255 @@ export default function ClientNutritionPage() {
   if (!plan) {
     return (
       <div className="pb-28">
-        <h1 className="text-[22px] font-semibold text-[#1A1917] mt-4 mb-6">Voeding</h1>
-        <div className="py-16 text-center">
-          <p className="text-[18px] font-semibold text-[#1A1917] mb-2">Nog geen plan</p>
-          <p className="text-[14px] text-[#B0B0B0]">Je coach bereidt je voedingsplan voor.</p>
+        <button
+          onClick={() => window.history.back()}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 4,
+            marginTop: 8, marginBottom: 18,
+            background: 'transparent', border: 'none', cursor: 'pointer',
+            color: 'rgba(253,253,254,0.62)',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          <ChevronLeft strokeWidth={1.5} size={18} />
+          <span style={{ fontSize: 14 }}>Home</span>
+        </button>
+        <div className="v6-card" style={{ textAlign: 'center', padding: '48px 22px' }}>
+          <p style={{ fontSize: 16, fontWeight: 600, color: '#FDFDFE', margin: '0 0 6px' }}>
+            Nog geen plan
+          </p>
+          <p style={{ fontSize: 13, color: 'rgba(253,253,254,0.62)', margin: 0 }}>
+            Je coach bereidt je voedingsplan voor.
+          </p>
         </div>
       </div>
     )
   }
 
   const currentMeal = meals.find(m => m.id === bottomSheetMealId)
+  const ringColor = allMealsComplete ? '#2FA65A' : '#C0FC01'
 
   return (
     <div className="pb-28">
-      {/* ── Back button ── */}
-      <div className="animate-slide-up">
-        <button
-          onClick={() => window.history.back()}
-          className="flex items-center gap-1 mb-4 mt-2 group"
-        >
-          <ChevronLeft strokeWidth={1.5} className="w-[18px] h-[18px] text-[#C0C0C0] group-hover:text-[#1A1917] transition-colors" />
-          <span className="text-[14px] text-[#C0C0C0] group-hover:text-[#1A1917] transition-colors">Home</span>
-        </button>
-      </div>
+      {/* Back button */}
+      <button
+        onClick={() => window.history.back()}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 4,
+          marginTop: 8, marginBottom: 14,
+          background: 'transparent', border: 'none', cursor: 'pointer',
+          color: 'rgba(253,253,254,0.62)',
+          WebkitTapHighlightColor: 'transparent',
+          padding: 0,
+        }}
+      >
+        <ChevronLeft strokeWidth={1.5} size={18} />
+        <span style={{ fontSize: 14 }}>Home</span>
+      </button>
 
-      {/* ── Date nav ── */}
-      <div className="flex items-center gap-4 mb-8 animate-slide-up">
-        <button onClick={() => navigateDate(-1)} className="p-1.5 text-[#D0D0D0] hover:text-[#1A1917] transition-colors">
-          <ChevronLeft strokeWidth={1.5} className="w-4 h-4" />
-        </button>
-        <span className="text-[15px] font-semibold text-[#1A1917]">{formatDate(selectedDate)}</span>
-        <button onClick={() => navigateDate(1)} className="p-1.5 text-[#D0D0D0] hover:text-[#1A1917] transition-colors">
-          <ChevronRight strokeWidth={1.5} className="w-4 h-4" />
-        </button>
-      </div>
+      {/* ── HERO CARD: date nav + ring + macros ── */}
+      <div className="v6-card-dark animate-slide-up" style={{ marginBottom: 14 }}>
+        {/* Date nav */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          gap: 16, marginBottom: 18,
+        }}>
+          <button
+            onClick={() => navigateDate(-1)}
+            style={{
+              width: 32, height: 32, borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'rgba(253,253,254,0.08)',
+              border: 'none', cursor: 'pointer',
+              color: 'rgba(253,253,254,0.62)',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            <ChevronLeft strokeWidth={1.5} size={16} />
+          </button>
+          <span style={{
+            fontSize: 15, fontWeight: 600, color: '#FDFDFE',
+            letterSpacing: '-0.01em', minWidth: 88, textAlign: 'center',
+          }}>
+            {formatDate(selectedDate)}
+          </span>
+          <button
+            onClick={() => navigateDate(1)}
+            style={{
+              width: 32, height: 32, borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'rgba(253,253,254,0.08)',
+              border: 'none', cursor: 'pointer',
+              color: 'rgba(253,253,254,0.62)',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            <ChevronRight strokeWidth={1.5} size={16} />
+          </button>
+        </div>
 
-      {/* ── Calorie ring ── */}
-      <div className="flex justify-center mb-6 animate-slide-up stagger-2">
-        <div className="relative w-[160px] h-[160px]">
-          <svg viewBox="0 0 160 160" className="w-full h-full -rotate-90">
-            <circle cx="80" cy="80" r="68" fill="none" stroke="#F0F0EE" strokeWidth="8" />
-            <circle
-              cx="80" cy="80" r="68" fill="none"
-              stroke={allMealsComplete ? '#3D8B5C' : '#D46A3A'}
-              strokeWidth="8"
-              strokeLinecap="round"
-              strokeDasharray={`${(calPct / 100) * 427.26} 427.26`}
-              className="transition-all duration-700"
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span
-              className="text-[32px] font-bold leading-none tracking-tight"
-              style={{ color: allMealsComplete ? '#3D8B5C' : '#1A1917' }}
-            >
-              {actualCal}
-            </span>
-            <span className="text-[12px] text-[#B0B0B0] mt-1">/ {targetCal} kcal</span>
+        {/* Calorie ring */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+          <div style={{ position: 'relative', width: 176, height: 176 }}>
+            <svg viewBox="0 0 176 176" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+              <circle cx="88" cy="88" r="76" fill="none" stroke="rgba(253,253,254,0.10)" strokeWidth="8" />
+              <circle
+                cx="88" cy="88" r="76" fill="none"
+                stroke={ringColor}
+                strokeWidth="8"
+                strokeLinecap="round"
+                strokeDasharray={`${(calPct / 100) * 477.52} 477.52`}
+                style={{ transition: 'stroke-dasharray 700ms cubic-bezier(0.16, 1, 0.3, 1), stroke 300ms' }}
+              />
+            </svg>
+            <div style={{
+              position: 'absolute', inset: 0,
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{
+                fontSize: 38, fontWeight: 700,
+                lineHeight: 1, letterSpacing: '-0.03em',
+                color: allMealsComplete ? '#2FA65A' : '#FDFDFE',
+                fontVariantNumeric: 'tabular-nums',
+              }}>
+                {actualCal}
+              </span>
+              <span style={{
+                fontSize: 11, color: 'rgba(253,253,254,0.52)',
+                marginTop: 4, letterSpacing: '0.02em',
+              }}>
+                / {targetCal} kcal
+              </span>
+            </div>
           </div>
+        </div>
+
+        {/* Macro pills */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr 1fr',
+          gap: 8,
+        }}>
+          {[
+            { label: 'Eiwit', actual: actualProt, target: targetProt },
+            { label: 'Koolh', actual: actualCarbs, target: targetCarbs },
+            { label: 'Vet', actual: actualFat, target: targetFat },
+          ].map(macro => {
+            const pct = macro.target > 0 ? Math.min((macro.actual / macro.target) * 100, 100) : 0
+            return (
+              <div
+                key={macro.label}
+                style={{
+                  background: 'rgba(253,253,254,0.06)',
+                  borderRadius: 14,
+                  padding: '12px 10px 10px',
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{
+                  fontSize: 15, fontWeight: 600, color: '#FDFDFE',
+                  fontVariantNumeric: 'tabular-nums',
+                }}>
+                  {macro.actual}
+                  <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(253,253,254,0.52)' }}>g</span>
+                </div>
+                <div style={{
+                  fontSize: 10, color: 'rgba(253,253,254,0.44)',
+                  marginTop: 2, fontVariantNumeric: 'tabular-nums',
+                }}>
+                  / {macro.target}g
+                </div>
+                <div style={{
+                  marginTop: 8,
+                  height: 3, borderRadius: 999,
+                  background: 'rgba(253,253,254,0.10)',
+                  overflow: 'hidden',
+                }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${pct}%`,
+                    background: ringColor,
+                    transition: 'width 500ms, background 300ms',
+                  }} />
+                </div>
+                <div style={{
+                  fontSize: 10, fontWeight: 500,
+                  color: 'rgba(253,253,254,0.62)',
+                  textTransform: 'uppercase', letterSpacing: '0.08em',
+                  marginTop: 8,
+                }}>
+                  {macro.label}
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
 
-      {/* ── Macro pills ── */}
-      <div className="flex justify-center gap-3 mb-10 animate-slide-up stagger-3">
-        {[
-          { label: 'Eiwit', actual: actualProt, target: targetProt, color: '#4A90D9' },
-          { label: 'Koolh', actual: actualCarbs, target: targetCarbs, color: '#D4A03A' },
-          { label: 'Vet', actual: actualFat, target: targetFat, color: '#D46A3A' },
-        ].map(macro => (
-          <div key={macro.label} className="flex flex-col items-center bg-[#FAFAF8] rounded-xl px-4 py-2.5 min-w-[80px]">
-            <span className="text-[15px] font-semibold text-[#1A1917]">{macro.actual}g</span>
-            <span className="text-[11px] text-[#B0B0B0] mt-0.5">/ {macro.target}g</span>
-            <span className="text-[10px] font-medium mt-1" style={{ color: macro.color }}>{macro.label}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* ── Meals ── */}
-      <div className="animate-slide-up stagger-4 space-y-5">
-        {meals.map(meal => {
+      {/* ── MEALS CARD ── */}
+      <div className="v6-card-dark animate-slide-up" style={{ marginBottom: 14, padding: '4px 22px 18px' }}>
+        {meals.map((meal, idx) => {
           const log = logs.get(meal.id)
           const foods = log?.foods_eaten || meal.foods || []
           const allChecked = foods.length > 0 && foods.every(f => f.checked === true)
           const cal = mealCalories(foods)
 
           return (
-            <div key={meal.id}>
-              {/* Category header */}
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2.5">
-                  <span className={`text-[15px] font-semibold ${allChecked ? 'text-[#B0B0B0]' : 'text-[#1A1917]'}`}>
+            <div
+              key={meal.id}
+              style={{
+                borderTop: idx === 0 ? 'none' : '1px solid rgba(253,253,254,0.08)',
+                padding: '18px 0 14px',
+              }}
+            >
+              {/* Meal header */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                marginBottom: foods.length > 0 ? 8 : 0,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+                  <span style={{
+                    fontSize: 15, fontWeight: 600,
+                    color: allChecked ? 'rgba(253,253,254,0.52)' : '#FDFDFE',
+                    letterSpacing: '-0.01em',
+                  }}>
                     {meal.name}
                   </span>
-                  {allChecked && <span className="text-[11px] text-[#3D8B5C] font-medium">✓ Voltooid</span>}
-                  <span className="text-[12px] text-[#C0C0C0]">{cal} kcal</span>
+                  {allChecked && (
+                    <span style={{
+                      fontSize: 10, fontWeight: 600, color: '#2FA65A',
+                      textTransform: 'uppercase', letterSpacing: '0.08em',
+                    }}>
+                      Voltooid
+                    </span>
+                  )}
+                  <span style={{
+                    fontSize: 12, color: 'rgba(253,253,254,0.44)',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}>
+                    {cal} kcal
+                  </span>
                 </div>
                 <button
                   onClick={() => { setBottomSheetMealId(meal.id); setBottomSheetOpen(true) }}
-                  className="w-7 h-7 rounded-full bg-[#F5F5F3] flex items-center justify-center hover:bg-[#EBEBEA] active:scale-95 transition-all"
+                  style={{
+                    width: 28, height: 28, borderRadius: '50%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(253,253,254,0.10)',
+                    border: 'none', cursor: 'pointer',
+                    color: '#FDFDFE',
+                    WebkitTapHighlightColor: 'transparent',
+                    flexShrink: 0,
+                  }}
                 >
-                  <Plus strokeWidth={2} className="w-3.5 h-3.5 text-[#8A8A8A]" />
+                  <Plus strokeWidth={2} size={14} />
                 </button>
               </div>
 
-              {/* Food items */}
+              {/* Foods */}
               {foods.length > 0 ? (
-                <div className="space-y-0.5">
+                <div>
                   {foods.map(food => {
                     const foodCal = calcMacro(food, 'calories')
                     const isChecked = food.checked === true
@@ -1080,51 +1356,68 @@ export default function ClientNutritionPage() {
                     return (
                       <div
                         key={food.id}
-                        className={`flex items-center gap-3 py-2 px-2 rounded-lg group transition-colors ${
-                          isChecked ? 'bg-[#F5F5F3]' : 'hover:bg-[#FAFAF8]'
-                        }`}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 12,
+                          padding: '8px 0',
+                        }}
                       >
-                        {/* Checkbox on left */}
                         <button
                           onClick={() => toggleFoodChecked(meal, food.id)}
-                          className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-all ${
-                            isChecked
-                              ? 'bg-[#3D8B5C]'
-                              : 'border-[1.5px] border-[#E0E0DE] hover:border-[#3D8B5C]'
-                          }`}
+                          style={{
+                            width: 20, height: 20, borderRadius: '50%',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            flexShrink: 0,
+                            background: isChecked ? '#2FA65A' : 'transparent',
+                            border: isChecked ? 'none' : '1.5px solid rgba(253,253,254,0.28)',
+                            cursor: 'pointer',
+                            WebkitTapHighlightColor: 'transparent',
+                            transition: 'all 160ms',
+                          }}
                         >
-                          {isChecked && <Check strokeWidth={2.5} className="w-3 h-3 text-white" />}
+                          {isChecked && <Check strokeWidth={2.5} size={11} style={{ color: '#FDFDFE' }} />}
                         </button>
 
-                        {/* Food name + grams */}
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-[14px] leading-tight truncate ${
-                            isChecked ? 'line-through text-[#B0B0B0]' : 'text-[#1A1917]'
-                          }`}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{
+                            fontSize: 14, margin: 0, lineHeight: 1.2,
+                            color: isChecked ? 'rgba(253,253,254,0.44)' : '#FDFDFE',
+                            textDecoration: isChecked ? 'line-through' : 'none',
+                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                          }}>
                             {food.name}
                           </p>
-                          <p className={`text-[12px] mt-0.5 ${
-                            isChecked ? 'text-[#D0D0D0]' : 'text-[#C0C0C0]'
-                          }`}>
+                          <p style={{
+                            fontSize: 12, margin: '3px 0 0',
+                            color: isChecked ? 'rgba(253,253,254,0.30)' : 'rgba(253,253,254,0.52)',
+                            fontVariantNumeric: 'tabular-nums',
+                          }}>
                             {food.grams}g · {foodCal} kcal
                           </p>
                         </div>
 
-                        {/* Delete button — visible on mobile */}
                         <button
                           onClick={() => deleteFood(meal, food.id)}
-                          className="p-1.5 text-[#E0E0DE] hover:text-[#E53935] transition-colors shrink-0"
+                          style={{
+                            padding: 6,
+                            background: 'transparent', border: 'none', cursor: 'pointer',
+                            color: 'rgba(253,253,254,0.28)',
+                            WebkitTapHighlightColor: 'transparent',
+                            flexShrink: 0,
+                          }}
                         >
-                          <Trash2 strokeWidth={1.5} className="w-3.5 h-3.5" />
+                          <Trash2 strokeWidth={1.5} size={14} />
                         </button>
                       </div>
                     )
                   })}
                 </div>
               ) : (
-                <div className="py-2">
-                  <p className="text-[13px] text-[#D0D0D0]">Geen items</p>
-                </div>
+                <p style={{
+                  fontSize: 12, color: 'rgba(253,253,254,0.32)',
+                  margin: '6px 0 0', fontStyle: 'italic',
+                }}>
+                  Geen items
+                </p>
               )}
             </div>
           )
@@ -1133,37 +1426,63 @@ export default function ClientNutritionPage() {
 
       {/* ── Submit day ── */}
       {meals.length > 0 && (
-        <div className="mt-8 mb-4 animate-slide-up stagger-6">
-          <button
-            onClick={submitDay}
-            disabled={daySubmitted}
-            className={`w-full py-3 rounded-xl font-semibold text-[13px] uppercase tracking-[0.06em] transition-all ${
-              daySubmitted
-                ? 'bg-[#E8F5E9] text-[#3D8B5C]'
-                : allMealsComplete
-                  ? 'bg-[#3D8B5C] text-white hover:bg-[#347A4F]'
-                  : 'bg-[#F5F5F3] text-[#1A1917] hover:bg-[#EBEBEA]'
-            }`}
-          >
-            {daySubmitted ? 'Ingediend ✓' : 'Dag indienen'}
-          </button>
-        </div>
+        <button
+          onClick={submitDay}
+          disabled={daySubmitted}
+          className="animate-slide-up"
+          style={{
+            width: '100%',
+            padding: '14px 20px',
+            borderRadius: 16,
+            fontSize: 13, fontWeight: 600,
+            textTransform: 'uppercase', letterSpacing: '0.06em',
+            border: 'none',
+            cursor: daySubmitted ? 'default' : 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+            transition: 'all 200ms',
+            marginBottom: 14,
+            background: daySubmitted
+              ? '#2FA65A'
+              : allMealsComplete
+                ? '#C0FC01'
+                : 'rgba(253,253,254,0.10)',
+            color: daySubmitted
+              ? '#FDFDFE'
+              : allMealsComplete
+                ? '#1A1917'
+                : '#FDFDFE',
+          }}
+        >
+          {daySubmitted ? 'Ingediend ✓' : 'Dag indienen'}
+        </button>
       )}
 
-      {/* ── Weekly Shopping List ── */}
-      <div className="animate-slide-up stagger-7">
+      {/* ── Shopping list ── */}
+      <div className="animate-slide-up" style={{ marginBottom: 14 }}>
         <WeeklyShoppingList meals={meals} />
       </div>
 
       {/* ── Guidelines ── */}
       {plan.guidelines && (
-        <div className="border-t border-[#F0F0EE] pt-5 mt-6 animate-slide-up stagger-8">
-          <p className="text-[11px] text-[#B0B0B0] uppercase tracking-[0.1em] mb-2">Richtlijnen</p>
-          <p className="text-[13px] text-[#8A8A8A] leading-relaxed whitespace-pre-wrap">{plan.guidelines}</p>
+        <div className="v6-card-dark animate-slide-up">
+          <p style={{
+            fontSize: 10, color: 'rgba(253,253,254,0.52)',
+            textTransform: 'uppercase', letterSpacing: '0.1em',
+            margin: '0 0 8px',
+          }}>
+            Richtlijnen
+          </p>
+          <p style={{
+            fontSize: 13, lineHeight: 1.55,
+            color: 'rgba(253,253,254,0.78)',
+            margin: 0, whiteSpace: 'pre-wrap',
+          }}>
+            {plan.guidelines}
+          </p>
         </div>
       )}
 
-      {/* ── Bottom Sheet ── */}
+      {/* Bottom Sheet */}
       <AddFoodBottomSheet
         isOpen={bottomSheetOpen}
         onClose={() => setBottomSheetOpen(false)}
@@ -1175,16 +1494,6 @@ export default function ClientNutritionPage() {
         setSummary={setSummary}
         recentFoods={recentFoods}
       />
-
-      {/* ── Animations ── */}
-      <style jsx global>{`
-        @keyframes slideUp {
-          from { transform: translateY(100%); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-      `}</style>
     </div>
   )
 }

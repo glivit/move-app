@@ -1,35 +1,75 @@
 export default function NutritionLoading() {
   return (
-    <div className="pb-28 animate-pulse">
-      {/* Back button skeleton */}
-      <div className="h-4 w-12 bg-[#F0F0EE] rounded mb-4 mt-2" />
-      {/* Label + title */}
-      <div className="h-3 w-16 bg-[#F0F0EE] rounded mb-2" />
-      <div className="h-8 w-32 bg-[#F0F0EE] rounded mb-4" />
-      {/* Date nav */}
-      <div className="h-5 w-28 bg-[#F0F0EE] rounded mb-10" />
-      {/* Big calorie number */}
-      <div className="h-14 w-40 bg-[#F0F0EE] rounded mb-2" />
-      <div className="h-4 w-28 bg-[#F0F0EE] rounded mb-5" />
-      <div className="h-[3px] w-full bg-[#F0F0EE] rounded-full mb-14" />
-      {/* Macro row */}
-      <div className="border-t border-[#F0F0EE] pt-6 flex gap-6 mb-12">
-        <div className="h-4 w-20 bg-[#F0F0EE] rounded" />
-        <div className="h-4 w-24 bg-[#F0F0EE] rounded" />
-        <div className="h-4 w-16 bg-[#F0F0EE] rounded" />
-      </div>
-      {/* Meals label */}
-      <div className="h-3 w-24 bg-[#F0F0EE] rounded mb-4" />
-      {/* Meal rows */}
-      {[1, 2, 3].map(i => (
-        <div key={i} className="py-5 border-t border-[#F0F0EE] flex items-center justify-between">
-          <div>
-            <div className="h-4 w-28 bg-[#F0F0EE] rounded mb-1.5" />
-            <div className="h-3 w-20 bg-[#F0F0EE] rounded" />
-          </div>
-          <div className="h-4 w-12 bg-[#F0F0EE] rounded" />
+    <div className="pb-28" style={{ animation: 'pulse 1.8s ease-in-out infinite' }}>
+      {/* Back button placeholder */}
+      <div style={{
+        height: 16, width: 52,
+        background: 'rgba(253,253,254,0.10)',
+        borderRadius: 4,
+        margin: '8px 0 14px',
+      }} />
+
+      {/* Hero card skeleton */}
+      <div className="v6-card-dark" style={{ marginBottom: 14, minHeight: 300 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+          <div style={{
+            height: 24, width: 96,
+            background: 'rgba(253,253,254,0.08)',
+            borderRadius: 6,
+          }} />
         </div>
-      ))}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+          <div style={{
+            width: 176, height: 176, borderRadius: '50%',
+            background: 'rgba(253,253,254,0.06)',
+          }} />
+        </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr 1fr',
+          gap: 8,
+        }}>
+          {[1, 2, 3].map(i => (
+            <div key={i} style={{
+              height: 76,
+              background: 'rgba(253,253,254,0.06)',
+              borderRadius: 14,
+            }} />
+          ))}
+        </div>
+      </div>
+
+      {/* Meals card skeleton */}
+      <div className="v6-card-dark" style={{ marginBottom: 14, padding: '18px 22px' }}>
+        {[1, 2, 3].map(i => (
+          <div
+            key={i}
+            style={{
+              borderTop: i === 1 ? 'none' : '1px solid rgba(253,253,254,0.08)',
+              padding: '14px 0',
+            }}
+          >
+            <div style={{
+              height: 16, width: 112,
+              background: 'rgba(253,253,254,0.10)',
+              borderRadius: 4,
+              marginBottom: 6,
+            }} />
+            <div style={{
+              height: 12, width: 72,
+              background: 'rgba(253,253,254,0.08)',
+              borderRadius: 4,
+            }} />
+          </div>
+        ))}
+      </div>
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.65; }
+        }
+      `}</style>
     </div>
   )
 }

@@ -115,8 +115,8 @@ export default function PhotoComparisonPage() {
       canvas.height = Math.max(img1.height, img2.height) + labelHeight
       const ctx = canvas.getContext('2d')!
 
-      // Background
-      ctx.fillStyle = '#1A1917'
+      // Background — v6 canvas
+      ctx.fillStyle = '#474B48'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       // Images
@@ -124,8 +124,8 @@ export default function PhotoComparisonPage() {
       ctx.drawImage(img2, img1.width + gap, 0)
 
       // Labels
-      ctx.fillStyle = '#ffffff'
-      ctx.font = 'bold 28px system-ui'
+      ctx.fillStyle = '#FDFDFE'
+      ctx.font = '500 24px Outfit, system-ui'
       ctx.textAlign = 'center'
       ctx.fillText(`Before — ${formatDate(before.date)}`, img1.width / 2, Math.max(img1.height, img2.height) + 40)
       ctx.fillText(`After — ${formatDate(after.date)}`, img1.width + gap + img2.width / 2, Math.max(img1.height, img2.height) + 40)
@@ -157,26 +157,53 @@ export default function PhotoComparisonPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center bg-[#FFFFFF]">
-        <div className="animate-pulse space-y-3 text-center">
-          <Camera size={48} className="text-[#C0C0C0] mx-auto" />
-          <p className="text-[#ACACAC] text-[14px]">Foto's laden...</p>
-        </div>
+      <div
+        style={{
+          minHeight: '70vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 12,
+        }}
+      >
+        <Camera size={40} style={{ color: 'rgba(253,253,254,0.44)' }} />
+        <p style={{ fontSize: 13, color: 'rgba(253,253,254,0.62)' }}>Foto&rsquo;s laden&hellip;</p>
       </div>
     )
   }
 
   if (photoDates.length < 2) {
     return (
-      <div className="min-h-[80vh] bg-[#FFFFFF] px-4 py-6">
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-[#ACACAC] mb-6">
-          <ArrowLeft size={18} /> Terug
+      <div className="pb-28">
+        <button
+          onClick={() => router.back()}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: 13,
+            color: 'rgba(253,253,254,0.62)',
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            marginBottom: 18,
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          <ArrowLeft size={16} /> Terug
         </button>
-        <div className="text-center py-16">
-          <Camera size={48} className="text-[#C0C0C0] mx-auto mb-3" />
-          <p className="font-semibold text-[#1A1917] text-lg">Niet genoeg foto's</p>
-          <p className="text-[14px] text-[#ACACAC] mt-2">
-            Je hebt minimaal 2 check-ins met foto's nodig om te vergelijken.
+        <div
+          className="v6-card"
+          style={{ padding: '40px 22px', textAlign: 'center' }}
+        >
+          <Camera size={44} style={{ color: 'rgba(253,253,254,0.44)', margin: '0 auto 12px' }} />
+          <p style={{ fontSize: 18, fontWeight: 300, color: '#FDFDFE', letterSpacing: '-0.012em', margin: 0 }}>
+            Niet genoeg foto&rsquo;s
+          </p>
+          <p style={{ fontSize: 13, color: 'rgba(253,253,254,0.62)', marginTop: 8, maxWidth: 280, marginLeft: 'auto', marginRight: 'auto' }}>
+            Je hebt minimaal 2 check-ins met foto&rsquo;s nodig om te vergelijken.
           </p>
         </div>
       </div>
@@ -189,251 +216,464 @@ export default function PhotoComparisonPage() {
   const afterUrl = getPhotoUrl(after, angle)
   const hasBoth = !!beforeUrl && !!afterUrl
 
-  // Available angles for the current pair
   const availableAngles = (['front', 'back', 'left', 'right'] as ViewAngle[]).filter(
-    a => getPhotoUrl(before, a) && getPhotoUrl(after, a)
+    a => getPhotoUrl(before, a) && getPhotoUrl(after, a),
   )
 
   const daysDiff = Math.round(
-    (new Date(after.date === 'Intake' ? after.date : after.date).getTime() - new Date(before.date === 'Intake' ? before.date : before.date).getTime()) / 86400000
+    (new Date(after.date).getTime() - new Date(before.date).getTime()) / 86400000,
   )
 
   return (
-    <div className="min-h-[80vh] bg-[#1A1917] -mx-4 -mt-4">
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-[#1A1917]">
-        <button onClick={() => router.back()} className="text-white/70 hover:text-white">
-          <ArrowLeft size={20} />
+    <div className="pb-28">
+      {/* Back + action row */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 16,
+        }}
+      >
+        <button
+          onClick={() => router.back()}
+          aria-label="Terug"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: 13,
+            color: 'rgba(253,253,254,0.62)',
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          <ArrowLeft size={16} /> Terug
         </button>
-        <h1 className="text-white font-semibold text-[16px]">Foto vergelijking</h1>
-        <div className="flex gap-2">
-          <button onClick={exportComparison} className="text-white/70 hover:text-white" title="Exporteer">
-            <Download size={20} />
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={exportComparison}
+            aria-label="Exporteer"
+            style={{
+              width: 36, height: 36, borderRadius: '50%',
+              background: 'rgba(253,253,254,0.14)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              border: 'none', cursor: 'pointer',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            <Download size={16} style={{ color: '#FDFDFE' }} />
           </button>
-          <button onClick={() => setFullscreen(!fullscreen)} className="text-white/70 hover:text-white" title="Fullscreen">
-            <Maximize2 size={20} />
+          <button
+            onClick={() => setFullscreen(!fullscreen)}
+            aria-label="Volledig scherm"
+            style={{
+              width: 36, height: 36, borderRadius: '50%',
+              background: 'rgba(253,253,254,0.14)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              border: 'none', cursor: 'pointer',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            <Maximize2 size={16} style={{ color: '#FDFDFE' }} />
           </button>
         </div>
       </div>
 
-      {/* Angle selector */}
-      <div className="flex justify-center gap-2 px-4 py-2">
-        {availableAngles.map(a => (
-          <button
-            key={a}
-            onClick={() => setAngle(a)}
-            className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-[0.04em] transition-colors ${
-              angle === a
-                ? 'bg-white text-[#1A1917]'
-                : 'bg-white/10 text-white/60 hover:bg-white/20'
-            }`}
-          >
-            {ANGLE_LABELS[a]}
-          </button>
-        ))}
-      </div>
+      {/* Vergelijking — dark card */}
+      <div className="v6-card-dark mb-4" style={{ padding: 14 }}>
+        {/* Angle selector */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginBottom: 12 }}>
+          {availableAngles.map(a => {
+            const active = angle === a
+            return (
+              <button
+                key={a}
+                onClick={() => setAngle(a)}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: 10,
+                  fontSize: 10,
+                  fontWeight: 500,
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  background: active ? '#FDFDFE' : 'rgba(253,253,254,0.08)',
+                  color: active ? '#1A1917' : 'rgba(253,253,254,0.62)',
+                  border: 'none',
+                  WebkitTapHighlightColor: 'transparent',
+                  cursor: 'pointer',
+                }}
+              >
+                {ANGLE_LABELS[a]}
+              </button>
+            )
+          })}
+        </div>
 
-      {/* Comparison area */}
-      {hasBoth ? (
-        <div
-          ref={containerRef}
-          className="relative aspect-[3/4] max-h-[60vh] mx-4 mt-2 rounded-2xl overflow-hidden cursor-col-resize select-none touch-none bg-[#2A2825]"
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-        >
-          {/* Before (full) */}
-          <NextImage
-            src={beforeUrl!}
-            alt="Before"
-            width={400}
-            height={300}
-            className="absolute inset-0 w-full h-full object-cover"
-            draggable={false}
-            unoptimized
-            loading="lazy"
-          />
-
-          {/* After (clipped from right) */}
+        {/* Comparison area */}
+        {hasBoth ? (
           <div
-            className="absolute inset-0 overflow-hidden"
-            style={{ clipPath: `inset(0 0 0 ${sliderPercent}%)` }}
+            ref={containerRef}
+            style={{
+              position: 'relative',
+              aspectRatio: '3 / 4',
+              maxHeight: '58vh',
+              borderRadius: 18,
+              overflow: 'hidden',
+              cursor: 'col-resize',
+              userSelect: 'none',
+              touchAction: 'none',
+              background: '#2A2E2B',
+            }}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
           >
             <NextImage
-              src={afterUrl!}
-              alt="After"
+              src={beforeUrl!}
+              alt="Before"
               width={400}
-              height={300}
-              className="absolute inset-0 w-full h-full object-cover"
+              height={500}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+              draggable={false}
               unoptimized
               loading="lazy"
-              draggable={false}
             />
-          </div>
 
-          {/* Slider handle */}
-          <div className="absolute top-0 bottom-0 z-10" style={{ left: `${sliderPercent}%` }}>
-            <div className="absolute inset-y-0 -translate-x-1/2 w-[2px] bg-white shadow-[0_0_8px_rgba(0,0,0,0.5)]" />
-            <div className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center">
-              <div className="flex items-center gap-0.5">
-                <ChevronLeft size={12} strokeWidth={2.5} className="text-[#1A1917]" />
-                <ChevronRight size={12} strokeWidth={2.5} className="text-[#1A1917]" />
+            <div
+              style={{ position: 'absolute', inset: 0, overflow: 'hidden', clipPath: `inset(0 0 0 ${sliderPercent}%)` }}
+            >
+              <NextImage
+                src={afterUrl!}
+                alt="After"
+                width={400}
+                height={500}
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                unoptimized
+                loading="lazy"
+                draggable={false}
+              />
+            </div>
+
+            {/* Slider handle */}
+            <div style={{ position: 'absolute', top: 0, bottom: 0, left: `${sliderPercent}%`, zIndex: 10 }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0, bottom: 0,
+                  transform: 'translateX(-50%)',
+                  width: 2,
+                  background: '#FDFDFE',
+                  boxShadow: '0 0 12px rgba(0,0,0,0.5)',
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: 42, height: 42,
+                  borderRadius: '50%',
+                  background: '#FDFDFE',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.25)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  gap: 1,
+                }}
+              >
+                <ChevronLeft size={12} strokeWidth={2.5} style={{ color: '#1A1917' }} />
+                <ChevronRight size={12} strokeWidth={2.5} style={{ color: '#1A1917' }} />
+              </div>
+            </div>
+
+            {/* Labels */}
+            <div
+              style={{
+                position: 'absolute', top: 10, left: 10,
+                background: 'rgba(0,0,0,0.55)',
+                backdropFilter: 'blur(6px)',
+                color: '#FDFDFE',
+                fontSize: 10,
+                fontWeight: 500,
+                padding: '4px 10px',
+                borderRadius: 999,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Before
+            </div>
+            <div
+              style={{
+                position: 'absolute', top: 10, right: 10,
+                background: 'rgba(0,0,0,0.55)',
+                backdropFilter: 'blur(6px)',
+                color: '#C0FC01',
+                fontSize: 10,
+                fontWeight: 500,
+                padding: '4px 10px',
+                borderRadius: 999,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+              }}
+            >
+              After
+            </div>
+          </div>
+        ) : (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 2,
+              borderRadius: 18,
+              overflow: 'hidden',
+            }}
+          >
+            <div style={{ position: 'relative', aspectRatio: '3 / 4', background: '#2A2E2B' }}>
+              {beforeUrl ? (
+                <NextImage src={beforeUrl} alt="Before" width={400} height={500} style={{ width: '100%', height: '100%', objectFit: 'cover' }} unoptimized loading="lazy" />
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                  <Camera size={24} style={{ color: 'rgba(253,253,254,0.44)' }} />
+                </div>
+              )}
+              <div
+                style={{
+                  position: 'absolute', bottom: 0, left: 0, right: 0,
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.65), transparent)',
+                  padding: '24px 10px 10px',
+                }}
+              >
+                <p style={{ fontSize: 10, color: 'rgba(253,253,254,0.62)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 500, margin: 0 }}>Before</p>
+                <p style={{ fontSize: 12, color: '#FDFDFE', fontWeight: 500, margin: 0 }}>{formatDate(before.date)}</p>
+              </div>
+            </div>
+            <div style={{ position: 'relative', aspectRatio: '3 / 4', background: '#2A2E2B' }}>
+              {afterUrl ? (
+                <NextImage src={afterUrl} alt="After" width={400} height={500} style={{ width: '100%', height: '100%', objectFit: 'cover' }} unoptimized loading="lazy" />
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                  <Camera size={24} style={{ color: 'rgba(253,253,254,0.44)' }} />
+                </div>
+              )}
+              <div
+                style={{
+                  position: 'absolute', bottom: 0, left: 0, right: 0,
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.65), transparent)',
+                  padding: '24px 10px 10px',
+                }}
+              >
+                <p style={{ fontSize: 10, color: '#C0FC01', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 500, margin: 0 }}>After</p>
+                <p style={{ fontSize: 12, color: '#FDFDFE', fontWeight: 500, margin: 0 }}>{formatDate(after.date)}</p>
               </div>
             </div>
           </div>
+        )}
 
-          {/* Labels */}
-          <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white text-[11px] font-semibold px-2.5 py-1 rounded-full">
-            Before
-          </div>
-          <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white text-[11px] font-semibold px-2.5 py-1 rounded-full">
-            After
-          </div>
-        </div>
-      ) : (
-        <div className="mx-4 mt-2 grid grid-cols-2 gap-1 rounded-2xl overflow-hidden">
-          <div className="relative aspect-[3/4] bg-[#2A2825]">
-            {beforeUrl ? (
-              <NextImage src={beforeUrl} alt="Before" width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
-            ) : (
-              <div className="flex items-center justify-center h-full"><Camera size={24} className="text-[#ACACAC]" /></div>
-            )}
-            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 p-2 pt-6">
-              <p className="text-[10px] text-white/70 uppercase font-bold">Before</p>
-              <p className="text-[12px] text-white font-semibold">{formatDate(before.date)}</p>
-            </div>
-          </div>
-          <div className="relative aspect-[3/4] bg-[#2A2825]">
-            {afterUrl ? (
-              <NextImage src={afterUrl} alt="After" width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
-            ) : (
-              <div className="flex items-center justify-center h-full"><Camera size={24} className="text-[#ACACAC]" /></div>
-            )}
-            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 p-2 pt-6">
-              <p className="text-[10px] text-white/70 uppercase font-bold">After</p>
-              <p className="text-[12px] text-white font-semibold">{formatDate(after.date)}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Stats bar */}
-      <div className="flex justify-center gap-6 px-4 py-3">
-        <div className="text-center">
-          <p className="text-white/50 text-[10px] uppercase font-bold tracking-wide">Periode</p>
-          <p className="text-white text-[14px] font-semibold">{isNaN(daysDiff) ? '—' : `${daysDiff} dagen`}</p>
-        </div>
-        {before.weight_kg && after.weight_kg && (
-          <div className="text-center">
-            <p className="text-white/50 text-[10px] uppercase font-bold tracking-wide">Gewicht</p>
-            <p className="text-white text-[14px] font-semibold">
-              {before.weight_kg}kg → {after.weight_kg}kg
-              <span className={`ml-1 text-[12px] ${after.weight_kg < before.weight_kg ? 'text-[#3D8B5C]' : 'text-[#C4372A]'}`}>
-                ({after.weight_kg > before.weight_kg ? '+' : ''}{(after.weight_kg - before.weight_kg).toFixed(1)})
-              </span>
+        {/* Stats bar */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 28, padding: '14px 0 4px' }}>
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: 9, color: 'rgba(253,253,254,0.44)', textTransform: 'uppercase', fontWeight: 500, letterSpacing: '0.1em', margin: 0 }}>
+              Periode
+            </p>
+            <p style={{ fontSize: 14, color: '#FDFDFE', fontWeight: 500, margin: 0, marginTop: 4 }}>
+              {isNaN(daysDiff) ? '—' : `${daysDiff} dagen`}
             </p>
           </div>
-        )}
+          {before.weight_kg && after.weight_kg && (
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ fontSize: 9, color: 'rgba(253,253,254,0.44)', textTransform: 'uppercase', fontWeight: 500, letterSpacing: '0.1em', margin: 0 }}>
+                Gewicht
+              </p>
+              <p style={{ fontSize: 14, color: '#FDFDFE', fontWeight: 500, margin: 0, marginTop: 4 }}>
+                {before.weight_kg}kg → {after.weight_kg}kg
+                <span
+                  style={{
+                    marginLeft: 6,
+                    fontSize: 12,
+                    color: after.weight_kg < before.weight_kg ? '#2FA65A' : 'rgba(253,253,254,0.62)',
+                  }}
+                >
+                  ({after.weight_kg > before.weight_kg ? '+' : ''}{(after.weight_kg - before.weight_kg).toFixed(1)})
+                </span>
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Timeline */}
-      <div className="px-4 pb-6">
-        <div className="bg-white/5 rounded-2xl p-4">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-white/50 text-[11px] uppercase font-bold tracking-wide">Tijdlijn</p>
-            <p className="text-white/30 text-[11px]">
-              {formatDate(before.date)} vs {formatDate(after.date)}
-            </p>
-          </div>
+      {/* Timeline — eigen card */}
+      <div className="v6-card-dark mb-4" style={{ padding: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+          <p className="text-label" style={{ color: 'rgba(253,253,254,0.62)' }}>
+            Tijdlijn
+          </p>
+          <p style={{ fontSize: 11, color: 'rgba(253,253,254,0.38)', letterSpacing: '0.02em' }}>
+            {formatDate(before.date)} · {formatDate(after.date)}
+          </p>
+        </div>
 
-          {/* Timeline dots */}
-          <div className="relative h-12">
-            <div className="absolute top-1/2 left-2 right-2 h-[2px] bg-white/10 -translate-y-1/2" />
+        <div style={{ position: 'relative', height: 44, marginBottom: 8 }}>
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: 8, right: 8,
+              height: 2,
+              background: 'rgba(253,253,254,0.10)',
+              transform: 'translateY(-50%)',
+            }}
+          />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '100%', padding: '0 8px' }}>
+            {photoDates.map((pd, idx) => {
+              const isBefore = idx === beforeIdx
+              const isAfter = idx === afterIdx
+              const isBetween = idx > beforeIdx && idx < afterIdx
 
-            <div className="flex items-center justify-between h-full px-2">
-              {photoDates.map((pd, idx) => {
-                const isBefore = idx === beforeIdx
-                const isAfter = idx === afterIdx
-                const isBetween = idx > beforeIdx && idx < afterIdx
-
-                return (
-                  <button
-                    key={pd.id}
-                    onClick={() => {
-                      if (selecting === 'before') {
+              return (
+                <button
+                  key={pd.id}
+                  onClick={() => {
+                    if (selecting === 'before') {
+                      if (idx < afterIdx) setBeforeIdx(idx)
+                      setSelecting(null)
+                    } else if (selecting === 'after') {
+                      if (idx > beforeIdx) setAfterIdx(idx)
+                      setSelecting(null)
+                    } else {
+                      if (idx < beforeIdx + (afterIdx - beforeIdx) / 2) {
                         if (idx < afterIdx) setBeforeIdx(idx)
-                        setSelecting(null)
-                      } else if (selecting === 'after') {
-                        if (idx > beforeIdx) setAfterIdx(idx)
-                        setSelecting(null)
                       } else {
-                        // Quick select: if tapped, use closest role
-                        if (idx < beforeIdx + (afterIdx - beforeIdx) / 2) {
-                          if (idx < afterIdx) setBeforeIdx(idx)
-                        } else {
-                          if (idx > beforeIdx) setAfterIdx(idx)
-                        }
+                        if (idx > beforeIdx) setAfterIdx(idx)
                       }
+                    }
+                  }}
+                  style={{
+                    position: 'relative',
+                    zIndex: 1,
+                    background: 'transparent',
+                    border: 'none',
+                    padding: 0,
+                    cursor: 'pointer',
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
+                  aria-label={`Selecteer ${formatDate(pd.date)}`}
+                >
+                  <div
+                    style={{
+                      width: 14, height: 14,
+                      borderRadius: '50%',
+                      background:
+                        isBefore ? '#FDFDFE' :
+                        isAfter ? '#C0FC01' :
+                        isBetween ? 'rgba(253,253,254,0.30)' :
+                        'rgba(253,253,254,0.10)',
+                      transform: (isBefore || isAfter) ? 'scale(1.15)' : 'scale(1)',
+                      transition: 'all 180ms',
                     }}
-                    className="relative z-10 group flex flex-col items-center"
-                  >
-                    <div className={`w-4 h-4 rounded-full border-2 transition-all ${
-                      isBefore ? 'bg-white border-white scale-125' :
-                      isAfter ? 'bg-[#D46A3A] border-[#D46A3A] scale-125' :
-                      isBetween ? 'bg-white/30 border-white/30' :
-                      'bg-white/10 border-white/10 hover:bg-white/30'
-                    }`} />
-                    {(isBefore || isAfter) && (
-                      <span className={`absolute -bottom-5 text-[9px] font-bold whitespace-nowrap ${
-                        isBefore ? 'text-white' : 'text-[#D46A3A]'
-                      }`}>
-                        {pd.label || formatDate(pd.date)}
-                      </span>
-                    )}
-                  </button>
-                )
-              })}
-            </div>
+                  />
+                </button>
+              )
+            })}
           </div>
+        </div>
 
-          {/* Selection buttons */}
-          <div className="flex gap-2 mt-6">
-            <button
-              onClick={() => setSelecting(selecting === 'before' ? null : 'before')}
-              className={`flex-1 py-2 rounded-xl text-[12px] font-semibold transition-colors ${
-                selecting === 'before' ? 'bg-white text-[#1A1917]' : 'bg-white/10 text-white hover:bg-white/20'
-              }`}
-            >
-              Before: {formatDate(before.date)}
-            </button>
-            <button
-              onClick={() => setSelecting(selecting === 'after' ? null : 'after')}
-              className={`flex-1 py-2 rounded-xl text-[12px] font-semibold transition-colors ${
-                selecting === 'after' ? 'bg-[#D46A3A] text-white' : 'bg-white/10 text-white hover:bg-white/20'
-              }`}
-            >
-              After: {formatDate(after.date)}
-            </button>
-          </div>
+        <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+          <button
+            onClick={() => setSelecting(selecting === 'before' ? null : 'before')}
+            style={{
+              flex: 1,
+              padding: '10px 12px',
+              borderRadius: 12,
+              fontSize: 12,
+              fontWeight: 500,
+              letterSpacing: '0.02em',
+              background: selecting === 'before' ? '#FDFDFE' : 'rgba(253,253,254,0.08)',
+              color: selecting === 'before' ? '#1A1917' : '#FDFDFE',
+              border: 'none',
+              cursor: 'pointer',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            Before · {formatDate(before.date)}
+          </button>
+          <button
+            onClick={() => setSelecting(selecting === 'after' ? null : 'after')}
+            style={{
+              flex: 1,
+              padding: '10px 12px',
+              borderRadius: 12,
+              fontSize: 12,
+              fontWeight: 500,
+              letterSpacing: '0.02em',
+              background: selecting === 'after' ? '#C0FC01' : 'rgba(253,253,254,0.08)',
+              color: selecting === 'after' ? '#1A1917' : '#FDFDFE',
+              border: 'none',
+              cursor: 'pointer',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            After · {formatDate(after.date)}
+          </button>
         </div>
       </div>
 
       {/* Hidden canvas for export */}
-      <canvas ref={canvasRef} className="hidden" />
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
 
       {/* Fullscreen overlay */}
       {fullscreen && hasBoth && (
-        <div className="fixed inset-0 z-50 bg-black flex items-center justify-center" onClick={() => setFullscreen(false)}>
-          <button className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-            <X size={20} className="text-white" />
+        <div
+          onClick={() => setFullscreen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 60,
+            background: '#1A1917',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <button
+            aria-label="Sluiten"
+            style={{
+              position: 'absolute',
+              top: 16, right: 16,
+              zIndex: 1,
+              width: 40, height: 40,
+              borderRadius: '50%',
+              background: 'rgba(253,253,254,0.14)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <X size={18} style={{ color: '#FDFDFE' }} />
           </button>
-          <div className="w-full h-full grid grid-cols-2 gap-[2px]">
-            <NextImage src={beforeUrl!} alt="Before" width={600} height={600} className="w-full h-full object-contain" unoptimized loading="lazy" />
-            <NextImage src={afterUrl!} alt="After" width={600} height={600} className="w-full h-full object-contain" unoptimized loading="lazy" />
+          <div style={{ width: '100%', height: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+            <NextImage src={beforeUrl!} alt="Before" width={800} height={1000} style={{ width: '100%', height: '100%', objectFit: 'contain' }} unoptimized loading="lazy" />
+            <NextImage src={afterUrl!} alt="After" width={800} height={1000} style={{ width: '100%', height: '100%', objectFit: 'contain' }} unoptimized loading="lazy" />
           </div>
-          <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-8">
-            <p className="text-white text-[14px] font-semibold">Before — {formatDate(before.date)}</p>
-            <p className="text-white text-[14px] font-semibold">After — {formatDate(after.date)}</p>
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 24,
+              left: 0, right: 0,
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 32,
+            }}
+          >
+            <p style={{ fontSize: 13, color: '#FDFDFE', fontWeight: 500, margin: 0 }}>
+              Before — {formatDate(before.date)}
+            </p>
+            <p style={{ fontSize: 13, color: '#C0FC01', fontWeight: 500, margin: 0 }}>
+              After — {formatDate(after.date)}
+            </p>
           </div>
         </div>
       )}

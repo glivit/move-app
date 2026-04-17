@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { PhotoComparison } from '@/components/client/PhotoComparison'
-import { ChevronRight } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -144,6 +143,7 @@ export default function ProgressPage() {
             weeks[key] = { week: label, duration: 0, volume: 0, sets: 0 }
           }
 
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           for (const s of sessions as any[]) {
             const date = new Date(s.started_at)
             const weekStart = new Date(date)
@@ -173,20 +173,60 @@ export default function ProgressPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-6 h-6 border-[1.5px] border-[#C0C0C0] border-t-[#1A1917] rounded-full animate-spin" />
+      <div className="pb-28 animate-fade-in">
+        {/* Skeleton: hero card */}
+        <div
+          className="rounded-[24px] mb-4"
+          style={{
+            padding: '22px 22px 24px',
+            background: '#A6ADA7',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+          }}
+        >
+          <div className="animate-pulse space-y-3">
+            <div className="h-3 w-24 rounded-full" style={{ background: 'rgba(253,253,254,0.18)' }} />
+            <div className="h-14 w-40 rounded-lg" style={{ background: 'rgba(253,253,254,0.24)' }} />
+            <div className="h-3 w-32 rounded-full" style={{ background: 'rgba(253,253,254,0.14)' }} />
+          </div>
+        </div>
+        {/* Skeleton: chart card */}
+        <div
+          className="rounded-[24px] mb-4"
+          style={{
+            padding: '22px 22px 24px',
+            background: '#474B48',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 6px rgba(0,0,0,0.22)',
+          }}
+        >
+          <div className="animate-pulse space-y-4">
+            <div className="h-3 w-20 rounded-full" style={{ background: 'rgba(253,253,254,0.14)' }} />
+            <div className="flex items-end gap-[3px] h-[90px]">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="flex-1 rounded-t-md" style={{ height: `${30 + (i * 5) % 60}%`, background: 'rgba(253,253,254,0.12)' }} />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
 
   if (!data) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="text-center">
-          <p className="section-title mb-3">
+      <div className="pb-28 animate-fade-in">
+        <div
+          className="rounded-[24px]"
+          style={{
+            padding: '48px 22px',
+            background: '#A6ADA7',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+            textAlign: 'center',
+          }}
+        >
+          <p style={{ color: '#FDFDFE', fontSize: 18, fontWeight: 300, letterSpacing: '-0.012em', marginBottom: 8 }}>
             Nog geen data
           </p>
-          <p className="text-[15px] text-[#ACACAC] max-w-[260px] mx-auto">
+          <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 14, maxWidth: 260, margin: '0 auto' }}>
             Start je eerste workout en je voortgang verschijnt hier.
           </p>
         </div>
@@ -236,141 +276,234 @@ export default function ProgressPage() {
   const chartLabel = chartMode === 'duration' ? 'min' : chartMode === 'volume' ? 'ton' : 'sets'
   const thisWeekVal = chartData.length > 0 ? chartData[chartData.length - 1] : 0
 
+  const weightPositive = body.weightChange !== null && body.weightChange <= 0
+  const weightColor = weightPositive ? '#2FA65A' : 'rgba(253,253,254,0.78)'
+
   return (
     <div className="pb-28">
 
-      {/* ═══ HERO — ONE dynamic number ═════════════════════ */}
-      <div className="mb-14 animate-fade-in">
-        <p className="text-label mb-4">Voortgang</p>
-        <p className="stat-number-hero text-[#1A1917] animate-count-up">
+      {/* ═══ HERO — v6-card licht met grote number ═════════════════ */}
+      <div
+        className="v6-card mb-4 animate-fade-in"
+        style={{ paddingBottom: 24 }}
+      >
+        <p
+          className="text-label"
+          style={{ marginBottom: 16, color: '#FDFDFE', opacity: 0.62 }}
+        >
+          Voortgang
+        </p>
+        <p className="stat-number-hero animate-count-up" style={{ lineHeight: 0.95 }}>
           <AnimatedNumber
             value={hero.value}
             prefix={'prefix' in hero ? hero.prefix : ''}
             suffix={hero.suffix}
           />
         </p>
-        <p className="text-[16px] text-[#ACACAC] mt-2">{hero.label}</p>
+        <p style={{ fontSize: 15, color: 'rgba(253,253,254,0.78)', marginTop: 10, fontWeight: 400 }}>
+          {hero.label}
+        </p>
+        {supportingText && (
+          <p style={{ fontSize: 12, color: 'rgba(253,253,254,0.52)', marginTop: 14, letterSpacing: 0.01 }}>
+            {supportingText}
+          </p>
+        )}
       </div>
 
-      {/* Supporting stats as text */}
-      {supportingText && (
-        <p className="text-[14px] text-[#ACACAC] mb-12 animate-fade-in stagger-2">
-          {supportingText}
-        </p>
-      )}
-
-      {/* ═══ 12 WEEK CHART — full-width, clean ════════════ */}
+      {/* ═══ 12 WEEK CHART — v6-card-dark met lime event-paint op deze week ═══ */}
       {weeklyStats.length > 0 && (
-        <div className="border-t border-[#F0F0EE] pt-8 mt-12 mb-12 animate-slide-up stagger-3">
-          <div className="flex items-baseline justify-between mb-6">
+        <div className="v6-card-dark mb-4 animate-slide-up stagger-2">
+          <div className="flex items-center justify-between" style={{ marginBottom: 14 }}>
+            <p className="text-label" style={{ color: 'rgba(253,253,254,0.44)' }}>
+              12 weken trend
+            </p>
+            <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)', letterSpacing: '0.02em' }}>
+              {chartMode === 'duration' ? 'Duur' : chartMode === 'volume' ? 'Volume' : 'Sets'}
+            </span>
+          </div>
+
+          <div className="flex items-baseline justify-between" style={{ marginBottom: 18 }}>
             <div>
-              <span className="stat-number text-[32px] text-[#1A1917]">{thisWeekVal}</span>
-              <span className="text-[14px] text-[#ACACAC] ml-2">{chartLabel} deze week</span>
+              <span
+                className="stat-number"
+                style={{ fontSize: 40, fontWeight: 200, color: '#FDFDFE' }}
+              >
+                {thisWeekVal}
+              </span>
+              <span style={{ fontSize: 13, color: 'rgba(253,253,254,0.52)', marginLeft: 8 }}>
+                {chartLabel} deze week
+              </span>
             </div>
-            <span className="text-[12px] text-[#C0C0C0]">12 weken</span>
           </div>
 
           {/* Bars */}
-          <div className="flex items-end gap-[3px] h-[90px] mb-3">
-            {chartData.map((val, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
-                <div
-                  className={`w-full rounded-t-md transition-all ${
-                    i === chartData.length - 1 ? 'bg-[#D46A3A]' : 'bg-[#F0F0EE]'
-                  }`}
-                  style={{ height: `${Math.max((val / maxVal) * 100, 3)}%` }}
-                />
-              </div>
-            ))}
+          <div className="flex items-end gap-[3px]" style={{ height: 90, marginBottom: 10 }}>
+            {chartData.map((val, i) => {
+              const isCurrentWeek = i === chartData.length - 1
+              return (
+                <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
+                  <div
+                    className="w-full rounded-t-md transition-all"
+                    style={{
+                      height: `${Math.max((val / maxVal) * 100, 3)}%`,
+                      background: isCurrentWeek ? '#C0FC01' : 'rgba(253,253,254,0.22)',
+                      transition: 'height 480ms cubic-bezier(0.16, 1, 0.3, 1), background 240ms',
+                    }}
+                  />
+                </div>
+              )
+            })}
           </div>
 
           {/* Week labels */}
-          <div className="flex gap-[3px] mb-6">
+          <div className="flex gap-[3px]" style={{ marginBottom: 18 }}>
             {weeklyStats.map((w, i) => (
               <div key={i} className="flex-1 text-center">
-                {i % 4 === 0 && <span className="text-[9px] text-[#C0C0C0]">{w.week}</span>}
+                {i % 4 === 0 && (
+                  <span style={{ fontSize: 9, color: 'rgba(253,253,254,0.38)', letterSpacing: '0.02em' }}>
+                    {w.week}
+                  </span>
+                )}
               </div>
             ))}
           </div>
 
-          {/* Mode tabs */}
+          {/* Mode tabs — v6 pill row */}
           <div className="flex gap-1">
-            {(['duration', 'volume', 'sets'] as ChartMode[]).map(mode => (
-              <button
-                key={mode}
-                onClick={() => setChartMode(mode)}
-                className={`px-4 py-2.5 rounded-lg text-[12px] font-semibold uppercase tracking-[0.06em] transition-all ${
-                  chartMode === mode
-                    ? 'bg-[#1A1917] text-white'
-                    : 'text-[#ACACAC] hover:text-[#1A1917]'
-                }`}
-              >
-                {mode === 'duration' ? 'Duur' : mode === 'volume' ? 'Volume' : 'Sets'}
-              </button>
-            ))}
+            {(['duration', 'volume', 'sets'] as ChartMode[]).map(mode => {
+              const active = chartMode === mode
+              return (
+                <button
+                  key={mode}
+                  onClick={() => setChartMode(mode)}
+                  className="transition-all"
+                  style={{
+                    flex: 1,
+                    padding: '9px 12px',
+                    borderRadius: 12,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    background: active ? '#FDFDFE' : 'rgba(253,253,254,0.06)',
+                    color: active ? '#1A1917' : 'rgba(253,253,254,0.62)',
+                    border: 'none',
+                    WebkitTapHighlightColor: 'transparent',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {mode === 'duration' ? 'Duur' : mode === 'volume' ? 'Volume' : 'Sets'}
+                </button>
+              )
+            })}
           </div>
         </div>
       )}
 
-      {/* ═══ GEWICHT — sparkline ═════════════════════ */}
+      {/* ═══ GEWICHT — licht card, link naar metingen ═════════════════ */}
       {body.weightData.length >= 2 && (
         <Link
           href="/client/measurements"
-          className="block border-t border-[#F0F0EE] pt-8 mt-12 mb-12 group hover:opacity-60 transition-opacity animate-slide-up stagger-4"
+          className="v6-card block mb-4 animate-slide-up stagger-3"
+          style={{ textDecoration: 'none' }}
         >
-          <div className="flex items-center justify-between mb-5">
-            <span className="text-label">Gewicht</span>
-            <ChevronRight size={16} strokeWidth={1.5} className="text-[#C0C0C0] group-hover:text-[#1A1917] transition-colors" />
+          <div className="flex items-center justify-between" style={{ marginBottom: 14 }}>
+            <p className="text-label" style={{ color: 'rgba(253,253,254,0.62)' }}>
+              Gewicht
+            </p>
+            <div
+              style={{
+                width: 32, height: 32,
+                borderRadius: '50%',
+                background: 'rgba(253,253,254,0.14)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FDFDFE" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
           </div>
 
           <div className="flex items-end justify-between">
             <div>
-              <p className="leading-none">
-                <span className="stat-number text-[32px] text-[#1A1917]">{body.weightCurrent}</span>
-                <span className="text-[14px] font-medium text-[#ACACAC] ml-1">kg</span>
+              <p style={{ lineHeight: 1, margin: 0 }}>
+                <span
+                  className="stat-number"
+                  style={{ fontSize: 42, fontWeight: 200, color: '#FDFDFE' }}
+                >
+                  {body.weightCurrent}
+                </span>
+                <span style={{ fontSize: 14, color: 'rgba(253,253,254,0.62)', marginLeft: 4, fontWeight: 400 }}>
+                  kg
+                </span>
               </p>
               {body.weightChange !== null && (
-                <p className="text-[13px] mt-2 font-semibold" style={{
-                  color: body.weightChange <= 0 ? '#3D8B5C' : '#C47D15'
-                }}>
+                <p
+                  style={{
+                    fontSize: 13,
+                    marginTop: 10,
+                    fontWeight: 500,
+                    color: weightColor,
+                  }}
+                >
                   {body.weightChange > 0 ? '+' : ''}{body.weightChange} kg
-                  <span className="font-normal text-[#ACACAC] ml-1">totaal</span>
+                  <span style={{ fontWeight: 400, color: 'rgba(253,253,254,0.44)', marginLeft: 6 }}>
+                    totaal
+                  </span>
                 </p>
               )}
             </div>
             <Sparkline
               data={body.weightData.map(w => w.weight)}
-              color={body.weightChange !== null && body.weightChange <= 0 ? '#3D8B5C' : '#C47D15'}
+              color={weightColor}
             />
           </div>
         </Link>
       )}
 
-      {/* ═══ RECORDS — top 3 inline ══════════════════════ */}
+      {/* ═══ RECORDS — licht card ══════════════════════════════════ */}
       {strength.recentPrs.length > 0 && (
-        <div className="border-t border-[#F0F0EE] pt-8 mt-12 mb-12 animate-slide-up stagger-5">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-label">Recente records</span>
+        <div className="v6-card mb-4 animate-slide-up stagger-4">
+          <div className="flex items-center justify-between" style={{ marginBottom: 10 }}>
+            <p className="text-label" style={{ color: 'rgba(253,253,254,0.62)' }}>
+              Recente records
+            </p>
             {strength.totalPrs > 3 && (
               <Link
                 href="/client/stats"
-                className="text-[13px] font-medium text-[#D46A3A] hover:opacity-70 transition-opacity"
+                style={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: '#C0FC01',
+                  textDecoration: 'none',
+                  letterSpacing: '0.02em',
+                }}
               >
-                Bekijk alles
+                Alles bekijken
               </Link>
             )}
           </div>
-          {strength.recentPrs.slice(0, 3).map((pr) => (
-            <div key={pr.id} className="flex items-center justify-between py-4 border-b border-[#F0F0EE] hover:opacity-60 transition-opacity">
+          {strength.recentPrs.slice(0, 3).map((pr, i, arr) => (
+            <div
+              key={pr.id}
+              className="flex items-center justify-between"
+              style={{
+                padding: '14px 0',
+                borderBottom: i < arr.length - 1 ? '1px solid rgba(253,253,254,0.10)' : 'none',
+              }}
+            >
               <div className="flex-1 min-w-0">
-                <p className="text-[14px] font-medium text-[#1A1917] truncate">{pr.exercise}</p>
-                <p className="text-[11px] text-[#ACACAC] mt-0.5">
+                <p style={{ fontSize: 14, fontWeight: 500, color: '#FDFDFE', margin: 0 }} className="truncate">
+                  {pr.exercise}
+                </p>
+                <p style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)', marginTop: 2 }}>
                   {new Date(pr.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                 </p>
               </div>
-              <span className="stat-number text-[18px] text-[#1A1917]">
+              <span style={{ fontSize: 18, fontWeight: 300, color: '#FDFDFE', fontFeatureSettings: '"tnum"', letterSpacing: '-0.02em' }}>
                 {pr.value}
-                <span className="text-[12px] font-medium text-[#ACACAC] ml-1">
+                <span style={{ fontSize: 12, color: 'rgba(253,253,254,0.44)', marginLeft: 4, fontWeight: 400 }}>
                   {pr.type === 'weight' ? 'kg' : pr.type === 'reps' ? 'reps' : 'kg'}
                 </span>
               </span>
@@ -379,16 +512,38 @@ export default function ProgressPage() {
         </div>
       )}
 
-      {/* ═══ PHOTO COMPARISON — prominent CTA ════════════ */}
+      {/* ═══ PHOTO COMPARISON — dark card ═════════════════════════ */}
       {body.hasPhotos && (
-        <div className="border-t border-[#F0F0EE] pt-8 mt-12 mb-12 animate-slide-up stagger-6">
+        <div className="v6-card-dark mb-4 animate-slide-up stagger-5">
+          <div className="flex items-center justify-between" style={{ marginBottom: 14 }}>
+            <p className="text-label" style={{ color: 'rgba(253,253,254,0.62)' }}>
+              Foto&rsquo;s
+            </p>
+          </div>
           <PhotoComparison />
           <Link
             href="/client/progress/photos"
-            className="flex items-center justify-center gap-2.5 mt-5 py-3.5 rounded-2xl bg-[#1A1917] text-white text-[14px] font-medium transition-all duration-250 hover:bg-[#333] active:scale-[0.97] group"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 10,
+              marginTop: 14,
+              padding: '14px 0',
+              borderRadius: 14,
+              background: '#FDFDFE',
+              color: '#1A1917',
+              fontSize: 13,
+              fontWeight: 500,
+              textDecoration: 'none',
+              letterSpacing: '0.02em',
+              WebkitTapHighlightColor: 'transparent',
+            }}
           >
-            Alle foto's bekijken
-            <ChevronRight size={16} strokeWidth={2} className="transition-transform duration-250 group-hover:translate-x-0.5" />
+            Alle foto&rsquo;s bekijken
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1A1917" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
           </Link>
         </div>
       )}
