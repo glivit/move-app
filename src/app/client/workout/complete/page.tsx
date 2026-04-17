@@ -1,9 +1,8 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef, Suspense } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import { ArrowRight, AlertTriangle, ChevronDown, ChevronUp, Trophy, Share2, Dumbbell, Clock, Flame, TrendingUp } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -28,6 +27,7 @@ interface WorkoutSet {
 interface WorkoutSessionComplete {
   id: string
   started_at: string
+  program_template_id: string | null
   workout_sets: WorkoutSet[]
 }
 
@@ -35,94 +35,98 @@ interface ExerciseGroup {
   exerciseId: string
   name: string
   sets: WorkoutSet[]
-  painFlag: boolean
-  painNotes: string
+  volume: number
+  prevVolume: number | null
+  hasPR: boolean
+  topSet: WorkoutSet | null
+  history: number[]
 }
 
-// ─── Animated Counter ─────────────────────
-
-function AnimatedStat({ value, suffix = '', delay = 0 }: { value: number | string; suffix?: string; delay?: number }) {
-  const numValue = typeof value === 'number' ? value : parseFloat(value) || 0
-  const [display, setDisplay] = useState(0)
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), delay)
-    return () => clearTimeout(timer)
-  }, [delay])
-
-  useEffect(() => {
-    if (!visible || numValue === 0) { setDisplay(0); return }
-    const startTime = performance.now()
-    const isDecimal = !Number.isInteger(numValue)
-
-    function animate(currentTime: number) {
-      const elapsed = currentTime - startTime
-      const progress = Math.min(elapsed / 800, 1)
-      const eased = 1 - Math.pow(1 - progress, 3)
-      const current = eased * numValue
-      setDisplay(isDecimal ? +current.toFixed(1) : Math.round(current))
-      if (progress < 1) requestAnimationFrame(animate)
-    }
-    requestAnimationFrame(animate)
-  }, [numValue, visible])
-
-  return (
-    <span
-      className={`stat-number text-[#1A1917] transition-opacity duration-500 ${visible ? 'opacity-100' : 'opacity-0'}`}
-      style={{ fontWeight: 800, letterSpacing: '-0.04em', lineHeight: 1 }}
-    >
-      {display}{suffix}
-    </span>
-  )
+interface PRRow {
+  exerciseId: string
+  name: string
+  kind: 'weight' | 'reps' | 'volume'
+  fromVal: number
+  toVal: number
+  unit: string
 }
 
-// ─── Confetti (enhanced) ─────────────────────
+// ─── Helpers ────────────────────────────────────────────────
 
-function useConfetti() {
-  return useCallback((intensity: 'subtle' | 'big' = 'subtle') => {
-    const colors = ['#D46A3A', '#3D8B5C', '#F0C040', '#4A7BD4', '#9B59B6']
-    const container = document.body
-    const count = intensity === 'big' ? 30 : 5
+function buildTrendPath(values: number[], w = 300, h = 96, padL = 10, padR = 10, padT = 10, padB = 26): string {
+  if (values.length < 2) return ''
+  const min = Math.min(...values)
+  const max = Math.max(...values)
+  const range = max - min || 1
+  const innerW = w - padL - padR
+  const innerH = h - padT - padB
+  const step = innerW / (values.length - 1)
+  return values
+    .map((v, i) => {
+      const x = padL + i * step
+      const y = padT + innerH - ((v - min) / range) * innerH
+      return `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`
+    })
+    .join(' ')
+}
 
-    for (let i = 0; i < count; i++) {
-      const el = document.createElement('div')
-      el.className = 'confetti-particle'
-      el.style.position = 'fixed'
-      el.style.top = '-10px'
-      el.style.left = `${10 + Math.random() * 80}vw`
-      el.style.width = `${4 + Math.random() * 8}px`
-      el.style.height = `${4 + Math.random() * 8}px`
-      el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
-      el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px'
-      el.style.opacity = '1'
-      el.style.zIndex = '9999'
-      el.style.pointerEvents = 'none'
-
-      const rotation = Math.random() * 720
-      const xDrift = (Math.random() - 0.5) * 200
-      const duration = 1.5 + Math.random() * 1.5
-      const delay = Math.random() * 0.6
-
-      el.style.animation = `confettiFall ${duration}s ${delay}s ease-out forwards`
-      el.style.setProperty('--x-drift', `${xDrift}px`)
-      el.style.setProperty('--rotation', `${rotation}deg`)
-
-      container.appendChild(el)
-      setTimeout(() => el.remove(), (duration + delay) * 1000 + 200)
-    }
-  }, [])
+function buildSparkPath(values: number[], w = 64, h = 28, pad = 2): { d: string; lastX: number; lastY: number } {
+  if (values.length === 0) return { d: '', lastX: 0, lastY: 0 }
+  if (values.length === 1) {
+    const x = w - pad
+    const y = h / 2
+    return { d: `M ${pad} ${y} L ${x} ${y}`, lastX: x, lastY: y }
+  }
+  const min = Math.min(...values)
+  const max = Math.max(...values)
+  const range = max - min || 1
+  const innerW = w - pad * 2
+  const innerH = h - pad * 2
+  const step = innerW / (values.length - 1)
+  let lastX = pad
+  let lastY = h / 2
+  const d = values
+    .map((v, i) => {
+      const x = pad + i * step
+      const y = pad + innerH - ((v - min) / range) * innerH
+      lastX = x
+      lastY = y
+      return `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`
+    })
+    .join(' ')
+  return { d, lastX, lastY }
 }
 
 // ─── Component ──────────────────────────────────────────────
 
 export default function WorkoutCompletePageWrapper() {
   return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#C0C0C0] border-t-[#1A1917]" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: '#8E9890',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
+              border: '2px solid rgba(253,253,254,0.20)',
+              borderTopColor: '#FDFDFE',
+              animation: 'spin 1s linear infinite',
+            }}
+          />
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      }
+    >
       <WorkoutCompletePage />
     </Suspense>
   )
@@ -132,113 +136,297 @@ function WorkoutCompletePage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('sessionId')
-  const summaryRef = useRef<HTMLDivElement>(null)
 
   const [session, setSession] = useState<WorkoutSessionComplete | null>(null)
+  const [programName, setProgramName] = useState<string>('')
   const [loading, setLoading] = useState(true)
-  const [moodRating, setMoodRating] = useState<number | null>(null)
-  const [difficultyRating, setDifficultyRating] = useState<number | null>(null)
+  const [rpe, setRpe] = useState<number | null>(null)
   const [notes, setNotes] = useState('')
-  const [feedbackText, setFeedbackText] = useState('')
   const [exerciseGroups, setExerciseGroups] = useState<ExerciseGroup[]>([])
-  const [expandedExercise, setExpandedExercise] = useState<string | null>(null)
+  const [prRows, setPrRows] = useState<PRRow[]>([])
+  const [trendHistory, setTrendHistory] = useState<number[]>([])
+  const [prevVolume, setPrevVolume] = useState<number | null>(null)
+  const [nextWorkout, setNextWorkout] = useState<{ name: string; meta: string } | null>(null)
   const [saving, setSaving] = useState(false)
-  const [showExerciseDetail, setShowExerciseDetail] = useState(false)
-
-  const spawnConfetti = useConfetti()
+  const [confettiOn, setConfettiOn] = useState(false)
 
   useEffect(() => {
     const loadSession = async () => {
       try {
-        if (!sessionId) { router.push('/client/workout'); return }
+        if (!sessionId) {
+          router.push('/client/workout')
+          return
+        }
         const supabase = createClient()
         const { data: sessionData } = await supabase
           .from('workout_sessions')
-          .select('*, workout_sets(*, exercises(id, name, name_nl))')
+          .select('id, started_at, program_template_id, workout_sets(*, exercises(id, name, name_nl))')
           .eq('id', sessionId)
           .single()
 
-        if (sessionData) {
-          const sd = sessionData as unknown as WorkoutSessionComplete
-          let workoutSets = sd.workout_sets || []
+        if (!sessionData) {
+          setLoading(false)
+          return
+        }
 
-          // RESCUE: If no sets in DB, recover from localStorage
-          if (workoutSets.length === 0) {
-            try {
-              const raw = localStorage.getItem('move_active_workout')
-              if (raw) {
-                const saved = JSON.parse(raw)
-                if (saved.sessionId === sessionId && saved.sets) {
-                  const templateExIds = Object.keys(saved.sets)
-                  const { data: templateExercises } = await supabase
-                    .from('program_template_exercises')
-                    .select('id, exercise_id')
-                    .in('id', templateExIds)
+        const sd = sessionData as unknown as WorkoutSessionComplete
+        let workoutSets = sd.workout_sets || []
 
-                  const idMap: Record<string, string> = {}
-                  for (const te of templateExercises || []) {
-                    idMap[te.id] = te.exercise_id
+        // RESCUE: if no sets in DB, recover from localStorage
+        if (workoutSets.length === 0) {
+          try {
+            const raw = localStorage.getItem('move_active_workout')
+            if (raw) {
+              const saved = JSON.parse(raw)
+              if (saved.sessionId === sessionId && saved.sets) {
+                const templateExIds = Object.keys(saved.sets)
+                const { data: templateExercises } = await supabase
+                  .from('program_template_exercises')
+                  .select('id, exercise_id')
+                  .in('id', templateExIds)
+
+                const idMap: Record<string, string> = {}
+                for (const te of templateExercises || []) {
+                  idMap[te.id] = te.exercise_id
+                }
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const setsToInsert: any[] = []
+                for (const [templateExId, exSets] of Object.entries(saved.sets)) {
+                  const realExId = idMap[templateExId] || templateExId
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  for (const s of exSets as any[]) {
+                    if (!s.weight_kg && !s.actual_reps) continue
+                    setsToInsert.push({
+                      workout_session_id: sessionId,
+                      exercise_id: realExId,
+                      set_number: s.set_number,
+                      prescribed_reps: s.prescribed_reps || null,
+                      actual_reps: s.actual_reps,
+                      weight_kg: s.weight_kg,
+                      is_warmup: s.is_warmup || false,
+                      completed: true,
+                      is_pr: s.is_pr || false,
+                    })
                   }
+                }
 
-                  const setsToInsert: any[] = []
-                  for (const [templateExId, exSets] of Object.entries(saved.sets)) {
-                    const realExId = idMap[templateExId] || templateExId
-                    for (const s of exSets as any[]) {
-                      if (!s.weight_kg && !s.actual_reps) continue
-                      setsToInsert.push({
-                        workout_session_id: sessionId,
-                        exercise_id: realExId,
-                        set_number: s.set_number,
-                        prescribed_reps: s.prescribed_reps || null,
-                        actual_reps: s.actual_reps,
-                        weight_kg: s.weight_kg,
-                        is_warmup: s.is_warmup || false,
-                        completed: true,
-                        is_pr: s.is_pr || false,
-                      })
-                    }
-                  }
-
-                  if (setsToInsert.length > 0) {
-                    const { error: insertErr } = await supabase.from('workout_sets').insert(setsToInsert)
-                    if (!insertErr) {
-                      const { data: refreshed } = await supabase
-                        .from('workout_sessions')
-                        .select('*, workout_sets(*, exercises(id, name, name_nl))')
-                        .eq('id', sessionId)
-                        .single()
-                      if (refreshed) {
-                        workoutSets = (refreshed as any).workout_sets || []
-                      }
+                if (setsToInsert.length > 0) {
+                  const { error: insertErr } = await supabase.from('workout_sets').insert(setsToInsert)
+                  if (!insertErr) {
+                    const { data: refreshed } = await supabase
+                      .from('workout_sessions')
+                      .select('id, started_at, program_template_id, workout_sets(*, exercises(id, name, name_nl))')
+                      .eq('id', sessionId)
+                      .single()
+                    if (refreshed) {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      workoutSets = (refreshed as any).workout_sets || []
                     }
                   }
                 }
               }
-            } catch (e) {
-              console.error('Recovery from localStorage failed:', e)
             }
-            try {
-              localStorage.removeItem('move_active_workout')
-              localStorage.removeItem('move_minimized_workout')
-            } catch { /* ok */ }
+          } catch (e) {
+            console.error('Recovery from localStorage failed:', e)
           }
+          try {
+            localStorage.removeItem('move_active_workout')
+            localStorage.removeItem('move_minimized_workout')
+          } catch {
+            /* ok */
+          }
+        }
 
-          setSession({ ...sd, workout_sets: workoutSets })
-          const groups: Record<string, ExerciseGroup> = {}
-          for (const set of workoutSets) {
-            const exId = set.exercise_id
-            if (!groups[exId]) {
-              groups[exId] = {
-                exerciseId: exId,
-                name: set.exercises?.name_nl || set.exercises?.name || 'Oefening',
-                sets: [],
-                painFlag: false,
-                painNotes: '',
+        setSession({ ...sd, workout_sets: workoutSets })
+
+        // ── Program name for page-head sub ──
+        if (sd.program_template_id) {
+          const { data: tpl } = await supabase
+            .from('program_templates')
+            .select('name, program_id')
+            .eq('id', sd.program_template_id)
+            .single()
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const tplAny = tpl as any
+          if (tplAny?.name) setProgramName(tplAny.name)
+
+          // ── Next workout: next template in same program by day_order ──
+          if (tplAny?.program_id) {
+            const { data: templates } = await supabase
+              .from('program_templates')
+              .select('id, name, day_order, program_template_exercises(id)')
+              .eq('program_id', tplAny.program_id)
+              .order('day_order', { ascending: true })
+            if (templates && templates.length > 0) {
+              const idx = templates.findIndex((t) => t.id === sd.program_template_id)
+              const next =
+                idx >= 0 && idx + 1 < templates.length
+                  ? templates[idx + 1]
+                  : templates[0]
+              if (next && next.id !== sd.program_template_id) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const exCount = ((next as any).program_template_exercises || []).length
+                setNextWorkout({
+                  name: next.name,
+                  meta: exCount > 0 ? `${exCount} oefeningen` : 'Volgende training',
+                })
               }
             }
-            groups[exId].sets.push(set)
           }
-          setExerciseGroups(Object.values(groups))
+        }
+
+        // ── Group sets per exercise ──
+        const groupMap: Record<string, ExerciseGroup> = {}
+        for (const set of workoutSets) {
+          const exId = set.exercise_id
+          if (!groupMap[exId]) {
+            groupMap[exId] = {
+              exerciseId: exId,
+              name: set.exercises?.name_nl || set.exercises?.name || 'Oefening',
+              sets: [],
+              volume: 0,
+              prevVolume: null,
+              hasPR: false,
+              topSet: null,
+              history: [],
+            }
+          }
+          groupMap[exId].sets.push(set)
+          groupMap[exId].volume += (set.weight_kg || 0) * (set.actual_reps || 0)
+          if (set.is_pr) groupMap[exId].hasPR = true
+          const cur = groupMap[exId].topSet
+          const curVol = cur ? (cur.weight_kg || 0) * (cur.actual_reps || 0) : -1
+          const setVol = (set.weight_kg || 0) * (set.actual_reps || 0)
+          if (setVol > curVol) groupMap[exId].topSet = set
+        }
+        const groups = Object.values(groupMap)
+
+        // ── Per-exercise history (last 6 sessions incl current) for sparklines & prevVolume ──
+        try {
+          const { data: { user } } = await supabase.auth.getUser()
+          if (user) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const sbAny: any = supabase
+            for (const g of groups) {
+              const { data: hist } = await sbAny
+                .from('workout_sets')
+                .select('weight_kg, actual_reps, workout_session_id, workout_sessions!inner(user_id, started_at, completed_at)')
+                .eq('exercise_id', g.exerciseId)
+                .eq('workout_sessions.user_id', user.id)
+                .not('workout_sessions.completed_at', 'is', null)
+                .order('workout_sessions(started_at)', { ascending: false })
+                .limit(60)
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const histAny = (hist as any[]) || []
+              // bucket per session_id, compute volume
+              const buckets: Record<string, { volume: number; startedAt: string }> = {}
+              for (const row of histAny) {
+                const sid = row.workout_session_id
+                if (!buckets[sid]) {
+                  buckets[sid] = {
+                    volume: 0,
+                    startedAt: row.workout_sessions?.started_at || '',
+                  }
+                }
+                buckets[sid].volume += (row.weight_kg || 0) * (row.actual_reps || 0)
+              }
+              const ordered = Object.values(buckets)
+                .sort((a, b) => new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime())
+                .slice(-6)
+              g.history = ordered.map((b) => b.volume)
+              if (ordered.length >= 2) {
+                // previous volume = second-to-last (i.e. previous session for this exercise)
+                g.prevVolume = ordered[ordered.length - 2].volume
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('per-exercise history failed:', e)
+        }
+
+        setExerciseGroups(groups)
+
+        // ── PR rows (only is_pr sets) ──
+        const prRowsMap: Record<string, PRRow> = {}
+        for (const set of workoutSets) {
+          if (!set.is_pr) continue
+          const exId = set.exercise_id
+          const name = set.exercises?.name_nl || set.exercises?.name || 'Oefening'
+          const weight = set.weight_kg || 0
+          const reps = set.actual_reps || 0
+          // keep the heaviest PR row per exercise
+          if (!prRowsMap[exId] || weight > prRowsMap[exId].toVal) {
+            prRowsMap[exId] = {
+              exerciseId: exId,
+              name,
+              kind: 'weight',
+              fromVal: 0,
+              toVal: weight,
+              unit: 'kg',
+            }
+            // look up previous best for this exercise
+            try {
+              const { data: prev } = await supabase
+                .from('workout_sets')
+                .select('weight_kg, actual_reps, workout_session_id, workout_sessions!inner(started_at)')
+                .eq('exercise_id', exId)
+                .lt('workout_sessions.started_at' as never, session?.started_at || new Date().toISOString())
+                .order('weight_kg', { ascending: false })
+                .limit(1)
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const prevRow = ((prev as any[]) || [])[0]
+              if (prevRow?.weight_kg) {
+                prRowsMap[exId].fromVal = prevRow.weight_kg
+              }
+            } catch {
+              /* ok */
+            }
+            // if weight is 0 (e.g. bodyweight), show reps delta
+            if (weight === 0 && reps > 0) {
+              prRowsMap[exId].kind = 'reps'
+              prRowsMap[exId].toVal = reps
+              prRowsMap[exId].unit = 'reps'
+            }
+          }
+        }
+        setPrRows(Object.values(prRowsMap))
+
+        // ── Global volume trend: last 6 user sessions ──
+        try {
+          const { data: { user } } = await supabase.auth.getUser()
+          if (user) {
+            const { data: recent } = await supabase
+              .from('workout_sessions')
+              .select('id, started_at, completed_at, workout_sets(weight_kg, actual_reps)')
+              .eq('user_id', user.id)
+              .not('completed_at', 'is', null)
+              .order('started_at', { ascending: false })
+              .limit(6)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const recentAny = ((recent as any[]) || []).reverse()
+            const volumes = recentAny.map((s) =>
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (s.workout_sets || []).reduce(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (sum: number, st: any) => sum + (st.weight_kg || 0) * (st.actual_reps || 0),
+                0
+              )
+            )
+            // include current session as last point if not already present
+            const currentVol = workoutSets.reduce(
+              (sum, st) => sum + (st.weight_kg || 0) * (st.actual_reps || 0),
+              0
+            )
+            let hist = volumes
+            if (volumes.length === 0 || volumes[volumes.length - 1] === 0) {
+              hist = [...volumes, currentVol]
+            }
+            setTrendHistory(hist)
+            if (hist.length >= 2) setPrevVolume(hist[hist.length - 2])
+          }
+        } catch (e) {
+          console.warn('trend history failed:', e)
         }
       } catch (error) {
         console.error('Error loading session:', error)
@@ -247,71 +435,68 @@ function WorkoutCompletePage() {
       }
     }
     loadSession()
-  }, [sessionId, router])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId])
 
-  const prsCount = session?.workout_sets?.filter((s) => s.is_pr).length || 0
+  // ── Trigger confetti if any PR ──
+  const prCount = prRows.length
   useEffect(() => {
-    if (prsCount > 0) {
-      setTimeout(() => spawnConfetti('big'), 400)
-      setTimeout(() => spawnConfetti('subtle'), 1200)
+    if (prCount > 0) {
+      setConfettiOn(true)
+      const t = setTimeout(() => setConfettiOn(false), 3000)
+      return () => clearTimeout(t)
     }
-  }, [prsCount, spawnConfetti])
+  }, [prCount])
 
-  const togglePain = (exerciseId: string) => {
-    setExerciseGroups(prev =>
-      prev.map(g =>
-        g.exerciseId === exerciseId ? { ...g, painFlag: !g.painFlag } : g
-      )
-    )
-  }
-
-  const setPainNotes = (exerciseId: string, text: string) => {
-    setExerciseGroups(prev =>
-      prev.map(g =>
-        g.exerciseId === exerciseId ? { ...g, painNotes: text } : g
-      )
-    )
-  }
-
-  // --- Share workout summary ---
+  // ── Share ──
   const handleShare = useCallback(async () => {
     if (!session) return
     const workoutSets = session.workout_sets || []
     const totalSets = workoutSets.length
-    const totalVolume = workoutSets.reduce((sum, set) => sum + (set.weight_kg || 0) * (set.actual_reps || 0), 0)
-    const minutes = Math.floor((new Date().getTime() - new Date(session.started_at).getTime()) / 1000 / 60)
-    const prSets = workoutSets.filter(s => s.is_pr)
+    const totalVolume = workoutSets.reduce(
+      (sum, set) => sum + (set.weight_kg || 0) * (set.actual_reps || 0),
+      0
+    )
+    const minutes = Math.max(
+      1,
+      Math.floor((new Date().getTime() - new Date(session.started_at).getTime()) / 1000 / 60)
+    )
 
-    let text = `🏋️ MŌVE Workout voltooid!\n\n`
-    text += `⏱ ${minutes} min · 💪 ${totalSets} sets · 🔥 ${totalVolume > 1000 ? (totalVolume / 1000).toFixed(1) + 't' : totalVolume + ' kg'} volume\n`
-    if (prSets.length > 0) {
-      text += `🏆 ${prSets.length} ${prSets.length === 1 ? 'nieuw record' : 'nieuwe records'}!\n`
+    let text = `MŌVE — training voltooid\n\n`
+    text += `${minutes} min · ${totalSets} sets · ${Math.round(totalVolume)} kg volume\n`
+    if (prCount > 0) {
+      text += `${prCount} ${prCount === 1 ? 'nieuw record' : 'nieuwe records'}\n`
     }
     text += `\n— movestudio.be`
 
     if (navigator.share) {
       try {
         await navigator.share({ text })
-      } catch { /* user cancelled */ }
+      } catch {
+        /* cancelled */
+      }
     } else {
-      await navigator.clipboard.writeText(text)
-      // Brief visual feedback
-      alert('Gekopieerd naar klembord!')
+      try {
+        await navigator.clipboard.writeText(text)
+        alert('Gekopieerd naar klembord')
+      } catch {
+        /* ok */
+      }
     }
-  }, [session])
+  }, [session, prCount])
 
+  // ── Complete (Sluiten) ──
   const handleComplete = async () => {
-    if (!session) return
+    if (!session) {
+      router.push('/client/workout')
+      return
+    }
     try {
       setSaving(true)
       const supabase = createClient()
       const startTime = new Date(session.started_at)
       const endTime = new Date()
       const durationSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000)
-
-      const painData = exerciseGroups
-        .filter(g => g.painFlag)
-        .map(g => ({ exerciseId: g.exerciseId, painNotes: g.painNotes || null }))
 
       const { data: { session: authSession } } = await supabase.auth.getSession()
       const headers: Record<string, string> = { 'Content-Type': 'application/json' }
@@ -326,35 +511,25 @@ function WorkoutCompletePage() {
           sessionId,
           completedAt: endTime.toISOString(),
           durationSeconds,
-          moodRating: moodRating ?? null,
-          difficultyRating: difficultyRating ?? null,
+          moodRating: null,
+          difficultyRating: rpe ?? null,
           notes: notes || null,
-          feedbackText: feedbackText || null,
-          painData: painData.length > 0 ? painData : null,
+          feedbackText: null,
+          painData: null,
         }),
       })
 
       if (!res.ok) {
-        console.error('[handleComplete] Server error:', await res.json())
+        console.error('[handleComplete] Server error:', await res.json().catch(() => ({})))
         await supabase
           .from('workout_sessions')
           .update({
             completed_at: endTime.toISOString(),
             duration_seconds: durationSeconds,
-            mood_rating: moodRating ?? null,
-            difficulty_rating: difficultyRating ?? null,
+            difficulty_rating: rpe ?? null,
             notes: notes || null,
-            feedback_text: feedbackText || null,
           })
           .eq('id', sessionId)
-
-        for (const pain of painData) {
-          await supabase
-            .from('workout_sets')
-            .update({ pain_flag: true, pain_notes: pain.painNotes })
-            .eq('workout_session_id', sessionId)
-            .eq('exercise_id', pain.exerciseId)
-        }
 
         fetch('/api/workout-complete', {
           method: 'POST',
@@ -370,382 +545,542 @@ function WorkoutCompletePage() {
     }
   }
 
+  // ── Loading / empty states ──
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#C0C0C0] border-t-[#1A1917]" />
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: '#8E9890',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
+            border: '2px solid rgba(253,253,254,0.20)',
+            borderTopColor: '#FDFDFE',
+            animation: 'spin 1s linear infinite',
+          }}
+        />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     )
   }
 
   if (!session) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-[14px] text-[#ACACAC]">Sessie niet gevonden</p>
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: '#8E9890',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'rgba(253,253,254,0.62)',
+          fontSize: 14,
+        }}
+      >
+        Sessie niet gevonden
       </div>
     )
   }
 
+  // ── Derived stats ──
   const workoutSets = session.workout_sets || []
   const totalSets = workoutSets.length
-  const totalVolume = workoutSets.reduce((sum, set) => sum + (set.weight_kg || 0) * (set.actual_reps || 0), 0)
+  const totalVolume = workoutSets.reduce(
+    (sum, set) => sum + (set.weight_kg || 0) * (set.actual_reps || 0),
+    0
+  )
   const startTime = new Date(session.started_at)
   const endTime = new Date()
-  const minutes = Math.floor((endTime.getTime() - startTime.getTime()) / 1000 / 60)
-  const prSets = workoutSets.filter(s => s.is_pr)
-  // Estimate calories: ~0.05 kcal per kg × rep (rough strength training estimate)
-  const estCalories = Math.round(totalVolume * 0.05 + minutes * 5)
+  const minutes = Math.max(1, Math.floor((endTime.getTime() - startTime.getTime()) / 1000 / 60))
 
-  const moodOptions = [
-    { value: 1, label: 'Zwaar', emoji: '😮‍💨' },
-    { value: 2, label: 'Oké', emoji: '😐' },
-    { value: 3, label: 'Goed', emoji: '🙂' },
-    { value: 4, label: 'Sterk', emoji: '💪' },
-    { value: 5, label: 'Top', emoji: '🔥' },
-  ]
+  const deltaPct =
+    prevVolume && prevVolume > 0
+      ? Math.round(((totalVolume - prevVolume) / prevVolume) * 100)
+      : null
 
-  const painCount = exerciseGroups.filter(g => g.painFlag).length
+  const startLabel = new Date(session.started_at).toLocaleTimeString('nl-NL', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+  const pageSub = programName ? `${programName} · ${startLabel}` : startLabel
+
+  const trendD = buildTrendPath(trendHistory)
+  const trendMin = trendHistory.length > 0 ? Math.min(...trendHistory) : 0
+  const trendMax = trendHistory.length > 0 ? Math.max(...trendHistory) : 0
+
+  // last point coords for the lime dot on trend chart
+  let lastX = 290
+  let lastY = 8
+  if (trendHistory.length >= 2) {
+    const padL = 10
+    const padR = 10
+    const padT = 10
+    const padB = 26
+    const innerW = 300 - padL - padR
+    const innerH = 96 - padT - padB
+    const range = trendMax - trendMin || 1
+    const i = trendHistory.length - 1
+    lastX = padL + i * (innerW / (trendHistory.length - 1))
+    lastY = padT + innerH - ((trendHistory[i] - trendMin) / range) * innerH
+  }
+  // first point coords for the small dim circle + label
+  let firstX = 10
+  let firstY = 58
+  if (trendHistory.length >= 2) {
+    const padL = 10
+    const padT = 10
+    const padB = 26
+    const innerH = 96 - padT - padB
+    const range = trendMax - trendMin || 1
+    firstX = padL
+    firstY = padT + innerH - ((trendHistory[0] - trendMin) / range) * innerH
+  }
+
+  const fmtVolume = (v: number) =>
+    v >= 1000
+      ? v.toLocaleString('nl-NL', { maximumFractionDigits: 0 })
+      : `${Math.round(v)}`
 
   return (
-    <div className="pb-28">
-
-      {/* Confetti CSS */}
-      <style>{`
-        @keyframes confettiFall {
-          0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 1; }
-          100% { transform: translateY(100vh) translateX(var(--x-drift, 0px)) rotate(var(--rotation, 720deg)); opacity: 0; }
-        }
-      `}</style>
-
-      {/* ── Header — celebration ── */}
-      <div ref={summaryRef} className="pt-10 pb-6 text-center">
-        {/* Animated checkmark circle */}
-        <div className="mx-auto w-16 h-16 rounded-full bg-[#3D8B5C] flex items-center justify-center mb-5 animate-[scale-in_0.5s_ease-out]">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: '#8E9890',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+      }}
+    >
+      {/* ═══ CONFETTI ══════════════════════════════ */}
+      {confettiOn && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 60,
+            pointerEvents: 'none',
+            overflow: 'hidden',
+          }}
+        >
+          {Array.from({ length: 40 }).map((_, i) => {
+            const left = Math.random() * 100
+            const delay = Math.random() * 0.6
+            const dur = 1.5 + Math.random() * 1
+            const size = 6 + Math.random() * 6
+            const colors = ['#C0FC01', '#A6ADA7', '#FDFDFE', '#2FA65A']
+            return (
+              <div
+                key={i}
+                style={{
+                  position: 'absolute',
+                  left: `${left}%`,
+                  top: '-10px',
+                  width: `${size}px`,
+                  height: `${size * 0.6}px`,
+                  backgroundColor: colors[i % colors.length],
+                  borderRadius: '2px',
+                  transform: `rotate(${Math.random() * 360}deg)`,
+                  animation: `confettiFall ${dur}s ease-in ${delay}s forwards`,
+                  opacity: 0,
+                }}
+              />
+            )
+          })}
+          <style>{`@keyframes confettiFall { 0% { opacity:1; transform:translateY(0) rotate(0deg);} 100% { opacity:0; transform:translateY(100vh) rotate(720deg);} }`}</style>
         </div>
+      )}
 
-        <p className="text-[12px] font-medium text-[#3D8B5C] uppercase tracking-[1.5px] mb-3">
-          Voltooid
-        </p>
-        <h1 className="text-editorial-h1 mb-2">
-          Goed gedaan
-        </h1>
-
-        {prsCount > 0 && (
-          <div className="mt-4 inline-flex items-center gap-2 bg-[#D46A3A]/10 px-4 py-2 rounded-full">
-            <Trophy size={16} strokeWidth={2} className="text-[#D46A3A]" />
-            <span className="text-[14px] font-bold text-[#D46A3A]">
-              {prsCount} {prsCount === 1 ? 'nieuw record' : 'nieuwe records'}!
-            </span>
+      {/* ═══ TOP BAR ═══════════════════════════════ */}
+      <div
+        style={{
+          padding: 'calc(env(safe-area-inset-top, 0px) + 14px) 5% 10px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexShrink: 0,
+        }}
+      >
+        <span
+          style={{
+            fontFamily: 'var(--font-sans, Outfit), Outfit, sans-serif',
+            fontSize: 22,
+            fontWeight: 500,
+            letterSpacing: '-0.02em',
+            color: '#FDFDFE',
+          }}
+        >
+          MŌVE
+        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #646B66, #4a4f4c)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 12,
+              fontWeight: 500,
+              color: '#FDFDFE',
+            }}
+          >
+            G
           </div>
-        )}
-
-        {/* Share button */}
-        <div className="mt-5">
           <button
-            onClick={handleShare}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-[#F0F0EE] text-[12px] font-semibold text-[#ACACAC] uppercase tracking-[0.06em] hover:bg-[#F8F8F6] transition-colors touch-manipulation"
+            className="ico-btn"
+            aria-label="Menu"
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
-            <Share2 size={14} strokeWidth={2} />
-            Delen
+            <svg viewBox="0 0 24 24">
+              <line x1="4" y1="8" x2="20" y2="8" />
+              <line x1="4" y1="16" x2="20" y2="16" />
+            </svg>
           </button>
         </div>
       </div>
 
-      {/* ── Stats grid — 2×2 ── */}
-      <div className="grid grid-cols-2 gap-3 mb-8">
-        <div className="bg-[#F8F8F6] rounded-2xl p-5">
-          <div className="flex items-center gap-1.5 mb-2">
-            <Clock size={13} strokeWidth={1.5} className="text-[#ACACAC]" />
-            <p className="text-[10px] text-[#ACACAC] uppercase tracking-[1px] font-medium">Duur</p>
-          </div>
-          <div className="flex items-baseline gap-1">
-            <AnimatedStat value={minutes} delay={200} />
-            <span className="text-[13px] text-[#ACACAC] font-medium">min</span>
-          </div>
-        </div>
-        <div className="bg-[#F8F8F6] rounded-2xl p-5">
-          <div className="flex items-center gap-1.5 mb-2">
-            <Dumbbell size={13} strokeWidth={1.5} className="text-[#ACACAC]" />
-            <p className="text-[10px] text-[#ACACAC] uppercase tracking-[1px] font-medium">Sets</p>
-          </div>
-          <AnimatedStat value={totalSets} delay={400} />
-        </div>
-        <div className="bg-[#F8F8F6] rounded-2xl p-5">
-          <div className="flex items-center gap-1.5 mb-2">
-            <TrendingUp size={13} strokeWidth={1.5} className="text-[#ACACAC]" />
-            <p className="text-[10px] text-[#ACACAC] uppercase tracking-[1px] font-medium">Volume</p>
-          </div>
-          <div className="flex items-baseline gap-1">
-            <AnimatedStat
-              value={totalVolume > 1000 ? +(totalVolume / 1000).toFixed(1) : totalVolume}
-              suffix={totalVolume > 1000 ? 't' : ''}
-              delay={600}
-            />
-            {totalVolume <= 1000 && <span className="text-[13px] text-[#ACACAC] font-medium">kg</span>}
-          </div>
-        </div>
-        <div className="bg-[#F8F8F6] rounded-2xl p-5">
-          <div className="flex items-center gap-1.5 mb-2">
-            <Flame size={13} strokeWidth={1.5} className="text-[#ACACAC]" />
-            <p className="text-[10px] text-[#ACACAC] uppercase tracking-[1px] font-medium">Kcal</p>
-          </div>
-          <div className="flex items-baseline gap-1">
-            <AnimatedStat value={estCalories} delay={800} />
-            <span className="text-[11px] text-[#C0C0C0]">est.</span>
-          </div>
+      {/* ═══ PAGE HEAD ═════════════════════════════ */}
+      <div
+        className="page-head review-head"
+        style={{ padding: '4px 5% 18px', flexShrink: 0 }}
+      >
+        <div>
+          <div className="page-title">Voltooid</div>
+          <div className="page-sub">{pageSub}</div>
         </div>
       </div>
 
-      {/* ── PR Records detail ── */}
-      {prSets.length > 0 && (
-        <div className="mb-8 bg-[#FDF6F0] border border-[#F0E4D8] rounded-2xl p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <Trophy size={15} strokeWidth={2} className="text-[#D46A3A]" />
-            <p className="text-[12px] font-bold text-[#D46A3A] uppercase tracking-[0.06em]">Persoonlijke Records</p>
-          </div>
-          <div className="space-y-2">
-            {prSets.map((set) => (
-              <div key={set.id} className="flex items-center justify-between py-1.5">
-                <span className="text-[13px] font-medium text-[#1A1917]">
-                  {set.exercises?.name_nl || set.exercises?.name || 'Oefening'}
-                </span>
-                <span className="text-[13px] font-bold text-[#D46A3A] tabular-nums">
-                  {set.weight_kg} kg × {set.actual_reps}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ── Exercise breakdown (collapsible) ── */}
-      <div className="mb-8">
-        <button
-          onClick={() => setShowExerciseDetail(!showExerciseDetail)}
-          className="w-full flex items-center justify-between py-3 touch-manipulation"
-          style={{ WebkitTapHighlightColor: 'transparent' }}
-        >
-          <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] font-medium">
-            Oefeningen ({exerciseGroups.length})
-          </p>
-          {showExerciseDetail
-            ? <ChevronUp size={16} className="text-[#C0C0C0]" />
-            : <ChevronDown size={16} className="text-[#C0C0C0]" />
-          }
-        </button>
-
-        {showExerciseDetail && (
-          <div className="space-y-3 mt-1">
-            {exerciseGroups.map((group) => {
-              const groupVolume = group.sets.reduce((s, set) => s + (set.weight_kg || 0) * (set.actual_reps || 0), 0)
-              const bestSet = [...group.sets].sort((a, b) => ((b.weight_kg || 0) * (b.actual_reps || 0)) - ((a.weight_kg || 0) * (a.actual_reps || 0)))[0]
-              const hasPR = group.sets.some(s => s.is_pr)
-
-              return (
-                <div key={group.exerciseId} className={`rounded-xl border p-4 ${hasPR ? 'border-[#D46A3A]/30 bg-[#FDF6F0]/50' : 'border-[#F0F0EE] bg-white'}`}>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[14px] font-semibold text-[#1A1917]">{group.name}</span>
-                      {hasPR && (
-                        <span className="text-[9px] font-black text-[#D46A3A] uppercase bg-[#D46A3A]/10 px-1.5 py-0.5 rounded-md">PR</span>
-                      )}
-                    </div>
-                    <span className="text-[11px] text-[#ACACAC] tabular-nums">{Math.round(groupVolume)} kg vol.</span>
-                  </div>
-                  {/* Mini sets table */}
-                  <div className="space-y-0.5">
-                    {group.sets.map((set) => (
-                      <div key={set.id} className="flex items-center gap-3 py-1">
-                        <span className="text-[11px] text-[#C0C0C0] w-[24px] tabular-nums">S{set.set_number}</span>
-                        <span className={`text-[12px] font-medium tabular-nums ${set.is_pr ? 'text-[#D46A3A] font-bold' : 'text-[#1A1917]'}`}>
-                          {set.weight_kg || 0} kg × {set.actual_reps || 0}
-                        </span>
-                        {set.is_pr && <Trophy size={10} className="text-[#D46A3A]" />}
-                      </div>
-                    ))}
-                  </div>
-                  {/* Best set highlight */}
-                  {bestSet && (
-                    <div className="mt-2 pt-2 border-t border-[#F0F0EE]">
-                      <span className="text-[10px] text-[#ACACAC] uppercase tracking-[0.06em]">
-                        Beste set: {bestSet.weight_kg} kg × {bestSet.actual_reps} ({Math.round((bestSet.weight_kg || 0) * (bestSet.actual_reps || 0))} kg vol.)
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* ── Gevoel ── */}
-      <div className="border-t border-[#F0F0EE] pt-8 mb-8">
-        <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-4">
-          Hoe voelde je je?
-        </p>
-        <div className="flex gap-2">
-          {moodOptions.map((m) => (
-            <button
-              key={m.value}
-              onClick={() => setMoodRating(m.value)}
-              className={`flex-1 py-3 text-center rounded-xl text-[13px] font-medium transition-all touch-manipulation ${
-                moodRating === m.value
-                  ? 'bg-[#1A1917] text-white scale-105'
-                  : 'border border-[#F0F0EE] text-[#ACACAC] hover:border-[#C0C0C0]'
-              }`}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-            >
-              <span className="block text-[18px] mb-0.5">{m.emoji}</span>
-              <span className="text-[10px]">{m.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Moeilijkheid ── */}
-      <div className="border-t border-[#F0F0EE] pt-8 mb-8">
-        <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-4">
-          Moeilijkheidsgraad
-        </p>
-        <div className="flex gap-2">
-          {[1, 2, 3, 4, 5].map((level) => (
-            <button
-              key={level}
-              onClick={() => setDifficultyRating(level)}
-              className={`flex-1 min-h-[44px] py-3 text-center rounded-xl transition-all touch-manipulation ${
-                difficultyRating === level
-                  ? 'bg-[#D46A3A] text-white scale-105'
-                  : 'border border-[#F0F0EE] text-[#ACACAC] hover:border-[#C0C0C0]'
-              }`}
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-            >
-              <span className="section-title">
-                {level}
+      {/* ═══ SCROLL ════════════════════════════════ */}
+      <main
+        className="review-scroll"
+        style={{ flex: 1, overflowY: 'auto', width: '100%' }}
+      >
+        {/* 1 · Hero + 2 · Trend + 3 · PRs */}
+        <div style={{ padding: '0 5%', display: 'flex', flexDirection: 'column' }}>
+          {/* Hero (dark) */}
+          <div className="review-card dark hero-card">
+            <div className="hero-title">
+              <span className="dot" />
+              Training afgerond
+            </div>
+            <div className="hero-num">{fmtVolume(totalVolume)}</div>
+            <div className="hero-sub">kg volume</div>
+            <div className="hero-meta">
+              <span>{minutes} min</span>
+              <span className="sep" />
+              <span>
+                {totalSets}/{totalSets} sets
               </span>
-            </button>
-          ))}
-        </div>
-        <div className="flex justify-between mt-2 px-1">
-          <span className="text-[10px] text-[#D5D5D5]">Makkelijk</span>
-          <span className="text-[10px] text-[#D5D5D5]">Te zwaar</span>
-        </div>
-      </div>
-
-      {/* ── Pijn per oefening ── */}
-      {exerciseGroups.length > 0 && (
-        <div className="border-t border-[#F0F0EE] pt-8 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px]">
-              Pijn of ongemak?
-            </p>
-            {painCount > 0 && (
-              <span className="text-[11px] font-medium text-[#C4372A]">
-                {painCount} oefening{painCount !== 1 ? 'en' : ''}
-              </span>
-            )}
-          </div>
-
-          {exerciseGroups.map((group, i) => (
-            <div key={group.exerciseId} className={i > 0 ? 'border-t border-[#F0F0EE]' : ''}>
-              <button
-                onClick={() => {
-                  togglePain(group.exerciseId)
-                  setExpandedExercise(!group.painFlag ? group.exerciseId : null)
-                }}
-                className="w-full flex items-center gap-3 py-3.5 min-h-[44px] touch-manipulation"
-                style={{ WebkitTapHighlightColor: 'transparent' }}
-              >
-                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                  group.painFlag ? 'border-[#C4372A] bg-[#C4372A]' : 'border-[#E0E0E0]'
-                }`}>
-                  {group.painFlag && <AlertTriangle size={10} strokeWidth={2.5} className="text-white" />}
-                </div>
-                <span
-                  className={`text-[14px] font-medium flex-1 text-left ${
-                    group.painFlag ? 'text-[#C4372A]' : 'text-[#1A1917]'
-                  }`}
-                >
-                  {group.name}
+              {deltaPct !== null && (
+                <span className="hero-delta">
+                  {deltaPct >= 0 ? '+' : ''}
+                  {deltaPct}%
                 </span>
-                <span className="text-[12px] text-[#C0C0C0]">
-                  {group.sets.length} sets
-                </span>
-                {group.painFlag && (
-                  expandedExercise === group.exerciseId
-                    ? <ChevronUp size={14} className="text-[#C4372A]" />
-                    : <ChevronDown size={14} className="text-[#C4372A]" />
-                )}
-              </button>
-              {group.painFlag && expandedExercise === group.exerciseId && (
-                <div className="pb-4 pl-8">
-                  <textarea
-                    value={group.painNotes}
-                    onChange={(e) => setPainNotes(group.exerciseId, e.target.value)}
-                    placeholder="Waar voelde je pijn? (bijv. linkerschouder, onderrug...)"
-                    className="w-full px-4 py-3 border border-[#F0F0EE] rounded-xl text-[13px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:border-[#C4372A]/40 resize-none h-16 bg-white"
-                  />
-                </div>
               )}
             </div>
-          ))}
+          </div>
+
+          {/* Trend (light) */}
+          {trendHistory.length >= 2 && (
+            <div className="review-card">
+              <div className="trend-head">
+                <div className="trend-title">
+                  Volume-trend · {trendHistory.length} {trendHistory.length === 1 ? 'sessie' : 'sessies'}
+                </div>
+                <div className="trend-scale">kg</div>
+              </div>
+              <svg className="trend-svg" viewBox="0 0 300 96" preserveAspectRatio="none">
+                <line
+                  x1="0"
+                  y1="88"
+                  x2="300"
+                  y2="88"
+                  stroke="rgba(253,253,254,0.08)"
+                  strokeWidth="1"
+                />
+                <path
+                  d={trendD}
+                  stroke="rgba(253,253,254,0.65)"
+                  strokeWidth="1.5"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <circle cx={firstX} cy={firstY} r="2.5" fill="rgba(253,253,254,0.45)" />
+                <circle cx={lastX} cy={lastY} r="8" fill="rgba(192,252,1,0.18)" />
+                <circle cx={lastX} cy={lastY} r="4" fill="#C0FC01" />
+                <text
+                  x={lastX}
+                  y={Math.max(lastY - 10, 10)}
+                  fill="#FDFDFE"
+                  fontFamily="Outfit"
+                  fontSize="11"
+                  fontWeight="500"
+                  textAnchor="end"
+                  style={{ fontFeatureSettings: "'tnum'" }}
+                >
+                  {fmtVolume(trendHistory[trendHistory.length - 1])}
+                </text>
+                <text
+                  x={firstX}
+                  y={firstY + 16}
+                  fill="rgba(253,253,254,0.44)"
+                  fontFamily="Outfit"
+                  fontSize="10"
+                  fontWeight="400"
+                  textAnchor="start"
+                  style={{ fontFeatureSettings: "'tnum'" }}
+                >
+                  {fmtVolume(trendHistory[0])}
+                </text>
+              </svg>
+              <div className="trend-axis">
+                <div className="pt">{trendHistory.length}w geleden</div>
+                <div className="pt now">Vandaag</div>
+              </div>
+            </div>
+          )}
+
+          {/* PRs (light, conditional) */}
+          {prRows.length > 0 && (
+            <div className="review-card">
+              <div className="prs-head">
+                <span className="pulse" />
+                <div className="prs-title">
+                  Nieuwe records · {prRows.length}
+                </div>
+              </div>
+              {prRows.map((pr) => (
+                <div key={pr.exerciseId} className="pr-row">
+                  <div>
+                    <span className="pr-name">{pr.name}</span>
+                    <span className="pr-tag">Nieuw</span>
+                  </div>
+                  <div className="pr-delta">
+                    {pr.fromVal > 0 && <span>{pr.fromVal}</span>}
+                    {pr.fromVal > 0 && <span className="arrow">→</span>}
+                    <span>
+                      {pr.toVal} {pr.unit}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      )}
 
-      {/* ── Feedback voor coach ── */}
-      <div className="border-t border-[#F0F0EE] pt-8 mb-8">
-        <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-3">
-          Feedback voor je coach
-        </p>
-        <textarea
-          value={feedbackText}
-          onChange={(e) => setFeedbackText(e.target.value)}
-          placeholder="Welke oefeningen wil je meer of minder?"
-          className="w-full px-4 py-3 border border-[#F0F0EE] rounded-xl text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917] resize-none h-20 bg-white"
-        />
-      </div>
+        {/* 4 · Per oefening */}
+        {exerciseGroups.length > 0 && (
+          <>
+            <div className="review-section-head">
+              <h3>Per oefening</h3>
+              <span>
+                {exerciseGroups.length} oefeningen
+              </span>
+            </div>
+            {exerciseGroups.map((g) => {
+              const top = g.topSet
+              const topSummary = top
+                ? top.weight_kg && top.weight_kg > 0
+                  ? `${g.sets.length} × ${top.weight_kg} kg`
+                  : `${g.sets.length} × ${top.actual_reps || 0} reps`
+                : `${g.sets.length} sets`
+              let deltaLabel = '='
+              let deltaFlat = true
+              if (g.prevVolume && g.prevVolume > 0 && g.volume > 0) {
+                const diff = g.volume - g.prevVolume
+                if (Math.abs(diff) / g.prevVolume >= 0.02) {
+                  deltaFlat = false
+                  if (g.hasPR) {
+                    deltaLabel = `+${Math.round(diff)} kg · PR`
+                  } else if (diff > 0) {
+                    deltaLabel = `+${Math.round(diff)} kg`
+                  } else {
+                    deltaLabel = `${Math.round(diff)} kg`
+                  }
+                } else if (g.hasPR) {
+                  deltaFlat = false
+                  deltaLabel = 'PR'
+                }
+              } else if (g.hasPR) {
+                deltaFlat = false
+                deltaLabel = 'PR'
+              }
 
-      {/* ── Notities ── */}
-      <div className="border-t border-[#F0F0EE] pt-8 mb-10">
-        <p className="text-[11px] text-[#C0C0C0] uppercase tracking-[1px] mb-3">
-          Notities <span className="normal-case tracking-normal text-[#D5D5D5]">(optioneel)</span>
-        </p>
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="Hoe ging het? Extra opmerkingen..."
-          className="w-full px-4 py-3 border border-[#F0F0EE] rounded-xl text-[14px] text-[#1A1917] placeholder-[#C0C0C0] focus:outline-none focus:border-[#1A1917] resize-none h-20 bg-white"
-        />
-      </div>
+              const spark = buildSparkPath(
+                g.history.length > 0 ? g.history : [g.volume],
+                64,
+                28,
+                2
+              )
 
-      {/* ── Sticky CTA ── */}
-      <div className="fixed bottom-20 left-0 right-0 px-5 z-30 pointer-events-none">
-        <div className="max-w-lg mx-auto pointer-events-auto">
-          <button
-            onClick={handleComplete}
-            disabled={saving}
-            className="w-full py-4 rounded-2xl bg-[#1A1917] text-white font-bold text-[14px] uppercase tracking-[0.06em] flex items-center justify-center gap-2 shadow-lg shadow-black/10 hover:bg-[#333330] transition-all active:scale-[0.98] disabled:opacity-50 touch-manipulation"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            {saving ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <>
-                Opslaan & afsluiten
-                <ArrowRight size={16} strokeWidth={2} />
-              </>
-            )}
-          </button>
+              return (
+                <button
+                  key={g.exerciseId}
+                  className="ex-review"
+                  onClick={() =>
+                    router.push(`/client/exercises/${g.exerciseId}/history`)
+                  }
+                  style={{ WebkitTapHighlightColor: 'transparent' }}
+                >
+                  <div className="ex-body">
+                    <div className="ex-name">{g.name}</div>
+                    <div className="ex-meta">
+                      <span>{topSummary}</span>
+                      <span className={`delta${deltaFlat ? ' flat' : ''}`}>
+                        {deltaLabel}
+                      </span>
+                    </div>
+                  </div>
+                  <svg
+                    className="spark"
+                    viewBox="0 0 64 28"
+                    preserveAspectRatio="none"
+                  >
+                    <path
+                      d={spark.d}
+                      stroke="rgba(253,253,254,0.50)"
+                      strokeWidth="1.3"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    {g.hasPR ? (
+                      <>
+                        <circle
+                          cx={spark.lastX}
+                          cy={spark.lastY}
+                          r="3.5"
+                          fill="rgba(192,252,1,0.22)"
+                        />
+                        <circle
+                          cx={spark.lastX}
+                          cy={spark.lastY}
+                          r="2.5"
+                          fill="#C0FC01"
+                        />
+                      </>
+                    ) : (
+                      <circle
+                        cx={spark.lastX}
+                        cy={spark.lastY}
+                        r="2.5"
+                        fill="rgba(253,253,254,0.70)"
+                      />
+                    )}
+                  </svg>
+                  <svg className="chev" viewBox="0 0 24 24">
+                    <polyline
+                      points="9 6 15 12 9 18"
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+              )
+            })}
+          </>
+        )}
+
+        {/* 5 · Reflect + 6 · Morgen */}
+        <div
+          style={{
+            padding: '0 5%',
+            marginTop: 14,
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <div className="review-card dark reflect">
+            <h3>Hoe voelde deze training?</h3>
+            <div className="rpe">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  className={`rpe-dot${rpe === n ? ' on' : ''}`}
+                  onClick={() => setRpe(n)}
+                  style={{ WebkitTapHighlightColor: 'transparent' }}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+            <div className="rpe-scale">
+              <span>Licht</span>
+              <span>Maximaal</span>
+            </div>
+            <textarea
+              className="note-box"
+              placeholder="Notitie voor je coach…"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={2}
+            />
+          </div>
+
+          {nextWorkout && (
+            <button
+              className="tomorrow"
+              onClick={() => router.push('/client/workout')}
+              style={{ WebkitTapHighlightColor: 'transparent' }}
+            >
+              <div className="t-lbl">Morgen</div>
+              <div className="t-body">
+                {nextWorkout.name}
+                <small>{nextWorkout.meta}</small>
+              </div>
+              <svg className="chev" viewBox="0 0 24 24">
+                <polyline
+                  points="9 6 15 12 9 18"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          )}
         </div>
-      </div>
+      </main>
 
-      <p className="text-center text-[12px] text-[#D5D5D5] mt-3">
-        Je coach ziet deze feedback bij de volgende aanpassing
-      </p>
+      {/* ═══ STICKY FOOTER ═════════════════════════ */}
+      <div className="review-foot">
+        <button
+          className="btn-share"
+          onClick={handleShare}
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+        >
+          <svg viewBox="0 0 24 24">
+            <path d="M7 11l10-6M7 13l10 6" strokeLinecap="round" />
+            <circle cx="5" cy="12" r="2.5" />
+            <circle cx="19" cy="5" r="2.5" />
+            <circle cx="19" cy="19" r="2.5" />
+          </svg>
+          Delen met coach
+        </button>
+        <button
+          className="btn-close"
+          onClick={handleComplete}
+          disabled={saving}
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+        >
+          {saving ? 'Opslaan…' : 'Sluiten'}
+        </button>
+      </div>
     </div>
   )
 }

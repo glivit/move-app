@@ -1281,6 +1281,13 @@ body:has(.workout-active-modal) [data-client-bottom-nav] { display: none !import
   line-height: 1.1;
   margin-bottom: 4px;
 }
+.page-head.review-head .page-sub {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(253,253,254,0.62);
+  letter-spacing: -0.003em;
+  font-feature-settings: "tnum";
+}
 
 .hero-card { padding: 22px 22px 22px; }
 .hero-title {
