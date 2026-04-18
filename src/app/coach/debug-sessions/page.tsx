@@ -29,6 +29,16 @@ interface SessionRow {
   notes: string | null
 }
 
+// Lichte variant voor de "recent ever" diagnostic — alleen gegarandeerd-bestaande kolommen
+interface RecentEverRow {
+  id: string
+  started_at: string | null
+  completed_at: string | null
+  template_day_id: string | null
+  client_program_id: string | null
+  created_at: string | null
+}
+
 interface ProgramRow {
   id: string
   name: string | null
@@ -143,7 +153,7 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
   // de 5 meest recente. Zo zien we meteen of het een id-mismatch-probleem is
   // (ooit=0) of een window-probleem (ooit>0, maar windowed=0).
   let everCount: number | null = null
-  let recentEver: SessionRow[] = []
+  let recentEver: RecentEverRow[] = []
   // Error capture per query — zo zien we als de SELECT silently faalt
   const queryErrors: { query: string; message: string }[] = []
 
@@ -212,7 +222,7 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
     const sessionsByStarted = sessionsByStartedRes.data
     const sessionsByCompleted = sessionsByCompletedRes.data
     everCount = everCountResWrap.count ?? null
-    recentEver = (recentEverResWrap.data as SessionRow[]) || []
+    recentEver = (recentEverResWrap.data as RecentEverRow[]) || []
 
     // Merge + dedupe by id
     const byId = new Map<string, SessionRow>()
@@ -491,6 +501,27 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
               />
             </div>
 
+            {/* Query errors banner — tonen als enige query faalde */}
+            {queryErrors.length > 0 && (
+              <div
+                className="mb-4 rounded-2xl p-3"
+                style={{
+                  background: 'rgba(232,169,60,0.10)',
+                  border: `1px solid ${HAIR}`,
+                  color: INK,
+                }}
+              >
+                <div className="mb-1 text-[12px]" style={{ color: AMBER }}>
+                  ⚠︎ Query-errors:
+                </div>
+                {queryErrors.map((e, i) => (
+                  <div key={i} className="text-[11px]" style={{ color: AMBER }}>
+                    <span style={{ color: INK }}>{e.query}:</span> {e.message}
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* Recent-ever diagnostic — altijd zichtbaar, geen date-window */}
             {everCount !== null && (
               <div
@@ -502,13 +533,18 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
                 }}
               >
                 <div className="mb-1.5 text-[12px]" style={{ color: BLUE }}>
-                  🔎 5 meest recente workout_sessions voor <span className="tabular-nums">{client.id.slice(0, 8)}</span>{' '}
-                  — ongeacht datum
+                  🔎 5 meest recente workout_sessions (sort op created_at) voor{' '}
+                  <span className="tabular-nums">{client.id.slice(0, 8)}</span> — ongeacht datum
                 </div>
-                {recentEver.length === 0 ? (
+                {everCount === 0 ? (
                   <div className="text-[12px]" style={{ color: AMBER }}>
-                    ⚠︎ 0 sessies ooit voor deze client.id — id-mismatch waarschijnlijk. Controleer of dit de
-                    juiste Charles is.
+                    ⚠︎ 0 sessies ooit voor deze client.id — id-mismatch. Controleer of dit de juiste
+                    Charles is.
+                  </div>
+                ) : recentEver.length === 0 ? (
+                  <div className="text-[12px]" style={{ color: AMBER }}>
+                    ⚠︎ Count zegt {everCount} sessies, maar SELECT gaf 0 rijen terug — query faalt
+                    stil. Zie query-errors boven.
                   </div>
                 ) : (
                   <div className="space-y-1 text-[11px] tabular-nums" style={{ color: INK_MUTED }}>
@@ -528,6 +564,9 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
                         <span style={{ color: INK }}>{fmtTime(s.started_at)}</span>
                         <span>→</span>
                         <span>{fmtTime(s.completed_at)}</span>
+                        <span style={{ color: 'rgba(253,253,254,0.35)' }}>
+                          (created {fmtTime(s.created_at)})
+                        </span>
                         <span className="truncate" style={{ color: 'rgba(253,253,254,0.35)' }}>
                           {s.id.slice(0, 8)}
                         </span>
