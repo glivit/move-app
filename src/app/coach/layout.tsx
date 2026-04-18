@@ -15,7 +15,7 @@ export default function CoachLayout({ children }: { children: React.ReactNode })
       </div>
 
       <main className="lg:pl-[280px]">
-        <div className="max-w-[420px] lg:max-w-5xl mx-auto px-[22px] lg:px-10 pt-[14px] lg:pt-10 pb-8">
+        <div className="max-w-[420px] lg:max-w-5xl mx-auto px-[22px] lg:px-10 pb-8 pt-[calc(env(safe-area-inset-top,0px)+18px)] lg:pt-10">
           {children}
         </div>
       </main>

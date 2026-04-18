@@ -58,7 +58,7 @@ export function InboxView({ data, coachId }: Props) {
   return (
     <div className="pb-32">
       {/* Header */}
-      <div className="flex items-end justify-between pt-[14px] pb-[18px] px-0.5">
+      <div className="flex items-end justify-between pb-[22px] px-0.5">
         <div>
           <h1
             className="text-[30px] font-light tracking-[-0.025em] leading-[1.1] text-[#FDFDFE]"
@@ -77,7 +77,7 @@ export function InboxView({ data, coachId }: Props) {
         <button
           type="button"
           aria-label="Zoek"
-          className="w-10 h-10 rounded-full bg-[rgba(253,253,254,0.08)] text-[#FDFDFE] flex items-center justify-center"
+          className="w-10 h-10 rounded-full bg-[rgba(253,253,254,0.06)] text-[rgba(253,253,254,0.72)] flex items-center justify-center"
         >
           <svg
             viewBox="0 0 24 24"
@@ -96,7 +96,7 @@ export function InboxView({ data, coachId }: Props) {
 
       {/* Filter pills */}
       <div
-        className="flex gap-1.5 mb-[22px] overflow-x-auto"
+        className="flex gap-1.5 mb-[18px] overflow-x-auto"
         style={{ scrollbarWidth: 'none' }}
       >
         <FilterPill
@@ -212,7 +212,7 @@ function FilterPill({
 
 function SectionLabel({ label, count }: { label: string; count: number }) {
   return (
-    <div className="flex items-baseline justify-between mt-2 mb-[10px] mx-0.5 text-[11px] uppercase tracking-[0.18em] text-[rgba(253,253,254,0.40)]">
+    <div className="flex items-baseline justify-between mt-3 mb-[8px] mx-0.5 text-[10.5px] uppercase tracking-[0.18em] text-[rgba(253,253,254,0.36)]">
       <span>{label}</span>
       <span className="tracking-[0.04em]">{count}</span>
     </div>
@@ -228,11 +228,10 @@ function ThreadCard({ thread }: { thread: InboxThread }) {
 
   if (dismissed) return null
 
-  const isAlert = !!thread.alertVariant
+  // v3 clean: geen amber bg/border meer — de colored dot + optionele amber
+  // kicker doen het accent-werk. Alles leeft op dezelfde dark card-basis.
   const base = thread.read
-    ? 'bg-[rgba(71,75,72,0.55)]'
-    : isAlert
-    ? 'bg-[rgba(232,169,60,0.08)] border border-[rgba(232,169,60,0.18)]'
+    ? 'bg-[rgba(71,75,72,0.45)]'
     : 'bg-[#474B48]'
 
   const handleOpen = () => {
@@ -257,6 +256,11 @@ function ThreadCard({ thread }: { thread: InboxThread }) {
     setDismissed(true)
   }
 
+  // Only surface amber/lime kickers — neutral kickers add visual noise.
+  const showKicker =
+    thread.kicker &&
+    (thread.kickerVariant === 'act' || thread.kickerVariant === 'live')
+
   return (
     <div
       role="button"
@@ -268,13 +272,13 @@ function ThreadCard({ thread }: { thread: InboxThread }) {
           handleOpen()
         }
       }}
-      className={`relative rounded-[18px] px-[14px] pr-4 py-[14px] mb-2 grid grid-cols-[22px_1fr_14px] gap-3 items-start cursor-pointer ${base}`}
+      className={`relative rounded-[16px] px-[14px] py-[13px] mb-1.5 grid grid-cols-[18px_1fr] gap-3 items-start cursor-pointer transition-colors active:bg-[rgba(71,75,72,0.75)] ${base}`}
     >
-      <div className="flex justify-center pt-[3px]">
+      <div className="flex justify-center pt-[5px]">
         <ThreadDot dot={thread.dotClass} />
       </div>
       <div className="min-w-0">
-        <div className="flex items-baseline justify-between gap-2.5 mb-1">
+        <div className="flex items-baseline justify-between gap-2.5">
           <span
             className={`text-[14.5px] tracking-[-0.005em] truncate ${
               thread.read
@@ -284,26 +288,24 @@ function ThreadCard({ thread }: { thread: InboxThread }) {
           >
             {thread.clientName}
           </span>
-          <span className="text-[11.5px] text-[rgba(253,253,254,0.40)] tracking-[0.01em] flex-shrink-0">
+          <span className="text-[11px] text-[rgba(253,253,254,0.40)] tracking-[0.01em] flex-shrink-0">
             {thread.timeLabel}
           </span>
         </div>
-        {thread.kicker && (
+        {showKicker && (
           <div
-            className={`text-[10.5px] uppercase tracking-[0.14em] mb-1 ${
+            className={`text-[10px] uppercase tracking-[0.14em] mt-[3px] ${
               thread.kickerVariant === 'act'
                 ? 'text-[#E8A93C]'
-                : thread.kickerVariant === 'live'
-                ? 'text-[#C0FC01]'
-                : 'text-[rgba(253,253,254,0.40)]'
+                : 'text-[#C0FC01]'
             }`}
           >
             {thread.kicker}
           </div>
         )}
         <p
-          className={`text-[13.5px] leading-[1.45] tracking-[-0.005em] m-0 ${
-            thread.read ? 'text-[rgba(253,253,254,0.62)]' : 'text-[#FDFDFE]'
+          className={`text-[13px] leading-[1.42] tracking-[-0.005em] m-0 mt-[3px] ${
+            thread.read ? 'text-[rgba(253,253,254,0.55)]' : 'text-[rgba(253,253,254,0.82)]'
           }`}
           style={{
             display: '-webkit-box',
@@ -348,9 +350,6 @@ function ThreadCard({ thread }: { thread: InboxThread }) {
           </div>
         )}
       </div>
-      <span className="text-[rgba(253,253,254,0.40)] text-[15px] leading-none pt-1 justify-self-end">
-        ›
-      </span>
     </div>
   )
 }
