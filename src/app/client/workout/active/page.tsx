@@ -1551,11 +1551,46 @@ function ActiveWorkoutPage() {
         }
         setSets(setsMap)
 
-        const { data: newSession } = await supabase
+        const { data: newSession, error: insertErr } = await supabase
           .from('workout_sessions')
           .insert({ client_id: authUser.id, client_program_id: programId, template_day_id: dayId, started_at: new Date().toISOString() })
           .select().single()
-        if (newSession) setSession(newSession as WorkoutSession)
+        if (insertErr || !newSession) {
+          // CRITICAL: zonder session.id kan completeSet() niets bewaren —
+          // sets verdwijnen stil. Toon expliciet aan de user en log naar
+          // bug_reports zodat coach het ziet.
+          console.error('[workout/active] session INSERT failed', {
+            insertErr,
+            programId,
+            dayId,
+            clientId: authUser.id,
+          })
+          try {
+            await supabase.from('bug_reports').insert({
+              user_id: authUser.id,
+              page_url: typeof window !== 'undefined' ? window.location.href : '/client/workout/active',
+              description:
+                '[auto] workout_sessions INSERT failed — ' +
+                (insertErr?.message || 'no row') +
+                ' | program=' + String(programId) +
+                ' day=' + String(dayId) +
+                (insertErr?.code ? ' code=' + insertErr.code : '') +
+                (insertErr?.details ? ' details=' + insertErr.details : ''),
+              viewport_width: typeof window !== 'undefined' ? window.innerWidth : null,
+              viewport_height: typeof window !== 'undefined' ? window.innerHeight : null,
+              user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+            })
+          } catch { /* best effort */ }
+          alert(
+            'Workout kon niet gestart worden — neem contact op met je coach.\n\n' +
+              'Reden: ' +
+              (insertErr?.message || 'onbekend') +
+              '\nDit is gelogd zodat je sets niet verloren gaan.',
+          )
+          router.push('/client')
+          return
+        }
+        setSession(newSession as WorkoutSession)
       } catch (error) { console.error('Error loading workout:', error) }
       finally { setLoading(false) }
     }
