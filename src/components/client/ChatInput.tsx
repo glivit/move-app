@@ -2,16 +2,45 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
-import { Send, Paperclip, X, Camera, Image as ImageIcon, Film, Mic, Square } from 'lucide-react'
+import {
+  Send,
+  Plus,
+  X,
+  Camera,
+  Image as ImageIcon,
+  Film,
+  Mic,
+  Square,
+  Paperclip,
+} from 'lucide-react'
 
 interface ChatInputProps {
   onSend: (content: string, messageType?: string, fileUrl?: string) => void
   loading?: boolean
 }
 
+/**
+ * v6 Orion · Chat input pill
+ * Geënt op design-system/09-chat.html `.input-bar`:
+ *   - dark pill (#474B48), grid 36px 1fr 36px.
+ *   - links: attach/plus knop (opent media-menu).
+ *   - midden: textveld (transparant, ink-placeholder).
+ *   - rechts: MIC in rest-state — swap naar SEND zodra er tekst staat
+ *     (design: "send na typen"). Long-press/klik op mic start opname.
+ *   - geen top-border; het bubble-oppervlak zweeft boven canvas via
+ *     eigen schaduw.
+ */
+
+const DARK = '#474B48'
+const WHITE = '#FDFDFE'
+const LIME = '#C0FC01'
+const PLACEHOLDER = 'rgba(253,253,254,0.44)'
+const INK_MUTED = 'rgba(253,253,254,0.62)'
+const INPUT_BG = 'rgba(253,253,254,0.06)'
+const INPUT_HOVER = 'rgba(253,253,254,0.12)'
+
 export function ChatInput({ onSend, loading = false }: ChatInputProps) {
   const [content, setContent] = useState('')
-  const [showSendButton, setShowSendButton] = useState(false)
   const [showMediaMenu, setShowMediaMenu] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -28,15 +57,13 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const videoInputRef = useRef<HTMLInputElement>(null)
+  const docInputRef = useRef<HTMLInputElement>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  useEffect(() => {
-    setShowSendButton(content.trim().length > 0 || filePreview !== null)
-  }, [content, filePreview])
+  const hasContent = content.trim().length > 0 || filePreview !== null
 
-  // Cleanup recording on unmount
   useEffect(() => {
     return () => {
       if (recordingIntervalRef.current) clearInterval(recordingIntervalRef.current)
@@ -50,10 +77,13 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
     if (isUploading) return
 
     if (filePreview) {
-      const messageType = filePreview.type.startsWith('image/') ? 'image'
-        : filePreview.type.startsWith('video/') ? 'video'
-        : filePreview.type.startsWith('audio/') ? 'voice'
-        : 'file'
+      const messageType = filePreview.type.startsWith('image/')
+        ? 'image'
+        : filePreview.type.startsWith('video/')
+          ? 'video'
+          : filePreview.type.startsWith('audio/')
+            ? 'voice'
+            : 'file'
       onSend(content || filePreview.name, messageType, filePreview.url)
       setFilePreview(null)
       setContent('')
@@ -85,6 +115,7 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
     }
   }
 
+  /* ─── compress large photos in-browser to keep upload fast ─── */
   const compressImage = async (file: File): Promise<File> => {
     if (!file.type.startsWith('image/') || file.size < 500_000) return file
 
@@ -120,7 +151,6 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
           0.8
         )
       }
-
       img.onerror = () => resolve(file)
       img.src = URL.createObjectURL(file)
     })
@@ -132,17 +162,14 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
     setShowMediaMenu(false)
 
     try {
-      // Create local preview for images
       let localPreview: string | undefined
       if (file.type.startsWith('image/')) {
         localPreview = URL.createObjectURL(file)
       }
 
-      // Compress images
       const processedFile = await compressImage(file)
       setUploadProgress(30)
 
-      // Upload via server-side API route (bypasses storage RLS)
       const formData = new FormData()
       formData.append('file', processedFile)
       formData.append('bucket', 'message-attachments')
@@ -176,7 +203,7 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
     e.target.value = ''
   }
 
-  // Voice recording
+  /* ─── voice recording ─── */
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -191,7 +218,9 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
       mediaRecorder.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop())
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
-        const audioFile = new File([audioBlob], `voice-${Date.now()}.webm`, { type: 'audio/webm' })
+        const audioFile = new File([audioBlob], `voice-${Date.now()}.webm`, {
+          type: 'audio/webm',
+        })
         await uploadFile(audioFile)
       }
 
@@ -226,40 +255,17 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
     return `${m}:${s.toString().padStart(2, '0')}`
   }
 
-  // v6 tokens
-  const DARK = '#474B48'
-  const INPUT_BG = 'rgba(253,253,254,0.08)'
-  const INPUT_HOVER = 'rgba(253,253,254,0.12)'
-  const BORDER_TOP = 'rgba(253,253,254,0.08)'
-  const MUTED = 'rgba(253,253,254,0.48)'
-  const PLACEHOLDER = 'rgba(253,253,254,0.38)'
-  const WHITE = '#FDFDFE'
-  const LIME = '#C0FC01'
-  const INK = '#FDFDFE'
-
   return (
-    <div style={{ background: DARK, borderTop: `1px solid ${BORDER_TOP}` }}>
-      {/* Upload progress */}
-      {isUploading && (
-        <div className="px-4 pt-3">
-          <div className="flex items-center gap-3">
-            <div
-              className="flex-1 h-1 rounded-full overflow-hidden"
-              style={{ background: INPUT_BG }}
-            >
-              <div
-                className="h-full rounded-full transition-all duration-300"
-                style={{ width: `${uploadProgress}%`, background: LIME }}
-              />
-            </div>
-            <span className="text-[11px]" style={{ color: MUTED }}>Uploaden...</span>
-          </div>
-        </div>
-      )}
-
-      {/* File preview */}
+    <div
+      style={{
+        padding: '10px 5% calc(14px + env(safe-area-inset-bottom, 0px))',
+        background:
+          'linear-gradient(180deg, rgba(142,152,144,0) 0%, rgba(142,152,144,0.95) 30%, rgba(142,152,144,1) 100%)',
+      }}
+    >
+      {/* ═══ File preview strip ═══ */}
       {filePreview && (
-        <div className="px-4 pt-3">
+        <div className="pb-2">
           <div className="relative inline-block">
             {filePreview.type.startsWith('image/') ? (
               <Image
@@ -275,8 +281,10 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
                 className="h-20 w-32 rounded-xl flex items-center justify-center"
                 style={{ background: INPUT_BG }}
               >
-                <Film size={24} style={{ color: MUTED }} />
-                <span className="text-[11px] ml-1" style={{ color: MUTED }}>Video</span>
+                <Film size={24} style={{ color: INK_MUTED }} />
+                <span className="text-[11px] ml-1" style={{ color: INK_MUTED }}>
+                  Video
+                </span>
               </div>
             ) : filePreview.type.startsWith('audio/') ? (
               <div
@@ -284,15 +292,22 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
                 style={{ background: INPUT_BG }}
               >
                 <Mic size={16} style={{ color: WHITE }} />
-                <span className="text-[13px]" style={{ color: WHITE }}>Spraakbericht</span>
+                <span className="text-[13px]" style={{ color: WHITE }}>
+                  Spraakbericht
+                </span>
               </div>
             ) : (
               <div
                 className="h-12 px-4 rounded-xl flex items-center gap-2"
                 style={{ background: INPUT_BG }}
               >
-                <Paperclip size={16} style={{ color: MUTED }} />
-                <span className="text-[13px] truncate max-w-[200px]" style={{ color: WHITE }}>{filePreview.name}</span>
+                <Paperclip size={16} style={{ color: INK_MUTED }} />
+                <span
+                  className="text-[13px] truncate max-w-[200px]"
+                  style={{ color: WHITE }}
+                >
+                  {filePreview.name}
+                </span>
               </div>
             )}
             <button
@@ -301,7 +316,12 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
                 setFilePreview(null)
               }}
               className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center"
-              style={{ background: INK, boxShadow: '0 2px 4px rgba(0,0,0,0.32)' }}
+              style={{
+                background: DARK,
+                border: '1px solid rgba(253,253,254,0.12)',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.32)',
+              }}
+              aria-label="Bestand verwijderen"
             >
               <X size={12} style={{ color: WHITE }} />
             </button>
@@ -309,14 +329,37 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
         </div>
       )}
 
-      {/* Recording indicator */}
+      {/* ═══ Upload progress ═══ */}
+      {isUploading && (
+        <div className="pb-2">
+          <div className="flex items-center gap-3">
+            <div
+              className="flex-1 h-1 rounded-full overflow-hidden"
+              style={{ background: INPUT_BG }}
+            >
+              <div
+                className="h-full rounded-full transition-all duration-300"
+                style={{ width: `${uploadProgress}%`, background: LIME }}
+              />
+            </div>
+            <span className="text-[11px]" style={{ color: INK_MUTED }}>
+              Uploaden…
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* ═══ Recording indicator ═══ */}
       {isRecording && (
-        <div className="px-4 pt-3">
+        <div className="pb-2">
           <div
-            className="flex items-center gap-3 py-2 px-4 rounded-xl"
+            className="flex items-center gap-3 py-2 px-4 rounded-full"
             style={{ background: 'rgba(232,96,79,0.14)' }}
           >
-            <div className="w-3 h-3 rounded-full animate-pulse" style={{ background: '#B55A4A' }} />
+            <div
+              className="w-3 h-3 rounded-full animate-pulse"
+              style={{ background: '#B55A4A' }}
+            />
             <span className="text-[13px] font-medium" style={{ color: '#B55A4A' }}>
               Opnemen {formatRecordingTime(recordingTime)}
             </span>
@@ -324,6 +367,7 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
               onClick={stopRecording}
               className="ml-auto w-8 h-8 rounded-full flex items-center justify-center"
               style={{ background: '#B55A4A' }}
+              aria-label="Opname stoppen"
             >
               <Square size={12} style={{ color: WHITE }} fill={WHITE} />
             </button>
@@ -331,85 +375,180 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
         </div>
       )}
 
-      {/* Media menu */}
+      {/* ═══ Media menu (chips) ═══ */}
       {showMediaMenu && !isRecording && (
-        <div className="px-4 pt-3 flex gap-2 flex-wrap">
+        <div className="pb-2 flex gap-2 flex-wrap">
           {[
             { icon: ImageIcon, label: 'Foto', onClick: () => fileInputRef.current?.click() },
             { icon: Camera, label: 'Camera', onClick: () => cameraInputRef.current?.click() },
             { icon: Film, label: 'Video', onClick: () => videoInputRef.current?.click() },
-            { icon: Mic, label: 'Audio', onClick: startRecording },
+            { icon: Paperclip, label: 'Bestand', onClick: () => docInputRef.current?.click() },
           ].map(({ icon: Icon, label, onClick }) => (
             <button
               key={label}
               onClick={onClick}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full transition-colors"
               style={{ background: INPUT_BG }}
               onMouseEnter={(e) => (e.currentTarget.style.background = INPUT_HOVER)}
               onMouseLeave={(e) => (e.currentTarget.style.background = INPUT_BG)}
             >
               <Icon size={16} style={{ color: WHITE }} />
-              <span className="text-[13px] font-medium" style={{ color: WHITE }}>{label}</span>
+              <span
+                className="text-[13px] font-medium"
+                style={{ color: WHITE, letterSpacing: '-0.003em' }}
+              >
+                {label}
+              </span>
             </button>
           ))}
         </div>
       )}
 
-      {/* Hidden file inputs */}
-      <input ref={fileInputRef} type="file" onChange={handleFileSelect} className="hidden" accept="image/*" />
-      <input ref={cameraInputRef} type="file" onChange={handleFileSelect} className="hidden" accept="image/*" capture="environment" />
-      <input ref={videoInputRef} type="file" onChange={handleFileSelect} className="hidden" accept="video/*" capture="environment" />
+      {/* hidden file inputs */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        onChange={handleFileSelect}
+        className="hidden"
+        accept="image/*"
+      />
+      <input
+        ref={cameraInputRef}
+        type="file"
+        onChange={handleFileSelect}
+        className="hidden"
+        accept="image/*"
+        capture="environment"
+      />
+      <input
+        ref={videoInputRef}
+        type="file"
+        onChange={handleFileSelect}
+        className="hidden"
+        accept="video/*"
+        capture="environment"
+      />
+      <input
+        ref={docInputRef}
+        type="file"
+        onChange={handleFileSelect}
+        className="hidden"
+        accept=".pdf,.doc,.docx,.xls,.xlsx"
+      />
 
-      {/* Input row */}
-      <div className="px-4 py-3 flex items-end gap-2">
-        {!isRecording && (
-          <button
-            onClick={() => setShowMediaMenu(!showMediaMenu)}
-            disabled={loading || isUploading}
-            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
-            style={{
-              background: showMediaMenu ? LIME : 'transparent',
-              color: showMediaMenu ? INK : MUTED,
-            }}
-          >
-            {showMediaMenu ? <X size={18} strokeWidth={1.5} /> : <Paperclip size={18} strokeWidth={1.5} />}
-          </button>
-        )}
+      {/* ═══ The pill ═══ */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '36px 1fr 36px',
+          alignItems: 'center',
+          gap: 8,
+          padding: '8px 8px 8px 8px',
+          background: DARK,
+          borderRadius: 999,
+          boxShadow:
+            'inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.28)',
+        }}
+      >
+        {/* Attach */}
+        <button
+          onClick={() => !isRecording && setShowMediaMenu(!showMediaMenu)}
+          disabled={loading || isUploading || isRecording}
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: '50%',
+            background: showMediaMenu ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.06)',
+            border: 'none',
+            cursor: isRecording ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'background 160ms ease, transform 160ms ease',
+            transform: showMediaMenu ? 'rotate(45deg)' : 'rotate(0deg)',
+          }}
+          aria-label={showMediaMenu ? 'Menu sluiten' : 'Bijlage toevoegen'}
+        >
+          <Plus size={16} style={{ color: WHITE }} strokeWidth={1.8} />
+        </button>
 
+        {/* Text field */}
         <textarea
           ref={textareaRef}
           value={content}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          placeholder={isRecording ? 'Opname bezig...' : 'Typ een bericht...'}
+          placeholder={isRecording ? 'Opname bezig…' : 'Bericht…'}
           disabled={loading || isUploading || isRecording}
-          className="flex-1 rounded-2xl px-4 py-2.5 text-[15px] resize-none min-h-[40px] max-h-[120px] focus:outline-none disabled:opacity-50 chat-input-textarea"
+          rows={1}
+          className="chat-pill-textarea"
           style={{
-            background: INPUT_BG,
+            background: 'transparent',
             color: WHITE,
             border: 'none',
+            outline: 'none',
+            fontSize: 14,
+            fontWeight: 400,
+            letterSpacing: '-0.003em',
+            lineHeight: 1.4,
+            padding: '8px 4px',
+            resize: 'none',
+            width: '100%',
+            minHeight: 20,
+            maxHeight: 120,
+            fontFamily: 'inherit',
           }}
-          rows={1}
         />
 
-        {(showSendButton || filePreview) && !isRecording && (
+        {/* Mic ↔ Send (hasContent triggert swap) */}
+        {hasContent ? (
           <button
             onClick={handleSend}
             disabled={loading || isUploading}
-            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all disabled:opacity-50 active:scale-95"
             style={{
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
               background: LIME,
-              color: INK,
-              boxShadow: '0 2px 8px rgba(192,252,1,0.28)',
+              color: '#1A1917',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 10px rgba(192,252,1,0.42)',
+              transition: 'transform 160ms ease',
             }}
+            aria-label="Bericht verzenden"
+            title="Bericht verzenden"
           >
-            <Send size={18} strokeWidth={1.75} />
+            <Send size={15} strokeWidth={2} style={{ color: '#1A1917' }} />
+          </button>
+        ) : (
+          <button
+            onClick={startRecording}
+            disabled={loading || isUploading || isRecording}
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              background: 'rgba(255,255,255,0.06)',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            aria-label="Spraakbericht opnemen"
+            title="Spraakbericht opnemen"
+          >
+            <Mic size={15} style={{ color: WHITE }} strokeWidth={1.8} />
           </button>
         )}
       </div>
 
       <style jsx>{`
-        .chat-input-textarea::placeholder {
+        .chat-pill-textarea::placeholder {
           color: ${PLACEHOLDER};
         }
       `}</style>

@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import { cachedFetch, invalidateCache } from '@/lib/fetcher'
+import { ChatFAB } from '@/components/home/ChatFAB'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -365,6 +366,9 @@ export default function ClientDashboard({ initialData }: { initialData: Dashboar
           </div>
         </section>
       )}
+
+      {/* ═══ CHAT FAB — alleen mobile, lime-pellet bij unread ═══ */}
+      <ChatFAB unreadCount={actions?.unreadMessages ?? 0} />
     </div>
   )
 }

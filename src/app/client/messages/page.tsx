@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { MessageCircle } from 'lucide-react'
+import { MessageCircle, ChevronLeft, Info } from 'lucide-react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { ChatBubble } from '@/components/client/ChatBubble'
 import { ChatInput } from '@/components/client/ChatInput'
@@ -271,10 +272,9 @@ export default function ClientMessagesPage() {
 
   // v6 tokens
   const CANVAS = '#8E9890'
-  const DARK = '#474B48'
   const WHITE = '#FDFDFE'
   const MUTED = 'rgba(253,253,254,0.56)'
-  const DIVIDER = 'rgba(253,253,254,0.14)'
+  const INK_FAINT = 'rgba(253,253,254,0.44)'
 
   if (loading) {
     return (
@@ -282,22 +282,64 @@ export default function ClientMessagesPage() {
         className="flex flex-col -mx-4 -mt-4"
         style={{ height: 'calc(100dvh - 140px)', background: CANVAS }}
       >
+        {/* Ghost header — zelfde vorm als echte .chat-top, zonder data */}
         <div
           style={{
-            background: DARK,
-            padding: '18px 20px',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18)',
+            padding: '18px 5% 14px',
+            display: 'grid',
+            gridTemplateColumns: '32px 1fr 32px',
+            alignItems: 'center',
+            gap: 14,
           }}
         >
-          <div className="animate-pulse space-y-2">
-            <div className="h-5 rounded w-32" style={{ background: 'rgba(253,253,254,0.14)' }} />
-            <div className="h-3 rounded w-24" style={{ background: 'rgba(253,253,254,0.08)' }} />
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 999,
+              background: 'rgba(255,255,255,0.06)',
+            }}
+          />
+          <div className="flex items-center gap-[10px]">
+            <div
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 999,
+                background: 'rgba(255,255,255,0.08)',
+              }}
+            />
+            <div className="animate-pulse space-y-1.5">
+              <div
+                className="h-3 rounded w-24"
+                style={{ background: 'rgba(253,253,254,0.14)' }}
+              />
+              <div
+                className="h-2 rounded w-14"
+                style={{ background: 'rgba(253,253,254,0.08)' }}
+              />
+            </div>
           </div>
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 999,
+              background: 'rgba(255,255,255,0.06)',
+              justifySelf: 'end',
+            }}
+          />
         </div>
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-pulse space-y-3">
-            <div className="h-3 rounded w-48 mx-auto" style={{ background: 'rgba(253,253,254,0.14)' }} />
-            <div className="h-3 rounded w-64 mx-auto" style={{ background: 'rgba(253,253,254,0.10)' }} />
+            <div
+              className="h-3 rounded w-48 mx-auto"
+              style={{ background: 'rgba(253,253,254,0.14)' }}
+            />
+            <div
+              className="h-3 rounded w-64 mx-auto"
+              style={{ background: 'rgba(253,253,254,0.10)' }}
+            />
           </div>
         </div>
       </div>
@@ -328,69 +370,134 @@ export default function ClientMessagesPage() {
 
   return (
     <div
-      className="flex flex-col -mx-4 -mt-4"
+      className="flex flex-col -mx-4 -mt-4 relative"
       style={{ height: 'calc(100dvh - 140px)', background: CANVAS }}
     >
-      {/* Header — dark card */}
+      {/* ═══ Chat top — back · peer · info (design-system 09 .chat-top) ═══
+           Licht gradient naar canvas zodat messages eronder “inzwemmen”. */}
       <div
         className="animate-slide-up"
         style={{
-          background: DARK,
-          padding: '18px 20px',
-          display: 'flex',
+          padding: '18px 5% 14px',
+          display: 'grid',
+          gridTemplateColumns: '32px 1fr 32px',
           alignItems: 'center',
           gap: 14,
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18)',
+          background:
+            'linear-gradient(180deg, rgba(142,152,144,1) 0%, rgba(142,152,144,1) 72%, rgba(142,152,144,0) 100%)',
+          position: 'relative',
+          zIndex: 40,
         }}
       >
-        <div
+        <Link
+          href="/client"
+          aria-label="Terug"
           style={{
-            width: 44,
-            height: 44,
+            width: 32,
+            height: 32,
             borderRadius: '50%',
-            background: '#2F3230',
-            color: WHITE,
+            background: 'rgba(255,255,255,0.06)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.10)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 14,
-            fontWeight: 600,
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+            textDecoration: 'none',
           }}
         >
-          {getInitials(coachName)}
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <h1
+          <ChevronLeft size={14} strokeWidth={1.8} style={{ color: WHITE }} />
+        </Link>
+
+        {/* Peer (coach) — avatar + name + status */}
+        <div className="flex items-center gap-[10px] min-w-0">
+          <div
             style={{
-              fontSize: 16,
-              fontWeight: 600,
-              color: WHITE,
-              letterSpacing: '-0.01em',
-              margin: 0,
+              width: 36,
+              height: 36,
+              borderRadius: '50%',
+              background: 'linear-gradient(140deg, #5A5E52, #3D403A)',
+              color: 'rgba(244,242,235,0.92)',
+              fontSize: 13,
+              fontWeight: 500,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.10)',
+              flexShrink: 0,
             }}
           >
-            {coachName}
-          </h1>
-          <p style={{ fontSize: 12, color: MUTED, marginTop: 2, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span
+            {getInitials(coachName)}
+          </div>
+          <div style={{ lineHeight: 1.15, minWidth: 0 }}>
+            <div
               style={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                background: '#2FA65A',
-                display: 'inline-block',
+                fontSize: 15,
+                fontWeight: 500,
+                letterSpacing: '-0.01em',
+                color: WHITE,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
-            />
-            Je coach
-          </p>
+            >
+              {coachName}
+            </div>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 400,
+                color: INK_FAINT,
+                letterSpacing: '0.01em',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                marginTop: 1,
+              }}
+            >
+              <span
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: '50%',
+                  background: '#2FA65A',
+                  display: 'inline-block',
+                }}
+              />
+              Online
+            </div>
+          </div>
         </div>
+
+        {/* Info — placeholder-knop; toont later coach-bio/contact */}
+        <button
+          aria-label="Info"
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,0.06)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.10)',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            justifySelf: 'end',
+          }}
+        >
+          <Info size={14} strokeWidth={1.8} style={{ color: WHITE }} />
+        </button>
       </div>
 
-      {/* Messages */}
+      {/* ═══ Messages ═══ */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-y-auto px-4 py-4 space-y-3 animate-slide-up stagger-2"
+        className="flex-1 overflow-y-auto animate-slide-up stagger-2"
+        style={{
+          padding: '0 5% 12px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 10,
+        }}
       >
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full animate-fade-in">
@@ -399,11 +506,7 @@ export default function ClientMessagesPage() {
                 className="w-16 h-16 rounded-full flex items-center justify-center mx-auto"
                 style={{ background: 'rgba(253,253,254,0.10)' }}
               >
-                <MessageCircle
-                  size={28}
-                  style={{ color: WHITE }}
-                  strokeWidth={1.5}
-                />
+                <MessageCircle size={28} style={{ color: WHITE }} strokeWidth={1.5} />
               </div>
               <div className="space-y-1">
                 <p style={{ fontSize: 15, fontWeight: 500, color: WHITE }}>
@@ -418,26 +521,25 @@ export default function ClientMessagesPage() {
         ) : (
           <>
             {dateKeys.map((dateKey) => (
-              <div key={dateKey} className="space-y-3">
-                {/* Date separator */}
-                <div className="flex items-center gap-3 py-2">
-                  <div className="flex-1 h-px" style={{ background: DIVIDER }} />
-                  <span
-                    className="px-2"
-                    style={{
-                      fontSize: 11,
-                      color: MUTED,
-                      fontWeight: 500,
-                      letterSpacing: '0.04em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {dateKey}
-                  </span>
-                  <div className="flex-1 h-px" style={{ background: DIVIDER }} />
+              <div
+                key={dateKey}
+                style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+              >
+                {/* Date divider — gecentreerd zonder hairlines. */}
+                <div
+                  style={{
+                    textAlign: 'center',
+                    fontSize: 11,
+                    fontWeight: 500,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: INK_FAINT,
+                    margin: '14px 0 6px',
+                  }}
+                >
+                  {dateKey}
                 </div>
 
-                {/* Messages for this date */}
                 {groupedMessages[dateKey].map((msg) => (
                   <ChatBubble
                     key={msg.id}
@@ -459,7 +561,7 @@ export default function ClientMessagesPage() {
         )}
       </div>
 
-      {/* Input - positioned above mobile nav */}
+      {/* ═══ Input pill ═══ */}
       <div className="sticky bottom-0 left-0 right-0">
         <ChatInput onSend={handleSendMessage} loading={sending} />
       </div>

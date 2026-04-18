@@ -6,6 +6,18 @@ import { useMessageSubscription } from '@/hooks/useMessageSubscription'
 import { MessageInput } from './MessageInput'
 import { MessagePreview } from './MessagePreview'
 
+/**
+ * v6 Orion · Coach-side thread — gespiegeld op design-system/09-chat.html.
+ * Spelregels:
+ *   - Coach (=own) → DARK card, top-right squished, read-receipt onderaan.
+ *   - Client (=other) → LIGHT card, top-left squished.
+ *   - Timestamp staat IN de bubble (10px ink-faint, mt:4px).
+ *   - Date dividers zonder hairlines, gecentreerd uppercase tracking.
+ * Op de coach-tooling zit boven de thread een aparte page-header (client-
+ * naam, terug, tag), dus deze component levert ALLEEN thread + input.
+ */
+const INK_FAINT = 'rgba(253,253,254,0.44)'
+
 interface MessageThreadProps {
   currentUserId: string
   otherUserId: string
@@ -101,10 +113,16 @@ export function MessageThread({
 
   return (
     <div className="flex flex-col h-full" style={{ background: '#8E9890' }}>
-      {/* Messages */}
+      {/* ═══ Messages (5% gutter, 10px gap — matcht .thread) ═══ */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-y-auto px-4 py-6 space-y-5"
+        className="flex-1 overflow-y-auto"
+        style={{
+          padding: '12px 5% 12px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 10,
+        }}
       >
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
@@ -119,7 +137,10 @@ export function MessageThread({
               <p className="text-[15px] font-semibold" style={{ color: '#FDFDFE' }}>
                 Nog geen berichten
               </p>
-              <p className="text-[13px] mt-1" style={{ color: 'rgba(253,253,254,0.72)' }}>
+              <p
+                className="text-[13px] mt-1"
+                style={{ color: 'rgba(253,253,254,0.72)' }}
+              >
                 Start een gesprek met {otherUserName}
               </p>
             </div>
@@ -130,67 +151,47 @@ export function MessageThread({
               const firstDate = new Date(dateMessages[0].created_at)
               const label = formatDateLabel(firstDate)
               return (
-                <div key={dateKey} className="space-y-3">
-                  {/* Date separator */}
-                  <div className="flex items-center gap-3 py-1">
-                    <div className="flex-1 h-px" style={{ background: 'rgba(253,253,254,0.18)' }} />
-                    <span
-                      className="text-[10px] font-semibold px-2 uppercase tracking-[0.16em]"
-                      style={{ color: 'rgba(253,253,254,0.56)' }}
-                    >
-                      {label}
-                    </span>
-                    <div className="flex-1 h-px" style={{ background: 'rgba(253,253,254,0.18)' }} />
+                <div
+                  key={dateKey}
+                  style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+                >
+                  {/* Date divider — gecentreerd, zonder lines */}
+                  <div
+                    style={{
+                      textAlign: 'center',
+                      fontSize: 11,
+                      fontWeight: 500,
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      color: INK_FAINT,
+                      margin: '14px 0 6px',
+                    }}
+                  >
+                    {label}
                   </div>
 
-                  {/* Messages */}
                   {dateMessages.map((msg) => {
                     const isOwn = msg.sender_id === currentUserId
+                    const time = formatTime(msg.created_at)
 
                     if (!isOwn) {
-                      // Other party (client) — light card
+                      // Client (other) — light card, top-left squished
                       return (
                         <div key={msg.id} className="flex justify-start">
-                          <div className="flex flex-col max-w-[78%]">
-                            <div
-                              style={{
-                                background: '#A6ADA7',
-                                borderRadius: 20,
-                                borderBottomLeftRadius: 4,
-                                padding: '12px 16px',
-                                boxShadow:
-                                  'inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 6px rgba(0,0,0,0.14)',
-                              }}
-                            >
-                              <MessagePreview
-                                messageType={msg.message_type}
-                                content={msg.content}
-                                fileUrl={msg.file_url}
-                              />
-                            </div>
-                            <span
-                              className="text-[11px] mt-1 px-2"
-                              style={{ color: 'rgba(253,253,254,0.56)' }}
-                            >
-                              {formatTime(msg.created_at)}
-                            </span>
-                          </div>
-                        </div>
-                      )
-                    }
-
-                    // Own (coach) — dark card with read-receipt
-                    return (
-                      <div key={msg.id} className="flex justify-end">
-                        <div className="flex flex-col max-w-[78%] items-end">
                           <div
                             style={{
-                              background: '#474B48',
-                              borderRadius: 20,
-                              borderBottomRightRadius: 4,
-                              padding: '12px 16px',
+                              maxWidth: '76%',
+                              padding: '11px 14px',
+                              borderRadius: 18,
+                              borderTopLeftRadius: 8,
+                              background: '#A6ADA7',
+                              color: '#FDFDFE',
                               boxShadow:
-                                'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.22)',
+                                'inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 6px rgba(0,0,0,0.14)',
+                              wordWrap: 'break-word',
+                              fontSize: 14,
+                              lineHeight: 1.45,
+                              letterSpacing: '-0.003em',
                             }}
                           >
                             <MessagePreview
@@ -198,26 +199,75 @@ export function MessageThread({
                               content={msg.content}
                               fileUrl={msg.file_url}
                             />
-                          </div>
-                          <div className="flex items-center gap-1.5 mt-1 px-2">
                             <span
-                              className="text-[11px]"
-                              style={{ color: 'rgba(253,253,254,0.56)' }}
+                              style={{
+                                display: 'block',
+                                fontSize: 10,
+                                fontWeight: 400,
+                                color: INK_FAINT,
+                                letterSpacing: '0.02em',
+                                marginTop: 4,
+                                fontFeatureSettings: '"tnum"',
+                              }}
                             >
-                              {formatTime(msg.created_at)}
+                              {time}
                             </span>
+                          </div>
+                        </div>
+                      )
+                    }
+
+                    // Own (coach) — dark card, top-right squished, + read-receipt
+                    return (
+                      <div key={msg.id} className="flex justify-end">
+                        <div
+                          style={{
+                            maxWidth: '76%',
+                            padding: '11px 14px',
+                            borderRadius: 18,
+                            borderTopRightRadius: 8,
+                            background: '#474B48',
+                            color: '#FDFDFE',
+                            boxShadow:
+                              'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.22)',
+                            wordWrap: 'break-word',
+                            fontSize: 14,
+                            lineHeight: 1.45,
+                            letterSpacing: '-0.003em',
+                          }}
+                        >
+                          <MessagePreview
+                            messageType={msg.message_type}
+                            content={msg.content}
+                            fileUrl={msg.file_url}
+                          />
+                          <span
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'flex-end',
+                              gap: 4,
+                              fontSize: 10,
+                              fontWeight: 400,
+                              color: INK_FAINT,
+                              letterSpacing: '0.02em',
+                              marginTop: 4,
+                              fontFeatureSettings: '"tnum"',
+                            }}
+                          >
+                            {time}
                             {msg.read_at ? (
                               <CheckCheck
-                                className="w-3.5 h-3.5"
+                                className="w-3 h-3"
                                 style={{ color: '#2FA65A' }}
                               />
                             ) : (
                               <Check
-                                className="w-3.5 h-3.5"
-                                style={{ color: 'rgba(253,253,254,0.44)' }}
+                                className="w-3 h-3"
+                                style={{ color: INK_FAINT }}
                               />
                             )}
-                          </div>
+                          </span>
                         </div>
                       </div>
                     )

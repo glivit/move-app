@@ -169,6 +169,12 @@ const IcoHelp = () => (
     <line x1="12" y1="16" x2="12" y2="16.01" />
   </svg>
 )
+const IcoLogs = () => (
+  <svg viewBox="0 0 24 24" style={icoStyle}>
+    <path d="M4 6h16M4 12h16M4 18h10" />
+    <circle cx="20" cy="18" r="1.5" fill={icoColor} stroke="none" />
+  </svg>
+)
 
 // ─── Dark mode toggle (inline row) ────────────────────────────
 function AppearanceValue() {
@@ -469,6 +475,12 @@ export default function ProfilePage() {
           leading={<IcoCheckins />}
           label="Check-ins"
           meta="Wekelijkse voortgang"
+        />
+        <Row
+          href="/client/profile/logs"
+          leading={<IcoLogs />}
+          label="Mijn logs"
+          meta="Workouts · gewicht · voeding · verwijderen"
         />
       </div>
 
