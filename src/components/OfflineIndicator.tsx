@@ -1,31 +1,35 @@
 'use client'
 
 /**
- * OfflineIndicator — top-banner die persisteert zolang de browser offline is.
+ * OfflineIndicator — top-banner die toont wanneer de browser offline gaat.
  *
  * Werkt complementair met SyncStatusIndicator (bottom pill, transient):
- *   - Top-banner = persistent context "je bent offline" (geen verrassing
- *     als een actie geen server-respons teruggeeft).
+ *   - Top-banner = persistent context "je bent offline" zodra de browser
+ *     écht een offline-event vuurt.
  *   - Bottom-pill = transient feedback "X items wachten op sync" en
  *     "alles weer in sync" als je terug online komt.
  *
- * v6 Orion: dark-ink banner met lime-rand. Geen bg-warning class meer
- * (oranje/geel matcht de v6 paint nergens en haalt focus naar zichzelf).
+ * BELANGRIJK — géén navigator.onLine-check bij mount:
+ *   navigator.onLine is op iOS PWA (en sommige Safari-builds) niet betrouw-
+ *   baar bij app-launch — het kan 'false' rapporteren totdat de eerste echte
+ *   fetch slaagt. Dat zorgde ervoor dat online users de offline-banner zagen.
+ *   We rekenen daarom alleen op het 'offline' event vanuit het OS.
+ *   Een echte offline-situatie wordt sowieso binnen ms door de browser ge-
+ *   signaleerd, dus dit kost niets aan UX.
+ *
+ * v6 Orion: dark-ink banner met lime-rand.
  */
 
 import { useEffect, useState } from 'react'
 import { WifiOff } from 'lucide-react'
 
 export function OfflineIndicator() {
-  // Lazy initial — synchronous navigator.onLine lezen vóór eerste render
-  // (tijdens SSR bestaat navigator niet, vandaar de typeof-guard).
-  const [isOnline, setIsOnline] = useState(() =>
-    typeof navigator !== 'undefined' ? navigator.onLine : true,
-  )
+  // Default: aannemen dat we online zijn. Pas tonen na een offline-event.
+  const [isOffline, setIsOffline] = useState(false)
 
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true)
-    const handleOffline = () => setIsOnline(false)
+    const handleOnline = () => setIsOffline(false)
+    const handleOffline = () => setIsOffline(true)
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline', handleOffline)
     return () => {
@@ -34,7 +38,7 @@ export function OfflineIndicator() {
     }
   }, [])
 
-  if (isOnline) return null
+  if (!isOffline) return null
 
   return (
     <div

@@ -13,7 +13,43 @@ import { useEffect, useState, useCallback } from 'react'
  * en roept applyUpdate() aan op user-bevestiging. We sturen dan SKIP_WAITING
  * naar de wachtende SW; serwist's eigen handler activeert hem, waarna
  * controllerchange → window.location.reload().
+ *
+ * Fase 6 fix (Bug 74):
+ *   - Het Serwist route-handler pad (`/serwist/sw.js`) levert in dev (en soms
+ *     prod) byte-verschillen per request omdat de SW on-demand gecompileerd
+ *     wordt. De browser ziet dat als een update → SW blijft in "waiting" →
+ *     de update-prompt verscheen bij elke page load.
+ *   - We tonen de prompt nu niet meer voor een pre-existing `registration.
+ *     waiting` bij register-time. Alleen updates die tijdens deze sessie
+ *     via `updatefound` binnenkomen triggeren de prompt. Een waiting SW die
+ *     uit een vorige sessie staat, activeert zichzelf zodra alle tabs dicht
+ *     gaan (native browser behavior).
+ *   - Extra veiligheid: sessionStorage-cooldown van 10 min, zodat opeen-
+ *     volgende dev-rebuilds binnen dezelfde tab niet steeds opnieuw prompten.
+ *   - Reload na SKIP_WAITING: 150ms delay zodat de nieuwe SW genoeg tijd
+ *     heeft om zijn precache te settlen voordat we fetches doen (voorkomt
+ *     "er ging iets mis bij het laden").
  */
+
+const UPDATE_COOLDOWN_KEY = 'move-sw-update-seen-at'
+const UPDATE_COOLDOWN_MS = 10 * 60 * 1000
+
+function isInCooldown(): boolean {
+  try {
+    const seen = parseInt(sessionStorage.getItem(UPDATE_COOLDOWN_KEY) ?? '0', 10)
+    return Number.isFinite(seen) && Date.now() - seen < UPDATE_COOLDOWN_MS
+  } catch {
+    return false
+  }
+}
+
+function markCooldown() {
+  try {
+    sessionStorage.setItem(UPDATE_COOLDOWN_KEY, Date.now().toString())
+  } catch {
+    /* storage disabled — no cooldown, acceptable */
+  }
+}
 
 export interface ServiceWorkerStatus {
   /** Een nieuwe SW staat klaar in "waiting" — caller kan prompt tonen. */
@@ -32,11 +68,15 @@ export function useServiceWorker(): ServiceWorkerStatus {
 
     let refreshing = false
 
-    // ── Reload de pagina pas wanneer de nieuwe SW echt aan het roer is ──
+    // ── Reload pas wanneer de nieuwe SW echt aan het roer is ─────────────
+    // Kleine delay zodat de nieuwe SW zijn precache kan afronden voordat
+    // de browser de eerstvolgende fetch doet. Zonder dit zagen we sporadisch
+    // "er ging iets mis bij het laden" omdat chunks gedurende de transitie
+    // niet uit cache noch netwerk ingelost konden worden.
     const onControllerChange = () => {
       if (refreshing) return
       refreshing = true
-      window.location.reload()
+      setTimeout(() => window.location.reload(), 150)
     }
     navigator.serviceWorker.addEventListener('controllerchange', onControllerChange)
 
@@ -46,11 +86,9 @@ export function useServiceWorker(): ServiceWorkerStatus {
     navigator.serviceWorker
       .register('/serwist/sw.js', { scope: '/' })
       .then((registration) => {
-        // Detecteer "er staat al een waiting SW klaar bij page load"
-        if (registration.waiting && navigator.serviceWorker.controller) {
-          setWaitingWorker(registration.waiting)
-          setUpdateAvailable(true)
-        }
+        // NB: geen prompt meer voor pre-existing `registration.waiting`
+        // bij register-time — zie toelichting boven. Dit voorkomt de
+        // update-prompt-spam uit Bug 74.
 
         // Detecteer een NIEUWE update die binnenkomt tijdens deze sessie
         registration.addEventListener('updatefound', () => {
@@ -59,6 +97,9 @@ export function useServiceWorker(): ServiceWorkerStatus {
           newWorker.addEventListener('statechange', () => {
             // installed + controller bestaat = update (geen first install)
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // Cooldown tegen dev-rebuild-spam.
+              if (isInCooldown()) return
+              markCooldown()
               setWaitingWorker(newWorker)
               setUpdateAvailable(true)
             }
