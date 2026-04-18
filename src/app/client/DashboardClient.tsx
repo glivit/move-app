@@ -9,6 +9,7 @@ import {
   writeDashboardCache,
   STALE_AFTER_MS,
 } from '@/lib/dashboard-cache'
+import { optimisticMutate } from '@/lib/optimistic'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -215,34 +216,98 @@ export default function ClientDashboard({
     }
   }, [initialData, userId])
 
+  // ────────────────────────────────────────────────────────────
+  // Fase 4 — Optimistic weight-log
+  //
+  //   Flow:
+  //     1. apply(): weightLog onmiddellijk updaten (lastValue, lastDate,
+  //        entriesThisWeek+1), input clear, "Opgeslagen"-pill aan,
+  //        IDB cache mee-updaten zodat refresh optimistic state toont.
+  //     2. commit(): POST /api/health-metrics
+  //     3. onSuccess(): refetch /api/dashboard om momentum.weightChange*
+  //        te reconciliëren (server-berekend t.o.v. vorige entries).
+  //     4. onError(): rollback weightLog + input, pill uit, log error.
+  //
+  //   We tonen bewust geen saving=true spinner — optimistic update is
+  //   instant, de ronde-trip is "eventual" en mag in de achtergrond.
+  // ────────────────────────────────────────────────────────────
   const submitWeight = useCallback(async () => {
     const val = parseFloat(weightInput.replace(',', '.'))
     if (!val || val < 30 || val > 300) return
+
+    const today = new Date().toISOString().split('T')[0]
+    const snapshotData = data
+    const snapshotInput = weightInput
+    const prevWeightLog = snapshotData?.weightLog ?? null
+
+    const optimisticWeightLog: DashboardData['weightLog'] = {
+      entriesThisWeek: (prevWeightLog?.entriesThisWeek ?? 0) + 1,
+      targetPerWeek: prevWeightLog?.targetPerWeek ?? 2,
+      lastValue: val,
+      lastDate: today,
+    }
+
+    let savedTimer: ReturnType<typeof setTimeout> | null = null
+
     setWeightSaving(true)
     try {
-      const today = new Date().toISOString().split('T')[0]
-      await fetch('/api/health-metrics', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: today, weight_kg: val }),
+      await optimisticMutate({
+        key: 'weight-log',
+        apply: () => {
+          if (snapshotData) {
+            const nextData: DashboardData = {
+              ...snapshotData,
+              weightLog: optimisticWeightLog,
+            }
+            setData(nextData)
+            if (userId) writeDashboardCache(userId, nextData).catch(() => {})
+          }
+          setWeightInput('')
+          setWeightSaved(true)
+          savedTimer = setTimeout(() => setWeightSaved(false), 2500)
+        },
+        rollback: () => {
+          if (savedTimer) clearTimeout(savedTimer)
+          if (snapshotData) {
+            setData(snapshotData)
+            if (userId) writeDashboardCache(userId, snapshotData).catch(() => {})
+          }
+          setWeightInput(snapshotInput)
+          setWeightSaved(false)
+        },
+        commit: async () => {
+          const r = await fetch('/api/health-metrics', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date: today, weight_kg: val }),
+          })
+          if (!r.ok) throw new Error(`Weight log failed: ${r.status}`)
+          return r
+        },
+        onSuccess: () => {
+          // Server reconcile: momentum.weightChangeMonth en aggregates
+          // worden server-side (her)berekend. We triggeren een refresh
+          // op de achtergrond — UI blijft zichtbaar ongewijzigd tot
+          // de response binnen is (apart van deze herberekende velden).
+          invalidateCache('/api/dashboard')
+          cachedFetch<DashboardData>('/api/dashboard', { forceRefresh: true })
+            .then((d) => {
+              setData(d)
+              setCacheAgeMs(null)
+              if (userId) writeDashboardCache(userId, d).catch(() => {})
+            })
+            .catch(() => {})
+        },
+        onError: (err) => {
+          console.error('[optimistic:weight-log] commit failed:', err)
+        },
       })
-      setWeightSaved(true)
-      setWeightInput('')
-      setTimeout(() => setWeightSaved(false), 2500)
-      invalidateCache('/api/dashboard')
-      cachedFetch<DashboardData>('/api/dashboard', { forceRefresh: true })
-        .then((d) => {
-          setData(d)
-          setCacheAgeMs(null)
-          if (userId) writeDashboardCache(userId, d).catch(() => {})
-        })
-        .catch(() => {})
-    } catch (err) {
-      console.error('Weight log error:', err)
+    } catch {
+      // optimisticMutate heeft al gerapporteerd + state gerollbackt.
     } finally {
       setWeightSaving(false)
     }
-  }, [weightInput])
+  }, [weightInput, data, userId])
 
   const training = data?.training
   const nutrition = data?.nutrition

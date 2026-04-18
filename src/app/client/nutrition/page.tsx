@@ -7,6 +7,7 @@ import {
   Check, Trash2, ShoppingCart, ChevronDown
 } from 'lucide-react'
 import { invalidateCache } from '@/lib/fetcher'
+import { optimisticMutate } from '@/lib/optimistic'
 
 // ─── Types ──────────────────────────────────────────
 
@@ -429,6 +430,7 @@ function AddFoodBottomSheet({
     const key = 'barcode' in product ? (product.barcode || product.name) : product.name
     setAddingProduct(key)
 
+    const prevLogs = logs
     const existing = logs.get(meal.id)
     const currentFoods = existing?.foods_eaten || meal.foods || []
 
@@ -459,31 +461,51 @@ function AddFoodBottomSheet({
     }
     const upd = new Map(logs)
     upd.set(meal.id, newLog)
-    setLogs(upd)
 
-    setJustAdded(prev => new Set(prev).add(key))
-    setTimeout(() => setJustAdded(prev => { const n = new Set(prev); n.delete(key); return n }), 1000)
+    let justAddedTimer: ReturnType<typeof setTimeout> | null = null
 
     try {
-      const res = await fetch('/api/nutrition-log', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          plan_id: plan.id,
-          date: dateStr,
-          meal_id: meal.id,
-          meal_name: meal.name,
-          completed: existing?.completed || false,
-          foods_eaten: newFoods,
-          client_notes: existing?.client_notes || null,
-        }),
+      // ── Optimistic add: instant UI + rollback on commit failure ──────
+      await optimisticMutate({
+        key: `meal-add-food:${meal.id}:${key}`,
+        apply: () => {
+          setLogs(upd)
+          setJustAdded(prev => new Set(prev).add(key))
+          justAddedTimer = setTimeout(() => {
+            setJustAdded(prev => { const n = new Set(prev); n.delete(key); return n })
+          }, 1000)
+        },
+        rollback: () => {
+          if (justAddedTimer) clearTimeout(justAddedTimer)
+          setLogs(prevLogs)
+          setJustAdded(prev => { const n = new Set(prev); n.delete(key); return n })
+        },
+        commit: async () => {
+          const res = await fetch('/api/nutrition-log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              plan_id: plan.id,
+              date: dateStr,
+              meal_id: meal.id,
+              meal_name: meal.name,
+              completed: existing?.completed || false,
+              foods_eaten: newFoods,
+              client_notes: existing?.client_notes || null,
+            }),
+          })
+          if (!res.ok) throw new Error(`add-food failed: ${res.status}`)
+          return res
+        },
+        onSuccess: () => {
+          invalidateCache('/api/dashboard')
+        },
+        onError: (err) => {
+          console.error('[optimistic:add-food] commit failed:', err)
+        },
       })
-
-      if (res.ok) {
-        invalidateCache('/api/dashboard')
-      }
-    } catch (err) {
-      console.error('Add food error:', err)
+    } catch {
+      // Rollback al gedaan; we slikken zodat de UI niet crasht.
     } finally {
       setAddingProduct(null)
     }
@@ -1269,32 +1291,22 @@ export default function ClientNutritionPage() {
     }
   }
 
-  const saveMealToAPI = useCallback(async (meal: MealMoment, newFoods: FoodEntry[]) => {
-    const existing = logs.get(meal.id)
-    try {
-      const res = await fetch('/api/nutrition-log', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          plan_id: plan!.id,
-          date: dateStr,
-          meal_id: meal.id,
-          meal_name: meal.name,
-          completed: existing?.completed || false,
-          foods_eaten: newFoods,
-          client_notes: existing?.client_notes || null,
-        }),
-      })
-      if (res.ok) {
-        invalidateCache('/api/dashboard')
-      }
-    } catch (err) {
-      console.error('Save meal foods error:', err)
-    }
-  }, [logs, plan, dateStr])
-
+  // ────────────────────────────────────────────────────────────
+  // Fase 4 — Optimistic meal-food updates (toggle/delete/grams)
+  //
+  //   Vóór: setLogs synchroon → fire-and-forget POST.
+  //   Na  : optimisticMutate met snapshot-rollback. Als de POST faalt
+  //         (offline, 5xx) wordt de food-checkbox automatisch terug-
+  //         geflipt zodat UI consistent blijft met server.
+  //
+  //   Dashboard-cache wordt na succes geïnvalideerd zodat de homepage
+  //   bij volgende mount de hertelde mealsCompleted/macros ziet.
+  // ────────────────────────────────────────────────────────────
   function updateMealFoods(meal: MealMoment, newFoods: FoodEntry[]) {
+    if (!plan) return
     const existing = logs.get(meal.id)
+    const prevLogs = logs
+
     const newLog: MealLog = {
       meal_id: meal.id,
       meal_name: meal.name,
@@ -1305,8 +1317,37 @@ export default function ClientNutritionPage() {
     }
     const upd = new Map(logs)
     upd.set(meal.id, newLog)
-    setLogs(upd)
-    saveMealToAPI(meal, newFoods)
+
+    optimisticMutate({
+      key: `meal-foods:${meal.id}`,
+      apply: () => setLogs(upd),
+      rollback: () => setLogs(prevLogs),
+      commit: async () => {
+        const res = await fetch('/api/nutrition-log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            plan_id: plan.id,
+            date: dateStr,
+            meal_id: meal.id,
+            meal_name: meal.name,
+            completed: existing?.completed || false,
+            foods_eaten: newFoods,
+            client_notes: existing?.client_notes || null,
+          }),
+        })
+        if (!res.ok) throw new Error(`meal-foods save failed: ${res.status}`)
+        return res
+      },
+      onSuccess: () => {
+        invalidateCache('/api/dashboard')
+      },
+      onError: (err) => {
+        console.error('[optimistic:meal-foods] commit failed:', err)
+      },
+    }).catch(() => {
+      // Rollback al gedaan; we slikken de error zodat React niets afhandelt.
+    })
   }
 
   function toggleFoodChecked(meal: MealMoment, foodId: string) {
