@@ -44,13 +44,13 @@ export default async function IntakeFormPage({ params }: Props) {
       <div className="space-y-6">
         <Link
           href={`/coach/clients/${id}`}
-          className="inline-flex items-center gap-1 text-[#8E8E93] hover:text-[#666] transition-colors"
+          className="inline-flex items-center gap-1 text-[#D6D9D6] hover:text-[#666] transition-colors"
         >
           <ArrowLeft strokeWidth={1.5} className="w-4 h-4" />
           <span className="text-sm font-medium">Terug naar {profile.full_name}</span>
         </Link>
-        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
-          <p className="text-[#8E8E93]">Geen intake formulier beschikbaar voor deze cliënt.</p>
+        <div className="bg-[#A6ADA7] rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] text-center">
+          <p className="text-[#D6D9D6]">Geen intake formulier beschikbaar voor deze cliënt.</p>
         </div>
       </div>
     )
@@ -84,12 +84,12 @@ export default async function IntakeFormPage({ params }: Props) {
   /* ─── Shared Components ──────────────────────────── */
 
   const Section = ({ icon: Icon, title, children }: { icon: any; title: string; children: React.ReactNode }) => (
-    <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
+    <div className="bg-[#A6ADA7] rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7]">
       <div className="flex items-center gap-3 mb-5">
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#EDEAE4' }}>
-          <Icon className="w-5 h-5" strokeWidth={1.5} style={{ color: '#1A1917' }} />
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: '#A6ADA7' }}>
+          <Icon className="w-5 h-5" strokeWidth={1.5} style={{ color: '#FDFDFE' }} />
         </div>
-        <h2 className="text-[17px] font-semibold" style={{ color: '#1A1A18' }}>{title}</h2>
+        <h2 className="text-[17px] font-semibold" style={{ color: '#FDFDFE' }}>{title}</h2>
       </div>
       {children}
     </div>
@@ -99,8 +99,8 @@ export default async function IntakeFormPage({ params }: Props) {
     if (!value && value !== 0) return null
     return (
       <div>
-        <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#8E8E93' }}>{label}</p>
-        <p className="mt-1 text-[14px] whitespace-pre-line" style={{ color: '#1A1A18' }}>{value}</p>
+        <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#D6D9D6' }}>{label}</p>
+        <p className="mt-1 text-[14px] whitespace-pre-line" style={{ color: '#FDFDFE' }}>{value}</p>
       </div>
     )
   }
@@ -109,10 +109,10 @@ export default async function IntakeFormPage({ params }: Props) {
     if (!items || items.length === 0) return null
     return (
       <div>
-        <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#8E8E93' }}>{label}</p>
+        <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#D6D9D6' }}>{label}</p>
         <div className="flex flex-wrap gap-2 mt-2">
           {items.map((item: string) => (
-            <span key={item} className="text-[13px] px-3 py-1.5 rounded-full" style={{ backgroundColor: '#EDEAE4', color: '#1A1917' }}>
+            <span key={item} className="text-[13px] px-3 py-1.5 rounded-full" style={{ backgroundColor: '#A6ADA7', color: '#FDFDFE' }}>
               {item}
             </span>
           ))}
@@ -144,16 +144,16 @@ export default async function IntakeFormPage({ params }: Props) {
       <div>
         <Link
           href={`/coach/clients/${id}`}
-          className="inline-flex items-center gap-1 text-[#8E8E93] hover:text-[#666] transition-colors mb-4"
+          className="inline-flex items-center gap-1 text-[#D6D9D6] hover:text-[#666] transition-colors mb-4"
         >
           <ArrowLeft strokeWidth={1.5} className="w-4 h-4" />
           <span className="text-sm font-medium">Terug naar {profile.full_name}</span>
         </Link>
 
-        <h1 className="text-3xl font-display font-semibold" style={{ color: '#1A1A18' }}>
+        <h1 className="text-3xl font-display font-semibold" style={{ color: '#FDFDFE' }}>
           Intake formulier
         </h1>
-        <p className="text-sm mt-1" style={{ color: '#8E8E93' }}>
+        <p className="text-sm mt-1" style={{ color: '#D6D9D6' }}>
           {profile.full_name} — ingevuld op {new Date(intake.created_at).toLocaleDateString('nl-BE', { day: 'numeric', month: 'long', year: 'numeric' })}
         </p>
       </div>
@@ -201,8 +201,8 @@ export default async function IntakeFormPage({ params }: Props) {
         <div className="space-y-4">
           {i.typical_daily_eating && (
             <div>
-              <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#8E8E93' }}>Wat eet je op een doorsnee dag?</p>
-              <div className="mt-2 p-4 rounded-xl text-[14px] leading-relaxed whitespace-pre-line" style={{ backgroundColor: '#FAFAFA', color: '#1A1A18' }}>
+              <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#D6D9D6' }}>Wat eet je op een doorsnee dag?</p>
+              <div className="mt-2 p-4 rounded-xl text-[14px] leading-relaxed whitespace-pre-line" style={{ backgroundColor: '#A6ADA7', color: '#FDFDFE' }}>
                 {i.typical_daily_eating}
               </div>
             </div>
@@ -227,7 +227,7 @@ export default async function IntakeFormPage({ params }: Props) {
           <Field label="Avondsnacker" value={i.evening_snacker} />
           {i.food_adventurousness !== null && i.food_adventurousness !== undefined && (
             <div>
-              <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#8E8E93' }}>Avontuurlijk met eten</p>
+              <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#D6D9D6' }}>Avontuurlijk met eten</p>
               <div className="flex items-center gap-2 mt-2">
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
@@ -235,15 +235,15 @@ export default async function IntakeFormPage({ params }: Props) {
                       key={n}
                       className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-medium"
                       style={{
-                        backgroundColor: n <= (i.food_adventurousness || 0) ? '#1A1917' : '#EDEAE4',
-                        color: n <= (i.food_adventurousness || 0) ? 'white' : '#8E8E93',
+                        backgroundColor: n <= (i.food_adventurousness || 0) ? '#FDFDFE' : '#A6ADA7',
+                        color: n <= (i.food_adventurousness || 0) ? 'white' : '#D6D9D6',
                       }}
                     >
                       {n}
                     </div>
                   ))}
                 </div>
-                <span className="text-[12px]" style={{ color: '#8E8E93' }}>/ 10</span>
+                <span className="text-[12px]" style={{ color: '#D6D9D6' }}>/ 10</span>
               </div>
             </div>
           )}
@@ -259,7 +259,7 @@ export default async function IntakeFormPage({ params }: Props) {
           )}
           {i.stress_level && (
             <div>
-              <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#8E8E93' }}>Stressniveau</p>
+              <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#D6D9D6' }}>Stressniveau</p>
               <div className="flex items-center gap-3 mt-2">
                 <div className="flex gap-1">
                   {[1, 2, 3, 4, 5].map(n => (
@@ -267,15 +267,15 @@ export default async function IntakeFormPage({ params }: Props) {
                       key={n}
                       className="w-8 h-8 rounded-lg flex items-center justify-center text-[13px] font-medium"
                       style={{
-                        backgroundColor: n <= i.stress_level ? '#1A1917' : '#EDEAE4',
-                        color: n <= i.stress_level ? 'white' : '#8E8E93',
+                        backgroundColor: n <= i.stress_level ? '#FDFDFE' : '#A6ADA7',
+                        color: n <= i.stress_level ? 'white' : '#D6D9D6',
                       }}
                     >
                       {n}
                     </div>
                   ))}
                 </div>
-                <span className="text-[13px] font-medium" style={{ color: '#8E8E93' }}>
+                <span className="text-[13px] font-medium" style={{ color: '#D6D9D6' }}>
                   {stressLabel}
                 </span>
               </div>
@@ -290,33 +290,33 @@ export default async function IntakeFormPage({ params }: Props) {
       <Section icon={Ruler} title="Startmetingen">
         <div className="grid grid-cols-3 gap-4">
           {i.weight_kg && (
-            <div className="p-4 rounded-xl" style={{ backgroundColor: '#FAFAFA' }}>
-              <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#8E8E93' }}>Gewicht</p>
-              <p className="text-xl font-bold mt-1" style={{ color: '#1A1A18' }}>{i.weight_kg} <span className="text-sm font-normal" style={{ color: '#8E8E93' }}>kg</span></p>
+            <div className="p-4 rounded-xl" style={{ backgroundColor: '#A6ADA7' }}>
+              <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#D6D9D6' }}>Gewicht</p>
+              <p className="text-xl font-bold mt-1" style={{ color: '#FDFDFE' }}>{i.weight_kg} <span className="text-sm font-normal" style={{ color: '#D6D9D6' }}>kg</span></p>
             </div>
           )}
           {i.height_cm && (
-            <div className="p-4 rounded-xl" style={{ backgroundColor: '#FAFAFA' }}>
-              <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#8E8E93' }}>Lengte</p>
-              <p className="text-xl font-bold mt-1" style={{ color: '#1A1A18' }}>{i.height_cm} <span className="text-sm font-normal" style={{ color: '#8E8E93' }}>cm</span></p>
+            <div className="p-4 rounded-xl" style={{ backgroundColor: '#A6ADA7' }}>
+              <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#D6D9D6' }}>Lengte</p>
+              <p className="text-xl font-bold mt-1" style={{ color: '#FDFDFE' }}>{i.height_cm} <span className="text-sm font-normal" style={{ color: '#D6D9D6' }}>cm</span></p>
             </div>
           )}
           {i.age && (
-            <div className="p-4 rounded-xl" style={{ backgroundColor: '#FAFAFA' }}>
-              <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#8E8E93' }}>Leeftijd</p>
-              <p className="text-xl font-bold mt-1" style={{ color: '#1A1A18' }}>{i.age} <span className="text-sm font-normal" style={{ color: '#8E8E93' }}>jaar</span></p>
+            <div className="p-4 rounded-xl" style={{ backgroundColor: '#A6ADA7' }}>
+              <p className="text-[12px] uppercase font-medium tracking-wide" style={{ color: '#D6D9D6' }}>Leeftijd</p>
+              <p className="text-xl font-bold mt-1" style={{ color: '#FDFDFE' }}>{i.age} <span className="text-sm font-normal" style={{ color: '#D6D9D6' }}>jaar</span></p>
             </div>
           )}
         </div>
 
         {tapeMeasurements.length > 0 && (
           <div className="mt-5">
-            <p className="text-[13px] font-semibold mb-3" style={{ color: '#1A1A18' }}>Omtrekmaten</p>
+            <p className="text-[13px] font-semibold mb-3" style={{ color: '#FDFDFE' }}>Omtrekmaten</p>
             <div className="grid grid-cols-3 gap-3">
               {tapeMeasurements.map(m => (
-                <div key={m.label} className="p-3 rounded-xl" style={{ backgroundColor: '#FAFAFA' }}>
-                  <p className="text-[11px] uppercase font-medium tracking-wide" style={{ color: '#8E8E93' }}>{m.label}</p>
-                  <p className="text-[15px] font-semibold mt-1" style={{ color: '#1A1A18' }}>{m.value} <span className="text-[12px] font-normal" style={{ color: '#8E8E93' }}>cm</span></p>
+                <div key={m.label} className="p-3 rounded-xl" style={{ backgroundColor: '#A6ADA7' }}>
+                  <p className="text-[11px] uppercase font-medium tracking-wide" style={{ color: '#D6D9D6' }}>{m.label}</p>
+                  <p className="text-[15px] font-semibold mt-1" style={{ color: '#FDFDFE' }}>{m.value} <span className="text-[12px] font-normal" style={{ color: '#D6D9D6' }}>cm</span></p>
                 </div>
               ))}
             </div>
@@ -329,7 +329,7 @@ export default async function IntakeFormPage({ params }: Props) {
         <Section icon={Camera} title="Startfoto's">
           <div className="grid grid-cols-2 gap-3">
             {signedPhotos.map(({ url, label }) => (
-              <div key={label} className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#FAFAFA]">
+              <div key={label} className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#A6ADA7]">
                 <Image src={url} alt={label} width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
                 <span className="absolute bottom-2 left-2 text-xs font-medium text-white bg-black/50 px-2 py-0.5 rounded">
                   {label}

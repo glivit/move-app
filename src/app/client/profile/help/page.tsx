@@ -62,7 +62,7 @@ export default function HelpPage() {
       {/* Contact Coach */}
       <a
         href="/client/messages"
-        className="bg-[#FDFDFE] rounded-2xl p-5 flex items-center gap-4 text-white hover:bg-[#7A5C12] transition-colors"
+        className="bg-[#474B48] rounded-2xl p-5 flex items-center gap-4 text-white hover:bg-[#3A3E3B] transition-colors"
       >
         <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
           <MessageSquare strokeWidth={1.5} className="w-6 h-6" />

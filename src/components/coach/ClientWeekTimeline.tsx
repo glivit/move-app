@@ -126,16 +126,16 @@ export function ClientWeekTimelineView({ data, weekOffset, coachId }: Props) {
   return (
     <div className="pb-24 lg:pb-10 -mt-2">
       {/* Sticky header bar */}
-      <div className="sticky top-[60px] lg:top-0 z-20 -mx-5 sm:-mx-8 lg:mx-0 px-5 sm:px-8 lg:px-0 bg-[#EEEBE3]/95 backdrop-blur-sm py-3 mb-4">
+      <div className="sticky top-[60px] lg:top-0 z-20 -mx-5 sm:-mx-8 lg:mx-0 px-5 sm:px-8 lg:px-0 bg-[#A6ADA7]/95 backdrop-blur-sm py-3 mb-4">
         <div className="flex items-center gap-3">
           <Link
             href="/coach"
-            className="w-9 h-9 rounded-full bg-white border border-[#E8E4DC] flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform"
+            className="w-9 h-9 rounded-full bg-[#A6ADA7] border border-[#A6ADA7] flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform"
           >
-            <ArrowLeft size={16} strokeWidth={2} className="text-[#1A1917]" />
+            <ArrowLeft size={16} strokeWidth={2} className="text-[#FDFDFE]" />
           </Link>
 
-          <div className="w-10 h-10 rounded-full bg-[#F0EDE7] flex items-center justify-center text-[12px] font-semibold text-[#6B6862] flex-shrink-0 overflow-hidden">
+          <div className="w-10 h-10 rounded-full bg-[#A6ADA7] flex items-center justify-center text-[12px] font-semibold text-[#E6E8E7] flex-shrink-0 overflow-hidden">
             {data.avatarUrl ? (
               <Image
                 src={data.avatarUrl}
@@ -152,10 +152,10 @@ export function ClientWeekTimelineView({ data, weekOffset, coachId }: Props) {
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="text-[15px] font-semibold text-[#1A1917] truncate leading-tight">
+            <p className="text-[15px] font-semibold text-[#FDFDFE] truncate leading-tight">
               {data.fullName}
             </p>
-            <p className="text-[11px] text-[#A09D96] truncate flex items-center gap-1.5">
+            <p className="text-[11px] text-[#E6E8E7] truncate flex items-center gap-1.5">
               <span>{weekLabel}</span>
               {coachId && (
                 <span
@@ -174,10 +174,10 @@ export function ClientWeekTimelineView({ data, weekOffset, coachId }: Props) {
 
           <Link
             href={`/coach/clients/${data.clientId}`}
-            className="w-9 h-9 rounded-full bg-white border border-[#E8E4DC] flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform"
+            className="w-9 h-9 rounded-full bg-[#A6ADA7] border border-[#A6ADA7] flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform"
             title="Volledig profiel"
           >
-            <MoreHorizontal size={16} strokeWidth={2} className="text-[#6B6862]" />
+            <MoreHorizontal size={16} strokeWidth={2} className="text-[#E6E8E7]" />
           </Link>
         </div>
       </div>
@@ -187,7 +187,7 @@ export function ClientWeekTimelineView({ data, weekOffset, coachId }: Props) {
         <button
           onClick={() => setActiveTab('week')}
           className={`flex-1 py-2 rounded-lg text-[13px] font-semibold transition-all ${
-            activeTab === 'week' ? 'bg-white text-[#1A1917] shadow-sm' : 'text-[#6B6862]'
+            activeTab === 'week' ? 'bg-[#A6ADA7] text-[#FDFDFE] shadow-sm' : 'text-[#E6E8E7]'
           }`}
         >
           Week
@@ -195,12 +195,12 @@ export function ClientWeekTimelineView({ data, weekOffset, coachId }: Props) {
         <button
           onClick={() => setActiveTab('chat')}
           className={`flex-1 py-2 rounded-lg text-[13px] font-semibold transition-all flex items-center justify-center gap-1.5 ${
-            activeTab === 'chat' ? 'bg-white text-[#1A1917] shadow-sm' : 'text-[#6B6862]'
+            activeTab === 'chat' ? 'bg-[#A6ADA7] text-[#FDFDFE] shadow-sm' : 'text-[#E6E8E7]'
           }`}
         >
           Chat
           {messages.filter((m) => !m.senderIsCoach).length > 0 && (
-            <span className="w-[6px] h-[6px] bg-[#D46A3A] rounded-full" />
+            <span className="w-[6px] h-[6px] bg-[#C0FC01] rounded-full" />
           )}
         </button>
       </div>
@@ -209,19 +209,19 @@ export function ClientWeekTimelineView({ data, weekOffset, coachId }: Props) {
       <div className="flex items-center justify-between mb-4">
         <Link
           href={`/coach/clients/${data.clientId}/week?offset=${weekOffset - 1}`}
-          className="flex items-center gap-1 text-[12px] font-medium text-[#6B6862] hover:text-[#1A1917] active:scale-95 transition-transform"
+          className="flex items-center gap-1 text-[12px] font-medium text-[#E6E8E7] hover:text-[#FDFDFE] active:scale-95 transition-transform"
         >
           <ChevronLeft size={14} strokeWidth={2} />
           Vorige
         </Link>
-        <span className="text-[12px] font-semibold text-[#1A1917] tabular-nums">
+        <span className="text-[12px] font-semibold text-[#FDFDFE] tabular-nums">
           {new Date(data.weekStartIso).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })} —{' '}
           {new Date(data.weekEndIso).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
         </span>
         {weekOffset < 0 ? (
           <Link
             href={`/coach/clients/${data.clientId}/week?offset=${weekOffset + 1}`}
-            className="flex items-center gap-1 text-[12px] font-medium text-[#6B6862] hover:text-[#1A1917] active:scale-95 transition-transform"
+            className="flex items-center gap-1 text-[12px] font-medium text-[#E6E8E7] hover:text-[#FDFDFE] active:scale-95 transition-transform"
           >
             Volgende
             <ChevronRight size={14} strokeWidth={2} />
@@ -291,7 +291,7 @@ export function ClientWeekTimelineView({ data, weekOffset, coachId }: Props) {
           {/* Floating general-message button */}
           <button
             onClick={() => setComposeType({ kind: 'general' })}
-            className="fixed right-5 bottom-24 lg:bottom-10 w-14 h-14 rounded-full bg-[#1A1917] text-white shadow-xl flex items-center justify-center active:scale-95 transition-transform z-30"
+            className="fixed right-5 bottom-24 lg:bottom-10 w-14 h-14 rounded-full bg-[#474B48] text-white shadow-xl flex items-center justify-center active:scale-95 transition-transform z-30"
             aria-label="Stuur bericht"
           >
             <MessageCircle size={20} strokeWidth={2} />
@@ -302,7 +302,7 @@ export function ClientWeekTimelineView({ data, weekOffset, coachId }: Props) {
       {/* Triage toast */}
       {toast && (
         <div className="fixed left-1/2 -translate-x-1/2 bottom-24 lg:bottom-8 z-40 animate-toast-in">
-          <div className="flex items-center gap-3 bg-[#1A1917] text-white rounded-full pl-4 pr-2 py-2 shadow-xl">
+          <div className="flex items-center gap-3 bg-[#474B48] text-white rounded-full pl-4 pr-2 py-2 shadow-xl">
             <span className="text-[13px]">
               {toast.kind === 'seen' ? (
                 <>
@@ -384,27 +384,27 @@ function SummaryStrip({ data }: { data: ClientWeekTimeline }) {
     data.summary
 
   return (
-    <div className="bg-white rounded-2xl border border-[#E8E4DC] p-4 grid grid-cols-4 gap-2 text-center">
+    <div className="bg-[#A6ADA7] rounded-2xl border border-[#A6ADA7] p-4 grid grid-cols-4 gap-2 text-center">
       <div>
-        <p className="text-[10px] uppercase tracking-wider text-[#A09D96] font-semibold mb-1">Trainingen</p>
-        <p className="text-[17px] font-bold text-[#1A1917] tabular-nums">
+        <p className="text-[10px] uppercase tracking-wider text-[#E6E8E7] font-semibold mb-1">Trainingen</p>
+        <p className="text-[17px] font-bold text-[#FDFDFE] tabular-nums">
           {doneCount}
-          <span className="text-[11px] text-[#A09D96] font-medium">/{plannedCount}</span>
+          <span className="text-[11px] text-[#E6E8E7] font-medium">/{plannedCount}</span>
         </p>
       </div>
       <div>
-        <p className="text-[10px] uppercase tracking-wider text-[#A09D96] font-semibold mb-1">Gemist</p>
+        <p className="text-[10px] uppercase tracking-wider text-[#E6E8E7] font-semibold mb-1">Gemist</p>
         <p
           className={`text-[17px] font-bold tabular-nums ${
-            missedCount > 0 ? 'text-[#FF3B30]' : 'text-[#1A1917]'
+            missedCount > 0 ? 'text-[#B55A4A]' : 'text-[#FDFDFE]'
           }`}
         >
           {missedCount}
         </p>
       </div>
       <div>
-        <p className="text-[10px] uppercase tracking-wider text-[#A09D96] font-semibold mb-1">Volume</p>
-        <p className="text-[17px] font-bold text-[#1A1917] tabular-nums">
+        <p className="text-[10px] uppercase tracking-wider text-[#E6E8E7] font-semibold mb-1">Volume</p>
+        <p className="text-[17px] font-bold text-[#FDFDFE] tabular-nums">
           {totalVolumeKg >= 1000
             ? `${(totalVolumeKg / 1000).toFixed(1)}t`
             : totalVolumeKg > 0
@@ -413,16 +413,16 @@ function SummaryStrip({ data }: { data: ClientWeekTimeline }) {
         </p>
       </div>
       <div>
-        <p className="text-[10px] uppercase tracking-wider text-[#A09D96] font-semibold mb-1">PR&apos;s</p>
-        <p className="text-[17px] font-bold text-[#FF9500] tabular-nums flex items-center justify-center gap-1">
+        <p className="text-[10px] uppercase tracking-wider text-[#E6E8E7] font-semibold mb-1">PR&apos;s</p>
+        <p className="text-[17px] font-bold text-[#E8B948] tabular-nums flex items-center justify-center gap-1">
           {prCountWeek}
           {prCountWeek > 0 && <Trophy size={12} strokeWidth={2} />}
         </p>
       </div>
       {needingFeedback > 0 && (
         <div className="col-span-4 -mx-4 -mb-4 mt-3 px-4 py-2.5 bg-[#FFF8F0] border-t border-[#FFE8CC] rounded-b-2xl flex items-center gap-2">
-          <AlertTriangle size={14} className="text-[#C47D15]" strokeWidth={2} />
-          <span className="text-[12px] font-semibold text-[#C47D15]">
+          <AlertTriangle size={14} className="text-[#D9A645]" strokeWidth={2} />
+          <span className="text-[12px] font-semibold text-[#D9A645]">
             {needingFeedback} training{needingFeedback > 1 ? 'en' : ''} wacht{needingFeedback > 1 ? 'en' : ''} op feedback
           </span>
         </div>
@@ -450,12 +450,12 @@ function TimelineDayRow({
   // Left rail color
   const railColor =
     day.state === 'done_planned' || day.state === 'done_moved' || day.state === 'done_bonus'
-      ? '#1A1917'
+      ? '#FDFDFE'
       : day.state === 'missed'
-      ? '#FF3B30'
+      ? '#B55A4A'
       : day.state === 'today_open'
-      ? '#FFB800'
-      : '#E8E4DC'
+      ? '#E8B948'
+      : '#A6ADA7'
 
   // Icon in rail
   const railIcon =
@@ -473,31 +473,31 @@ function TimelineDayRow({
     <div
       className={`relative rounded-2xl border overflow-hidden transition-all ${
         day.isToday
-          ? 'bg-white border-[#D46A3A]/30 shadow-[0_0_0_3px_rgba(212,106,58,0.08)]'
+          ? 'bg-[#A6ADA7] border-[#C0FC01]/30 shadow-[0_0_0_3px_rgba(212,106,58,0.08)]'
           : day.state === 'missed'
           ? 'bg-[#FFFAFA] border-[#FFD5D1]'
           : isRestPure
-          ? 'bg-[#F9F7F2] border-[#F0EDE7]'
-          : 'bg-white border-[#E8E4DC]'
+          ? 'bg-[#A6ADA7] border-[#A6ADA7]'
+          : 'bg-[#A6ADA7] border-[#A6ADA7]'
       }`}
     >
       {/* Day header */}
       <div className="flex items-stretch">
         {/* Left rail */}
         <div
-          className="w-[52px] flex-shrink-0 flex flex-col items-center justify-center py-3 border-r border-[#F0EDE7]"
-          style={{ backgroundColor: isRestPure ? '#F9F7F2' : 'transparent' }}
+          className="w-[52px] flex-shrink-0 flex flex-col items-center justify-center py-3 border-r border-[#A6ADA7]"
+          style={{ backgroundColor: isRestPure ? '#A6ADA7' : 'transparent' }}
         >
           <span
             className={`text-[10px] font-semibold uppercase tracking-wider mb-0.5 ${
-              day.isToday ? 'text-[#D46A3A]' : 'text-[#A09D96]'
+              day.isToday ? 'text-[#C0FC01]' : 'text-[#E6E8E7]'
             }`}
           >
             {day.dayLabelShort}
           </span>
           <span
             className={`text-[18px] font-bold leading-none tabular-nums ${
-              day.isToday ? 'text-[#D46A3A]' : 'text-[#1A1917]'
+              day.isToday ? 'text-[#C0FC01]' : 'text-[#FDFDFE]'
             }`}
           >
             {new Date(day.dateIso).getDate()}
@@ -533,45 +533,45 @@ function TimelineDayRow({
           ) : day.state === 'upcoming' ? (
             <UpcomingCard plannedName={day.plannedDayName || 'Training'} />
           ) : day.state === 'rest' && day.plannedDayName ? (
-            <p className="text-[12px] text-[#A09D96] italic">
+            <p className="text-[12px] text-[#E6E8E7] italic">
               {day.plannedDayName} — verplaatst naar andere dag
             </p>
           ) : (
-            <p className="text-[12px] text-[#C5C2BC] italic">Rustdag</p>
+            <p className="text-[12px] text-[#989F99] italic">Rustdag</p>
           )}
 
           {/* Nutrition mini row */}
           {day.nutrition && (day.nutrition.caloriesLogged > 0 || day.nutrition.caloriesTarget > 0) && (
-            <div className="mt-2.5 pt-2.5 border-t border-[#F0EDE7] flex items-center gap-2">
+            <div className="mt-2.5 pt-2.5 border-t border-[#A6ADA7] flex items-center gap-2">
               <UtensilsCrossed
                 size={12}
-                className={day.nutrition.caloriesLogged > 0 ? 'text-[#D46A3A]' : 'text-[#D5D0C8]'}
+                className={day.nutrition.caloriesLogged > 0 ? 'text-[#C0FC01]' : 'text-[#989F99]'}
                 strokeWidth={1.5}
               />
               {day.nutrition.caloriesTarget > 0 ? (
                 <>
                   <div className="flex-1 flex items-center gap-2 min-w-0">
-                    <div className="flex-1 h-1 bg-[#F0EDE7] rounded-full overflow-hidden">
+                    <div className="flex-1 h-1 bg-[#A6ADA7] rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full"
                         style={{
                           width: `${day.nutritionPct}%`,
                           backgroundColor:
                             day.nutritionPct >= 80
-                              ? '#34C759'
+                              ? '#2FA65A'
                               : day.nutritionPct > 0
-                              ? '#D46A3A'
-                              : '#E8E4DC',
+                              ? '#C0FC01'
+                              : '#A6ADA7',
                         }}
                       />
                     </div>
-                    <span className="text-[10px] font-semibold tabular-nums text-[#6B6862] flex-shrink-0">
+                    <span className="text-[10px] font-semibold tabular-nums text-[#E6E8E7] flex-shrink-0">
                       {day.nutrition.caloriesLogged}/{day.nutrition.caloriesTarget} kcal
                     </span>
                   </div>
                 </>
               ) : (
-                <span className="text-[11px] text-[#A09D96]">
+                <span className="text-[11px] text-[#E6E8E7]">
                   {day.nutrition.caloriesLogged > 0
                     ? `${day.nutrition.caloriesLogged} kcal gelogd`
                     : 'Niet gelogd'}
@@ -608,35 +608,35 @@ function SessionCard({
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-[14px] font-semibold text-[#1A1917]">{sessionName}</p>
+            <p className="text-[14px] font-semibold text-[#FDFDFE]">{sessionName}</p>
             {state === 'done_moved' && movedFrom && (
-              <span className="text-[10px] font-semibold text-[#FFB800] bg-[#FFF8E8] px-1.5 py-0.5 rounded">
+              <span className="text-[10px] font-semibold text-[#E8B948] bg-[#FFF8E8] px-1.5 py-0.5 rounded">
                 van {movedFrom}
               </span>
             )}
             {state === 'done_bonus' && (
-              <span className="text-[10px] font-semibold text-[#34C759] bg-[#E6F7EA] px-1.5 py-0.5 rounded">
+              <span className="text-[10px] font-semibold text-[#2FA65A] bg-[#E6F7EA] px-1.5 py-0.5 rounded">
                 BONUS
               </span>
             )}
             {session.prCount > 0 && (
-              <span className="flex items-center gap-0.5 text-[10px] font-semibold text-[#FF9500] bg-[#FFF3E0] px-1.5 py-0.5 rounded">
+              <span className="flex items-center gap-0.5 text-[10px] font-semibold text-[#E8B948] bg-[rgba(232,185,72,0.14)] px-1.5 py-0.5 rounded">
                 <Trophy size={9} strokeWidth={2.5} />
                 {session.prCount} PR
               </span>
             )}
             {session.hasPain && (
-              <span className="flex items-center gap-0.5 text-[10px] font-semibold text-[#FF3B30] bg-[#FFE8E5] px-1.5 py-0.5 rounded">
+              <span className="flex items-center gap-0.5 text-[10px] font-semibold text-[#B55A4A] bg-[rgba(181,90,74,0.14)] px-1.5 py-0.5 rounded">
                 <AlertTriangle size={9} strokeWidth={2.5} />
                 Pijn
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2 mt-1 text-[11px] text-[#A09D96] tabular-nums">
+          <div className="flex items-center gap-2 mt-1 text-[11px] text-[#E6E8E7] tabular-nums">
             {session.durationMin != null && <span>{session.durationMin}&thinsp;min</span>}
             {session.totalSets > 0 && (
               <>
-                <span className="text-[#D5D0C8]">•</span>
+                <span className="text-[#989F99]">•</span>
                 <span>
                   {session.completedSets}/{session.totalSets} sets
                 </span>
@@ -644,13 +644,13 @@ function SessionCard({
             )}
             {session.totalVolumeKg > 0 && (
               <>
-                <span className="text-[#D5D0C8]">•</span>
+                <span className="text-[#989F99]">•</span>
                 <span>{session.totalVolumeKg}&thinsp;kg</span>
               </>
             )}
             {session.difficultyRating && (
               <>
-                <span className="text-[#D5D0C8]">•</span>
+                <span className="text-[#989F99]">•</span>
                 <span>{'★'.repeat(session.difficultyRating)}</span>
               </>
             )}
@@ -659,8 +659,8 @@ function SessionCard({
             <div
               className={`mt-2 px-2.5 py-1.5 rounded-lg text-[11px] leading-snug line-clamp-2 ${
                 needsFeedback
-                  ? 'bg-[#FFF8F0] text-[#1A1917] border border-[#FFE8CC]'
-                  : 'bg-[#F5F2EC] text-[#6B6862]'
+                  ? 'bg-[#FFF8F0] text-[#FDFDFE] border border-[#FFE8CC]'
+                  : 'bg-[#A6ADA7] text-[#E6E8E7]'
               }`}
             >
               &ldquo;{session.feedbackText}&rdquo;
@@ -673,7 +673,7 @@ function SessionCard({
       <div className="flex items-center gap-2 mt-2.5">
         <Link
           href={`/coach/clients/${clientId}/workout/${session.id}`}
-          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#F5F2EC] text-[11px] font-semibold text-[#6B6862] active:scale-95 transition-transform"
+          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#A6ADA7] text-[11px] font-semibold text-[#E6E8E7] active:scale-95 transition-transform"
         >
           <Dumbbell size={11} strokeWidth={2} />
           Bekijk
@@ -683,8 +683,8 @@ function SessionCard({
           onClick={onFeedback}
           className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold active:scale-95 transition-transform ${
             needsFeedback
-              ? 'bg-[#1A1917] text-white'
-              : 'bg-[#F5F2EC] text-[#6B6862]'
+              ? 'bg-[#474B48] text-white'
+              : 'bg-[#A6ADA7] text-[#E6E8E7]'
           }`}
         >
           <MessageCircle size={11} strokeWidth={2} />
@@ -701,15 +701,15 @@ function MissedCard({ plannedName, onMessage }: { plannedName: string; onMessage
   return (
     <div>
       <div className="flex items-center gap-2">
-        <p className="text-[14px] font-semibold text-[#FF3B30]">{plannedName}</p>
-        <span className="text-[10px] font-semibold text-[#FF3B30] bg-[#FFE8E5] px-1.5 py-0.5 rounded uppercase tracking-wider">
+        <p className="text-[14px] font-semibold text-[#B55A4A]">{plannedName}</p>
+        <span className="text-[10px] font-semibold text-[#B55A4A] bg-[rgba(181,90,74,0.14)] px-1.5 py-0.5 rounded uppercase tracking-wider">
           Gemist
         </span>
       </div>
-      <p className="text-[11px] text-[#A09D96] mt-1">Training niet voltooid op de geplande dag</p>
+      <p className="text-[11px] text-[#E6E8E7] mt-1">Training niet voltooid op de geplande dag</p>
       <button
         onClick={onMessage}
-        className="mt-2 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#FFE8E5] text-[11px] font-semibold text-[#FF3B30] active:scale-95 transition-transform"
+        className="mt-2 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[rgba(181,90,74,0.14)] text-[11px] font-semibold text-[#B55A4A] active:scale-95 transition-transform"
       >
         <MessageCircle size={11} strokeWidth={2} />
         Stuur bericht
@@ -722,12 +722,12 @@ function TodayOpenCard({ plannedName }: { plannedName: string }) {
   return (
     <div>
       <div className="flex items-center gap-2">
-        <p className="text-[14px] font-semibold text-[#1A1917]">{plannedName}</p>
-        <span className="text-[10px] font-semibold text-[#C47D15] bg-[#FFF3E0] px-1.5 py-0.5 rounded uppercase tracking-wider">
+        <p className="text-[14px] font-semibold text-[#FDFDFE]">{plannedName}</p>
+        <span className="text-[10px] font-semibold text-[#D9A645] bg-[rgba(232,185,72,0.14)] px-1.5 py-0.5 rounded uppercase tracking-wider">
           Vandaag
         </span>
       </div>
-      <p className="text-[11px] text-[#A09D96] mt-1">Nog niet gestart vandaag</p>
+      <p className="text-[11px] text-[#E6E8E7] mt-1">Nog niet gestart vandaag</p>
     </div>
   )
 }
@@ -735,8 +735,8 @@ function TodayOpenCard({ plannedName }: { plannedName: string }) {
 function UpcomingCard({ plannedName }: { plannedName: string }) {
   return (
     <div>
-      <p className="text-[14px] font-medium text-[#6B6862]">{plannedName}</p>
-      <p className="text-[11px] text-[#C5C2BC] mt-1">Gepland</p>
+      <p className="text-[14px] font-medium text-[#E6E8E7]">{plannedName}</p>
+      <p className="text-[11px] text-[#989F99] mt-1">Gepland</p>
     </div>
   )
 }
@@ -755,15 +755,15 @@ function ChatPanel({
 }) {
   if (messages.length === 0) {
     return (
-      <div className="bg-white border border-[#E8E4DC] rounded-2xl p-10 text-center">
-        <div className="w-11 h-11 rounded-full bg-[#F5F2EC] flex items-center justify-center mx-auto mb-3">
-          <MessageCircle size={18} className="text-[#A09D96]" strokeWidth={1.5} />
+      <div className="bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl p-10 text-center">
+        <div className="w-11 h-11 rounded-full bg-[#A6ADA7] flex items-center justify-center mx-auto mb-3">
+          <MessageCircle size={18} className="text-[#E6E8E7]" strokeWidth={1.5} />
         </div>
-        <p className="text-[14px] font-medium text-[#1A1917]">Nog geen berichten</p>
-        <p className="text-[12px] text-[#A09D96] mt-1">Start een gesprek met {firstName}</p>
+        <p className="text-[14px] font-medium text-[#FDFDFE]">Nog geen berichten</p>
+        <p className="text-[12px] text-[#E6E8E7] mt-1">Start een gesprek met {firstName}</p>
         <button
           onClick={onCompose}
-          className="mt-4 px-4 py-2 rounded-lg bg-[#1A1917] text-white text-[12px] font-semibold active:scale-95 transition-transform"
+          className="mt-4 px-4 py-2 rounded-lg bg-[#474B48] text-white text-[12px] font-semibold active:scale-95 transition-transform"
         >
           Stuur eerste bericht
         </button>
@@ -784,8 +784,8 @@ function ChatPanel({
             <div
               className={`px-3.5 py-2.5 rounded-2xl ${
                 m.senderIsCoach
-                  ? 'bg-[#1A1917] text-white rounded-br-md'
-                  : 'bg-white border border-[#E8E4DC] text-[#1A1917] rounded-bl-md'
+                  ? 'bg-[#474B48] text-white rounded-br-md'
+                  : 'bg-[#A6ADA7] border border-[#A6ADA7] text-[#FDFDFE] rounded-bl-md'
               }`}
             >
               {isVoice ? (
@@ -793,7 +793,7 @@ function ChatPanel({
                   <Mic
                     size={14}
                     strokeWidth={2}
-                    className={m.senderIsCoach ? 'text-white/70' : 'text-[#D46A3A]'}
+                    className={m.senderIsCoach ? 'text-white/70' : 'text-[#C0FC01]'}
                   />
                   <audio
                     src={m.fileUrl || undefined}
@@ -815,7 +815,7 @@ function ChatPanel({
               )}
             </div>
             <p
-              className={`text-[10px] text-[#A09D96] mt-1 px-2 ${
+              className={`text-[10px] text-[#E6E8E7] mt-1 px-2 ${
                 m.senderIsCoach ? 'text-right' : 'text-left'
               }`}
             >
@@ -831,7 +831,7 @@ function ChatPanel({
       })}
       <button
         onClick={onCompose}
-        className="fixed right-5 bottom-24 lg:bottom-10 w-14 h-14 rounded-full bg-[#1A1917] text-white shadow-xl flex items-center justify-center active:scale-95 transition-transform z-30"
+        className="fixed right-5 bottom-24 lg:bottom-10 w-14 h-14 rounded-full bg-[#474B48] text-white shadow-xl flex items-center justify-center active:scale-95 transition-transform z-30"
       >
         <Send size={18} strokeWidth={2} />
       </button>
@@ -1089,26 +1089,26 @@ function QuickComposeSheet({
     <div className="fixed inset-0 z-50 flex items-end lg:items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/30 backdrop-blur-sm animate-fade-in" />
       <div
-        className="relative bg-white w-full lg:max-w-md lg:rounded-2xl rounded-t-3xl p-5 pb-8 lg:pb-5 shadow-2xl animate-slide-up max-h-[85vh] overflow-y-auto"
+        className="relative bg-[#A6ADA7] w-full lg:max-w-md lg:rounded-2xl rounded-t-3xl p-5 pb-8 lg:pb-5 shadow-2xl animate-slide-up max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
           <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#A09D96]">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#E6E8E7]">
               {type === 'session' ? 'Reactie op training' : 'Bericht aan'}
             </p>
-            <p className="text-[17px] font-semibold text-[#1A1917] truncate">{client.fullName}</p>
+            <p className="text-[17px] font-semibold text-[#FDFDFE] truncate">{client.fullName}</p>
             {type === 'session' && session && (
-              <p className="text-[12px] text-[#A09D96] truncate">
+              <p className="text-[12px] text-[#E6E8E7] truncate">
                 {session.templateDayName || 'Training'} · {new Date(session.startedAt).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
               </p>
             )}
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-[#F5F2EC] flex items-center justify-center active:scale-95 flex-shrink-0"
+            className="w-8 h-8 rounded-full bg-[#A6ADA7] flex items-center justify-center active:scale-95 flex-shrink-0"
           >
-            <X size={16} className="text-[#6B6862]" />
+            <X size={16} className="text-[#E6E8E7]" />
           </button>
         </div>
 
@@ -1120,7 +1120,7 @@ function QuickComposeSheet({
                 <button
                   key={i}
                   onClick={() => setMessage(s)}
-                  className="w-full text-left px-3.5 py-2.5 rounded-xl bg-[#F9F7F2] border border-[#F0EDE7] text-[13px] text-[#1A1917] leading-snug active:scale-[0.99] transition-transform"
+                  className="w-full text-left px-3.5 py-2.5 rounded-xl bg-[#A6ADA7] border border-[#A6ADA7] text-[13px] text-[#FDFDFE] leading-snug active:scale-[0.99] transition-transform"
                 >
                   {s}
                 </button>
@@ -1132,7 +1132,7 @@ function QuickComposeSheet({
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Typ een bericht..."
               rows={3}
-              className="w-full px-4 py-3 rounded-xl bg-white border border-[#E8E4DC] text-[14px] text-[#1A1917] placeholder-[#A09D96] focus:outline-none focus:ring-2 focus:ring-[#D46A3A]/25 focus:border-transparent resize-none mb-3"
+              className="w-full px-4 py-3 rounded-xl bg-[#A6ADA7] border border-[#A6ADA7] text-[14px] text-[#FDFDFE] placeholder-[#E6E8E7] focus:outline-none focus:ring-2 focus:ring-[#C0FC01]/25 focus:border-transparent resize-none mb-3"
             />
           </>
         )}
@@ -1141,39 +1141,39 @@ function QuickComposeSheet({
         {recState === 'recording' && (
           <div className="mb-4 rounded-2xl bg-[#FFF4F0] border border-[#FFD5CC] px-4 py-5 flex flex-col items-center">
             <div className="flex items-center gap-2 mb-3">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#FF3B30] animate-pulse" />
-              <span className="text-[12px] font-semibold uppercase tracking-wider text-[#FF3B30]">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#B55A4A] animate-pulse" />
+              <span className="text-[12px] font-semibold uppercase tracking-wider text-[#B55A4A]">
                 Opnemen
               </span>
             </div>
-            <p className="text-[28px] font-bold tabular-nums text-[#1A1917] mb-4">
+            <p className="text-[28px] font-bold tabular-nums text-[#FDFDFE] mb-4">
               {formatTime(recSeconds)}
             </p>
             <button
               onClick={stopRecording}
-              className="w-14 h-14 rounded-full bg-[#FF3B30] text-white flex items-center justify-center shadow-lg active:scale-95 transition-transform"
+              className="w-14 h-14 rounded-full bg-[#B55A4A] text-white flex items-center justify-center shadow-lg active:scale-95 transition-transform"
               aria-label="Stop opname"
             >
               <Square size={18} strokeWidth={2.5} fill="white" />
             </button>
-            <p className="text-[11px] text-[#A09D96] mt-3">Tik om te stoppen</p>
+            <p className="text-[11px] text-[#E6E8E7] mt-3">Tik om te stoppen</p>
           </div>
         )}
 
         {/* Preview before sending */}
         {recState === 'preview' && previewUrl && (
-          <div className="mb-4 rounded-2xl bg-[#F9F7F2] border border-[#F0EDE7] px-4 py-4">
+          <div className="mb-4 rounded-2xl bg-[#A6ADA7] border border-[#A6ADA7] px-4 py-4">
             <div className="flex items-center gap-2 mb-3">
-              <Mic size={14} className="text-[#D46A3A]" strokeWidth={2} />
-              <span className="text-[12px] font-semibold text-[#1A1917]">
+              <Mic size={14} className="text-[#C0FC01]" strokeWidth={2} />
+              <span className="text-[12px] font-semibold text-[#FDFDFE]">
                 Spraakbericht · {formatTime(recSeconds)}
               </span>
               <button
                 onClick={discardRecording}
-                className="ml-auto w-7 h-7 rounded-full bg-white border border-[#E8E4DC] flex items-center justify-center active:scale-95"
+                className="ml-auto w-7 h-7 rounded-full bg-[#A6ADA7] border border-[#A6ADA7] flex items-center justify-center active:scale-95"
                 aria-label="Verwijder opname"
               >
-                <Trash2 size={12} className="text-[#6B6862]" />
+                <Trash2 size={12} className="text-[#E6E8E7]" />
               </button>
             </div>
             <audio src={previewUrl} controls className="w-full h-10" />
@@ -1182,14 +1182,14 @@ function QuickComposeSheet({
 
         {/* Uploading state */}
         {recState === 'uploading' && (
-          <div className="mb-4 rounded-2xl bg-[#F9F7F2] border border-[#F0EDE7] px-4 py-5 flex items-center justify-center gap-2">
-            <div className="w-4 h-4 border-2 border-[#1A1917] border-t-transparent rounded-full animate-spin" />
-            <span className="text-[13px] font-medium text-[#1A1917]">Spraakbericht versturen...</span>
+          <div className="mb-4 rounded-2xl bg-[#A6ADA7] border border-[#A6ADA7] px-4 py-5 flex items-center justify-center gap-2">
+            <div className="w-4 h-4 border-2 border-[#FDFDFE] border-t-transparent rounded-full animate-spin" />
+            <span className="text-[13px] font-medium text-[#FDFDFE]">Spraakbericht versturen...</span>
           </div>
         )}
 
         {recError && (
-          <p className="text-[12px] text-[#FF3B30] mb-3">{recError}</p>
+          <p className="text-[12px] text-[#B55A4A] mb-3">{recError}</p>
         )}
 
         {/* Action row: Send text OR Record voice OR Send voice */}
@@ -1198,7 +1198,7 @@ function QuickComposeSheet({
             <button
               onClick={handleSend}
               disabled={!message.trim() || sending}
-              className="flex-1 py-3.5 rounded-xl bg-[#1A1917] text-white text-[14px] font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-transform"
+              className="flex-1 py-3.5 rounded-xl bg-[#474B48] text-white text-[14px] font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-transform"
             >
               {sending ? (
                 <>
@@ -1215,7 +1215,7 @@ function QuickComposeSheet({
             <button
               onClick={startRecording}
               disabled={sending}
-              className="w-[52px] rounded-xl bg-[#D46A3A] text-white flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40"
+              className="w-[52px] rounded-xl bg-[#C0FC01] text-white flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40"
               aria-label="Spraakbericht opnemen"
               title="Spraakbericht opnemen"
             >
@@ -1226,13 +1226,13 @@ function QuickComposeSheet({
           <div className="flex items-stretch gap-2">
             <button
               onClick={discardRecording}
-              className="flex-1 py-3.5 rounded-xl bg-white border border-[#E8E4DC] text-[#6B6862] text-[14px] font-semibold active:scale-[0.99] transition-transform"
+              className="flex-1 py-3.5 rounded-xl bg-[#A6ADA7] border border-[#A6ADA7] text-[#E6E8E7] text-[14px] font-semibold active:scale-[0.99] transition-transform"
             >
               Opnieuw opnemen
             </button>
             <button
               onClick={sendVoice}
-              className="flex-1 py-3.5 rounded-xl bg-[#1A1917] text-white text-[14px] font-semibold flex items-center justify-center gap-2 active:scale-[0.99] transition-transform"
+              className="flex-1 py-3.5 rounded-xl bg-[#474B48] text-white text-[14px] font-semibold flex items-center justify-center gap-2 active:scale-[0.99] transition-transform"
             >
               <Send size={15} strokeWidth={2} />
               Verstuur spraakbericht

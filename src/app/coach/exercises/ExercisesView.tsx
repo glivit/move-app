@@ -41,15 +41,15 @@ const EQUIPMENT = [
 
 function ExerciseCardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl shadow-clean border border-client-border overflow-hidden animate-shimmer">
-      <div className="aspect-video bg-[#F5F5F3]" />
+    <div className="bg-[#A6ADA7] rounded-2xl shadow-clean border border-client-border overflow-hidden animate-shimmer">
+      <div className="aspect-video bg-[#A6ADA7]" />
       <div className="p-4 space-y-3">
-        <div className="h-4 bg-[#F5F5F3] rounded w-3/4" />
+        <div className="h-4 bg-[#A6ADA7] rounded w-3/4" />
         <div className="flex gap-2">
-          <div className="h-6 bg-[#F5F5F3] rounded-full w-16" />
-          <div className="h-6 bg-[#F5F5F3] rounded-full w-20" />
+          <div className="h-6 bg-[#A6ADA7] rounded-full w-16" />
+          <div className="h-6 bg-[#A6ADA7] rounded-full w-20" />
         </div>
-        <div className="h-3 bg-[#F5F5F3] rounded w-1/2" />
+        <div className="h-3 bg-[#A6ADA7] rounded w-1/2" />
       </div>
     </div>
   )
@@ -147,7 +147,7 @@ export default function ExercisesView({ initialExercises, initialCount }: Exerci
               setDisplayedCount(50)
               setHasFilters(true)
             }}
-            className="w-full pl-12 pr-4 py-3 bg-white border border-client-border rounded-2xl text-[15px] placeholder-client-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/20"
+            className="w-full pl-12 pr-4 py-3 bg-[#A6ADA7] border border-client-border rounded-2xl text-[15px] placeholder-client-text-secondary focus:outline-none focus:ring-2 focus:ring-accent/20"
           />
         </div>
 
@@ -167,7 +167,7 @@ export default function ExercisesView({ initialExercises, initialCount }: Exerci
                   className={`px-4 py-2 rounded-full whitespace-nowrap text-[13px] font-medium transition-colors ${
                     selectedBodyPart === part.value
                       ? 'bg-accent text-white'
-                      : 'bg-white border border-client-border text-text-primary hover:bg-client-surface-muted'
+                      : 'bg-[#A6ADA7] border border-client-border text-text-primary hover:bg-client-surface-muted'
                   }`}
                 >
                   {part.label}
@@ -184,7 +184,7 @@ export default function ExercisesView({ initialExercises, initialCount }: Exerci
               setDisplayedCount(50)
               setHasFilters(true)
             }}
-            className="w-full px-4 py-2.5 bg-white border border-client-border rounded-2xl text-[13px] font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/20"
+            className="w-full px-4 py-2.5 bg-[#A6ADA7] border border-client-border rounded-2xl text-[13px] font-medium text-text-primary focus:outline-none focus:ring-2 focus:ring-accent/20"
           >
             {EQUIPMENT.map((eq) => (
               <option key={eq.value} value={eq.value}>
@@ -233,7 +233,7 @@ export default function ExercisesView({ initialExercises, initialCount }: Exerci
               <button
                 onClick={handleLoadMore}
                 disabled={loading}
-                className="flex items-center gap-2 px-6 py-3 bg-white border border-client-border rounded-2xl font-semibold text-[15px] text-text-primary hover:bg-client-surface-muted transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-3 bg-[#A6ADA7] border border-client-border rounded-2xl font-semibold text-[15px] text-text-primary hover:bg-client-surface-muted transition-colors disabled:opacity-50"
               >
                 {loading ? (
                   <>
@@ -248,7 +248,7 @@ export default function ExercisesView({ initialExercises, initialCount }: Exerci
           )}
         </>
       ) : (
-        <div className="bg-white rounded-2xl shadow-clean p-12 flex flex-col items-center justify-center">
+        <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-12 flex flex-col items-center justify-center">
           <div className="w-12 h-12 rounded-xl bg-data-orange/10 flex items-center justify-center mb-4">
             <Search className="w-6 h-6 text-data-orange" strokeWidth={1.5} />
           </div>

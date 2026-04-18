@@ -116,11 +116,11 @@ export function ComplianceWidget() {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-6">
-        <div className="h-5 w-40 bg-[#F5F5F3] rounded animate-pulse mb-4" />
+      <div className="bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] p-6">
+        <div className="h-5 w-40 bg-[#A6ADA7] rounded animate-pulse mb-4" />
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-12 bg-[#F5F5F3] rounded-xl animate-pulse" />
+            <div key={i} className="h-12 bg-[#A6ADA7] rounded-xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -135,11 +135,11 @@ export function ComplianceWidget() {
   const onTrack = clients.filter(c => c.compliancePercent >= 80)
 
   return (
-    <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-6">
+    <div className="bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] p-6">
       <div className="flex items-center justify-between mb-5">
-        <h3 className="text-[17px] font-semibold text-[#1A1A18]">Compliance deze week</h3>
+        <h3 className="text-[17px] font-semibold text-[#FDFDFE]">Compliance deze week</h3>
         <div className="flex items-center gap-1.5 text-[13px] font-medium">
-          <span className={avgCompliance >= 70 ? 'text-[#34C759]' : avgCompliance >= 40 ? 'text-[#FF9500]' : 'text-[#FF3B30]'}>
+          <span className={avgCompliance >= 70 ? 'text-[#2FA65A]' : avgCompliance >= 40 ? 'text-[#E8B948]' : 'text-[#B55A4A]'}>
             {avgCompliance}% gemiddeld
           </span>
         </div>
@@ -147,11 +147,11 @@ export function ComplianceWidget() {
 
       {/* Summary pills */}
       <div className="flex gap-2 mb-4">
-        <div className="flex items-center gap-1.5 bg-[#34C759]/10 text-[#34C759] text-[12px] font-semibold px-3 py-1.5 rounded-full">
+        <div className="flex items-center gap-1.5 bg-[#2FA65A]/10 text-[#2FA65A] text-[12px] font-semibold px-3 py-1.5 rounded-full">
           <TrendingUp size={14} /> {onTrack.length} op schema
         </div>
         {atRisk.length > 0 && (
-          <div className="flex items-center gap-1.5 bg-[#FF3B30]/10 text-[#FF3B30] text-[12px] font-semibold px-3 py-1.5 rounded-full">
+          <div className="flex items-center gap-1.5 bg-[#B55A4A]/10 text-[#B55A4A] text-[12px] font-semibold px-3 py-1.5 rounded-full">
             <TrendingDown size={14} /> {atRisk.length} achter
           </div>
         )}
@@ -161,15 +161,15 @@ export function ComplianceWidget() {
       <div className="space-y-2">
         {clients.slice(0, 8).map((client) => {
           const statusColor = client.compliancePercent >= 80
-            ? '#34C759'
+            ? '#2FA65A'
             : client.compliancePercent >= 50
-              ? '#FF9500'
-              : '#FF3B30'
+              ? '#E8B948'
+              : '#B55A4A'
 
           return (
             <div key={client.id} className="flex items-center gap-3 py-2">
               {/* Avatar */}
-              <div className="w-8 h-8 rounded-full bg-[#F5F5F3] flex items-center justify-center text-[12px] font-semibold text-[#8E8E93] flex-shrink-0 overflow-hidden">
+              <div className="w-8 h-8 rounded-full bg-[#A6ADA7] flex items-center justify-center text-[12px] font-semibold text-[#D6D9D6] flex-shrink-0 overflow-hidden">
                 {client.avatar_url ? (
                   <Image src={client.avatar_url} alt="" width={32} height={32} className="w-full h-full object-cover" unoptimized loading="lazy" />
                 ) : (
@@ -179,17 +179,17 @@ export function ComplianceWidget() {
 
               {/* Name + stats */}
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-medium text-[#1A1A18] truncate">
+                <p className="text-[13px] font-medium text-[#FDFDFE] truncate">
                   {client.first_name} {client.last_name}
                 </p>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <div className="flex-1 h-1.5 bg-[#F5F5F3] rounded-full overflow-hidden">
+                  <div className="flex-1 h-1.5 bg-[#A6ADA7] rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all"
                       style={{ width: `${client.compliancePercent}%`, backgroundColor: statusColor }}
                     />
                   </div>
-                  <span className="text-[11px] font-medium text-[#8E8E93] tabular-nums w-14 text-right">
+                  <span className="text-[11px] font-medium text-[#D6D9D6] tabular-nums w-14 text-right">
                     {client.workoutsThisWeek}/{client.expectedPerWeek} sessies
                   </span>
                 </div>
@@ -197,7 +197,7 @@ export function ComplianceWidget() {
 
               {/* Streak */}
               {client.streak > 1 && (
-                <div className="flex items-center gap-0.5 text-[#FF9500] text-[12px] font-semibold flex-shrink-0">
+                <div className="flex items-center gap-0.5 text-[#E8B948] text-[12px] font-semibold flex-shrink-0">
                   <Flame size={14} />
                   {client.streak}
                 </div>

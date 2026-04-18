@@ -215,7 +215,7 @@ export default function CheckInPage() {
               Je coach bekijkt je resultaten binnen 24 uur.
             </p>
           </div>
-          <button onClick={() => router.push('/client')} className="bg-[#FDFDFE] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#5A5E5B] transition-colors active:scale-[0.98] rounded-2xl w-full py-4">
+          <button onClick={() => router.push('/client')} className="bg-[#474B48] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#3A3E3B] transition-colors active:scale-[0.98] rounded-2xl w-full py-4">
             Terug naar dashboard
           </button>
         </div>
@@ -238,7 +238,7 @@ export default function CheckInPage() {
             </h2>
             <p className="text-[14px] text-[rgba(253,253,254,0.55)] leading-relaxed">{windowMessage}</p>
           </div>
-          <button onClick={() => router.push('/client')} className="bg-[#FDFDFE] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#5A5E5B] transition-colors active:scale-[0.98] rounded-2xl w-full py-4 text-[13px]">
+          <button onClick={() => router.push('/client')} className="bg-[#474B48] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#3A3E3B] transition-colors active:scale-[0.98] rounded-2xl w-full py-4 text-[13px]">
             Terug naar dashboard
           </button>
         </div>
@@ -331,7 +331,7 @@ export default function CheckInPage() {
         {currentStep < steps.length - 1 ? (
           <button
             onClick={() => setCurrentStep(currentStep + 1)}
-            className="flex-1 bg-[#FDFDFE] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#5A5E5B] transition-colors active:scale-[0.98] rounded-2xl py-4"
+            className="flex-1 bg-[#474B48] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#3A3E3B] transition-colors active:scale-[0.98] rounded-2xl py-4"
           >
             Volgende
           </button>
@@ -339,7 +339,7 @@ export default function CheckInPage() {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="flex-1 bg-[#FDFDFE] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#5A5E5B] transition-colors active:scale-[0.98] rounded-2xl py-4 disabled:opacity-50"
+            className="flex-1 bg-[#474B48] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#3A3E3B] transition-colors active:scale-[0.98] rounded-2xl py-4 disabled:opacity-50"
           >
             {submitting ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />

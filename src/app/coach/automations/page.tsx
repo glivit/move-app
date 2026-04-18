@@ -277,7 +277,7 @@ export default function CoachAutomationsPage() {
         </div>
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-24 bg-white rounded-2xl animate-pulse" />
+            <div key={i} className="h-24 bg-[#A6ADA7] rounded-2xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -308,7 +308,7 @@ export default function CoachAutomationsPage() {
         <button
           onClick={() => setTab('rules')}
           className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
-            tab === 'rules' ? 'bg-accent text-white' : 'bg-white border border-client-border text-text-primary hover:bg-client-surface-muted'
+            tab === 'rules' ? 'bg-accent text-white' : 'bg-[#A6ADA7] border border-client-border text-text-primary hover:bg-client-surface-muted'
           }`}
         >
           Mijn regels ({rules.length})
@@ -316,7 +316,7 @@ export default function CoachAutomationsPage() {
         <button
           onClick={() => setTab('templates')}
           className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
-            tab === 'templates' ? 'bg-accent text-white' : 'bg-white border border-client-border text-text-primary hover:bg-client-surface-muted'
+            tab === 'templates' ? 'bg-accent text-white' : 'bg-[#A6ADA7] border border-client-border text-text-primary hover:bg-client-surface-muted'
           }`}
         >
           Templates
@@ -327,7 +327,7 @@ export default function CoachAutomationsPage() {
       {tab === 'rules' && (
         <>
           {rules.length === 0 ? (
-            <div className="bg-white rounded-2xl p-8 border border-client-border text-center">
+            <div className="bg-[#A6ADA7] rounded-2xl p-8 border border-client-border text-center">
               <Zap size={48} strokeWidth={1.5} className="text-client-text-secondary mx-auto mb-3" />
               <p className="font-semibold text-text-primary text-lg">Nog geen automatiseringen</p>
               <p className="text-[14px] text-client-text-secondary mt-2">
@@ -348,15 +348,15 @@ export default function CoachAutomationsPage() {
                 const ActionIcon = getActionIcon(rule.action_type)
 
                 return (
-                  <div key={rule.id} className="bg-white rounded-2xl border border-client-border overflow-hidden">
+                  <div key={rule.id} className="bg-[#A6ADA7] rounded-2xl border border-client-border overflow-hidden">
                     <div
                       className="p-5 flex items-center gap-4 cursor-pointer hover:bg-client-surface-muted transition-colors"
                       onClick={() => setExpandedRule(isExpanded ? null : rule.id)}
                     >
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                        rule.is_active ? 'bg-[#34C759]/10' : 'bg-gray-100'
+                        rule.is_active ? 'bg-[#2FA65A]/10' : 'bg-[#A6ADA7]'
                       }`}>
-                        <TriggerIcon size={20} strokeWidth={1.5} className={rule.is_active ? 'text-[#34C759]' : 'text-gray-400'} />
+                        <TriggerIcon size={20} strokeWidth={1.5} className={rule.is_active ? 'text-[#2FA65A]' : 'text-gray-400'} />
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -374,10 +374,10 @@ export default function CoachAutomationsPage() {
                         onClick={(e) => { e.stopPropagation(); toggleRule(rule.id, rule.is_active) }}
                         disabled={togglingId === rule.id}
                         className={`relative w-12 h-7 rounded-full transition-colors shrink-0 ${
-                          rule.is_active ? 'bg-[#34C759]' : 'bg-gray-200'
+                          rule.is_active ? 'bg-[#2FA65A]' : 'bg-[#989F99]'
                         }`}
                       >
-                        <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform ${
+                        <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-[#A6ADA7] shadow transition-transform ${
                           rule.is_active ? 'translate-x-5' : 'translate-x-0.5'
                         }`} />
                       </button>
@@ -419,7 +419,7 @@ export default function CoachAutomationsPage() {
 
                         {/* Message preview */}
                         {(rule.action_config?.message || rule.action_config?.body) && (
-                          <div className="bg-[#F8F7F4] rounded-xl p-3 border border-client-border">
+                          <div className="bg-[#A6ADA7] rounded-xl p-3 border border-client-border">
                             <p className="text-[11px] font-medium text-client-text-secondary uppercase tracking-wide mb-1">Bericht</p>
                             <p className="text-[14px] text-text-primary italic">
                               &ldquo;{rule.action_config.message || rule.action_config.body}&rdquo;
@@ -443,7 +443,7 @@ export default function CoachAutomationsPage() {
                             </button>
                             <button
                               onClick={() => deleteRule(rule.id)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium text-[#C4372A] hover:bg-red-50 transition-colors"
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium text-[#B55A4A] hover:bg-red-50 transition-colors"
                             >
                               <Trash2 size={14} />
                               Verwijder
@@ -471,7 +471,7 @@ export default function CoachAutomationsPage() {
             const existsAlready = rules.some(r => r.name === template.name)
 
             return (
-              <div key={i} className="bg-white rounded-2xl border border-client-border p-5">
+              <div key={i} className="bg-[#A6ADA7] rounded-2xl border border-client-border p-5">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
                     <TriggerIcon size={20} strokeWidth={1.5} className="text-accent" />
@@ -479,7 +479,7 @@ export default function CoachAutomationsPage() {
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-text-primary">{template.name}</p>
                     <p className="text-[13px] text-client-text-secondary mt-0.5">{template.description}</p>
-                    <div className="mt-2 bg-[#F8F7F4] rounded-lg p-2.5">
+                    <div className="mt-2 bg-[#A6ADA7] rounded-lg p-2.5">
                       <p className="text-[12px] text-client-text-secondary italic">
                         &ldquo;{template.action_config.message || template.action_config.body}&rdquo;
                       </p>
@@ -490,7 +490,7 @@ export default function CoachAutomationsPage() {
                     disabled={saving || existsAlready}
                     className={`px-4 py-2 rounded-xl text-[13px] font-medium shrink-0 transition-all ${
                       existsAlready
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        ? 'bg-[#A6ADA7] text-gray-400 cursor-not-allowed'
                         : 'bg-accent text-white hover:opacity-90'
                     }`}
                   >
@@ -510,13 +510,13 @@ export default function CoachAutomationsPage() {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-start justify-center pt-[10vh] px-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl w-full max-w-lg shadow-xl mb-10">
+          <div className="bg-[#A6ADA7] rounded-2xl w-full max-w-lg shadow-xl mb-10">
             {/* Modal header */}
             <div className="flex items-center justify-between p-5 border-b border-client-border">
               <h2 className="text-[18px] font-semibold text-text-primary">
                 {editingRule ? 'Regel bewerken' : 'Nieuwe automatisering'}
               </h2>
-              <button onClick={() => setShowModal(false)} className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center">
+              <button onClick={() => setShowModal(false)} className="w-8 h-8 rounded-full hover:bg-[#A6ADA7] flex items-center justify-center">
                 <X size={18} />
               </button>
             </div>
@@ -560,7 +560,7 @@ export default function CoachAutomationsPage() {
                       setFormTriggerConfig({})
                     }
                   }}
-                  className="w-full px-4 py-2.5 rounded-xl border border-client-border text-[14px] focus:outline-none focus:ring-2 focus:ring-accent/30 bg-white"
+                  className="w-full px-4 py-2.5 rounded-xl border border-client-border text-[14px] focus:outline-none focus:ring-2 focus:ring-accent/30 bg-[#A6ADA7]"
                 >
                   {TRIGGER_OPTIONS.map(t => (
                     <option key={t.value} value={t.value}>{t.label} — {t.description}</option>
@@ -590,7 +590,7 @@ export default function CoachAutomationsPage() {
                     setFormActionType(e.target.value)
                     setFormActionConfig({})
                   }}
-                  className="w-full px-4 py-2.5 rounded-xl border border-client-border text-[14px] focus:outline-none focus:ring-2 focus:ring-accent/30 bg-white"
+                  className="w-full px-4 py-2.5 rounded-xl border border-client-border text-[14px] focus:outline-none focus:ring-2 focus:ring-accent/30 bg-[#A6ADA7]"
                 >
                   {ACTION_OPTIONS.map(a => (
                     <option key={a.value} value={a.value}>{a.label} — {a.description}</option>
@@ -660,7 +660,7 @@ export default function CoachAutomationsPage() {
                       className={`px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors ${
                         formCooldown === opt.hours
                           ? 'bg-accent text-white'
-                          : 'bg-client-surface-muted text-text-primary hover:bg-gray-200'
+                          : 'bg-client-surface-muted text-text-primary hover:bg-[#989F99]'
                       }`}
                     >
                       {opt.label}
@@ -671,7 +671,7 @@ export default function CoachAutomationsPage() {
             </div>
 
             {/* Preview */}
-            <div className="mx-5 mb-4 p-3 bg-[#F8F7F4] rounded-xl border border-client-border">
+            <div className="mx-5 mb-4 p-3 bg-[#A6ADA7] rounded-xl border border-client-border">
               <p className="text-[12px] font-medium text-client-text-secondary mb-1">Preview</p>
               <p className="text-[14px] text-text-primary">
                 Als <strong>{getTriggerLabel(formTriggerType)}</strong>{' '}
@@ -685,7 +685,7 @@ export default function CoachAutomationsPage() {
             <div className="flex items-center justify-end gap-3 p-5 border-t border-client-border">
               <button
                 onClick={() => setShowModal(false)}
-                className="px-5 py-2.5 rounded-xl text-[14px] font-medium text-text-primary hover:bg-gray-100 transition-colors"
+                className="px-5 py-2.5 rounded-xl text-[14px] font-medium text-text-primary hover:bg-[#A6ADA7] transition-colors"
               >
                 Annuleer
               </button>

@@ -615,7 +615,7 @@ export default function WorkoutHistoryPage() {
                     onClick={() => setSelectedExercise(selectedExercise === ex.exerciseId ? null : ex.exerciseId)}
                     className={`px-3 py-2 rounded-xl text-[12px] font-medium transition-all touch-manipulation ${
                       selectedExercise === ex.exerciseId
-                        ? 'bg-[#FDFDFE] text-white'
+                        ? 'bg-[#474B48] text-white'
                         : 'bg-[rgba(253,253,254,0.08)] text-[#FDFDFE] hover:bg-[rgba(253,253,254,0.14)]'
                     }`}
                     style={{ WebkitTapHighlightColor: 'transparent' }}

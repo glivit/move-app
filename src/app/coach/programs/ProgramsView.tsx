@@ -62,12 +62,12 @@ export default function ProgramsView({ initialPrograms }: ProgramsViewProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] p-6">
+    <div className="min-h-screen bg-[#A6ADA7] p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1
-            className="text-[32px] font-display font-semibold text-[#1A1A18] mb-4"
+            className="text-[32px] font-display font-semibold text-[#FDFDFE] mb-4"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Programma&apos;s
@@ -81,9 +81,9 @@ export default function ProgramsView({ initialPrograms }: ProgramsViewProps) {
                   type="checkbox"
                   checked={showArchived}
                   onChange={(e) => setShowArchived(e.target.checked)}
-                  className="w-4 h-4 rounded border border-[#D0D0CC] text-[#1A1917]"
+                  className="w-4 h-4 rounded border border-[#D0D0CC] text-[#FDFDFE]"
                 />
-                <span className="text-[15px] text-[#8E8E93]">Gearchiveerde tonen</span>
+                <span className="text-[15px] text-[#D6D9D6]">Gearchiveerde tonen</span>
               </label>
             </div>
 
@@ -99,7 +99,7 @@ export default function ProgramsView({ initialPrograms }: ProgramsViewProps) {
         {/* Programs Grid */}
         {filteredPrograms.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-[15px] text-[#8E8E93] mb-4">
+            <p className="text-[15px] text-[#D6D9D6] mb-4">
               {showArchived ? 'Geen gearchiveerde programma\'s' : 'Nog geen programma\'s'}
             </p>
             {!showArchived && (
@@ -114,15 +114,15 @@ export default function ProgramsView({ initialPrograms }: ProgramsViewProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredPrograms.map((program) => (
               <Link key={program.id} href={`/coach/programs/${program.id}`}>
-                <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-6 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-shadow cursor-pointer h-full flex flex-col">
+                <div className="bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] p-6 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-shadow cursor-pointer h-full flex flex-col">
                   {/* Header with Archive Button */}
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-1">
+                      <h3 className="text-[17px] font-semibold text-[#FDFDFE] mb-1">
                         {program.name}
                       </h3>
                       {program.description && (
-                        <p className="text-[13px] text-[#8E8E93] line-clamp-2">
+                        <p className="text-[13px] text-[#D6D9D6] line-clamp-2">
                           {program.description}
                         </p>
                       )}
@@ -135,7 +135,7 @@ export default function ProgramsView({ initialPrograms }: ProgramsViewProps) {
                         e.stopPropagation()
                         handleArchiveToggle(program)
                       }}
-                      className="p-2 text-[#8E8E93] hover:text-[#1A1A18] hover:bg-[#EDEAE4] rounded-lg transition-colors ml-2 flex-shrink-0"
+                      className="p-2 text-[#D6D9D6] hover:text-[#FDFDFE] hover:bg-[#A6ADA7] rounded-lg transition-colors ml-2 flex-shrink-0"
                       title={program.is_archived ? 'Archivering opheffen' : 'Archiveren'}
                     >
                       {program.is_archived ? (
@@ -158,10 +158,10 @@ export default function ProgramsView({ initialPrograms }: ProgramsViewProps) {
                     </span>
 
                     {/* Duration and Frequency */}
-                    <span className="text-[11px] bg-[#EDEAE4] text-[#1A1917] font-medium px-2.5 py-1 rounded-full">
+                    <span className="text-[11px] bg-[#A6ADA7] text-[#FDFDFE] font-medium px-2.5 py-1 rounded-full">
                       {program.duration_weeks}w
                     </span>
-                    <span className="text-[11px] bg-[#EDEAE4] text-[#1A1917] font-medium px-2.5 py-1 rounded-full">
+                    <span className="text-[11px] bg-[#A6ADA7] text-[#FDFDFE] font-medium px-2.5 py-1 rounded-full">
                       {program.days_per_week}d/w
                     </span>
                   </div>
@@ -172,7 +172,7 @@ export default function ProgramsView({ initialPrograms }: ProgramsViewProps) {
                       {program.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="text-[11px] bg-[#E8E4DC] text-[#8E8E93] px-2.5 py-1 rounded-full"
+                          className="text-[11px] bg-[#A6ADA7] text-[#D6D9D6] px-2.5 py-1 rounded-full"
                         >
                           {tag}
                         </span>

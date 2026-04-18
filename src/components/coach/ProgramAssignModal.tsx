@@ -233,14 +233,14 @@ export function ProgramAssignModal({
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" onClick={onClose} />
 
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="bg-[#A6ADA7] rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
           {/* Header */}
-          <div className="p-5 border-b border-[#E8E4DC] flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
-            <h2 className="text-[17px] font-semibold text-[#1A1A18]">
+          <div className="p-5 border-b border-[#A6ADA7] flex items-center justify-between sticky top-0 bg-[#A6ADA7] rounded-t-2xl z-10">
+            <h2 className="text-[17px] font-semibold text-[#FDFDFE]">
               {success ? 'Gereed!' : 'Programma toewijzen'}
             </h2>
             {!success && (
-              <button onClick={onClose} className="text-[#8E8E93] hover:text-[#1A1A18] transition-colors p-1">
+              <button onClick={onClose} className="text-[#D6D9D6] hover:text-[#FDFDFE] transition-colors p-1">
                 <X strokeWidth={1.5} className="w-5 h-5" />
               </button>
             )}
@@ -254,18 +254,18 @@ export function ProgramAssignModal({
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p className="text-[15px] text-[#1A1A18]">Programma succesvol toegewezen</p>
+                <p className="text-[15px] text-[#FDFDFE]">Programma succesvol toegewezen</p>
               </div>
             ) : (
               <>
                 {/* Client */}
                 <div>
-                  <label className="block text-[13px] font-medium text-[#8E8E93] mb-2">Cliënt</label>
+                  <label className="block text-[13px] font-medium text-[#D6D9D6] mb-2">Cliënt</label>
                   <select
                     value={selectedClientId}
                     onChange={(e) => setSelectedClientId(e.target.value)}
                     disabled={loading}
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors disabled:opacity-50"
+                    className="w-full px-4 py-3 bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl text-[15px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors disabled:opacity-50"
                   >
                     {loading ? (
                       <option>Laden...</option>
@@ -281,18 +281,18 @@ export function ProgramAssignModal({
 
                 {/* Start Date */}
                 <div>
-                  <label className="block text-[13px] font-medium text-[#8E8E93] mb-2">Startdatum</label>
+                  <label className="block text-[13px] font-medium text-[#D6D9D6] mb-2">Startdatum</label>
                   <input
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                    className="w-full px-4 py-3 bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl text-[15px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
                   />
                 </div>
 
                 {/* ══════ TRAININGSSCHEMA ══════ */}
                 <div>
-                  <label className="block text-[13px] font-medium text-[#8E8E93] mb-2">
+                  <label className="block text-[13px] font-medium text-[#D6D9D6] mb-2">
                     Trainingsschema
                     <span className="text-[11px] ml-2 font-normal">
                       ({assignedCount}/{templateDays.length} dagen ingepland)
@@ -311,7 +311,7 @@ export function ProgramAssignModal({
                           className={`py-2.5 rounded-xl text-center transition-all ${
                             isActive
                               ? 'bg-[var(--color-pop)] text-white shadow-sm'
-                              : 'bg-[#F5F2EC] text-[#A09D96] hover:bg-[#EBE8E0]'
+                              : 'bg-[#A6ADA7] text-[#E6E8E7] hover:bg-[#EBE8E0]'
                           }`}
                         >
                           <span className="text-[11px] font-bold uppercase tracking-[0.06em]">{wd.label}</span>
@@ -332,7 +332,7 @@ export function ProgramAssignModal({
                             <select
                               value={dayId}
                               onChange={(e) => handleDaySelect(weekdayKey, e.target.value)}
-                              className="flex-1 px-3 py-2 bg-[#F5F2EC] border-0 rounded-xl text-[13px] text-[#1A1917] focus:outline-none focus:ring-2 focus:ring-[var(--color-pop)]"
+                              className="flex-1 px-3 py-2 bg-[#A6ADA7] border-0 rounded-xl text-[13px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[var(--color-pop)]"
                             >
                               {templateDays.map(td => (
                                 <option key={td.id} value={td.id}>
@@ -346,7 +346,7 @@ export function ProgramAssignModal({
                   </div>
 
                   {assignedCount === 0 && (
-                    <p className="text-[12px] text-[#C5C2BC] text-center py-2">
+                    <p className="text-[12px] text-[#989F99] text-center py-2">
                       Klik op een weekdag om een trainingsdag in te plannen
                     </p>
                   )}
@@ -354,23 +354,23 @@ export function ProgramAssignModal({
 
                 {/* Program Name */}
                 <div>
-                  <label className="block text-[13px] font-medium text-[#8E8E93] mb-2">Programma naam</label>
+                  <label className="block text-[13px] font-medium text-[#D6D9D6] mb-2">Programma naam</label>
                   <input
                     type="text"
                     value={programName}
                     onChange={(e) => setProgramName(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                    className="w-full px-4 py-3 bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl text-[15px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
                   />
                 </div>
 
                 {/* Coach Notes */}
                 <div>
-                  <label className="block text-[13px] font-medium text-[#8E8E93] mb-2">Coach aantekeningen (optioneel)</label>
+                  <label className="block text-[13px] font-medium text-[#D6D9D6] mb-2">Coach aantekeningen (optioneel)</label>
                   <textarea
                     value={coachNotes}
                     onChange={(e) => setCoachNotes(e.target.value)}
                     rows={2}
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors resize-none"
+                    className="w-full px-4 py-3 bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl text-[15px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors resize-none"
                     placeholder="Bijzondere opmerkingen..."
                   />
                 </div>
@@ -381,8 +381,8 @@ export function ProgramAssignModal({
                   </div>
                 )}
 
-                <div className="p-3 bg-[#EDEAE4] border border-[#ECEAE3] rounded-2xl">
-                  <p className="text-[13px] text-[#1A1917]">
+                <div className="p-3 bg-[#A6ADA7] border border-[#ECEAE3] rounded-2xl">
+                  <p className="text-[13px] text-[#FDFDFE]">
                     <span className="font-semibold">Duur:</span> {durationWeeks} weken
                   </p>
                 </div>
@@ -391,7 +391,7 @@ export function ProgramAssignModal({
           </div>
 
           {!success && (
-            <div className="p-5 border-t border-[#E8E4DC] flex gap-3 sticky bottom-0 bg-white rounded-b-2xl">
+            <div className="p-5 border-t border-[#A6ADA7] flex gap-3 sticky bottom-0 bg-[#A6ADA7] rounded-b-2xl">
               <Button variant="secondary" onClick={onClose} disabled={saving} className="flex-1">
                 Annuleren
               </Button>

@@ -7,7 +7,7 @@ import { Heart, Footprints, Moon, Droplets, Brain, Activity, TrendingUp, Trendin
 
 const ClientHealthChart = dynamic(() => import('./ClientHealthChart').then(mod => ({ default: mod.ClientHealthChart })), {
   ssr: false,
-  loading: () => <div className="h-24 bg-[#F8F8F6] rounded animate-pulse" />
+  loading: () => <div className="h-24 bg-[#A6ADA7] rounded animate-pulse" />
 })
 
 interface HealthMetric {
@@ -50,17 +50,17 @@ export function ClientHealthSummary({ clientId }: Props) {
   }
 
   if (loading) {
-    return <div className="h-32 bg-white rounded-2xl animate-pulse border border-[#E8E4DC]" />
+    return <div className="h-32 bg-[#A6ADA7] rounded-2xl animate-pulse border border-[#A6ADA7]" />
   }
 
   if (metrics.length === 0) {
     return (
       <div
         className="rounded-2xl border p-6 text-center"
-        style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+        style={{ backgroundColor: 'white', borderColor: '#A6ADA7', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
       >
-        <Heart size={24} strokeWidth={1.5} className="mx-auto mb-2" style={{ color: '#C7C7CC' }} />
-        <p className="text-[13px]" style={{ color: '#8E8E93' }}>
+        <Heart size={24} strokeWidth={1.5} className="mx-auto mb-2" style={{ color: '#CDD1CE' }} />
+        <p className="text-[13px]" style={{ color: '#D6D9D6' }}>
           Nog geen gezondheidsdata beschikbaar
         </p>
       </div>
@@ -97,59 +97,59 @@ export function ClientHealthSummary({ clientId }: Props) {
   return (
     <div
       className="rounded-2xl border p-6"
-      style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+      style={{ backgroundColor: 'white', borderColor: '#A6ADA7', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
     >
-      <h3 className="text-[15px] font-semibold mb-4" style={{ color: '#1A1A18' }}>
+      <h3 className="text-[15px] font-semibold mb-4" style={{ color: '#FDFDFE' }}>
         Gezondheidsoverzicht (14d)
       </h3>
 
       {/* KPI Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         {avg.steps !== null && (
-          <div className="p-3 rounded-xl" style={{ backgroundColor: '#FFF3E0' }}>
-            <Footprints size={14} strokeWidth={1.5} style={{ color: '#FF9500' }} />
-            <p className="text-[16px] font-bold mt-1" style={{ color: '#1A1A18' }}>
+          <div className="p-3 rounded-xl" style={{ backgroundColor: 'rgba(232,185,72,0.14)' }}>
+            <Footprints size={14} strokeWidth={1.5} style={{ color: '#E8B948' }} />
+            <p className="text-[16px] font-bold mt-1" style={{ color: '#FDFDFE' }}>
               {(avg.steps / 1000).toFixed(1)}k
             </p>
-            <p className="text-[10px]" style={{ color: '#8E8E93' }}>Gem. stappen</p>
+            <p className="text-[10px]" style={{ color: '#D6D9D6' }}>Gem. stappen</p>
           </div>
         )}
         {avg.sleep !== null && (
           <div className="p-3 rounded-xl" style={{ backgroundColor: '#F5EEFA' }}>
-            <Moon size={14} strokeWidth={1.5} style={{ color: '#AF52DE' }} />
-            <p className="text-[16px] font-bold mt-1" style={{ color: '#1A1A18' }}>
+            <Moon size={14} strokeWidth={1.5} style={{ color: '#8A7BA8' }} />
+            <p className="text-[16px] font-bold mt-1" style={{ color: '#FDFDFE' }}>
               {avg.sleep}u
             </p>
-            <p className="text-[10px]" style={{ color: '#8E8E93' }}>Gem. slaap</p>
+            <p className="text-[10px]" style={{ color: '#D6D9D6' }}>Gem. slaap</p>
           </div>
         )}
         {avg.water !== null && (
           <div className="p-3 rounded-xl" style={{ backgroundColor: '#EBF5FF' }}>
-            <Droplets size={14} strokeWidth={1.5} style={{ color: '#007AFF' }} />
-            <p className="text-[16px] font-bold mt-1" style={{ color: '#1A1A18' }}>
+            <Droplets size={14} strokeWidth={1.5} style={{ color: '#5A7FB5' }} />
+            <p className="text-[16px] font-bold mt-1" style={{ color: '#FDFDFE' }}>
               {(avg.water / 1000).toFixed(1)}L
             </p>
-            <p className="text-[10px]" style={{ color: '#8E8E93' }}>Gem. water</p>
+            <p className="text-[10px]" style={{ color: '#D6D9D6' }}>Gem. water</p>
           </div>
         )}
         {avg.hr !== null && (
-          <div className="p-3 rounded-xl" style={{ backgroundColor: '#FFE5E5' }}>
-            <Heart size={14} strokeWidth={1.5} style={{ color: '#FF3B30' }} />
-            <p className="text-[16px] font-bold mt-1" style={{ color: '#1A1A18' }}>
+          <div className="p-3 rounded-xl" style={{ backgroundColor: 'rgba(181,90,74,0.14)' }}>
+            <Heart size={14} strokeWidth={1.5} style={{ color: '#B55A4A' }} />
+            <p className="text-[16px] font-bold mt-1" style={{ color: '#FDFDFE' }}>
               {avg.hr}
             </p>
-            <p className="text-[10px]" style={{ color: '#8E8E93' }}>Gem. BPM</p>
+            <p className="text-[10px]" style={{ color: '#D6D9D6' }}>Gem. BPM</p>
           </div>
         )}
       </div>
 
       {/* Weight trend */}
       {weightTrend !== null && (
-        <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-xl" style={{ backgroundColor: '#FAFAFA' }}>
-          <Activity size={14} strokeWidth={1.5} style={{ color: '#34C759' }} />
-          <span className="text-[12px]" style={{ color: '#8E8E93' }}>Gewichtstrend:</span>
+        <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-xl" style={{ backgroundColor: '#A6ADA7' }}>
+          <Activity size={14} strokeWidth={1.5} style={{ color: '#2FA65A' }} />
+          <span className="text-[12px]" style={{ color: '#D6D9D6' }}>Gewichtstrend:</span>
           <span className="flex items-center gap-1 text-[12px] font-semibold" style={{
-            color: weightTrend > 0 ? '#FF9500' : weightTrend < 0 ? '#34C759' : '#8E8E93'
+            color: weightTrend > 0 ? '#E8B948' : weightTrend < 0 ? '#2FA65A' : '#D6D9D6'
           }}>
             {weightTrend > 0 ? (
               <TrendingUp size={12} strokeWidth={2} />
@@ -166,7 +166,7 @@ export function ClientHealthSummary({ clientId }: Props) {
       {/* Mini chart */}
       {chartData.length > 2 && (
         <div>
-          <p className="text-[11px] font-medium mb-2" style={{ color: '#8E8E93' }}>Slaap afgelopen 7 dagen</p>
+          <p className="text-[11px] font-medium mb-2" style={{ color: '#D6D9D6' }}>Slaap afgelopen 7 dagen</p>
           <ClientHealthChart data={chartData} />
         </div>
       )}

@@ -21,10 +21,10 @@ const CONTEXT_LABELS: Record<string, string> = {
 }
 
 const CONTEXT_COLORS: Record<string, string> = {
-  workout_feedback: 'bg-[#7B5EA7]/10 text-[#7B5EA7]',
-  missed_workout: 'bg-[#C47D15]/10 text-[#C47D15]',
-  missed_nutrition: 'bg-[#3068C4]/10 text-[#3068C4]',
-  weekly_motivation: 'bg-[#3D8B5C]/10 text-[#3D8B5C]',
+  workout_feedback: 'bg-[#8A7BA8]/10 text-[#8A7BA8]',
+  missed_workout: 'bg-[#D9A645]/10 text-[#D9A645]',
+  missed_nutrition: 'bg-[#5A7FB5]/10 text-[#5A7FB5]',
+  weekly_motivation: 'bg-[#2FA65A]/10 text-[#2FA65A]',
 }
 
 function timeSince(date: string) {
@@ -83,13 +83,13 @@ export function AIDraftsPanel() {
   if (loading) {
     return (
       <div className="card-tactile overflow-hidden animate-pulse">
-        <div className="px-6 py-4 border-b border-[#E8E4DC] flex items-center gap-2.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#E8E4DC]" />
-          <div className="h-4 w-32 bg-[#E8E4DC] rounded" />
+        <div className="px-6 py-4 border-b border-[#A6ADA7] flex items-center gap-2.5">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#A6ADA7]" />
+          <div className="h-4 w-32 bg-[#A6ADA7] rounded" />
         </div>
         <div className="px-6 py-6">
-          <div className="h-3 w-48 bg-[#E8E4DC] rounded mb-3" />
-          <div className="h-3 w-64 bg-[#E8E4DC] rounded" />
+          <div className="h-3 w-48 bg-[#A6ADA7] rounded mb-3" />
+          <div className="h-3 w-64 bg-[#A6ADA7] rounded" />
         </div>
       </div>
     )
@@ -99,10 +99,10 @@ export function AIDraftsPanel() {
 
   return (
     <div className="card-tactile overflow-hidden">
-      <div className="px-6 py-4 border-b border-[#E8E4DC] flex items-center gap-2.5">
-        <Bot className="w-4 h-4 text-[#7B5EA7]" strokeWidth={1.5} />
-        <p className="text-[14px] font-semibold text-[#1A1917]">AI Concepten</p>
-        <span className="text-[12px] text-[#A09D96] ml-auto font-medium">
+      <div className="px-6 py-4 border-b border-[#A6ADA7] flex items-center gap-2.5">
+        <Bot className="w-4 h-4 text-[#8A7BA8]" strokeWidth={1.5} />
+        <p className="text-[14px] font-semibold text-[#FDFDFE]">AI Concepten</p>
+        <span className="text-[12px] text-[#E6E8E7] ml-auto font-medium">
           {drafts.length} te beoordelen
         </span>
       </div>
@@ -115,17 +115,17 @@ export function AIDraftsPanel() {
         return (
           <div
             key={draft.id}
-            className={`px-6 py-4 ${index !== drafts.length - 1 ? 'border-b border-[#E8E4DC]' : ''}`}
+            className={`px-6 py-4 ${index !== drafts.length - 1 ? 'border-b border-[#A6ADA7]' : ''}`}
           >
             {/* Header row */}
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <p className="text-[15px] font-medium text-[#1A1917]">{clientName}</p>
-                <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${CONTEXT_COLORS[draft.context_type] || 'bg-[#E8E4DC] text-[#6B6862]'}`}>
+                <p className="text-[15px] font-medium text-[#FDFDFE]">{clientName}</p>
+                <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${CONTEXT_COLORS[draft.context_type] || 'bg-[#A6ADA7] text-[#E6E8E7]'}`}>
                   {CONTEXT_LABELS[draft.context_type] || draft.context_type}
                 </span>
               </div>
-              <span className="text-[12px] text-[#C5C2BC]">{timeSince(draft.created_at)}</span>
+              <span className="text-[12px] text-[#989F99]">{timeSince(draft.created_at)}</span>
             </div>
 
             {/* Message content */}
@@ -135,10 +135,10 @@ export function AIDraftsPanel() {
                 onChange={(e) => setEditText(e.target.value)}
                 autoFocus
                 rows={3}
-                className="w-full px-3 py-2.5 border border-[#E8E4DC] rounded-xl text-[14px] text-[#1A1917] focus:outline-none focus:border-[#1A1917] resize-none mb-3"
+                className="w-full px-3 py-2.5 border border-[#A6ADA7] rounded-xl text-[14px] text-[#FDFDFE] focus:outline-none focus:border-[#FDFDFE] resize-none mb-3"
               />
             ) : (
-              <p className="text-[14px] text-[#6B6862] leading-relaxed mb-3 whitespace-pre-wrap">
+              <p className="text-[14px] text-[#E6E8E7] leading-relaxed mb-3 whitespace-pre-wrap">
                 {draft.content}
               </p>
             )}
@@ -150,14 +150,14 @@ export function AIDraftsPanel() {
                   <button
                     onClick={() => handleAction(draft.id, 'edit_send', editText)}
                     disabled={isProcessing || !editText.trim()}
-                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1A1917] text-white text-[13px] font-semibold hover:bg-[#333] transition-colors disabled:opacity-40"
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#474B48] text-white text-[13px] font-semibold hover:bg-[#333] transition-colors disabled:opacity-40"
                   >
                     {isProcessing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                     Verstuur
                   </button>
                   <button
                     onClick={() => setEditingId(null)}
-                    className="px-3.5 py-2 rounded-xl text-[13px] font-medium text-[#8E8E93] hover:bg-[#F5F2EC] transition-colors"
+                    className="px-3.5 py-2 rounded-xl text-[13px] font-medium text-[#D6D9D6] hover:bg-[#A6ADA7] transition-colors"
                   >
                     Annuleren
                   </button>
@@ -168,7 +168,7 @@ export function AIDraftsPanel() {
                   <button
                     onClick={() => handleAction(draft.id, 'send')}
                     disabled={isProcessing}
-                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1A1917] text-white text-[13px] font-semibold hover:bg-[#333] transition-colors disabled:opacity-40"
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#474B48] text-white text-[13px] font-semibold hover:bg-[#333] transition-colors disabled:opacity-40"
                   >
                     {isProcessing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                     Verstuur
@@ -177,7 +177,7 @@ export function AIDraftsPanel() {
                   {/* Edit */}
                   <button
                     onClick={() => { setEditingId(draft.id); setEditText(draft.content) }}
-                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[13px] font-medium text-[#6B6862] hover:bg-[#F5F2EC] transition-colors"
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[13px] font-medium text-[#E6E8E7] hover:bg-[#A6ADA7] transition-colors"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                     Bewerken
@@ -187,7 +187,7 @@ export function AIDraftsPanel() {
                   <button
                     onClick={() => handleAction(draft.id, 'dismiss')}
                     disabled={isProcessing}
-                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[13px] font-medium text-[#C5C2BC] hover:text-[#C4372A] hover:bg-[#FFF5F5] transition-colors ml-auto"
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[13px] font-medium text-[#989F99] hover:text-[#B55A4A] hover:bg-[rgba(181,90,74,0.08)] transition-colors ml-auto"
                   >
                     <X className="w-3.5 h-3.5" />
                     Verwijder

@@ -182,7 +182,7 @@ export function ScheduleCallForm({
           <select
             value={formData.duration}
             onChange={handleDurationChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-text-primary bg-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
+            className="w-full px-3 py-2 border border-[#989F99] rounded-lg text-text-primary bg-[#A6ADA7] focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent"
           >
             <option value="15">15 minuten</option>
             <option value="20">20 minuten</option>

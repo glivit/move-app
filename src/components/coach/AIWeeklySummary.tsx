@@ -52,7 +52,7 @@ export function AIWeeklySummary({ clientId, clientName }: AIWeeklySummaryProps) 
   }, [clientId])
 
   return (
-    <div className="bg-white rounded-2xl border border-[#E8E4DD] p-5">
+    <div className="bg-[#A6ADA7] rounded-2xl border border-[#A6ADA7] p-5">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -60,13 +60,13 @@ export function AIWeeklySummary({ clientId, clientName }: AIWeeklySummaryProps) 
             <Bot className="w-5 h-5 text-[#6B4226]" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-[#1A1917]">Weekoverzicht {clientName}</h3>
-            <p className="text-xs text-[#9B9390] mt-0.5">Gegenereerd door AI</p>
+            <h3 className="text-base font-semibold text-[#FDFDFE]">Weekoverzicht {clientName}</h3>
+            <p className="text-xs text-[#E6E8E7] mt-0.5">Gegenereerd door AI</p>
           </div>
         </div>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="p-2 text-[#6B6862] hover:bg-[#F5F2F0] rounded-lg transition-colors"
+          className="p-2 text-[#E6E8E7] hover:bg-[#F5F2F0] rounded-lg transition-colors"
           aria-label={isExpanded ? 'Inklappen' : 'Uitklappen'}
         >
           {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
@@ -78,23 +78,23 @@ export function AIWeeklySummary({ clientId, clientName }: AIWeeklySummaryProps) 
         <div className="space-y-4">
           {/* Stats row if available */}
           {summary?.stats && (
-            <div className="grid grid-cols-3 gap-3 pb-4 border-b border-[#E8E4DD]">
+            <div className="grid grid-cols-3 gap-3 pb-4 border-b border-[#A6ADA7]">
               {summary.stats.workoutsCompleted !== undefined && (
-                <div className="bg-[#FAF8F5] rounded-lg p-3">
-                  <p className="text-xs text-[#9B9390] font-medium">Trainingen</p>
-                  <p className="text-lg font-semibold text-[#1A1917]">{summary.stats.workoutsCompleted}</p>
+                <div className="bg-[#A6ADA7] rounded-lg p-3">
+                  <p className="text-xs text-[#E6E8E7] font-medium">Trainingen</p>
+                  <p className="text-lg font-semibold text-[#FDFDFE]">{summary.stats.workoutsCompleted}</p>
                 </div>
               )}
               {summary.stats.totalMinutes !== undefined && (
-                <div className="bg-[#FAF8F5] rounded-lg p-3">
-                  <p className="text-xs text-[#9B9390] font-medium">Minuten</p>
-                  <p className="text-lg font-semibold text-[#1A1917]">{summary.stats.totalMinutes}</p>
+                <div className="bg-[#A6ADA7] rounded-lg p-3">
+                  <p className="text-xs text-[#E6E8E7] font-medium">Minuten</p>
+                  <p className="text-lg font-semibold text-[#FDFDFE]">{summary.stats.totalMinutes}</p>
                 </div>
               )}
               {summary.stats.averageIntensity && (
-                <div className="bg-[#FAF8F5] rounded-lg p-3">
-                  <p className="text-xs text-[#9B9390] font-medium">Intensiteit</p>
-                  <p className="text-lg font-semibold text-[#1A1917]">{summary.stats.averageIntensity}</p>
+                <div className="bg-[#A6ADA7] rounded-lg p-3">
+                  <p className="text-xs text-[#E6E8E7] font-medium">Intensiteit</p>
+                  <p className="text-lg font-semibold text-[#FDFDFE]">{summary.stats.averageIntensity}</p>
                 </div>
               )}
             </div>
@@ -103,23 +103,23 @@ export function AIWeeklySummary({ clientId, clientName }: AIWeeklySummaryProps) 
           {/* Summary text */}
           {isLoading && !summary ? (
             <div className="space-y-3">
-              <div className="h-4 bg-[#E8E4DD] rounded-full w-full animate-pulse" />
-              <div className="h-4 bg-[#E8E4DD] rounded-full w-5/6 animate-pulse" />
-              <div className="h-4 bg-[#E8E4DD] rounded-full w-4/5 animate-pulse" />
+              <div className="h-4 bg-[#A6ADA7] rounded-full w-full animate-pulse" />
+              <div className="h-4 bg-[#A6ADA7] rounded-full w-5/6 animate-pulse" />
+              <div className="h-4 bg-[#A6ADA7] rounded-full w-4/5 animate-pulse" />
             </div>
           ) : error ? (
             <div className="flex items-start gap-3 p-3 bg-[#FEF5F0] border border-[#FFD4C2] rounded-lg">
-              <AlertCircle className="w-5 h-5 text-[#D4682A] flex-shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-[#C0FC01] flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-medium text-[#D4682A]">Fout bij ophalen samenvatting</p>
+                <p className="text-sm font-medium text-[#C0FC01]">Fout bij ophalen samenvatting</p>
                 <p className="text-xs text-[#A0542F] mt-1">{error}</p>
               </div>
             </div>
           ) : summary ? (
             <div className="space-y-3">
-              <p className="text-sm text-[#6B6862] leading-relaxed">{summary.summary}</p>
+              <p className="text-sm text-[#E6E8E7] leading-relaxed">{summary.summary}</p>
               {summary.generatedAt && (
-                <p className="text-xs text-[#9B9390]">
+                <p className="text-xs text-[#E6E8E7]">
                   Gegenereerd op: {new Date(summary.generatedAt).toLocaleDateString('nl-NL', {
                     weekday: 'long',
                     month: 'long',
@@ -130,11 +130,11 @@ export function AIWeeklySummary({ clientId, clientName }: AIWeeklySummaryProps) 
             </div>
           ) : (
             <div className="py-8 text-center">
-              <p className="text-sm text-[#9B9390] mb-4">Geen samenvatting gegenereerd</p>
+              <p className="text-sm text-[#E6E8E7] mb-4">Geen samenvatting gegenereerd</p>
               <button
                 onClick={generateSummary}
                 disabled={isLoading}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#D4682A] text-white rounded-lg hover:bg-[#C25720] disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#C0FC01] text-white rounded-lg hover:bg-[#C25720] disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
               >
                 <Sparkles className="w-4 h-4" />
                 Genereren
@@ -146,11 +146,11 @@ export function AIWeeklySummary({ clientId, clientName }: AIWeeklySummaryProps) 
 
       {/* Footer with refresh button */}
       {isExpanded && summary && (
-        <div className="mt-4 pt-4 border-t border-[#E8E4DD] flex justify-end">
+        <div className="mt-4 pt-4 border-t border-[#A6ADA7] flex justify-end">
           <button
             onClick={generateSummary}
             disabled={isLoading}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-[#D4682A] hover:bg-[#FFF8F5] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-[#C0FC01] hover:bg-[#FFF8F5] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Samenvatting verversen"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
@@ -165,7 +165,7 @@ export function AIWeeklySummary({ clientId, clientName }: AIWeeklySummaryProps) 
           <button
             onClick={generateSummary}
             disabled={isLoading}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#D4682A] text-white rounded-lg hover:bg-[#C25720] disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#C0FC01] text-white rounded-lg hover:bg-[#C25720] disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
           >
             <Sparkles className="w-4 h-4" />
             Samenvatting genereren

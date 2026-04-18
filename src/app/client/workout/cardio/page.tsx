@@ -317,7 +317,7 @@ export default function CardioSessionPage() {
             {elapsed > 30 && (
               <button
                 onClick={() => handleFinish(elapsed)}
-                className="w-16 h-16 flex items-center justify-center bg-[#FDFDFE] rounded-2xl hover:bg-[#5A5E5B] transition-colors"
+                className="w-16 h-16 flex items-center justify-center bg-[#FDFDFE] rounded-2xl hover:bg-[#3A3E3B] transition-colors"
               >
                 <Check size={22} strokeWidth={2.5} className="text-white" />
               </button>
@@ -452,7 +452,7 @@ export default function CardioSessionPage() {
             </div>
             <button
               onClick={() => { handleFinish(totalElapsed); router.push('/client/workout') }}
-              className="w-full py-5 bg-[#FDFDFE] text-white rounded-2xl font-bold text-[15px] uppercase tracking-[0.06em] hover:bg-[#5A5E5B] transition-colors active:scale-[0.98]"
+              className="w-full py-5 bg-[#474B48] text-white rounded-2xl font-bold text-[15px] uppercase tracking-[0.06em] hover:bg-[#3A3E3B] transition-colors active:scale-[0.98]"
             >
               {saving ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
@@ -532,7 +532,7 @@ export default function CardioSessionPage() {
                 setTotalElapsed(Math.floor((Date.now() - startTimeRef.current) / 1000))
                 setPhase('done')
               }}
-              className="px-8 py-4 bg-[#FDFDFE] text-white rounded-2xl font-semibold text-[14px] hover:bg-[#5A5E5B] transition-colors"
+              className="px-8 py-4 bg-[#474B48] text-white rounded-2xl font-semibold text-[14px] hover:bg-[#3A3E3B] transition-colors"
             >
               Stop
             </button>
@@ -560,7 +560,7 @@ export default function CardioSessionPage() {
         </div>
         <button
           onClick={() => router.push('/client/workout')}
-          className="w-full py-5 bg-[#FDFDFE] text-white rounded-2xl font-bold text-[15px] uppercase tracking-[0.06em] hover:bg-[#5A5E5B] transition-colors active:scale-[0.98]"
+          className="w-full py-5 bg-[#474B48] text-white rounded-2xl font-bold text-[15px] uppercase tracking-[0.06em] hover:bg-[#3A3E3B] transition-colors active:scale-[0.98]"
         >
           {saving ? (
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />

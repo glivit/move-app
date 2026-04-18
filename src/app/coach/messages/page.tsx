@@ -46,12 +46,12 @@ export default function CoachMessagesPage() {
   // Loading state
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#FAFAFA' }}>
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#A6ADA7' }}>
         <div className="space-y-6 text-center">
           <div className="space-y-3">
-            <div className="h-3 rounded-lg w-48 mx-auto animate-pulse" style={{ backgroundColor: '#E8E4DC' }} />
-            <div className="h-3 rounded-lg w-64 mx-auto animate-pulse" style={{ backgroundColor: '#E8E4DC' }} />
-            <div className="h-3 rounded-lg w-56 mx-auto animate-pulse" style={{ backgroundColor: '#E8E4DC' }} />
+            <div className="h-3 rounded-lg w-48 mx-auto animate-pulse" style={{ backgroundColor: '#A6ADA7' }} />
+            <div className="h-3 rounded-lg w-64 mx-auto animate-pulse" style={{ backgroundColor: '#A6ADA7' }} />
+            <div className="h-3 rounded-lg w-56 mx-auto animate-pulse" style={{ backgroundColor: '#A6ADA7' }} />
           </div>
         </div>
       </div>
@@ -61,12 +61,12 @@ export default function CoachMessagesPage() {
   // Not authenticated state
   if (!userId) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#FAFAFA' }}>
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#A6ADA7' }}>
         <div className="text-center space-y-3">
-          <p style={{ color: '#8E8E93' }} className="text-lg font-medium">
+          <p style={{ color: '#D6D9D6' }} className="text-lg font-medium">
             Niet aangemeld
           </p>
-          <p style={{ color: '#8E8E93' }} className="text-sm">
+          <p style={{ color: '#D6D9D6' }} className="text-sm">
             Meld je aan om berichten te zien
           </p>
         </div>
@@ -75,28 +75,28 @@ export default function CoachMessagesPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-80px)]" style={{ backgroundColor: '#FAFAFA' }}>
+    <div className="flex h-[calc(100vh-80px)]" style={{ backgroundColor: '#A6ADA7' }}>
       {/* Desktop Layout: Split view (list + thread) */}
       <div className="hidden lg:flex w-full gap-0">
         {/* Left Panel: Conversation List */}
         <div
           className="w-80 border-r flex flex-col overflow-hidden"
-          style={{ borderColor: '#E8E4DC' }}
+          style={{ borderColor: '#A6ADA7' }}
         >
           {/* Header */}
           <div
             className="px-6 py-5 border-b"
-            style={{ borderColor: '#E8E4DC' }}
+            style={{ borderColor: '#A6ADA7' }}
           >
             <h1
               className="text-2xl font-bold"
-              style={{ color: '#1A1A18' }}
+              style={{ color: '#FDFDFE' }}
             >
               Berichten
             </h1>
             <p
               className="text-xs mt-1"
-              style={{ color: '#8E8E93' }}
+              style={{ color: '#D6D9D6' }}
             >
               Jouw gesprekken
             </p>
@@ -107,13 +107,13 @@ export default function CoachMessagesPage() {
             {conversationsLoading ? (
               <div className="p-4 space-y-4">
                 <div className="space-y-3">
-                  <div className="h-4 rounded-lg w-3/4 animate-pulse" style={{ backgroundColor: '#E8E4DC' }} />
+                  <div className="h-4 rounded-lg w-3/4 animate-pulse" style={{ backgroundColor: '#A6ADA7' }} />
                   <div className="space-y-3">
                     {[1, 2, 3].map((i) => (
                       <div
                         key={i}
                         className="h-16 rounded-lg animate-pulse"
-                        style={{ backgroundColor: '#E8E4DC' }}
+                        style={{ backgroundColor: '#A6ADA7' }}
                       />
                     ))}
                   </div>
@@ -142,14 +142,14 @@ export default function CoachMessagesPage() {
               <div className="text-center space-y-3 max-w-sm">
                 <div
                   className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
-                  style={{ backgroundColor: '#E8E4DC' }}
+                  style={{ backgroundColor: '#A6ADA7' }}
                 >
                   <svg
                     className="w-8 h-8"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                    style={{ color: '#1A1917' }}
+                    style={{ color: '#FDFDFE' }}
                   >
                     <path
                       strokeLinecap="round"
@@ -161,13 +161,13 @@ export default function CoachMessagesPage() {
                 </div>
                 <p
                   className="text-lg font-medium"
-                  style={{ color: '#1A1A18' }}
+                  style={{ color: '#FDFDFE' }}
                 >
                   Selecteer een gesprek
                 </p>
                 <p
                   className="text-sm"
-                  style={{ color: '#8E8E93' }}
+                  style={{ color: '#D6D9D6' }}
                 >
                   Kies een cliënt uit de lijst om berichten uit te wisselen
                 </p>
@@ -185,11 +185,11 @@ export default function CoachMessagesPage() {
             {/* Mobile Header */}
             <div
               className="px-4 py-4 border-b"
-              style={{ borderColor: '#E8E4DC' }}
+              style={{ borderColor: '#A6ADA7' }}
             >
               <h1
                 className="text-2xl font-bold"
-                style={{ color: '#1A1A18' }}
+                style={{ color: '#FDFDFE' }}
               >
                 Berichten
               </h1>
@@ -204,7 +204,7 @@ export default function CoachMessagesPage() {
                       <div
                         key={i}
                         className="h-16 rounded-lg animate-pulse"
-                        style={{ backgroundColor: '#E8E4DC' }}
+                        style={{ backgroundColor: '#A6ADA7' }}
                       />
                     ))}
                   </div>
@@ -224,19 +224,19 @@ export default function CoachMessagesPage() {
             {/* Mobile Thread Header with Back Button */}
             <div
               className="px-4 py-3 border-b flex items-center gap-3"
-              style={{ borderColor: '#E8E4DC' }}
+              style={{ borderColor: '#A6ADA7' }}
             >
               <button
                 onClick={handleBackToList}
                 className="p-2 rounded-lg transition-colors hover:opacity-75"
-                style={{ backgroundColor: '#E8E4DC', color: '#1A1A18' }}
+                style={{ backgroundColor: '#A6ADA7', color: '#FDFDFE' }}
                 aria-label="Terug naar berichten"
               >
                 <ArrowLeft strokeWidth={1.5} className="w-5 h-5" />
               </button>
               <h2
                 className="text-lg font-semibold"
-                style={{ color: '#1A1A18' }}
+                style={{ color: '#FDFDFE' }}
               >
                 {selectedClientName}
               </h2>

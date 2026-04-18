@@ -238,21 +238,21 @@ export default function NewNutritionPlanPage() {
   }, { calories: 0, protein: 0, carbs: 0, fat: 0 })
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA]">
+    <div className="min-h-screen bg-[#A6ADA7]">
       {/* Header */}
-      <div className="border-b border-[#E8E4DC]">
+      <div className="border-b border-[#A6ADA7]">
         <div className="max-w-3xl mx-auto px-6 py-12">
           <button
             onClick={() => router.push('/coach/nutrition')}
-            className="flex items-center gap-2 text-[13px] font-medium text-[#8E8E93] hover:text-[#1A1A18] transition-colors mb-6"
+            className="flex items-center gap-2 text-[13px] font-medium text-[#D6D9D6] hover:text-[#FDFDFE] transition-colors mb-6"
           >
             <ChevronLeft className="w-4 h-4" />
             Terug naar voeding
           </button>
-          <h1 className="text-[32px] font-[family-name:var(--font-display)] text-[#1A1A18]">
+          <h1 className="text-[32px] font-[family-name:var(--font-display)] text-[#FDFDFE]">
             Nieuw voedingsplan
           </h1>
-          <p className="text-[15px] text-[#8E8E93] mt-1">
+          <p className="text-[15px] text-[#D6D9D6] mt-1">
             Maak een template of wijs direct toe aan een cliënt
           </p>
         </div>
@@ -260,14 +260,14 @@ export default function NewNutritionPlanPage() {
 
       <div className="max-w-3xl mx-auto px-6 py-8 space-y-6">
         {/* Template or Direct */}
-        <div className="bg-white rounded-2xl p-6 border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <div className="bg-[#A6ADA7] rounded-2xl p-6 border border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <div className="flex gap-3 mb-6">
             <button
               onClick={() => setIsTemplate(true)}
               className={`flex-1 py-3 rounded-xl text-[14px] font-semibold transition-all border ${
                 isTemplate
-                  ? 'bg-[#1A1917] text-white border-[#1A1917]'
-                  : 'bg-white text-[#8E8E93] border-[#E8E4DC] hover:border-[#1A1917]'
+                  ? 'bg-[#474B48] text-white border-[#FDFDFE]'
+                  : 'bg-[#A6ADA7] text-[#D6D9D6] border-[#A6ADA7] hover:border-[#FDFDFE]'
               }`}
             >
               Template opslaan
@@ -276,8 +276,8 @@ export default function NewNutritionPlanPage() {
               onClick={() => { setIsTemplate(false); loadClients() }}
               className={`flex-1 py-3 rounded-xl text-[14px] font-semibold transition-all border ${
                 !isTemplate
-                  ? 'bg-[#1A1917] text-white border-[#1A1917]'
-                  : 'bg-white text-[#8E8E93] border-[#E8E4DC] hover:border-[#1A1917]'
+                  ? 'bg-[#474B48] text-white border-[#FDFDFE]'
+                  : 'bg-[#A6ADA7] text-[#D6D9D6] border-[#A6ADA7] hover:border-[#FDFDFE]'
               }`}
             >
               Direct toewijzen
@@ -287,9 +287,9 @@ export default function NewNutritionPlanPage() {
           {/* Client selector */}
           {!isTemplate && (
             <div className="mb-6">
-              <label className="text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide block mb-2">Cliënt</label>
+              <label className="text-[12px] font-semibold text-[#D6D9D6] uppercase tracking-wide block mb-2">Cliënt</label>
               {loadingClients ? (
-                <div className="flex items-center gap-2 text-[13px] text-[#8E8E93]">
+                <div className="flex items-center gap-2 text-[13px] text-[#D6D9D6]">
                   <Loader2 className="w-4 h-4 animate-spin" /> Laden...
                 </div>
               ) : (
@@ -300,8 +300,8 @@ export default function NewNutritionPlanPage() {
                       onClick={() => setSelectedClient(c.id)}
                       className={`text-left px-4 py-3 rounded-xl border text-[13px] font-medium transition-all ${
                         selectedClient === c.id
-                          ? 'border-[#1A1917] bg-[#F5F2EC] text-[#1A1917]'
-                          : 'border-[#E8E4DC] text-[#1A1A18] hover:border-[#1A1917]'
+                          ? 'border-[#FDFDFE] bg-[#A6ADA7] text-[#FDFDFE]'
+                          : 'border-[#A6ADA7] text-[#FDFDFE] hover:border-[#FDFDFE]'
                       }`}
                     >
                       {c.full_name}
@@ -314,13 +314,13 @@ export default function NewNutritionPlanPage() {
 
           {/* Quick presets */}
           <div>
-            <label className="text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide block mb-2">Snel starten met preset</label>
+            <label className="text-[12px] font-semibold text-[#D6D9D6] uppercase tracking-wide block mb-2">Snel starten met preset</label>
             <div className="flex flex-wrap gap-2">
               {TEMPLATE_PRESETS.map(preset => (
                 <button
                   key={preset.name}
                   onClick={() => applyPreset(preset)}
-                  className="px-3 py-2 rounded-lg text-[12px] font-medium border border-[#E8E4DC] text-[#1A1A18] hover:border-[#1A1917] hover:bg-[#F5F2EC] transition-all"
+                  className="px-3 py-2 rounded-lg text-[12px] font-medium border border-[#A6ADA7] text-[#FDFDFE] hover:border-[#FDFDFE] hover:bg-[#A6ADA7] transition-all"
                 >
                   {preset.name}
                 </button>
@@ -330,71 +330,71 @@ export default function NewNutritionPlanPage() {
         </div>
 
         {/* Basic Info */}
-        <div className="bg-white rounded-2xl p-6 border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <h2 className="text-[17px] font-semibold text-[#1A1A18] mb-5">Basisgegevens</h2>
+        <div className="bg-[#A6ADA7] rounded-2xl p-6 border border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <h2 className="text-[17px] font-semibold text-[#FDFDFE] mb-5">Basisgegevens</h2>
 
           <div className="space-y-4">
             <div>
-              <label className="text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide block mb-1.5">Naam</label>
+              <label className="text-[12px] font-semibold text-[#D6D9D6] uppercase tracking-wide block mb-1.5">Naam</label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="bv. Afvallen — Calorie deficit"
-                className="w-full px-4 py-3 border border-[#E8E4DC] rounded-xl text-[14px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
+                className="w-full px-4 py-3 border border-[#A6ADA7] rounded-xl text-[14px] text-[#FDFDFE] placeholder-[#CDD1CE] focus:outline-none focus:border-[#FDFDFE]"
               />
             </div>
 
             {/* Macro targets */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div>
-                <label className="text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide flex items-center gap-1.5 mb-1.5">
-                  <Flame className="w-3.5 h-3.5 text-[#FF9500]" /> Calorieën
+                <label className="text-[12px] font-semibold text-[#D6D9D6] uppercase tracking-wide flex items-center gap-1.5 mb-1.5">
+                  <Flame className="w-3.5 h-3.5 text-[#E8B948]" /> Calorieën
                 </label>
                 <input
                   type="number"
                   value={caloriesTarget}
                   onChange={(e) => setCaloriesTarget(parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2.5 border border-[#E8E4DC] rounded-xl text-[14px] text-[#1A1A18] focus:outline-none focus:border-[#1A1917]"
+                  className="w-full px-3 py-2.5 border border-[#A6ADA7] rounded-xl text-[14px] text-[#FDFDFE] focus:outline-none focus:border-[#FDFDFE]"
                 />
               </div>
               <div>
-                <label className="text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide flex items-center gap-1.5 mb-1.5">
-                  <Beef className="w-3.5 h-3.5 text-[#FF3B30]" /> Eiwit (g)
+                <label className="text-[12px] font-semibold text-[#D6D9D6] uppercase tracking-wide flex items-center gap-1.5 mb-1.5">
+                  <Beef className="w-3.5 h-3.5 text-[#B55A4A]" /> Eiwit (g)
                 </label>
                 <input
                   type="number"
                   value={proteinG}
                   onChange={(e) => setProteinG(parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2.5 border border-[#E8E4DC] rounded-xl text-[14px] text-[#1A1A18] focus:outline-none focus:border-[#1A1917]"
+                  className="w-full px-3 py-2.5 border border-[#A6ADA7] rounded-xl text-[14px] text-[#FDFDFE] focus:outline-none focus:border-[#FDFDFE]"
                 />
               </div>
               <div>
-                <label className="text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide flex items-center gap-1.5 mb-1.5">
-                  <Wheat className="w-3.5 h-3.5 text-[#FF9500]" /> Koolh (g)
+                <label className="text-[12px] font-semibold text-[#D6D9D6] uppercase tracking-wide flex items-center gap-1.5 mb-1.5">
+                  <Wheat className="w-3.5 h-3.5 text-[#E8B948]" /> Koolh (g)
                 </label>
                 <input
                   type="number"
                   value={carbsG}
                   onChange={(e) => setCarbsG(parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2.5 border border-[#E8E4DC] rounded-xl text-[14px] text-[#1A1A18] focus:outline-none focus:border-[#1A1917]"
+                  className="w-full px-3 py-2.5 border border-[#A6ADA7] rounded-xl text-[14px] text-[#FDFDFE] focus:outline-none focus:border-[#FDFDFE]"
                 />
               </div>
               <div>
-                <label className="text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide flex items-center gap-1.5 mb-1.5">
-                  <Droplet className="w-3.5 h-3.5 text-[#007AFF]" /> Vet (g)
+                <label className="text-[12px] font-semibold text-[#D6D9D6] uppercase tracking-wide flex items-center gap-1.5 mb-1.5">
+                  <Droplet className="w-3.5 h-3.5 text-[#5A7FB5]" /> Vet (g)
                 </label>
                 <input
                   type="number"
                   value={fatG}
                   onChange={(e) => setFatG(parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2.5 border border-[#E8E4DC] rounded-xl text-[14px] text-[#1A1A18] focus:outline-none focus:border-[#1A1917]"
+                  className="w-full px-3 py-2.5 border border-[#A6ADA7] rounded-xl text-[14px] text-[#FDFDFE] focus:outline-none focus:border-[#FDFDFE]"
                 />
               </div>
             </div>
 
             {/* Macro bar visual */}
-            <div className="flex h-3 rounded-full overflow-hidden bg-[#E8E4DC]">
+            <div className="flex h-3 rounded-full overflow-hidden bg-[#A6ADA7]">
               {(() => {
                 const proteinCal = proteinG * 4
                 const carbsCal = carbsG * 4
@@ -402,14 +402,14 @@ export default function NewNutritionPlanPage() {
                 const total = proteinCal + carbsCal + fatCal || 1
                 return (
                   <>
-                    <div className="bg-[#FF3B30]" style={{ width: `${(proteinCal / total) * 100}%` }} title={`Eiwit: ${Math.round((proteinCal / total) * 100)}%`} />
-                    <div className="bg-[#FF9500]" style={{ width: `${(carbsCal / total) * 100}%` }} title={`Koolh: ${Math.round((carbsCal / total) * 100)}%`} />
-                    <div className="bg-[#007AFF]" style={{ width: `${(fatCal / total) * 100}%` }} title={`Vet: ${Math.round((fatCal / total) * 100)}%`} />
+                    <div className="bg-[#B55A4A]" style={{ width: `${(proteinCal / total) * 100}%` }} title={`Eiwit: ${Math.round((proteinCal / total) * 100)}%`} />
+                    <div className="bg-[#E8B948]" style={{ width: `${(carbsCal / total) * 100}%` }} title={`Koolh: ${Math.round((carbsCal / total) * 100)}%`} />
+                    <div className="bg-[#5A7FB5]" style={{ width: `${(fatCal / total) * 100}%` }} title={`Vet: ${Math.round((fatCal / total) * 100)}%`} />
                   </>
                 )
               })()}
             </div>
-            <div className="flex justify-between text-[10px] font-medium text-[#8E8E93]">
+            <div className="flex justify-between text-[10px] font-medium text-[#D6D9D6]">
               <span>Eiwit {Math.round((proteinG * 4) / (caloriesTarget || 1) * 100)}%</span>
               <span>Koolh {Math.round((carbsG * 4) / (caloriesTarget || 1) * 100)}%</span>
               <span>Vet {Math.round((fatG * 9) / (caloriesTarget || 1) * 100)}%</span>
@@ -418,12 +418,12 @@ export default function NewNutritionPlanPage() {
         </div>
 
         {/* Meals */}
-        <div className="bg-white rounded-2xl p-6 border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <div className="bg-[#A6ADA7] rounded-2xl p-6 border border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="text-[17px] font-semibold text-[#1A1A18]">Maaltijden</h2>
+            <h2 className="text-[17px] font-semibold text-[#FDFDFE]">Maaltijden</h2>
             <button
               onClick={addMeal}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-[#EDEAE4] text-[#1A1917] hover:bg-[#EDE5D4] transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-[#A6ADA7] text-[#FDFDFE] hover:bg-[#A6ADA7] transition-colors"
             >
               <Plus className="w-3.5 h-3.5" /> Maaltijd toevoegen
             </button>
@@ -431,24 +431,24 @@ export default function NewNutritionPlanPage() {
 
           <div className="space-y-4">
             {meals.map((meal, mealIndex) => (
-              <div key={mealIndex} className="border border-[#E8E4DC] rounded-xl p-4">
+              <div key={mealIndex} className="border border-[#A6ADA7] rounded-xl p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <UtensilsCrossed className="w-4 h-4 text-[#1A1917]" />
+                  <UtensilsCrossed className="w-4 h-4 text-[#FDFDFE]" />
                   <input
                     type="text"
                     value={meal.name}
                     onChange={(e) => updateMeal(mealIndex, 'name', e.target.value)}
-                    className="flex-1 text-[14px] font-semibold text-[#1A1A18] bg-transparent focus:outline-none border-b border-transparent focus:border-[#1A1917]"
+                    className="flex-1 text-[14px] font-semibold text-[#FDFDFE] bg-transparent focus:outline-none border-b border-transparent focus:border-[#FDFDFE]"
                   />
                   <input
                     type="time"
                     value={meal.time}
                     onChange={(e) => updateMeal(mealIndex, 'time', e.target.value)}
-                    className="text-[12px] text-[#8E8E93] bg-transparent focus:outline-none"
+                    className="text-[12px] text-[#D6D9D6] bg-transparent focus:outline-none"
                   />
                   <button
                     onClick={() => removeMeal(mealIndex)}
-                    className="p-1.5 rounded-lg text-[#C7C7CC] hover:text-[#FF3B30] hover:bg-[#FF3B30]/5 transition-all"
+                    className="p-1.5 rounded-lg text-[#CDD1CE] hover:text-[#B55A4A] hover:bg-[#B55A4A]/5 transition-all"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -461,8 +461,8 @@ export default function NewNutritionPlanPage() {
                       <div key={itemIndex}>
                         {item.per100g ? (
                           /* Food from database — nice display */
-                          <div className="flex items-center gap-2 pl-7 bg-[#FAFAFA] rounded-lg p-2.5">
-                            <div className="w-8 h-8 rounded-lg bg-white border border-[#E8E4DC] flex items-center justify-center overflow-hidden shrink-0">
+                          <div className="flex items-center gap-2 pl-7 bg-[#A6ADA7] rounded-lg p-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-[#A6ADA7] border border-[#A6ADA7] flex items-center justify-center overflow-hidden shrink-0">
                               {item.image ? (
                                 <Image src={item.image} alt="" width={32} height={32} className="w-full h-full object-cover" unoptimized loading="lazy" />
                               ) : (
@@ -470,21 +470,21 @@ export default function NewNutritionPlanPage() {
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-[13px] font-medium text-[#1A1A18] truncate">{item.name}</p>
-                              <p className="text-[11px] text-[#8E8E93]">{item.grams}g</p>
+                              <p className="text-[13px] font-medium text-[#FDFDFE] truncate">{item.name}</p>
+                              <p className="text-[11px] text-[#D6D9D6]">{item.grams}g</p>
                             </div>
                             <div className="flex items-center gap-1.5 shrink-0">
-                              <span className="text-[11px] font-semibold text-[#FF9500]">{item.calories}</span>
-                              <span className="text-[10px] text-[#8E8E93]">kcal</span>
+                              <span className="text-[11px] font-semibold text-[#E8B948]">{item.calories}</span>
+                              <span className="text-[10px] text-[#D6D9D6]">kcal</span>
                             </div>
                             <div className="flex items-center gap-1 shrink-0 text-[10px]">
-                              <span className="text-[#FF3B30] font-medium">{item.protein}P</span>
-                              <span className="text-[#FF9500] font-medium">{item.carbs}K</span>
-                              <span className="text-[#007AFF] font-medium">{item.fat}V</span>
+                              <span className="text-[#B55A4A] font-medium">{item.protein}P</span>
+                              <span className="text-[#E8B948] font-medium">{item.carbs}K</span>
+                              <span className="text-[#5A7FB5] font-medium">{item.fat}V</span>
                             </div>
                             <button
                               onClick={() => removeMealItem(mealIndex, itemIndex)}
-                              className="p-1 text-[#C7C7CC] hover:text-[#FF3B30] shrink-0"
+                              className="p-1 text-[#CDD1CE] hover:text-[#B55A4A] shrink-0"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -497,39 +497,39 @@ export default function NewNutritionPlanPage() {
                               value={item.name}
                               onChange={(e) => updateMealItem(mealIndex, itemIndex, 'name', e.target.value)}
                               placeholder="Voedingsmiddel"
-                              className="flex-1 text-[13px] text-[#1A1A18] px-2 py-1.5 border border-[#E8E4DC] rounded-lg focus:outline-none focus:border-[#1A1917] placeholder-[#C7C7CC]"
+                              className="flex-1 text-[13px] text-[#FDFDFE] px-2 py-1.5 border border-[#A6ADA7] rounded-lg focus:outline-none focus:border-[#FDFDFE] placeholder-[#CDD1CE]"
                             />
                             <input
                               type="number"
                               value={item.calories || ''}
                               onChange={(e) => updateMealItem(mealIndex, itemIndex, 'calories', parseInt(e.target.value) || 0)}
                               placeholder="kcal"
-                              className="w-16 text-[12px] text-[#1A1A18] px-2 py-1.5 border border-[#E8E4DC] rounded-lg focus:outline-none focus:border-[#1A1917] placeholder-[#C7C7CC] text-center"
+                              className="w-16 text-[12px] text-[#FDFDFE] px-2 py-1.5 border border-[#A6ADA7] rounded-lg focus:outline-none focus:border-[#FDFDFE] placeholder-[#CDD1CE] text-center"
                             />
                             <input
                               type="number"
                               value={item.protein || ''}
                               onChange={(e) => updateMealItem(mealIndex, itemIndex, 'protein', parseInt(e.target.value) || 0)}
                               placeholder="P"
-                              className="w-12 text-[12px] text-[#FF3B30] px-2 py-1.5 border border-[#E8E4DC] rounded-lg focus:outline-none focus:border-[#1A1917] placeholder-[#C7C7CC] text-center"
+                              className="w-12 text-[12px] text-[#B55A4A] px-2 py-1.5 border border-[#A6ADA7] rounded-lg focus:outline-none focus:border-[#FDFDFE] placeholder-[#CDD1CE] text-center"
                             />
                             <input
                               type="number"
                               value={item.carbs || ''}
                               onChange={(e) => updateMealItem(mealIndex, itemIndex, 'carbs', parseInt(e.target.value) || 0)}
                               placeholder="K"
-                              className="w-12 text-[12px] text-[#FF9500] px-2 py-1.5 border border-[#E8E4DC] rounded-lg focus:outline-none focus:border-[#1A1917] placeholder-[#C7C7CC] text-center"
+                              className="w-12 text-[12px] text-[#E8B948] px-2 py-1.5 border border-[#A6ADA7] rounded-lg focus:outline-none focus:border-[#FDFDFE] placeholder-[#CDD1CE] text-center"
                             />
                             <input
                               type="number"
                               value={item.fat || ''}
                               onChange={(e) => updateMealItem(mealIndex, itemIndex, 'fat', parseInt(e.target.value) || 0)}
                               placeholder="V"
-                              className="w-12 text-[12px] text-[#007AFF] px-2 py-1.5 border border-[#E8E4DC] rounded-lg focus:outline-none focus:border-[#1A1917] placeholder-[#C7C7CC] text-center"
+                              className="w-12 text-[12px] text-[#5A7FB5] px-2 py-1.5 border border-[#A6ADA7] rounded-lg focus:outline-none focus:border-[#FDFDFE] placeholder-[#CDD1CE] text-center"
                             />
                             <button
                               onClick={() => removeMealItem(mealIndex, itemIndex)}
-                              className="p-1 text-[#C7C7CC] hover:text-[#FF3B30]"
+                              className="p-1 text-[#CDD1CE] hover:text-[#B55A4A]"
                             >
                               <Trash2 className="w-3 h-3" />
                             </button>
@@ -554,14 +554,14 @@ export default function NewNutritionPlanPage() {
                 <div className="ml-7 flex items-center gap-3">
                   <button
                     onClick={() => setShowFoodSearch(showFoodSearch === mealIndex ? null : mealIndex)}
-                    className="flex items-center gap-1.5 text-[12px] font-semibold text-[#1A1917] px-3 py-1.5 rounded-lg bg-[#EDEAE4] hover:bg-[#EDE5D4] transition-colors"
+                    className="flex items-center gap-1.5 text-[12px] font-semibold text-[#FDFDFE] px-3 py-1.5 rounded-lg bg-[#A6ADA7] hover:bg-[#A6ADA7] transition-colors"
                   >
                     <Search className="w-3.5 h-3.5" />
                     Zoek voedingsmiddel
                   </button>
                   <button
                     onClick={() => addItemToMeal(mealIndex)}
-                    className="text-[12px] font-medium text-[#8E8E93] hover:text-[#1A1917] transition-colors"
+                    className="text-[12px] font-medium text-[#D6D9D6] hover:text-[#FDFDFE] transition-colors"
                   >
                     + Handmatig toevoegen
                   </button>
@@ -572,24 +572,24 @@ export default function NewNutritionPlanPage() {
 
           {/* Items total */}
           {totalFromItems.calories > 0 && (
-            <div className="mt-4 pt-4 border-t border-[#E8E4DC] flex items-center gap-4 text-[12px]">
-              <span className="text-[#8E8E93] font-medium">Totaal items:</span>
-              <span className="font-semibold text-[#1A1A18]">{totalFromItems.calories} kcal</span>
-              <span className="text-[#FF3B30]">{totalFromItems.protein}g P</span>
-              <span className="text-[#FF9500]">{totalFromItems.carbs}g K</span>
-              <span className="text-[#007AFF]">{totalFromItems.fat}g V</span>
+            <div className="mt-4 pt-4 border-t border-[#A6ADA7] flex items-center gap-4 text-[12px]">
+              <span className="text-[#D6D9D6] font-medium">Totaal items:</span>
+              <span className="font-semibold text-[#FDFDFE]">{totalFromItems.calories} kcal</span>
+              <span className="text-[#B55A4A]">{totalFromItems.protein}g P</span>
+              <span className="text-[#E8B948]">{totalFromItems.carbs}g K</span>
+              <span className="text-[#5A7FB5]">{totalFromItems.fat}g V</span>
             </div>
           )}
         </div>
 
         {/* Guidelines */}
-        <div className="bg-white rounded-2xl p-6 border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <h2 className="text-[17px] font-semibold text-[#1A1A18] mb-4">Richtlijnen</h2>
+        <div className="bg-[#A6ADA7] rounded-2xl p-6 border border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <h2 className="text-[17px] font-semibold text-[#FDFDFE] mb-4">Richtlijnen</h2>
           <textarea
             value={guidelines}
             onChange={(e) => setGuidelines(e.target.value)}
             placeholder="Voeg richtlijnen toe voor de cliënt, bijv. waterdoel, timing, supplementen..."
-            className="w-full px-4 py-3 border border-[#E8E4DC] rounded-xl text-[14px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917] resize-none h-28"
+            className="w-full px-4 py-3 border border-[#A6ADA7] rounded-xl text-[14px] text-[#FDFDFE] placeholder-[#CDD1CE] focus:outline-none focus:border-[#FDFDFE] resize-none h-28"
           />
         </div>
 
@@ -597,14 +597,14 @@ export default function NewNutritionPlanPage() {
         <div className="flex gap-3">
           <button
             onClick={() => router.push('/coach/nutrition')}
-            className="px-6 py-3 rounded-xl text-[14px] font-semibold border border-[#E8E4DC] text-[#8E8E93] hover:text-[#1A1A18] hover:bg-white transition-colors"
+            className="px-6 py-3 rounded-xl text-[14px] font-semibold border border-[#A6ADA7] text-[#D6D9D6] hover:text-[#FDFDFE] hover:bg-[#A6ADA7] transition-colors"
           >
             Annuleren
           </button>
           <button
             onClick={savePlan}
             disabled={saving || !title.trim() || (!isTemplate && !selectedClient)}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[14px] font-semibold bg-[#1A1A18] text-white hover:bg-[#2A2A28] transition-colors disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-[14px] font-semibold bg-[#474B48] text-white hover:bg-[#2A2A28] transition-colors disabled:opacity-50"
           >
             {saving ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Opslaan...</>

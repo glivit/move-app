@@ -275,7 +275,7 @@ export default function AccountabilityPage() {
       <button
         onClick={handleSubmit}
         disabled={submitting}
-        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#FDFDFE] text-white font-semibold uppercase tracking-wider text-[15px] hover:bg-[#5A5E5B] transition-colors disabled:opacity-50 rounded-xl animate-slide-up stagger-3"
+        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#474B48] text-white font-semibold uppercase tracking-wider text-[15px] hover:bg-[#3A3E3B] transition-colors disabled:opacity-50 rounded-xl animate-slide-up stagger-3"
       >
         {submitting ? (
           <>

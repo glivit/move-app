@@ -198,7 +198,7 @@ export default function WeeklyCheckInPage() {
             <Image src={photoPreview} alt="Preview" width={400} height={300} className="w-full max-h-[300px] object-cover border border-[rgba(253,253,254,0.08)]" unoptimized loading="lazy" />
             <button
               onClick={() => { setPhoto(null); setPhotoPreview(null) }}
-              className="absolute top-2 right-2 w-8 h-8 bg-[#FDFDFE]/70 text-white flex items-center justify-center text-[14px]"
+              className="absolute top-2 right-2 w-8 h-8 bg-[#474B48]/70 text-white flex items-center justify-center text-[14px]"
             >
               &times;
             </button>
@@ -264,7 +264,7 @@ export default function WeeklyCheckInPage() {
       <button
         onClick={handleSubmit}
         disabled={submitting || !weight.trim()}
-        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#FDFDFE] text-white font-semibold uppercase tracking-wider text-[15px] hover:bg-[#2A2A28] transition-colors disabled:opacity-40 animate-slide-up stagger-6"
+        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#474B48] text-white font-semibold uppercase tracking-wider text-[15px] hover:bg-[#3A3E3B] transition-colors disabled:opacity-40 animate-slide-up stagger-6"
       >
         {submitting ? (
           <>
@@ -305,7 +305,7 @@ function RatingRow({ label, value, onChange, labels }: {
             onClick={() => onChange(n === value ? 0 : n)}
             className={`flex-1 py-2.5 text-[14px] font-semibold transition-all ${
               n <= value
-                ? 'bg-[#FDFDFE] text-white'
+                ? 'bg-[#474B48] text-white'
                 : 'bg-[rgba(253,253,254,0.08)] text-[rgba(253,253,254,0.55)] hover:bg-[rgba(253,253,254,0.08)]'
             }`}
           >

@@ -70,10 +70,10 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="p-2 rounded-xl transition-all hover:bg-[#FAFAFA]"
+        className="p-2 rounded-xl transition-all hover:bg-[#A6ADA7]"
         title="Stuur notificatie"
       >
-        <Bell strokeWidth={1.5} className="w-5 h-5" style={{ color: '#8E8E93' }} />
+        <Bell strokeWidth={1.5} className="w-5 h-5" style={{ color: '#D6D9D6' }} />
       </button>
     )
   }
@@ -92,12 +92,12 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
         }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-[#E8E4DC]">
-          <h3 className="text-base font-semibold" style={{ color: '#1A1A18' }}>
+        <div className="flex items-center justify-between p-4 border-b border-[#A6ADA7]">
+          <h3 className="text-base font-semibold" style={{ color: '#FDFDFE' }}>
             Notificatie naar {firstName}
           </h3>
           <button onClick={() => setOpen(false)} className="p-1">
-            <X strokeWidth={1.5} className="w-5 h-5" style={{ color: '#8E8E93' }} />
+            <X strokeWidth={1.5} className="w-5 h-5" style={{ color: '#D6D9D6' }} />
           </button>
         </div>
 
@@ -106,7 +106,7 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
           <button
             onClick={() => setMode('quick')}
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold transition-all ${
-              mode === 'quick' ? 'bg-[#1A1A18] text-white' : 'bg-[#FAFAFA] text-[#8E8E93]'
+              mode === 'quick' ? 'bg-[#474B48] text-white' : 'bg-[#A6ADA7] text-[#D6D9D6]'
             }`}
           >
             Snel bericht
@@ -114,7 +114,7 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
           <button
             onClick={() => setMode('custom')}
             className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold transition-all ${
-              mode === 'custom' ? 'bg-[#1A1A18] text-white' : 'bg-[#FAFAFA] text-[#8E8E93]'
+              mode === 'custom' ? 'bg-[#474B48] text-white' : 'bg-[#A6ADA7] text-[#D6D9D6]'
             }`}
           >
             Eigen bericht
@@ -129,9 +129,9 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
                 className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3"
                 style={{ backgroundColor: '#E8FAF0' }}
               >
-                <Bell strokeWidth={1.5} className="w-6 h-6" style={{ color: '#34C759' }} />
+                <Bell strokeWidth={1.5} className="w-6 h-6" style={{ color: '#2FA65A' }} />
               </div>
-              <p className="text-sm font-semibold" style={{ color: '#1A1A18' }}>
+              <p className="text-sm font-semibold" style={{ color: '#FDFDFE' }}>
                 Verzonden!
               </p>
             </div>
@@ -142,12 +142,12 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
                   key={msg.label}
                   onClick={() => sendNotification(msg.title, msg.message, msg.url, (msg as any).notificationType)}
                   disabled={sending}
-                  className="w-full text-left p-3 rounded-xl transition-all hover:bg-[#FAFAFA] border border-[#E8E4DC]"
+                  className="w-full text-left p-3 rounded-xl transition-all hover:bg-[#A6ADA7] border border-[#A6ADA7]"
                 >
-                  <p className="text-sm font-semibold" style={{ color: '#1A1A18' }}>
+                  <p className="text-sm font-semibold" style={{ color: '#FDFDFE' }}>
                     {msg.label}
                   </p>
-                  <p className="text-xs mt-0.5" style={{ color: '#8E8E93' }}>
+                  <p className="text-xs mt-0.5" style={{ color: '#D6D9D6' }}>
                     {msg.message.replace('{name}', firstName)}
                   </p>
                 </button>
@@ -156,7 +156,7 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
           ) : (
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-medium" style={{ color: '#8E8E93' }}>
+                <label className="text-xs font-medium" style={{ color: '#D6D9D6' }}>
                   Titel
                 </label>
                 <input
@@ -164,12 +164,12 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
                   value={customTitle}
                   onChange={(e) => setCustomTitle(e.target.value)}
                   placeholder="Notificatie titel..."
-                  className="w-full mt-1 p-3 rounded-xl border border-[#E8E4DC] text-sm focus:outline-none focus:border-[#1A1917]"
-                  style={{ color: '#1A1A18' }}
+                  className="w-full mt-1 p-3 rounded-xl border border-[#A6ADA7] text-sm focus:outline-none focus:border-[#FDFDFE]"
+                  style={{ color: '#FDFDFE' }}
                 />
               </div>
               <div>
-                <label className="text-xs font-medium" style={{ color: '#8E8E93' }}>
+                <label className="text-xs font-medium" style={{ color: '#D6D9D6' }}>
                   Bericht
                 </label>
                 <textarea
@@ -177,15 +177,15 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
                   onChange={(e) => setCustomMessage(e.target.value)}
                   placeholder="Typ je bericht..."
                   rows={3}
-                  className="w-full mt-1 p-3 rounded-xl border border-[#E8E4DC] text-sm focus:outline-none focus:border-[#1A1917] resize-none"
-                  style={{ color: '#1A1A18' }}
+                  className="w-full mt-1 p-3 rounded-xl border border-[#A6ADA7] text-sm focus:outline-none focus:border-[#FDFDFE] resize-none"
+                  style={{ color: '#FDFDFE' }}
                 />
               </div>
               <button
                 onClick={() => sendNotification(customTitle, customMessage, '/client')}
                 disabled={sending || !customTitle.trim() || !customMessage.trim()}
                 className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-40"
-                style={{ backgroundColor: '#1A1917' }}
+                style={{ backgroundColor: '#FDFDFE' }}
               >
                 <span className="flex items-center justify-center gap-2">
                   <Send strokeWidth={1.5} className="w-4 h-4" />
@@ -196,7 +196,7 @@ export function SendNotificationButton({ clientId, clientName }: Props) {
           )}
 
           {error && (
-            <p className="text-xs text-center mt-3" style={{ color: '#FF3B30' }}>
+            <p className="text-xs text-center mt-3" style={{ color: '#B55A4A' }}>
               {error}
             </p>
           )}

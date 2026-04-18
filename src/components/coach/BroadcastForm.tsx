@@ -138,7 +138,7 @@ export function BroadcastForm({ clients, onSend, isSending = false }: BroadcastF
             onChange={(e) => setMessage(e.target.value)}
             maxLength={1000}
             rows={5}
-            className="w-full px-3 py-2 bg-white border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none text-sm"
+            className="w-full px-3 py-2 bg-[#A6ADA7] border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/50 resize-none text-sm"
           />
           <div className="flex items-center justify-between mt-1">
             <p className="text-xs text-text-muted">{message.length}/1000 karakters</p>

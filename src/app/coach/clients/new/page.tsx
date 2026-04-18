@@ -62,7 +62,7 @@ export default function NewClientPage() {
     return (
       <div className="min-h-screen bg-client-bg">
         <div className="max-w-md mx-auto px-6 py-12">
-          <div className="bg-white rounded-2xl shadow-clean p-8 text-center">
+          <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-8 text-center">
             <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 bg-client-surface-muted">
               <CheckCircle2 size={32} strokeWidth={1.5} className="text-data-green" />
             </div>
@@ -126,7 +126,7 @@ export default function NewClientPage() {
         </div>
 
         {/* Form Card */}
-        <div className="bg-white rounded-2xl shadow-clean p-6">
+        <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-6">
           {error && (
             <div className="mb-6 p-4 rounded-xl bg-data-red/10">
               <p className="text-[13px] text-data-red">
@@ -206,7 +206,7 @@ export default function NewClientPage() {
                     className={`flex items-center p-4 rounded-xl cursor-pointer border transition ${
                       formData.package === pkg.value
                         ? 'bg-accent-light border-accent'
-                        : 'bg-white border-client-border hover:border-client-border-strong'
+                        : 'bg-[#A6ADA7] border-client-border hover:border-client-border-strong'
                     }`}
                   >
                     <input

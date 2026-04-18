@@ -106,7 +106,7 @@ export default function NotificationsPage() {
           ) : (
             <button
               onClick={requestPushPermission}
-              className="px-4 py-2 bg-[#FDFDFE] text-white text-[13px] font-semibold rounded-full"
+              className="px-4 py-2 bg-[#474B48] text-white text-[13px] font-semibold rounded-full"
             >
               Inschakelen
             </button>

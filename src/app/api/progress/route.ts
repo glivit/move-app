@@ -51,6 +51,8 @@ export async function GET(request: NextRequest) {
       thisWeekCheckInRes,
       coachRes,
       weeklyCheckInsRes,
+      weeklyWeightsRes,
+      intakeWeightRes,
     ] = await Promise.all([
       db.from('profiles').select('created_at, start_date, coach_id, height_cm').eq('id', user.id).single(),
 
@@ -77,17 +79,17 @@ export async function GET(request: NextRequest) {
         .eq('client_id', user.id).gte('date', thirtyDaysAgo.toISOString().split('T')[0]),
 
       // For streak computation
-      db.from('workout_sessions').select('started_at')
+      db.from('workout_sessions').select('started_at, completed_at')
         .eq('client_id', user.id).not('completed_at', 'is', null)
-        .gte('started_at', ninetyDaysAgo.toISOString())
-        .order('started_at', { ascending: false }),
+        .gte('completed_at', ninetyDaysAgo.toISOString())
+        .order('completed_at', { ascending: false }),
 
-      // This week's sessions (for 7-dot rhythm)
+      // This week's sessions (for 7-dot rhythm) — dated by completion (workouts completed this week, regardless of when started)
       db.from('workout_sessions').select('started_at, completed_at')
         .eq('client_id', user.id)
         .not('completed_at', 'is', null)
-        .gte('started_at', monday.toISOString())
-        .lt('started_at', sunday.toISOString()),
+        .gte('completed_at', monday.toISOString())
+        .lt('completed_at', sunday.toISOString()),
 
       // This week's daily nutrition (for adherence bars)
       db.from('nutrition_daily_summary').select('date, total_calories')
@@ -121,6 +123,20 @@ export async function GET(request: NextRequest) {
         .eq('client_id', user.id)
         .order('date', { ascending: false })
         .limit(12),
+
+      // All weekly check-ins with weight (for weight journey — no limit, just the weight+date)
+      db.from('weekly_checkins').select('date, weight_kg')
+        .eq('client_id', user.id)
+        .not('weight_kg', 'is', null)
+        .order('date', { ascending: true }),
+
+      // Intake form weight (starting point)
+      db.from('intake_forms').select('weight_kg, created_at')
+        .eq('client_id', user.id)
+        .not('weight_kg', 'is', null)
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle(),
     ])
 
     const profile = profileRes.data
@@ -131,8 +147,11 @@ export async function GET(request: NextRequest) {
     const nutritionLogs = nutritionLogsRes.data || []
 
     // ── Streak ────────────────────────────────────────────
+    // Streak uses completion date so late-completed workouts still extend the streak on the day they finished.
     const activeDates = new Set(
-      (streakSessions.data || []).map((s: any) => new Date(s.started_at).toISOString().split('T')[0])
+      (streakSessions.data || []).map((s: any) =>
+        new Date(s.completed_at || s.started_at).toISOString().split('T')[0]
+      )
     )
     let streak = 0
     for (let i = 0; i < 90; i++) {
@@ -181,12 +200,41 @@ export async function GET(request: NextRequest) {
     }
 
     // ── Weight journey ───────────────────────────────────
-    const weightData = checkins
-      .filter((c: any) => c.weight_kg)
-      .map((c: any) => ({
-        date: c.date,
-        weight: Number(c.weight_kg),
-        label: new Date(c.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }),
+    // Merge weight entries from 3 sources: intake form (baseline), weekly check-ins, monthly check-ins.
+    // Priority on date collision: monthly > weekly > intake (more complete data wins).
+    const weightByDate = new Map<string, { weight: number; source: 'intake' | 'weekly' | 'monthly' }>()
+
+    // 1. Intake form (one-time baseline)
+    const intakeWeight = intakeWeightRes.data as any
+    if (intakeWeight?.weight_kg && intakeWeight.created_at) {
+      const d = intakeWeight.created_at.split('T')[0]
+      weightByDate.set(d, { weight: Number(intakeWeight.weight_kg), source: 'intake' })
+    }
+
+    // 2. Weekly check-ins (regular weigh-ins)
+    const weeklyWeights = (weeklyWeightsRes.data as any[]) || []
+    for (const w of weeklyWeights) {
+      if (!w.weight_kg || !w.date) continue
+      const d = String(w.date).split('T')[0]
+      const existing = weightByDate.get(d)
+      if (!existing || existing.source === 'intake') {
+        weightByDate.set(d, { weight: Number(w.weight_kg), source: 'weekly' })
+      }
+    }
+
+    // 3. Monthly check-ins (highest priority — full body data)
+    for (const c of checkins) {
+      if (!c.weight_kg || !c.date) continue
+      const d = String(c.date).split('T')[0]
+      weightByDate.set(d, { weight: Number(c.weight_kg), source: 'monthly' })
+    }
+
+    const weightData = Array.from(weightByDate.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([date, v]) => ({
+        date,
+        weight: v.weight,
+        label: new Date(date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }),
       }))
 
     const weightStart = weightData.length > 0 ? weightData[0].weight : null
@@ -274,9 +322,10 @@ export async function GET(request: NextRequest) {
     const nutritionCompliance = totalPlanned > 0 ? Math.round((totalCompleted / totalPlanned) * 100) : null
 
     // ── This week's daily rhythm (Mo–Su) ─────────────────
+    // Dot position follows completion day, not start day — workouts done late still count on the day they finished.
     const trainedDates = new Set(
       (thisWeekSessionsRes.data || []).map((s: any) =>
-        new Date(s.started_at).toISOString().split('T')[0]
+        new Date(s.completed_at || s.started_at).toISOString().split('T')[0]
       )
     )
 
@@ -337,7 +386,7 @@ export async function GET(request: NextRequest) {
       const wkEnd = new Date(wkStart)
       wkEnd.setDate(wkEnd.getDate() + 7)
       const anyWorkout = allWorkouts.some((s: any) => {
-        const d = new Date(s.started_at)
+        const d = new Date(s.completed_at || s.started_at)
         return d >= wkStart && d < wkEnd
       })
       if (anyWorkout) weekStreak++

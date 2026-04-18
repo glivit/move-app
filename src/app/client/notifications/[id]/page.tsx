@@ -137,7 +137,7 @@ export default function BroadcastDetailPage() {
       <div className="px-6 py-5 border-t border-[rgba(253,253,254,0.08)]">
         <button
           onClick={handleClose}
-          className="w-full py-3.5 rounded-2xl bg-[#FDFDFE] text-white text-[15px] font-semibold tracking-[-0.01em] transition-all active:scale-[0.98]"
+          className="w-full py-3.5 rounded-2xl bg-[#474B48] text-white text-[15px] font-semibold tracking-[-0.01em] transition-all active:scale-[0.98]"
         >
           {markedRead ? (
             <span className="flex items-center justify-center gap-2">

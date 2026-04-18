@@ -181,7 +181,7 @@ export default function MeasurementsPage() {
         action={
           <button
             onClick={() => router.push('/client/check-in')}
-            className="flex items-center gap-1.5 px-4 py-2 bg-[#FDFDFE] text-white text-[12px] font-semibold uppercase tracking-[0.08em] rounded-xl"
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#474B48] text-white text-[12px] font-semibold uppercase tracking-[0.08em] rounded-xl"
           >
             <Plus size={14} strokeWidth={2} />
             Meting
@@ -219,7 +219,7 @@ export default function MeasurementsPage() {
               <p className="text-[14px] text-[rgba(253,253,254,0.55)] mb-4">Nog geen progressiefoto's</p>
               <button
                 onClick={() => router.push('/client/check-in')}
-                className="px-6 py-3 bg-[#FDFDFE] text-white text-[13px] font-semibold uppercase tracking-[0.06em] rounded-xl"
+                className="px-6 py-3 bg-[#474B48] text-white text-[13px] font-semibold uppercase tracking-[0.06em] rounded-xl"
               >
                 Eerste meting starten
               </button>
@@ -311,7 +311,7 @@ export default function MeasurementsPage() {
               <p className="text-[14px] text-[rgba(253,253,254,0.55)] mb-4">Nog geen lichaamsmetingen</p>
               <button
                 onClick={() => router.push('/client/check-in')}
-                className="px-6 py-3 bg-[#FDFDFE] text-white text-[13px] font-semibold uppercase tracking-[0.06em] rounded-xl"
+                className="px-6 py-3 bg-[#474B48] text-white text-[13px] font-semibold uppercase tracking-[0.06em] rounded-xl"
               >
                 Eerste meting starten
               </button>
@@ -337,7 +337,7 @@ export default function MeasurementsPage() {
               <p className="text-[14px] text-[rgba(253,253,254,0.55)] mb-4">Nog geen omtrekmetingen</p>
               <button
                 onClick={() => router.push('/client/check-in')}
-                className="px-6 py-3 bg-[#FDFDFE] text-white text-[13px] font-semibold uppercase tracking-[0.06em] rounded-xl"
+                className="px-6 py-3 bg-[#474B48] text-white text-[13px] font-semibold uppercase tracking-[0.06em] rounded-xl"
               >
                 Eerste meting starten
               </button>

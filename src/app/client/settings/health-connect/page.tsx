@@ -213,7 +213,7 @@ export default function HealthConnectPage() {
                   <button
                     onClick={() => connectProvider(provider.id)}
                     disabled={connecting === provider.id}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FDFDFE] text-white text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#474B48] text-white text-[13px] font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
                   >
                     {connecting === provider.id ? (
                       <Loader2 size={14} className="animate-spin" />

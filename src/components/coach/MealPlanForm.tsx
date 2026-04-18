@@ -256,7 +256,7 @@ export function MealPlanForm({ clientId, onSave }: MealPlanFormProps) {
                           placeholder="Maalnaam"
                           value={meal.name}
                           onChange={(e) => updateMeal(dayIndex, mealIndex, { name: e.target.value })}
-                          className="w-full px-2 py-1.5 border border-border rounded text-sm bg-white"
+                          className="w-full px-2 py-1.5 border border-border rounded text-sm bg-[#A6ADA7]"
                         />
 
                         <input
@@ -264,7 +264,7 @@ export function MealPlanForm({ clientId, onSave }: MealPlanFormProps) {
                           placeholder="Beschrijving (ingrediënten, bereiding...)"
                           value={meal.description}
                           onChange={(e) => updateMeal(dayIndex, mealIndex, { description: e.target.value })}
-                          className="w-full px-2 py-1.5 border border-border rounded text-sm bg-white"
+                          className="w-full px-2 py-1.5 border border-border rounded text-sm bg-[#A6ADA7]"
                         />
                       </div>
 
@@ -290,7 +290,7 @@ export function MealPlanForm({ clientId, onSave }: MealPlanFormProps) {
                           onChange={(e) =>
                             updateMacro(dayIndex, mealIndex, 'cal', e.target.value ? parseInt(e.target.value) : null)
                           }
-                          className="px-2 py-1 border border-border rounded text-xs bg-white"
+                          className="px-2 py-1 border border-border rounded text-xs bg-[#A6ADA7]"
                         />
                         <input
                           type="number"
@@ -299,7 +299,7 @@ export function MealPlanForm({ clientId, onSave }: MealPlanFormProps) {
                           onChange={(e) =>
                             updateMacro(dayIndex, mealIndex, 'protein', e.target.value ? parseInt(e.target.value) : null)
                           }
-                          className="px-2 py-1 border border-border rounded text-xs bg-white"
+                          className="px-2 py-1 border border-border rounded text-xs bg-[#A6ADA7]"
                         />
                         <input
                           type="number"
@@ -308,7 +308,7 @@ export function MealPlanForm({ clientId, onSave }: MealPlanFormProps) {
                           onChange={(e) =>
                             updateMacro(dayIndex, mealIndex, 'carbs', e.target.value ? parseInt(e.target.value) : null)
                           }
-                          className="px-2 py-1 border border-border rounded text-xs bg-white"
+                          className="px-2 py-1 border border-border rounded text-xs bg-[#A6ADA7]"
                         />
                         <input
                           type="number"
@@ -317,7 +317,7 @@ export function MealPlanForm({ clientId, onSave }: MealPlanFormProps) {
                           onChange={(e) =>
                             updateMacro(dayIndex, mealIndex, 'fat', e.target.value ? parseInt(e.target.value) : null)
                           }
-                          className="px-2 py-1 border border-border rounded text-xs bg-white"
+                          className="px-2 py-1 border border-border rounded text-xs bg-[#A6ADA7]"
                         />
                       </div>
                     </details>
@@ -334,7 +334,7 @@ export function MealPlanForm({ clientId, onSave }: MealPlanFormProps) {
                     key={type}
                     type="button"
                     onClick={() => addMeal(dayIndex, type)}
-                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-white border border-accent text-accent-dark rounded hover:bg-accent/5 transition-colors"
+                    className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium bg-[#A6ADA7] border border-accent text-accent-dark rounded hover:bg-accent/5 transition-colors"
                   >
                     <Plus className="h-3 w-3" />
                     {type}

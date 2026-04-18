@@ -84,19 +84,19 @@ export function AIChatSuggestions({
   }
 
   return (
-    <div className="bg-[#FAF8F5] border border-[#E8E4DD] rounded-lg px-4 py-3">
+    <div className="bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg px-4 py-3">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-[#D4682A]" />
-          <span className="text-xs font-semibold text-[#6B6862] uppercase tracking-wide">
+          <Sparkles className="w-4 h-4 text-[#C0FC01]" />
+          <span className="text-xs font-semibold text-[#E6E8E7] uppercase tracking-wide">
             AI suggesties
           </span>
         </div>
         <button
           onClick={fetchSuggestions}
           disabled={isLoading}
-          className="p-1 text-[#9B9390] hover:text-[#6B6862] hover:bg-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="p-1 text-[#E6E8E7] hover:text-[#E6E8E7] hover:bg-[#A6ADA7] rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label="Suggesties verversen"
         >
           <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
@@ -106,25 +106,25 @@ export function AIChatSuggestions({
       {/* Suggestions grid */}
       {isLoading ? (
         <div className="flex items-center justify-center py-3 gap-2">
-          <Loader className="w-4 h-4 text-[#D4682A] animate-spin" />
-          <span className="text-xs text-[#9B9390]">Suggesties laden...</span>
+          <Loader className="w-4 h-4 text-[#C0FC01] animate-spin" />
+          <span className="text-xs text-[#E6E8E7]">Suggesties laden...</span>
         </div>
       ) : error ? (
-        <p className="text-xs text-[#D4682A]">Fout bij laden suggesties</p>
+        <p className="text-xs text-[#C0FC01]">Fout bij laden suggesties</p>
       ) : suggestions.length > 0 ? (
         <div className="space-y-2">
           {suggestions.map((suggestion, index) => (
             <button
               key={index}
               onClick={() => handleSelectSuggestion(suggestion)}
-              className="w-full text-left px-3 py-2 bg-white border border-[#E8E4DD] rounded-xl text-sm text-[#6B6862] hover:border-[#D4682A] hover:bg-[#FFF8F5] transition-colors focus:outline-none focus:ring-2 focus:ring-[#D4682A] focus:ring-offset-1"
+              className="w-full text-left px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-xl text-sm text-[#E6E8E7] hover:border-[#C0FC01] hover:bg-[#FFF8F5] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C0FC01] focus:ring-offset-1"
             >
               <p className="line-clamp-2">{suggestion}</p>
             </button>
           ))}
         </div>
       ) : (
-        <p className="text-xs text-[#9B9390] py-2">Geen suggesties beschikbaar</p>
+        <p className="text-xs text-[#E6E8E7] py-2">Geen suggesties beschikbaar</p>
       )}
     </div>
   )

@@ -117,7 +117,7 @@ function AnimatedNumber({ value, suffix = '' }: { value: number; suffix?: string
 function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null
   return (
-    <div className="bg-[#FDFDFE] text-white px-3 py-2 text-[12px] font-medium">
+    <div className="bg-[#474B48] text-white px-3 py-2 text-[12px] font-medium">
       <p>{label}</p>
       {payload.map((p: any, i: number) => (
         <p key={i} className="font-bold">{p.name}: {typeof p.value === 'number' ? Math.round(p.value).toLocaleString('nl-BE') : p.value}</p>
@@ -404,7 +404,7 @@ export default function StatsPage() {
               key={r}
               onClick={() => setTimeRange(r)}
               className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] transition-all ${
-                timeRange === r ? 'bg-[#FDFDFE] text-white' : 'text-[rgba(253,253,254,0.55)] hover:text-[#FDFDFE]'
+                timeRange === r ? 'bg-[#474B48] text-white' : 'text-[rgba(253,253,254,0.55)] hover:text-[#FDFDFE]'
               }`}
             >
               {r === 'all' ? 'Alles' : r}
@@ -416,7 +416,7 @@ export default function StatsPage() {
           <button
             onClick={() => { setGroupBy('spiergroep'); setSelectedExercise(null) }}
             className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] transition-all ${
-              groupBy === 'spiergroep' ? 'bg-[#FDFDFE] text-white' : 'text-[rgba(253,253,254,0.55)] hover:text-[#FDFDFE]'
+              groupBy === 'spiergroep' ? 'bg-[#474B48] text-white' : 'text-[rgba(253,253,254,0.55)] hover:text-[#FDFDFE]'
             }`}
           >
             Spiergroep
@@ -424,7 +424,7 @@ export default function StatsPage() {
           <button
             onClick={() => setGroupBy('oefening')}
             className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] transition-all ${
-              groupBy === 'oefening' ? 'bg-[#FDFDFE] text-white' : 'text-[rgba(253,253,254,0.55)] hover:text-[#FDFDFE]'
+              groupBy === 'oefening' ? 'bg-[#474B48] text-white' : 'text-[rgba(253,253,254,0.55)] hover:text-[#FDFDFE]'
             }`}
           >
             Oefening
@@ -457,7 +457,7 @@ export default function StatsPage() {
           <button
             onClick={() => setSelectedGroup(null)}
             className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 ${
-              !selectedGroup ? 'bg-[#FDFDFE] text-white' : 'text-[rgba(253,253,254,0.55)]'
+              !selectedGroup ? 'bg-[#474B48] text-white' : 'text-[rgba(253,253,254,0.55)]'
             }`}
           >
             Alles
@@ -467,7 +467,7 @@ export default function StatsPage() {
               key={g}
               onClick={() => setSelectedGroup(selectedGroup === g ? null : g)}
               className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 ${
-                selectedGroup === g ? 'bg-[#FDFDFE] text-white' : 'text-[rgba(253,253,254,0.55)]'
+                selectedGroup === g ? 'bg-[#474B48] text-white' : 'text-[rgba(253,253,254,0.55)]'
               }`}
             >
               <span className="inline-block w-2 h-2 mr-1.5" style={{ backgroundColor: GROUP_COLORS[g] || 'rgba(253,253,254,0.55)' }} />

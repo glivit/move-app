@@ -250,7 +250,7 @@ export default function HealthPage() {
       <button
         onClick={handleSave}
         disabled={saving}
-        className="w-full py-3.5 rounded-2xl bg-[#FDFDFE] text-white font-semibold text-[15px] hover:bg-[#7A5C12] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-3.5 rounded-2xl bg-[#474B48] text-white font-semibold text-[15px] hover:bg-[#3A3E3B] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {saving ? (
           <Loader2 className="w-5 h-5 animate-spin" />

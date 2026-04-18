@@ -23,13 +23,13 @@ interface Props {
 }
 
 const PHASE_TYPES: Record<string, { label: string; color: string; bgColor: string; icon: any }> = {
-  prep: { label: 'Voorbereiding', color: '#007AFF', bgColor: '#EBF5FF', icon: Timer },
-  hypertrophy: { label: 'Hypertrofie', color: '#AF52DE', bgColor: '#F5EEFA', icon: Dumbbell },
-  strength: { label: 'Kracht', color: '#FF9500', bgColor: '#FFF3E0', icon: TrendingUp },
-  power: { label: 'Power', color: '#FF3B30', bgColor: '#FFE5E5', icon: Zap },
-  deload: { label: 'Deload', color: '#34C759', bgColor: '#E8FAF0', icon: Shield },
+  prep: { label: 'Voorbereiding', color: '#5A7FB5', bgColor: '#EBF5FF', icon: Timer },
+  hypertrophy: { label: 'Hypertrofie', color: '#8A7BA8', bgColor: '#F5EEFA', icon: Dumbbell },
+  strength: { label: 'Kracht', color: '#E8B948', bgColor: 'rgba(232,185,72,0.14)', icon: TrendingUp },
+  power: { label: 'Power', color: '#B55A4A', bgColor: 'rgba(181,90,74,0.14)', icon: Zap },
+  deload: { label: 'Deload', color: '#2FA65A', bgColor: '#E8FAF0', icon: Shield },
   peaking: { label: 'Peaking', color: '#FF2D55', bgColor: '#FFE5EC', icon: Target },
-  maintenance: { label: 'Onderhoud', color: '#8E8E93', bgColor: '#E8E4DC', icon: Brain },
+  maintenance: { label: 'Onderhoud', color: '#D6D9D6', bgColor: '#A6ADA7', icon: Brain },
 }
 
 export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek }: Props) {
@@ -133,28 +133,28 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
 
   if (loading) {
     return (
-      <div className="h-32 bg-white rounded-2xl animate-pulse border border-[#E8E4DC]" />
+      <div className="h-32 bg-[#A6ADA7] rounded-2xl animate-pulse border border-[#A6ADA7]" />
     )
   }
 
   return (
     <div
       className="rounded-2xl border p-6"
-      style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+      style={{ backgroundColor: 'white', borderColor: '#A6ADA7', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
     >
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="text-[15px] font-semibold" style={{ color: '#1A1A18' }}>
+          <h3 className="text-[15px] font-semibold" style={{ color: '#FDFDFE' }}>
             Periodisering
           </h3>
-          <p className="text-[12px] mt-0.5" style={{ color: '#8E8E93' }}>
+          <p className="text-[12px] mt-0.5" style={{ color: '#D6D9D6' }}>
             {totalWeeks} weken — week {currentWeek} actief
           </p>
         </div>
         <button
           onClick={() => { setEditingPhase({ ...defaultPhase }); setShowForm(true) }}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all hover:opacity-80"
-          style={{ backgroundColor: '#F5F2EC', color: '#1A1917' }}
+          style={{ backgroundColor: '#A6ADA7', color: '#FDFDFE' }}
         >
           <Plus size={14} strokeWidth={2} />
           Fase toevoegen
@@ -174,9 +174,9 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
               >
                 <span
                   className={`text-[10px] font-semibold inline-block ${
-                    w === currentWeek ? 'text-white bg-[#1A1917] rounded-full px-1.5 py-0.5' : ''
+                    w === currentWeek ? 'text-white bg-[#FDFDFE] rounded-full px-1.5 py-0.5' : ''
                   }`}
-                  style={{ color: w === currentWeek ? 'white' : '#C7C7CC' }}
+                  style={{ color: w === currentWeek ? 'white' : '#CDD1CE' }}
                 >
                   {w}
                 </span>
@@ -188,9 +188,9 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
           {phases.length === 0 ? (
             <div
               className="h-12 rounded-xl flex items-center justify-center border border-dashed"
-              style={{ borderColor: '#C7C7CC' }}
+              style={{ borderColor: '#CDD1CE' }}
             >
-              <p className="text-[12px]" style={{ color: '#C7C7CC' }}>
+              <p className="text-[12px]" style={{ color: '#CDD1CE' }}>
                 Nog geen fasen gedefinieerd
               </p>
             </div>
@@ -208,7 +208,7 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
                     {/* Background grid lines */}
                     <div className="absolute inset-0 flex">
                       {weeks.map(w => (
-                        <div key={w} className="flex-1 border-r border-[#F8F8F6] last:border-0" />
+                        <div key={w} className="flex-1 border-r border-[#A6ADA7] last:border-0" />
                       ))}
                     </div>
                     <div
@@ -239,14 +239,14 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
 
           {/* Intensity curve */}
           {intensityCurve && intensityCurve.length > 1 && (
-            <div className="mt-4 pt-3 border-t border-[#E8E4DC]">
-              <p className="text-[10px] font-semibold text-[#C7C7CC] uppercase tracking-wide mb-2">Intensiteitscurve</p>
+            <div className="mt-4 pt-3 border-t border-[#A6ADA7]">
+              <p className="text-[10px] font-semibold text-[#CDD1CE] uppercase tracking-wide mb-2">Intensiteitscurve</p>
               <div className="relative" style={{ height: 48 }}>
                 <svg className="w-full h-full" viewBox={`0 0 ${totalWeeks * 40} 48`} preserveAspectRatio="none">
                   {/* Horizontal grid */}
-                  <line x1="0" y1="12" x2={totalWeeks * 40} y2="12" stroke="#E8E4DC" strokeDasharray="3 2" />
-                  <line x1="0" y1="24" x2={totalWeeks * 40} y2="24" stroke="#E8E4DC" strokeDasharray="3 2" />
-                  <line x1="0" y1="36" x2={totalWeeks * 40} y2="36" stroke="#E8E4DC" strokeDasharray="3 2" />
+                  <line x1="0" y1="12" x2={totalWeeks * 40} y2="12" stroke="#A6ADA7" strokeDasharray="3 2" />
+                  <line x1="0" y1="24" x2={totalWeeks * 40} y2="24" stroke="#A6ADA7" strokeDasharray="3 2" />
+                  <line x1="0" y1="36" x2={totalWeeks * 40} y2="36" stroke="#A6ADA7" strokeDasharray="3 2" />
 
                   {/* Fill area */}
                   <polygon
@@ -258,8 +258,8 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
                   {/* Gradient definition */}
                   <defs>
                     <linearGradient id="intensityGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#1A1917" stopOpacity="0.4" />
-                      <stop offset="100%" stopColor="#1A1917" stopOpacity="0.05" />
+                      <stop offset="0%" stopColor="#FDFDFE" stopOpacity="0.4" />
+                      <stop offset="100%" stopColor="#FDFDFE" stopOpacity="0.05" />
                     </linearGradient>
                   </defs>
 
@@ -267,7 +267,7 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
                   <polyline
                     points={intensityCurve.map(p => `${p.x},${p.y}`).join(' ')}
                     fill="none"
-                    stroke="#1A1917"
+                    stroke="#FDFDFE"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -291,7 +291,7 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
                       y1="0"
                       x2={((currentWeek - 0.5) / totalWeeks) * totalWeeks * 40}
                       y2="48"
-                      stroke="#1A1917"
+                      stroke="#FDFDFE"
                       strokeWidth="1.5"
                       strokeDasharray="4 2"
                       opacity="0.5"
@@ -299,7 +299,7 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
                   )}
                 </svg>
                 {/* Labels */}
-                <div className="absolute right-0 top-0 bottom-0 flex flex-col justify-between text-[9px] font-medium text-[#C7C7CC] -mr-6">
+                <div className="absolute right-0 top-0 bottom-0 flex flex-col justify-between text-[9px] font-medium text-[#CDD1CE] -mr-6">
                   <span>100%</span>
                   <span>50%</span>
                   <span>0%</span>
@@ -316,7 +316,7 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
                 left: `${((currentWeek - 0.5) / totalWeeks) * 100}%`,
                 height: `${phases.length * 46 + 8}px`,
                 width: '2px',
-                backgroundColor: '#1A1917',
+                backgroundColor: '#FDFDFE',
                 opacity: 0.4,
                 borderRadius: '1px',
               }}
@@ -327,13 +327,13 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
 
       {/* Phase legend */}
       {phases.length > 0 && (
-        <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-[#E8E4DC]">
+        <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-[#A6ADA7]">
           {phases.map((phase) => {
             const config = PHASE_TYPES[phase.phase_type] || PHASE_TYPES.maintenance
             return (
               <div key={phase.id} className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: config.color }} />
-                <span className="text-[11px]" style={{ color: '#8E8E93' }}>
+                <span className="text-[11px]" style={{ color: '#D6D9D6' }}>
                   {phase.name || config.label} (wk {phase.week_start}-{phase.week_end})
                 </span>
               </div>
@@ -351,18 +351,18 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
             style={{ backgroundColor: 'white', boxShadow: '0 8px 30px rgba(0,0,0,0.12)' }}
           >
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-[15px] font-semibold" style={{ color: '#1A1A18' }}>
+              <h3 className="text-[15px] font-semibold" style={{ color: '#FDFDFE' }}>
                 {editingPhase.id ? 'Fase bewerken' : 'Nieuwe fase'}
               </h3>
               <button onClick={() => { setShowForm(false); setEditingPhase(null) }}>
-                <X size={20} strokeWidth={1.5} style={{ color: '#8E8E93' }} />
+                <X size={20} strokeWidth={1.5} style={{ color: '#D6D9D6' }} />
               </button>
             </div>
 
             <div className="space-y-4">
               {/* Phase type */}
               <div>
-                <label className="text-[12px] font-medium" style={{ color: '#8E8E93' }}>Type</label>
+                <label className="text-[12px] font-medium" style={{ color: '#D6D9D6' }}>Type</label>
                 <div className="grid grid-cols-4 gap-1.5 mt-1.5">
                   {Object.entries(PHASE_TYPES).map(([key, cfg]) => {
                     const TypeIcon = cfg.icon
@@ -377,8 +377,8 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
                         className="py-2 px-2 rounded-lg text-[10px] font-semibold transition-all border flex flex-col items-center gap-1"
                         style={{
                           backgroundColor: editingPhase.phase_type === key ? cfg.bgColor : 'white',
-                          borderColor: editingPhase.phase_type === key ? cfg.color : '#E8E4DC',
-                          color: editingPhase.phase_type === key ? cfg.color : '#8E8E93',
+                          borderColor: editingPhase.phase_type === key ? cfg.color : '#A6ADA7',
+                          color: editingPhase.phase_type === key ? cfg.color : '#D6D9D6',
                         }}
                       >
                         <TypeIcon size={14} strokeWidth={1.5} />
@@ -391,13 +391,13 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
 
               {/* Name */}
               <div>
-                <label className="text-[12px] font-medium" style={{ color: '#8E8E93' }}>Naam</label>
+                <label className="text-[12px] font-medium" style={{ color: '#D6D9D6' }}>Naam</label>
                 <input
                   type="text"
                   value={editingPhase.name}
                   onChange={(e) => setEditingPhase({ ...editingPhase, name: e.target.value })}
-                  className="w-full mt-1 p-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#1A1917]"
-                  style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
+                  className="w-full mt-1 p-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#FDFDFE]"
+                  style={{ borderColor: '#A6ADA7', color: '#FDFDFE' }}
                   placeholder={PHASE_TYPES[editingPhase.phase_type]?.label}
                 />
               </div>
@@ -405,27 +405,27 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
               {/* Week range */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[12px] font-medium" style={{ color: '#8E8E93' }}>Start (week)</label>
+                  <label className="text-[12px] font-medium" style={{ color: '#D6D9D6' }}>Start (week)</label>
                   <input
                     type="number"
                     min={1}
                     max={totalWeeks}
                     value={editingPhase.week_start}
                     onChange={(e) => setEditingPhase({ ...editingPhase, week_start: parseInt(e.target.value) || 1 })}
-                    className="w-full mt-1 p-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#1A1917]"
-                    style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
+                    className="w-full mt-1 p-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#FDFDFE]"
+                    style={{ borderColor: '#A6ADA7', color: '#FDFDFE' }}
                   />
                 </div>
                 <div>
-                  <label className="text-[12px] font-medium" style={{ color: '#8E8E93' }}>Einde (week)</label>
+                  <label className="text-[12px] font-medium" style={{ color: '#D6D9D6' }}>Einde (week)</label>
                   <input
                     type="number"
                     min={editingPhase.week_start}
                     max={totalWeeks}
                     value={editingPhase.week_end}
                     onChange={(e) => setEditingPhase({ ...editingPhase, week_end: parseInt(e.target.value) || 4 })}
-                    className="w-full mt-1 p-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#1A1917]"
-                    style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
+                    className="w-full mt-1 p-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#FDFDFE]"
+                    style={{ borderColor: '#A6ADA7', color: '#FDFDFE' }}
                   />
                 </div>
               </div>
@@ -433,7 +433,7 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
               {/* Intensity + Volume */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[12px] font-medium" style={{ color: '#8E8E93' }}>
+                  <label className="text-[12px] font-medium" style={{ color: '#D6D9D6' }}>
                     Intensiteit: {editingPhase.intensity_pct}%
                   </label>
                   <input
@@ -442,15 +442,15 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
                     max={100}
                     value={editingPhase.intensity_pct}
                     onChange={(e) => setEditingPhase({ ...editingPhase, intensity_pct: parseInt(e.target.value) })}
-                    className="w-full mt-1 accent-[#1A1917]"
+                    className="w-full mt-1 accent-[#FDFDFE]"
                   />
-                  <div className="flex justify-between text-[10px]" style={{ color: '#C7C7CC' }}>
+                  <div className="flex justify-between text-[10px]" style={{ color: '#CDD1CE' }}>
                     <span>30%</span>
                     <span>100%</span>
                   </div>
                 </div>
                 <div>
-                  <label className="text-[12px] font-medium" style={{ color: '#8E8E93' }}>
+                  <label className="text-[12px] font-medium" style={{ color: '#D6D9D6' }}>
                     Volume: {editingPhase.volume_modifier}x
                   </label>
                   <input
@@ -459,9 +459,9 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
                     max={20}
                     value={Math.round(editingPhase.volume_modifier * 10)}
                     onChange={(e) => setEditingPhase({ ...editingPhase, volume_modifier: parseInt(e.target.value) / 10 })}
-                    className="w-full mt-1 accent-[#1A1917]"
+                    className="w-full mt-1 accent-[#FDFDFE]"
                   />
-                  <div className="flex justify-between text-[10px]" style={{ color: '#C7C7CC' }}>
+                  <div className="flex justify-between text-[10px]" style={{ color: '#CDD1CE' }}>
                     <span>0.5x</span>
                     <span>2.0x</span>
                   </div>
@@ -470,13 +470,13 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
 
               {/* Notes */}
               <div>
-                <label className="text-[12px] font-medium" style={{ color: '#8E8E93' }}>Notities</label>
+                <label className="text-[12px] font-medium" style={{ color: '#D6D9D6' }}>Notities</label>
                 <textarea
                   value={editingPhase.notes}
                   onChange={(e) => setEditingPhase({ ...editingPhase, notes: e.target.value })}
                   rows={2}
-                  className="w-full mt-1 p-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#1A1917] resize-none"
-                  style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
+                  className="w-full mt-1 p-2.5 rounded-xl border text-[13px] focus:outline-none focus:border-[#FDFDFE] resize-none"
+                  style={{ borderColor: '#A6ADA7', color: '#FDFDFE' }}
                   placeholder="Focus punten, richtlijnen..."
                 />
               </div>
@@ -487,7 +487,7 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
                   <button
                     onClick={() => { deletePhase(editingPhase.id!); setShowForm(false); setEditingPhase(null) }}
                     className="px-4 py-2.5 rounded-xl text-[13px] font-semibold transition-all flex items-center gap-1.5"
-                    style={{ color: '#FF3B30', backgroundColor: '#FFE5E5' }}
+                    style={{ color: '#B55A4A', backgroundColor: 'rgba(181,90,74,0.14)' }}
                   >
                     <Trash2 size={14} />
                     Verwijder
@@ -496,7 +496,7 @@ export function PeriodizationTimeline({ clientProgramId, totalWeeks, currentWeek
                 <button
                   onClick={() => savePhase(editingPhase)}
                   className="flex-1 py-2.5 rounded-xl text-[13px] font-semibold text-white transition-all"
-                  style={{ backgroundColor: '#1A1917' }}
+                  style={{ backgroundColor: '#FDFDFE' }}
                 >
                   {editingPhase.id ? 'Opslaan' : 'Toevoegen'}
                 </button>

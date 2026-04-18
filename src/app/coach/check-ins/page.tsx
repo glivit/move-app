@@ -57,7 +57,7 @@ export default async function CheckInsPage() {
           <div className="space-y-2">
             {pendingCheckins.map((checkin: any) => (
               <Link key={checkin.id} href={`/coach/check-ins/${checkin.id}`}>
-                <Card className="flex items-center justify-between p-4 transition-all hover:shadow-md cursor-pointer bg-white rounded-2xl shadow-clean border border-client-border">
+                <Card className="flex items-center justify-between p-4 transition-all hover:shadow-md cursor-pointer bg-[#A6ADA7] rounded-2xl shadow-clean border border-client-border">
                   <div className="flex items-center gap-4 flex-1">
                     <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 bg-orange-50">
                       <AlertCircle size={20} className="text-orange-600" strokeWidth={1.5} />
@@ -84,7 +84,7 @@ export default async function CheckInsPage() {
             ))}
           </div>
         ) : (
-          <Card className="p-8 text-center bg-white rounded-2xl shadow-clean border border-client-border">
+          <Card className="p-8 text-center bg-[#A6ADA7] rounded-2xl shadow-clean border border-client-border">
             <p className="text-client-text-secondary">Geen check-ins wachtend op review</p>
           </Card>
         )}
@@ -105,7 +105,7 @@ export default async function CheckInsPage() {
           <div className="space-y-2">
             {(reviewedCheckins || []).map((checkin: any) => (
               <Link key={checkin.id} href={`/coach/check-ins/${checkin.id}`}>
-                <Card className="flex items-center justify-between p-4 transition-all hover:shadow-md cursor-pointer opacity-75 hover:opacity-100 bg-white rounded-2xl shadow-clean border border-client-border">
+                <Card className="flex items-center justify-between p-4 transition-all hover:shadow-md cursor-pointer opacity-75 hover:opacity-100 bg-[#A6ADA7] rounded-2xl shadow-clean border border-client-border">
                   <div className="flex items-center gap-4 flex-1">
                     <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 bg-green-50">
                       <CheckCircle2 size={20} className="text-green-700" strokeWidth={1.5} />

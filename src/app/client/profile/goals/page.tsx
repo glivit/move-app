@@ -140,7 +140,7 @@ export default function GoalsPage() {
                 onClick={() => toggleSecondaryGoal(goal.id)}
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
-                    ? 'bg-[#FDFDFE] text-white'
+                    ? 'bg-[#474B48] text-white'
                     : 'bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] text-[#FDFDFE] hover:border-[#FDFDFE]'
                 }`}
               >
@@ -169,7 +169,7 @@ export default function GoalsPage() {
       <button
         onClick={handleSave}
         disabled={saving}
-        className="w-full py-3.5 rounded-2xl bg-[#FDFDFE] text-white font-semibold text-[15px] hover:bg-[#7A5C12] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-3.5 rounded-2xl bg-[#474B48] text-white font-semibold text-[15px] hover:bg-[#3A3E3B] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {saving ? (
           <Loader2 className="w-5 h-5 animate-spin" />

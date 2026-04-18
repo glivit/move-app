@@ -70,7 +70,7 @@ export function SwipeableRow({
       <div
         className="absolute inset-0 flex items-center justify-start pl-6 pointer-events-none rounded-2xl"
         style={{
-          backgroundColor: rightRevealed ? '#34C759' : 'transparent',
+          backgroundColor: rightRevealed ? '#2FA65A' : 'transparent',
           opacity: rightRevealed ? revealOpacity : 0,
         }}
       >

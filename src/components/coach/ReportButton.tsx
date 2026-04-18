@@ -63,21 +63,21 @@ export function ReportButton({ clientId, clientName }: ReportButtonProps) {
     return (
       <button
         onClick={() => setShowOptions(true)}
-        className="inline-flex items-center gap-2 px-4 py-2.5 bg-white rounded-xl border border-[#E8E4DC] text-[14px] font-medium text-[#1A1A18] hover:bg-[#EDEAE4] hover:border-[#1A1917]/30 transition-all shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+        className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#A6ADA7] rounded-xl border border-[#A6ADA7] text-[14px] font-medium text-[#FDFDFE] hover:bg-[#A6ADA7] hover:border-[#FDFDFE]/30 transition-all shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
       >
-        <FileText size={16} strokeWidth={1.5} className="text-[#1A1917]" />
+        <FileText size={16} strokeWidth={1.5} className="text-[#FDFDFE]" />
         PDF Rapport
       </button>
     )
   }
 
   return (
-    <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
+    <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7]">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-[15px] font-semibold text-[#1A1A18]">Voortgangsrapport genereren</h3>
+        <h3 className="text-[15px] font-semibold text-[#FDFDFE]">Voortgangsrapport genereren</h3>
         <button
           onClick={() => setShowOptions(false)}
-          className="text-[#8E8E93] text-[13px] hover:text-[#1A1A18]"
+          className="text-[#D6D9D6] text-[13px] hover:text-[#FDFDFE]"
         >
           Annuleren
         </button>
@@ -85,7 +85,7 @@ export function ReportButton({ clientId, clientName }: ReportButtonProps) {
 
       {/* Period selector */}
       <div className="mb-4">
-        <label className="text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide block mb-2">
+        <label className="text-[12px] font-semibold text-[#D6D9D6] uppercase tracking-wide block mb-2">
           Periode
         </label>
         <div className="flex gap-2">
@@ -100,8 +100,8 @@ export function ReportButton({ clientId, clientName }: ReportButtonProps) {
               onClick={() => setPeriod(opt.value)}
               className={`flex-1 py-2 rounded-lg text-[13px] font-medium transition-all ${
                 period === opt.value
-                  ? 'bg-[#1A1917] text-white'
-                  : 'bg-[#E8E4DC] text-[#8E8E93] hover:text-[#1A1A18]'
+                  ? 'bg-[#474B48] text-white'
+                  : 'bg-[#A6ADA7] text-[#D6D9D6] hover:text-[#FDFDFE]'
               }`}
             >
               {opt.label}
@@ -112,14 +112,14 @@ export function ReportButton({ clientId, clientName }: ReportButtonProps) {
 
       {/* Coach notes */}
       <div className="mb-4">
-        <label className="text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide block mb-2">
+        <label className="text-[12px] font-semibold text-[#D6D9D6] uppercase tracking-wide block mb-2">
           Persoonlijke notitie (optioneel)
         </label>
         <textarea
           value={coachNotes}
           onChange={(e) => setCoachNotes(e.target.value)}
           placeholder="Wordt onderaan het rapport getoond..."
-          className="w-full px-3 py-2.5 border border-[#E8E4DC] rounded-xl text-[13px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917] resize-none h-20"
+          className="w-full px-3 py-2.5 border border-[#A6ADA7] rounded-xl text-[13px] text-[#FDFDFE] placeholder-[#CDD1CE] focus:outline-none focus:border-[#FDFDFE] resize-none h-20"
         />
       </div>
 
@@ -128,7 +128,7 @@ export function ReportButton({ clientId, clientName }: ReportButtonProps) {
         <button
           onClick={generateReport}
           disabled={generating}
-          className="flex-1 py-3 px-4 bg-[#1A1917] text-white rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2 hover:bg-[#6F5612] transition-colors disabled:opacity-60"
+          className="flex-1 py-3 px-4 bg-[#474B48] text-white rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2 hover:bg-[#3A3E3B] transition-colors disabled:opacity-60"
         >
           {generating ? (
             <>
@@ -144,7 +144,7 @@ export function ReportButton({ clientId, clientName }: ReportButtonProps) {
         </button>
         <button
           onClick={openReportPreview}
-          className="py-3 px-4 bg-[#E8E4DC] text-[#1A1A18] rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2 hover:bg-[#E8E8E5] transition-colors"
+          className="py-3 px-4 bg-[#A6ADA7] text-[#FDFDFE] rounded-xl font-semibold text-[14px] flex items-center justify-center gap-2 hover:bg-[#E8E8E5] transition-colors"
         >
           <ExternalLink size={16} strokeWidth={1.5} />
           Preview

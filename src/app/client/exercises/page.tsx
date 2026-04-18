@@ -230,7 +230,7 @@ export default function ExercisesPage() {
         <button
           onClick={() => setSelectedGroup(null)}
           className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 transition-all rounded-xl ${
-            !selectedGroup ? 'bg-[#FDFDFE] text-white' : 'text-[rgba(253,253,254,0.55)] hover:text-[#FDFDFE]'
+            !selectedGroup ? 'bg-[#474B48] text-white' : 'text-[rgba(253,253,254,0.55)] hover:text-[#FDFDFE]'
           }`}
         >
           Alles
@@ -240,7 +240,7 @@ export default function ExercisesPage() {
             key={group}
             onClick={() => setSelectedGroup(selectedGroup === group ? null : group)}
             className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 transition-all rounded-xl ${
-              selectedGroup === group ? 'bg-[#FDFDFE] text-white' : 'text-[rgba(253,253,254,0.55)] hover:text-[#FDFDFE]'
+              selectedGroup === group ? 'bg-[#474B48] text-white' : 'text-[rgba(253,253,254,0.55)] hover:text-[#FDFDFE]'
             }`}
           >
             {group}

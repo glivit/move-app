@@ -46,7 +46,7 @@ export function CheckInReviewForm({ checkinId, existingNotes, isReviewed, review
           <CheckCircle2 size={40} style={{ color: '#1D8C47' }} strokeWidth={1.5} />
         </div>
         <div>
-          <p className="font-display font-semibold" style={{ color: '#1A1A18' }}>
+          <p className="font-display font-semibold" style={{ color: '#FDFDFE' }}>
             Review opgeslagen
           </p>
           <p className="text-sm mt-1" style={{ color: '#A3957E' }}>
@@ -58,9 +58,9 @@ export function CheckInReviewForm({ checkinId, existingNotes, isReviewed, review
   }
 
   return (
-    <Card variant="default" className="p-6 space-y-4" style={{ backgroundColor: '#FAFAFA', borderColor: '#E8E0D5' }}>
+    <Card variant="default" className="p-6 space-y-4" style={{ backgroundColor: '#A6ADA7', borderColor: '#E8E0D5' }}>
       <div>
-        <h2 className="text-lg font-display font-semibold" style={{ color: '#1A1A18' }}>
+        <h2 className="text-lg font-display font-semibold" style={{ color: '#FDFDFE' }}>
           Coach feedback
         </h2>
         {isReviewed && reviewedDate && (
@@ -86,10 +86,10 @@ export function CheckInReviewForm({ checkinId, existingNotes, isReviewed, review
         style={{
           backgroundColor: '#FFFFFF',
           borderColor: '#E8E0D5',
-          color: '#1A1A18',
+          color: '#FDFDFE',
         }}
         onFocus={(e) => {
-          e.currentTarget.style.borderColor = '#1A1917'
+          e.currentTarget.style.borderColor = '#FDFDFE'
           e.currentTarget.style.boxShadow = '0 0 0 3px rgba(200, 169, 110, 0.1)'
         }}
         onBlur={(e) => {

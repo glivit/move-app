@@ -62,7 +62,7 @@ export default async function CheckInReviewPage({ params }: Props) {
     <div className="space-y-8">
       {/* Header Section */}
       <div className="flex items-start gap-4">
-        <Link href="/coach/check-ins" className="p-2 rounded-lg transition-all flex-shrink-0 mt-1 bg-client-surface-muted hover:bg-gray-200">
+        <Link href="/coach/check-ins" className="p-2 rounded-lg transition-all flex-shrink-0 mt-1 bg-client-surface-muted hover:bg-[#989F99]">
           <ArrowLeft size={20} className="text-text-primary" strokeWidth={1.5} />
         </Link>
         <div className="flex-1">
@@ -84,7 +84,7 @@ export default async function CheckInReviewPage({ params }: Props) {
 
       {/* Photos Section */}
       {(checkin.photo_front_url || checkin.photo_back_url || checkin.photo_left_url || checkin.photo_right_url) && (
-        <Card className="p-6 bg-white rounded-2xl shadow-clean border border-client-border">
+        <Card className="p-6 bg-[#A6ADA7] rounded-2xl shadow-clean border border-client-border">
           <h2 className="text-[17px] font-display font-semibold mb-6 text-text-primary">
             Foto's
           </h2>
@@ -96,7 +96,7 @@ export default async function CheckInReviewPage({ params }: Props) {
               { url: signedPhotoUrls.photo_right_url, label: 'Rechts' },
             ].map((photo, idx) => (
               <div key={idx} className="space-y-2">
-                <div className="relative w-full aspect-square rounded-2xl overflow-hidden flex items-center justify-center bg-white border border-client-border">
+                <div className="relative w-full aspect-square rounded-2xl overflow-hidden flex items-center justify-center bg-[#A6ADA7] border border-client-border">
                   {photo.url ? (
                     <Image
                       src={photo.url}
@@ -126,7 +126,7 @@ export default async function CheckInReviewPage({ params }: Props) {
       )}
 
       {/* Body Composition Section */}
-      <Card className="p-6 bg-white rounded-2xl shadow-clean border border-client-border">
+      <Card className="p-6 bg-[#A6ADA7] rounded-2xl shadow-clean border border-client-border">
         <h2 className="text-[17px] font-display font-semibold mb-6 text-text-primary">
           Lichaamssamenstelling
         </h2>
@@ -177,7 +177,7 @@ export default async function CheckInReviewPage({ params }: Props) {
       </Card>
 
       {/* Measurements Section */}
-      <Card className="p-6 bg-white rounded-2xl shadow-clean border border-client-border">
+      <Card className="p-6 bg-[#A6ADA7] rounded-2xl shadow-clean border border-client-border">
         <h2 className="text-[17px] font-display font-semibold mb-6 text-text-primary">
           Omtrekmaten
         </h2>

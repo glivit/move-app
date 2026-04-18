@@ -128,7 +128,7 @@ export default function BroadcastsView({ initialClients, initialBroadcasts }: Br
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Broadcast Form */}
-        <Card className="p-8 bg-white border border-client-border rounded-2xl shadow-clean mb-8">
+        <Card className="p-8 bg-[#A6ADA7] border border-client-border rounded-2xl shadow-clean mb-8">
           <h2 className="text-[17px] font-display text-text-primary mb-6">
             Nieuwe broadcast
           </h2>
@@ -146,7 +146,7 @@ export default function BroadcastsView({ initialClients, initialBroadcasts }: Br
           </h2>
 
           {broadcasts.length === 0 ? (
-            <Card className="p-12 text-center bg-white border border-client-border rounded-2xl shadow-clean">
+            <Card className="p-12 text-center bg-[#A6ADA7] border border-client-border rounded-2xl shadow-clean">
               <div className="flex justify-center mb-4">
                 <div className="p-4 rounded-2xl bg-accent-light">
                   <Send size={32} strokeWidth={1.5} className="text-accent-dark" />
@@ -164,7 +164,7 @@ export default function BroadcastsView({ initialClients, initialBroadcasts }: Br
               {broadcasts.map((broadcast) => (
                 <Card
                   key={broadcast.id}
-                  className="p-6 bg-white border border-client-border rounded-2xl transition-all hover:shadow-clean"
+                  className="p-6 bg-[#A6ADA7] border border-client-border rounded-2xl transition-all hover:shadow-clean"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">

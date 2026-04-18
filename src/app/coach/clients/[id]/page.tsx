@@ -71,7 +71,7 @@ export default async function ClientProfilePage({ params }: Props) {
         {/* Back Button */}
         <Link
           href="/coach/clients"
-          className="inline-flex items-center gap-1 text-[#8E8E93] hover:text-[#8E8E93] transition-colors mb-6"
+          className="inline-flex items-center gap-1 text-[#D6D9D6] hover:text-[#D6D9D6] transition-colors mb-6"
         >
           <ArrowLeft strokeWidth={1.5} className="w-4 h-4" />
           <span className="text-sm font-medium">Terug naar cliënten</span>
@@ -80,7 +80,7 @@ export default async function ClientProfilePage({ params }: Props) {
         {/* Client Header */}
         <div className="flex items-start gap-4">
           {/* Avatar */}
-          <div className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#FAFAFA' }}>
+          <div className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#A6ADA7' }}>
             {profile.avatar_url ? (
               <Image
                 src={profile.avatar_url}
@@ -92,7 +92,7 @@ export default async function ClientProfilePage({ params }: Props) {
                 loading="lazy"
               />
             ) : (
-              <span className="text-xl font-semibold" style={{ color: '#1A1917' }}>
+              <span className="text-xl font-semibold" style={{ color: '#FDFDFE' }}>
                 {initials}
               </span>
             )}
@@ -100,14 +100,14 @@ export default async function ClientProfilePage({ params }: Props) {
 
           {/* Client Info */}
           <div className="flex-1">
-            <h1 className="text-4xl font-display font-semibold" style={{ color: '#1A1A18' }}>
+            <h1 className="text-4xl font-display font-semibold" style={{ color: '#FDFDFE' }}>
               {profile.full_name}
             </h1>
 
             {/* Email and Badge */}
             <div className="flex items-center gap-3 mt-3">
               {profile.email && (
-                <span className="text-sm" style={{ color: '#8E8E93' }}>
+                <span className="text-sm" style={{ color: '#D6D9D6' }}>
                   {profile.email}
                 </span>
               )}
@@ -117,8 +117,8 @@ export default async function ClientProfilePage({ params }: Props) {
             {/* Start Date */}
             {profile.start_date && (
               <div className="flex items-center gap-1 mt-2">
-                <Calendar strokeWidth={1.5} className="w-4 h-4" style={{ color: '#8E8E93' }} />
-                <span className="text-sm" style={{ color: '#8E8E93' }}>
+                <Calendar strokeWidth={1.5} className="w-4 h-4" style={{ color: '#D6D9D6' }} />
+                <span className="text-sm" style={{ color: '#D6D9D6' }}>
                   Lid sinds {new Date(profile.start_date).toLocaleDateString('nl-BE')}
                 </span>
               </div>
@@ -138,12 +138,12 @@ export default async function ClientProfilePage({ params }: Props) {
           {/* Last Check-in */}
           <div
             className="p-4 rounded-lg"
-            style={{ backgroundColor: '#FAFAFA' }}
+            style={{ backgroundColor: '#A6ADA7' }}
           >
-            <p className="text-xs font-medium" style={{ color: '#8E8E93' }}>
+            <p className="text-xs font-medium" style={{ color: '#D6D9D6' }}>
               LAATSTE CHECK-IN
             </p>
-            <p className="text-lg font-semibold mt-1" style={{ color: '#1A1A18' }}>
+            <p className="text-lg font-semibold mt-1" style={{ color: '#FDFDFE' }}>
               {latestCheckin ? new Date(latestCheckin.date).toLocaleDateString('nl-BE') : '—'}
             </p>
           </div>
@@ -151,12 +151,12 @@ export default async function ClientProfilePage({ params }: Props) {
           {/* Total Check-ins */}
           <div
             className="p-4 rounded-lg"
-            style={{ backgroundColor: '#FAFAFA' }}
+            style={{ backgroundColor: '#A6ADA7' }}
           >
-            <p className="text-xs font-medium" style={{ color: '#8E8E93' }}>
+            <p className="text-xs font-medium" style={{ color: '#D6D9D6' }}>
               TOTAAL CHECK-INS
             </p>
-            <p className="text-lg font-semibold mt-1" style={{ color: '#1A1A18' }}>
+            <p className="text-lg font-semibold mt-1" style={{ color: '#FDFDFE' }}>
               {checkinCount || 0}
             </p>
           </div>
@@ -164,12 +164,12 @@ export default async function ClientProfilePage({ params }: Props) {
           {/* Workouts Completed */}
           <div
             className="p-4 rounded-lg"
-            style={{ backgroundColor: '#FAFAFA' }}
+            style={{ backgroundColor: '#A6ADA7' }}
           >
-            <p className="text-xs font-medium" style={{ color: '#8E8E93' }}>
+            <p className="text-xs font-medium" style={{ color: '#D6D9D6' }}>
               WORKOUTS
             </p>
-            <p className="text-lg font-semibold mt-1" style={{ color: '#1A1A18' }}>
+            <p className="text-lg font-semibold mt-1" style={{ color: '#FDFDFE' }}>
               {workoutCount || 0}
             </p>
           </div>
@@ -177,12 +177,12 @@ export default async function ClientProfilePage({ params }: Props) {
           {/* Days Active */}
           <div
             className="p-4 rounded-lg"
-            style={{ backgroundColor: '#FAFAFA' }}
+            style={{ backgroundColor: '#A6ADA7' }}
           >
-            <p className="text-xs font-medium" style={{ color: '#8E8E93' }}>
+            <p className="text-xs font-medium" style={{ color: '#D6D9D6' }}>
               DAGEN ACTIEF
             </p>
-            <p className="text-lg font-semibold mt-1" style={{ color: '#1A1A18' }}>
+            <p className="text-lg font-semibold mt-1" style={{ color: '#FDFDFE' }}>
               {daysActive}
             </p>
           </div>

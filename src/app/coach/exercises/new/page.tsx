@@ -162,7 +162,7 @@ export default function NewExercisePage() {
       {/* Form */}
       <form onSubmit={handleSubmit} className="max-w-2xl space-y-4 mb-12">
         {/* Name (English) */}
-        <div className="bg-white rounded-2xl shadow-clean p-4">
+        <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
           <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
             NAAM (Engels) *
           </label>
@@ -177,7 +177,7 @@ export default function NewExercisePage() {
         </div>
 
         {/* Name (Dutch) */}
-        <div className="bg-white rounded-2xl shadow-clean p-4">
+        <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
           <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
             NEDERLANDSE NAAM
           </label>
@@ -191,7 +191,7 @@ export default function NewExercisePage() {
         </div>
 
         {/* Body Part */}
-        <div className="bg-white rounded-2xl shadow-clean p-4">
+        <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
           <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
             LICHAAMSDEEL *
           </label>
@@ -211,7 +211,7 @@ export default function NewExercisePage() {
         </div>
 
         {/* Target Muscle */}
-        <div className="bg-white rounded-2xl shadow-clean p-4">
+        <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
           <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
             DOELSPIER *
           </label>
@@ -226,7 +226,7 @@ export default function NewExercisePage() {
         </div>
 
         {/* Equipment */}
-        <div className="bg-white rounded-2xl shadow-clean p-4">
+        <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
           <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
             APPARATUUR *
           </label>
@@ -246,7 +246,7 @@ export default function NewExercisePage() {
         </div>
 
         {/* Category */}
-        <div className="bg-white rounded-2xl shadow-clean p-4">
+        <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
           <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
             CATEGORIE
           </label>
@@ -265,7 +265,7 @@ export default function NewExercisePage() {
         </div>
 
         {/* GIF URL */}
-        <div className="bg-white rounded-2xl shadow-clean p-4">
+        <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
           <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
             GIF URL (optioneel)
           </label>
@@ -280,7 +280,7 @@ export default function NewExercisePage() {
         </div>
 
         {/* Video URL */}
-        <div className="bg-white rounded-2xl shadow-clean p-4">
+        <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
           <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
             VIDEO URL (optioneel)
           </label>
@@ -295,7 +295,7 @@ export default function NewExercisePage() {
         </div>
 
         {/* Coach Tips */}
-        <div className="bg-white rounded-2xl shadow-clean p-4">
+        <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
           <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
             COACHING TIPS VOOR CLIËNTEN
           </label>
@@ -310,7 +310,7 @@ export default function NewExercisePage() {
         </div>
 
         {/* Coach Notes */}
-        <div className="bg-white rounded-2xl shadow-clean p-4">
+        <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
           <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
             INTERNE NOTITIES
           </label>
@@ -329,7 +329,7 @@ export default function NewExercisePage() {
           <Link href="/coach/exercises" className="flex-1">
             <button
               type="button"
-              className="w-full px-6 py-3 bg-white border border-client-border rounded-2xl font-semibold text-[15px] text-text-primary hover:bg-client-surface-muted transition-colors"
+              className="w-full px-6 py-3 bg-[#A6ADA7] border border-client-border rounded-2xl font-semibold text-[15px] text-text-primary hover:bg-client-surface-muted transition-colors"
             >
               Annuleren
             </button>

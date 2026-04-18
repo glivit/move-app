@@ -19,7 +19,7 @@ function timeSince(date: string) {
 
 const moodEmojis: Record<number, string> = { 1: '😫', 2: '😐', 3: '😊', 4: '💪', 5: '🔥' }
 const difficultyLabels: Record<number, string> = { 1: 'Te makkelijk', 2: 'Makkelijk', 3: 'Perfect', 4: 'Zwaar', 5: 'Te zwaar' }
-const difficultyColors: Record<number, string> = { 1: 'text-[#3068C4]', 2: 'text-[#3D8B5C]', 3: 'text-[#1A1917]', 4: 'text-[#C47D15]', 5: 'text-[#C4372A]' }
+const difficultyColors: Record<number, string> = { 1: 'text-[#5A7FB5]', 2: 'text-[#2FA65A]', 3: 'text-[#FDFDFE]', 4: 'text-[#D9A645]', 5: 'text-[#B55A4A]' }
 
 export default async function CoachActivityFeedPage() {
   const supabase = await createServerSupabaseClient()
@@ -125,10 +125,10 @@ export default async function CoachActivityFeedPage() {
     <div className="space-y-8">
       {/* Header */}
       <div className="pt-2">
-        <h1 className="text-[40px] font-semibold text-[#1A1917] tracking-[-0.03em] leading-[1.1]" style={{ fontFamily: 'var(--font-display)' }}>
+        <h1 className="text-[40px] font-semibold text-[#FDFDFE] tracking-[-0.03em] leading-[1.1]" style={{ fontFamily: 'var(--font-display)' }}>
           Activiteit
         </h1>
-        <p className="mt-2.5 text-[15px] text-[#A09D96] tracking-[-0.01em]">
+        <p className="mt-2.5 text-[15px] text-[#E6E8E7] tracking-[-0.01em]">
           {unseenCount > 0
             ? `${unseenCount} nieuwe activiteit${unseenCount !== 1 ? 'en' : ''} in de afgelopen 2 weken`
             : 'Alle activiteit is bijgewerkt'
@@ -151,28 +151,28 @@ export default async function CoachActivityFeedPage() {
                   href={`/coach/clients/${activity.clientId}/workout/${d.sessionId}`}
                   className={`block rounded-2xl border overflow-hidden transition-all hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] ${
                     !activity.reviewed
-                      ? 'bg-white border-[#D46A3A]/20 shadow-[0_1px_3px_rgba(212,106,58,0.08)]'
-                      : 'bg-white border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]'
+                      ? 'bg-[#A6ADA7] border-[#C0FC01]/20 shadow-[0_1px_3px_rgba(212,106,58,0.08)]'
+                      : 'bg-[#A6ADA7] border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)]'
                   }`}
                 >
                   <div className="px-5 py-4 flex items-center gap-4">
                     {/* Icon */}
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                      !activity.reviewed ? 'bg-[var(--color-pop-light)]' : 'bg-[#EDEAE4]'
+                      !activity.reviewed ? 'bg-[var(--color-pop-light)]' : 'bg-[#A6ADA7]'
                     }`}>
-                      <Dumbbell strokeWidth={1.5} className={`w-5 h-5 ${!activity.reviewed ? 'text-[var(--color-pop)]' : 'text-[#6B6862]'}`} />
+                      <Dumbbell strokeWidth={1.5} className={`w-5 h-5 ${!activity.reviewed ? 'text-[var(--color-pop)]' : 'text-[#E6E8E7]'}`} />
                     </div>
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="text-[15px] font-semibold text-[#1A1917]">{firstName}</p>
-                        <span className="text-[13px] text-[#A09D96]">heeft {d.dayName} voltooid</span>
+                        <p className="text-[15px] font-semibold text-[#FDFDFE]">{firstName}</p>
+                        <span className="text-[13px] text-[#E6E8E7]">heeft {d.dayName} voltooid</span>
                         {!activity.reviewed && (
                           <span className="w-2 h-2 rounded-full bg-[var(--color-pop)] flex-shrink-0" />
                         )}
                       </div>
-                      <div className="flex items-center gap-3 mt-1 text-[12px] text-[#A09D96]">
+                      <div className="flex items-center gap-3 mt-1 text-[12px] text-[#E6E8E7]">
                         {durationMin && <span>{durationMin} min</span>}
                         {d.difficultyRating && (
                           <span className={`font-medium ${difficultyColors[d.difficultyRating] || ''}`}>
@@ -181,13 +181,13 @@ export default async function CoachActivityFeedPage() {
                         )}
                         {d.moodRating && <span>{moodEmojis[d.moodRating]}</span>}
                         {d.painReported && (
-                          <span className="flex items-center gap-1 text-[#C4372A] font-medium">
+                          <span className="flex items-center gap-1 text-[#B55A4A] font-medium">
                             <AlertTriangle strokeWidth={1.5} className="w-3 h-3" /> Pijn
                           </span>
                         )}
                       </div>
                       {d.feedbackText && (
-                        <p className="text-[13px] text-[#6B6862] mt-1.5 truncate italic">
+                        <p className="text-[13px] text-[#E6E8E7] mt-1.5 truncate italic">
                           &ldquo;{d.feedbackText}&rdquo;
                         </p>
                       )}
@@ -195,8 +195,8 @@ export default async function CoachActivityFeedPage() {
 
                     {/* Time + Chevron */}
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="text-[12px] text-[#C5C2BC]">{timeSince(activity.timestamp)}</span>
-                      <ChevronRight className="w-4 h-4 text-[#C5C2BC]" strokeWidth={1.5} />
+                      <span className="text-[12px] text-[#989F99]">{timeSince(activity.timestamp)}</span>
+                      <ChevronRight className="w-4 h-4 text-[#989F99]" strokeWidth={1.5} />
                     </div>
                   </div>
                 </Link>
@@ -213,31 +213,31 @@ export default async function CoachActivityFeedPage() {
                   href={`/coach/check-ins/${d.checkinId}`}
                   className={`block rounded-2xl border overflow-hidden transition-all hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] ${
                     !activity.reviewed
-                      ? 'bg-white border-[#C47D15]/20 shadow-[0_1px_3px_rgba(196,125,21,0.08)]'
-                      : 'bg-white border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]'
+                      ? 'bg-[#A6ADA7] border-[#D9A645]/20 shadow-[0_1px_3px_rgba(196,125,21,0.08)]'
+                      : 'bg-[#A6ADA7] border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)]'
                   }`}
                 >
                   <div className="px-5 py-4 flex items-center gap-4">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                      !activity.reviewed ? 'bg-[#C47D15]/10' : 'bg-[#EDEAE4]'
+                      !activity.reviewed ? 'bg-[#D9A645]/10' : 'bg-[#A6ADA7]'
                     }`}>
-                      <CheckCircle2 strokeWidth={1.5} className={`w-5 h-5 ${!activity.reviewed ? 'text-[#C47D15]' : 'text-[#6B6862]'}`} />
+                      <CheckCircle2 strokeWidth={1.5} className={`w-5 h-5 ${!activity.reviewed ? 'text-[#D9A645]' : 'text-[#E6E8E7]'}`} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="text-[15px] font-semibold text-[#1A1917]">{firstName}</p>
-                        <span className="text-[13px] text-[#A09D96]">heeft een check-in ingediend</span>
+                        <p className="text-[15px] font-semibold text-[#FDFDFE]">{firstName}</p>
+                        <span className="text-[13px] text-[#E6E8E7]">heeft een check-in ingediend</span>
                         {!activity.reviewed && (
-                          <span className="w-2 h-2 rounded-full bg-[#C47D15] flex-shrink-0" />
+                          <span className="w-2 h-2 rounded-full bg-[#D9A645] flex-shrink-0" />
                         )}
                       </div>
                       {d.weightKg && (
-                        <p className="text-[12px] text-[#A09D96] mt-1">Gewicht: {d.weightKg} kg</p>
+                        <p className="text-[12px] text-[#E6E8E7] mt-1">Gewicht: {d.weightKg} kg</p>
                       )}
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="text-[12px] text-[#C5C2BC]">{timeSince(activity.timestamp)}</span>
-                      <ChevronRight className="w-4 h-4 text-[#C5C2BC]" strokeWidth={1.5} />
+                      <span className="text-[12px] text-[#989F99]">{timeSince(activity.timestamp)}</span>
+                      <ChevronRight className="w-4 h-4 text-[#989F99]" strokeWidth={1.5} />
                     </div>
                   </div>
                 </Link>
@@ -249,11 +249,11 @@ export default async function CoachActivityFeedPage() {
         </div>
       ) : (
         <div className="card-elevated p-16 flex flex-col items-center justify-center">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#3D8B5C]/10 to-[#3D8B5C]/5 flex items-center justify-center mb-5">
-            <Activity className="w-7 h-7 text-[#3D8B5C]" strokeWidth={1.5} />
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#2FA65A]/10 to-[#2FA65A]/5 flex items-center justify-center mb-5">
+            <Activity className="w-7 h-7 text-[#2FA65A]" strokeWidth={1.5} />
           </div>
-          <h3 className="text-[18px] font-semibold text-[#1A1917] mb-1.5">Geen activiteit</h3>
-          <p className="text-[14px] text-[#A09D96]">Activiteiten van je cliënten verschijnen hier.</p>
+          <h3 className="text-[18px] font-semibold text-[#FDFDFE] mb-1.5">Geen activiteit</h3>
+          <p className="text-[14px] text-[#E6E8E7]">Activiteiten van je cliënten verschijnen hier.</p>
         </div>
       )}
     </div>

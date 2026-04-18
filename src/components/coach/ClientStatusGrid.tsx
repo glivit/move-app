@@ -259,9 +259,9 @@ export function ClientStatusGrid() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <div className="h-6 w-56 bg-[#F0EDE7] rounded animate-pulse" />
+        <div className="h-6 w-56 bg-[#A6ADA7] rounded animate-pulse" />
         {[1, 2, 3].map(i => (
-          <div key={i} className="h-32 bg-white rounded-2xl border border-[#E8E4DC] animate-pulse" />
+          <div key={i} className="h-32 bg-[#A6ADA7] rounded-2xl border border-[#A6ADA7] animate-pulse" />
         ))}
       </div>
     )
@@ -270,22 +270,22 @@ export function ClientStatusGrid() {
   return (
     <div>
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-[22px] font-semibold text-[#1A1917] tracking-[-0.02em]" style={{ fontFamily: 'var(--font-display)' }}>
+        <h2 className="text-[22px] font-semibold text-[#FDFDFE] tracking-[-0.02em]" style={{ fontFamily: 'var(--font-display)' }}>
           Cliënten
         </h2>
         <div className="flex gap-1.5">
           {[
             { key: 'all' as FilterMode, label: `Iedereen (${clients.length})` },
-            { key: 'behind' as FilterMode, label: `Achter (${behindCount})`, color: 'text-[#FF3B30]' },
-            { key: 'on-track' as FilterMode, label: `Op schema (${onTrackCount})`, color: 'text-[#34C759]' },
+            { key: 'behind' as FilterMode, label: `Achter (${behindCount})`, color: 'text-[#B55A4A]' },
+            { key: 'on-track' as FilterMode, label: `Op schema (${onTrackCount})`, color: 'text-[#2FA65A]' },
           ].map(f => (
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}
               className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all ${
                 filter === f.key
-                  ? 'bg-[#1A1917] text-white'
-                  : `bg-[#F5F2EC] ${f.color || 'text-[#6B6862]'} hover:bg-[#EBE8E0]`
+                  ? 'bg-[#474B48] text-white'
+                  : `bg-[#A6ADA7] ${f.color || 'text-[#E6E8E7]'} hover:bg-[#EBE8E0]`
               }`}
             >
               {f.label}
@@ -302,42 +302,42 @@ export function ClientStatusGrid() {
           return (
             <div
               key={client.id}
-              className={`bg-white rounded-2xl border transition-all ${
+              className={`bg-[#A6ADA7] rounded-2xl border transition-all ${
                 client.needsAttention
-                  ? 'border-[#FF3B30]/20 shadow-[0_0_0_1px_rgba(255,59,48,0.05)]'
-                  : 'border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]'
+                  ? 'border-[#B55A4A]/20 shadow-[0_0_0_1px_rgba(255,59,48,0.05)]'
+                  : 'border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)]'
               }`}
             >
               {/* ── Top row: name + badges + actions ── */}
               <div className="flex items-center gap-3 px-5 py-4">
                 <Link href={`/coach/clients/${client.id}`} className="flex items-center gap-3 flex-1 min-w-0 group">
-                  <div className="w-11 h-11 rounded-full bg-[#F5F2EC] flex items-center justify-center text-[13px] font-semibold text-[#8E8E93] flex-shrink-0 overflow-hidden">
+                  <div className="w-11 h-11 rounded-full bg-[#A6ADA7] flex items-center justify-center text-[13px] font-semibold text-[#D6D9D6] flex-shrink-0 overflow-hidden">
                     {client.avatarUrl ? (
                       <Image src={client.avatarUrl} alt="" width={44} height={44} className="w-full h-full object-cover" unoptimized loading="lazy" />
                     ) : client.initials}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-[16px] font-semibold text-[#1A1917] truncate group-hover:text-[#D46A3A] transition-colors">
+                      <p className="text-[16px] font-semibold text-[#FDFDFE] truncate group-hover:text-[#C0FC01] transition-colors">
                         {client.fullName}
                       </p>
                       {client.needsAttention && (
-                        <span className="text-[11px] font-semibold text-[#FF3B30] flex items-center gap-0.5 shrink-0">
+                        <span className="text-[11px] font-semibold text-[#B55A4A] flex items-center gap-0.5 shrink-0">
                           <AlertTriangle size={11} /> Achter
                         </span>
                       )}
                       {client.workoutStreak > 1 && (
-                        <span className="text-[11px] font-semibold text-[#FF9500] flex items-center gap-0.5 shrink-0">
+                        <span className="text-[11px] font-semibold text-[#E8B948] flex items-center gap-0.5 shrink-0">
                           <Flame size={11} /> {client.workoutStreak}w
                         </span>
                       )}
                       {client.hasPendingCheckin && (
-                        <span className="text-[11px] font-semibold text-[#C47D15] flex items-center gap-0.5 shrink-0">
+                        <span className="text-[11px] font-semibold text-[#D9A645] flex items-center gap-0.5 shrink-0">
                           Check-in
                         </span>
                       )}
                     </div>
-                    <p className="text-[12px] text-[#A09D96] mt-0.5">
+                    <p className="text-[12px] text-[#E6E8E7] mt-0.5">
                       {client.lastWorkoutDaysAgo !== null
                         ? client.lastWorkoutDaysAgo === 0
                           ? 'Vandaag getraind'
@@ -346,41 +346,41 @@ export function ClientStatusGrid() {
                           : `${client.lastWorkoutDaysAgo} dagen geleden getraind`
                         : 'Nog niet getraind'}
                       {client.scheduledToday && !client.workedOutToday && (
-                        <span className="text-[#D46A3A]"> · {client.scheduledToday} gepland</span>
+                        <span className="text-[#C0FC01]"> · {client.scheduledToday} gepland</span>
                       )}
                     </p>
                   </div>
                 </Link>
 
-                <ChevronRight size={16} className="text-[#D5D0C8] flex-shrink-0" strokeWidth={1.5} />
+                <ChevronRight size={16} className="text-[#989F99] flex-shrink-0" strokeWidth={1.5} />
               </div>
 
               {/* ── Stats row ── */}
               <div className="px-5 pb-3 flex items-center gap-6">
                 {/* Workout progress */}
                 <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                  <Dumbbell size={15} className={client.workedOutToday ? 'text-[#34C759] shrink-0' : 'text-[#C5C2BC] shrink-0'} strokeWidth={1.5} />
+                  <Dumbbell size={15} className={client.workedOutToday ? 'text-[#2FA65A] shrink-0' : 'text-[#989F99] shrink-0'} strokeWidth={1.5} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
                       <span className={`text-[12px] font-semibold tabular-nums ${
                         client.workoutsThisWeek >= client.expectedPerWeek && client.expectedPerWeek > 0
-                          ? 'text-[#34C759]'
+                          ? 'text-[#2FA65A]'
                           : client.workoutsThisWeek > 0
-                          ? 'text-[#FF9500]'
+                          ? 'text-[#E8B948]'
                           : client.expectedPerWeek > 0
-                          ? 'text-[#FF3B30]'
-                          : 'text-[#A09D96]'
+                          ? 'text-[#B55A4A]'
+                          : 'text-[#E6E8E7]'
                       }`}>
                         {client.expectedPerWeek > 0 ? `${client.workoutsThisWeek}/${client.expectedPerWeek} deze week` : 'Geen schema'}
                       </span>
                     </div>
                     {client.expectedPerWeek > 0 && (
-                      <div className="h-1.5 bg-[#F5F2EC] rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-[#A6ADA7] rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-500"
                           style={{
                             width: `${workoutPct}%`,
-                            backgroundColor: client.workoutsThisWeek >= client.expectedPerWeek ? '#34C759' : client.workoutsThisWeek > 0 ? '#FF9500' : '#FF3B30',
+                            backgroundColor: client.workoutsThisWeek >= client.expectedPerWeek ? '#2FA65A' : client.workoutsThisWeek > 0 ? '#E8B948' : '#B55A4A',
                           }}
                         />
                       </div>
@@ -390,51 +390,51 @@ export function ClientStatusGrid() {
 
                 {/* Nutrition progress */}
                 <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                  <UtensilsCrossed size={15} className={client.nutritionLoggedToday ? 'text-[#D46A3A] shrink-0' : 'text-[#C5C2BC] shrink-0'} strokeWidth={1.5} />
+                  <UtensilsCrossed size={15} className={client.nutritionLoggedToday ? 'text-[#C0FC01] shrink-0' : 'text-[#989F99] shrink-0'} strokeWidth={1.5} />
                   <div className="flex-1 min-w-0">
                     {client.hasNutritionPlan ? (
                       <>
                         <div className="flex items-center justify-between mb-1">
                           <span className={`text-[12px] font-semibold tabular-nums ${
-                            kcalPct >= 80 ? 'text-[#34C759]' : kcalPct > 0 ? 'text-[#D46A3A]' : 'text-[#A09D96]'
+                            kcalPct >= 80 ? 'text-[#2FA65A]' : kcalPct > 0 ? 'text-[#C0FC01]' : 'text-[#E6E8E7]'
                           }`}>
                             {client.caloriesLogged}/{client.caloriesTarget} kcal
                           </span>
                           {client.proteinTarget > 0 && (
-                            <span className="text-[11px] text-[#A09D96] tabular-nums">
+                            <span className="text-[11px] text-[#E6E8E7] tabular-nums">
                               {client.proteinLogged}/{client.proteinTarget}g eiwit
                             </span>
                           )}
                         </div>
-                        <div className="h-1.5 bg-[#F5F2EC] rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-[#A6ADA7] rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-500"
                             style={{
                               width: `${kcalPct}%`,
-                              backgroundColor: kcalPct >= 80 ? '#34C759' : kcalPct > 0 ? '#D46A3A' : '#E8E4DC',
+                              backgroundColor: kcalPct >= 80 ? '#2FA65A' : kcalPct > 0 ? '#C0FC01' : '#A6ADA7',
                             }}
                           />
                         </div>
                       </>
                     ) : (
-                      <span className="text-[12px] text-[#C5C2BC]">Geen voedingsplan</span>
+                      <span className="text-[12px] text-[#989F99]">Geen voedingsplan</span>
                     )}
                   </div>
                 </div>
               </div>
 
               {/* ── Action buttons ── */}
-              <div className="px-5 py-3 border-t border-[#F5F2EC] flex items-center gap-2">
+              <div className="px-5 py-3 border-t border-[#A6ADA7] flex items-center gap-2">
                 <Link
                   href={`/coach/clients/${client.id}`}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-[#6B6862] hover:bg-[#F5F2EC] transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-[#E6E8E7] hover:bg-[#A6ADA7] transition-colors"
                 >
                   <Settings size={13} strokeWidth={1.5} />
                   Programma
                 </Link>
                 <Link
                   href={`/coach/clients/${client.id}/nutrition`}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-[#6B6862] hover:bg-[#F5F2EC] transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-[#E6E8E7] hover:bg-[#A6ADA7] transition-colors"
                 >
                   <UtensilsCrossed size={13} strokeWidth={1.5} />
                   Voeding
@@ -442,7 +442,7 @@ export function ClientStatusGrid() {
                 {client.hasPendingCheckin && (
                   <Link
                     href={`/coach/check-ins?client=${client.id}`}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold text-[#C47D15] bg-[#C47D15]/8 hover:bg-[#C47D15]/15 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold text-[#D9A645] bg-[#D9A645]/8 hover:bg-[#D9A645]/15 transition-colors"
                   >
                     <Calendar size={13} strokeWidth={1.5} />
                     Check-in
@@ -457,15 +457,15 @@ export function ClientStatusGrid() {
                       disabled={sendingPrompt !== null || promptSent.has(`${client.id}-workout`)}
                       className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all ${
                         promptSent.has(`${client.id}-workout`)
-                          ? 'bg-[#34C759]/10 text-[#34C759]'
-                          : 'bg-[#F5F2EC] text-[#A09D96] hover:bg-[#D46A3A]/10 hover:text-[#D46A3A]'
+                          ? 'bg-[#2FA65A]/10 text-[#2FA65A]'
+                          : 'bg-[#A6ADA7] text-[#E6E8E7] hover:bg-[#C0FC01]/10 hover:text-[#C0FC01]'
                       }`}
                       title="Herinnering workout"
                     >
                       {promptSent.has(`${client.id}-workout`) ? (
                         <><CheckCircle2 size={11} /> Verstuurd</>
                       ) : sendingPrompt === `${client.id}-workout` ? (
-                        <div className="w-3 h-3 border-2 border-[#D46A3A] border-t-transparent rounded-full animate-spin" />
+                        <div className="w-3 h-3 border-2 border-[#C0FC01] border-t-transparent rounded-full animate-spin" />
                       ) : (
                         <><Dumbbell size={11} /> Herinnering</>
                       )}
@@ -477,17 +477,17 @@ export function ClientStatusGrid() {
                     disabled={sendingPrompt !== null || promptSent.has(`${client.id}-general`)}
                     className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all ${
                       promptSent.has(`${client.id}-general`)
-                        ? 'bg-[#34C759]/10'
-                        : 'bg-[#F5F2EC] hover:bg-[#D46A3A]/10 active:scale-95'
+                        ? 'bg-[#2FA65A]/10'
+                        : 'bg-[#A6ADA7] hover:bg-[#C0FC01]/10 active:scale-95'
                     }`}
                     title="Stuur bericht"
                   >
                     {promptSent.has(`${client.id}-general`) ? (
-                      <CheckCircle2 size={14} className="text-[#34C759]" />
+                      <CheckCircle2 size={14} className="text-[#2FA65A]" />
                     ) : sendingPrompt === `${client.id}-general` ? (
-                      <div className="w-3.5 h-3.5 border-2 border-[#D46A3A] border-t-transparent rounded-full animate-spin" />
+                      <div className="w-3.5 h-3.5 border-2 border-[#C0FC01] border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <MessageCircle size={14} className="text-[#A09D96]" />
+                      <MessageCircle size={14} className="text-[#E6E8E7]" />
                     )}
                   </button>
                 </div>
@@ -499,7 +499,7 @@ export function ClientStatusGrid() {
 
       {filtered.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-[14px] text-[#A09D96]">
+          <p className="text-[14px] text-[#E6E8E7]">
             {filter === 'behind' ? 'Geen cliënten achter op schema' : 'Geen cliënten gevonden'}
           </p>
         </div>

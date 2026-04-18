@@ -100,12 +100,12 @@ export function MessageSearch() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onFocus={() => searchQuery && setIsOpen(true)}
-          className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+          className="pl-10 pr-4 py-2 border border-[#989F99] rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
         />
       </div>
 
       {isOpen && (searchQuery || results.length > 0) && (
-        <div className="absolute top-full mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <div className="absolute top-full mt-2 w-full bg-[#A6ADA7] border border-[#989F99] rounded-lg shadow-lg z-50">
           {isLoading ? (
             <div className="p-4 text-center text-gray-500">
               <div className="inline-block animate-spin">
@@ -124,7 +124,7 @@ export function MessageSearch() {
                 <button
                   key={result.id}
                   onClick={() => handleResultClick(result)}
-                  className="w-full text-left p-4 hover:bg-gray-50 transition-colors"
+                  className="w-full text-left p-4 hover:bg-[#A6ADA7] transition-colors"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
@@ -152,7 +152,7 @@ export function MessageSearch() {
       )}
 
       {isOpen && !searchQuery && results.length === 0 && (
-        <div className="absolute top-full mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-4 text-center text-gray-500">
+        <div className="absolute top-full mt-2 w-full bg-[#A6ADA7] border border-[#989F99] rounded-lg shadow-lg z-50 p-4 text-center text-gray-500">
           <p className="text-sm">Type om berichten te zoeken</p>
         </div>
       )}

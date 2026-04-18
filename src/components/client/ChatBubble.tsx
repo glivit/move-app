@@ -52,11 +52,14 @@ function MediaContent({ message, isOwn }: { message: ChatBubbleProps['message'];
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const fileUrl = message.image_url
 
-  // isOwn = user (dark bubble, light text)
-  // !isOwn = coach (light bubble, dark text)
-  const textClass = isOwn ? 'text-[#FDFDFE]' : 'text-[#FDFDFE]'
+  // v6: beide bubbels gebruiken ink-op-colored-surface.
+  // isOwn = user  → dark card (#474B48) met ink tekst
+  // !isOwn = coach → light card (#A6ADA7) met ink tekst
+  const textClass = 'text-[#FDFDFE]'
   const accentClass = isOwn ? 'text-[#C0FC01]' : 'text-[#FDFDFE]'
-  const subtleClass = isOwn ? 'text-[rgba(253,253,254,0.56)]' : 'text-[rgba(26,25,23,0.48)]'
+  const subtleClass = isOwn
+    ? 'text-[rgba(253,253,254,0.56)]'
+    : 'text-[rgba(253,253,254,0.68)]'
 
   // Image
   if (message.type === 'image' && fileUrl) {
@@ -147,11 +150,11 @@ export function ChatBubble({ message, isCoach }: ChatBubbleProps) {
         <div className="flex flex-col max-w-[78%]">
           <div
             style={{
-              background: '#FDFDFE',
+              background: '#A6ADA7',
               borderRadius: '20px',
               borderBottomLeftRadius: '4px',
               padding: '12px 16px',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.08)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 6px rgba(0,0,0,0.14)',
             }}
           >
             <MediaContent message={message} isOwn={false} />

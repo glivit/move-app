@@ -51,8 +51,8 @@ export default function CoachClientThreadPage({ params }: PageProps) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="animate-pulse space-y-3">
-          <div className="h-3 bg-gray-200 rounded w-48 mx-auto" />
-          <div className="h-3 bg-gray-200 rounded w-64 mx-auto" />
+          <div className="h-3 bg-[#989F99] rounded w-48 mx-auto" />
+          <div className="h-3 bg-[#989F99] rounded w-64 mx-auto" />
         </div>
       </div>
     )

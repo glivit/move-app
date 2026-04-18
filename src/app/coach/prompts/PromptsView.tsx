@@ -193,7 +193,7 @@ export default function PromptsView({ initialPrompts }: PromptsViewProps) {
 
         {/* Creation/Edit Form */}
         {showForm && (
-          <Card className="mb-8 p-8 bg-white border border-client-border rounded-2xl shadow-clean">
+          <Card className="mb-8 p-8 bg-[#A6ADA7] border border-client-border rounded-2xl shadow-clean">
             <h2 className="text-[17px] font-display text-text-primary mb-6">
               {editingId ? 'Bewerk prompt' : 'Nieuwe prompt'}
             </h2>
@@ -210,7 +210,7 @@ export default function PromptsView({ initialPrompts }: PromptsViewProps) {
                     setFormData({ ...formData, title: e.target.value })
                   }
                   placeholder="Bijv. Wekelijkse reflectie"
-                  className="w-full px-4 py-3 rounded-xl border border-client-border bg-white text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-dark transition"
+                  className="w-full px-4 py-3 rounded-xl border border-client-border bg-[#A6ADA7] text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-dark transition"
                 />
               </div>
 
@@ -225,7 +225,7 @@ export default function PromptsView({ initialPrompts }: PromptsViewProps) {
                   }
                   placeholder="Stel je reflectie vraag..."
                   rows={4}
-                  className="w-full px-4 py-3 rounded-xl border border-client-border bg-white text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-dark transition resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-client-border bg-[#A6ADA7] text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-dark transition resize-none"
                 />
               </div>
 
@@ -239,7 +239,7 @@ export default function PromptsView({ initialPrompts }: PromptsViewProps) {
                     onChange={(e) =>
                       setFormData({ ...formData, send_day: e.target.value })
                     }
-                    className="w-full px-4 py-3 rounded-xl border border-client-border bg-white text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-dark transition"
+                    className="w-full px-4 py-3 rounded-xl border border-client-border bg-[#A6ADA7] text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-dark transition"
                   >
                     {DAYS.map((day, index) => (
                       <option key={index} value={index}>
@@ -259,7 +259,7 @@ export default function PromptsView({ initialPrompts }: PromptsViewProps) {
                     onChange={(e) =>
                       setFormData({ ...formData, send_time: e.target.value })
                     }
-                    className="w-full px-4 py-3 rounded-xl border border-client-border bg-white text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-dark transition"
+                    className="w-full px-4 py-3 rounded-xl border border-client-border bg-[#A6ADA7] text-text-primary focus:outline-none focus:ring-2 focus:ring-accent-dark transition"
                   />
                 </div>
               </div>
@@ -289,7 +289,7 @@ export default function PromptsView({ initialPrompts }: PromptsViewProps) {
                 <Button
                   type="button"
                   onClick={handleCancel}
-                  className="flex-1 px-5 py-3 rounded-xl bg-white border border-client-border text-text-primary font-medium transition-all hover:bg-client-surface-muted"
+                  className="flex-1 px-5 py-3 rounded-xl bg-[#A6ADA7] border border-client-border text-text-primary font-medium transition-all hover:bg-client-surface-muted"
                 >
                   Annuleren
                 </Button>
@@ -300,7 +300,7 @@ export default function PromptsView({ initialPrompts }: PromptsViewProps) {
 
         {/* Prompts List */}
         {prompts.length === 0 ? (
-          <Card className="text-center py-16 bg-white border border-client-border rounded-2xl shadow-clean">
+          <Card className="text-center py-16 bg-[#A6ADA7] border border-client-border rounded-2xl shadow-clean">
             <p className="text-[15px] mb-4 text-client-text-secondary">
               Je hebt nog geen reflectie prompts aangemaakt
             </p>
@@ -329,7 +329,7 @@ export default function PromptsView({ initialPrompts }: PromptsViewProps) {
             {prompts.map((prompt) => (
               <Card
                 key={prompt.id}
-                className="p-6 bg-white border border-client-border rounded-2xl transition-all hover:shadow-clean"
+                className="p-6 bg-[#A6ADA7] border border-client-border rounded-2xl transition-all hover:shadow-clean"
               >
                 <div className="flex items-start justify-between gap-4">
                   {/* Prompt Info */}

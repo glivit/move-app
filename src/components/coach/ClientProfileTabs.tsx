@@ -509,9 +509,9 @@ export function ClientProfileTabs({
   const Skeleton = ({ rows = 3 }: { rows?: number }) => (
     <div className="space-y-3">
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className="rounded-2xl p-4 animate-pulse bg-[#FAFAFA]">
-          <div className="h-4 rounded w-1/3 mb-3 bg-[#E8E4DC]" />
-          <div className="h-3 rounded w-2/3 bg-[#E8E4DC]" />
+        <div key={i} className="rounded-2xl p-4 animate-pulse bg-[#A6ADA7]">
+          <div className="h-4 rounded w-1/3 mb-3 bg-[#A6ADA7]" />
+          <div className="h-3 rounded w-2/3 bg-[#A6ADA7]" />
         </div>
       ))}
     </div>
@@ -520,7 +520,7 @@ export function ClientProfileTabs({
   return (
     <div>
       {/* Tab Navigation */}
-      <div className="border-b border-[#E8E4DC] overflow-x-auto">
+      <div className="border-b border-[#A6ADA7] overflow-x-auto">
         <div className="flex gap-0 min-w-max">
           {tabs.map((tab) => (
             <button
@@ -528,7 +528,7 @@ export function ClientProfileTabs({
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-3 text-[14px] font-medium border-b-2 transition-colors whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'border-[#1A1917] text-text-primary'
+                  ? 'border-[#FDFDFE] text-text-primary'
                   : 'border-transparent text-client-text-secondary hover:text-text-primary'
               }`}
             >
@@ -551,7 +551,7 @@ export function ClientProfileTabs({
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {latestCheckin.weight_kg && (
-                    <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
+                    <div className="bg-[#A6ADA7] rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7]">
                       <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Gewicht</p>
                       <p className="text-2xl font-bold text-text-primary mt-2">
                         {latestCheckin.weight_kg}<span className="text-[12px] text-client-text-secondary ml-1 font-normal">kg</span>
@@ -559,7 +559,7 @@ export function ClientProfileTabs({
                     </div>
                   )}
                   {latestCheckin.body_fat_pct && (
-                    <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
+                    <div className="bg-[#A6ADA7] rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7]">
                       <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Vetpercentage</p>
                       <p className="text-2xl font-bold text-text-primary mt-2">
                         {latestCheckin.body_fat_pct}<span className="text-[12px] text-client-text-secondary ml-1 font-normal">%</span>
@@ -567,7 +567,7 @@ export function ClientProfileTabs({
                     </div>
                   )}
                   {latestCheckin.muscle_mass_kg && (
-                    <div className="bg-white rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
+                    <div className="bg-[#A6ADA7] rounded-2xl p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7]">
                       <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Spiermassa</p>
                       <p className="text-2xl font-bold text-text-primary mt-2">
                         {latestCheckin.muscle_mass_kg}<span className="text-[12px] text-client-text-secondary ml-1 font-normal">kg</span>
@@ -577,19 +577,19 @@ export function ClientProfileTabs({
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
+              <div className="bg-[#A6ADA7] rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] text-center">
                 <p className="text-[14px] text-client-text-secondary">Nog geen check-in data beschikbaar.</p>
               </div>
             )}
 
             {intakeForm && intakeForm.completed && (
-              <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
+              <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7]">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-[15px] font-semibold text-text-primary">Intake informatie</h3>
                   <Link
                     href={`/coach/clients/${profile.id}/intake`}
                     className="text-[13px] font-medium flex items-center gap-1 hover:opacity-70 transition-opacity"
-                    style={{ color: '#1A1917' }}
+                    style={{ color: '#FDFDFE' }}
                   >
                     Volledig formulier
                     <ArrowUpRight className="w-3.5 h-3.5" strokeWidth={2} />
@@ -638,7 +638,7 @@ export function ClientProfileTabs({
               </div>
             )}
 
-            <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
+            <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7]">
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Dagen actief</p>
@@ -676,7 +676,7 @@ export function ClientProfileTabs({
                       <Link
                         key={session.id}
                         href={`/coach/clients/${profile.id}/workout/${session.id}`}
-                        className="flex items-center gap-3 p-3.5 bg-white rounded-2xl border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:bg-[#FAFAFA] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all"
+                        className="flex items-center gap-3 p-3.5 bg-[#A6ADA7] rounded-2xl border border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:bg-[#A6ADA7] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all"
                       >
                         <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
                           isCompleted ? 'bg-green-50' : 'bg-orange-50'
@@ -710,7 +710,7 @@ export function ClientProfileTabs({
                           {hasFeedback && !session.coach_seen && (
                             <div className="w-2 h-2 rounded-full bg-[var(--color-pop)]" title="Feedback niet bekeken" />
                           )}
-                          <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#C7C7CC]" />
+                          <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[#CDD1CE]" />
                         </div>
                       </Link>
                     )
@@ -729,23 +729,23 @@ export function ClientProfileTabs({
             ) : activeProgram ? (
               <>
                 {/* Active Program Header */}
-                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
+                <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7]">
                   <div className="flex items-start justify-between gap-4 mb-4">
                     <div>
                       <h3 className="text-[17px] font-semibold text-text-primary">{activeProgram.name}</h3>
                       <div className="flex items-center gap-2 mt-2 flex-wrap">
                         {activeProgram.template?.difficulty && (
-                          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-[#EDEAE4] text-[#1A1917]">
+                          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-[#A6ADA7] text-[#FDFDFE]">
                             {difficultyLabels[activeProgram.template.difficulty] || activeProgram.template.difficulty}
                           </span>
                         )}
                         {activeProgram.template?.duration_weeks && (
-                          <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#E8E4DC] text-[#8E8E93]">
+                          <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#A6ADA7] text-[#D6D9D6]">
                             {activeProgram.template.duration_weeks} weken
                           </span>
                         )}
                         {activeProgram.template?.days_per_week && (
-                          <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#E8E4DC] text-[#8E8E93]">
+                          <span className="text-[11px] font-medium px-2.5 py-1 rounded-full bg-[#A6ADA7] text-[#D6D9D6]">
                             {activeProgram.template.days_per_week} dagen/week
                           </span>
                         )}
@@ -753,7 +753,7 @@ export function ClientProfileTabs({
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide">Week</p>
-                      <p className="text-2xl font-bold text-[#1A1917]">
+                      <p className="text-2xl font-bold text-[#FDFDFE]">
                         {activeProgram.current_week}
                         <span className="text-[14px] font-normal text-client-text-secondary">
                           /{activeProgram.template?.duration_weeks || '—'}
@@ -763,7 +763,7 @@ export function ClientProfileTabs({
                   </div>
 
                   {/* Date Info */}
-                  <div className="flex items-center gap-4 text-[13px] text-client-text-secondary pt-3 border-t border-[#E8E4DC]">
+                  <div className="flex items-center gap-4 text-[13px] text-client-text-secondary pt-3 border-t border-[#A6ADA7]">
                     <div className="flex items-center gap-1.5">
                       <Calendar strokeWidth={1.5} className="w-3.5 h-3.5" />
                       <span>Start: {formatDate(activeProgram.start_date)}</span>
@@ -783,28 +783,28 @@ export function ClientProfileTabs({
                   )}
 
                   {/* Stop Program Button */}
-                  <div className="mt-4 pt-3 border-t border-[#E8E4DC]">
+                  <div className="mt-4 pt-3 border-t border-[#A6ADA7]">
                     {!showStopConfirm ? (
                       <button
                         onClick={() => setShowStopConfirm(true)}
-                        className="flex items-center gap-1.5 text-[12px] font-medium text-[#C4372A] hover:text-[#A02B1F] transition-colors"
+                        className="flex items-center gap-1.5 text-[12px] font-medium text-[#B55A4A] hover:text-[#A02B1F] transition-colors"
                       >
                         <StopCircle strokeWidth={1.5} className="w-3.5 h-3.5" />
                         Programma stoppen
                       </button>
                     ) : (
-                      <div className="bg-[#FFF5F5] rounded-xl p-3 border border-[#F5D5D5]">
-                        <p className="text-[13px] text-[#1A1917] font-medium mb-1">
+                      <div className="bg-[rgba(181,90,74,0.08)] rounded-xl p-3 border border-[#F5D5D5]">
+                        <p className="text-[13px] text-[#FDFDFE] font-medium mb-1">
                           Programma stoppen?
                         </p>
-                        <p className="text-[12px] text-[#6B6862] mb-3">
+                        <p className="text-[12px] text-[#E6E8E7] mb-3">
                           De trainingshistorie blijft bewaard. Je kunt altijd een nieuw programma toewijzen.
                         </p>
                         <div className="flex gap-2">
                           <button
                             onClick={handleStopProgram}
                             disabled={stoppingProgram}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold bg-[#C4372A] text-white rounded-lg hover:bg-[#A02B1F] disabled:opacity-50 transition-colors"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold bg-[#B55A4A] text-white rounded-lg hover:bg-[#A02B1F] disabled:opacity-50 transition-colors"
                           >
                             {stoppingProgram ? (
                               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -815,7 +815,7 @@ export function ClientProfileTabs({
                           </button>
                           <button
                             onClick={() => setShowStopConfirm(false)}
-                            className="px-3 py-1.5 text-[12px] font-medium text-[#6B6862] bg-white rounded-lg border border-[#E8E4DC] hover:bg-[#FAFAFA] transition-colors"
+                            className="px-3 py-1.5 text-[12px] font-medium text-[#E6E8E7] bg-[#A6ADA7] rounded-lg border border-[#A6ADA7] hover:bg-[#A6ADA7] transition-colors"
                           >
                             Annuleren
                           </button>
@@ -838,15 +838,15 @@ export function ClientProfileTabs({
                       return (
                         <div
                           key={day.id}
-                          className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden"
+                          className="bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] overflow-hidden"
                         >
                           <button
                             onClick={() => toggleDay(day.id)}
-                            className="w-full flex items-center justify-between p-4 hover:bg-[#FAFAFA] transition-colors"
+                            className="w-full flex items-center justify-between p-4 hover:bg-[#A6ADA7] transition-colors"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-[#EDEAE4] flex items-center justify-center flex-shrink-0">
-                                <Dumbbell strokeWidth={1.5} className="w-4 h-4 text-[#1A1917]" />
+                              <div className="w-8 h-8 rounded-lg bg-[#A6ADA7] flex items-center justify-center flex-shrink-0">
+                                <Dumbbell strokeWidth={1.5} className="w-4 h-4 text-[#FDFDFE]" />
                               </div>
                               <div className="text-left">
                                 <h5 className="text-[15px] font-semibold text-text-primary">{day.name}</h5>
@@ -859,18 +859,18 @@ export function ClientProfileTabs({
                             </div>
                             <ChevronDown
                               strokeWidth={1.5}
-                              className={`w-5 h-5 text-[#8E8E93] transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                              className={`w-5 h-5 text-[#D6D9D6] transition-transform ${isExpanded ? 'rotate-180' : ''}`}
                             />
                           </button>
 
                           {isExpanded && dayExercises.length > 0 && (
-                            <div className="px-4 pb-4 space-y-2 border-t border-[#E8E4DC]">
+                            <div className="px-4 pb-4 space-y-2 border-t border-[#A6ADA7]">
                               {dayExercises.map((ex, i) => (
                                 <div
                                   key={ex.id}
-                                  className="flex items-start gap-3 py-3 border-b border-[#E8E4DC] last:border-b-0"
+                                  className="flex items-start gap-3 py-3 border-b border-[#A6ADA7] last:border-b-0"
                                 >
-                                  <span className="text-[12px] font-semibold text-[#8E8E93] w-6 flex-shrink-0 pt-0.5">
+                                  <span className="text-[12px] font-semibold text-[#D6D9D6] w-6 flex-shrink-0 pt-0.5">
                                     {i + 1}.
                                   </span>
                                   <div className="flex-1 min-w-0">
@@ -894,13 +894,13 @@ export function ClientProfileTabs({
                     })}
                   </div>
                 ) : (
-                  <div className="bg-[#FAFAFA] rounded-2xl p-6 text-center">
+                  <div className="bg-[#A6ADA7] rounded-2xl p-6 text-center">
                     <p className="text-[14px] text-client-text-secondary">
                       Dit programma heeft nog geen trainingsschema. Voeg dagen en oefeningen toe via de programma-editor.
                     </p>
                     <Link
                       href={`/coach/programs/${activeProgram.template_id}`}
-                      className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-semibold text-[#1A1917] hover:underline"
+                      className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-semibold text-[#FDFDFE] hover:underline"
                     >
                       Template bewerken <ArrowUpRight strokeWidth={1.5} className="w-3.5 h-3.5" />
                     </Link>
@@ -918,14 +918,14 @@ export function ClientProfileTabs({
                         <button
                           key={t.id}
                           onClick={() => handleAssignTemplate(t)}
-                          className="text-[13px] px-3 py-1.5 rounded-xl bg-[#FAFAFA] border border-[#E8E4DC] text-text-primary hover:bg-[#EDEAE4] hover:border-[#ECEAE3] transition-colors"
+                          className="text-[13px] px-3 py-1.5 rounded-xl bg-[#A6ADA7] border border-[#A6ADA7] text-text-primary hover:bg-[#A6ADA7] hover:border-[#ECEAE3] transition-colors"
                         >
                           {t.name}
                         </button>
                       ))}
                     <Link
                       href="/coach/programs"
-                      className="text-[13px] px-3 py-1.5 rounded-xl text-[#1A1917] hover:underline inline-flex items-center gap-1"
+                      className="text-[13px] px-3 py-1.5 rounded-xl text-[#FDFDFE] hover:underline inline-flex items-center gap-1"
                     >
                       Alle programma's <ChevronRight strokeWidth={1.5} className="w-3.5 h-3.5" />
                     </Link>
@@ -935,8 +935,8 @@ export function ClientProfileTabs({
             ) : (
               /* No Active Program */
               <div className="space-y-5">
-                <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
-                  <Dumbbell strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#8E8E93] opacity-40" />
+                <div className="bg-[#A6ADA7] rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] text-center">
+                  <Dumbbell strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#D6D9D6] opacity-40" />
                   <h3 className="text-[17px] font-semibold text-text-primary mb-1">
                     Geen actief programma
                   </h3>
@@ -956,20 +956,20 @@ export function ClientProfileTabs({
                         <button
                           key={t.id}
                           onClick={() => handleAssignTemplate(t)}
-                          className="w-full flex items-center justify-between p-4 bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-shadow text-left"
+                          className="w-full flex items-center justify-between p-4 bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-shadow text-left"
                         >
                           <div>
                             <h5 className="text-[15px] font-semibold text-text-primary">{t.name}</h5>
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#EDEAE4] text-[#1A1917]">
+                              <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#A6ADA7] text-[#FDFDFE]">
                                 {t.duration_weeks}w · {t.days_per_week}d/w
                               </span>
-                              <span className="text-[11px] text-[#8E8E93]">
+                              <span className="text-[11px] text-[#D6D9D6]">
                                 {difficultyLabels[t.difficulty] || t.difficulty}
                               </span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-1.5 text-[13px] font-semibold text-[#1A1917] flex-shrink-0">
+                          <div className="flex items-center gap-1.5 text-[13px] font-semibold text-[#FDFDFE] flex-shrink-0">
                             Toewijzen
                             <Plus strokeWidth={1.5} className="w-4 h-4" />
                           </div>
@@ -978,7 +978,7 @@ export function ClientProfileTabs({
                     </div>
                     <Link
                       href="/coach/programs/new"
-                      className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-medium text-[#1A1917] hover:underline"
+                      className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-medium text-[#FDFDFE] hover:underline"
                     >
                       <Plus strokeWidth={1.5} className="w-3.5 h-3.5" />
                       Nieuw programma aanmaken
@@ -998,35 +998,35 @@ export function ClientProfileTabs({
             ) : nutritionPlan ? (
               <>
                 {/* Macro Summary */}
-                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
+                <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7]">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-[15px] font-semibold text-text-primary">{nutritionPlan.title}</h3>
                     <Link
                       href={`/coach/clients/${profile.id}/nutrition`}
-                      className="text-[12px] font-medium text-[#1A1917] hover:underline inline-flex items-center gap-1"
+                      className="text-[12px] font-medium text-[#FDFDFE] hover:underline inline-flex items-center gap-1"
                     >
                       Bewerken <ExternalLink strokeWidth={1.5} className="w-3 h-3" />
                     </Link>
                   </div>
 
                   {/* Calorie Target */}
-                  <div className="bg-[#EDEAE4] rounded-xl p-4 mb-4 text-center">
-                    <p className="text-[12px] text-[#1A1917] uppercase font-medium tracking-wide">Dagelijks doel</p>
-                    <p className="text-3xl font-bold text-[#1A1917] mt-1">{nutritionPlan.calories_target}</p>
-                    <p className="text-[12px] text-[#1A1917]">calorieën</p>
+                  <div className="bg-[#A6ADA7] rounded-xl p-4 mb-4 text-center">
+                    <p className="text-[12px] text-[#FDFDFE] uppercase font-medium tracking-wide">Dagelijks doel</p>
+                    <p className="text-3xl font-bold text-[#FDFDFE] mt-1">{nutritionPlan.calories_target}</p>
+                    <p className="text-[12px] text-[#FDFDFE]">calorieën</p>
                   </div>
 
                   {/* Macros Grid */}
                   <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-[#FAFAFA] rounded-xl p-3 text-center">
+                    <div className="bg-[#A6ADA7] rounded-xl p-3 text-center">
                       <p className="text-[11px] text-client-text-secondary uppercase font-medium">Eiwitten</p>
                       <p className="text-xl font-bold text-text-primary mt-1">{nutritionPlan.protein_g}<span className="text-[11px] font-normal">g</span></p>
                     </div>
-                    <div className="bg-[#FAFAFA] rounded-xl p-3 text-center">
+                    <div className="bg-[#A6ADA7] rounded-xl p-3 text-center">
                       <p className="text-[11px] text-client-text-secondary uppercase font-medium">Koolhydraten</p>
                       <p className="text-xl font-bold text-text-primary mt-1">{nutritionPlan.carbs_g}<span className="text-[11px] font-normal">g</span></p>
                     </div>
-                    <div className="bg-[#FAFAFA] rounded-xl p-3 text-center">
+                    <div className="bg-[#A6ADA7] rounded-xl p-3 text-center">
                       <p className="text-[11px] text-client-text-secondary uppercase font-medium">Vetten</p>
                       <p className="text-xl font-bold text-text-primary mt-1">{nutritionPlan.fat_g}<span className="text-[11px] font-normal">g</span></p>
                     </div>
@@ -1043,10 +1043,10 @@ export function ClientProfileTabs({
                       {nutritionPlan.meals.map((meal: any, i: number) => (
                         <div
                           key={meal.id || i}
-                          className="flex items-center gap-3 p-3 bg-white rounded-xl border border-[#E8E4DC]"
+                          className="flex items-center gap-3 p-3 bg-[#A6ADA7] rounded-xl border border-[#A6ADA7]"
                         >
-                          <div className="w-8 h-8 rounded-lg bg-[#EDEAE4] flex items-center justify-center flex-shrink-0">
-                            <Apple strokeWidth={1.5} className="w-4 h-4 text-[#1A1917]" />
+                          <div className="w-8 h-8 rounded-lg bg-[#A6ADA7] flex items-center justify-center flex-shrink-0">
+                            <Apple strokeWidth={1.5} className="w-4 h-4 text-[#FDFDFE]" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-[14px] font-medium text-text-primary">{meal.name}</p>
@@ -1066,22 +1066,22 @@ export function ClientProfileTabs({
                 )}
 
                 {nutritionPlan.guidelines && (
-                  <div className="bg-[#FAFAFA] rounded-2xl p-4">
+                  <div className="bg-[#A6ADA7] rounded-2xl p-4">
                     <p className="text-[12px] text-client-text-secondary uppercase font-medium tracking-wide mb-2">Richtlijnen</p>
                     <p className="text-[14px] text-text-primary whitespace-pre-line">{nutritionPlan.guidelines}</p>
                   </div>
                 )}
               </>
             ) : (
-              <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
-                <Apple strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#8E8E93] opacity-40" />
+              <div className="bg-[#A6ADA7] rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] text-center">
+                <Apple strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#D6D9D6] opacity-40" />
                 <h3 className="text-[17px] font-semibold text-text-primary mb-1">Geen voedingsplan</h3>
                 <p className="text-[14px] text-client-text-secondary mb-4">
                   Stel een voedingsplan op voor {profile.full_name?.split(' ')[0] || 'deze cliënt'}
                 </p>
                 <Link
                   href={`/coach/clients/${profile.id}/nutrition`}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1A1917] text-white rounded-xl text-[14px] font-semibold hover:bg-[#6F5612] transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#474B48] text-white rounded-xl text-[14px] font-semibold hover:bg-[#3A3E3B] transition-colors"
                 >
                   Voedingsplan aanmaken
                   <Plus strokeWidth={1.5} className="w-4 h-4" />
@@ -1094,7 +1094,7 @@ export function ClientProfileTabs({
               <div className="flex gap-3">
                 <Link
                   href={`/coach/clients/${profile.id}/nutrition`}
-                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#1A1917] hover:underline"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#FDFDFE] hover:underline"
                 >
                   Volledig voedingsplan bewerken <ArrowUpRight strokeWidth={1.5} className="w-3.5 h-3.5" />
                 </Link>
@@ -1125,7 +1125,7 @@ export function ClientProfileTabs({
                     : null
 
                   return (
-                    <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
+                    <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7]">
                       <h3 className="text-[13px] text-client-text-secondary uppercase font-medium tracking-wide mb-4">
                         Evolutie ({progressCheckins.length} metingen)
                       </h3>
@@ -1176,8 +1176,8 @@ export function ClientProfileTabs({
 
                 {/* Workout History */}
                 {workoutSessions.length > 0 && (
-                  <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden">
-                    <div className="p-4 border-b border-[#E8E4DC] flex items-center justify-between">
+                  <div className="bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] overflow-hidden">
+                    <div className="p-4 border-b border-[#A6ADA7] flex items-center justify-between">
                       <h4 className="text-[13px] text-client-text-secondary uppercase font-medium tracking-wide">
                         Trainingsgeschiedenis
                       </h4>
@@ -1185,13 +1185,13 @@ export function ClientProfileTabs({
                         {workoutSessions.filter(w => w.completed_at).length} afgerond
                       </span>
                     </div>
-                    <div className="divide-y divide-[#E8E4DC]">
+                    <div className="divide-y divide-[#A6ADA7]">
                       {workoutSessions.slice(0, 10).map((session) => {
                         const isCompleted = !!session.completed_at
                         const sessionDate = new Date(session.started_at)
 
                         return (
-                          <Link key={session.id} href={`/coach/clients/${profile.id}/workout/${session.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-[#FAFAFA] transition-colors">
+                          <Link key={session.id} href={`/coach/clients/${profile.id}/workout/${session.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-[#A6ADA7] transition-colors">
                             <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isCompleted ? 'bg-green-500' : 'bg-orange-400'}`} />
                             <div className="flex-1 min-w-0">
                               <p className="text-[13px] font-medium text-text-primary truncate">
@@ -1211,7 +1211,7 @@ export function ClientProfileTabs({
                               <span className="w-16 text-right">
                                 {sessionDate.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                               </span>
-                              <ChevronRight strokeWidth={1.5} className="w-3.5 h-3.5 text-[#C7C7CC]" />
+                              <ChevronRight strokeWidth={1.5} className="w-3.5 h-3.5 text-[#CDD1CE]" />
                             </div>
                           </Link>
                         )
@@ -1221,8 +1221,8 @@ export function ClientProfileTabs({
                 )}
 
                 {/* Check-in History Table */}
-                <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden">
-                  <div className="p-4 border-b border-[#E8E4DC]">
+                <div className="bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] overflow-hidden">
+                  <div className="p-4 border-b border-[#A6ADA7]">
                     <h4 className="text-[13px] text-client-text-secondary uppercase font-medium tracking-wide">
                       Meetgeschiedenis
                     </h4>
@@ -1230,7 +1230,7 @@ export function ClientProfileTabs({
                   <div className="overflow-x-auto">
                     <table className="w-full text-[13px]">
                       <thead>
-                        <tr className="bg-[#FAFAFA]">
+                        <tr className="bg-[#A6ADA7]">
                           <th className="text-left px-4 py-2.5 font-medium text-client-text-secondary">Datum</th>
                           <th className="text-right px-4 py-2.5 font-medium text-client-text-secondary">Gewicht</th>
                           <th className="text-right px-4 py-2.5 font-medium text-client-text-secondary">Vet%</th>
@@ -1240,7 +1240,7 @@ export function ClientProfileTabs({
                       </thead>
                       <tbody>
                         {[...progressCheckins].reverse().map((c, i) => (
-                          <tr key={c.id} className={i % 2 === 0 ? '' : 'bg-[#FAFAFA]'}>
+                          <tr key={c.id} className={i % 2 === 0 ? '' : 'bg-[#A6ADA7]'}>
                             <td className="px-4 py-2.5 text-text-primary font-medium">
                               {new Date(c.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                             </td>
@@ -1257,7 +1257,7 @@ export function ClientProfileTabs({
 
                 <Link
                   href={`/coach/clients/${profile.id}/progress`}
-                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#1A1917] hover:underline"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#FDFDFE] hover:underline"
                 >
                   Uitgebreide grafieken en PR&apos;s bekijken <ArrowUpRight strokeWidth={1.5} className="w-3.5 h-3.5" />
                 </Link>
@@ -1266,8 +1266,8 @@ export function ClientProfileTabs({
               <div className="space-y-4">
                 {/* Show workouts even without check-ins */}
                 {workoutSessions.length > 0 && (
-                  <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden">
-                    <div className="p-4 border-b border-[#E8E4DC] flex items-center justify-between">
+                  <div className="bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] overflow-hidden">
+                    <div className="p-4 border-b border-[#A6ADA7] flex items-center justify-between">
                       <h4 className="text-[13px] text-client-text-secondary uppercase font-medium tracking-wide">
                         Trainingsgeschiedenis
                       </h4>
@@ -1275,7 +1275,7 @@ export function ClientProfileTabs({
                         {workoutSessions.filter(w => w.completed_at).length} afgerond
                       </span>
                     </div>
-                    <div className="divide-y divide-[#E8E4DC]">
+                    <div className="divide-y divide-[#A6ADA7]">
                       {workoutSessions.slice(0, 10).map((session) => {
                         const isCompleted = !!session.completed_at
                         const sessionDate = new Date(session.started_at)
@@ -1303,8 +1303,8 @@ export function ClientProfileTabs({
                 )}
 
                 {workoutSessions.length === 0 && (
-                  <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
-                    <TrendingUp strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#8E8E93] opacity-40" />
+                  <div className="bg-[#A6ADA7] rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] text-center">
+                    <TrendingUp strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#D6D9D6] opacity-40" />
                     <h3 className="text-[17px] font-semibold text-text-primary mb-1">Nog geen voortgangsdata</h3>
                     <p className="text-[14px] text-client-text-secondary">
                       Data verschijnt hier zodra er trainingen of check-ins zijn ingediend.
@@ -1329,7 +1329,7 @@ export function ClientProfileTabs({
                     <Link
                       key={checkin.id}
                       href={`/coach/check-ins/${checkin.id}`}
-                      className="block p-4 rounded-2xl border border-[#E8E4DC] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:bg-[#FAFAFA] transition-colors"
+                      className="block p-4 rounded-2xl border border-[#A6ADA7] bg-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:bg-[#A6ADA7] transition-colors"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
@@ -1342,14 +1342,14 @@ export function ClientProfileTabs({
                           </div>
                         </div>
                         {isReviewed ? (
-                          <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#34C759]/10">
-                            <CheckCircle2 strokeWidth={1.5} className="w-4 h-4 text-[#34C759]" />
-                            <span className="text-[12px] font-medium text-[#34C759]">Bekeken</span>
+                          <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#2FA65A]/10">
+                            <CheckCircle2 strokeWidth={1.5} className="w-4 h-4 text-[#2FA65A]" />
+                            <span className="text-[12px] font-medium text-[#2FA65A]">Bekeken</span>
                           </div>
                         ) : (
-                          <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#FF9500]/10">
-                            <Clock strokeWidth={1.5} className="w-4 h-4 text-[#FF9500]" />
-                            <span className="text-[12px] font-medium text-[#FF9500]">Te reviewen</span>
+                          <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#E8B948]/10">
+                            <Clock strokeWidth={1.5} className="w-4 h-4 text-[#E8B948]" />
+                            <span className="text-[12px] font-medium text-[#E8B948]">Te reviewen</span>
                           </div>
                         )}
                       </div>
@@ -1358,7 +1358,7 @@ export function ClientProfileTabs({
                 })}
               </div>
             ) : (
-              <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
+              <div className="bg-[#A6ADA7] rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] text-center">
                 <p className="text-[14px] text-client-text-secondary">Geen check-ins beschikbaar.</p>
               </div>
             )}
@@ -1373,11 +1373,11 @@ export function ClientProfileTabs({
             ) : (
               <>
                 {/* Messages Container */}
-                <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] overflow-hidden">
+                <div className="bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] overflow-hidden">
                   <div className="max-h-[400px] overflow-y-auto p-4 space-y-3">
                     {messages.length === 0 ? (
                       <div className="text-center py-8">
-                        <MessageSquare strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#8E8E93] opacity-40" />
+                        <MessageSquare strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#D6D9D6] opacity-40" />
                         <p className="text-[14px] text-client-text-secondary">Nog geen berichten</p>
                       </div>
                     ) : (
@@ -1391,8 +1391,8 @@ export function ClientProfileTabs({
                             <div
                               className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
                                 isCoach
-                                  ? 'bg-[#1A1917] text-white'
-                                  : 'bg-[#E8E4DC] text-text-primary'
+                                  ? 'bg-[#474B48] text-white'
+                                  : 'bg-[#A6ADA7] text-text-primary'
                               }`}
                             >
                               <p className="text-[14px] whitespace-pre-wrap">{msg.content}</p>
@@ -1408,7 +1408,7 @@ export function ClientProfileTabs({
                   </div>
 
                   {/* Message Input */}
-                  <div className="p-3 border-t border-[#E8E4DC] flex items-center gap-2">
+                  <div className="p-3 border-t border-[#A6ADA7] flex items-center gap-2">
                     <input
                       type="text"
                       value={newMessage}
@@ -1420,12 +1420,12 @@ export function ClientProfileTabs({
                         }
                       }}
                       placeholder="Typ een bericht..."
-                      className="flex-1 px-4 py-2.5 bg-[#FAFAFA] border border-[#E8E4DC] rounded-xl text-[14px] text-text-primary placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                      className="flex-1 px-4 py-2.5 bg-[#A6ADA7] border border-[#A6ADA7] rounded-xl text-[14px] text-text-primary placeholder:text-[#D6D9D6] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
                     />
                     <button
                       onClick={handleSendMessage}
                       disabled={sendingMessage || !newMessage.trim()}
-                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#1A1917] text-white hover:bg-[#6F5612] transition-colors disabled:opacity-40"
+                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#474B48] text-white hover:bg-[#3A3E3B] transition-colors disabled:opacity-40"
                     >
                       <Send strokeWidth={1.5} className="w-4 h-4" />
                     </button>

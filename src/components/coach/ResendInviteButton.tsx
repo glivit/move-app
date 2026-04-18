@@ -46,8 +46,8 @@ export function ResendInviteButton({ clientId, clientName }: ResendInviteButtonP
       disabled={status === 'loading'}
       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg transition-all duration-200 disabled:opacity-50"
       style={{
-        backgroundColor: status === 'success' ? '#3D8B5C' : status === 'error' ? '#D14343' : '#F5F5F5',
-        color: status === 'success' || status === 'error' ? '#fff' : '#1A1A18',
+        backgroundColor: status === 'success' ? '#2FA65A' : status === 'error' ? '#B55A4A' : '#F5F5F5',
+        color: status === 'success' || status === 'error' ? '#fff' : '#FDFDFE',
       }}
       title={`Uitnodiging opnieuw versturen naar ${clientName}`}
     >

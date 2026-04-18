@@ -34,7 +34,7 @@ export function ProgressLineChart({
   data,
   dataKey,
   name,
-  color = '#34C759',
+  color = '#2FA65A',
   height = 300,
   xAxisKey = 'dateShort',
   yAxisConfig,
@@ -45,10 +45,10 @@ export function ProgressLineChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <LineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DC" />
-        <XAxis dataKey={xAxisKey} tick={{ fontSize: 12, fill: '#C7C7CC' }} />
-        <YAxis tick={{ fontSize: 12, fill: '#C7C7CC' }} {...yAxisConfig} />
-        <Tooltip contentStyle={tooltip || { backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#A6ADA7" />
+        <XAxis dataKey={xAxisKey} tick={{ fontSize: 12, fill: '#CDD1CE' }} />
+        <YAxis tick={{ fontSize: 12, fill: '#CDD1CE' }} {...yAxisConfig} />
+        <Tooltip contentStyle={tooltip || { backgroundColor: 'white', border: '1px solid #A6ADA7', borderRadius: '0.75rem' }} />
         <Line
           type="monotone"
           dataKey={dataKey}
@@ -68,7 +68,7 @@ export function ProgressBarChart({
   data,
   dataKey,
   name,
-  color = '#34C759',
+  color = '#2FA65A',
   height = 300,
   xAxisKey = 'dateShort',
   yAxisConfig
@@ -76,10 +76,10 @@ export function ProgressBarChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#E8E4DC" />
-        <XAxis dataKey={xAxisKey} tick={{ fontSize: 12, fill: '#C7C7CC' }} />
-        <YAxis tick={{ fontSize: 12, fill: '#C7C7CC' }} {...yAxisConfig} />
-        <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#A6ADA7" />
+        <XAxis dataKey={xAxisKey} tick={{ fontSize: 12, fill: '#CDD1CE' }} />
+        <YAxis tick={{ fontSize: 12, fill: '#CDD1CE' }} {...yAxisConfig} />
+        <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #A6ADA7', borderRadius: '0.75rem' }} />
         <Bar dataKey={dataKey} fill={color} radius={[8, 8, 0, 0]} name={name} />
       </BarChart>
     </ResponsiveContainer>

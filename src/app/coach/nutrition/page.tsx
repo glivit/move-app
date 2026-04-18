@@ -298,31 +298,31 @@ export default function NutritionOverviewPage() {
       <div className="min-h-screen bg-client-bg">
         {/* Header */}
         <div className="mb-8 animate-pulse">
-          <div className="h-9 w-32 bg-[#E5E1D9] rounded-xl mb-2" />
-          <div className="h-4 w-56 bg-[#E5E1D9] rounded" />
+          <div className="h-9 w-32 bg-[#A6ADA7] rounded-xl mb-2" />
+          <div className="h-4 w-56 bg-[#A6ADA7] rounded" />
         </div>
         {/* Action bar */}
         <div className="flex items-center justify-between mb-6 animate-pulse">
-          <div className="h-10 w-64 bg-white rounded-xl border border-client-border" />
-          <div className="h-10 w-36 bg-[#E5E1D9] rounded-xl" />
+          <div className="h-10 w-64 bg-[#A6ADA7] rounded-xl border border-client-border" />
+          <div className="h-10 w-36 bg-[#A6ADA7] rounded-xl" />
         </div>
         {/* Client cards */}
         <div className="space-y-4">
           {[1, 2, 3, 4, 5].map(i => (
-            <div key={i} className="bg-white rounded-2xl p-5 border border-client-border shadow-clean animate-pulse">
+            <div key={i} className="bg-[#A6ADA7] rounded-2xl p-5 border border-client-border shadow-clean animate-pulse">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#E5E1D9]" />
+                  <div className="w-10 h-10 rounded-full bg-[#A6ADA7]" />
                   <div>
-                    <div className="h-4 w-32 bg-[#E5E1D9] rounded mb-1" />
-                    <div className="h-3 w-20 bg-[#E5E1D9] rounded" />
+                    <div className="h-4 w-32 bg-[#A6ADA7] rounded mb-1" />
+                    <div className="h-3 w-20 bg-[#A6ADA7] rounded" />
                   </div>
                 </div>
                 <div className="flex gap-6">
                   {[1, 2, 3].map(j => (
                     <div key={j} className="text-center">
-                      <div className="h-5 w-10 bg-[#E5E1D9] rounded mx-auto mb-1" />
-                      <div className="h-2.5 w-8 bg-[#E5E1D9] rounded mx-auto" />
+                      <div className="h-5 w-10 bg-[#A6ADA7] rounded mx-auto mb-1" />
+                      <div className="h-2.5 w-8 bg-[#A6ADA7] rounded mx-auto" />
                     </div>
                   ))}
                 </div>
@@ -335,21 +335,21 @@ export default function NutritionOverviewPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FAFAFA' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#A6ADA7' }}>
       <div className="max-w-4xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-[32px] font-[family-name:var(--font-display)] text-[#1A1A18] mb-2">
+            <h1 className="text-[32px] font-[family-name:var(--font-display)] text-[#FDFDFE] mb-2">
               Voeding
             </h1>
-            <p className="text-[13px] text-[#8E8E93]">
+            <p className="text-[13px] text-[#D6D9D6]">
               Voedingsplannen en dagelijkse compliance van je cliënten
             </p>
           </div>
           <Link
             href="/coach/nutrition/new"
-            className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium text-[14px] transition-all hover:opacity-90 text-white bg-[#1A1A18]"
+            className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium text-[14px] transition-all hover:opacity-90 text-white bg-[#474B48]"
           >
             <Plus size={18} strokeWidth={1.5} />
             Nieuw plan
@@ -358,21 +358,21 @@ export default function NutritionOverviewPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
-            <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide">Cliënten</p>
-            <p className="text-2xl font-bold text-[#1A1A18] mt-2">{clients.length}</p>
+          <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7]">
+            <p className="text-[12px] text-[#D6D9D6] uppercase font-medium tracking-wide">Cliënten</p>
+            <p className="text-2xl font-bold text-[#FDFDFE] mt-2">{clients.length}</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
-            <p className="text-[12px] text-[#34C759] uppercase font-medium tracking-wide">Met plan</p>
-            <p className="text-2xl font-bold text-[#1A1A18] mt-2">{withPlanCount}</p>
+          <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7]">
+            <p className="text-[12px] text-[#2FA65A] uppercase font-medium tracking-wide">Met plan</p>
+            <p className="text-2xl font-bold text-[#FDFDFE] mt-2">{withPlanCount}</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
-            <p className="text-[12px] text-[#FF9500] uppercase font-medium tracking-wide">Te bekijken</p>
-            <p className="text-2xl font-bold text-[#1A1A18] mt-2">{needsReviewCount}</p>
+          <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7]">
+            <p className="text-[12px] text-[#E8B948] uppercase font-medium tracking-wide">Te bekijken</p>
+            <p className="text-2xl font-bold text-[#FDFDFE] mt-2">{needsReviewCount}</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
-            <p className="text-[12px] text-[#007AFF] uppercase font-medium tracking-wide">Gem. compliance</p>
-            <p className="text-2xl font-bold text-[#1A1A18] mt-2">
+          <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7]">
+            <p className="text-[12px] text-[#5A7FB5] uppercase font-medium tracking-wide">Gem. compliance</p>
+            <p className="text-2xl font-bold text-[#FDFDFE] mt-2">
               {avgCompliance !== null ? `${avgCompliance}%` : '—'}
             </p>
           </div>
@@ -399,12 +399,12 @@ export default function NutritionOverviewPage() {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <BookOpen strokeWidth={1.5} className="w-4 h-4 text-[#1A1917]" />
-                <h2 className="text-[15px] font-semibold text-[#1A1A18]">Voedingsplan templates</h2>
+                <BookOpen strokeWidth={1.5} className="w-4 h-4 text-[#FDFDFE]" />
+                <h2 className="text-[15px] font-semibold text-[#FDFDFE]">Voedingsplan templates</h2>
               </div>
               <Link
                 href="/coach/nutrition/new"
-                className="text-[12px] font-semibold text-[#1A1917] hover:underline"
+                className="text-[12px] font-semibold text-[#FDFDFE] hover:underline"
               >
                 + Nieuwe template
               </Link>
@@ -416,26 +416,26 @@ export default function NutritionOverviewPage() {
                 return (
                   <div
                     key={template.id}
-                    className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-5"
+                    className="bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] p-5"
                   >
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div>
-                        <h3 className="text-[15px] font-semibold text-[#1A1A18]">{template.title}</h3>
-                        <p className="text-[13px] text-[#8E8E93] mt-1">
+                        <h3 className="text-[15px] font-semibold text-[#FDFDFE]">{template.title}</h3>
+                        <p className="text-[13px] text-[#D6D9D6] mt-1">
                           {template.calories_target} kcal · {template.protein_g}g eiwit · {template.carbs_g}g koolh · {template.fat_g}g vet
                         </p>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
                         <Link
                           href={`/coach/nutrition/${template.id}/edit`}
-                          className="flex items-center gap-1.5 px-3 py-1.5 border border-[#E8E4DC] text-[#1A1917] text-[12px] font-semibold rounded-full hover:bg-[#F5F2EC] transition-colors"
+                          className="flex items-center gap-1.5 px-3 py-1.5 border border-[#A6ADA7] text-[#FDFDFE] text-[12px] font-semibold rounded-full hover:bg-[#A6ADA7] transition-colors"
                         >
                           <Pencil strokeWidth={1.5} className="w-3.5 h-3.5" />
                           Bewerken
                         </Link>
                         <button
                           onClick={() => setShowAssignModal(template.id)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1A1917] text-white text-[12px] font-semibold rounded-full hover:bg-[#7A5C12] transition-colors"
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-[#474B48] text-white text-[12px] font-semibold rounded-full hover:bg-[#7A5C12] transition-colors"
                         >
                           <Copy strokeWidth={1.5} className="w-3.5 h-3.5" />
                           Toewijzen
@@ -445,7 +445,7 @@ export default function NutritionOverviewPage() {
                     {meals.length > 0 && (
                       <div className="flex flex-wrap gap-1.5">
                         {meals.map((meal: any, i: number) => (
-                          <span key={i} className="text-[11px] bg-[#EDEAE4] text-[#1A1917] px-2 py-0.5 rounded-full">
+                          <span key={i} className="text-[11px] bg-[#A6ADA7] text-[#FDFDFE] px-2 py-0.5 rounded-full">
                             {meal.name}
                           </span>
                         ))}
@@ -456,13 +456,13 @@ export default function NutritionOverviewPage() {
               })}
             </div>
         ) : (
-            <div className="bg-white rounded-2xl p-8 border border-dashed border-[#C7C7CC] text-center">
-              <BookOpen strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#C7C7CC]" />
-              <p className="text-[14px] font-medium text-[#8E8E93] mb-2">Nog geen templates</p>
-              <p className="text-[12px] text-[#C7C7CC] mb-4">Maak een voedingsplan template aan om snel toe te wijzen aan cliënten</p>
+            <div className="bg-[#A6ADA7] rounded-2xl p-8 border border-dashed border-[#CDD1CE] text-center">
+              <BookOpen strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#CDD1CE]" />
+              <p className="text-[14px] font-medium text-[#D6D9D6] mb-2">Nog geen templates</p>
+              <p className="text-[12px] text-[#CDD1CE] mb-4">Maak een voedingsplan template aan om snel toe te wijzen aan cliënten</p>
               <Link
                 href="/coach/nutrition/new"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold bg-[#1A1917] text-white hover:bg-[#7A5C12] transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-semibold bg-[#474B48] text-white hover:bg-[#7A5C12] transition-colors"
               >
                 <Plus size={16} /> Eerste template maken
               </Link>
@@ -474,35 +474,35 @@ export default function NutritionOverviewPage() {
         {prebuiltTemplates.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-3">
-              <Zap strokeWidth={1.5} className="w-4 h-4 text-[#D46A3A]" />
-              <h2 className="text-[15px] font-semibold text-[#1A1A18]">Standaard templates</h2>
-              <span className="text-[12px] text-[#8E8E93] ml-1">High protein</span>
+              <Zap strokeWidth={1.5} className="w-4 h-4 text-[#C0FC01]" />
+              <h2 className="text-[15px] font-semibold text-[#FDFDFE]">Standaard templates</h2>
+              <span className="text-[12px] text-[#D6D9D6] ml-1">High protein</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {prebuiltTemplates.map((tpl) => (
                 <div
                   key={tpl.id}
-                  className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-5"
+                  className="bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] p-5"
                 >
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-[15px] font-semibold text-[#1A1A18]">{tpl.title}</h3>
-                      <p className="text-[12px] text-[#8E8E93] mt-1">{tpl.description}</p>
+                      <h3 className="text-[15px] font-semibold text-[#FDFDFE]">{tpl.title}</h3>
+                      <p className="text-[12px] text-[#D6D9D6] mt-1">{tpl.description}</p>
                     </div>
                     <button
                       onClick={() => setShowPrebuiltAssign(tpl.id)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1A1917] text-white text-[12px] font-semibold rounded-full hover:bg-[#7A5C12] transition-colors shrink-0"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#474B48] text-white text-[12px] font-semibold rounded-full hover:bg-[#7A5C12] transition-colors shrink-0"
                     >
                       <Copy strokeWidth={1.5} className="w-3.5 h-3.5" />
                       Toewijzen
                     </button>
                   </div>
-                  <p className="text-[13px] text-[#8E8E93] mb-2">
+                  <p className="text-[13px] text-[#D6D9D6] mb-2">
                     {tpl.calories_target} kcal · {tpl.protein_g}g eiwit · {tpl.carbs_g}g koolh · {tpl.fat_g}g vet
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {tpl.tags.map((tag) => (
-                      <span key={tag} className="text-[11px] bg-[#EDEAE4] text-[#1A1917] px-2 py-0.5 rounded-full">
+                      <span key={tag} className="text-[11px] bg-[#A6ADA7] text-[#FDFDFE] px-2 py-0.5 rounded-full">
                         {tag}
                       </span>
                     ))}
@@ -516,10 +516,10 @@ export default function NutritionOverviewPage() {
         {/* Assign Prebuilt Template Modal */}
         {showPrebuiltAssign && (
           <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowPrebuiltAssign(null)}>
-            <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
-              <div className="p-5 border-b border-[#E8E4DC]">
-                <h3 className="text-[17px] font-semibold text-[#1A1A18]">Template toewijzen</h3>
-                <p className="text-[13px] text-[#8E8E93] mt-1">
+            <div className="bg-[#A6ADA7] rounded-2xl shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              <div className="p-5 border-b border-[#A6ADA7]">
+                <h3 className="text-[17px] font-semibold text-[#FDFDFE]">Template toewijzen</h3>
+                <p className="text-[13px] text-[#D6D9D6] mt-1">
                   {prebuiltTemplates.find(t => t.id === showPrebuiltAssign)?.title} — kies een cliënt
                 </p>
               </div>
@@ -532,34 +532,34 @@ export default function NutritionOverviewPage() {
                     key={client.id}
                     onClick={() => assignPrebuiltToClient(showPrebuiltAssign, client.id)}
                     disabled={assigning}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#FAFAFA] transition-colors text-left disabled:opacity-50"
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#A6ADA7] transition-colors text-left disabled:opacity-50"
                   >
                     <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold flex-shrink-0"
-                      style={{ backgroundColor: '#F5F5F3', color: '#1A1917' }}
+                      style={{ backgroundColor: '#A6ADA7', color: '#FDFDFE' }}
                     >
                       {client.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[15px] text-[#1A1A18] font-medium truncate">{client.full_name}</p>
-                      <p className="text-[12px] text-[#8E8E93]">
+                      <p className="text-[15px] text-[#FDFDFE] font-medium truncate">{client.full_name}</p>
+                      <p className="text-[12px] text-[#D6D9D6]">
                         {client.nutrition_plan ? `Huidig: ${client.nutrition_plan.title}` : 'Geen plan'}
                       </p>
                     </div>
                     {assigning ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-[#1A1917]" />
+                      <Loader2 className="w-4 h-4 animate-spin text-[#FDFDFE]" />
                     ) : (
-                      <Copy strokeWidth={1.5} className="w-4 h-4 text-[#C7C7CC]" />
+                      <Copy strokeWidth={1.5} className="w-4 h-4 text-[#CDD1CE]" />
                     )}
                   </button>
                 ))}
                 {clients.length === 0 && (
-                  <p className="text-center text-[14px] text-[#8E8E93] py-8">Nog geen cliënten</p>
+                  <p className="text-center text-[14px] text-[#D6D9D6] py-8">Nog geen cliënten</p>
                 )}
               </div>
-              <div className="p-3 border-t border-[#E8E4DC]">
+              <div className="p-3 border-t border-[#A6ADA7]">
                 <button
                   onClick={() => setShowPrebuiltAssign(null)}
-                  className="w-full py-2.5 text-[14px] font-medium text-[#8E8E93] hover:text-[#1A1A18] transition-colors"
+                  className="w-full py-2.5 text-[14px] font-medium text-[#D6D9D6] hover:text-[#FDFDFE] transition-colors"
                 >
                   Annuleren
                 </button>
@@ -571,10 +571,10 @@ export default function NutritionOverviewPage() {
         {/* Assign Template Modal */}
         {showAssignModal && (
           <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowAssignModal(null)}>
-            <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
-              <div className="p-5 border-b border-[#E8E4DC]">
-                <h3 className="text-[17px] font-semibold text-[#1A1A18]">Voedingsplan toewijzen</h3>
-                <p className="text-[13px] text-[#8E8E93] mt-1">Kies een cliënt om dit plan aan toe te wijzen</p>
+            <div className="bg-[#A6ADA7] rounded-2xl shadow-xl max-w-md w-full max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              <div className="p-5 border-b border-[#A6ADA7]">
+                <h3 className="text-[17px] font-semibold text-[#FDFDFE]">Voedingsplan toewijzen</h3>
+                <p className="text-[13px] text-[#D6D9D6] mt-1">Kies een cliënt om dit plan aan toe te wijzen</p>
               </div>
               <div className="p-3 max-h-[60vh] overflow-y-auto">
                 {clients.map((client) => (
@@ -582,34 +582,34 @@ export default function NutritionOverviewPage() {
                     key={client.id}
                     onClick={() => assignTemplateToClient(showAssignModal, client.id)}
                     disabled={assigning}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#FAFAFA] transition-colors text-left disabled:opacity-50"
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#A6ADA7] transition-colors text-left disabled:opacity-50"
                   >
                     <div className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold flex-shrink-0"
-                      style={{ backgroundColor: '#F5F5F3', color: '#1A1917' }}
+                      style={{ backgroundColor: '#A6ADA7', color: '#FDFDFE' }}
                     >
                       {client.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[15px] text-[#1A1A18] font-medium truncate">{client.full_name}</p>
-                      <p className="text-[12px] text-[#8E8E93]">
+                      <p className="text-[15px] text-[#FDFDFE] font-medium truncate">{client.full_name}</p>
+                      <p className="text-[12px] text-[#D6D9D6]">
                         {client.nutrition_plan ? `Huidig: ${client.nutrition_plan.title}` : 'Geen plan'}
                       </p>
                     </div>
                     {assigning ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-[#1A1917]" />
+                      <Loader2 className="w-4 h-4 animate-spin text-[#FDFDFE]" />
                     ) : (
-                      <Copy strokeWidth={1.5} className="w-4 h-4 text-[#C7C7CC]" />
+                      <Copy strokeWidth={1.5} className="w-4 h-4 text-[#CDD1CE]" />
                     )}
                   </button>
                 ))}
                 {clients.length === 0 && (
-                  <p className="text-center text-[14px] text-[#8E8E93] py-8">Nog geen cliënten</p>
+                  <p className="text-center text-[14px] text-[#D6D9D6] py-8">Nog geen cliënten</p>
                 )}
               </div>
-              <div className="p-3 border-t border-[#E8E4DC]">
+              <div className="p-3 border-t border-[#A6ADA7]">
                 <button
                   onClick={() => setShowAssignModal(null)}
-                  className="w-full py-2.5 text-[14px] font-medium text-[#8E8E93] hover:text-[#1A1A18] transition-colors"
+                  className="w-full py-2.5 text-[14px] font-medium text-[#D6D9D6] hover:text-[#FDFDFE] transition-colors"
                 >
                   Annuleren
                 </button>
@@ -621,14 +621,14 @@ export default function NutritionOverviewPage() {
         {/* Search & Filter */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
           <div className="relative flex-1">
-            <Search strokeWidth={1.5} className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C7C7CC]" />
+            <Search strokeWidth={1.5} className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#CDD1CE]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Zoek cliënt..."
-              className="w-full pl-11 pr-4 py-3 rounded-2xl border text-[14px] bg-white"
-              style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
+              className="w-full pl-11 pr-4 py-3 rounded-2xl border text-[14px] bg-[#A6ADA7]"
+              style={{ borderColor: '#A6ADA7', color: '#FDFDFE' }}
             />
           </div>
           <div className="flex gap-2 flex-wrap">
@@ -643,16 +643,16 @@ export default function NutritionOverviewPage() {
                 onClick={() => setFilter(f.key as any)}
                 className="px-4 py-2.5 rounded-xl text-[13px] font-medium transition-colors border whitespace-nowrap"
                 style={{
-                  backgroundColor: filter === f.key ? '#1A1917' : 'white',
-                  color: filter === f.key ? 'white' : '#8E8E93',
-                  borderColor: filter === f.key ? '#1A1917' : '#E8E4DC',
+                  backgroundColor: filter === f.key ? '#FDFDFE' : 'white',
+                  color: filter === f.key ? 'white' : '#D6D9D6',
+                  borderColor: filter === f.key ? '#FDFDFE' : '#A6ADA7',
                 }}
               >
                 {f.label}
                 {f.key === 'needs_review' && needsReviewCount > 0 && (
                   <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold"
                     style={{
-                      backgroundColor: filter === f.key ? 'rgba(255,255,255,0.3)' : '#FF9500',
+                      backgroundColor: filter === f.key ? 'rgba(255,255,255,0.3)' : '#E8B948',
                       color: filter === f.key ? 'white' : 'white',
                     }}
                   >
@@ -667,9 +667,9 @@ export default function NutritionOverviewPage() {
         {/* Client List */}
         <div className="space-y-3">
           {filteredClients.length === 0 ? (
-            <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
-              <Apple strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#C7C7CC]" />
-              <p className="text-[14px] text-[#8E8E93]">
+            <div className="bg-[#A6ADA7] rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] text-center">
+              <Apple strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#CDD1CE]" />
+              <p className="text-[14px] text-[#D6D9D6]">
                 {searchQuery ? 'Geen cliënten gevonden' : 'Nog geen cliënten'}
               </p>
             </div>
@@ -683,14 +683,14 @@ export default function NutritionOverviewPage() {
                 <Link
                   key={client.id}
                   href={`/coach/clients/${client.id}/nutrition`}
-                  className="block bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all group"
+                  className="block bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] hover:shadow-[0_2px_8px_rgba(0,0,0,0.08)] transition-all group"
                 >
                   <div className="p-5">
                     <div className="flex items-center gap-4">
                       {/* Avatar */}
                       <div
                         className="w-11 h-11 rounded-full flex items-center justify-center text-[15px] font-semibold shrink-0"
-                        style={{ backgroundColor: '#F5F5F3', color: '#1A1917' }}
+                        style={{ backgroundColor: '#A6ADA7', color: '#FDFDFE' }}
                       >
                         {client.full_name
                           .split(' ')
@@ -703,37 +703,37 @@ export default function NutritionOverviewPage() {
                       {/* Client Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <p className="text-[15px] font-semibold text-[#1A1A18] truncate">
+                          <p className="text-[15px] font-semibold text-[#FDFDFE] truncate">
                             {client.full_name}
                           </p>
                           {client.package && (
                             <span
                               className="text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0"
-                              style={{ backgroundColor: '#F5F5F3', color: '#8E8E93' }}
+                              style={{ backgroundColor: '#A6ADA7', color: '#D6D9D6' }}
                             >
                               {client.package}
                             </span>
                           )}
                           {summary && !summary.coach_seen && (
-                            <span className="w-2.5 h-2.5 rounded-full bg-[#FF9500] shrink-0" title="Nog niet bekeken" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#E8B948] shrink-0" title="Nog niet bekeken" />
                           )}
                         </div>
 
                         {plan ? (
                           <div className="flex items-center gap-3 text-[13px]">
-                            <span className="text-[#34C759] font-medium">
+                            <span className="text-[#2FA65A] font-medium">
                               {plan.title}
                             </span>
-                            <span className="text-[#C7C7CC]">•</span>
-                            <span className="text-[#8E8E93]">
+                            <span className="text-[#CDD1CE]">•</span>
+                            <span className="text-[#D6D9D6]">
                               {plan.calories_target} kcal
                             </span>
                           </div>
                         ) : (
                           <div className="flex items-center gap-2 text-[13px]">
-                            <span className="text-[#FF9500] font-medium">Geen plan</span>
-                            <span className="text-[#C7C7CC]">—</span>
-                            <span className="text-[#8E8E93]">Klik om een voedingsplan aan te maken</span>
+                            <span className="text-[#E8B948] font-medium">Geen plan</span>
+                            <span className="text-[#CDD1CE]">—</span>
+                            <span className="text-[#D6D9D6]">Klik om een voedingsplan aan te maken</span>
                           </div>
                         )}
                       </div>
@@ -744,50 +744,50 @@ export default function NutritionOverviewPage() {
                           <div
                             className="w-12 h-12 rounded-full flex items-center justify-center text-[14px] font-bold border-2"
                             style={{
-                              color: compliance >= 80 ? '#34C759' : compliance >= 50 ? '#FF9500' : '#FF3B30',
-                              borderColor: compliance >= 80 ? '#34C759' : compliance >= 50 ? '#FF9500' : '#FF3B30',
-                              backgroundColor: compliance >= 80 ? '#34C759' + '10' : compliance >= 50 ? '#FF9500' + '10' : '#FF3B30' + '10',
+                              color: compliance >= 80 ? '#2FA65A' : compliance >= 50 ? '#E8B948' : '#B55A4A',
+                              borderColor: compliance >= 80 ? '#2FA65A' : compliance >= 50 ? '#E8B948' : '#B55A4A',
+                              backgroundColor: compliance >= 80 ? '#2FA65A' + '10' : compliance >= 50 ? '#E8B948' + '10' : '#B55A4A' + '10',
                             }}
                           >
                             {compliance}%
                           </div>
-                          <p className="text-[10px] text-[#C7C7CC] mt-1">7 dagen</p>
+                          <p className="text-[10px] text-[#CDD1CE] mt-1">7 dagen</p>
                         </div>
                       )}
 
                       {/* Arrow */}
                       <ChevronRight
                         strokeWidth={1.5}
-                        className="w-5 h-5 text-[#C7C7CC] group-hover:text-[#1A1917] transition-colors shrink-0"
+                        className="w-5 h-5 text-[#CDD1CE] group-hover:text-[#FDFDFE] transition-colors shrink-0"
                       />
                     </div>
 
                     {/* Today's compliance strip */}
                     {summary && summary.meals_planned > 0 && (
-                      <div className="mt-4 pt-4 border-t border-[#E8E4DC] flex items-center gap-4 text-[12px]">
+                      <div className="mt-4 pt-4 border-t border-[#A6ADA7] flex items-center gap-4 text-[12px]">
                         <div className="flex items-center gap-1.5">
-                          <CheckCircle strokeWidth={1.5} className="w-3.5 h-3.5 text-[#34C759]" />
-                          <span className="text-[#8E8E93]">
-                            Vandaag: <span className="font-semibold text-[#1A1A18]">{summary.meals_completed}/{summary.meals_planned}</span> maaltijden
+                          <CheckCircle strokeWidth={1.5} className="w-3.5 h-3.5 text-[#2FA65A]" />
+                          <span className="text-[#D6D9D6]">
+                            Vandaag: <span className="font-semibold text-[#FDFDFE]">{summary.meals_completed}/{summary.meals_planned}</span> maaltijden
                           </span>
                         </div>
                         {summary.total_calories > 0 && (
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[#FF9500] font-semibold">{summary.total_calories}</span>
-                            <span className="text-[#C7C7CC]">kcal</span>
+                            <span className="text-[#E8B948] font-semibold">{summary.total_calories}</span>
+                            <span className="text-[#CDD1CE]">kcal</span>
                           </div>
                         )}
                         {summary.water_liters && (
                           <div className="flex items-center gap-1">
-                            <Droplets strokeWidth={1.5} className="w-3.5 h-3.5 text-[#007AFF]" />
-                            <span className="text-[#8E8E93]">{summary.water_liters}L</span>
+                            <Droplets strokeWidth={1.5} className="w-3.5 h-3.5 text-[#5A7FB5]" />
+                            <span className="text-[#D6D9D6]">{summary.water_liters}L</span>
                           </div>
                         )}
                         {summary.mood && (
                           <span className="text-[14px]" title={`Mood: ${summary.mood}`}>{MOOD_EMOJI[summary.mood] || '😐'}</span>
                         )}
                         {summary.daily_note && (
-                          <span className="text-[#8E8E93] truncate max-w-[200px]" title={summary.daily_note}>
+                          <span className="text-[#D6D9D6] truncate max-w-[200px]" title={summary.daily_note}>
                             &ldquo;{summary.daily_note}&rdquo;
                           </span>
                         )}

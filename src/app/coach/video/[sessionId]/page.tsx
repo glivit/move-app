@@ -66,9 +66,9 @@ export default function CoachVideoPage({ params }: PageProps) {
       <div className="w-full h-screen bg-warm-offwhite flex items-center justify-center">
         <Card padding="md" className="w-full max-w-md">
           <div className="space-y-4">
-            <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3"></div>
+            <div className="h-4 bg-[#989F99] rounded animate-pulse"></div>
+            <div className="h-4 bg-[#989F99] rounded animate-pulse"></div>
+            <div className="h-4 bg-[#989F99] rounded animate-pulse w-2/3"></div>
           </div>
         </Card>
       </div>

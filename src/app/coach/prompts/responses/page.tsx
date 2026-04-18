@@ -75,7 +75,7 @@ async function PromptResponsesServer() {
 
     if (!responses || responses.length === 0) {
       return (
-        <Card className="p-8 bg-white border border-client-border rounded-2xl shadow-clean text-center">
+        <Card className="p-8 bg-[#A6ADA7] border border-client-border rounded-2xl shadow-clean text-center">
           <p className="text-text-primary mb-2 font-medium">
             Geen client responses beschikbaar
           </p>
@@ -96,7 +96,7 @@ async function PromptResponsesServer() {
     return (
       <div className="space-y-4">
         {normalized.map((response) => (
-          <Card key={response.id} className="p-6 bg-white border border-client-border rounded-2xl shadow-clean">
+          <Card key={response.id} className="p-6 bg-[#A6ADA7] border border-client-border rounded-2xl shadow-clean">
             <div className="space-y-4">
               <div className="flex items-start justify-between">
                 <div>

@@ -237,7 +237,7 @@ export default function SupplementsPage() {
           <button
             type="submit"
             disabled={saving || !name.trim()}
-            className="w-full py-3 bg-[#FDFDFE] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#5A5E5B] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 rounded-xl"
+            className="w-full py-3 bg-[#474B48] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#3A3E3B] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 rounded-xl"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Toevoegen
@@ -319,7 +319,7 @@ export default function SupplementsPage() {
           </p>
           <button
             onClick={() => setShowAdd(true)}
-            className="px-5 py-2.5 bg-[#FDFDFE] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#5A5E5B] transition-colors rounded-xl"
+            className="px-5 py-2.5 bg-[#474B48] text-white font-semibold text-[11px] uppercase tracking-[0.12em] hover:bg-[#3A3E3B] transition-colors rounded-xl"
           >
             Eerste supplement toevoegen
           </button>

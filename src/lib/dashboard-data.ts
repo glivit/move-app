@@ -54,12 +54,15 @@ export async function fetchDashboardData(userId: string) {
     db.from('nutrition_daily_summary').select('meals_planned, meals_completed, total_calories, total_protein, total_carbs, total_fat')
       .eq('client_id', userId).eq('date', today).single(),
 
+    // Today's scheduled-slot sessions — started today. Used for "today is done" hero only;
+    // late-completed workouts from earlier in the week count toward the weekview below, not here.
     db.from('workout_sessions').select('id, started_at, completed_at, template_day_id')
       .eq('client_id', userId).gte('started_at', `${today}T00:00:00`).lte('started_at', `${today}T23:59:59`),
 
+    // Workouts COMPLETED this week (completion date — not start date — drives weekview + voltooid counter)
     db.from('workout_sessions').select('id, completed_at')
       .eq('client_id', userId).not('completed_at', 'is', null)
-      .gte('started_at', getWeekStart()),
+      .gte('completed_at', getWeekStart()),
 
     db.from('messages').select('id', { count: 'exact', head: true })
       .eq('receiver_id', userId).is('read_at', null),
@@ -415,13 +418,14 @@ async function computeStreak(supabase: any, userId: string): Promise<number> {
     .select('started_at, completed_at')
     .eq('client_id', userId)
     .not('completed_at', 'is', null)
-    .gte('started_at', sixtyDaysAgo.toISOString())
-    .order('started_at', { ascending: false })
+    .gte('completed_at', sixtyDaysAgo.toISOString())
+    .order('completed_at', { ascending: false })
 
   if (!sessions || sessions.length === 0) return 0
 
+  // Streak keyed on completion day so late-completed workouts still count on the day they finished.
   const activeDates = new Set(
-    sessions.map((s: any) => new Date(s.started_at).toISOString().split('T')[0])
+    sessions.map((s: any) => new Date(s.completed_at || s.started_at).toISOString().split('T')[0])
   )
 
   let streak = 0

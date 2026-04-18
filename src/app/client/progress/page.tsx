@@ -635,7 +635,7 @@ export default function ProgressPage() {
 
           setExerciseAgg(allAgg)
 
-          // Top 4 by frequency — for the Hoofdlifts grid and Overzicht momentum
+          // Top 4 by frequency — for the Compounds grid and Overzicht momentum
           const topMomentum: MomentumLift[] = [...allAgg]
             .sort((a, b) => b.count - a.count)
             .slice(0, 4)
@@ -1033,7 +1033,7 @@ export default function ProgressPage() {
               >
                 <div className="flex items-baseline justify-between" style={{ marginBottom: 14 }}>
                   <span style={{ fontSize: 14, fontWeight: 400, color: '#FDFDFE', letterSpacing: '-0.005em' }}>
-                    Hoofdlifts e1RM
+                    Compounds e1RM
                   </span>
                   <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)' }}>
                     vs. 8 weken terug
@@ -1276,7 +1276,7 @@ export default function ProgressPage() {
               color: '#FDFDFE',
             }}
           >
-            Hoofdlifts
+            Compounds
             <small
               style={{
                 fontSize: 13,
@@ -1399,7 +1399,7 @@ export default function ProgressPage() {
                 Nog geen kracht-data
               </p>
               <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 12, marginTop: 4 }}>
-                Log je eerste set om je hoofdlifts te zien.
+                Log je eerste set om je compounds te zien.
               </p>
             </div>
           )}
@@ -1605,7 +1605,7 @@ export default function ProgressPage() {
       {tab === 'lichaam' && (
         <>
           {/* Weight card */}
-          {body.weightData.length >= 2 ? (
+          {body.weightData.length >= 1 ? (
             <>
               <div style={capStyle}>Gewicht</div>
               <div
@@ -1700,23 +1700,38 @@ export default function ProgressPage() {
                   )}
                 </div>
 
-                <WeightAreaChart data={filteredWeightData} />
+                {body.weightData.length >= 2 ? (
+                  <>
+                    <WeightAreaChart data={filteredWeightData} />
 
-                <div
-                  className="flex justify-between"
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 500,
-                    letterSpacing: '0.14em',
-                    textTransform: 'uppercase',
-                    color: 'rgba(253,253,254,0.44)',
-                    marginTop: 6,
-                  }}
-                >
-                  {monthAxisLabels(filteredWeightData, 5).map((lbl, i) => (
-                    <span key={`${lbl}-${i}`}>{lbl}</span>
-                  ))}
-                </div>
+                    <div
+                      className="flex justify-between"
+                      style={{
+                        fontSize: 9,
+                        fontWeight: 500,
+                        letterSpacing: '0.14em',
+                        textTransform: 'uppercase',
+                        color: 'rgba(253,253,254,0.44)',
+                        marginTop: 6,
+                      }}
+                    >
+                      {monthAxisLabels(filteredWeightData, 5).map((lbl, i) => (
+                        <span key={`${lbl}-${i}`}>{lbl}</span>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <p
+                    style={{
+                      fontSize: 11,
+                      color: 'rgba(253,253,254,0.44)',
+                      marginTop: 4,
+                      letterSpacing: '-0.005em',
+                    }}
+                  >
+                    Eerste meting — log nog een keer om je trend te zien.
+                  </p>
+                )}
               </div>
             </>
           ) : null}
@@ -1937,7 +1952,7 @@ export default function ProgressPage() {
           )}
 
           {/* Empty state */}
-          {body.weightData.length < 2 && !body.measurements.some((m) => m.current !== null) && body.photos.length === 0 && (
+          {body.weightData.length < 1 && !body.measurements.some((m) => m.current !== null) && body.photos.length === 0 && (
             <div
               className="animate-fade-in"
               style={{

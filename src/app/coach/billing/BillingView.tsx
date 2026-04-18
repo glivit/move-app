@@ -69,7 +69,7 @@ export default function BillingView({ initialClients }: BillingViewProps) {
       {/* Content */}
       <div className="max-w-6xl mx-auto px-6 py-12">
         {/* MRR Card */}
-        <Card className="mb-8 p-8 bg-white border border-client-border rounded-2xl shadow-clean">
+        <Card className="mb-8 p-8 bg-[#A6ADA7] border border-client-border rounded-2xl shadow-clean">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-[13px] font-medium text-client-text-secondary mb-2">
@@ -90,7 +90,7 @@ export default function BillingView({ initialClients }: BillingViewProps) {
 
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-6 mb-8">
-          <Card className="p-6 bg-white border border-client-border rounded-2xl shadow-clean">
+          <Card className="p-6 bg-[#A6ADA7] border border-client-border rounded-2xl shadow-clean">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[13px] text-client-text-secondary mb-1">Actief</p>
@@ -102,7 +102,7 @@ export default function BillingView({ initialClients }: BillingViewProps) {
             </div>
           </Card>
 
-          <Card className="p-6 bg-white border border-client-border rounded-2xl shadow-clean">
+          <Card className="p-6 bg-[#A6ADA7] border border-client-border rounded-2xl shadow-clean">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[13px] text-client-text-secondary mb-1">Achterstallig</p>
@@ -114,7 +114,7 @@ export default function BillingView({ initialClients }: BillingViewProps) {
             </div>
           </Card>
 
-          <Card className="p-6 bg-white border border-client-border rounded-2xl shadow-clean">
+          <Card className="p-6 bg-[#A6ADA7] border border-client-border rounded-2xl shadow-clean">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[13px] text-client-text-secondary mb-1">Geannuleerd</p>
@@ -128,7 +128,7 @@ export default function BillingView({ initialClients }: BillingViewProps) {
         </div>
 
         {/* Filter Buttons */}
-        <Card className="mb-8 p-6 bg-white border border-client-border rounded-2xl shadow-clean">
+        <Card className="mb-8 p-6 bg-[#A6ADA7] border border-client-border rounded-2xl shadow-clean">
           <div className="flex gap-2 flex-wrap">
             {(['all', 'active', 'past_due', 'cancelled'] as const).map((status) => (
               <button
@@ -137,7 +137,7 @@ export default function BillingView({ initialClients }: BillingViewProps) {
                 className={`px-4 py-2 rounded-xl text-[13px] font-medium transition-all ${
                   filter === status
                     ? 'bg-text-primary text-white'
-                    : 'bg-white border border-client-border text-text-primary hover:bg-client-surface-muted'
+                    : 'bg-[#A6ADA7] border border-client-border text-text-primary hover:bg-client-surface-muted'
                 }`}
               >
                 {status === 'all' && 'Alle'}
@@ -151,13 +151,13 @@ export default function BillingView({ initialClients }: BillingViewProps) {
 
         {/* Clients Table */}
         {filteredClients.length === 0 ? (
-          <Card className="p-12 text-center bg-white border border-client-border rounded-2xl shadow-clean">
+          <Card className="p-12 text-center bg-[#A6ADA7] border border-client-border rounded-2xl shadow-clean">
             <p className="text-[15px] text-client-text-secondary">
               Geen cliënten gevonden voor dit filter.
             </p>
           </Card>
         ) : (
-          <Card className="bg-white border border-client-border rounded-2xl shadow-clean">
+          <Card className="bg-[#A6ADA7] border border-client-border rounded-2xl shadow-clean">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -215,7 +215,7 @@ export default function BillingView({ initialClients }: BillingViewProps) {
         )}
 
         {/* Stripe Dashboard Link */}
-        <Card className="mt-8 p-6 bg-white border border-client-border rounded-2xl shadow-clean">
+        <Card className="mt-8 p-6 bg-[#A6ADA7] border border-client-border rounded-2xl shadow-clean">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-medium text-text-primary">Stripe Dashboard</h3>

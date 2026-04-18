@@ -155,29 +155,29 @@ export default function AvailabilityPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA]">
+      <div className="min-h-screen bg-[#A6ADA7]">
         <div className="max-w-4xl mx-auto px-6 py-12">
-          <div className="h-8 w-64 bg-white rounded-xl animate-pulse mb-4" />
-          <div className="h-64 bg-white rounded-2xl animate-pulse" />
+          <div className="h-8 w-64 bg-[#A6ADA7] rounded-xl animate-pulse mb-4" />
+          <div className="h-64 bg-[#A6ADA7] rounded-2xl animate-pulse" />
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA]">
+    <div className="min-h-screen bg-[#A6ADA7]">
       {/* Header */}
-      <div className="border-b border-[#E8E4DC]">
+      <div className="border-b border-[#A6ADA7]">
         <div className="max-w-4xl mx-auto px-6 py-12">
           <button
             onClick={() => router.push('/coach/schedule')}
-            className="flex items-center gap-2 text-[13px] font-medium text-[#8E8E93] hover:text-[#1A1A18] transition-colors mb-6"
+            className="flex items-center gap-2 text-[13px] font-medium text-[#D6D9D6] hover:text-[#FDFDFE] transition-colors mb-6"
           >
             <ChevronLeft className="w-4 h-4" />
             Terug naar planning
           </button>
-          <h1 className="text-[32px] font-display text-[#1A1A18]">Beschikbaarheid</h1>
-          <p className="text-[15px] text-[#8E8E93] mt-1">
+          <h1 className="text-[32px] font-display text-[#FDFDFE]">Beschikbaarheid</h1>
+          <p className="text-[15px] text-[#D6D9D6] mt-1">
             Stel in wanneer cliënten een sessie kunnen boeken
           </p>
         </div>
@@ -185,15 +185,15 @@ export default function AvailabilityPage() {
 
       <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
         {/* Weekly Slots */}
-        <div className="bg-white rounded-2xl p-6 border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <div className="bg-[#A6ADA7] rounded-2xl p-6 border border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-[17px] font-semibold text-[#1A1A18]">Wekelijkse beschikbaarheid</h2>
-              <p className="text-[13px] text-[#8E8E93] mt-0.5">Terugkerende tijdsloten per dag</p>
+              <h2 className="text-[17px] font-semibold text-[#FDFDFE]">Wekelijkse beschikbaarheid</h2>
+              <p className="text-[13px] text-[#D6D9D6] mt-0.5">Terugkerende tijdsloten per dag</p>
             </div>
             <button
               onClick={addSlot}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold bg-[#EDEAE4] text-[#1A1917] hover:bg-[#EDE5D4] transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-semibold bg-[#A6ADA7] text-[#FDFDFE] hover:bg-[#A6ADA7] transition-colors"
             >
               <Plus className="w-4 h-4" />
               Tijdslot toevoegen
@@ -202,9 +202,9 @@ export default function AvailabilityPage() {
 
           {slots.length === 0 ? (
             <div className="text-center py-12">
-              <Clock strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[#C7C7CC]" />
-              <p className="text-[15px] font-semibold text-[#1A1A18] mb-2">Geen tijdsloten ingesteld</p>
-              <p className="text-[13px] text-[#8E8E93]">
+              <Clock strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[#CDD1CE]" />
+              <p className="text-[15px] font-semibold text-[#FDFDFE] mb-2">Geen tijdsloten ingesteld</p>
+              <p className="text-[13px] text-[#D6D9D6]">
                 Voeg tijdsloten toe zodat cliënten sessies kunnen boeken
               </p>
             </div>
@@ -215,17 +215,17 @@ export default function AvailabilityPage() {
                   key={index}
                   className={`flex items-center gap-3 p-4 rounded-xl border transition-all ${
                     slot.is_active
-                      ? 'border-[#E8E4DC] bg-white'
-                      : 'border-[#E8E4DC] bg-[#FAFAFA] opacity-60'
+                      ? 'border-[#A6ADA7] bg-[#A6ADA7]'
+                      : 'border-[#A6ADA7] bg-[#A6ADA7] opacity-60'
                   }`}
                 >
                   {/* Toggle active */}
                   <button
                     onClick={() => updateSlot(index, 'is_active', !slot.is_active)}
-                    className="text-[#8E8E93] hover:text-[#1A1917] transition-colors"
+                    className="text-[#D6D9D6] hover:text-[#FDFDFE] transition-colors"
                   >
                     {slot.is_active ? (
-                      <ToggleRight className="w-6 h-6 text-[#34C759]" />
+                      <ToggleRight className="w-6 h-6 text-[#2FA65A]" />
                     ) : (
                       <ToggleLeft className="w-6 h-6" />
                     )}
@@ -235,7 +235,7 @@ export default function AvailabilityPage() {
                   <select
                     value={slot.day_of_week}
                     onChange={(e) => updateSlot(index, 'day_of_week', parseInt(e.target.value))}
-                    className="px-3 py-2 border border-[#E8E4DC] rounded-lg text-[13px] font-medium text-[#1A1A18] bg-white focus:outline-none focus:border-[#1A1917]"
+                    className="px-3 py-2 border border-[#A6ADA7] rounded-lg text-[13px] font-medium text-[#FDFDFE] bg-[#A6ADA7] focus:outline-none focus:border-[#FDFDFE]"
                   >
                     {DAY_NAMES.map((name, i) => (
                       <option key={i} value={i}>{name}</option>
@@ -246,20 +246,20 @@ export default function AvailabilityPage() {
                   <select
                     value={slot.start_time}
                     onChange={(e) => updateSlot(index, 'start_time', e.target.value)}
-                    className="px-3 py-2 border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] bg-white focus:outline-none focus:border-[#1A1917]"
+                    className="px-3 py-2 border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] bg-[#A6ADA7] focus:outline-none focus:border-[#FDFDFE]"
                   >
                     {TIME_OPTIONS.map(t => (
                       <option key={t} value={t}>{t}</option>
                     ))}
                   </select>
 
-                  <span className="text-[13px] text-[#8E8E93]">tot</span>
+                  <span className="text-[13px] text-[#D6D9D6]">tot</span>
 
                   {/* End time */}
                   <select
                     value={slot.end_time}
                     onChange={(e) => updateSlot(index, 'end_time', e.target.value)}
-                    className="px-3 py-2 border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] bg-white focus:outline-none focus:border-[#1A1917]"
+                    className="px-3 py-2 border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] bg-[#A6ADA7] focus:outline-none focus:border-[#FDFDFE]"
                   >
                     {TIME_OPTIONS.map(t => (
                       <option key={t} value={t}>{t}</option>
@@ -270,7 +270,7 @@ export default function AvailabilityPage() {
                   <select
                     value={slot.slot_duration_minutes}
                     onChange={(e) => updateSlot(index, 'slot_duration_minutes', parseInt(e.target.value))}
-                    className="px-3 py-2 border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] bg-white focus:outline-none focus:border-[#1A1917]"
+                    className="px-3 py-2 border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] bg-[#A6ADA7] focus:outline-none focus:border-[#FDFDFE]"
                   >
                     <option value={15}>15 min</option>
                     <option value={30}>30 min</option>
@@ -281,7 +281,7 @@ export default function AvailabilityPage() {
                   {/* Delete */}
                   <button
                     onClick={() => removeSlot(index)}
-                    className="ml-auto p-2 rounded-lg text-[#C7C7CC] hover:text-[#FF3B30] hover:bg-[#FF3B30]/5 transition-all"
+                    className="ml-auto p-2 rounded-lg text-[#CDD1CE] hover:text-[#B55A4A] hover:bg-[#B55A4A]/5 transition-all"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -291,11 +291,11 @@ export default function AvailabilityPage() {
           )}
 
           {/* Save button */}
-          <div className="flex items-center gap-3 mt-6 pt-6 border-t border-[#E8E4DC]">
+          <div className="flex items-center gap-3 mt-6 pt-6 border-t border-[#A6ADA7]">
             <button
               onClick={saveSlots}
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl text-[14px] font-semibold bg-[#1A1A18] text-white hover:bg-[#2A2A28] transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl text-[14px] font-semibold bg-[#474B48] text-white hover:bg-[#2A2A28] transition-colors disabled:opacity-50"
             >
               {saving ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Opslaan...</>
@@ -304,38 +304,38 @@ export default function AvailabilityPage() {
               )}
             </button>
             {saved && (
-              <span className="text-[13px] font-medium text-[#34C759]">Opgeslagen!</span>
+              <span className="text-[13px] font-medium text-[#2FA65A]">Opgeslagen!</span>
             )}
           </div>
         </div>
 
         {/* Preview */}
-        <div className="bg-white rounded-2xl p-6 border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <h2 className="text-[17px] font-semibold text-[#1A1A18] mb-4">Weekoverzicht</h2>
+        <div className="bg-[#A6ADA7] rounded-2xl p-6 border border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <h2 className="text-[17px] font-semibold text-[#FDFDFE] mb-4">Weekoverzicht</h2>
           <div className="grid grid-cols-7 gap-2">
             {[1, 2, 3, 4, 5, 6, 0].map(day => {
               const daySlots = slots.filter(s => s.day_of_week === day && s.is_active)
               return (
                 <div key={day} className="text-center">
-                  <p className="text-[11px] font-semibold text-[#8E8E93] mb-2">
+                  <p className="text-[11px] font-semibold text-[#D6D9D6] mb-2">
                     {DAY_SHORT[day]}
                   </p>
                   {daySlots.length > 0 ? (
                     <div className="space-y-1">
                       {daySlots.map((s, i) => (
-                        <div key={i} className="bg-[#EDEAE4] rounded-lg py-1.5 px-1">
-                          <p className="text-[10px] font-medium text-[#1A1917]">
+                        <div key={i} className="bg-[#A6ADA7] rounded-lg py-1.5 px-1">
+                          <p className="text-[10px] font-medium text-[#FDFDFE]">
                             {s.start_time}
                           </p>
-                          <p className="text-[10px] text-[#1A1917]/60">
+                          <p className="text-[10px] text-[#FDFDFE]/60">
                             {s.end_time}
                           </p>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="bg-[#FAFAFA] rounded-lg py-3">
-                      <p className="text-[10px] text-[#C7C7CC]">—</p>
+                    <div className="bg-[#A6ADA7] rounded-lg py-3">
+                      <p className="text-[10px] text-[#CDD1CE]">—</p>
                     </div>
                   )}
                 </div>
@@ -345,36 +345,36 @@ export default function AvailabilityPage() {
         </div>
 
         {/* Blocked Dates */}
-        <div className="bg-white rounded-2xl p-6 border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <h2 className="text-[17px] font-semibold text-[#1A1A18] mb-1">Geblokkeerde dagen</h2>
-          <p className="text-[13px] text-[#8E8E93] mb-6">Vakantie, feestdagen, of andere niet-beschikbare dagen</p>
+        <div className="bg-[#A6ADA7] rounded-2xl p-6 border border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <h2 className="text-[17px] font-semibold text-[#FDFDFE] mb-1">Geblokkeerde dagen</h2>
+          <p className="text-[13px] text-[#D6D9D6] mb-6">Vakantie, feestdagen, of andere niet-beschikbare dagen</p>
 
           {/* Add blocked date */}
-          <div className="flex items-end gap-3 mb-6 pb-6 border-b border-[#E8E4DC]">
+          <div className="flex items-end gap-3 mb-6 pb-6 border-b border-[#A6ADA7]">
             <div className="flex-1">
-              <label className="text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide block mb-1.5">Datum</label>
+              <label className="text-[12px] font-semibold text-[#D6D9D6] uppercase tracking-wide block mb-1.5">Datum</label>
               <input
                 type="date"
                 value={newBlockDate}
                 onChange={(e) => setNewBlockDate(e.target.value)}
                 min={new Date().toISOString().split('T')[0]}
-                className="w-full px-3 py-2.5 border border-[#E8E4DC] rounded-xl text-[13px] text-[#1A1A18] focus:outline-none focus:border-[#1A1917]"
+                className="w-full px-3 py-2.5 border border-[#A6ADA7] rounded-xl text-[13px] text-[#FDFDFE] focus:outline-none focus:border-[#FDFDFE]"
               />
             </div>
             <div className="flex-1">
-              <label className="text-[12px] font-semibold text-[#8E8E93] uppercase tracking-wide block mb-1.5">Reden (optioneel)</label>
+              <label className="text-[12px] font-semibold text-[#D6D9D6] uppercase tracking-wide block mb-1.5">Reden (optioneel)</label>
               <input
                 type="text"
                 value={newBlockReason}
                 onChange={(e) => setNewBlockReason(e.target.value)}
                 placeholder="bv. Vakantie"
-                className="w-full px-3 py-2.5 border border-[#E8E4DC] rounded-xl text-[13px] text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917]"
+                className="w-full px-3 py-2.5 border border-[#A6ADA7] rounded-xl text-[13px] text-[#FDFDFE] placeholder-[#CDD1CE] focus:outline-none focus:border-[#FDFDFE]"
               />
             </div>
             <button
               onClick={blockDate}
               disabled={!newBlockDate || blockingDate}
-              className="px-5 py-2.5 rounded-xl text-[13px] font-semibold bg-[#FF3B30] text-white hover:bg-[#D63228] transition-colors disabled:opacity-50"
+              className="px-5 py-2.5 rounded-xl text-[13px] font-semibold bg-[#B55A4A] text-white hover:bg-[#D63228] transition-colors disabled:opacity-50"
             >
               {blockingDate ? <Loader2 className="w-4 h-4 animate-spin" /> : <CalendarOff className="w-4 h-4" />}
             </button>
@@ -383,26 +383,26 @@ export default function AvailabilityPage() {
           {/* Blocked dates list */}
           {blockedDates.length === 0 ? (
             <div className="text-center py-8">
-              <CalendarCheck strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#34C759]" />
-              <p className="text-[13px] text-[#8E8E93]">Geen geblokkeerde dagen</p>
+              <CalendarCheck strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#2FA65A]" />
+              <p className="text-[13px] text-[#D6D9D6]">Geen geblokkeerde dagen</p>
             </div>
           ) : (
             <div className="space-y-2">
               {blockedDates.map((bd) => (
-                <div key={bd.id} className="flex items-center justify-between px-4 py-3 rounded-xl bg-[#FFF5F5] border border-[#FF3B30]/10">
+                <div key={bd.id} className="flex items-center justify-between px-4 py-3 rounded-xl bg-[rgba(181,90,74,0.08)] border border-[#B55A4A]/10">
                   <div>
-                    <p className="text-[13px] font-semibold text-[#1A1A18]">
+                    <p className="text-[13px] font-semibold text-[#FDFDFE]">
                       {new Date(bd.blocked_date + 'T00:00:00').toLocaleDateString('nl-BE', {
                         weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
                       })}
                     </p>
                     {bd.reason && (
-                      <p className="text-[12px] text-[#8E8E93]">{bd.reason}</p>
+                      <p className="text-[12px] text-[#D6D9D6]">{bd.reason}</p>
                     )}
                   </div>
                   <button
                     onClick={() => unblockDate(bd.blocked_date)}
-                    className="text-[12px] font-medium text-[#FF3B30] hover:underline"
+                    className="text-[12px] font-medium text-[#B55A4A] hover:underline"
                   >
                     Deblokkeren
                   </button>

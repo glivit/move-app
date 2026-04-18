@@ -106,7 +106,7 @@ export function ClientsListView({ clients }: ClientsListViewProps) {
           ))}
         </div>
       ) : (
-        <div className="bg-white border border-client-border rounded-2xl shadow-clean p-16 text-center">
+        <div className="bg-[#A6ADA7] border border-client-border rounded-2xl shadow-clean p-16 text-center">
           {searchQuery || activeFilter !== 'all' ? (
             <>
               <p className="text-text-primary font-medium">Geen resultaten gevonden</p>

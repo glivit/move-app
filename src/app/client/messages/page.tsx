@@ -349,7 +349,7 @@ export default function ClientMessagesPage() {
             width: 44,
             height: 44,
             borderRadius: '50%',
-            background: '#FDFDFE',
+            background: '#2F3230',
             color: WHITE,
             display: 'flex',
             alignItems: 'center',

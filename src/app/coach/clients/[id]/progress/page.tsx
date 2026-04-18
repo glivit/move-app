@@ -10,12 +10,12 @@ import Link from 'next/link'
 
 const ProgressLineChart = dynamic(() => import('@/components/coach/ProgressCharts').then(mod => ({ default: mod.ProgressLineChart })), {
   ssr: false,
-  loading: () => <div className="h-64 bg-[#F8F8F6] rounded animate-pulse" />
+  loading: () => <div className="h-64 bg-[#A6ADA7] rounded animate-pulse" />
 })
 
 const ProgressBarChart = dynamic(() => import('@/components/coach/ProgressCharts').then(mod => ({ default: mod.ProgressBarChart })), {
   ssr: false,
-  loading: () => <div className="h-64 bg-[#F8F8F6] rounded animate-pulse" />
+  loading: () => <div className="h-64 bg-[#A6ADA7] rounded animate-pulse" />
 })
 
 interface CheckIn {
@@ -340,10 +340,10 @@ export default function CoachClientProgressPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-[32px] font-[family-name:var(--font-display)] text-[#1A1A18]">Laden...</h1>
+        <h1 className="text-[32px] font-[family-name:var(--font-display)] text-[#FDFDFE]">Laden...</h1>
         <div className="space-y-4">
           {[1, 2].map(i => (
-            <div key={i} className="bg-white rounded-2xl h-64 shadow-card animate-shimmer" />
+            <div key={i} className="bg-[#A6ADA7] rounded-2xl h-64 shadow-card animate-shimmer" />
           ))}
         </div>
       </div>
@@ -356,32 +356,32 @@ export default function CoachClientProgressPage() {
       <div>
         <Link
           href={`/coach/clients/${clientId}`}
-          className="inline-flex items-center gap-1 text-[#8E8E93] hover:text-[#666] transition-colors mb-6"
+          className="inline-flex items-center gap-1 text-[#D6D9D6] hover:text-[#666] transition-colors mb-6"
         >
           <ArrowLeft strokeWidth={1.5} className="w-4 h-4" />
           <span className="text-sm font-medium">Terug naar profiel</span>
         </Link>
-        <h1 className="text-[32px] font-[family-name:var(--font-display)] text-[#1A1A18] mb-1">Voortgang</h1>
-        {profile && <p className="text-[#8E8E93] text-[15px]">{profile.full_name}</p>}
+        <h1 className="text-[32px] font-[family-name:var(--font-display)] text-[#FDFDFE] mb-1">Voortgang</h1>
+        {profile && <p className="text-[#D6D9D6] text-[15px]">{profile.full_name}</p>}
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 border-b border-[#E8E4DC] overflow-x-auto">
+      <div className="flex gap-1 border-b border-[#A6ADA7] overflow-x-auto">
         {([
-          { id: 'fotos' as TabType, label: "Foto's", color: '#1A1917' },
-          { id: 'lichaam' as TabType, label: 'Lichaam', color: '#34C759' },
-          { id: 'maten' as TabType, label: 'Omtrekmaten', color: '#FF9500' },
-          { id: 'kracht' as TabType, label: 'Kracht', color: '#007AFF' },
-          { id: 'prs' as TabType, label: "PR's", color: '#AF52DE' },
-          { id: 'compliance' as TabType, label: 'Compliance', color: '#1A1917' },
+          { id: 'fotos' as TabType, label: "Foto's", color: '#FDFDFE' },
+          { id: 'lichaam' as TabType, label: 'Lichaam', color: '#2FA65A' },
+          { id: 'maten' as TabType, label: 'Omtrekmaten', color: '#E8B948' },
+          { id: 'kracht' as TabType, label: 'Kracht', color: '#5A7FB5' },
+          { id: 'prs' as TabType, label: "PR's", color: '#8A7BA8' },
+          { id: 'compliance' as TabType, label: 'Compliance', color: '#FDFDFE' },
         ]).map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-3 text-[14px] font-medium transition-colors border-b-2 whitespace-nowrap ${
               activeTab === tab.id
-                ? 'text-[#1A1A18]'
-                : 'text-[#C7C7CC] border-transparent hover:text-[#1A1A18]'
+                ? 'text-[#FDFDFE]'
+                : 'text-[#CDD1CE] border-transparent hover:text-[#FDFDFE]'
             }`}
             style={{ borderBottomColor: activeTab === tab.id ? tab.color : 'transparent' }}
           >
@@ -401,8 +401,8 @@ export default function CoachClientProgressPage() {
                 onClick={() => setPhotoPosition(pos)}
                 className={`px-4 py-2 rounded-xl text-[13px] font-medium transition-all ${
                   photoPosition === pos
-                    ? 'bg-[#1A1A18] text-white'
-                    : 'bg-[#FAFAFA] text-[#8E8E93] border border-[#E8E4DC] hover:bg-[#EDEAE4]'
+                    ? 'bg-[#474B48] text-white'
+                    : 'bg-[#A6ADA7] text-[#D6D9D6] border border-[#A6ADA7] hover:bg-[#A6ADA7]'
                 }`}
               >
                 {positionLabels[pos]}
@@ -418,28 +418,28 @@ export default function CoachClientProgressPage() {
                   const photoUrl = entry.photos[photoPosition]
                   return (
                     <div key={idx} className="space-y-2">
-                      <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#FAFAFA] border border-[#E8E4DC]">
+                      <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#A6ADA7] border border-[#A6ADA7]">
                         {photoUrl ? (
                           <Image src={photoUrl} alt={`${entry.label} ${positionLabels[photoPosition]}`} width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
                         ) : (
                           <div className="flex flex-col items-center justify-center h-full gap-2">
-                            <ImageOff className="w-6 h-6 text-[#C7C7CC]" strokeWidth={1.5} />
-                            <span className="text-[11px] text-[#C7C7CC]">Geen foto</span>
+                            <ImageOff className="w-6 h-6 text-[#CDD1CE]" strokeWidth={1.5} />
+                            <span className="text-[11px] text-[#CDD1CE]">Geen foto</span>
                           </div>
                         )}
                         {idx === 0 && (
-                          <span className="absolute top-2 left-2 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#1A1917] text-white">
+                          <span className="absolute top-2 left-2 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#474B48] text-white">
                             Start
                           </span>
                         )}
                         {idx === photoTimeline.length - 1 && idx > 0 && (
-                          <span className="absolute top-2 left-2 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#34C759] text-white">
+                          <span className="absolute top-2 left-2 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#2FA65A] text-white">
                             Laatste
                           </span>
                         )}
                       </div>
-                      <p className="text-[13px] font-medium text-center text-[#1A1A18]">{entry.label}</p>
-                      <p className="text-[11px] text-center text-[#8E8E93]">
+                      <p className="text-[13px] font-medium text-center text-[#FDFDFE]">{entry.label}</p>
+                      <p className="text-[11px] text-center text-[#D6D9D6]">
                         {new Date(entry.date).toLocaleDateString('nl-BE')}
                       </p>
                     </div>
@@ -449,26 +449,26 @@ export default function CoachClientProgressPage() {
 
               {/* Side by side: Start vs Latest */}
               {photoTimeline.length >= 2 && (
-                <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC]">
-                  <h3 className="text-[15px] font-semibold text-[#1A1A18] mb-4">Start vs. Nu</h3>
+                <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7]">
+                  <h3 className="text-[15px] font-semibold text-[#FDFDFE] mb-4">Start vs. Nu</h3>
                   <div className="grid grid-cols-2 gap-4">
                     {[photoTimeline[0], photoTimeline[photoTimeline.length - 1]].map((entry, idx) => {
                       const photoUrl = entry.photos[photoPosition]
                       return (
                         <div key={idx}>
-                          <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#FAFAFA]">
+                          <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#A6ADA7]">
                             {photoUrl ? (
                               <Image src={photoUrl} alt={entry.label} width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
                             ) : (
                               <div className="flex items-center justify-center h-full">
-                                <ImageOff className="w-8 h-8 text-[#C7C7CC]" strokeWidth={1.5} />
+                                <ImageOff className="w-8 h-8 text-[#CDD1CE]" strokeWidth={1.5} />
                               </div>
                             )}
                           </div>
-                          <p className="text-[13px] font-semibold text-center mt-2 text-[#1A1A18]">
+                          <p className="text-[13px] font-semibold text-center mt-2 text-[#FDFDFE]">
                             {idx === 0 ? 'Start' : 'Nu'}
                           </p>
-                          <p className="text-[11px] text-center text-[#8E8E93]">
+                          <p className="text-[11px] text-center text-[#D6D9D6]">
                             {new Date(entry.date).toLocaleDateString('nl-BE')}
                           </p>
                         </div>
@@ -479,10 +479,10 @@ export default function CoachClientProgressPage() {
               )}
             </>
           ) : (
-            <div className="bg-white rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] text-center">
-              <Camera className="w-10 h-10 mx-auto mb-3 text-[#C7C7CC]" strokeWidth={1.5} />
-              <p className="text-[#1A1A18] font-semibold mb-1">Nog geen foto's</p>
-              <p className="text-[#8E8E93] text-[14px]">Foto's verschijnen na de eerste check-in of onboarding.</p>
+            <div className="bg-[#A6ADA7] rounded-2xl p-12 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] text-center">
+              <Camera className="w-10 h-10 mx-auto mb-3 text-[#CDD1CE]" strokeWidth={1.5} />
+              <p className="text-[#FDFDFE] font-semibold mb-1">Nog geen foto's</p>
+              <p className="text-[#D6D9D6] text-[14px]">Foto's verschijnen na de eerste check-in of onboarding.</p>
             </div>
           )}
         </div>
@@ -493,17 +493,17 @@ export default function CoachClientProgressPage() {
         <div className="space-y-6">
           {/* Weight Chart */}
           {lichaamData.length > 0 && (
-            <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
-              <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-4">Gewicht</h3>
+            <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-card border border-[#A6ADA7]">
+              <h3 className="text-[17px] font-semibold text-[#FDFDFE] mb-4">Gewicht</h3>
               <div style={{ height: 250 }}>
                 <ProgressLineChart
                   data={lichaamData}
                   dataKey="weight"
                   name="Gewicht (kg)"
-                  color="#34C759"
+                  color="#2FA65A"
                   height={250}
                   yAxisConfig={{ domain: ['dataMin - 2', 'dataMax + 2'] }}
-                  tooltip={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }}
+                  tooltip={{ backgroundColor: 'white', border: '1px solid #A6ADA7', borderRadius: '0.75rem' }}
                 />
               </div>
             </div>
@@ -511,16 +511,16 @@ export default function CoachClientProgressPage() {
 
           {/* Body Fat Chart */}
           {lichaamData.some(d => d.bodyFat) && (
-            <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
-              <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-4">Vetpercentage</h3>
+            <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-card border border-[#A6ADA7]">
+              <h3 className="text-[17px] font-semibold text-[#FDFDFE] mb-4">Vetpercentage</h3>
               <div style={{ height: 250 }}>
                 <ProgressLineChart
                   data={lichaamData}
                   dataKey="bodyFat"
                   name="Vet (%)"
-                  color="#AF52DE"
+                  color="#8A7BA8"
                   height={250}
-                  tooltip={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }}
+                  tooltip={{ backgroundColor: 'white', border: '1px solid #A6ADA7', borderRadius: '0.75rem' }}
                 />
               </div>
             </div>
@@ -528,16 +528,16 @@ export default function CoachClientProgressPage() {
 
           {/* Muscle Mass Chart */}
           {lichaamData.some(d => d.muscle) && (
-            <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
-              <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-4">Spiermassa</h3>
+            <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-card border border-[#A6ADA7]">
+              <h3 className="text-[17px] font-semibold text-[#FDFDFE] mb-4">Spiermassa</h3>
               <div style={{ height: 250 }}>
                 <ProgressLineChart
                   data={lichaamData}
                   dataKey="muscle"
                   name="Spiermassa (kg)"
-                  color="#007AFF"
+                  color="#5A7FB5"
                   height={250}
-                  tooltip={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }}
+                  tooltip={{ backgroundColor: 'white', border: '1px solid #A6ADA7', borderRadius: '0.75rem' }}
                 />
               </div>
             </div>
@@ -545,8 +545,8 @@ export default function CoachClientProgressPage() {
 
           {/* Current vs Start summary */}
           {(intakeData?.weight_kg || latest) && (
-            <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
-              <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-4">Start vs. Nu</h3>
+            <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-card border border-[#A6ADA7]">
+              <h3 className="text-[17px] font-semibold text-[#FDFDFE] mb-4">Start vs. Nu</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
                   { label: 'Gewicht', start: intakeData?.weight_kg, current: latest?.weight_kg, unit: 'kg', positiveDown: true },
@@ -557,9 +557,9 @@ export default function CoachClientProgressPage() {
                   const diff = start && current ? current - start : null
                   const isPositive = diff !== null ? (positiveDown ? diff < 0 : diff > 0) : null
                   return (
-                    <div key={label} className="p-3 bg-[#FAFAFA] rounded-xl">
-                      <p className="text-[12px] text-[#8E8E93] font-medium mb-1">{label}</p>
-                      <p className="text-xl font-bold text-[#1A1A18]">
+                    <div key={label} className="p-3 bg-[#A6ADA7] rounded-xl">
+                      <p className="text-[12px] text-[#D6D9D6] font-medium mb-1">{label}</p>
+                      <p className="text-xl font-bold text-[#FDFDFE]">
                         {current !== null && current !== undefined ? Number(current).toFixed(1) : '—'} {unit}
                       </p>
                       {diff !== null && (
@@ -568,7 +568,7 @@ export default function CoachClientProgressPage() {
                         </p>
                       )}
                       {start && (
-                        <p className="text-[11px] text-[#C7C7CC] mt-0.5">Start: {Number(start).toFixed(1)} {unit}</p>
+                        <p className="text-[11px] text-[#CDD1CE] mt-0.5">Start: {Number(start).toFixed(1)} {unit}</p>
                       )}
                     </div>
                   )
@@ -582,23 +582,23 @@ export default function CoachClientProgressPage() {
       {/* ═══ OMTREKMATEN TAB ═══ */}
       {activeTab === 'maten' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
-            <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-4">Omtrekmaten vergelijking</h3>
+          <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-card border border-[#A6ADA7]">
+            <h3 className="text-[17px] font-semibold text-[#FDFDFE] mb-4">Omtrekmaten vergelijking</h3>
 
             {/* Table header */}
             <div className="overflow-x-auto">
               <table className="w-full text-[13px]">
                 <thead>
-                  <tr className="bg-[#FAFAFA]">
-                    <th className="text-left px-3 py-2.5 font-medium text-[#8E8E93]">Meting</th>
-                    {intakeData && <th className="text-right px-3 py-2.5 font-medium text-[#8E8E93]">Start</th>}
+                  <tr className="bg-[#A6ADA7]">
+                    <th className="text-left px-3 py-2.5 font-medium text-[#D6D9D6]">Meting</th>
+                    {intakeData && <th className="text-right px-3 py-2.5 font-medium text-[#D6D9D6]">Start</th>}
                     {checkins.map((c, idx) => (
-                      <th key={c.id} className="text-right px-3 py-2.5 font-medium text-[#8E8E93]">
+                      <th key={c.id} className="text-right px-3 py-2.5 font-medium text-[#D6D9D6]">
                         {new Date(c.date).toLocaleDateString('nl-BE', { month: 'short' })}
                       </th>
                     ))}
                     {intakeData && latest && (
-                      <th className="text-right px-3 py-2.5 font-medium text-[#1A1917]">Verschil</th>
+                      <th className="text-right px-3 py-2.5 font-medium text-[#FDFDFE]">Verschil</th>
                     )}
                   </tr>
                 </thead>
@@ -612,23 +612,23 @@ export default function CoachClientProgressPage() {
                     if (!hasAnyData) return null
 
                     return (
-                      <tr key={key} className="border-t border-[#E8E4DC]">
-                        <td className="px-3 py-2.5 font-medium text-[#1A1A18]">{label}</td>
+                      <tr key={key} className="border-t border-[#A6ADA7]">
+                        <td className="px-3 py-2.5 font-medium text-[#FDFDFE]">{label}</td>
                         {intakeData && (
-                          <td className="px-3 py-2.5 text-right text-[#1A1A18]">
+                          <td className="px-3 py-2.5 text-right text-[#FDFDFE]">
                             {startVal ? `${startVal} cm` : '—'}
                           </td>
                         )}
                         {checkins.map(c => (
-                          <td key={c.id} className="px-3 py-2.5 text-right text-[#1A1A18]">
+                          <td key={c.id} className="px-3 py-2.5 text-right text-[#FDFDFE]">
                             {(c as any)[key] ? `${(c as any)[key]} cm` : '—'}
                           </td>
                         ))}
                         {intakeData && latest && (
                           <td className={`px-3 py-2.5 text-right font-semibold ${
                             diff !== null
-                              ? diff < 0 ? 'text-green-600' : diff > 0 ? 'text-orange-600' : 'text-[#8E8E93]'
-                              : 'text-[#8E8E93]'
+                              ? diff < 0 ? 'text-green-600' : diff > 0 ? 'text-orange-600' : 'text-[#D6D9D6]'
+                              : 'text-[#D6D9D6]'
                           }`}>
                             {diff !== null ? `${diff > 0 ? '+' : ''}${diff.toFixed(1)}` : '—'}
                           </td>
@@ -642,8 +642,8 @@ export default function CoachClientProgressPage() {
           </div>
 
           {(!intakeData || !checkins.length) && (
-            <div className="bg-[#FAFAFA] rounded-2xl p-6 text-center">
-              <p className="text-[14px] text-[#8E8E93]">
+            <div className="bg-[#A6ADA7] rounded-2xl p-6 text-center">
+              <p className="text-[14px] text-[#D6D9D6]">
                 Meer data verschijnt na de eerste maandelijkse check-in.
               </p>
             </div>
@@ -654,12 +654,12 @@ export default function CoachClientProgressPage() {
       {/* ═══ KRACHT TAB ═══ */}
       {activeTab === 'kracht' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
-            <label className="text-[13px] font-semibold text-[#1A1A18] block mb-3">Selecteer oefening</label>
+          <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-card border border-[#A6ADA7]">
+            <label className="text-[13px] font-semibold text-[#FDFDFE] block mb-3">Selecteer oefening</label>
             <select
               value={selectedExerciseId}
               onChange={(e) => setSelectedExerciseId(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl border border-[#E8E4DC] bg-white text-[15px] focus:outline-none focus:ring-2 focus:ring-[#007AFF]"
+              className="w-full px-4 py-2 rounded-xl border border-[#A6ADA7] bg-[#A6ADA7] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#5A7FB5]"
             >
               {exercisesWithData.map(ex => (
                 <option key={ex.id} value={ex.id}>{ex.name_nl || ex.name}</option>
@@ -668,23 +668,23 @@ export default function CoachClientProgressPage() {
           </div>
 
           {krachtData.length > 0 && selectedExercise ? (
-            <div className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC]">
-              <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-4">{selectedExercise.name_nl || selectedExercise.name}</h3>
+            <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-card border border-[#A6ADA7]">
+              <h3 className="text-[17px] font-semibold text-[#FDFDFE] mb-4">{selectedExercise.name_nl || selectedExercise.name}</h3>
               <div style={{ height: 250 }}>
                 <ProgressLineChart
                   data={krachtData}
                   dataKey="weight"
                   name="Gewicht (kg)"
-                  color="#007AFF"
+                  color="#5A7FB5"
                   height={250}
                   xAxisKey="date"
-                  tooltip={{ backgroundColor: 'white', border: '1px solid #E8E4DC', borderRadius: '0.75rem' }}
+                  tooltip={{ backgroundColor: 'white', border: '1px solid #A6ADA7', borderRadius: '0.75rem' }}
                 />
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl p-12 shadow-card border border-[#E8E4DC] text-center">
-              <p className="text-[#C7C7CC] text-[15px]">Geen data beschikbaar</p>
+            <div className="bg-[#A6ADA7] rounded-2xl p-12 shadow-card border border-[#A6ADA7] text-center">
+              <p className="text-[#CDD1CE] text-[15px]">Geen data beschikbaar</p>
             </div>
           )}
         </div>
@@ -696,29 +696,29 @@ export default function CoachClientProgressPage() {
           {personalRecords.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {personalRecords.map(pr => (
-                <div key={pr.id} className="bg-white rounded-2xl p-5 shadow-card border border-[#E8E4DC] flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-[#AF52DE] flex items-center justify-center flex-shrink-0">
+                <div key={pr.id} className="bg-[#A6ADA7] rounded-2xl p-5 shadow-card border border-[#A6ADA7] flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-[#8A7BA8] flex items-center justify-center flex-shrink-0">
                     <Trophy size={20} className="text-white" strokeWidth={1.5} />
                   </div>
                   <div className="flex-1">
-                    <p className="text-[17px] font-semibold text-[#1A1A18]">
+                    <p className="text-[17px] font-semibold text-[#FDFDFE]">
                       {(pr as any).exercises?.name_nl || (pr as any).exercises?.name || 'Oefening'}
                     </p>
-                    <p className="text-[13px] text-[#C7C7CC] mt-1">{pr.record_type === 'weight' ? 'Max gewicht' : pr.record_type}</p>
+                    <p className="text-[13px] text-[#CDD1CE] mt-1">{pr.record_type === 'weight' ? 'Max gewicht' : pr.record_type}</p>
                     <div className="flex items-baseline gap-2 mt-2">
-                      <p className="text-2xl font-semibold text-[#1A1A18]">{pr.value}</p>
-                      <p className="text-[15px] text-[#C7C7CC]">kg</p>
+                      <p className="text-2xl font-semibold text-[#FDFDFE]">{pr.value}</p>
+                      <p className="text-[15px] text-[#CDD1CE]">kg</p>
                     </div>
-                    <p className="text-[13px] text-[#C7C7CC] mt-2">{new Date(pr.achieved_at).toLocaleDateString('nl-BE')}</p>
+                    <p className="text-[13px] text-[#CDD1CE] mt-2">{new Date(pr.achieved_at).toLocaleDateString('nl-BE')}</p>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-2xl p-12 shadow-card border border-[#E8E4DC] text-center">
-              <Trophy size={32} className="text-[#C7C7CC] mx-auto mb-4" strokeWidth={1.5} />
-              <p className="text-[#1A1A18] font-semibold mb-1">Nog geen PR's</p>
-              <p className="text-[#C7C7CC] text-[15px]">PR's verschijnen na gelogde workouts</p>
+            <div className="bg-[#A6ADA7] rounded-2xl p-12 shadow-card border border-[#A6ADA7] text-center">
+              <Trophy size={32} className="text-[#CDD1CE] mx-auto mb-4" strokeWidth={1.5} />
+              <p className="text-[#FDFDFE] font-semibold mb-1">Nog geen PR's</p>
+              <p className="text-[#CDD1CE] text-[15px]">PR's verschijnen na gelogde workouts</p>
             </div>
           )}
         </div>
@@ -727,20 +727,20 @@ export default function CoachClientProgressPage() {
       {/* ═══ COMPLIANCE TAB ═══ */}
       {activeTab === 'compliance' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl p-6 shadow-card border border-[#E8E4DC]">
-            <h3 className="text-[17px] font-semibold text-[#1A1A18] mb-6">Workouts deze maand</h3>
+          <div className="bg-[#A6ADA7] rounded-2xl p-6 shadow-card border border-[#A6ADA7]">
+            <h3 className="text-[17px] font-semibold text-[#FDFDFE] mb-6">Workouts deze maand</h3>
             <div className="space-y-4">
               <div className="flex justify-between items-center mb-2">
-                <p className="text-[15px] text-[#8E8E93]">Voltooide workouts</p>
-                <p className="text-[17px] font-semibold text-[#1A1A18]">{complianceData.completed} / {complianceData.total}</p>
+                <p className="text-[15px] text-[#D6D9D6]">Voltooide workouts</p>
+                <p className="text-[17px] font-semibold text-[#FDFDFE]">{complianceData.completed} / {complianceData.total}</p>
               </div>
-              <div className="w-full bg-[#E8E4DC] rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-[#A6ADA7] rounded-full h-2 overflow-hidden">
                 <div
-                  className="bg-[#1A1917] h-full transition-all duration-300"
+                  className="bg-[#FDFDFE] h-full transition-all duration-300"
                   style={{ width: `${complianceData.total > 0 ? (complianceData.completed / complianceData.total) * 100 : 0}%` }}
                 />
               </div>
-              <p className="text-[13px] text-[#C7C7CC] font-medium">{complianceData.percentage}% compliance</p>
+              <p className="text-[13px] text-[#CDD1CE] font-medium">{complianceData.percentage}% compliance</p>
             </div>
           </div>
         </div>

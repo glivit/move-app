@@ -56,9 +56,9 @@ function getPackageTarget(pkg: string): number {
 }
 
 const statusColors: Record<string, string> = {
-  on_track: '#34C759',
-  at_risk: '#FF9500',
-  behind: '#FF3B30',
+  on_track: '#2FA65A',
+  at_risk: '#E8B948',
+  behind: '#B55A4A',
 }
 
 export default function SchedulePage() {
@@ -212,23 +212,23 @@ export default function SchedulePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA]">
+    <div className="min-h-screen bg-[#A6ADA7]">
       {/* Header */}
-      <div className="border-b border-[#E8E4DC]">
+      <div className="border-b border-[#A6ADA7]">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-[32px] font-display" style={{ color: '#1A1A18' }}>
+              <h1 className="text-[32px] font-display" style={{ color: '#FDFDFE' }}>
                 Planning
               </h1>
-              <p className="text-[15px] mt-1" style={{ color: '#8E8E93' }}>
+              <p className="text-[15px] mt-1" style={{ color: '#D6D9D6' }}>
                 Smart scheduling & overzicht
               </p>
             </div>
             <div className="flex gap-3">
               <Link
                 href="/coach/schedule/availability"
-                className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all hover:opacity-90 text-[14px] border border-[#E8E4DC] bg-white text-[#1A1A18] hover:bg-[#EDEAE4]"
+                className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all hover:opacity-90 text-[14px] border border-[#A6ADA7] bg-[#A6ADA7] text-[#FDFDFE] hover:bg-[#A6ADA7]"
               >
                 <Clock size={18} strokeWidth={1.5} />
                 Beschikbaarheid
@@ -236,7 +236,7 @@ export default function SchedulePage() {
               <button
                 onClick={() => setShowForm(!showForm)}
                 className="flex items-center gap-2 px-5 py-3 rounded-xl font-medium transition-all hover:opacity-90 text-white"
-                style={{ backgroundColor: '#1A1A18' }}
+                style={{ backgroundColor: '#FDFDFE' }}
               >
                 <Plus size={20} strokeWidth={1.5} />
                 Nieuwe afspraak
@@ -245,11 +245,11 @@ export default function SchedulePage() {
           </div>
 
           {/* Tab switcher */}
-          <div className="flex gap-1 mt-8 p-1 rounded-xl inline-flex" style={{ backgroundColor: '#E8E4DC' }}>
+          <div className="flex gap-1 mt-8 p-1 rounded-xl inline-flex" style={{ backgroundColor: '#A6ADA7' }}>
             <button
               onClick={() => setActiveView('overview')}
               className={`py-2 px-4 rounded-lg text-[13px] font-semibold transition-all ${
-                activeView === 'overview' ? 'bg-white text-[#1A1A18] shadow-sm' : 'text-[#8E8E93]'
+                activeView === 'overview' ? 'bg-[#A6ADA7] text-[#FDFDFE] shadow-sm' : 'text-[#D6D9D6]'
               }`}
             >
               <span className="flex items-center gap-2">
@@ -260,7 +260,7 @@ export default function SchedulePage() {
             <button
               onClick={() => setActiveView('calls')}
               className={`py-2 px-4 rounded-lg text-[13px] font-semibold transition-all ${
-                activeView === 'calls' ? 'bg-white text-[#1A1A18] shadow-sm' : 'text-[#8E8E93]'
+                activeView === 'calls' ? 'bg-[#A6ADA7] text-[#FDFDFE] shadow-sm' : 'text-[#D6D9D6]'
               }`}
             >
               <span className="flex items-center gap-2">
@@ -277,21 +277,21 @@ export default function SchedulePage() {
         {showForm && (
           <div
             className="mb-8 p-8 rounded-2xl border"
-            style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+            style={{ backgroundColor: 'white', borderColor: '#A6ADA7', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
           >
-            <h2 className="text-[17px] font-display mb-6" style={{ color: '#1A1A18' }}>
+            <h2 className="text-[17px] font-display mb-6" style={{ color: '#FDFDFE' }}>
               Nieuwe afspraak inplannen
             </h2>
             {!selectedClient ? (
               <div className="space-y-2">
-                <p className="text-[13px] font-medium mb-3" style={{ color: '#8E8E93' }}>Selecteer een cliënt:</p>
+                <p className="text-[13px] font-medium mb-3" style={{ color: '#D6D9D6' }}>Selecteer een cliënt:</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {clients.map((c) => (
                     <button
                       key={c.id}
                       onClick={() => setSelectedClient(c)}
-                      className="text-left px-4 py-3 rounded-xl border transition-all hover:border-[#1A1917]"
-                      style={{ borderColor: '#E8E4DC', color: '#1A1A18' }}
+                      className="text-left px-4 py-3 rounded-xl border transition-all hover:border-[#FDFDFE]"
+                      style={{ borderColor: '#A6ADA7', color: '#FDFDFE' }}
                     >
                       {c.full_name}
                     </button>
@@ -300,9 +300,9 @@ export default function SchedulePage() {
               </div>
             ) : (
               <>
-                <p className="text-[13px] mb-4" style={{ color: '#8E8E93' }}>
-                  Afspraak voor: <strong style={{ color: '#1A1A18' }}>{selectedClient.full_name}</strong>
-                  <button onClick={() => setSelectedClient(null)} className="ml-2 underline" style={{ color: '#1A1917' }}>wijzig</button>
+                <p className="text-[13px] mb-4" style={{ color: '#D6D9D6' }}>
+                  Afspraak voor: <strong style={{ color: '#FDFDFE' }}>{selectedClient.full_name}</strong>
+                  <button onClick={() => setSelectedClient(null)} className="ml-2 underline" style={{ color: '#FDFDFE' }}>wijzig</button>
                 </p>
                 <ScheduleCallForm clientId={selectedClient.id} clientName={selectedClient.full_name} onSuccess={() => { fetchAll(); setShowForm(false); setSelectedClient(null); }} />
               </>
@@ -316,19 +316,19 @@ export default function SchedulePage() {
             <div className="flex items-center justify-between mb-6">
               <button
                 onClick={() => setWeekOffset((w) => w - 1)}
-                className="p-2 rounded-xl hover:bg-white transition-all"
+                className="p-2 rounded-xl hover:bg-[#A6ADA7] transition-all"
               >
-                <ChevronLeft strokeWidth={1.5} className="w-5 h-5" style={{ color: '#8E8E93' }} />
+                <ChevronLeft strokeWidth={1.5} className="w-5 h-5" style={{ color: '#D6D9D6' }} />
               </button>
               <div className="text-center">
-                <p className="text-[15px] font-semibold" style={{ color: '#1A1A18' }}>
+                <p className="text-[15px] font-semibold" style={{ color: '#FDFDFE' }}>
                   {formatWeekLabel()}
                 </p>
                 {weekOffset !== 0 && (
                   <button
                     onClick={() => setWeekOffset(0)}
                     className="text-[12px] font-medium mt-1"
-                    style={{ color: '#1A1917' }}
+                    style={{ color: '#FDFDFE' }}
                   >
                     Terug naar deze week
                   </button>
@@ -336,9 +336,9 @@ export default function SchedulePage() {
               </div>
               <button
                 onClick={() => setWeekOffset((w) => w + 1)}
-                className="p-2 rounded-xl hover:bg-white transition-all"
+                className="p-2 rounded-xl hover:bg-[#A6ADA7] transition-all"
               >
-                <ChevronRight strokeWidth={1.5} className="w-5 h-5" style={{ color: '#8E8E93' }} />
+                <ChevronRight strokeWidth={1.5} className="w-5 h-5" style={{ color: '#D6D9D6' }} />
               </button>
             </div>
 
@@ -348,12 +348,12 @@ export default function SchedulePage() {
               {weekDates.map((date, i) => (
                 <div
                   key={i}
-                  className={`text-center py-2 rounded-xl ${isToday(date) ? 'bg-[#1A1917] text-white' : ''}`}
+                  className={`text-center py-2 rounded-xl ${isToday(date) ? 'bg-[#474B48] text-white' : ''}`}
                 >
-                  <p className={`text-[11px] font-semibold ${isToday(date) ? 'text-white/80' : 'text-[#8E8E93]'}`}>
+                  <p className={`text-[11px] font-semibold ${isToday(date) ? 'text-white/80' : 'text-[#D6D9D6]'}`}>
                     {DAY_LABELS[i]}
                   </p>
-                  <p className={`text-[14px] font-bold ${isToday(date) ? 'text-white' : 'text-[#1A1A18]'}`}>
+                  <p className={`text-[14px] font-bold ${isToday(date) ? 'text-white' : 'text-[#FDFDFE]'}`}>
                     {date.getDate()}
                   </p>
                 </div>
@@ -364,16 +364,16 @@ export default function SchedulePage() {
             {loading ? (
               <div className="space-y-2">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-16 bg-white rounded-xl animate-pulse" />
+                  <div key={i} className="h-16 bg-[#A6ADA7] rounded-xl animate-pulse" />
                 ))}
               </div>
             ) : clientSchedules.length === 0 ? (
               <div
                 className="text-center py-12 rounded-2xl border"
-                style={{ backgroundColor: 'white', borderColor: '#E8E4DC' }}
+                style={{ backgroundColor: 'white', borderColor: '#A6ADA7' }}
               >
-                <Calendar size={40} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#C7C7CC' }} />
-                <p className="text-[15px]" style={{ color: '#8E8E93' }}>Geen cliënten gevonden</p>
+                <Calendar size={40} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#CDD1CE' }} />
+                <p className="text-[15px]" style={{ color: '#D6D9D6' }}>Geen cliënten gevonden</p>
               </div>
             ) : (
               <div className="space-y-1">
@@ -386,16 +386,16 @@ export default function SchedulePage() {
                     >
                       {/* Client info */}
                       <Link href={`/coach/clients/${client.id}`}>
-                        <div className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white transition-all cursor-pointer">
+                        <div className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[#A6ADA7] transition-all cursor-pointer">
                           <div
                             className="w-2 h-2 rounded-full flex-shrink-0"
                             style={{ backgroundColor: statusColors[status] }}
                           />
                           <div className="min-w-0">
-                            <p className="text-[13px] font-semibold truncate" style={{ color: '#1A1A18' }}>
+                            <p className="text-[13px] font-semibold truncate" style={{ color: '#FDFDFE' }}>
                               {client.full_name}
                             </p>
-                            <p className="text-[11px]" style={{ color: '#8E8E93' }}>
+                            <p className="text-[11px]" style={{ color: '#D6D9D6' }}>
                               {client.workoutsThisWeek}/{client.targetPerWeek} • {timeSince(client.lastWorkout)}
                             </p>
                           </div>
@@ -419,14 +419,14 @@ export default function SchedulePage() {
                             className="flex items-center justify-center py-3 rounded-xl"
                             style={{
                               backgroundColor: isPreferred
-                                ? isPast ? '#E8E4DC' : '#F5F2EC'
+                                ? isPast ? '#A6ADA7' : '#A6ADA7'
                                 : 'transparent',
                             }}
                           >
                             {hasCall ? (
-                              <Video size={14} strokeWidth={1.5} style={{ color: '#007AFF' }} />
+                              <Video size={14} strokeWidth={1.5} style={{ color: '#5A7FB5' }} />
                             ) : isPreferred ? (
-                              <Dumbbell size={14} strokeWidth={1.5} style={{ color: isPast ? '#C7C7CC' : '#1A1917', opacity: isPast ? 0.5 : 0.6 }} />
+                              <Dumbbell size={14} strokeWidth={1.5} style={{ color: isPast ? '#CDD1CE' : '#FDFDFE', opacity: isPast ? 0.5 : 0.6 }} />
                             ) : null}
                           </div>
                         )
@@ -442,45 +442,45 @@ export default function SchedulePage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
                 <div
                   className="p-5 rounded-2xl border"
-                  style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                  style={{ backgroundColor: 'white', borderColor: '#A6ADA7', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#E8FAF0' }}>
-                      <CheckCircle size={16} strokeWidth={1.5} style={{ color: '#34C759' }} />
+                      <CheckCircle size={16} strokeWidth={1.5} style={{ color: '#2FA65A' }} />
                     </div>
-                    <p className="text-[13px] font-medium" style={{ color: '#8E8E93' }}>Op schema</p>
+                    <p className="text-[13px] font-medium" style={{ color: '#D6D9D6' }}>Op schema</p>
                   </div>
-                  <p className="text-[28px] font-bold" style={{ color: '#1A1A18' }}>
+                  <p className="text-[28px] font-bold" style={{ color: '#FDFDFE' }}>
                     {clientSchedules.filter((c) => getClientStatus(c) === 'on_track').length}
                   </p>
                 </div>
 
                 <div
                   className="p-5 rounded-2xl border"
-                  style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                  style={{ backgroundColor: 'white', borderColor: '#A6ADA7', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
                 >
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFF3E0' }}>
-                      <AlertTriangle size={16} strokeWidth={1.5} style={{ color: '#FF9500' }} />
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(232,185,72,0.14)' }}>
+                      <AlertTriangle size={16} strokeWidth={1.5} style={{ color: '#E8B948' }} />
                     </div>
-                    <p className="text-[13px] font-medium" style={{ color: '#8E8E93' }}>Risico</p>
+                    <p className="text-[13px] font-medium" style={{ color: '#D6D9D6' }}>Risico</p>
                   </div>
-                  <p className="text-[28px] font-bold" style={{ color: '#1A1A18' }}>
+                  <p className="text-[28px] font-bold" style={{ color: '#FDFDFE' }}>
                     {clientSchedules.filter((c) => getClientStatus(c) === 'at_risk').length}
                   </p>
                 </div>
 
                 <div
                   className="p-5 rounded-2xl border"
-                  style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                  style={{ backgroundColor: 'white', borderColor: '#A6ADA7', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
                 >
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#FFE5E5' }}>
-                      <Flame size={16} strokeWidth={1.5} style={{ color: '#FF3B30' }} />
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(181,90,74,0.14)' }}>
+                      <Flame size={16} strokeWidth={1.5} style={{ color: '#B55A4A' }} />
                     </div>
-                    <p className="text-[13px] font-medium" style={{ color: '#8E8E93' }}>Achter</p>
+                    <p className="text-[13px] font-medium" style={{ color: '#D6D9D6' }}>Achter</p>
                   </div>
-                  <p className="text-[28px] font-bold" style={{ color: '#1A1A18' }}>
+                  <p className="text-[28px] font-bold" style={{ color: '#FDFDFE' }}>
                     {clientSchedules.filter((c) => getClientStatus(c) === 'behind').length}
                   </p>
                 </div>
@@ -491,16 +491,16 @@ export default function SchedulePage() {
           /* Video Calls View */
           <>
             {loading ? (
-              <div className="text-center py-12" style={{ color: '#8E8E93' }}>
+              <div className="text-center py-12" style={{ color: '#D6D9D6' }}>
                 <p>Planning laden...</p>
               </div>
             ) : sessions.length === 0 ? (
               <div
                 className="p-12 text-center rounded-2xl border"
-                style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                style={{ backgroundColor: 'white', borderColor: '#A6ADA7', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
               >
-                <Video size={40} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#C7C7CC' }} />
-                <p className="text-[15px]" style={{ color: '#8E8E93' }}>
+                <Video size={40} strokeWidth={1.5} className="mx-auto mb-3" style={{ color: '#CDD1CE' }} />
+                <p className="text-[15px]" style={{ color: '#D6D9D6' }}>
                   Geen video calls deze week
                 </p>
               </div>
@@ -510,17 +510,17 @@ export default function SchedulePage() {
                   <div
                     key={session.id}
                     className="p-5 rounded-2xl border flex items-center justify-between"
-                    style={{ backgroundColor: 'white', borderColor: '#E8E4DC', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+                    style={{ backgroundColor: 'white', borderColor: '#A6ADA7', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#EBF5FF' }}>
-                        <Video size={18} strokeWidth={1.5} style={{ color: '#007AFF' }} />
+                        <Video size={18} strokeWidth={1.5} style={{ color: '#5A7FB5' }} />
                       </div>
                       <div>
-                        <p className="text-[14px] font-semibold" style={{ color: '#1A1A18' }}>
+                        <p className="text-[14px] font-semibold" style={{ color: '#FDFDFE' }}>
                           {session.profiles?.full_name || 'Onbekend'}
                         </p>
-                        <p className="text-[12px]" style={{ color: '#8E8E93' }}>
+                        <p className="text-[12px]" style={{ color: '#D6D9D6' }}>
                           {formatDate(session.scheduled_at)} om {formatTime(session.scheduled_at)} • {session.duration_minutes} min
                         </p>
                       </div>
@@ -530,7 +530,7 @@ export default function SchedulePage() {
                       <Link href={`/coach/video/${session.id}`}>
                         <button
                           className="px-4 py-2 rounded-xl text-[13px] font-semibold text-white transition-all hover:opacity-90"
-                          style={{ backgroundColor: '#007AFF' }}
+                          style={{ backgroundColor: '#5A7FB5' }}
                         >
                           Deelnemen
                         </button>

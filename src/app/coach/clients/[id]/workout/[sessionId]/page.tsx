@@ -361,7 +361,7 @@ export default function CoachWorkoutDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-6 h-6 animate-spin text-[#8E8E93]" />
+        <Loader2 className="w-6 h-6 animate-spin text-[#D6D9D6]" />
       </div>
     )
   }
@@ -394,7 +394,7 @@ export default function CoachWorkoutDetailPage() {
       <div>
         <Link
           href={`/coach/clients/${clientId}`}
-          className="inline-flex items-center gap-1 text-[#8E8E93] hover:text-[#1A1917] transition-colors mb-4"
+          className="inline-flex items-center gap-1 text-[#D6D9D6] hover:text-[#FDFDFE] transition-colors mb-4"
         >
           <ArrowLeft strokeWidth={1.5} className="w-4 h-4" />
           <span className="text-sm font-medium">Terug naar {clientName || 'cliënt'}</span>
@@ -402,10 +402,10 @@ export default function CoachWorkoutDetailPage() {
 
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-[28px] font-[family-name:var(--font-display)] text-[#1A1A18]">
+            <h1 className="text-[28px] font-[family-name:var(--font-display)] text-[#FDFDFE]">
               {session.template_day?.name || 'Training'}
             </h1>
-            <p className="text-[14px] text-[#8E8E93] mt-1 capitalize">{dateStr} om {timeStr}</p>
+            <p className="text-[14px] text-[#D6D9D6] mt-1 capitalize">{dateStr} om {timeStr}</p>
           </div>
           <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold ${
             isCompleted
@@ -423,28 +423,28 @@ export default function CoachWorkoutDetailPage() {
 
       {/* Stats Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white rounded-2xl p-4 border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-[11px] text-[#8E8E93] uppercase font-semibold tracking-wide">Duur</p>
-          <p className="text-xl font-bold text-[#1A1917] mt-1">
+        <div className="bg-[#A6ADA7] rounded-2xl p-4 border border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <p className="text-[11px] text-[#D6D9D6] uppercase font-semibold tracking-wide">Duur</p>
+          <p className="text-xl font-bold text-[#FDFDFE] mt-1">
             {durationMin ? `${durationMin} min` : '—'}
           </p>
         </div>
-        <div className="bg-white rounded-2xl p-4 border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-[11px] text-[#8E8E93] uppercase font-semibold tracking-wide">Volume</p>
-          <p className="text-xl font-bold text-[#1A1917] mt-1">
+        <div className="bg-[#A6ADA7] rounded-2xl p-4 border border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <p className="text-[11px] text-[#D6D9D6] uppercase font-semibold tracking-wide">Volume</p>
+          <p className="text-xl font-bold text-[#FDFDFE] mt-1">
             {totalVolume > 0 ? `${totalVolume.toLocaleString('nl-BE')} kg` : '—'}
           </p>
         </div>
-        <div className="bg-white rounded-2xl p-4 border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-[11px] text-[#8E8E93] uppercase font-semibold tracking-wide">Sets</p>
-          <p className="text-xl font-bold text-[#1A1917] mt-1">{totalSets}</p>
+        <div className="bg-[#A6ADA7] rounded-2xl p-4 border border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <p className="text-[11px] text-[#D6D9D6] uppercase font-semibold tracking-wide">Sets</p>
+          <p className="text-xl font-bold text-[#FDFDFE] mt-1">{totalSets}</p>
         </div>
-        <div className="bg-white rounded-2xl p-4 border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <p className="text-[11px] text-[#8E8E93] uppercase font-semibold tracking-wide">PR&apos;s</p>
-          <p className="text-xl font-bold text-[#1A1917] mt-1">
+        <div className="bg-[#A6ADA7] rounded-2xl p-4 border border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          <p className="text-[11px] text-[#D6D9D6] uppercase font-semibold tracking-wide">PR&apos;s</p>
+          <p className="text-xl font-bold text-[#FDFDFE] mt-1">
             {totalPRs > 0 ? (
               <span className="flex items-center gap-1">
-                {totalPRs} <Trophy strokeWidth={1.5} className="w-4 h-4 text-[#FF9500]" />
+                {totalPRs} <Trophy strokeWidth={1.5} className="w-4 h-4 text-[#E8B948]" />
               </span>
             ) : '0'}
           </p>
@@ -453,29 +453,29 @@ export default function CoachWorkoutDetailPage() {
 
       {/* Feedback & Mood */}
       {(session.mood_rating || session.difficulty_rating || session.feedback_text || session.pain_reported) && (
-        <div className="bg-white rounded-2xl p-5 border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)] space-y-4">
-          <h2 className="text-[13px] text-[#8E8E93] uppercase font-semibold tracking-wide">Feedback van {clientName?.split(' ')[0] || 'cliënt'}</h2>
+        <div className="bg-[#A6ADA7] rounded-2xl p-5 border border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)] space-y-4">
+          <h2 className="text-[13px] text-[#D6D9D6] uppercase font-semibold tracking-wide">Feedback van {clientName?.split(' ')[0] || 'cliënt'}</h2>
 
           <div className="flex flex-wrap gap-4">
             {session.mood_rating && (
               <div>
-                <p className="text-[11px] text-[#8E8E93] uppercase font-medium mb-1">Gevoel</p>
+                <p className="text-[11px] text-[#D6D9D6] uppercase font-medium mb-1">Gevoel</p>
                 <p className="text-2xl">{moodEmojis[session.mood_rating] || '—'}</p>
               </div>
             )}
             {session.difficulty_rating && (
               <div>
-                <p className="text-[11px] text-[#8E8E93] uppercase font-medium mb-1">Moeilijkheid</p>
+                <p className="text-[11px] text-[#D6D9D6] uppercase font-medium mb-1">Moeilijkheid</p>
                 <div className="flex items-center gap-1.5">
                   <div className="flex gap-0.5">
                     {[1, 2, 3, 4, 5].map(i => (
                       <div
                         key={i}
-                        className={`w-5 h-2 rounded-full ${i <= session.difficulty_rating! ? 'bg-[var(--color-pop)]' : 'bg-[#E8E4DC]'}`}
+                        className={`w-5 h-2 rounded-full ${i <= session.difficulty_rating! ? 'bg-[var(--color-pop)]' : 'bg-[#A6ADA7]'}`}
                       />
                     ))}
                   </div>
-                  <span className="text-[12px] font-medium text-[#1A1917]">
+                  <span className="text-[12px] font-medium text-[#FDFDFE]">
                     {difficultyLabels[session.difficulty_rating] || `${session.difficulty_rating}/5`}
                   </span>
                 </div>
@@ -484,10 +484,10 @@ export default function CoachWorkoutDetailPage() {
           </div>
 
           {session.feedback_text && (
-            <div className="bg-[#FAFAFA] rounded-xl p-4">
+            <div className="bg-[#A6ADA7] rounded-xl p-4">
               <div className="flex items-start gap-2">
-                <MessageSquare strokeWidth={1.5} className="w-4 h-4 text-[#8E8E93] mt-0.5 flex-shrink-0" />
-                <p className="text-[14px] text-[#1A1917] whitespace-pre-wrap">{session.feedback_text}</p>
+                <MessageSquare strokeWidth={1.5} className="w-4 h-4 text-[#D6D9D6] mt-0.5 flex-shrink-0" />
+                <p className="text-[14px] text-[#FDFDFE] whitespace-pre-wrap">{session.feedback_text}</p>
               </div>
             </div>
           )}
@@ -508,33 +508,33 @@ export default function CoachWorkoutDetailPage() {
 
       {/* Session Notes */}
       {session.notes && (
-        <div className="bg-[#FAFAFA] rounded-2xl p-5 border border-[#E8E4DC]">
-          <p className="text-[12px] text-[#8E8E93] uppercase font-semibold tracking-wide mb-2">Notities</p>
-          <p className="text-[14px] text-[#1A1917] whitespace-pre-wrap">{session.notes}</p>
+        <div className="bg-[#A6ADA7] rounded-2xl p-5 border border-[#A6ADA7]">
+          <p className="text-[12px] text-[#D6D9D6] uppercase font-semibold tracking-wide mb-2">Notities</p>
+          <p className="text-[14px] text-[#FDFDFE] whitespace-pre-wrap">{session.notes}</p>
         </div>
       )}
 
       {/* Exercises */}
       {exercises.length > 0 ? (
         <div className="space-y-4">
-          <h2 className="text-[13px] text-[#8E8E93] uppercase font-semibold tracking-wide">
+          <h2 className="text-[13px] text-[#D6D9D6] uppercase font-semibold tracking-wide">
             Oefeningen — {exercises.length}
           </h2>
 
           {exercises.map((ex, exIdx) => (
             <div
               key={ex.exercise_id}
-              className="bg-white rounded-2xl border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden"
+              className="bg-[#A6ADA7] rounded-2xl border border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden"
             >
               {/* Exercise header */}
               <div className="px-5 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-[#EDEAE4] flex items-center justify-center flex-shrink-0">
-                    <span className="text-[12px] font-bold text-[#1A1917]">{exIdx + 1}</span>
+                  <div className="w-8 h-8 rounded-lg bg-[#A6ADA7] flex items-center justify-center flex-shrink-0">
+                    <span className="text-[12px] font-bold text-[#FDFDFE]">{exIdx + 1}</span>
                   </div>
                   <div>
-                    <p className="text-[15px] font-semibold text-[#1A1917]">{ex.name}</p>
-                    <div className="flex items-center gap-2 mt-0.5 text-[12px] text-[#8E8E93]">
+                    <p className="text-[15px] font-semibold text-[#FDFDFE]">{ex.name}</p>
+                    <div className="flex items-center gap-2 mt-0.5 text-[12px] text-[#D6D9D6]">
                       {ex.target_muscle && <span>{ex.target_muscle}</span>}
                       {ex.body_part && ex.target_muscle && <span>·</span>}
                       {ex.body_part && <span>{ex.body_part}</span>}
@@ -543,13 +543,13 @@ export default function CoachWorkoutDetailPage() {
                 </div>
                 <div className="flex items-center gap-3 flex-shrink-0">
                   {ex.hasPR && (
-                    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#FF9500]/10">
-                      <Trophy strokeWidth={1.5} className="w-3 h-3 text-[#FF9500]" />
-                      <span className="text-[11px] font-semibold text-[#FF9500]">PR</span>
+                    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#E8B948]/10">
+                      <Trophy strokeWidth={1.5} className="w-3 h-3 text-[#E8B948]" />
+                      <span className="text-[11px] font-semibold text-[#E8B948]">PR</span>
                     </div>
                   )}
                   {ex.totalVolume > 0 && (
-                    <span className="text-[12px] font-medium text-[#8E8E93]">
+                    <span className="text-[12px] font-medium text-[#D6D9D6]">
                       {ex.totalVolume.toLocaleString('nl-BE')} kg
                     </span>
                   )}
@@ -557,8 +557,8 @@ export default function CoachWorkoutDetailPage() {
               </div>
 
               {/* Sets table */}
-              <div className="border-t border-[#E8E4DC]">
-                <div className="grid grid-cols-5 text-[11px] font-semibold text-[#8E8E93] uppercase tracking-wide px-5 py-2 bg-[#FAFAFA]">
+              <div className="border-t border-[#A6ADA7]">
+                <div className="grid grid-cols-5 text-[11px] font-semibold text-[#D6D9D6] uppercase tracking-wide px-5 py-2 bg-[#A6ADA7]">
                   <span>Set</span>
                   <span className="text-right">Gewicht</span>
                   <span className="text-right">Reps</span>
@@ -569,12 +569,12 @@ export default function CoachWorkoutDetailPage() {
                   <div
                     key={set.id}
                     className={`grid grid-cols-5 items-center px-5 py-2.5 text-[13px] border-t border-[#F0EDE8] ${
-                      set.is_warmup ? 'text-[#A09D96] bg-[#FAFAFA]' : 'text-[#1A1917]'
+                      set.is_warmup ? 'text-[#E6E8E7] bg-[#A6ADA7]' : 'text-[#FDFDFE]'
                     }`}
                   >
                     <span className="font-medium">
                       {set.is_warmup ? 'W' : set.set_number}
-                      {set.is_pr && <Trophy strokeWidth={1.5} className="w-3 h-3 text-[#FF9500] inline ml-1" />}
+                      {set.is_pr && <Trophy strokeWidth={1.5} className="w-3 h-3 text-[#E8B948] inline ml-1" />}
                     </span>
                     <span className="text-right font-semibold tabular-nums">
                       {set.weight_kg != null ? `${set.weight_kg} kg` : '—'}
@@ -582,7 +582,7 @@ export default function CoachWorkoutDetailPage() {
                     <span className="text-right tabular-nums">
                       {set.actual_reps != null ? set.actual_reps : '—'}
                       {set.prescribed_reps && set.actual_reps != null && set.actual_reps !== set.prescribed_reps && (
-                        <span className="text-[10px] text-[#8E8E93] ml-0.5">/{set.prescribed_reps}</span>
+                        <span className="text-[10px] text-[#D6D9D6] ml-0.5">/{set.prescribed_reps}</span>
                       )}
                     </span>
                     <span className="text-right tabular-nums">
@@ -592,7 +592,7 @@ export default function CoachWorkoutDetailPage() {
                       {set.completed ? (
                         <CheckCircle2 strokeWidth={1.5} className="w-4 h-4 text-green-500 inline" />
                       ) : (
-                        <span className="text-[#C7C7CC]">—</span>
+                        <span className="text-[#CDD1CE]">—</span>
                       )}
                     </span>
                   </div>
@@ -601,9 +601,9 @@ export default function CoachWorkoutDetailPage() {
 
               {/* Best set summary */}
               {ex.bestSet && (
-                <div className="px-5 py-2.5 border-t border-[#E8E4DC] bg-[#FAFAFA] flex items-center justify-between text-[12px]">
-                  <span className="text-[#8E8E93] font-medium">Beste set</span>
-                  <span className="font-semibold text-[#1A1917]">
+                <div className="px-5 py-2.5 border-t border-[#A6ADA7] bg-[#A6ADA7] flex items-center justify-between text-[12px]">
+                  <span className="text-[#D6D9D6] font-medium">Beste set</span>
+                  <span className="font-semibold text-[#FDFDFE]">
                     {ex.bestSet.weight} kg × {ex.bestSet.reps}
                   </span>
                 </div>
@@ -611,8 +611,8 @@ export default function CoachWorkoutDetailPage() {
 
               {/* Previous 3 sessions history */}
               {exerciseHistory[ex.exercise_id] && exerciseHistory[ex.exercise_id].length > 0 && (
-                <div className="px-5 py-3 border-t border-[#E8E4DC] bg-[#F8F7F4]">
-                  <p className="text-[10px] font-semibold text-[#8E8E93] uppercase tracking-wide mb-2">
+                <div className="px-5 py-3 border-t border-[#A6ADA7] bg-[#A6ADA7]">
+                  <p className="text-[10px] font-semibold text-[#D6D9D6] uppercase tracking-wide mb-2">
                     Vorige {exerciseHistory[ex.exercise_id].length} training{exerciseHistory[ex.exercise_id].length > 1 ? 'en' : ''}
                   </p>
                   <div className="space-y-1.5">
@@ -627,10 +627,10 @@ export default function CoachWorkoutDetailPage() {
 
                       return (
                         <div key={i} className="flex items-center gap-2 text-[12px]">
-                          <span className="text-[#8E8E93] font-medium w-[52px] flex-shrink-0">{dateLabel}</span>
-                          <span className="text-[#1A1917] tabular-nums font-medium flex-1 truncate">{setsStr}</span>
+                          <span className="text-[#D6D9D6] font-medium w-[52px] flex-shrink-0">{dateLabel}</span>
+                          <span className="text-[#FDFDFE] tabular-nums font-medium flex-1 truncate">{setsStr}</span>
                           {prev.best_weight != null && (
-                            <span className="text-[#8E8E93] tabular-nums flex-shrink-0">{prev.best_weight} kg</span>
+                            <span className="text-[#D6D9D6] tabular-nums flex-shrink-0">{prev.best_weight} kg</span>
                           )}
                           {trend === 'up' && <TrendingUp strokeWidth={2} className="w-3 h-3 text-green-500 flex-shrink-0" />}
                           {trend === 'down' && <TrendingUp strokeWidth={2} className="w-3 h-3 text-red-400 flex-shrink-0 rotate-180" />}
@@ -644,25 +644,25 @@ export default function CoachWorkoutDetailPage() {
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-2xl p-8 border border-[#E8E4DC] text-center">
-          <Dumbbell strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#8E8E93] opacity-40" />
-          <p className="text-[14px] text-[#8E8E93]">Geen oefeningen gelogd voor deze sessie.</p>
+        <div className="bg-[#A6ADA7] rounded-2xl p-8 border border-[#A6ADA7] text-center">
+          <Dumbbell strokeWidth={1.5} className="w-10 h-10 mx-auto mb-3 text-[#D6D9D6] opacity-40" />
+          <p className="text-[14px] text-[#D6D9D6]">Geen oefeningen gelogd voor deze sessie.</p>
         </div>
       )}
 
       {/* Quick Feedback Section */}
-      <div className="bg-white rounded-2xl border border-[#E8E4DC] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-5 space-y-4">
-        <h2 className="text-[13px] text-[#8E8E93] uppercase font-semibold tracking-wide">
+      <div className="bg-[#A6ADA7] rounded-2xl border border-[#A6ADA7] shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-5 space-y-4">
+        <h2 className="text-[13px] text-[#D6D9D6] uppercase font-semibold tracking-wide">
           Feedback naar {clientName?.split(' ')[0] || 'cliënt'}
         </h2>
 
         {/* Existing Messages */}
         {coachMessages.length > 0 && (
-          <div className="space-y-2 pb-4 border-b border-[#E8E4DC]">
+          <div className="space-y-2 pb-4 border-b border-[#A6ADA7]">
             {coachMessages.map((msg) => (
-              <div key={msg.id} className="bg-[#FAFAFA] rounded-xl p-3">
-                <p className="text-[13px] text-[#1A1917] whitespace-pre-wrap">{msg.content}</p>
-                <p className="text-[11px] text-[#8E8E93] mt-1">
+              <div key={msg.id} className="bg-[#A6ADA7] rounded-xl p-3">
+                <p className="text-[13px] text-[#FDFDFE] whitespace-pre-wrap">{msg.content}</p>
+                <p className="text-[11px] text-[#D6D9D6] mt-1">
                   {new Date(msg.created_at).toLocaleDateString('nl-BE', {
                     day: 'numeric',
                     month: 'short',
@@ -681,7 +681,7 @@ export default function CoachWorkoutDetailPage() {
             <button
               key={reply}
               onClick={() => setFeedbackText(reply)}
-              className="px-3 py-1.5 rounded-full bg-[#EDEAE4] hover:bg-[#E0DCD2] transition-colors text-[13px] font-medium text-[#1A1917]"
+              className="px-3 py-1.5 rounded-full bg-[#A6ADA7] hover:bg-[#E0DCD2] transition-colors text-[13px] font-medium text-[#FDFDFE]"
             >
               {reply}
             </button>
@@ -699,7 +699,7 @@ export default function CoachWorkoutDetailPage() {
               value={feedbackText}
               onChange={(e) => setFeedbackText(e.target.value)}
               placeholder="Typ je feedback hier..."
-              className="w-full p-3 rounded-lg border border-[#E8E4DC] text-[14px] text-[#1A1917] placeholder:text-[#8E8E93] focus:outline-none focus:ring-1 focus:ring-[#D46A3A] resize-none"
+              className="w-full p-3 rounded-lg border border-[#A6ADA7] text-[14px] text-[#FDFDFE] placeholder:text-[#D6D9D6] focus:outline-none focus:ring-1 focus:ring-[#C0FC01] resize-none"
               rows={3}
             />
             <button

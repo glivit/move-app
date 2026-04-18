@@ -185,7 +185,7 @@ export default function MealPlanPage() {
 
         {/* New Plan Form */}
         {showForm && (
-          <Card className="rounded-2xl p-8 mb-10 bg-white shadow-clean border border-client-border">
+          <Card className="rounded-2xl p-8 mb-10 bg-[#A6ADA7] shadow-clean border border-client-border">
             <h2 className="text-2xl font-bold mb-6 text-text-primary">
               Nieuw voedingsplan aanmaken
             </h2>
@@ -193,7 +193,7 @@ export default function MealPlanPage() {
             <div className="flex gap-3 mt-8 pt-6 border-t border-client-border">
               <button
                 onClick={() => setShowForm(false)}
-                className="px-4 py-2 rounded-2xl font-medium transition-all bg-client-surface-muted text-text-primary border border-client-border hover:bg-gray-200"
+                className="px-4 py-2 rounded-2xl font-medium transition-all bg-client-surface-muted text-text-primary border border-client-border hover:bg-[#989F99]"
               >
                 Annuleren
               </button>
@@ -207,7 +207,7 @@ export default function MealPlanPage() {
             <h2 className="text-[15px] font-bold mb-4 text-text-primary">
               Actief plan
             </h2>
-            <Card className="rounded-2xl p-8 bg-white shadow-clean border border-client-border">
+            <Card className="rounded-2xl p-8 bg-[#A6ADA7] shadow-clean border border-client-border">
               <div className="flex items-start justify-between gap-6 mb-6">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-3">
@@ -289,7 +289,7 @@ export default function MealPlanPage() {
                     href={activePlan.pdf_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 rounded-2xl font-medium transition-all inline-flex items-center gap-2 bg-client-surface-muted text-text-primary border border-client-border hover:bg-gray-200"
+                    className="px-4 py-2 rounded-2xl font-medium transition-all inline-flex items-center gap-2 bg-client-surface-muted text-text-primary border border-client-border hover:bg-[#989F99]"
                   >
                     <Download strokeWidth={1.5} size={18} />
                     Download PDF
@@ -315,7 +315,7 @@ export default function MealPlanPage() {
             </h2>
             <div className="space-y-4">
               {archivedPlans.map((plan) => (
-                <Card key={plan.id} className="rounded-2xl p-6 bg-white shadow-clean border border-client-border">
+                <Card key={plan.id} className="rounded-2xl p-6 bg-[#A6ADA7] shadow-clean border border-client-border">
                   <div className="flex items-start justify-between gap-6">
                     <div className="flex-1">
                       <h3 className="text-[15px] font-bold mb-2 text-text-primary">
@@ -348,7 +348,7 @@ export default function MealPlanPage() {
                           href={plan.pdf_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-3 py-2 rounded-2xl font-medium transition-all inline-flex items-center gap-1 text-[13px] bg-client-surface-muted text-text-primary border border-client-border hover:bg-gray-200"
+                          className="px-3 py-2 rounded-2xl font-medium transition-all inline-flex items-center gap-1 text-[13px] bg-client-surface-muted text-text-primary border border-client-border hover:bg-[#989F99]"
                         >
                           <Download strokeWidth={1.5} size={16} />
                           PDF
@@ -372,7 +372,7 @@ export default function MealPlanPage() {
 
         {/* Empty State */}
         {mealPlans.length === 0 && (
-          <Card className="rounded-2xl p-12 text-center bg-white shadow-clean border border-client-border">
+          <Card className="rounded-2xl p-12 text-center bg-[#A6ADA7] shadow-clean border border-client-border">
             <Archive
               size={48}
               strokeWidth={1.5}

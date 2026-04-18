@@ -106,9 +106,9 @@ export function DashboardCalls() {
     return (
       <Card padding="md">
         <div className="space-y-3">
-          <div className="h-20 bg-gray-200 rounded animate-pulse"></div>
-          <div className="h-20 bg-gray-200 rounded animate-pulse"></div>
-          <div className="h-20 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-20 bg-[#989F99] rounded animate-pulse"></div>
+          <div className="h-20 bg-[#989F99] rounded animate-pulse"></div>
+          <div className="h-20 bg-[#989F99] rounded animate-pulse"></div>
         </div>
       </Card>
     );

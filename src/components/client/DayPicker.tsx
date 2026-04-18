@@ -45,7 +45,7 @@ export function DayPicker({
           'w-12 h-16 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all flex-shrink-0'
 
         if (isActive) {
-          buttonClasses += ' bg-[#FDFDFE] text-white'
+          buttonClasses += ' bg-[#474B48] text-white'
         } else if (isCompleted && hasExercisesToday) {
           buttonClasses += ' bg-data-green/10 text-data-green'
         } else if (!hasExercisesToday) {

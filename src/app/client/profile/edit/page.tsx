@@ -79,7 +79,7 @@ export default function EditProfilePage() {
       {/* Avatar */}
       <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] p-6 flex flex-col items-center">
         <div className="relative mb-4">
-          <div className="w-24 h-24 rounded-full bg-[#FDFDFE] text-white flex items-center justify-center text-3xl font-semibold overflow-hidden">
+          <div className="w-24 h-24 rounded-full bg-[#474B48] text-white flex items-center justify-center text-3xl font-semibold overflow-hidden">
             {avatarUrl ? (
               <Image src={avatarUrl} alt={fullName} width={96} height={96} className="w-full h-full object-cover" unoptimized loading="lazy" />
             ) : (
@@ -129,7 +129,7 @@ export default function EditProfilePage() {
       <button
         onClick={handleSave}
         disabled={saving}
-        className="w-full py-3.5 rounded-2xl bg-[#FDFDFE] text-white font-semibold text-[15px] hover:bg-[#7A5C12] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-3.5 rounded-2xl bg-[#474B48] text-white font-semibold text-[15px] hover:bg-[#3A3E3B] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {saving ? (
           <Loader2 className="w-5 h-5 animate-spin" />

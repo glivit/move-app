@@ -216,11 +216,11 @@ export default function NewProgramPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white p-6">
+    <div className="min-h-screen bg-[#A6ADA7] p-6">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/coach/programs" className="inline-flex items-center gap-2 text-[#1A1917] mb-6 hover:text-[#1A1917] transition-colors opacity-70 hover:opacity-100">
+          <Link href="/coach/programs" className="inline-flex items-center gap-2 text-[#FDFDFE] mb-6 hover:text-[#FDFDFE] transition-colors opacity-70 hover:opacity-100">
             <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
             <span className="text-[15px] font-medium" style={{ fontFamily: 'var(--font-body)' }}>
               Terug
@@ -228,7 +228,7 @@ export default function NewProgramPage() {
           </Link>
 
           <h1
-            className="text-[32px] font-semibold text-[#1A1917]"
+            className="text-[32px] font-semibold text-[#FDFDFE]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Nieuw Programma
@@ -238,7 +238,7 @@ export default function NewProgramPage() {
         {/* Template Picker Section */}
         <div className="mb-8">
           <label
-            className="block text-[12px] font-medium text-[#B0B0B0] uppercase mb-6"
+            className="block text-[12px] font-medium text-[#CDD1CE] uppercase mb-6"
             style={{
               fontFamily: 'var(--font-body)',
               letterSpacing: '1.5px',
@@ -249,7 +249,7 @@ export default function NewProgramPage() {
 
           {templatesLoading ? (
             <div className="flex justify-center py-8">
-              <Loader2 className="w-6 h-6 animate-spin text-[#1A1917]" />
+              <Loader2 className="w-6 h-6 animate-spin text-[#FDFDFE]" />
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-4 mb-8">
@@ -260,13 +260,13 @@ export default function NewProgramPage() {
                   onClick={() => handleSelectTemplate(template)}
                   className={`p-4 rounded-2xl border-2 transition-all text-left ${
                     selectedTemplateId === template.id
-                      ? 'border-[#D46A3A] bg-[#FFF9F6]'
-                      : 'border-[#F0F0EE] bg-white hover:border-[#E0E0DE]'
+                      ? 'border-[#C0FC01] bg-[#FFF9F6]'
+                      : 'border-[#A6ADA7] bg-[#A6ADA7] hover:border-[#E0E0DE]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <h3
-                      className="text-[15px] font-medium text-[#1A1917]"
+                      className="text-[15px] font-medium text-[#FDFDFE]"
                       style={{ fontFamily: 'var(--font-body)' }}
                     >
                       {template.name}
@@ -275,7 +275,7 @@ export default function NewProgramPage() {
 
                   <div className="flex items-center gap-2 flex-wrap">
                     <span
-                      className="text-[12px] px-2.5 py-1 rounded-full bg-[#F0F0EE] text-[#1A1917]"
+                      className="text-[12px] px-2.5 py-1 rounded-full bg-[#A6ADA7] text-[#FDFDFE]"
                       style={{ fontFamily: 'var(--font-body)' }}
                     >
                       {getDifficultyLabel(template.difficulty)}
@@ -294,21 +294,21 @@ export default function NewProgramPage() {
 
           {/* Divider */}
           <div className="flex items-center gap-4 mb-8">
-            <div className="flex-1 border-t border-[#F0F0EE]" />
+            <div className="flex-1 border-t border-[#A6ADA7]" />
             <span
-              className="text-[12px] text-[#B0B0B0]"
+              className="text-[12px] text-[#CDD1CE]"
               style={{ fontFamily: 'var(--font-body)' }}
             >
               of begin leeg
             </span>
-            <div className="flex-1 border-t border-[#F0F0EE]" />
+            <div className="flex-1 border-t border-[#A6ADA7]" />
           </div>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div
-            className="bg-white rounded-2xl border border-[#F0F0EE] p-6"
+            className="bg-[#A6ADA7] rounded-2xl border border-[#A6ADA7] p-6"
             style={{
               fontFamily: 'var(--font-body)',
             }}
@@ -317,9 +317,9 @@ export default function NewProgramPage() {
             <div className="mb-6">
               <label
                 htmlFor="name"
-                className="block text-[13px] font-medium text-[#B0B0B0] mb-2"
+                className="block text-[13px] font-medium text-[#CDD1CE] mb-2"
               >
-                Programmanaam <span className="text-[#D46A3A]">*</span>
+                Programmanaam <span className="text-[#C0FC01]">*</span>
               </label>
               <input
                 type="text"
@@ -328,7 +328,7 @@ export default function NewProgramPage() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="bijv. Fullbody Strength"
-                className="w-full px-4 py-3 bg-white border border-[#F0F0EE] rounded-2xl text-[15px] text-[#1A1917] placeholder:text-[#C0C0C0] focus:outline-none focus:ring-2 focus:ring-[#D46A3A] focus:ring-offset-1 transition-all"
+                className="w-full px-4 py-3 bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl text-[15px] text-[#FDFDFE] placeholder:text-[#C0C0C0] focus:outline-none focus:ring-2 focus:ring-[#C0FC01] focus:ring-offset-1 transition-all"
               />
             </div>
 
@@ -336,7 +336,7 @@ export default function NewProgramPage() {
             <div className="mb-6">
               <label
                 htmlFor="description"
-                className="block text-[13px] font-medium text-[#B0B0B0] mb-2"
+                className="block text-[13px] font-medium text-[#CDD1CE] mb-2"
               >
                 Beschrijving (optioneel)
               </label>
@@ -347,7 +347,7 @@ export default function NewProgramPage() {
                 onChange={handleChange}
                 placeholder="Beschrijf het doel en focus van dit programma..."
                 rows={4}
-                className="w-full px-4 py-3 bg-white border border-[#F0F0EE] rounded-2xl text-[15px] text-[#1A1917] placeholder:text-[#C0C0C0] focus:outline-none focus:ring-2 focus:ring-[#D46A3A] focus:ring-offset-1 transition-all resize-none"
+                className="w-full px-4 py-3 bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl text-[15px] text-[#FDFDFE] placeholder:text-[#C0C0C0] focus:outline-none focus:ring-2 focus:ring-[#C0FC01] focus:ring-offset-1 transition-all resize-none"
               />
             </div>
 
@@ -356,7 +356,7 @@ export default function NewProgramPage() {
               <div>
                 <label
                   htmlFor="duration_weeks"
-                  className="block text-[13px] font-medium text-[#B0B0B0] mb-2"
+                  className="block text-[13px] font-medium text-[#CDD1CE] mb-2"
                 >
                   Duur (weken)
                 </label>
@@ -367,14 +367,14 @@ export default function NewProgramPage() {
                   min="1"
                   value={formData.duration_weeks}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-white border border-[#F0F0EE] rounded-2xl text-[15px] text-[#1A1917] focus:outline-none focus:ring-2 focus:ring-[#D46A3A] focus:ring-offset-1 transition-all"
+                  className="w-full px-4 py-3 bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl text-[15px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#C0FC01] focus:ring-offset-1 transition-all"
                 />
               </div>
 
               <div>
                 <label
                   htmlFor="days_per_week"
-                  className="block text-[13px] font-medium text-[#B0B0B0] mb-2"
+                  className="block text-[13px] font-medium text-[#CDD1CE] mb-2"
                 >
                   Dagen per week
                 </label>
@@ -385,7 +385,7 @@ export default function NewProgramPage() {
                   min="1"
                   value={formData.days_per_week}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-white border border-[#F0F0EE] rounded-2xl text-[15px] text-[#1A1917] focus:outline-none focus:ring-2 focus:ring-[#D46A3A] focus:ring-offset-1 transition-all"
+                  className="w-full px-4 py-3 bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl text-[15px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#C0FC01] focus:ring-offset-1 transition-all"
                 />
               </div>
             </div>
@@ -394,7 +394,7 @@ export default function NewProgramPage() {
             <div className="mb-6">
               <label
                 htmlFor="difficulty"
-                className="block text-[13px] font-medium text-[#B0B0B0] mb-2"
+                className="block text-[13px] font-medium text-[#CDD1CE] mb-2"
               >
                 Moeilijkheidsgraad
               </label>
@@ -403,7 +403,7 @@ export default function NewProgramPage() {
                 name="difficulty"
                 value={formData.difficulty}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-white border border-[#F0F0EE] rounded-2xl text-[15px] text-[#1A1917] focus:outline-none focus:ring-2 focus:ring-[#D46A3A] focus:ring-offset-1 transition-all"
+                className="w-full px-4 py-3 bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl text-[15px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#C0FC01] focus:ring-offset-1 transition-all"
               >
                 <option value="beginner">Beginner</option>
                 <option value="intermediate">Intermediate</option>
@@ -415,7 +415,7 @@ export default function NewProgramPage() {
             <div>
               <label
                 htmlFor="tags"
-                className="block text-[13px] font-medium text-[#B0B0B0] mb-2"
+                className="block text-[13px] font-medium text-[#CDD1CE] mb-2"
               >
                 Tags (optioneel)
               </label>
@@ -426,7 +426,7 @@ export default function NewProgramPage() {
                 value={formData.tags}
                 onChange={handleChange}
                 placeholder="Voer tags in gescheiden door komma's (bijv. 'Bulk, Hypertrophy')"
-                className="w-full px-4 py-3 bg-white border border-[#F0F0EE] rounded-2xl text-[15px] text-[#1A1917] placeholder:text-[#C0C0C0] focus:outline-none focus:ring-2 focus:ring-[#D46A3A] focus:ring-offset-1 transition-all"
+                className="w-full px-4 py-3 bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl text-[15px] text-[#FDFDFE] placeholder:text-[#C0C0C0] focus:outline-none focus:ring-2 focus:ring-[#C0FC01] focus:ring-offset-1 transition-all"
               />
             </div>
           </div>
@@ -450,7 +450,7 @@ export default function NewProgramPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-[#1A1917] text-white px-6 py-3 rounded-2xl font-medium text-[15px] hover:bg-[#2d2520] focus:outline-none focus:ring-2 focus:ring-[#D46A3A] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors inline-flex items-center justify-center"
+              className="flex-1 bg-[#474B48] text-white px-6 py-3 rounded-2xl font-medium text-[15px] hover:bg-[#2d2520] focus:outline-none focus:ring-2 focus:ring-[#C0FC01] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors inline-flex items-center justify-center"
               style={{ fontFamily: 'var(--font-body)' }}
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}

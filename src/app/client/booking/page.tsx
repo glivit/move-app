@@ -215,7 +215,7 @@ export default function BookingPage() {
                     disabled={!day.hasSlots || isPast}
                     className={`aspect-square flex flex-col items-center justify-center text-[13px] transition-all relative ${
                       isSelected
-                        ? 'bg-[#FDFDFE] text-white font-bold'
+                        ? 'bg-[#474B48] text-white font-bold'
                         : day.hasSlots && !isPast
                           ? 'text-[#FDFDFE] hover:bg-[rgba(253,253,254,0.10)] font-medium'
                           : !day.isCurrentMonth
@@ -252,7 +252,7 @@ export default function BookingPage() {
                       onClick={() => setSelectedSlot(slot)}
                       className={`py-2.5 px-3 text-[14px] font-medium uppercase tracking-wider transition-all border rounded-xl ${
                         selectedSlot?.datetime === slot.datetime
-                          ? 'bg-[#FDFDFE] text-white border-[#FDFDFE]'
+                          ? 'bg-[#474B48] text-white border-[#FDFDFE]'
                           : 'bg-white text-[#FDFDFE] border-[rgba(253,253,254,0.08)] hover:border-[#FDFDFE]/30 hover:bg-[rgba(253,253,254,0.10)]'
                       }`}
                     >
@@ -295,7 +295,7 @@ export default function BookingPage() {
                 <button
                   onClick={handleBook}
                   disabled={booking}
-                  className="w-full py-3 bg-[#FDFDFE] text-white font-semibold uppercase tracking-wider text-[14px] hover:bg-[#5A5E5B] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-[#474B48] text-white font-semibold uppercase tracking-wider text-[14px] hover:bg-[#3A3E3B] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {booking ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> Boeken...</>

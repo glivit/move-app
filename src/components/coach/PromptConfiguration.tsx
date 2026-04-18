@@ -51,7 +51,7 @@ export function PromptConfiguration({
           handleSaveEdit();
         }} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: '#1a1a1a' }}>
+            <label className="block text-sm font-medium mb-2" style={{ color: '#FDFDFE' }}>
               Titel
             </label>
             <Input
@@ -64,7 +64,7 @@ export function PromptConfiguration({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: '#1a1a1a' }}>
+            <label className="block text-sm font-medium mb-2" style={{ color: '#FDFDFE' }}>
               Vraag
             </label>
             <textarea
@@ -73,13 +73,13 @@ export function PromptConfiguration({
                 setEditData({ ...editData, question: e.target.value })
               }
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              className="w-full px-3 py-2 border border-[#989F99] rounded-lg"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: '#1a1a1a' }}>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#FDFDFE' }}>
                 Dag
               </label>
               <select
@@ -87,7 +87,7 @@ export function PromptConfiguration({
                 onChange={(e) =>
                   setEditData({ ...editData, send_day: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-3 py-2 border border-[#989F99] rounded-lg"
               >
                 {DAYS.map((day, index) => (
                   <option key={index} value={index}>
@@ -98,7 +98,7 @@ export function PromptConfiguration({
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: '#1a1a1a' }}>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#FDFDFE' }}>
                 Tijd
               </label>
               <Input
@@ -115,7 +115,7 @@ export function PromptConfiguration({
             <Button
               type="submit"
               style={{
-                backgroundColor: '#1A1917',
+                backgroundColor: '#FDFDFE',
                 color: '#fff',
               }}
             >
@@ -135,7 +135,7 @@ export function PromptConfiguration({
         <div className="space-y-4">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <h3 className="text-lg font-semibold mb-2" style={{ color: '#1a1a1a' }}>
+              <h3 className="text-lg font-semibold mb-2" style={{ color: '#FDFDFE' }}>
                 {prompt.title}
               </h3>
               <p className="text-sm mb-3" style={{ color: '#666' }}>
@@ -152,7 +152,7 @@ export function PromptConfiguration({
                 onClick={() => onToggleActive(prompt.id, prompt.is_active)}
                 className="px-3 py-2 rounded-lg text-sm font-medium transition-colors"
                 style={{
-                  backgroundColor: prompt.is_active ? '#1A1917' : '#e0e0e0',
+                  backgroundColor: prompt.is_active ? '#FDFDFE' : '#e0e0e0',
                   color: prompt.is_active ? '#fff' : '#999',
                 }}
               >
@@ -161,7 +161,7 @@ export function PromptConfiguration({
             </div>
           </div>
 
-          <div className="flex gap-2 pt-2 border-t border-gray-200">
+          <div className="flex gap-2 pt-2 border-t border-[#989F99]">
             <Button
               onClick={() => setIsEditing(true)}
               variant="secondary"

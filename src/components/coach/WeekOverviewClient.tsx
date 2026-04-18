@@ -192,7 +192,7 @@ export function WeekOverviewClient({ initialData, coachFirstName, coachId }: Pro
       {/* Greeting */}
       <div className="mb-4">
         <h1
-          className="text-[32px] sm:text-[38px] font-semibold text-[#1A1917] tracking-[-0.03em] leading-[1.05]"
+          className="text-[32px] sm:text-[38px] font-semibold text-[#FDFDFE] tracking-[-0.03em] leading-[1.05]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
           {greeting}, {coachFirstName}
@@ -202,38 +202,38 @@ export function WeekOverviewClient({ initialData, coachFirstName, coachId }: Pro
       {/* Attention strip — sticky on mobile */}
       <div
         className={`sticky top-[60px] lg:top-0 z-20 -mx-5 sm:-mx-8 lg:mx-0 px-5 sm:px-8 lg:px-0 py-3 lg:py-0 mb-6 lg:mb-8 transition-colors ${
-          summary.needsAttention > 0 ? 'bg-[#EEEBE3]/95 lg:bg-transparent backdrop-blur-sm' : 'bg-[#EEEBE3]/95 lg:bg-transparent backdrop-blur-sm'
+          summary.needsAttention > 0 ? 'bg-[#A6ADA7]/95 lg:bg-transparent backdrop-blur-sm' : 'bg-[#A6ADA7]/95 lg:bg-transparent backdrop-blur-sm'
         }`}
       >
         <div
           className={`flex items-center justify-between gap-3 rounded-2xl px-4 py-3.5 ${
             summary.needsAttention > 0
-              ? 'bg-white border border-[#FFD5D1] shadow-[0_1px_3px_rgba(255,59,48,0.08)]'
-              : 'bg-white border border-[#E8E4DC]'
+              ? 'bg-[#A6ADA7] border border-[#FFD5D1] shadow-[0_1px_3px_rgba(255,59,48,0.08)]'
+              : 'bg-[#A6ADA7] border border-[#A6ADA7]'
           }`}
         >
           <div className="flex items-center gap-3 min-w-0">
             <div
               className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
-                summary.needsAttention > 0 ? 'bg-[#FFE8E5]' : 'bg-[#E6F7EA]'
+                summary.needsAttention > 0 ? 'bg-[rgba(181,90,74,0.14)]' : 'bg-[#E6F7EA]'
               }`}
             >
               {summary.needsAttention > 0 ? (
-                <AlertTriangle size={17} className="text-[#FF3B30]" strokeWidth={2} />
+                <AlertTriangle size={17} className="text-[#B55A4A]" strokeWidth={2} />
               ) : (
-                <CheckCircle2 size={17} className="text-[#34C759]" strokeWidth={2} />
+                <CheckCircle2 size={17} className="text-[#2FA65A]" strokeWidth={2} />
               )}
             </div>
             <div className="min-w-0">
-              <p className="text-[14px] font-semibold text-[#1A1917] truncate">{headlineText}</p>
-              <p className="text-[12px] text-[#A09D96] truncate flex items-center gap-1.5">
+              <p className="text-[14px] font-semibold text-[#FDFDFE] truncate">{headlineText}</p>
+              <p className="text-[12px] text-[#E6E8E7] truncate flex items-center gap-1.5">
                 <span
                   className={`inline-block w-1.5 h-1.5 rounded-full transition-all ${
                     justUpdated
-                      ? 'bg-[#34C759] animate-pulse-ring'
+                      ? 'bg-[#2FA65A] animate-pulse-ring'
                       : connected
-                      ? 'bg-[#34C759]'
-                      : 'bg-[#C5C2BC]'
+                      ? 'bg-[#2FA65A]'
+                      : 'bg-[#989F99]'
                   }`}
                   title={connected ? 'Live' : 'Offline'}
                 />
@@ -256,8 +256,8 @@ export function WeekOverviewClient({ initialData, coachFirstName, coachId }: Pro
             onClick={() => startTransition(() => setFilter(f.key))}
             className={`px-3.5 py-1.5 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all ${
               filter === f.key
-                ? 'bg-[#1A1917] text-white'
-                : 'bg-white border border-[#E8E4DC] text-[#6B6862] active:scale-95'
+                ? 'bg-[#474B48] text-white'
+                : 'bg-[#A6ADA7] border border-[#A6ADA7] text-[#E6E8E7] active:scale-95'
             }`}
           >
             {f.label}
@@ -272,7 +272,7 @@ export function WeekOverviewClient({ initialData, coachFirstName, coachId }: Pro
           placeholder="Zoek cliënt..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#E8E4DC] text-[14px] text-[#1A1917] placeholder-[#A09D96] focus:outline-none focus:ring-2 focus:ring-[#D46A3A]/25 focus:border-transparent"
+          className="w-full px-4 py-2.5 rounded-xl bg-[#A6ADA7] border border-[#A6ADA7] text-[14px] text-[#FDFDFE] placeholder-[#E6E8E7] focus:outline-none focus:ring-2 focus:ring-[#C0FC01]/25 focus:border-transparent"
         />
       </div>
 
@@ -295,8 +295,8 @@ export function WeekOverviewClient({ initialData, coachFirstName, coachId }: Pro
             </SwipeableRow>
           ))}
           {filter === 'needs' && filtered.length > 0 && (
-            <p className="text-center text-[11px] text-[#A09D96] pt-2 pb-1 lg:hidden">
-              Veeg → <span className="text-[#34C759] font-semibold">Gezien</span>  ·  Veeg ← <span className="text-[#6B6862] font-semibold">Later</span>
+            <p className="text-center text-[11px] text-[#E6E8E7] pt-2 pb-1 lg:hidden">
+              Veeg → <span className="text-[#2FA65A] font-semibold">Gezien</span>  ·  Veeg ← <span className="text-[#E6E8E7] font-semibold">Later</span>
             </p>
           )}
         </div>
@@ -314,7 +314,7 @@ export function WeekOverviewClient({ initialData, coachFirstName, coachId }: Pro
       {/* Triage undo toast */}
       {toast && (
         <div className="fixed left-1/2 -translate-x-1/2 bottom-24 lg:bottom-8 z-40 animate-toast-in">
-          <div className="flex items-center gap-3 bg-[#1A1917] text-white rounded-full pl-4 pr-2 py-2 shadow-xl">
+          <div className="flex items-center gap-3 bg-[#474B48] text-white rounded-full pl-4 pr-2 py-2 shadow-xl">
             <span className="text-[13px]">
               {toast.kind === 'seen' ? (
                 <>
@@ -368,10 +368,10 @@ export function WeekOverviewClient({ initialData, coachFirstName, coachId }: Pro
 function ClientRow({ client, onMessage }: { client: ClientWeekRow; onMessage: () => void }) {
   const accent =
     client.attention === 'urgent'
-      ? 'border-[#FF3B30]/25 bg-[#FFF8F7]'
+      ? 'border-[#B55A4A]/25 bg-[#FFF8F7]'
       : client.attention === 'attention'
-      ? 'border-[#FFB800]/25 bg-[#FFFCF4]'
-      : 'border-[#E8E4DC] bg-white'
+      ? 'border-[#E8B948]/25 bg-[#FFFCF4]'
+      : 'border-[#A6ADA7] bg-[#A6ADA7]'
 
   return (
     <div
@@ -380,7 +380,7 @@ function ClientRow({ client, onMessage }: { client: ClientWeekRow; onMessage: ()
       <Link href={`/coach/clients/${client.id}/week`} className="block px-4 pt-4 pb-2">
         <div className="flex items-center gap-3">
           {/* Avatar */}
-          <div className="w-11 h-11 rounded-full bg-[#F0EDE7] flex items-center justify-center text-[13px] font-semibold text-[#6B6862] flex-shrink-0 overflow-hidden">
+          <div className="w-11 h-11 rounded-full bg-[#A6ADA7] flex items-center justify-center text-[13px] font-semibold text-[#E6E8E7] flex-shrink-0 overflow-hidden">
             {client.avatarUrl ? (
               <Image
                 src={client.avatarUrl}
@@ -399,9 +399,9 @@ function ClientRow({ client, onMessage }: { client: ClientWeekRow; onMessage: ()
           {/* Name + status */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <p className="text-[15px] font-semibold text-[#1A1917] truncate">{client.fullName}</p>
+              <p className="text-[15px] font-semibold text-[#FDFDFE] truncate">{client.fullName}</p>
               {client.unreadFromClient > 0 && (
-                <span className="flex-shrink-0 min-w-[18px] h-[18px] px-1 rounded-full bg-[#D46A3A] text-white text-[10px] font-bold flex items-center justify-center">
+                <span className="flex-shrink-0 min-w-[18px] h-[18px] px-1 rounded-full bg-[#C0FC01] text-white text-[10px] font-bold flex items-center justify-center">
                   {client.unreadFromClient}
                 </span>
               )}
@@ -409,17 +409,17 @@ function ClientRow({ client, onMessage }: { client: ClientWeekRow; onMessage: ()
             <p
               className={`text-[12px] truncate mt-0.5 ${
                 client.attention === 'urgent'
-                  ? 'text-[#FF3B30] font-medium'
+                  ? 'text-[#B55A4A] font-medium'
                   : client.attention === 'attention'
-                  ? 'text-[#C47D15] font-medium'
-                  : 'text-[#A09D96]'
+                  ? 'text-[#D9A645] font-medium'
+                  : 'text-[#E6E8E7]'
               }`}
             >
               {client.attentionReason || client.lastActivityLabel || 'Geen activiteit'}
             </p>
           </div>
 
-          <ChevronRight size={16} className="text-[#D5D0C8] flex-shrink-0" strokeWidth={1.5} />
+          <ChevronRight size={16} className="text-[#989F99] flex-shrink-0" strokeWidth={1.5} />
         </div>
       </Link>
 
@@ -436,8 +436,8 @@ function ClientRow({ client, onMessage }: { client: ClientWeekRow; onMessage: ()
       {client.programDays.length > 0 && (
         <div className="px-4 pb-3 pt-0.5">
           <div className="flex items-center gap-1.5 mb-1.5">
-            <Dumbbell size={11} className="text-[#A09D96]" strokeWidth={2} />
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-[#A09D96]">
+            <Dumbbell size={11} className="text-[#E6E8E7]" strokeWidth={2} />
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-[#E6E8E7]">
               Programma · {client.doneThisWeek}/{client.plannedThisWeek}
             </span>
           </div>
@@ -450,12 +450,12 @@ function ClientRow({ client, onMessage }: { client: ClientWeekRow; onMessage: ()
       )}
 
       {/* Footer: nutrition + message button */}
-      <div className="px-4 py-2.5 border-t border-[#F0EDE7] flex items-center gap-3">
+      <div className="px-4 py-2.5 border-t border-[#A6ADA7] flex items-center gap-3">
         {/* Nutrition */}
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <UtensilsCrossed
             size={13}
-            className={client.nutritionLoggedToday ? 'text-[#D46A3A]' : 'text-[#D5D0C8]'}
+            className={client.nutritionLoggedToday ? 'text-[#C0FC01]' : 'text-[#989F99]'}
             strokeWidth={1.5}
           />
           {client.hasNutritionPlan ? (
@@ -464,33 +464,33 @@ function ClientRow({ client, onMessage }: { client: ClientWeekRow; onMessage: ()
                 <span
                   className={`text-[11px] font-semibold tabular-nums ${
                     client.nutritionTodayPct >= 80
-                      ? 'text-[#34C759]'
+                      ? 'text-[#2FA65A]'
                       : client.nutritionTodayPct > 0
-                      ? 'text-[#D46A3A]'
-                      : 'text-[#A09D96]'
+                      ? 'text-[#C0FC01]'
+                      : 'text-[#E6E8E7]'
                   }`}
                 >
                   {client.nutritionTodayPct}%
                 </span>
-                <span className="text-[10px] text-[#A09D96]">voeding</span>
+                <span className="text-[10px] text-[#E6E8E7]">voeding</span>
               </div>
-              <div className="h-1 bg-[#F0EDE7] rounded-full overflow-hidden">
+              <div className="h-1 bg-[#A6ADA7] rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all"
                   style={{
                     width: `${client.nutritionTodayPct}%`,
                     backgroundColor:
                       client.nutritionTodayPct >= 80
-                        ? '#34C759'
+                        ? '#2FA65A'
                         : client.nutritionTodayPct > 0
-                        ? '#D46A3A'
-                        : '#E8E4DC',
+                        ? '#C0FC01'
+                        : '#A6ADA7',
                   }}
                 />
               </div>
             </div>
           ) : (
-            <span className="text-[11px] text-[#C5C2BC]">Geen voedingsplan</span>
+            <span className="text-[11px] text-[#989F99]">Geen voedingsplan</span>
           )}
         </div>
 
@@ -500,7 +500,7 @@ function ClientRow({ client, onMessage }: { client: ClientWeekRow; onMessage: ()
             e.preventDefault()
             onMessage()
           }}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F5F2EC] text-[11px] font-semibold text-[#6B6862] active:scale-95 transition-transform flex-shrink-0"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#A6ADA7] text-[11px] font-semibold text-[#E6E8E7] active:scale-95 transition-transform flex-shrink-0"
         >
           <MessageCircle size={13} strokeWidth={2} />
           Bericht
@@ -515,28 +515,28 @@ function ClientRow({ client, onMessage }: { client: ClientWeekRow; onMessage: ()
 function ProgramDayRow({ entry }: { entry: ProgramDayEntry }) {
   // Icon + styling per status
   let icon: React.ReactNode
-  let nameClass = 'text-[#1A1917]'
-  const labelClass = 'text-[#A09D96]'
+  let nameClass = 'text-[#FDFDFE]'
+  const labelClass = 'text-[#E6E8E7]'
   let suffix: string | null = null
 
   switch (entry.status) {
     case 'done':
-      icon = <CheckCircle2 size={13} className="text-[#34C759] flex-shrink-0" strokeWidth={2.25} />
-      nameClass = 'text-[#6B6862] line-through decoration-[#C5C2BC] decoration-1'
+      icon = <CheckCircle2 size={13} className="text-[#2FA65A] flex-shrink-0" strokeWidth={2.25} />
+      nameClass = 'text-[#E6E8E7] line-through decoration-[#989F99] decoration-1'
       if (entry.completedOnLabel) suffix = `gedaan ${entry.completedOnLabel.toLowerCase()}`
       break
     case 'today':
-      icon = <Circle size={13} className="text-[#D46A3A] flex-shrink-0" strokeWidth={2.25} />
-      nameClass = 'text-[#1A1917] font-semibold'
+      icon = <Circle size={13} className="text-[#C0FC01] flex-shrink-0" strokeWidth={2.25} />
+      nameClass = 'text-[#FDFDFE] font-semibold'
       suffix = 'vandaag'
       break
     case 'upcoming':
-      icon = <CircleDashed size={13} className="text-[#C5C2BC] flex-shrink-0" strokeWidth={2} />
-      nameClass = 'text-[#6B6862]'
+      icon = <CircleDashed size={13} className="text-[#989F99] flex-shrink-0" strokeWidth={2} />
+      nameClass = 'text-[#E6E8E7]'
       break
     case 'missed':
-      icon = <CircleAlert size={13} className="text-[#FF3B30] flex-shrink-0" strokeWidth={2.25} />
-      nameClass = 'text-[#FF3B30] font-medium'
+      icon = <CircleAlert size={13} className="text-[#B55A4A] flex-shrink-0" strokeWidth={2.25} />
+      nameClass = 'text-[#B55A4A] font-medium'
       suffix = 'gemist'
       break
   }
@@ -552,10 +552,10 @@ function ProgramDayRow({ entry }: { entry: ProgramDayEntry }) {
         <span
           className={`ml-auto text-[10px] ${
             entry.status === 'missed'
-              ? 'text-[#FF3B30]'
+              ? 'text-[#B55A4A]'
               : entry.status === 'today'
-              ? 'text-[#D46A3A] font-semibold'
-              : 'text-[#A09D96]'
+              ? 'text-[#C0FC01] font-semibold'
+              : 'text-[#E6E8E7]'
           }`}
         >
           {suffix}
@@ -577,35 +577,35 @@ function WeekDot({ day }: { day: WeekDay }) {
 
   switch (day.state) {
     case 'done_planned':
-      dotClass = 'bg-[#1A1917] border-[#1A1917]'
+      dotClass = 'bg-[#FDFDFE] border-[#FDFDFE]'
       tooltipTitle += ` · ${day.completedDayName || 'Training'} voltooid`
       break
     case 'done_moved':
-      dotClass = 'bg-[#1A1917] border-[#1A1917]'
-      innerClass = 'bg-[#FFB800]'
+      dotClass = 'bg-[#FDFDFE] border-[#FDFDFE]'
+      innerClass = 'bg-[#E8B948]'
       tooltipTitle += ` · ${day.completedDayName || 'Training'} voltooid${
         day.movedFromDayName ? ` (van ${day.movedFromDayName})` : ''
       }`
       break
     case 'done_bonus':
-      dotClass = 'bg-[#34C759] border-[#34C759]'
+      dotClass = 'bg-[#2FA65A] border-[#2FA65A]'
       tooltipTitle += ` · Bonus training`
       break
     case 'missed':
-      dotClass = 'bg-white border-[#FF3B30] border-[1.5px]'
+      dotClass = 'bg-[#A6ADA7] border-[#B55A4A] border-[1.5px]'
       tooltipTitle += ` · ${day.plannedDayName || 'Training'} gemist`
       break
     case 'today_open':
-      dotClass = 'bg-[#FFF3E0] border-[#FFB800] border-[1.5px]'
+      dotClass = 'bg-[rgba(232,185,72,0.14)] border-[#E8B948] border-[1.5px]'
       tooltipTitle += ` · ${day.plannedDayName || 'Training'} vandaag`
       break
     case 'upcoming':
-      dotClass = 'bg-white border-[#D5D0C8] border-dashed'
+      dotClass = 'bg-[#A6ADA7] border-[#989F99] border-dashed'
       tooltipTitle += ` · ${day.plannedDayName || 'Training'} gepland`
       break
     case 'rest':
     default:
-      dotClass = 'bg-[#E8E4DC] border-[#E8E4DC]'
+      dotClass = 'bg-[#A6ADA7] border-[#A6ADA7]'
       tooltipTitle += ' · Rust'
       break
   }
@@ -621,14 +621,14 @@ function WeekDot({ day }: { day: WeekDay }) {
         className={`${
           isSmall ? 'w-2 h-2' : 'w-[22px] h-[22px]'
         } rounded-full border flex items-center justify-center transition-transform ${dotClass} ${
-          day.isToday && !isSmall ? 'ring-2 ring-[#D46A3A]/30 ring-offset-1 ring-offset-white' : ''
+          day.isToday && !isSmall ? 'ring-2 ring-[#C0FC01]/30 ring-offset-1 ring-offset-white' : ''
         }`}
       >
         {innerClass && <div className={`w-1.5 h-1.5 rounded-full ${innerClass}`} />}
       </div>
       <span
         className={`text-[9px] font-medium uppercase tracking-wider ${
-          day.isToday ? 'text-[#1A1917]' : 'text-[#A09D96]'
+          day.isToday ? 'text-[#FDFDFE]' : 'text-[#E6E8E7]'
         }`}
       >
         {label}
@@ -645,7 +645,7 @@ function ClientListSkeleton() {
       {[1, 2, 3, 4].map((i) => (
         <div
           key={i}
-          className="h-[140px] bg-white rounded-2xl border border-[#E8E4DC] animate-pulse"
+          className="h-[140px] bg-[#A6ADA7] rounded-2xl border border-[#A6ADA7] animate-pulse"
         />
       ))}
     </div>
@@ -655,25 +655,25 @@ function ClientListSkeleton() {
 function EmptyState({ filter, searchQuery }: { filter: FilterMode; searchQuery: string }) {
   if (searchQuery) {
     return (
-      <div className="bg-white border border-[#E8E4DC] rounded-2xl p-10 text-center">
-        <p className="text-[14px] text-[#A09D96]">Geen cliënten gevonden voor &ldquo;{searchQuery}&rdquo;</p>
+      <div className="bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl p-10 text-center">
+        <p className="text-[14px] text-[#E6E8E7]">Geen cliënten gevonden voor &ldquo;{searchQuery}&rdquo;</p>
       </div>
     )
   }
   if (filter === 'needs') {
     return (
-      <div className="bg-white border border-[#E8E4DC] rounded-2xl p-10 text-center">
+      <div className="bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl p-10 text-center">
         <div className="w-11 h-11 rounded-full bg-[#E6F7EA] flex items-center justify-center mx-auto mb-3">
-          <Sparkles size={18} className="text-[#34C759]" strokeWidth={1.5} />
+          <Sparkles size={18} className="text-[#2FA65A]" strokeWidth={1.5} />
         </div>
-        <p className="text-[15px] font-semibold text-[#1A1917]">Alles op schema</p>
-        <p className="text-[12px] text-[#A09D96] mt-1">Geen cliënten die aandacht nodig hebben</p>
+        <p className="text-[15px] font-semibold text-[#FDFDFE]">Alles op schema</p>
+        <p className="text-[12px] text-[#E6E8E7] mt-1">Geen cliënten die aandacht nodig hebben</p>
       </div>
     )
   }
   return (
-    <div className="bg-white border border-[#E8E4DC] rounded-2xl p-10 text-center">
-      <p className="text-[14px] text-[#A09D96]">Geen cliënten</p>
+    <div className="bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl p-10 text-center">
+      <p className="text-[14px] text-[#E6E8E7]">Geen cliënten</p>
     </div>
   )
 }
@@ -752,22 +752,22 @@ function QuickMessageSheet({
     >
       <div className="absolute inset-0 bg-black/30 backdrop-blur-sm animate-fade-in" />
       <div
-        className="relative bg-white w-full lg:max-w-md lg:rounded-2xl rounded-t-3xl p-5 pb-8 lg:pb-5 shadow-2xl animate-slide-up"
+        className="relative bg-[#A6ADA7] w-full lg:max-w-md lg:rounded-2xl rounded-t-3xl p-5 pb-8 lg:pb-5 shadow-2xl animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Handle / close */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#A09D96]">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#E6E8E7]">
               Bericht aan
             </p>
-            <p className="text-[18px] font-semibold text-[#1A1917]">{client.fullName}</p>
+            <p className="text-[18px] font-semibold text-[#FDFDFE]">{client.fullName}</p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-[#F5F2EC] flex items-center justify-center active:scale-95"
+            className="w-8 h-8 rounded-full bg-[#A6ADA7] flex items-center justify-center active:scale-95"
           >
-            <X size={16} className="text-[#6B6862]" />
+            <X size={16} className="text-[#E6E8E7]" />
           </button>
         </div>
 
@@ -777,7 +777,7 @@ function QuickMessageSheet({
             <button
               key={i}
               onClick={() => setMessage(s)}
-              className="w-full text-left px-3.5 py-2.5 rounded-xl bg-[#F9F7F2] border border-[#F0EDE7] text-[13px] text-[#1A1917] leading-snug active:scale-[0.99] transition-transform"
+              className="w-full text-left px-3.5 py-2.5 rounded-xl bg-[#A6ADA7] border border-[#A6ADA7] text-[13px] text-[#FDFDFE] leading-snug active:scale-[0.99] transition-transform"
             >
               {s}
             </button>
@@ -790,14 +790,14 @@ function QuickMessageSheet({
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Typ een bericht..."
           rows={3}
-          className="w-full px-4 py-3 rounded-xl bg-white border border-[#E8E4DC] text-[14px] text-[#1A1917] placeholder-[#A09D96] focus:outline-none focus:ring-2 focus:ring-[#D46A3A]/25 focus:border-transparent resize-none mb-3"
+          className="w-full px-4 py-3 rounded-xl bg-[#A6ADA7] border border-[#A6ADA7] text-[14px] text-[#FDFDFE] placeholder-[#E6E8E7] focus:outline-none focus:ring-2 focus:ring-[#C0FC01]/25 focus:border-transparent resize-none mb-3"
         />
 
         {/* Send button */}
         <button
           onClick={handleSend}
           disabled={!message.trim() || sending}
-          className="w-full py-3.5 rounded-xl bg-[#1A1917] text-white text-[14px] font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-transform"
+          className="w-full py-3.5 rounded-xl bg-[#474B48] text-white text-[14px] font-semibold flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99] transition-transform"
         >
           {sending ? (
             <>

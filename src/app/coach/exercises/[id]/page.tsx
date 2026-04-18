@@ -166,7 +166,7 @@ export default function ExerciseDetailPage() {
           <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
           Terug
         </Link>
-        <div className="bg-white rounded-2xl shadow-clean p-12 flex flex-col items-center justify-center">
+        <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-12 flex flex-col items-center justify-center">
           <h3 className="text-[15px] font-semibold text-text-primary mb-1">Oefening niet gevonden</h3>
         </div>
       </div>
@@ -201,8 +201,8 @@ export default function ExerciseDetailPage() {
         {/* Left Column - GIF and Basic Info */}
         <div className="lg:col-span-1 space-y-4">
           {/* GIF Display */}
-          <div className="bg-white rounded-2xl shadow-clean overflow-hidden">
-            <div className="aspect-video bg-[#FAFAFA] flex items-center justify-center">
+          <div className="bg-[#A6ADA7] rounded-2xl shadow-clean overflow-hidden">
+            <div className="aspect-video bg-[#A6ADA7] flex items-center justify-center">
               {exercise.gif_url ? (
                 <Image
                   src={exercise.gif_url}
@@ -223,7 +223,7 @@ export default function ExerciseDetailPage() {
 
           {/* Video Display */}
           {exercise.video_url && (
-            <div className="bg-white rounded-2xl shadow-clean overflow-hidden">
+            <div className="bg-[#A6ADA7] rounded-2xl shadow-clean overflow-hidden">
               <div className="p-3 border-b border-client-border">
                 <p className="text-[12px] font-semibold text-client-text-secondary">VIDEO</p>
               </div>
@@ -258,7 +258,7 @@ export default function ExerciseDetailPage() {
           )}
 
           {/* Basic Info */}
-          <div className="bg-white rounded-2xl shadow-clean p-4 space-y-4">
+          <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4 space-y-4">
             <div>
               <p className="text-[13px] font-semibold text-client-text-secondary mb-1">LICHAAMSDEEL</p>
               <p className="text-[15px] font-medium text-text-primary">{exercise.body_part}</p>
@@ -283,7 +283,7 @@ export default function ExerciseDetailPage() {
         {/* Right Column - Editable Fields */}
         <div className="lg:col-span-2 space-y-4">
           {/* Dutch Name */}
-          <div className="bg-white rounded-2xl shadow-clean p-4">
+          <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
             <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
               NEDERLANDSE NAAM
             </label>
@@ -297,7 +297,7 @@ export default function ExerciseDetailPage() {
           </div>
 
           {/* Category */}
-          <div className="bg-white rounded-2xl shadow-clean p-4">
+          <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
             <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
               CATEGORIE
             </label>
@@ -316,7 +316,7 @@ export default function ExerciseDetailPage() {
           </div>
 
           {/* GIF URL */}
-          <div className="bg-white rounded-2xl shadow-clean p-4">
+          <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
             <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
               GIF URL
             </label>
@@ -330,7 +330,7 @@ export default function ExerciseDetailPage() {
           </div>
 
           {/* Video URL */}
-          <div className="bg-white rounded-2xl shadow-clean p-4">
+          <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
             <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
               VIDEO URL
             </label>
@@ -345,7 +345,7 @@ export default function ExerciseDetailPage() {
           </div>
 
           {/* Coach Tips */}
-          <div className="bg-white rounded-2xl shadow-clean p-4">
+          <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
             <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
               JOUW COACHING TIPS VOOR CLIËNTEN
             </label>
@@ -360,7 +360,7 @@ export default function ExerciseDetailPage() {
           </div>
 
           {/* Coach Notes */}
-          <div className="bg-white rounded-2xl shadow-clean p-4">
+          <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
             <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
               INTERNE NOTITIES
             </label>
@@ -375,7 +375,7 @@ export default function ExerciseDetailPage() {
           </div>
 
           {/* Visibility Toggle */}
-          <div className="bg-white rounded-2xl shadow-clean p-4">
+          <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
             <label className="flex items-center justify-between">
               <span className="text-[15px] font-medium text-text-primary">Zichtbaar in bibliotheek</span>
               <input
@@ -389,7 +389,7 @@ export default function ExerciseDetailPage() {
           </div>
 
           {/* Instructions */}
-          <div className="bg-white rounded-2xl shadow-clean p-4">
+          <div className="bg-[#A6ADA7] rounded-2xl shadow-clean p-4">
             <label className="block text-[13px] font-semibold text-client-text-secondary mb-2">
               INSTRUCTIES
             </label>

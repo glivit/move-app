@@ -119,10 +119,10 @@ function nutriscoreColor(grade: string | null): { bg: string; text: string } {
   switch (grade?.toLowerCase()) {
     case 'a': return { bg: '#1B8539', text: 'white' }
     case 'b': return { bg: '#85BB2F', text: 'white' }
-    case 'c': return { bg: '#FECB02', text: '#1A1A18' }
+    case 'c': return { bg: '#FECB02', text: '#FDFDFE' }
     case 'd': return { bg: '#EE8100', text: 'white' }
     case 'e': return { bg: '#E63E11', text: 'white' }
-    default: return { bg: '#E8E4DC', text: '#8E8E93' }
+    default: return { bg: '#A6ADA7', text: '#D6D9D6' }
   }
 }
 
@@ -193,28 +193,28 @@ export function FoodSearch({ onSelect, onClose }: FoodSearchProps) {
   const calcForGrams = (value: number) => Math.round((value * grams) / 100)
 
   return (
-    <div className="rounded-2xl border border-[#E8E4DC] bg-white shadow-[0_4px_20px_rgba(0,0,0,0.08)] overflow-hidden">
+    <div className="rounded-2xl border border-[#A6ADA7] bg-[#A6ADA7] shadow-[0_4px_20px_rgba(0,0,0,0.08)] overflow-hidden">
       {/* Search Header */}
-      <div className="p-4 border-b border-[#E8E4DC] bg-[#FAFAFA]">
+      <div className="p-4 border-b border-[#A6ADA7] bg-[#A6ADA7]">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
-            <Search strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#C7C7CC]" />
+            <Search strokeWidth={1.5} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#CDD1CE]" />
             <input
               ref={inputRef}
               type="text"
               value={query}
               onChange={(e) => handleQueryChange(e.target.value)}
               placeholder="Zoek voedingsmiddel... (bijv. kipfilet, havermout, AH yoghurt)"
-              className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#E8E4DC] text-[14px] bg-white text-[#1A1A18] placeholder-[#C7C7CC] focus:outline-none focus:border-[#1A1917] focus:ring-1 focus:ring-[#1A1917]/20"
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#A6ADA7] text-[14px] bg-[#A6ADA7] text-[#FDFDFE] placeholder-[#CDD1CE] focus:outline-none focus:border-[#FDFDFE] focus:ring-1 focus:ring-[#FDFDFE]/20"
             />
             {loading && (
-              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#1A1917] animate-spin" />
+              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#FDFDFE] animate-spin" />
             )}
           </div>
           {onClose && (
             <button
               onClick={onClose}
-              className="p-2 rounded-lg hover:bg-[#E8E4DC] text-[#8E8E93] transition-colors"
+              className="p-2 rounded-lg hover:bg-[#A6ADA7] text-[#D6D9D6] transition-colors"
             >
               <X strokeWidth={1.5} className="w-5 h-5" />
             </button>
@@ -224,10 +224,10 @@ export function FoodSearch({ onSelect, onClose }: FoodSearchProps) {
 
       {/* Selected Food Detail */}
       {selectedFood && (
-        <div className="p-5 border-b border-[#E8E4DC] bg-[#FAFAFA]">
+        <div className="p-5 border-b border-[#A6ADA7] bg-[#A6ADA7]">
           <div className="flex items-start gap-4">
             {/* Food Image or Emoji */}
-            <div className="w-16 h-16 rounded-xl bg-white border border-[#E8E4DC] flex items-center justify-center overflow-hidden shrink-0">
+            <div className="w-16 h-16 rounded-xl bg-[#A6ADA7] border border-[#A6ADA7] flex items-center justify-center overflow-hidden shrink-0">
               {selectedFood.image_small ? (
                 <Image
                   src={selectedFood.image_small}
@@ -247,14 +247,14 @@ export function FoodSearch({ onSelect, onClose }: FoodSearchProps) {
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="text-[15px] font-semibold text-[#1A1A18] truncate">{selectedFood.name}</p>
+              <p className="text-[15px] font-semibold text-[#FDFDFE] truncate">{selectedFood.name}</p>
               {selectedFood.brand && (
-                <p className="text-[12px] text-[#8E8E93] mt-0.5">{selectedFood.brand}</p>
+                <p className="text-[12px] text-[#D6D9D6] mt-0.5">{selectedFood.brand}</p>
               )}
 
               {/* Grams Input */}
               <div className="flex items-center gap-3 mt-3">
-                <label className="text-[13px] text-[#8E8E93] shrink-0">Hoeveelheid:</label>
+                <label className="text-[13px] text-[#D6D9D6] shrink-0">Hoeveelheid:</label>
                 <div className="flex items-center gap-2">
                   {[50, 100, 150, 200].map((g) => (
                     <button
@@ -262,9 +262,9 @@ export function FoodSearch({ onSelect, onClose }: FoodSearchProps) {
                       onClick={() => setGrams(g)}
                       className="px-3 py-1.5 rounded-lg text-[12px] font-medium border transition-colors"
                       style={{
-                        backgroundColor: grams === g ? '#1A1917' : 'white',
-                        color: grams === g ? 'white' : '#8E8E93',
-                        borderColor: grams === g ? '#1A1917' : '#E8E4DC',
+                        backgroundColor: grams === g ? '#FDFDFE' : 'white',
+                        color: grams === g ? 'white' : '#D6D9D6',
+                        borderColor: grams === g ? '#FDFDFE' : '#A6ADA7',
                       }}
                     >
                       {g}g
@@ -274,36 +274,36 @@ export function FoodSearch({ onSelect, onClose }: FoodSearchProps) {
                     type="number"
                     value={grams}
                     onChange={(e) => setGrams(parseInt(e.target.value) || 0)}
-                    className="w-20 px-3 py-1.5 rounded-lg border border-[#E8E4DC] text-[13px] text-center text-[#1A1A18] bg-white"
+                    className="w-20 px-3 py-1.5 rounded-lg border border-[#A6ADA7] text-[13px] text-center text-[#FDFDFE] bg-[#A6ADA7]"
                     min={1}
                   />
-                  <span className="text-[12px] text-[#8E8E93]">gram</span>
+                  <span className="text-[12px] text-[#D6D9D6]">gram</span>
                 </div>
               </div>
 
               {/* Calculated Macros */}
               <div className="grid grid-cols-4 gap-3 mt-3">
-                <div className="bg-white rounded-lg p-2 border border-[#E8E4DC] text-center">
-                  <p className="text-[10px] text-[#8E8E93] uppercase font-medium">Kcal</p>
-                  <p className="text-[15px] font-bold text-[#FF9500]">
+                <div className="bg-[#A6ADA7] rounded-lg p-2 border border-[#A6ADA7] text-center">
+                  <p className="text-[10px] text-[#D6D9D6] uppercase font-medium">Kcal</p>
+                  <p className="text-[15px] font-bold text-[#E8B948]">
                     {calcForGrams(selectedFood.per100g.calories)}
                   </p>
                 </div>
-                <div className="bg-white rounded-lg p-2 border border-[#E8E4DC] text-center">
-                  <p className="text-[10px] text-[#8E8E93] uppercase font-medium">Eiwit</p>
-                  <p className="text-[15px] font-bold text-[#007AFF]">
+                <div className="bg-[#A6ADA7] rounded-lg p-2 border border-[#A6ADA7] text-center">
+                  <p className="text-[10px] text-[#D6D9D6] uppercase font-medium">Eiwit</p>
+                  <p className="text-[15px] font-bold text-[#5A7FB5]">
                     {calcForGrams(selectedFood.per100g.protein)}g
                   </p>
                 </div>
-                <div className="bg-white rounded-lg p-2 border border-[#E8E4DC] text-center">
-                  <p className="text-[10px] text-[#8E8E93] uppercase font-medium">Koolh</p>
-                  <p className="text-[15px] font-bold text-[#34C759]">
+                <div className="bg-[#A6ADA7] rounded-lg p-2 border border-[#A6ADA7] text-center">
+                  <p className="text-[10px] text-[#D6D9D6] uppercase font-medium">Koolh</p>
+                  <p className="text-[15px] font-bold text-[#2FA65A]">
                     {calcForGrams(selectedFood.per100g.carbs)}g
                   </p>
                 </div>
-                <div className="bg-white rounded-lg p-2 border border-[#E8E4DC] text-center">
-                  <p className="text-[10px] text-[#8E8E93] uppercase font-medium">Vet</p>
-                  <p className="text-[15px] font-bold text-[#AF52DE]">
+                <div className="bg-[#A6ADA7] rounded-lg p-2 border border-[#A6ADA7] text-center">
+                  <p className="text-[10px] text-[#D6D9D6] uppercase font-medium">Vet</p>
+                  <p className="text-[15px] font-bold text-[#8A7BA8]">
                     {calcForGrams(selectedFood.per100g.fat)}g
                   </p>
                 </div>
@@ -314,7 +314,7 @@ export function FoodSearch({ onSelect, onClose }: FoodSearchProps) {
           {/* Confirm Button */}
           <button
             onClick={handleConfirm}
-            className="w-full mt-4 px-4 py-3 rounded-xl bg-[#1A1917] text-white text-[14px] font-semibold hover:bg-[#6F5612] transition-colors flex items-center justify-center gap-2"
+            className="w-full mt-4 px-4 py-3 rounded-xl bg-[#474B48] text-white text-[14px] font-semibold hover:bg-[#3A3E3B] transition-colors flex items-center justify-center gap-2"
           >
             <Plus strokeWidth={1.5} className="w-4 h-4" />
             Toevoegen aan maaltijd
@@ -327,7 +327,7 @@ export function FoodSearch({ onSelect, onClose }: FoodSearchProps) {
         {/* Presets (when no search query) */}
         {showPresets && !selectedFood && (
           <div className="p-4">
-            <p className="text-[12px] text-[#8E8E93] uppercase font-medium tracking-wide mb-3">
+            <p className="text-[12px] text-[#D6D9D6] uppercase font-medium tracking-wide mb-3">
               Populaire voedingsmiddelen
             </p>
             <div className="grid grid-cols-2 gap-2">
@@ -335,14 +335,14 @@ export function FoodSearch({ onSelect, onClose }: FoodSearchProps) {
                 <button
                   key={index}
                   onClick={() => handleSelectFood(food)}
-                  className="flex items-center gap-3 p-3 rounded-xl border border-[#E8E4DC] bg-white hover:bg-[#FAFAFA] hover:border-[#1A1917]/30 transition-all text-left group"
+                  className="flex items-center gap-3 p-3 rounded-xl border border-[#A6ADA7] bg-[#A6ADA7] hover:bg-[#A6ADA7] hover:border-[#FDFDFE]/30 transition-all text-left group"
                 >
                   <span className="text-[22px] shrink-0">{getFoodEmoji(food.name)}</span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-medium text-[#1A1A18] truncate group-hover:text-[#1A1917] transition-colors">
+                    <p className="text-[13px] font-medium text-[#FDFDFE] truncate group-hover:text-[#FDFDFE] transition-colors">
                       {food.name}
                     </p>
-                    <p className="text-[11px] text-[#C7C7CC] mt-0.5">
+                    <p className="text-[11px] text-[#CDD1CE] mt-0.5">
                       {food.per100g.calories} kcal · {food.per100g.protein}g eiwit
                     </p>
                   </div>
@@ -354,17 +354,17 @@ export function FoodSearch({ onSelect, onClose }: FoodSearchProps) {
 
         {/* Search Results */}
         {!showPresets && !selectedFood && results.length > 0 && (
-          <div className="divide-y divide-[#E8E4DC]">
+          <div className="divide-y divide-[#A6ADA7]">
             {results.map((food, index) => {
               const ns = nutriscoreColor(food.nutriscore)
               return (
                 <button
                   key={index}
                   onClick={() => handleSelectFood(food)}
-                  className="w-full flex items-center gap-3 p-4 hover:bg-[#FAFAFA] transition-colors text-left group"
+                  className="w-full flex items-center gap-3 p-4 hover:bg-[#A6ADA7] transition-colors text-left group"
                 >
                   {/* Image */}
-                  <div className="w-12 h-12 rounded-lg bg-[#F5F5F3] border border-[#E8E4DC] flex items-center justify-center overflow-hidden shrink-0">
+                  <div className="w-12 h-12 rounded-lg bg-[#A6ADA7] border border-[#A6ADA7] flex items-center justify-center overflow-hidden shrink-0">
                     {food.image_small ? (
                       <Image
                         src={food.image_small}
@@ -386,7 +386,7 @@ export function FoodSearch({ onSelect, onClose }: FoodSearchProps) {
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-[14px] font-medium text-[#1A1A18] truncate group-hover:text-[#1A1917] transition-colors">
+                      <p className="text-[14px] font-medium text-[#FDFDFE] truncate group-hover:text-[#FDFDFE] transition-colors">
                         {food.name}
                       </p>
                       {food.nutriscore && (
@@ -399,16 +399,16 @@ export function FoodSearch({ onSelect, onClose }: FoodSearchProps) {
                       )}
                     </div>
                     {food.brand && (
-                      <p className="text-[12px] text-[#8E8E93] truncate">{food.brand}</p>
+                      <p className="text-[12px] text-[#D6D9D6] truncate">{food.brand}</p>
                     )}
                   </div>
 
                   {/* Quick Macros */}
                   <div className="text-right shrink-0">
-                    <p className="text-[13px] font-semibold text-[#1A1A18]">
+                    <p className="text-[13px] font-semibold text-[#FDFDFE]">
                       {food.per100g.calories} kcal
                     </p>
-                    <p className="text-[11px] text-[#8E8E93]">
+                    <p className="text-[11px] text-[#D6D9D6]">
                       E{food.per100g.protein} · K{food.per100g.carbs} · V{food.per100g.fat}
                     </p>
                   </div>
@@ -421,16 +421,16 @@ export function FoodSearch({ onSelect, onClose }: FoodSearchProps) {
         {/* No Results */}
         {!showPresets && !selectedFood && !loading && results.length === 0 && query.length >= 2 && (
           <div className="p-8 text-center">
-            <p className="text-[14px] text-[#8E8E93]">Geen resultaten voor &quot;{query}&quot;</p>
-            <p className="text-[12px] text-[#C7C7CC] mt-1">Probeer een andere zoekterm</p>
+            <p className="text-[14px] text-[#D6D9D6]">Geen resultaten voor &quot;{query}&quot;</p>
+            <p className="text-[12px] text-[#CDD1CE] mt-1">Probeer een andere zoekterm</p>
           </div>
         )}
 
         {/* Loading State */}
         {loading && !selectedFood && (
           <div className="p-8 flex items-center justify-center gap-2">
-            <Loader2 className="w-5 h-5 text-[#1A1917] animate-spin" />
-            <p className="text-[13px] text-[#8E8E93]">Zoeken in voedingsdatabank...</p>
+            <Loader2 className="w-5 h-5 text-[#FDFDFE] animate-spin" />
+            <p className="text-[13px] text-[#D6D9D6]">Zoeken in voedingsdatabank...</p>
           </div>
         )}
       </div>

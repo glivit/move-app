@@ -594,17 +594,17 @@ export default function ProgramEditorPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#1A1917]" />
+      <div className="min-h-screen bg-[#A6ADA7] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#FDFDFE]" />
       </div>
     )
   }
 
   if (!program) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] p-6">
+      <div className="min-h-screen bg-[#A6ADA7] p-6">
         <div className="max-w-7xl mx-auto text-center">
-          <p className="text-[15px] text-[#8E8E93]">Programma niet gevonden</p>
+          <p className="text-[15px] text-[#D6D9D6]">Programma niet gevonden</p>
           <Link href="/coach/programs" className="mt-4 inline-block">
             <Button variant="secondary">Terug naar programma's</Button>
           </Link>
@@ -614,11 +614,11 @@ export default function ProgramEditorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA]">
+    <div className="min-h-screen bg-[#A6ADA7]">
       {/* Header */}
-      <div className="bg-white border-b border-[#E8E4DC] sticky top-0 z-10">
+      <div className="bg-[#A6ADA7] border-b border-[#A6ADA7] sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 py-5">
-          <Link href="/coach/programs" className="inline-flex items-center gap-2 text-[#1A1917] mb-4 hover:text-[#1A1A18] transition-colors">
+          <Link href="/coach/programs" className="inline-flex items-center gap-2 text-[#FDFDFE] mb-4 hover:text-[#FDFDFE] transition-colors">
             <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
             <span className="text-[15px] font-medium">Terug</span>
           </Link>
@@ -626,12 +626,12 @@ export default function ProgramEditorPage() {
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <h1
-                className="text-[32px] font-display font-semibold text-[#1A1A18] mb-1"
+                className="text-[32px] font-display font-semibold text-[#FDFDFE] mb-1"
                 style={{ fontFamily: 'var(--font-display)' }}
               >
                 {program.name}
               </h1>
-              <p className="text-[13px] text-[#8E8E93]">
+              <p className="text-[13px] text-[#D6D9D6]">
                 {program.duration_weeks} weken · {program.days_per_week} dagen/week
               </p>
             </div>
@@ -648,7 +648,7 @@ export default function ProgramEditorPage() {
       </div>
 
       {/* Day Tabs */}
-      <div className="bg-white border-b border-[#E8E4DC] overflow-x-auto">
+      <div className="bg-[#A6ADA7] border-b border-[#A6ADA7] overflow-x-auto">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex gap-2 py-4">
             {days.map((day) => (
@@ -657,8 +657,8 @@ export default function ProgramEditorPage() {
                 onClick={() => setActiveDayId(day.id)}
                 className={`px-4 py-2 rounded-full text-[15px] font-medium whitespace-nowrap transition-colors ${
                   activeDayId === day.id
-                    ? 'bg-[#1A1917] text-white'
-                    : 'bg-[#EDEAE4] text-[#1A1917] hover:bg-[#ECEAE3]'
+                    ? 'bg-[#474B48] text-white'
+                    : 'bg-[#A6ADA7] text-[#FDFDFE] hover:bg-[#ECEAE3]'
                 }`}
               >
                 {day.name}
@@ -667,7 +667,7 @@ export default function ProgramEditorPage() {
 
             <button
               onClick={handleAddDay}
-              className="px-4 py-2 rounded-full text-[15px] font-medium text-[#1A1917] bg-[#EDEAE4] hover:bg-[#ECEAE3] transition-colors flex items-center gap-1 whitespace-nowrap"
+              className="px-4 py-2 rounded-full text-[15px] font-medium text-[#FDFDFE] bg-[#A6ADA7] hover:bg-[#ECEAE3] transition-colors flex items-center gap-1 whitespace-nowrap"
             >
               <Plus strokeWidth={1.5} className="w-5 h-5" />
               Dag toevoegen
@@ -681,11 +681,11 @@ export default function ProgramEditorPage() {
         {activeDay && (
           <div>
             {/* Day Details */}
-            <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-6 mb-8">
+            <div className="bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] p-6 mb-8">
               <div className="grid grid-cols-3 gap-6">
                 {/* Day Name */}
                 <div>
-                  <label className="block text-[13px] font-medium text-[#8E8E93] mb-2">
+                  <label className="block text-[13px] font-medium text-[#D6D9D6] mb-2">
                     Dag naam
                   </label>
                   <input
@@ -694,13 +694,13 @@ export default function ProgramEditorPage() {
                     onChange={(e) =>
                       handleUpdateDayField(activeDay.id, 'name', e.target.value)
                     }
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                    className="w-full px-4 py-3 bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl text-[15px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
                   />
                 </div>
 
                 {/* Focus Area */}
                 <div>
-                  <label className="block text-[13px] font-medium text-[#8E8E93] mb-2">
+                  <label className="block text-[13px] font-medium text-[#D6D9D6] mb-2">
                     Focus (optioneel)
                   </label>
                   <input
@@ -710,13 +710,13 @@ export default function ProgramEditorPage() {
                     onChange={(e) =>
                       handleUpdateDayField(activeDay.id, 'focus', e.target.value || null)
                     }
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                    className="w-full px-4 py-3 bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl text-[15px] text-[#FDFDFE] placeholder:text-[#D6D9D6] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
                   />
                 </div>
 
                 {/* Duration */}
                 <div>
-                  <label className="block text-[13px] font-medium text-[#8E8E93] mb-2">
+                  <label className="block text-[13px] font-medium text-[#D6D9D6] mb-2">
                     Geschatte duur (min)
                   </label>
                   <input
@@ -729,28 +729,28 @@ export default function ProgramEditorPage() {
                         parseInt(e.target.value) || 0
                       )
                     }
-                    className="w-full px-4 py-3 bg-[#FAFAFA] border border-[#E8E4DC] rounded-2xl text-[15px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                    className="w-full px-4 py-3 bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl text-[15px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
                   />
                 </div>
               </div>
 
               {/* Day Actions: Duplicate & Delete */}
-              <div className="mt-5 pt-5 border-t border-[#E8E4DC]">
+              <div className="mt-5 pt-5 border-t border-[#A6ADA7]">
                 {confirmDeleteDay === activeDay.id ? (
                   <div className="flex items-center gap-3">
-                    <p className="text-[13px] text-[#D14343] font-medium flex-1">
+                    <p className="text-[13px] text-[#B55A4A] font-medium flex-1">
                       &quot;{activeDay.name}&quot; verwijderen? Alle oefeningen worden ook verwijderd.
                     </p>
                     <button
                       onClick={() => setConfirmDeleteDay(null)}
-                      className="px-3 py-1.5 rounded-lg text-[12px] font-medium border border-[#E8E4DC] text-[#8E8E93] hover:bg-[#FAFAFA] transition-colors"
+                      className="px-3 py-1.5 rounded-lg text-[12px] font-medium border border-[#A6ADA7] text-[#D6D9D6] hover:bg-[#A6ADA7] transition-colors"
                     >
                       Annuleren
                     </button>
                     <button
                       onClick={() => handleRemoveDay(activeDay.id)}
                       disabled={deletingDay}
-                      className="px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-[#D14343] text-white hover:bg-[#B83A3A] transition-colors disabled:opacity-50 flex items-center gap-1"
+                      className="px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-[#B55A4A] text-white hover:bg-[#B83A3A] transition-colors disabled:opacity-50 flex items-center gap-1"
                     >
                       {deletingDay ? (
                         <Loader2 className="w-3 h-3 animate-spin" />
@@ -765,7 +765,7 @@ export default function ProgramEditorPage() {
                     <button
                       onClick={() => handleDuplicateDay(activeDay.id)}
                       disabled={duplicatingDay}
-                      className="inline-flex items-center gap-1.5 text-[12px] font-medium text-[#1A1917] hover:underline disabled:opacity-50"
+                      className="inline-flex items-center gap-1.5 text-[12px] font-medium text-[#FDFDFE] hover:underline disabled:opacity-50"
                     >
                       {duplicatingDay ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -776,7 +776,7 @@ export default function ProgramEditorPage() {
                     </button>
                     <button
                       onClick={() => setConfirmDeleteDay(activeDay.id)}
-                      className="inline-flex items-center gap-1.5 text-[12px] font-medium text-[#D14343] hover:underline"
+                      className="inline-flex items-center gap-1.5 text-[12px] font-medium text-[#B55A4A] hover:underline"
                     >
                       <Trash2 strokeWidth={1.5} className="w-3.5 h-3.5" />
                       Dag verwijderen
@@ -788,11 +788,11 @@ export default function ProgramEditorPage() {
 
             {/* Exercises */}
             <div className="space-y-3">
-              <h2 className="text-[17px] font-semibold text-[#1A1A18]">Oefeningen</h2>
+              <h2 className="text-[17px] font-semibold text-[#FDFDFE]">Oefeningen</h2>
 
               {activeDay.exercises.length === 0 ? (
-                <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#E8E4DC] p-8 text-center">
-                  <p className="text-[15px] text-[#8E8E93] mb-4">
+                <div className="bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] p-8 text-center">
+                  <p className="text-[15px] text-[#D6D9D6] mb-4">
                     Voeg oefeningen toe om aan de slag te gaan
                   </p>
                   <Button onClick={() => setShowExerciseModal(true)}>
@@ -823,37 +823,37 @@ export default function ProgramEditorPage() {
                     >
                       {/* Drop indicator line */}
                       {isDragOver && draggedIndex !== null && draggedIndex > index && (
-                        <div className="absolute -top-1.5 left-0 right-0 h-[3px] bg-[#1A1917] rounded-full z-10" />
+                        <div className="absolute -top-1.5 left-0 right-0 h-[3px] bg-[#FDFDFE] rounded-full z-10" />
                       )}
                       {isDragOver && draggedIndex !== null && draggedIndex < index && (
-                        <div className="absolute -bottom-1.5 left-0 right-0 h-[3px] bg-[#1A1917] rounded-full z-10" />
+                        <div className="absolute -bottom-1.5 left-0 right-0 h-[3px] bg-[#FDFDFE] rounded-full z-10" />
                       )}
                       {/* Superset connector line */}
                       {sameGroupAsPrev && (
-                        <div className="absolute -top-3 left-6 w-[2px] h-3 bg-[#AF52DE]" />
+                        <div className="absolute -top-3 left-6 w-[2px] h-3 bg-[#8A7BA8]" />
                       )}
                       {isInSuperset && (
-                        <div className="absolute top-0 left-4 bottom-0 w-1 rounded-full bg-[#AF52DE]/20" />
+                        <div className="absolute top-0 left-4 bottom-0 w-1 rounded-full bg-[#8A7BA8]/20" />
                       )}
-                      <div className={`bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border p-5 ${
-                        isInSuperset ? 'border-[#AF52DE]/30 ml-3' : 'border-[#E8E4DC]'
-                      } ${isDragOver ? 'border-[#1A1917] shadow-[0_0_0_1px_rgba(139,105,20,0.3)]' : ''}`}>
+                      <div className={`bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border p-5 ${
+                        isInSuperset ? 'border-[#8A7BA8]/30 ml-3' : 'border-[#A6ADA7]'
+                      } ${isDragOver ? 'border-[#FDFDFE] shadow-[0_0_0_1px_rgba(139,105,20,0.3)]' : ''}`}>
                         {isInSuperset && (
                           <div className="mb-2 -mt-1">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#AF52DE] bg-[#AF52DE]/10 px-2 py-0.5 rounded-full">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#8A7BA8] bg-[#8A7BA8]/10 px-2 py-0.5 rounded-full">
                               Superset
                             </span>
                           </div>
                         )}
                       {/* Exercise Header */}
-                      <div className="flex items-start gap-3 mb-4 pb-4 border-b border-[#E8E4DC]">
+                      <div className="flex items-start gap-3 mb-4 pb-4 border-b border-[#A6ADA7]">
                         {/* Drag Handle */}
                         <div className="flex-shrink-0 pt-1 cursor-grab active:cursor-grabbing touch-none">
-                          <GripVertical strokeWidth={1.5} className="w-5 h-5 text-[#C7C7CC] hover:text-[#8E8E93] transition-colors" />
+                          <GripVertical strokeWidth={1.5} className="w-5 h-5 text-[#CDD1CE] hover:text-[#D6D9D6] transition-colors" />
                         </div>
 
                         {/* GIF Thumbnail */}
-                        <div className="w-12 h-12 rounded-lg bg-[#FAFAFA] flex-shrink-0 overflow-hidden flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-lg bg-[#A6ADA7] flex-shrink-0 overflow-hidden flex items-center justify-center">
                           {exercise.gif_url ? (
                             <Image
                               src={exercise.gif_url}
@@ -865,21 +865,21 @@ export default function ProgramEditorPage() {
                               style={{ mixBlendMode: 'multiply' }}
                             />
                           ) : (
-                            <div className="w-full h-full bg-[#E8E4DC]" />
+                            <div className="w-full h-full bg-[#A6ADA7]" />
                           )}
                         </div>
 
                         {/* Exercise Info */}
                         <div className="flex-1">
-                          <h3 className="text-[15px] font-semibold text-[#1A1A18]">
+                          <h3 className="text-[15px] font-semibold text-[#FDFDFE]">
                             {exercise.name_nl || exercise.name}
                           </h3>
                           <div className="flex gap-2 mt-2">
-                            <span className="text-[11px] bg-[#EDEAE4] text-[#1A1917] px-2 py-0.5 rounded-full">
+                            <span className="text-[11px] bg-[#A6ADA7] text-[#FDFDFE] px-2 py-0.5 rounded-full">
                               {exercise.body_part}
                             </span>
                             {exercise.equipment && (
-                              <span className="text-[11px] bg-[#E8E4DC] text-[#8E8E93] px-2 py-0.5 rounded-full">
+                              <span className="text-[11px] bg-[#A6ADA7] text-[#D6D9D6] px-2 py-0.5 rounded-full">
                                 {exercise.equipment}
                               </span>
                             )}
@@ -905,8 +905,8 @@ export default function ProgramEditorPage() {
                               }}
                               className={`p-2 rounded-lg transition-colors ${
                                 exercise.superset_group_id
-                                  ? 'text-[#AF52DE] bg-[#AF52DE]/10 hover:bg-[#AF52DE]/20'
-                                  : 'text-[#8E8E93] hover:text-[#AF52DE] hover:bg-[#EDEAE4]'
+                                  ? 'text-[#8A7BA8] bg-[#8A7BA8]/10 hover:bg-[#8A7BA8]/20'
+                                  : 'text-[#D6D9D6] hover:text-[#8A7BA8] hover:bg-[#A6ADA7]'
                               }`}
                               title={exercise.superset_group_id ? 'Superset opheffen' : 'Superset met vorige'}
                             >
@@ -920,7 +920,7 @@ export default function ProgramEditorPage() {
 
                           <button
                             onClick={() => handleRemoveExercise(exercise.prescription_id)}
-                            className="p-2 text-[#8E8E93] hover:text-red-600 hover:bg-[#EDEAE4] rounded-lg transition-colors"
+                            className="p-2 text-[#D6D9D6] hover:text-red-600 hover:bg-[#A6ADA7] rounded-lg transition-colors"
                           >
                             <X strokeWidth={1.5} className="w-5 h-5" />
                           </button>
@@ -933,7 +933,7 @@ export default function ProgramEditorPage() {
                         <div className="grid grid-cols-2 gap-4">
                           {/* Duration (min) — stored in reps_min */}
                           <div>
-                            <label className="block text-[11px] font-medium text-[#8E8E93] mb-1 uppercase">
+                            <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
                               Duur (min)
                             </label>
                             <input
@@ -948,13 +948,13 @@ export default function ProgramEditorPage() {
                               }
                               min="1"
                               placeholder="20"
-                              className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                              className="w-full px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
                             />
                           </div>
 
                           {/* Notes */}
                           <div>
-                            <label className="block text-[11px] font-medium text-[#8E8E93] mb-1 uppercase">
+                            <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
                               Notities
                             </label>
                             <input
@@ -968,7 +968,7 @@ export default function ProgramEditorPage() {
                                   e.target.value || null
                                 )
                               }
-                              className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                              className="w-full px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
                             />
                           </div>
                         </div>
@@ -978,7 +978,7 @@ export default function ProgramEditorPage() {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {/* Sets */}
                         <div>
-                          <label className="block text-[11px] font-medium text-[#8E8E93] mb-1 uppercase">
+                          <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
                             Sets
                           </label>
                           <input
@@ -992,13 +992,13 @@ export default function ProgramEditorPage() {
                               )
                             }
                             min="1"
-                            className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                            className="w-full px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
                           />
                         </div>
 
                         {/* Reps */}
                         <div>
-                          <label className="block text-[11px] font-medium text-[#8E8E93] mb-1 uppercase">
+                          <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
                             Reps
                           </label>
                           <div className="flex gap-1">
@@ -1013,9 +1013,9 @@ export default function ProgramEditorPage() {
                                 )
                               }
                               min="1"
-                              className="flex-1 px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                              className="flex-1 px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
                             />
-                            <span className="text-[#8E8E93] px-1 py-2">-</span>
+                            <span className="text-[#D6D9D6] px-1 py-2">-</span>
                             <input
                               type="number"
                               value={exercise.reps_max || exercise.reps_min}
@@ -1027,14 +1027,14 @@ export default function ProgramEditorPage() {
                                 )
                               }
                               min="1"
-                              className="flex-1 px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                              className="flex-1 px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
                             />
                           </div>
                         </div>
 
                         {/* Rest */}
                         <div>
-                          <label className="block text-[11px] font-medium text-[#8E8E93] mb-1 uppercase">
+                          <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
                             Rest (s)
                           </label>
                           <input
@@ -1049,13 +1049,13 @@ export default function ProgramEditorPage() {
                             }
                             min="0"
                             step="15"
-                            className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                            className="w-full px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
                           />
                         </div>
 
                         {/* Tempo */}
                         <div>
-                          <label className="block text-[11px] font-medium text-[#8E8E93] mb-1 uppercase">
+                          <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
                             Tempo
                           </label>
                           <input
@@ -1069,7 +1069,7 @@ export default function ProgramEditorPage() {
                                 e.target.value || null
                               )
                             }
-                            className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                            className="w-full px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] placeholder:text-[#D6D9D6] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
                           />
                         </div>
                       </div>
@@ -1078,7 +1078,7 @@ export default function ProgramEditorPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         {/* RPE Target */}
                         <div>
-                          <label className="block text-[11px] font-medium text-[#8E8E93] mb-1 uppercase">
+                          <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
                             RPE Target (optioneel)
                           </label>
                           <input
@@ -1094,13 +1094,13 @@ export default function ProgramEditorPage() {
                             }
                             min="0"
                             max="10"
-                            className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                            className="w-full px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
                           />
                         </div>
 
                         {/* Weight Suggestion */}
                         <div>
-                          <label className="block text-[11px] font-medium text-[#8E8E93] mb-1 uppercase">
+                          <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
                             Weight Suggestion (optioneel)
                           </label>
                           <input
@@ -1114,7 +1114,7 @@ export default function ProgramEditorPage() {
                                 e.target.value || null
                               )
                             }
-                            className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors"
+                            className="w-full px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] placeholder:text-[#D6D9D6] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
                           />
                         </div>
                       </div>
@@ -1124,7 +1124,7 @@ export default function ProgramEditorPage() {
                       {/* Notes (for strength exercises only — cardio has notes inline) */}
                       {exercise.category !== 'cardio' && (
                       <div className="mt-4">
-                        <label className="block text-[11px] font-medium text-[#8E8E93] mb-1 uppercase">
+                        <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
                           Aantekeningen (optioneel)
                         </label>
                         <textarea
@@ -1138,7 +1138,7 @@ export default function ProgramEditorPage() {
                             )
                           }
                           rows={2}
-                          className="w-full px-3 py-2 bg-[#FAFAFA] border border-[#E8E4DC] rounded-lg text-[13px] text-[#1A1A18] placeholder:text-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#1A1917] focus:bg-white transition-colors resize-none"
+                          className="w-full px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] placeholder:text-[#D6D9D6] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors resize-none"
                         />
                       </div>
                       )}
@@ -1150,7 +1150,7 @@ export default function ProgramEditorPage() {
                   {/* Add Exercise Button */}
                   <button
                     onClick={() => setShowExerciseModal(true)}
-                    className="w-full py-4 border-2 border-dashed border-[#E8E4DC] rounded-2xl text-[15px] font-medium text-[#1A1917] hover:border-[#1A1917] hover:bg-[#EDEAE4] transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-4 border-2 border-dashed border-[#A6ADA7] rounded-2xl text-[15px] font-medium text-[#FDFDFE] hover:border-[#FDFDFE] hover:bg-[#A6ADA7] transition-colors flex items-center justify-center gap-2"
                   >
                     <Plus strokeWidth={1.5} className="w-5 h-5" />
                     Oefening toevoegen
