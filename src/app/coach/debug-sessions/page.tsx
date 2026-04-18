@@ -671,20 +671,16 @@ function SessionCard({
   const badgeColor = completed ? LIME : AMBER
   const badgeLabel = completed ? 'Voltooid' : 'Open'
 
-  // Default completedAt suggestion = started_at + sets_completed activity window.
-  // Als er geen sets zijn, pak started_at + 45 min als redelijke gok.
-  // Format: datetime-local (no seconds, no TZ suffix).
+  // Default completedAt suggestion = started_at + duration_seconds (of 45 min default).
+  // Format: datetime-local (no seconds, no TZ suffix). Capping op "nu" gebeurt
+  // niet hier (purity-rule) — coach kan in het input-veld zelf bijstellen.
   const suggestedCompletedAt = (() => {
     if (!s.started_at) return ''
     const started = new Date(s.started_at)
-    // Voeg duration_seconds toe als beschikbaar, anders 45 min default
     const fallbackMs = s.duration_seconds ? s.duration_seconds * 1000 : 45 * 60 * 1000
     const suggested = new Date(started.getTime() + fallbackMs)
-    // Als gok > nu, cap op nu
-    const capped = suggested.getTime() > Date.now() ? new Date() : suggested
-    // YYYY-MM-DDTHH:mm in local time
     const pad = (n: number) => String(n).padStart(2, '0')
-    return `${capped.getFullYear()}-${pad(capped.getMonth() + 1)}-${pad(capped.getDate())}T${pad(capped.getHours())}:${pad(capped.getMinutes())}`
+    return `${suggested.getFullYear()}-${pad(suggested.getMonth() + 1)}-${pad(suggested.getDate())}T${pad(suggested.getHours())}:${pad(suggested.getMinutes())}`
   })()
 
   return (
