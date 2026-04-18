@@ -175,6 +175,14 @@ const IcoLogs = () => (
     <circle cx="20" cy="18" r="1.5" fill={icoColor} stroke="none" />
   </svg>
 )
+// Sign-out icoon — arrow die uit een box loopt (standaard log-out metafoor).
+const IcoLogout = () => (
+  <svg viewBox="0 0 24 24" style={icoStyle}>
+    <path d="M9 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4" />
+    <polyline points="14 17 19 12 14 7" />
+    <line x1="19" y1="12" x2="9" y2="12" />
+  </svg>
+)
 
 // ─── Dark mode toggle (inline row) ────────────────────────────
 function AppearanceValue() {
@@ -550,36 +558,71 @@ export default function ProfilePage() {
           leading={<IcoHelp />}
           label="Help & support"
         />
-      </div>
 
-      {/* ─────────── UITLOGGEN — subtiel · premium = geen paniek-knop ─────── */}
-      <button
-        onClick={handleLogout}
-        disabled={signingOut}
-        className="animate-fade-in"
-        style={{
-          marginTop: 18,
-          padding: '15px 22px',
-          background: 'transparent',
-          border: 'none',
-          width: '100%',
-          display: 'block',
-          textAlign: 'center',
-          fontFamily: 'inherit',
-          fontSize: 14,
-          fontWeight: 400,
-          color: 'rgba(253,253,254,0.52)',
-          letterSpacing: '-0.003em',
-          cursor: signingOut ? 'default' : 'pointer',
-          WebkitTapHighlightColor: 'transparent',
-          animationDelay: '520ms',
-          animationFillMode: 'both',
-          opacity: signingOut ? 0.6 : 1,
-          transition: 'color 180ms',
-        }}
-      >
-        {signingOut ? 'Uitloggen…' : 'Uitloggen'}
-      </button>
+        {/* ─── Uitloggen — Row-style voor zichtbaarheid ────────────────────
+         * Voor: subtiele grijze tekstknop onder de rows, Glenn zag hem
+         * niet (grijs-op-grijs). Nu: zelfde visuele pattern als Privacy/
+         * Help rows (icoon + label + chevron + top-border), maar als
+         * button zodat hij handleLogout triggert ipv een Link te volgen.
+         * Niet destructief gestyled — uitloggen is geen paniekactie. */}
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={signingOut}
+          aria-label={signingOut ? 'Bezig met uitloggen' : 'Uitloggen'}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'auto 1fr auto 14px',
+            alignItems: 'center',
+            gap: 14,
+            padding: '14px 0',
+            borderTop: '1px solid rgba(253,253,254,0.08)',
+            border: 'none',
+            borderTopWidth: 1,
+            borderTopStyle: 'solid',
+            borderTopColor: 'rgba(253,253,254,0.08)',
+            background: 'transparent',
+            width: '100%',
+            cursor: signingOut ? 'default' : 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+            fontFamily: 'inherit',
+            textAlign: 'left',
+            opacity: signingOut ? 0.6 : 1,
+            transition: 'opacity 180ms',
+          }}
+        >
+          <div
+            style={{
+              width: 24, height: 24,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <IcoLogout />
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 15, fontWeight: 400, color: '#FDFDFE',
+                letterSpacing: '-0.003em', lineHeight: 1.2,
+              }}
+            >
+              {signingOut ? 'Uitloggen…' : 'Uitloggen'}
+            </div>
+          </div>
+          <div />
+          <svg
+            viewBox="0 0 24 24"
+            style={{
+              width: 12, height: 12,
+              stroke: 'rgba(253,253,254,0.44)',
+              strokeWidth: 1.8, fill: 'none',
+            }}
+          >
+            <polyline points="9 6 15 12 9 18" />
+          </svg>
+        </button>
+      </div>
 
       {/* ─────────── VERSIE ─────────── */}
       <div
