@@ -35,9 +35,13 @@ export async function GET(request: NextRequest) {
     }
 
     // Get template days + completed workouts in parallel
+    // Week-start wordt ISO-stijl (maandag) berekend — de client-UI toont
+    // ook Ma-Zo, dus server en client moeten dezelfde week-grens delen.
     const today = new Date()
     const weekStart = new Date(today)
-    weekStart.setDate(today.getDate() - today.getDay())
+    const jsDayForStart = weekStart.getDay() // 0=Sun, 1=Mon...
+    const daysSinceMonday = jsDayForStart === 0 ? 6 : jsDayForStart - 1
+    weekStart.setDate(weekStart.getDate() - daysSinceMonday)
     weekStart.setHours(0, 0, 0, 0)
 
     const [templateDaysRes, completedSessionsRes] = await Promise.all([
@@ -83,6 +87,12 @@ export async function GET(request: NextRequest) {
       (completedSessions || []).map(s => s.template_day_id)
     )
     const workoutsThisWeek = uniqueCompletedDays.size
+    // Frontend heeft deze set nodig om de Deze-week view te renderen — elke
+    // dag in de week-card checkt of zijn gescheduled template_day_id hier in
+    // zit om "Voltooid" vs "Gepland"/"Gemist" te bepalen.
+    const weekCompletedDayIds = Array.from(uniqueCompletedDays).filter(
+      (id): id is string => typeof id === 'string' && id.length > 0,
+    )
 
     // Schedule: map of weekday -> template_day_id
     const schedule = (activeProgram.schedule as Record<string, string>) || {}
@@ -102,6 +112,8 @@ export async function GET(request: NextRequest) {
       schedule,
       todayDay,
       todayCompleted,
+      weekCompletedDayIds,
+      weekStartIso: weekStart.toISOString(),
     })
     response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=300')
     return response

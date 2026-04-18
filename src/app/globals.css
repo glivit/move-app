@@ -983,6 +983,30 @@ a, button {
 .week-row.peek .wr-meta { color: rgba(253,253,254,0.18); }
 .week-row.peek .wr-chip { background: rgba(253,253,254,0.04); color: rgba(253,253,254,0.18); }
 
+/* Today — subtiele lime-tint op de date-column, zodat "nu" zichtbaar is
+ * tussen de andere rows zonder dat de hele rij luid wordt (hero-card boven
+ * blijft primary CTA). */
+.week-row.today .wr-date .n { color: #C0FC01; }
+.week-row.today .wr-date .d { color: rgba(192,252,1,0.62); }
+
+/* Voltooid — lime chip + dimmed body zodat done-rows rustig zijn, maar de
+ * ✓-state vanuit de ooghoek direct herkenbaar. */
+.week-row.done .wr-name { color: rgba(253,253,254,0.72); }
+.week-row.done .wr-meta { color: rgba(253,253,254,0.44); }
+.week-row.done .wr-chip {
+  background: rgba(192,252,1,0.14);
+  color: #C0FC01;
+}
+
+/* Gemist — past-day met gescheduled workout die niet afgevinkt is. Amber-
+ * warning chip zonder de hele rij te alarmeren; de user kán nog steeds
+ * tappen om alsnog in te halen. */
+.week-row.missed .wr-name { color: rgba(253,253,254,0.86); }
+.week-row.missed .wr-chip {
+  background: rgba(232,169,60,0.14);
+  color: #E8A93C;
+}
+
 .week-more {
   display: flex; justify-content: center; align-items: center; gap: 6px;
   padding: 12px 16px 14px;

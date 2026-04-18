@@ -440,7 +440,11 @@ function AddFoodBottomSheet({
       brand: product.brand,
       image: 'image' in product ? product.image : undefined,
       grams,
-      checked: false,
+      // Toevoegen = gegeten. De + knop is een shortcut voor "ik heb dit net
+      // gegeten" — dus auto-aanvinken zodat macro-telling en meal-completion
+      // direct kloppen. Gebruiker kan altijd terug uitvinken als ze per
+      // ongeluk iets toevoegden.
+      checked: true,
       per100g: {
         calories: product.per100g.calories,
         protein: product.per100g.protein,

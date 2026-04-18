@@ -32,7 +32,19 @@ interface ProgramResponse {
   schedule?: Record<string, string>
   todayDay?: TemplateDay | null
   todayCompleted?: boolean
+  weekCompletedDayIds?: string[]
+  weekStartIso?: string
   activeSession?: { setsDone: number; totalSets: number } | null
+}
+
+// Each week-cell carries everything the renderer needs to draw it + handle taps.
+interface WeekCell {
+  date: Date
+  day: TemplateDay | null
+  completed: boolean
+  isToday: boolean
+  isPast: boolean
+  isFuture: boolean
 }
 
 // ─── Constants ─────────────────────────────────────────────────────────
@@ -40,36 +52,61 @@ const WEEKDAY_SHORT_NL = ['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za']
 const MONTH_SHORT_NL = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
 
 /**
- * Compute the next N upcoming days starting from tomorrow.
- * Returns array with date + optional scheduled template day.
+ * Bouw de volledige huidige week (Maandag → Zondag).
+ *
+ * Waarom volle week i.p.v. "tomorrow+5": Glenn liet clients workouts op andere
+ * dagen starten dan gepland. Als je Upper-A op maandag miste en woensdag doet,
+ * telt die sessie dankzij de `template_day_id`-match ook voor maandag — maar
+ * dan moet je maandag WEL zien in de overview, anders is de retro-afvinking
+ * onzichtbaar. Past-days blijven tapbaar zodat je expliciet alsnog kan
+ * starten als je iets inhaalt zonder ergens anders langs te hoeven.
  */
-function buildUpcoming(
+function buildWeek(
   schedule: Record<string, string>,
   days: TemplateDay[],
-  count: number,
-): Array<{ date: Date; day: TemplateDay | null }> {
+  completedIds: Set<string>,
+): WeekCell[] {
   const dayMap = new Map(days.map(d => [d.id, d]))
-  const result: Array<{ date: Date; day: TemplateDay | null }> = []
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  for (let offset = 1; offset <= count; offset++) {
-    const d = new Date(today)
+  // Maandag-start (ISO 8601) — dezelfde conventie als de API weekStart.
+  const jsDay = today.getDay() // 0=Sun, 1=Mon...6=Sat
+  const daysSinceMonday = jsDay === 0 ? 6 : jsDay - 1
+  const monday = new Date(today)
+  monday.setDate(monday.getDate() - daysSinceMonday)
+
+  const result: WeekCell[] = []
+  for (let offset = 0; offset < 7; offset++) {
+    const d = new Date(monday)
     d.setDate(d.getDate() + offset)
-    const jsDay = d.getDay()
-    const iso = String(jsDay === 0 ? 7 : jsDay)
+    const cellJsDay = d.getDay()
+    const iso = String(cellJsDay === 0 ? 7 : cellJsDay)
     const templateDayId = schedule[iso]
     const tmpl = templateDayId ? dayMap.get(templateDayId) || null : null
-    result.push({ date: d, day: tmpl })
+    const completed = !!(tmpl && completedIds.has(tmpl.id))
+    const diff = Math.round((d.getTime() - today.getTime()) / 86400000)
+    result.push({
+      date: d,
+      day: tmpl,
+      completed,
+      isToday: diff === 0,
+      isPast: diff < 0,
+      isFuture: diff > 0,
+    })
   }
   return result
 }
 
-function chipLabelFor(date: Date, day: TemplateDay | null): string {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const diff = Math.round((date.getTime() - today.getTime()) / 86400000)
-  if (!day) return 'Rust'
+function chipLabelFor(cell: WeekCell): string {
+  if (!cell.day) return 'Rust'
+  if (cell.completed) return 'Voltooid'
+  if (cell.isToday) return 'Vandaag'
+  if (cell.isPast) return 'Gemist'
+  // Future
+  const diff = Math.round(
+    (cell.date.getTime() - new Date(new Date().setHours(0, 0, 0, 0)).getTime()) / 86400000,
+  )
   if (diff === 1) return 'Morgen'
   return 'Gepland'
 }
@@ -94,7 +131,15 @@ export default function WorkoutOverviewPage() {
     loadData()
   }, [])
 
-  const { program, days = [], schedule = {}, todayDay, todayCompleted, activeSession } = data
+  const {
+    program,
+    days = [],
+    schedule = {},
+    todayDay,
+    todayCompleted,
+    weekCompletedDayIds = [],
+    activeSession,
+  } = data
 
   // Compute next-month header for context row
   const monthLabel = useMemo(() => {
@@ -102,9 +147,9 @@ export default function WorkoutOverviewPage() {
     return `${MONTH_SHORT_NL[t.getMonth()]} ${t.getFullYear()}`.toUpperCase()
   }, [])
 
-  const upcoming = useMemo(
-    () => (days.length ? buildUpcoming(schedule, days, 5) : []),
-    [schedule, days],
+  const week = useMemo(
+    () => (days.length ? buildWeek(schedule, days, new Set(weekCompletedDayIds)) : []),
+    [schedule, days, weekCompletedDayIds],
   )
 
   // Loading skeleton
@@ -251,34 +296,42 @@ export default function WorkoutOverviewPage() {
         )}
       </div>
 
-      {/* ─── Context head · Komende ─── */}
+      {/* ─── Context head · Deze week ─── */}
       <div className="context-head">
-        <div className="context-l">Komende</div>
+        <div className="context-l">Deze week</div>
         <div className="context-r">
           {program.name} · Week {program.current_week}/{totalWeeks}
         </div>
       </div>
 
-      {/* ─── Week-card · frosted glass ─── */}
+      {/* ─── Week-card · frosted glass · Ma-Zo incl. past & retroactief ─── */}
       <div className="week-card">
-        {upcoming.map(({ date, day }, idx) => {
-          const isRest = !day
-          const isPeek = idx === upcoming.length - 1
+        {week.map((cell, idx) => {
+          const isRest = !cell.day
+          // "Gemist"-rows krijgen subtiele red-tint via .missed class; past
+          // rest-days krijgen .rest (zelfde styling als future rest-days —
+          // er valt niks in te halen).
           const rowClass =
             'week-row' +
             (isRest ? ' rest' : '') +
-            (isPeek && isRest ? ' peek' : '')
-          const weekdayLbl = WEEKDAY_SHORT_NL[date.getDay()]
-          const dayNum = date.getDate()
-          const chip = chipLabelFor(date, day)
-          const onClick = day ? () => handleStart(day) : undefined
+            (cell.isToday ? ' today' : '') +
+            (cell.completed ? ' done' : '') +
+            (cell.isPast && !cell.completed && cell.day ? ' missed' : '')
+          const weekdayLbl = WEEKDAY_SHORT_NL[cell.date.getDay()]
+          const dayNum = cell.date.getDate()
+          const chip = chipLabelFor(cell)
+          // Tap-any-scheduled-day: ook past + missed zijn tapbaar zodat je
+          // alsnog kunt starten — de server-side completion logic linkt die
+          // sessie via template_day_id aan de gemiste slot.
+          const onClick = cell.day ? () => cell.day && handleStart(cell.day) : undefined
           return (
             <button
               key={idx}
               className={rowClass}
               onClick={onClick}
-              style={{ cursor: day ? 'pointer' : 'default' }}
+              style={{ cursor: cell.day ? 'pointer' : 'default' }}
               type="button"
+              aria-current={cell.isToday ? 'date' : undefined}
             >
               <div className="wr-date">
                 <span className="d">{weekdayLbl}</span>
@@ -286,12 +339,12 @@ export default function WorkoutOverviewPage() {
               </div>
               <div className="wr-body">
                 <div className="wr-name">
-                  {day ? day.name : 'Rust · actief herstel'}
+                  {cell.day ? cell.day.name : 'Rust · actief herstel'}
                 </div>
                 <div className="wr-meta">
-                  {day ? (
+                  {cell.day ? (
                     <>
-                      {day.exercise_count ?? '—'} oefeningen · ±{day.estimated_duration_min} min
+                      {cell.day.exercise_count ?? '—'} oefeningen · ±{cell.day.estimated_duration_min} min
                     </>
                   ) : (
                     'Wandeling of mobility'
