@@ -24,19 +24,38 @@ import { useEffect, useState, useCallback } from 'react'
  *     via `updatefound` binnenkomen triggeren de prompt. Een waiting SW die
  *     uit een vorige sessie staat, activeert zichzelf zodra alle tabs dicht
  *     gaan (native browser behavior).
- *   - Extra veiligheid: sessionStorage-cooldown van 10 min, zodat opeen-
- *     volgende dev-rebuilds binnen dezelfde tab niet steeds opnieuw prompten.
  *   - Reload na SKIP_WAITING: 150ms delay zodat de nieuwe SW genoeg tijd
  *     heeft om zijn precache te settlen voordat we fetches doen (voorkomt
  *     "er ging iets mis bij het laden").
+ *
+ * Fase 6 fix v2 (Bug 74 follow-up):
+ *   - sessionStorage werd op iOS PWA leeggemaakt bij elke app-close. Bij
+ *     heropenen was er geen cooldown meer → de Serwist-route leverde weer
+ *     byte-verschillend → updatefound → prompt elke keer je de app opent.
+ *   - Switch naar localStorage + 24u cooldown. Eens Glenn de prompt zag
+ *     (of erop klikte) blijft hij weg voor een dag, ook na app-killen.
+ *     Voor écht nieuwe releases is 1× per 24u prompten meer dan voldoende.
+ *   - Bonus: markCooldown() óók bij applyUpdate, zodat na de reload niet
+ *     direct opnieuw geprompt wordt als de SW nóg een keer byte-veranderd.
  */
 
 const UPDATE_COOLDOWN_KEY = 'move-sw-update-seen-at'
-const UPDATE_COOLDOWN_MS = 10 * 60 * 1000
+const UPDATE_COOLDOWN_MS = 24 * 60 * 60 * 1000 // 24u — zie Fase 6 v2 toelichting
+
+function safeLocalStorage(): Storage | null {
+  try {
+    if (typeof window === 'undefined') return null
+    return window.localStorage
+  } catch {
+    return null
+  }
+}
 
 function isInCooldown(): boolean {
+  const store = safeLocalStorage()
+  if (!store) return false
   try {
-    const seen = parseInt(sessionStorage.getItem(UPDATE_COOLDOWN_KEY) ?? '0', 10)
+    const seen = parseInt(store.getItem(UPDATE_COOLDOWN_KEY) ?? '0', 10)
     return Number.isFinite(seen) && Date.now() - seen < UPDATE_COOLDOWN_MS
   } catch {
     return false
@@ -44,8 +63,10 @@ function isInCooldown(): boolean {
 }
 
 function markCooldown() {
+  const store = safeLocalStorage()
+  if (!store) return
   try {
-    sessionStorage.setItem(UPDATE_COOLDOWN_KEY, Date.now().toString())
+    store.setItem(UPDATE_COOLDOWN_KEY, Date.now().toString())
   } catch {
     /* storage disabled — no cooldown, acceptable */
   }
@@ -142,6 +163,10 @@ export function useServiceWorker(): ServiceWorkerStatus {
   }, [])
 
   const applyUpdate = useCallback(() => {
+    // Altijd cooldown-bump: ook als er geen waitingWorker is (fallback
+    // reload), willen we voorkomen dat direct na reload de prompt herverschijnt
+    // omdat Serwist per request byte-verschillende SW levert.
+    markCooldown()
     if (!waitingWorker) {
       // Fallback: forceer een reload — als update is geactiveerd via
       // tab-close-cycle is de nieuwe SW al actief.
