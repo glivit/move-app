@@ -96,13 +96,16 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
   const admin = createAdminClient()
 
   // Resolve client from query (id / email / name)
-  let client: { id: string; full_name: string | null; email?: string | null } | null = null
-  let multipleMatches: Array<{ id: string; name: string | null }> | null = null
+  let client: { id: string; full_name: string | null; email?: string | null; role?: string | null } | null = null
+  let multipleMatches: Array<{ id: string; name: string | null; role: string | null }> | null = null
+  // Alle profielen die op naam matchen — tonen we altijd, ook als er al een client is gekozen,
+  // zodat we kunnen zien of er dubbele Charles-accounts zijn (coach vs trial vs client).
+  let allNameMatches: Array<{ id: string; name: string | null; role: string | null }> = []
 
   if (q) {
     // Try UUID match first
     if (/^[0-9a-f-]{30,}$/i.test(q)) {
-      const { data } = await admin.from('profiles').select('id, full_name').eq('id', q).single()
+      const { data } = await admin.from('profiles').select('id, full_name, role').eq('id', q).single()
       client = data || null
     }
     // Try email
@@ -110,22 +113,24 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
       const { data: authUsers } = await admin.auth.admin.listUsers({ perPage: 200 })
       const match = authUsers?.users?.find((u) => u.email?.toLowerCase() === q.toLowerCase())
       if (match) {
-        const { data } = await admin.from('profiles').select('id, full_name').eq('id', match.id).single()
+        const { data } = await admin.from('profiles').select('id, full_name, role').eq('id', match.id).single()
         if (data) client = { ...data, email: match.email || null }
       }
     }
-    // Fall back to full_name ilike
-    if (!client) {
+    // Fall back to full_name ilike — géén role-filter meer, we willen ALLE matches zien
+    if (!q.includes('@') && !/^[0-9a-f-]{30,}$/i.test(q)) {
       const { data } = await admin
         .from('profiles')
-        .select('id, full_name')
-        .eq('role', 'client')
+        .select('id, full_name, role')
         .ilike('full_name', `%${q}%`)
-        .limit(10)
-      if (data && data.length === 1) {
-        client = data[0]
-      } else if (data && data.length > 1) {
-        multipleMatches = data.map((c) => ({ id: c.id, name: c.full_name }))
+        .limit(20)
+      allNameMatches = (data || []).map((c) => ({ id: c.id, name: c.full_name, role: c.role }))
+      if (!client) {
+        if (allNameMatches.length === 1) {
+          client = { id: allNameMatches[0].id, full_name: allNameMatches[0].name, role: allNameMatches[0].role }
+        } else if (allNameMatches.length > 1) {
+          multipleMatches = allNameMatches
+        }
       }
     }
   }
@@ -134,38 +139,65 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
   let activeProgram: ProgramRow | null = null
   let allPrograms: ProgramRow[] = []
   let templateDays: TemplateDayRow[] = []
+  // Diagnostics: ongeacht window, aantal sessies OOIT voor deze client.id, en
+  // de 5 meest recente. Zo zien we meteen of het een id-mismatch-probleem is
+  // (ooit=0) of een window-probleem (ooit>0, maar windowed=0).
+  let everCount: number | null = null
+  let recentEver: SessionRow[] = []
 
   if (client) {
     const now = new Date()
     const since = new Date(now.getTime() - days * 86400000)
 
-    const [{ data: programs }, { data: sessionsByStarted }, { data: sessionsByCompleted }] =
-      await Promise.all([
-        admin
-          .from('client_programs')
-          .select('id, name, is_active, schedule, template_id, start_date, end_date')
-          .eq('client_id', client.id)
-          .order('is_active', { ascending: false }),
-        // Sessions whose started_at is in the window
-        admin
-          .from('workout_sessions')
-          .select(
-            'id, started_at, completed_at, template_day_id, client_program_id, duration_seconds, duration_minutes, mood_rating, difficulty_rating, feedback_text, coach_seen, notes',
-          )
-          .eq('client_id', client.id)
-          .gte('started_at', since.toISOString())
-          .order('started_at', { ascending: false }),
-        // ALSO sessions whose completed_at is in the window — catches zombie-minimized
-        // sessions that were started long ago but finished recently.
-        admin
-          .from('workout_sessions')
-          .select(
-            'id, started_at, completed_at, template_day_id, client_program_id, duration_seconds, duration_minutes, mood_rating, difficulty_rating, feedback_text, coach_seen, notes',
-          )
-          .eq('client_id', client.id)
-          .gte('completed_at', since.toISOString())
-          .order('completed_at', { ascending: false }),
-      ])
+    const [
+      { data: programs },
+      { data: sessionsByStarted },
+      { data: sessionsByCompleted },
+      { count: everCountRes },
+      { data: recentEverRes },
+    ] = await Promise.all([
+      admin
+        .from('client_programs')
+        .select('id, name, is_active, schedule, template_id, start_date, end_date')
+        .eq('client_id', client.id)
+        .order('is_active', { ascending: false }),
+      // Sessions whose started_at is in the window
+      admin
+        .from('workout_sessions')
+        .select(
+          'id, started_at, completed_at, template_day_id, client_program_id, duration_seconds, duration_minutes, mood_rating, difficulty_rating, feedback_text, coach_seen, notes',
+        )
+        .eq('client_id', client.id)
+        .gte('started_at', since.toISOString())
+        .order('started_at', { ascending: false }),
+      // ALSO sessions whose completed_at is in the window — catches zombie-minimized
+      // sessions that were started long ago but finished recently.
+      admin
+        .from('workout_sessions')
+        .select(
+          'id, started_at, completed_at, template_day_id, client_program_id, duration_seconds, duration_minutes, mood_rating, difficulty_rating, feedback_text, coach_seen, notes',
+        )
+        .eq('client_id', client.id)
+        .gte('completed_at', since.toISOString())
+        .order('completed_at', { ascending: false }),
+      // Total ever — diagnostic
+      admin
+        .from('workout_sessions')
+        .select('id', { count: 'exact', head: true })
+        .eq('client_id', client.id),
+      // 5 meest recente ooit — diagnostic
+      admin
+        .from('workout_sessions')
+        .select(
+          'id, started_at, completed_at, template_day_id, client_program_id, duration_seconds, duration_minutes, mood_rating, difficulty_rating, feedback_text, coach_seen, notes',
+        )
+        .eq('client_id', client.id)
+        .order('started_at', { ascending: false })
+        .limit(5),
+    ])
+
+    everCount = everCountRes ?? null
+    recentEver = (recentEverRes as SessionRow[]) || []
 
     // Merge + dedupe by id
     const byId = new Map<string, SessionRow>()
@@ -317,21 +349,51 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
 
         {multipleMatches && (
           <div
-            className="rounded-2xl p-4"
+            className="mb-4 rounded-2xl p-4"
             style={{ background: CARD, color: INK, border: `1px solid ${HAIR}` }}
           >
             <div className="mb-2 text-[13px]" style={{ color: INK_MUTED }}>
-              Meerdere matches — klik om verder te zoeken:
+              Meerdere matches — klik om te selecteren:
             </div>
             <div className="flex flex-wrap gap-2">
               {multipleMatches.map((m) => (
                 <a
                   key={m.id}
                   href={`?q=${m.id}&days=${days}`}
-                  className="rounded-full px-3 py-1.5 text-[13px]"
+                  className="rounded-full px-3 py-1.5 text-[12px]"
                   style={{ background: 'rgba(192,252,1,0.14)', color: LIME, border: `1px solid ${HAIR}` }}
                 >
-                  {m.name || m.id}
+                  {m.name || '(geen naam)'} · {m.role || 'null'}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Ook als er één client gekozen is: toon alle naam-matches zodat
+            duplicaten / accounts met andere rol zichtbaar zijn */}
+        {client && allNameMatches.length > 1 && (
+          <div
+            className="mb-4 rounded-2xl p-3"
+            style={{ background: 'rgba(232,169,60,0.08)', border: `1px solid ${HAIR}`, color: INK }}
+          >
+            <div className="mb-1.5 text-[12px]" style={{ color: AMBER }}>
+              ⚠︎ {allNameMatches.length} profielen matchen &ldquo;{q}&rdquo; — mogelijk verkeerd account
+              gekozen:
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {allNameMatches.map((m) => (
+                <a
+                  key={m.id}
+                  href={`?q=${m.id}&days=${days}`}
+                  className="rounded-full px-2.5 py-1 text-[11px] tabular-nums"
+                  style={{
+                    background: m.id === client.id ? 'rgba(192,252,1,0.14)' : 'rgba(71,75,72,0.55)',
+                    color: m.id === client.id ? LIME : INK_MUTED,
+                    border: `1px solid ${HAIR}`,
+                  }}
+                >
+                  {m.name || '(geen naam)'} · {m.role || 'null'} · {m.id.slice(0, 8)}
                 </a>
               ))}
             </div>
