@@ -909,7 +909,7 @@ export default function ProgressPage() {
           {/* ─── Coach check-in banner ─── */}
           {weeklyCheckIn.pending && (
             <Link
-              href="/client/check-in/weekly"
+              href="/client/weekly-check-in"
               className="flex items-center mb-3 animate-slide-up stagger-3"
               style={{
                 background: '#474B48',
@@ -2011,7 +2011,7 @@ export default function ProgressPage() {
           {/* Due banner — only when weekly check-in still pending */}
           {weeklyCheckIn.pending && (
             <Link
-              href="/client/check-in/weekly"
+              href="/client/weekly-check-in"
               className="animate-slide-up stagger-2"
               style={{
                 display: 'block',
