@@ -40,7 +40,18 @@ export async function fetchDashboardData(userId: string) {
     db.from('profiles').select('id, full_name, role, package, start_date, intake_completed')
       .eq('id', userId).single(),
 
-    db.from('client_programs').select('id, name, start_date, is_active, current_week, template_id, schedule')
+    // Collapsed: client_programs + nested template_days + per-day exercise count
+    // in één round-trip. Vervangt twee opvolgende awaits (templateDays + count-query)
+    // verderop in deze functie — ~1s winst op initial load.
+    db.from('client_programs').select(`
+        id, name, start_date, is_active, current_week, template_id, schedule,
+        program_templates (
+          template_days:program_template_days (
+            id, day_number, name, focus, estimated_duration_min, sort_order,
+            program_template_exercises ( count )
+          )
+        )
+      `)
       .eq('client_id', userId).eq('is_active', true)
       .order('created_at', { ascending: false }).limit(1).single(),
 
@@ -123,14 +134,12 @@ export async function fetchDashboardData(userId: string) {
   const todayWorkouts = todayWorkoutsRes.data || []
   const weekWorkouts = weekWorkoutsRes.data || []
 
-  const templateDaysPromise = program?.template_id
-    ? db.from('program_template_days')
-        .select('id, day_number, name, focus, estimated_duration_min')
-        .eq('template_id', program.template_id)
-        .order('sort_order', { ascending: true })
-    : Promise.resolve({ data: [] })
-
-  const templateDays = (await templateDaysPromise).data || []
+  // Template-days komen nu uit de embed op client_programs — geen extra round-trip.
+  const templateDaysRaw: any[] =
+    (program as any)?.program_templates?.template_days || []
+  const templateDays = [...templateDaysRaw].sort(
+    (a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0)
+  )
 
   const todayDow = (() => { const d = new Date().getDay(); return d === 0 ? 7 : d })()
   const schedule = (program?.schedule as Record<string, string>) || {}
@@ -140,17 +149,9 @@ export async function fetchDashboardData(userId: string) {
     ? templateDays.find((d: any) => d.id === todayDayId) || null
     : null
 
-  // Exercise count voor vandaag (voor home-card meta-regel
-  // "N oefeningen · ±<min> min" — matcht design-system 04-homepage-v2).
-  // Eén count-query, alleen als er vandaag een template-day is.
-  let todayExerciseCount: number | null = null
-  if (todayTemplateDay?.id) {
-    const { count } = await db
-      .from('program_template_exercises')
-      .select('id', { count: 'exact', head: true })
-      .eq('template_day_id', todayTemplateDay.id)
-    todayExerciseCount = typeof count === 'number' ? count : null
-  }
+  // Exercise-count voor vandaag komt uit de nested embed — geen aparte count-query meer.
+  const todayExerciseCount: number | null =
+    (todayTemplateDay as any)?.program_template_exercises?.[0]?.count ?? null
 
   let nextTrainingDay: any = null
   for (let offset = 1; offset <= 7; offset++) {
