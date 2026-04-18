@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, MessageCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 import { useConversationList } from '@/hooks/useMessageSubscription'
 import { ConversationList } from '@/components/coach/ConversationList'
@@ -14,7 +14,6 @@ export default function CoachMessagesPage() {
   const [authLoading, setAuthLoading] = useState(true)
   const { conversations, loading: conversationsLoading } = useConversationList(userId || '')
 
-  // Get current user ID from auth
   useEffect(() => {
     async function getUser() {
       const supabase = createClient()
@@ -46,13 +45,19 @@ export default function CoachMessagesPage() {
   // Loading state
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#A6ADA7' }}>
-        <div className="space-y-6 text-center">
-          <div className="space-y-3">
-            <div className="h-3 rounded-lg w-48 mx-auto animate-pulse" style={{ backgroundColor: '#A6ADA7' }} />
-            <div className="h-3 rounded-lg w-64 mx-auto animate-pulse" style={{ backgroundColor: '#A6ADA7' }} />
-            <div className="h-3 rounded-lg w-56 mx-auto animate-pulse" style={{ backgroundColor: '#A6ADA7' }} />
-          </div>
+      <div
+        className="flex items-center justify-center min-h-screen"
+        style={{ background: '#8E9890' }}
+      >
+        <div className="space-y-3 animate-pulse">
+          <div
+            className="h-3 rounded-full w-48 mx-auto"
+            style={{ background: 'rgba(253,253,254,0.18)' }}
+          />
+          <div
+            className="h-3 rounded-full w-64 mx-auto"
+            style={{ background: 'rgba(253,253,254,0.18)' }}
+          />
         </div>
       </div>
     )
@@ -61,12 +66,22 @@ export default function CoachMessagesPage() {
   // Not authenticated state
   if (!userId) {
     return (
-      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: '#A6ADA7' }}>
-        <div className="text-center space-y-3">
-          <p style={{ color: '#D6D9D6' }} className="text-lg font-medium">
+      <div
+        className="flex items-center justify-center min-h-screen"
+        style={{ background: '#8E9890' }}
+      >
+        <div
+          className="text-center px-8 py-6 rounded-3xl max-w-sm"
+          style={{
+            background: '#A6ADA7',
+            boxShadow:
+              'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+          }}
+        >
+          <p className="text-[17px] font-semibold" style={{ color: '#FDFDFE' }}>
             Niet aangemeld
           </p>
-          <p style={{ color: '#D6D9D6' }} className="text-sm">
+          <p className="text-[14px] mt-2" style={{ color: 'rgba(253,253,254,0.72)' }}>
             Meld je aan om berichten te zien
           </p>
         </div>
@@ -75,49 +90,44 @@ export default function CoachMessagesPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-80px)]" style={{ backgroundColor: '#A6ADA7' }}>
-      {/* Desktop Layout: Split view (list + thread) */}
+    <div className="flex h-[calc(100vh-80px)]" style={{ background: '#8E9890' }}>
+      {/* Desktop Layout */}
       <div className="hidden lg:flex w-full gap-0">
-        {/* Left Panel: Conversation List */}
+        {/* Left Panel — dark sidebar */}
         <div
-          className="w-80 border-r flex flex-col overflow-hidden"
-          style={{ borderColor: '#A6ADA7' }}
+          className="w-[340px] flex flex-col overflow-hidden"
+          style={{
+            background: '#474B48',
+            boxShadow: 'inset -1px 0 0 rgba(255,255,255,0.04)',
+          }}
         >
           {/* Header */}
-          <div
-            className="px-6 py-5 border-b"
-            style={{ borderColor: '#A6ADA7' }}
-          >
+          <div className="px-5 pt-5 pb-2">
+            <span
+              className="text-[10px] font-semibold uppercase tracking-[0.16em]"
+              style={{ color: 'rgba(253,253,254,0.44)' }}
+            >
+              Inbox
+            </span>
             <h1
-              className="text-2xl font-bold"
+              className="text-[26px] font-bold tracking-tight mt-1"
               style={{ color: '#FDFDFE' }}
             >
               Berichten
             </h1>
-            <p
-              className="text-xs mt-1"
-              style={{ color: '#D6D9D6' }}
-            >
-              Jouw gesprekken
-            </p>
           </div>
 
-          {/* Conversation List */}
+          {/* List */}
           <div className="flex-1 overflow-hidden">
             {conversationsLoading ? (
-              <div className="p-4 space-y-4">
-                <div className="space-y-3">
-                  <div className="h-4 rounded-lg w-3/4 animate-pulse" style={{ backgroundColor: '#A6ADA7' }} />
-                  <div className="space-y-3">
-                    {[1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        className="h-16 rounded-lg animate-pulse"
-                        style={{ backgroundColor: '#A6ADA7' }}
-                      />
-                    ))}
-                  </div>
-                </div>
+              <div className="p-4 space-y-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="h-16 rounded-2xl animate-pulse"
+                    style={{ background: 'rgba(253,253,254,0.08)' }}
+                  />
+                ))}
               </div>
             ) : (
               <ConversationList
@@ -129,85 +139,121 @@ export default function CoachMessagesPage() {
           </div>
         </div>
 
-        {/* Right Panel: Message Thread */}
+        {/* Right Panel — thread */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {selectedClientId ? (
-            <MessageThread
-              currentUserId={userId}
-              otherUserId={selectedClientId}
-              otherUserName={selectedClientName}
-            />
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center px-8 py-6">
-              <div className="text-center space-y-3 max-w-sm">
+            <>
+              {/* Thread header */}
+              <div
+                className="px-6 py-4 flex items-center gap-3"
+                style={{
+                  background: '#474B48',
+                  boxShadow: 'inset 0 -1px 0 rgba(255,255,255,0.06)',
+                }}
+              >
                 <div
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
-                  style={{ backgroundColor: '#A6ADA7' }}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-[15px] font-bold"
+                  style={{ background: 'rgba(253,253,254,0.14)', color: '#FDFDFE' }}
                 >
-                  <svg
-                    className="w-8 h-8"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                  {selectedClientName?.charAt(0).toUpperCase() || '?'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p
+                    className="text-[16px] font-semibold truncate"
                     style={{ color: '#FDFDFE' }}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                    />
-                  </svg>
+                    {selectedClientName}
+                  </p>
+                  <p
+                    className="text-[11px] uppercase tracking-[0.16em]"
+                    style={{ color: 'rgba(253,253,254,0.56)' }}
+                  >
+                    Cliënt
+                  </p>
                 </div>
-                <p
-                  className="text-lg font-medium"
-                  style={{ color: '#FDFDFE' }}
+              </div>
+
+              <div className="flex-1 overflow-hidden">
+                <MessageThread
+                  currentUserId={userId}
+                  otherUserId={selectedClientId}
+                  otherUserName={selectedClientName}
+                />
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center px-8 py-6">
+              <div
+                className="text-center space-y-4 max-w-sm px-8 py-8 rounded-3xl"
+                style={{
+                  background: '#A6ADA7',
+                  boxShadow:
+                    'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+                }}
+              >
+                <div
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto"
+                  style={{ background: 'rgba(253,253,254,0.14)' }}
                 >
-                  Selecteer een gesprek
-                </p>
-                <p
-                  className="text-sm"
-                  style={{ color: '#D6D9D6' }}
-                >
-                  Kies een cliënt uit de lijst om berichten uit te wisselen
-                </p>
+                  <MessageCircle
+                    className="w-8 h-8"
+                    strokeWidth={1.5}
+                    style={{ color: '#FDFDFE' }}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[17px] font-semibold" style={{ color: '#FDFDFE' }}>
+                    Selecteer een gesprek
+                  </p>
+                  <p
+                    className="text-[14px]"
+                    style={{ color: 'rgba(253,253,254,0.72)' }}
+                  >
+                    Kies een cliënt uit de lijst om berichten uit te wisselen
+                  </p>
+                </div>
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Mobile Layout: Toggle between list and thread */}
+      {/* Mobile Layout */}
       <div className="lg:hidden w-full flex flex-col overflow-hidden">
         {!selectedClientId ? (
-          // Show conversation list on mobile
           <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Mobile Header */}
+            {/* Header */}
             <div
-              className="px-4 py-4 border-b"
-              style={{ borderColor: '#A6ADA7' }}
+              className="px-5 pt-5 pb-3"
+              style={{
+                background: '#474B48',
+                boxShadow: 'inset 0 -1px 0 rgba(255,255,255,0.06)',
+              }}
             >
+              <span
+                className="text-[10px] font-semibold uppercase tracking-[0.16em]"
+                style={{ color: 'rgba(253,253,254,0.44)' }}
+              >
+                Inbox
+              </span>
               <h1
-                className="text-2xl font-bold"
+                className="text-[26px] font-bold tracking-tight mt-1"
                 style={{ color: '#FDFDFE' }}
               >
                 Berichten
               </h1>
             </div>
 
-            {/* Conversation List */}
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 overflow-hidden" style={{ background: '#474B48' }}>
               {conversationsLoading ? (
-                <div className="p-4 space-y-4">
-                  <div className="space-y-3">
-                    {[1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        className="h-16 rounded-lg animate-pulse"
-                        style={{ backgroundColor: '#A6ADA7' }}
-                      />
-                    ))}
-                  </div>
+                <div className="p-4 space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="h-16 rounded-2xl animate-pulse"
+                      style={{ background: 'rgba(253,253,254,0.08)' }}
+                    />
+                  ))}
                 </div>
               ) : (
                 <ConversationList
@@ -219,30 +265,40 @@ export default function CoachMessagesPage() {
             </div>
           </div>
         ) : (
-          // Show message thread on mobile
           <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Mobile Thread Header with Back Button */}
+            {/* Mobile Thread Header */}
             <div
-              className="px-4 py-3 border-b flex items-center gap-3"
-              style={{ borderColor: '#A6ADA7' }}
+              className="px-4 py-3 flex items-center gap-3"
+              style={{
+                background: '#474B48',
+                boxShadow: 'inset 0 -1px 0 rgba(255,255,255,0.06)',
+              }}
             >
               <button
                 onClick={handleBackToList}
-                className="p-2 rounded-lg transition-colors hover:opacity-75"
-                style={{ backgroundColor: '#A6ADA7', color: '#FDFDFE' }}
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                style={{
+                  background: 'rgba(253,253,254,0.10)',
+                  color: '#FDFDFE',
+                }}
                 aria-label="Terug naar berichten"
               >
-                <ArrowLeft strokeWidth={1.5} className="w-5 h-5" />
+                <ArrowLeft strokeWidth={1.75} className="w-5 h-5" />
               </button>
+              <div
+                className="w-9 h-9 rounded-full flex items-center justify-center text-[14px] font-bold"
+                style={{ background: 'rgba(253,253,254,0.14)', color: '#FDFDFE' }}
+              >
+                {selectedClientName?.charAt(0).toUpperCase() || '?'}
+              </div>
               <h2
-                className="text-lg font-semibold"
+                className="text-[16px] font-semibold flex-1 truncate"
                 style={{ color: '#FDFDFE' }}
               >
                 {selectedClientName}
               </h2>
             </div>
 
-            {/* Message Thread */}
             <div className="flex-1 overflow-hidden">
               <MessageThread
                 currentUserId={userId}

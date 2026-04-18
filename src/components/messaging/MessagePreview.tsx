@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { Image as ImageIcon, FileText, Play } from 'lucide-react'
+import { FileText, Play } from 'lucide-react'
 
 interface MessagePreviewProps {
   messageType: string
@@ -9,22 +9,24 @@ interface MessagePreviewProps {
   fileUrl: string | null
 }
 
+// v6: used inside MessageThread bubbles (both own/other use dark/light card).
+// Text colour is always #FDFDFE on dark/light cards; accents muted.
 export function MessagePreview({ messageType, content, fileUrl }: MessagePreviewProps) {
   if (messageType === 'image' && fileUrl) {
     return (
-      <div className="mt-3">
+      <div>
         <a
           href={fileUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block rounded-lg overflow-hidden hover:opacity-90 transition-opacity"
+          className="inline-block rounded-xl overflow-hidden hover:opacity-90 transition-opacity"
         >
           <Image
             src={fileUrl}
             alt="Afbeelding bericht"
-            width={200}
-            height={200}
-            className="max-h-48 object-cover rounded-lg"
+            width={240}
+            height={240}
+            className="max-h-60 object-cover rounded-xl"
             unoptimized
             loading="lazy"
           />
@@ -35,7 +37,7 @@ export function MessagePreview({ messageType, content, fileUrl }: MessagePreview
 
   if (messageType === 'video' && fileUrl) {
     return (
-      <div className="mt-3 relative inline-block">
+      <div className="relative inline-block">
         <a
           href={fileUrl}
           target="_blank"
@@ -44,11 +46,12 @@ export function MessagePreview({ messageType, content, fileUrl }: MessagePreview
         >
           <video
             src={fileUrl}
-            className="max-h-48 rounded-lg"
+            className="max-h-60 rounded-xl"
             preload="metadata"
+            playsInline
           />
-          <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors rounded-lg">
-            <Play className="w-12 h-12 text-white" />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors rounded-xl">
+            <Play className="w-10 h-10" style={{ color: '#FDFDFE' }} />
           </div>
         </a>
       </div>
@@ -56,24 +59,27 @@ export function MessagePreview({ messageType, content, fileUrl }: MessagePreview
   }
 
   if (messageType === 'file' && fileUrl) {
-    const fileName = fileUrl.split('/').pop() || 'Bestand'
+    const fileName = content || fileUrl.split('/').pop() || 'Bestand'
     return (
-      <div className="mt-3 p-3 rounded-lg bg-surface-muted border border-border flex items-center gap-3">
-        <FileText className="w-5 h-5 text-accent flex-shrink-0" />
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-text-primary truncate">{fileName}</p>
-        </div>
-        <a
-          href={fileUrl}
-          download
-          className="text-xs font-medium text-accent hover:text-accent-dark transition-colors whitespace-nowrap"
+      <a
+        href={fileUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        download
+        className="flex items-center gap-3 px-3 py-2 rounded-xl"
+        style={{ background: 'rgba(253,253,254,0.10)' }}
+      >
+        <FileText className="w-[18px] h-[18px]" style={{ color: 'rgba(253,253,254,0.72)' }} />
+        <span
+          className="text-[13px] font-medium truncate max-w-[180px]"
+          style={{ color: '#FDFDFE' }}
         >
-          Download
-        </a>
-      </div>
+          {fileName}
+        </span>
+      </a>
     )
   }
 
-  // For text messages
-  return <p className="text-sm text-text-primary">{content}</p>
+  // Text
+  return <p className="text-[15px] leading-[1.45]" style={{ color: '#FDFDFE' }}>{content}</p>
 }

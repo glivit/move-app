@@ -65,7 +65,6 @@ export function AIChatSuggestions({
     }
   }, [clientId, recentMessages])
 
-  // Auto-fetch suggestions when component mounts or messages change
   useEffect(() => {
     fetchSuggestions()
   }, [fetchSuggestions])
@@ -78,53 +77,98 @@ export function AIChatSuggestions({
     [onSelectSuggestion]
   )
 
-  // Don't show anything if there are no messages or suggestions
   if (!isVisible || (suggestions.length === 0 && !isLoading && !error)) {
     return null
   }
 
   return (
-    <div className="bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg px-4 py-3">
+    <div
+      className="rounded-3xl px-4 py-3"
+      style={{
+        background: '#474B48',
+        boxShadow:
+          'inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 8px rgba(0,0,0,0.18)',
+      }}
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-[#C0FC01]" />
-          <span className="text-xs font-semibold text-[#E6E8E7] uppercase tracking-wide">
-            AI suggesties
+          <Sparkles
+            className="w-4 h-4"
+            style={{ color: 'rgba(253,253,254,0.82)' }}
+          />
+          <span
+            className="text-[10px] font-semibold uppercase tracking-[0.16em]"
+            style={{ color: 'rgba(253,253,254,0.56)' }}
+          >
+            AI-suggesties
           </span>
         </div>
         <button
           onClick={fetchSuggestions}
           disabled={isLoading}
-          className="p-1 text-[#E6E8E7] hover:text-[#E6E8E7] hover:bg-[#A6ADA7] rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-8 h-8 rounded-full flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{
+            background: 'rgba(253,253,254,0.10)',
+            color: '#FDFDFE',
+          }}
           aria-label="Suggesties verversen"
         >
           <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
-      {/* Suggestions grid */}
+      {/* Body */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-3 gap-2">
-          <Loader className="w-4 h-4 text-[#C0FC01] animate-spin" />
-          <span className="text-xs text-[#E6E8E7]">Suggesties laden...</span>
+        <div className="flex items-center justify-center py-4 gap-2">
+          <Loader
+            className="w-4 h-4 animate-spin"
+            style={{ color: 'rgba(253,253,254,0.72)' }}
+          />
+          <span
+            className="text-[12px]"
+            style={{ color: 'rgba(253,253,254,0.72)' }}
+          >
+            Suggesties laden…
+          </span>
         </div>
       ) : error ? (
-        <p className="text-xs text-[#C0FC01]">Fout bij laden suggesties</p>
+        <p
+          className="text-[12px] py-2"
+          style={{ color: 'rgba(253,180,180,0.88)' }}
+        >
+          Fout bij laden suggesties
+        </p>
       ) : suggestions.length > 0 ? (
         <div className="space-y-2">
           {suggestions.map((suggestion, index) => (
             <button
               key={index}
               onClick={() => handleSelectSuggestion(suggestion)}
-              className="w-full text-left px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-xl text-sm text-[#E6E8E7] hover:border-[#C0FC01] hover:bg-[#FFF8F5] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C0FC01] focus:ring-offset-1"
+              className="w-full text-left px-3.5 py-2.5 rounded-2xl text-[14px] leading-[1.4] transition-colors focus:outline-none"
+              style={{
+                background: 'rgba(253,253,254,0.10)',
+                color: '#FDFDFE',
+                border: '1px solid transparent',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(253,253,254,0.16)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(253,253,254,0.10)'
+              }}
             >
               <p className="line-clamp-2">{suggestion}</p>
             </button>
           ))}
         </div>
       ) : (
-        <p className="text-xs text-[#E6E8E7] py-2">Geen suggesties beschikbaar</p>
+        <p
+          className="text-[12px] py-2"
+          style={{ color: 'rgba(253,253,254,0.56)' }}
+        >
+          Geen suggesties beschikbaar
+        </p>
       )}
     </div>
   )

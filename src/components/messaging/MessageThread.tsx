@@ -14,23 +14,23 @@ interface MessageThreadProps {
 
 function formatTime(dateString: string): string {
   const date = new Date(dateString)
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  return `${hours}:${minutes}`
+}
+
+function formatDateLabel(date: Date): string {
   const now = new Date()
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const messageDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
 
-  const timeStr = date.toLocaleString('nl-BE', { hour: '2-digit', minute: '2-digit' })
-
-  if (messageDate.getTime() === today.getTime()) {
-    return timeStr
-  }
+  if (messageDate.getTime() === today.getTime()) return 'Vandaag'
 
   const yesterday = new Date(today)
   yesterday.setDate(yesterday.getDate() - 1)
-  if (messageDate.getTime() === yesterday.getTime()) {
-    return `Gisteren ${timeStr}`
-  }
+  if (messageDate.getTime() === yesterday.getTime()) return 'Gisteren'
 
-  return date.toLocaleString('nl-BE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+  return date.toLocaleString('nl-BE', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 function groupMessagesByDate(messages: any[]) {
@@ -64,12 +64,10 @@ export function MessageThread({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [])
 
-  // Mark as read on mount
   useEffect(() => {
     markAsRead()
   }, [markAsRead])
 
-  // Mark as read when new messages arrive
   useEffect(() => {
     const timer = setTimeout(() => {
       markAsRead()
@@ -77,7 +75,6 @@ export function MessageThread({
     return () => clearTimeout(timer)
   }, [messages, markAsRead])
 
-  // Auto-scroll to bottom on new messages
   useEffect(() => {
     scrollToBottom()
   }, [messages, scrollToBottom])
@@ -89,13 +86,11 @@ export function MessageThread({
 
   if (loading) {
     return (
-      <div className="flex flex-col h-full bg-surface">
+      <div className="flex flex-col h-full" style={{ background: '#8E9890' }}>
         <div className="flex-1 flex items-center justify-center">
-          <div className="space-y-4 text-center">
-            <div className="animate-pulse space-y-3">
-              <div className="h-3 bg-surface-muted rounded w-48 mx-auto" />
-              <div className="h-3 bg-surface-muted rounded w-64 mx-auto" />
-            </div>
+          <div className="space-y-3 animate-pulse">
+            <div className="h-3 rounded-full w-48 mx-auto" style={{ background: 'rgba(253,253,254,0.18)' }} />
+            <div className="h-3 rounded-full w-64 mx-auto" style={{ background: 'rgba(253,253,254,0.18)' }} />
           </div>
         </div>
       </div>
@@ -105,80 +100,137 @@ export function MessageThread({
   const groupedMessages = groupMessagesByDate(messages)
 
   return (
-    <div className="flex flex-col h-full bg-surface">
+    <div className="flex flex-col h-full" style={{ background: '#8E9890' }}>
       {/* Messages */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-y-auto px-4 py-6 space-y-4"
+        className="flex-1 overflow-y-auto px-4 py-6 space-y-5"
       >
         {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <div className="text-center space-y-2">
-              <p className="text-text-muted">Nog geen berichten</p>
-              <p className="text-xs text-text-muted">
+            <div
+              className="text-center px-6 py-5 rounded-3xl max-w-[280px]"
+              style={{
+                background: '#A6ADA7',
+                boxShadow:
+                  'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+              }}
+            >
+              <p className="text-[15px] font-semibold" style={{ color: '#FDFDFE' }}>
+                Nog geen berichten
+              </p>
+              <p className="text-[13px] mt-1" style={{ color: 'rgba(253,253,254,0.72)' }}>
                 Start een gesprek met {otherUserName}
               </p>
             </div>
           </div>
         ) : (
           <>
-            {groupedMessages.map(([dateKey, dateMessages]) => (
-              <div key={dateKey} className="space-y-3">
-                {/* Date separator */}
-                <div className="flex items-center gap-3 py-2">
-                  <div className="flex-1 h-px bg-border" />
-                  <span className="text-xs text-text-muted font-medium px-2">{dateKey}</span>
-                  <div className="flex-1 h-px bg-border" />
-                </div>
-
-                {/* Messages for this date */}
-                {dateMessages.map((msg) => {
-                  const isOwn = msg.sender_id === currentUserId
-                  return (
-                    <div
-                      key={msg.id}
-                      className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+            {groupedMessages.map(([dateKey, dateMessages]) => {
+              const firstDate = new Date(dateMessages[0].created_at)
+              const label = formatDateLabel(firstDate)
+              return (
+                <div key={dateKey} className="space-y-3">
+                  {/* Date separator */}
+                  <div className="flex items-center gap-3 py-1">
+                    <div className="flex-1 h-px" style={{ background: 'rgba(253,253,254,0.18)' }} />
+                    <span
+                      className="text-[10px] font-semibold px-2 uppercase tracking-[0.16em]"
+                      style={{ color: 'rgba(253,253,254,0.56)' }}
                     >
-                      <div
-                        className={`max-w-xs lg:max-w-md xl:max-w-lg px-4 py-3 rounded-2xl ${
-                          isOwn
-                            ? 'bg-accent text-white rounded-br-none'
-                            : 'bg-surface-muted text-text-primary rounded-bl-none border border-border'
-                        }`}
-                      >
-                        <MessagePreview
-                          messageType={msg.message_type}
-                          content={msg.content}
-                          fileUrl={msg.file_url}
-                        />
+                      {label}
+                    </span>
+                    <div className="flex-1 h-px" style={{ background: 'rgba(253,253,254,0.18)' }} />
+                  </div>
 
-                        {/* Timestamp and read receipt */}
-                        <div
-                          className={`flex items-center gap-2 mt-2 text-xs ${
-                            isOwn ? 'justify-end text-white/70' : 'text-text-muted'
-                          }`}
-                        >
-                          <span>{formatTime(msg.created_at)}</span>
-                          {isOwn && (
-                            msg.read_at ? (
-                              <CheckCheck className="w-4 h-4" />
+                  {/* Messages */}
+                  {dateMessages.map((msg) => {
+                    const isOwn = msg.sender_id === currentUserId
+
+                    if (!isOwn) {
+                      // Other party (client) — light card
+                      return (
+                        <div key={msg.id} className="flex justify-start">
+                          <div className="flex flex-col max-w-[78%]">
+                            <div
+                              style={{
+                                background: '#A6ADA7',
+                                borderRadius: 20,
+                                borderBottomLeftRadius: 4,
+                                padding: '12px 16px',
+                                boxShadow:
+                                  'inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 6px rgba(0,0,0,0.14)',
+                              }}
+                            >
+                              <MessagePreview
+                                messageType={msg.message_type}
+                                content={msg.content}
+                                fileUrl={msg.file_url}
+                              />
+                            </div>
+                            <span
+                              className="text-[11px] mt-1 px-2"
+                              style={{ color: 'rgba(253,253,254,0.56)' }}
+                            >
+                              {formatTime(msg.created_at)}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    }
+
+                    // Own (coach) — dark card with read-receipt
+                    return (
+                      <div key={msg.id} className="flex justify-end">
+                        <div className="flex flex-col max-w-[78%] items-end">
+                          <div
+                            style={{
+                              background: '#474B48',
+                              borderRadius: 20,
+                              borderBottomRightRadius: 4,
+                              padding: '12px 16px',
+                              boxShadow:
+                                'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.22)',
+                            }}
+                          >
+                            <MessagePreview
+                              messageType={msg.message_type}
+                              content={msg.content}
+                              fileUrl={msg.file_url}
+                            />
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-1 px-2">
+                            <span
+                              className="text-[11px]"
+                              style={{ color: 'rgba(253,253,254,0.56)' }}
+                            >
+                              {formatTime(msg.created_at)}
+                            </span>
+                            {msg.read_at ? (
+                              <CheckCheck
+                                className="w-3.5 h-3.5"
+                                style={{ color: '#2FA65A' }}
+                              />
                             ) : (
-                              <Check className="w-4 h-4" />
-                            )
-                          )}
+                              <Check
+                                className="w-3.5 h-3.5"
+                                style={{ color: 'rgba(253,253,254,0.44)' }}
+                              />
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )
-                })}
-              </div>
-            ))}
+                    )
+                  })}
+                </div>
+              )
+            })}
             <div ref={messagesEndRef} />
           </>
         )}
       </div>
 
-      {/* Message input */}
+      {/* Composer */}
       <MessageInput onSend={handleSendMessage} />
     </div>
   )

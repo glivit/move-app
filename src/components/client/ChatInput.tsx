@@ -283,7 +283,7 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
                 className="h-12 px-4 rounded-xl flex items-center gap-2"
                 style={{ background: INPUT_BG }}
               >
-                <Mic size={16} style={{ color: LIME }} />
+                <Mic size={16} style={{ color: WHITE }} />
                 <span className="text-[13px]" style={{ color: WHITE }}>Spraakbericht</span>
               </div>
             ) : (
@@ -348,7 +348,7 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
               onMouseEnter={(e) => (e.currentTarget.style.background = INPUT_HOVER)}
               onMouseLeave={(e) => (e.currentTarget.style.background = INPUT_BG)}
             >
-              <Icon size={16} style={{ color: LIME }} />
+              <Icon size={16} style={{ color: WHITE }} />
               <span className="text-[13px] font-medium" style={{ color: WHITE }}>{label}</span>
             </button>
           ))}

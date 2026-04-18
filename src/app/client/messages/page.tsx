@@ -275,7 +275,6 @@ export default function ClientMessagesPage() {
   const WHITE = '#FDFDFE'
   const MUTED = 'rgba(253,253,254,0.56)'
   const DIVIDER = 'rgba(253,253,254,0.14)'
-  const LIME = '#C0FC01'
 
   if (loading) {
     return (
@@ -398,11 +397,11 @@ export default function ClientMessagesPage() {
             <div className="text-center space-y-4">
               <div
                 className="w-16 h-16 rounded-full flex items-center justify-center mx-auto"
-                style={{ background: 'rgba(192,252,1,0.16)' }}
+                style={{ background: 'rgba(253,253,254,0.10)' }}
               >
                 <MessageCircle
                   size={28}
-                  style={{ color: LIME }}
+                  style={{ color: WHITE }}
                   strokeWidth={1.5}
                 />
               </div>

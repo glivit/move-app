@@ -49,10 +49,19 @@ export default function CoachClientThreadPage({ params }: PageProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[50vh]">
+      <div
+        className="flex items-center justify-center min-h-[50vh]"
+        style={{ background: '#8E9890' }}
+      >
         <div className="animate-pulse space-y-3">
-          <div className="h-3 bg-[#989F99] rounded w-48 mx-auto" />
-          <div className="h-3 bg-[#989F99] rounded w-64 mx-auto" />
+          <div
+            className="h-3 rounded-full w-48 mx-auto"
+            style={{ background: 'rgba(253,253,254,0.18)' }}
+          />
+          <div
+            className="h-3 rounded-full w-64 mx-auto"
+            style={{ background: 'rgba(253,253,254,0.18)' }}
+          />
         </div>
       </div>
     )
@@ -61,20 +70,38 @@ export default function CoachClientThreadPage({ params }: PageProps) {
   if (!userId) return null
 
   return (
-    <div className="flex flex-col h-[calc(100vh-80px)]">
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+    <div className="flex flex-col h-[calc(100vh-80px)]" style={{ background: '#8E9890' }}>
+      {/* v6 thread header — dark card */}
+      <div
+        className="flex items-center gap-3 px-4 py-3"
+        style={{
+          background: '#474B48',
+          boxShadow: 'inset 0 -1px 0 rgba(255,255,255,0.06)',
+        }}
+      >
         <button
           onClick={() => router.back()}
-          className="p-2 hover:bg-bg-secondary rounded-lg transition-colors"
+          className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+          style={{
+            background: 'rgba(253,253,254,0.10)',
+            color: '#FDFDFE',
+          }}
           aria-label="Terug"
         >
-          <ArrowLeft className="w-5 h-5 text-text-primary" />
+          <ArrowLeft strokeWidth={1.75} className="w-5 h-5" />
         </button>
-        <h1 className="text-lg font-semibold text-text-primary">
+        <div
+          className="w-9 h-9 rounded-full flex items-center justify-center text-[14px] font-bold"
+          style={{ background: 'rgba(253,253,254,0.14)', color: '#FDFDFE' }}
+        >
+          {(clientName || 'C').charAt(0).toUpperCase()}
+        </div>
+        <h1 className="text-[16px] font-semibold flex-1 truncate" style={{ color: '#FDFDFE' }}>
           {clientName || 'Client'}
         </h1>
       </div>
-      <div className="flex-1">
+
+      <div className="flex-1 overflow-hidden">
         <MessageThread
           currentUserId={userId}
           otherUserId={clientId}
