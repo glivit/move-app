@@ -853,14 +853,26 @@ function AddFoodBottomSheet({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Zoek voedingsmiddel..."
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  className="v6-search-input"
                   style={{
                     width: '100%',
                     padding: '10px 12px 10px 36px',
-                    background: 'rgba(253,253,254,0.08)',
+                    // Opaque kleur — rgba met alpha liet iOS PWA de UA-default
+                    // 'field' (= wit in light-mode context) doorschemeren,
+                    // waardoor de input wit-op-wit werd. Solid #343836 matcht
+                    // de donkere v6-card ~8% over #474B48 canvas.
+                    background: '#343836',
                     borderRadius: 12,
-                    fontSize: 14, color: '#FDFDFE',
+                    fontSize: 16, // 16px voorkomt iOS zoom-in op focus
+                    color: '#FDFDFE',
                     border: 'none',
                     outline: 'none',
+                    WebkitAppearance: 'none',
+                    appearance: 'none',
                   }}
                 />
                 {query && (

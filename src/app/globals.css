@@ -555,6 +555,12 @@ select {
   font-family: var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
   font-size: 16px;
   color: #FDFDFE;
+  /* Default opaque donkere surface — anders valt iOS PWA terug op de UA
+   * 'field' kleur (wit in light-mode context) en krijg je wit-op-wit.
+   * Inline styles per-input kunnen dit overschrijven waar nodig. */
+  background-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
   transition: border-color 250ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -564,6 +570,18 @@ select:focus {
   outline: none;
   border-color: rgba(253,253,254,0.46);
   box-shadow: none;
+}
+
+/* Autofill override — iOS/Chrome forceren anders een wit/geel bg op
+ * ingevulde inputs. Gebruik een opaque donkere bg + expliciete tekst-kleur. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #343836 inset !important;
+  -webkit-text-fill-color: #FDFDFE !important;
+  caret-color: #FDFDFE;
 }
 
 /* Spinner — ink-white op canvas */
