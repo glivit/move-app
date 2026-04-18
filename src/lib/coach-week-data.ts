@@ -191,8 +191,10 @@ export async function fetchCoachWeekOverview(coachId: string): Promise<CoachWeek
     supabase
       .from('workout_sessions')
       .select('client_id, started_at, completed_at, template_day_id')
-      .gte('started_at', weekStart.toISOString())
-      .lt('started_at', weekEnd.toISOString())
+      // Filter op completed_at (niet started_at): een session die eergisteren
+      // gestart en pas vandaag afgerond werd telt voor DEZE week.
+      .gte('completed_at', weekStart.toISOString())
+      .lt('completed_at', weekEnd.toISOString())
       .not('completed_at', 'is', null),
     supabase
       .from('workout_sessions')
