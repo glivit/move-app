@@ -17,7 +17,7 @@ import { useEffect, useState } from 'react'
 type BadgeCounts = Record<string, number>
 
 const HOME_HREF = '/coach'
-const INBOX_HREF = '/coach/messages'
+const INBOX_HREF = '/coach/inbox'
 const STUDIO_HREF = '/coach/programs'
 
 // Paths that still count as "inbox-ish" for the purpose of the active dot.

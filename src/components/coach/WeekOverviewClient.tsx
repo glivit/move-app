@@ -147,7 +147,7 @@ function ClientCard({ client }: { client: ClientWeekRow }) {
 
   return (
     <Link
-      href={`/coach/clients/${client.id}/week`}
+      href={`/coach/clients/${client.id}`}
       className="block bg-[#474B48] rounded-[22px] px-[22px] pt-5 pb-[22px] mb-[14px] active:scale-[0.995] transition-transform"
     >
       {/* Head row */}
