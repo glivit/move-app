@@ -18,7 +18,7 @@ type BadgeCounts = Record<string, number>
 
 const HOME_HREF = '/coach'
 const INBOX_HREF = '/coach/inbox'
-const STUDIO_HREF = '/coach/programs'
+const STUDIO_HREF = '/coach/studio'
 
 // Paths that still count as "inbox-ish" for the purpose of the active dot.
 const INBOX_PATHS = ['/coach/messages', '/coach/check-ins', '/coach/inbox']
