@@ -220,11 +220,9 @@ export default function WorkoutOverviewPage() {
     <div className="pb-28">
       {/* ─── Hero · Vandaag (DARK) ─── */}
       <div className="v6-card-dark" style={{ padding: '22px 22px 24px', marginBottom: 6, width: '100%' }}>
-        <div className="eyebrow" style={!todayDay && catchupCell ? { color: '#E8A93C' } : undefined}>
+        <div className="eyebrow">
           {todayDay && !todayCompleted && <span className="pulse" />}
-          {!todayDay && catchupCell && (
-            <span className="pulse" style={{ background: '#E8A93C' }} />
-          )}
+          {!todayDay && catchupCell && <span className="pulse" />}
           {todayDay
             ? 'Vandaag'
             : catchupCell
@@ -313,13 +311,12 @@ export default function WorkoutOverviewPage() {
               }}
             >
               {catchupCell.day.exercise_count ?? '—'} oefeningen · ±{catchupCell.day.estimated_duration_min} min
-              {' · Gemist op '}{WEEKDAY_LONG_NL[catchupCell.date.getDay()]}
             </div>
 
             <div className="start-row">
               <div>
                 <div className="start-lbl">Inhalen</div>
-                <div className="start-sub">Start alsnog — telt voor {WEEKDAY_LONG_NL[catchupCell.date.getDay()]}</div>
+                <div className="start-sub">Telt voor {WEEKDAY_LONG_NL[catchupCell.date.getDay()]}</div>
               </div>
               <div className="start-cta">
                 <button

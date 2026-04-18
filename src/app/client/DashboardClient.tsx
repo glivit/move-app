@@ -353,7 +353,7 @@ export default function ClientDashboard({
   // Vandaag-hero kan één van vijf states zijn.
   // `catchup` surfaced enkel op rustdagen (geen today-workout). Als vandaag
   // voltooid of nog te doen is, blijft die primair — celebratory "Voltooid"
-  // of play-CTA wint van de amber inhaal-nudge.
+  // of play-CTA wint van de inhaal-nudge.
   const heroState = useMemo(() => {
     if (!data) return 'rest' as const
     if (showOnboarding) return 'onboarding' as const
@@ -659,7 +659,8 @@ function HeroCard({
 
   if (state === 'catchup' && training?.catchup) {
     // Inhaal-card: gemiste workout deze week die nog kan afgerond worden.
-    // Amber-accent eyebrow onderscheidt van primaire today-card (lime). Tap
+    // Zelfde lime accent als today-card — amber voelde als warning, niet als
+    // invite. De "Inhalen"-eyebrow zegt al genoeg dat dit een nudge is. Tap
     // → overview-page (zelfde flow als today-card), waar de gemiste day als
     // tapbare rij verschijnt; server-side vervult de slot via template_day_id.
     const c = training.catchup
@@ -670,8 +671,8 @@ function HeroCard({
         aria-label={`${c.name} inhalen`}
       >
         <Arr />
-        <div className="eyebrow mb-3" style={{ color: '#E8A93C' }}>
-          <span className="pulse" style={{ background: '#E8A93C' }} /> Inhalen · {c.missedOnLabel}
+        <div className="eyebrow mb-3">
+          <span className="pulse" /> Inhalen · {c.missedOnLabel}
         </div>
         <h2 style={{ fontSize: 22, fontWeight: 300, letterSpacing: '-0.018em', lineHeight: 1.15, marginBottom: 6 }}>
           {c.name}
