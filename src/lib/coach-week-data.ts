@@ -237,7 +237,7 @@ export async function fetchCoachWeekOverview(coachId: string): Promise<CoachWeek
   type ProfileRow = { id: string; full_name: string | null; avatar_url: string | null; package: string | null }
   type ProgramRow = { client_id: string; schedule: Record<string, string> | null }
   type TemplateDayRow = { id: string; name: string }
-  type WeekSessionRow = { client_id: string; started_at: string; template_day_id: string | null }
+  type WeekSessionRow = { client_id: string; started_at: string; completed_at: string | null; template_day_id: string | null }
   type AllSessionRow = { client_id: string; started_at: string }
   type NutritionPlanRow = { client_id: string; calories_target: number | null; protein_g: number | null }
   type NutritionDayRow = { client_id: string; date: string; total_calories: number | null; total_protein: number | null }
@@ -296,11 +296,14 @@ export async function fetchCoachWeekOverview(coachId: string): Promise<CoachWeek
       const plannedDayName = plannedTemplateId ? (dayNameMap[plannedTemplateId] || 'Training') : null
 
       // Was something completed on this actual date?
+      // Anchor op completed_at (fallback naar started_at als ontbrekend) zodat
+      // een sessie op de dag van finish valt, niet de dag van start. Cruciaal
+      // voor minimized workouts die een dag overbruggen.
       const dayStart = new Date(dateIso + 'T00:00:00')
       const dayEnd = new Date(dayStart)
       dayEnd.setDate(dayEnd.getDate() + 1)
       const sessionOnDay = mySessions.find((s) => {
-        const t = new Date(s.started_at)
+        const t = new Date(s.completed_at || s.started_at)
         return t >= dayStart && t < dayEnd
       })
 

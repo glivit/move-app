@@ -308,8 +308,13 @@ export async function fetchClientWeekTimeline(
         'id, template_day_id, started_at, completed_at, duration_seconds, duration_minutes, mood_rating, difficulty_rating, feedback_text, coach_seen'
       )
       .eq('client_id', clientId)
-      .gte('started_at', weekStart.toISOString())
-      .lt('started_at', weekEnd.toISOString())
+      // OR op started_at óf completed_at binnen de week, zodat zowel
+      // "begonnen maar niet afgemaakt" als "al eerder gestart, vandaag klaar"
+      // sessies worden meegenomen. Zonder deze vangnet mistte de view sessies
+      // die over een dag-grens heen minimized + afgerond werden.
+      .or(
+        `and(started_at.gte.${weekStart.toISOString()},started_at.lt.${weekEnd.toISOString()}),and(completed_at.gte.${weekStart.toISOString()},completed_at.lt.${weekEnd.toISOString()})`,
+      )
       .order('started_at', { ascending: true }),
     supabase
       .from('nutrition_plans')
@@ -620,8 +625,12 @@ export async function fetchClientWeekTimeline(
     const dayEnd = new Date(dayStart)
     dayEnd.setDate(dayEnd.getDate() + 1)
     const daySessions = sessions.filter((s) => {
-      const t = new Date(s.started_at)
-      return t >= dayStart && t < dayEnd && s.completed_at
+      // Anchor op completed_at zodat een sessie thuishoort bij de dag van
+      // afronden, niet die van starten. Zombies die eergisteren gestart
+      // werden maar vandaag voltooid zijn vallen zo terecht op vandaag.
+      if (!s.completed_at) return false
+      const t = new Date(s.completed_at)
+      return t >= dayStart && t < dayEnd
     })
 
     const sessionObjs: DaySession[] = daySessions.map((s) => {

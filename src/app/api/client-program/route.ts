@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
     const completedSessions = completedSessionsRes.data
 
     // Get exercise counts for ALL days in a single query (fixes N+1)
-    const dayIds = (templateDays || []).map((d: any) => d.id)
+    const dayIds = (templateDays || []).map((d: { id: string }) => d.id)
     const { data: allExercises } = dayIds.length > 0
       ? await adminClient
           .from('program_template_exercises')
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
       exerciseCountMap[ex.template_day_id] = (exerciseCountMap[ex.template_day_id] || 0) + 1
     }
 
-    const days = (templateDays || []).map((day: any) => ({
+    const days = (templateDays || []).map((day: { id: string } & Record<string, unknown>) => ({
       ...day,
       exercise_count: exerciseCountMap[day.id] || 0,
     }))
