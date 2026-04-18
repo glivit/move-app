@@ -35,6 +35,39 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
     })
     return () => { cancelled = true }
   }, [])
+
+  // ─── Workout-finish retry-queue ──────────────────────────────────
+  // Als handleComplete in /client/workout/complete eerder vandaag failde,
+  // staat de payload in localStorage. Retry hier 1× bij volgende mount —
+  // Supabase access_token wordt via createClient gepakt zodat de
+  // server-route de gebruiker authenticeert via Bearer header. Zonder
+  // deze loop bleven mislukte sessies eeuwig op completed_at=NULL hangen
+  // (Charles' Upper-sessie van 2026-04-18).
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const [{ createClient }, { processPendingWorkoutFinish }] = await Promise.all([
+          import('@/lib/supabase'),
+          import('@/lib/workout-finish-retry'),
+        ])
+        if (cancelled) return
+        const supabase = createClient()
+        const { data: { session: authSession } } = await supabase.auth.getSession()
+        const headers: Record<string, string> = {}
+        if (authSession?.access_token) {
+          headers['Authorization'] = `Bearer ${authSession.access_token}`
+        }
+        if (cancelled) return
+        await processPendingWorkoutFinish(headers)
+      } catch {
+        /* best-effort */
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
   // Workout active page = focus-modus: top-bar + bnav + active-bar weggelaten,
   // page rendert zelf zijn eigen chrome conform design-system/06-workout.html
   const isFocusMode =
