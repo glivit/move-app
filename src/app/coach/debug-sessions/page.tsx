@@ -407,8 +407,24 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
               className="mb-4 rounded-2xl p-4"
               style={{ background: CARD, border: `1px solid ${HAIR}` }}
             >
-              <div className="text-[16px] font-medium" style={{ color: INK }}>
-                {client.full_name || 'Onbekende client'}
+              <div className="flex items-center gap-2">
+                <div className="text-[16px] font-medium" style={{ color: INK }}>
+                  {client.full_name || 'Onbekende client'}
+                </div>
+                {client.role && (
+                  <span
+                    className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+                    style={{
+                      background:
+                        client.role === 'client'
+                          ? 'rgba(192,252,1,0.14)'
+                          : 'rgba(232,169,60,0.18)',
+                      color: client.role === 'client' ? LIME : AMBER,
+                    }}
+                  >
+                    {client.role}
+                  </span>
+                )}
               </div>
               <div className="mt-0.5 text-[12px] tabular-nums" style={{ color: INK_MUTED }}>
                 {client.id}
@@ -435,8 +451,8 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
             </div>
 
             {/* Summary chips */}
-            <div className="mb-4 flex flex-wrap gap-2 text-[12px]">
-              <SummaryChip label="Totaal" value={summary.total} tint={INK} />
+            <div className="mb-3 flex flex-wrap gap-2 text-[12px]">
+              <SummaryChip label={`Laatste ${days}d`} value={summary.total} tint={INK} />
               <SummaryChip label="Voltooid" value={summary.completed} tint={LIME} />
               <SummaryChip
                 label="Open / abandoned"
@@ -449,11 +465,63 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
                 tint={summary.zeroSets > 0 ? AMBER : INK_MUTED}
               />
               <SummaryChip
-                label="Niet bij actief programma"
+                label="Off-active"
                 value={summary.offActive}
                 tint={summary.offActive > 0 ? BLUE : INK_MUTED}
               />
+              <SummaryChip
+                label="Ooit totaal"
+                value={everCount ?? 0}
+                tint={everCount && everCount > 0 ? INK : AMBER}
+              />
             </div>
+
+            {/* Recent-ever diagnostic — altijd zichtbaar, geen date-window */}
+            {everCount !== null && (
+              <div
+                className="mb-4 rounded-2xl p-3"
+                style={{
+                  background: 'rgba(164,199,242,0.08)',
+                  border: `1px solid ${HAIR}`,
+                  color: INK,
+                }}
+              >
+                <div className="mb-1.5 text-[12px]" style={{ color: BLUE }}>
+                  🔎 5 meest recente workout_sessions voor <span className="tabular-nums">{client.id.slice(0, 8)}</span>{' '}
+                  — ongeacht datum
+                </div>
+                {recentEver.length === 0 ? (
+                  <div className="text-[12px]" style={{ color: AMBER }}>
+                    ⚠︎ 0 sessies ooit voor deze client.id — id-mismatch waarschijnlijk. Controleer of dit de
+                    juiste Charles is.
+                  </div>
+                ) : (
+                  <div className="space-y-1 text-[11px] tabular-nums" style={{ color: INK_MUTED }}>
+                    {recentEver.map((s) => (
+                      <div key={s.id} className="flex items-baseline gap-2">
+                        <span
+                          className="rounded px-1.5 py-0.5 text-[10px]"
+                          style={{
+                            background: s.completed_at
+                              ? 'rgba(192,252,1,0.14)'
+                              : 'rgba(232,169,60,0.18)',
+                            color: s.completed_at ? LIME : AMBER,
+                          }}
+                        >
+                          {s.completed_at ? '✓' : '○'}
+                        </span>
+                        <span style={{ color: INK }}>{fmtTime(s.started_at)}</span>
+                        <span>→</span>
+                        <span>{fmtTime(s.completed_at)}</span>
+                        <span className="truncate" style={{ color: 'rgba(253,253,254,0.35)' }}>
+                          {s.id.slice(0, 8)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Session list */}
             {sessions.length === 0 ? (
