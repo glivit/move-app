@@ -33,3 +33,6 @@ next-env.d.ts
 
 # turbopack
 .turbo
+
+# serwist — service worker is geserveerd door route handler (src/app/serwist/[path]/route.ts)
+# (geen file output in /public meer met @serwist/turbopack)
