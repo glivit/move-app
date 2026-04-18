@@ -3,6 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Dumbbell, UtensilsCrossed, CheckCircle2, Send, Loader2 } from 'lucide-react'
+import { createClient } from '@/lib/supabase'
+import { invalidateCache } from '@/lib/fetcher'
+import { optimisticMutate } from '@/lib/optimistic'
+import { readDashboardCache, writeDashboardCache } from '@/lib/dashboard-cache'
+import type { DashboardData } from '@/app/client/DashboardClient'
 
 interface AccountabilityLog {
   id: string
@@ -62,26 +67,73 @@ export default function AccountabilityPage() {
     setError('')
     setSubmitting(true)
 
+    // Snapshot dashboard-cache vóór optimistic patch — nodig voor rollback.
+    const supabase = createClient()
+    const { data: { session: authSession } } = await supabase.auth.getSession()
+    const userId = authSession?.user?.id ?? null
+    let cacheSnapshot: DashboardData | null = null
+    if (userId) {
+      const hit = await readDashboardCache<DashboardData>(userId).catch(() => null)
+      cacheSnapshot = hit?.data ?? null
+    }
+
+    const logId = log.id
+    const payloadWorkout = workoutReason || null
+    const payloadNutrition = nutritionReason || null
+
     try {
-      const res = await fetch('/api/accountability', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          log_id: log.id,
-          workout_reason: workoutReason || null,
-          nutrition_reason: nutritionReason || null,
-        }),
+      await optimisticMutate({
+        key: `accountability-submit:${logId}`,
+        apply: () => {
+          // UI-voelt-instant: "Bedankt voor je feedback!" verschijnt meteen.
+          setSubmitted(true)
+          // Patch dashboard-cache zodat de home page de accountability-nudge
+          // niet meer toont als de user terug-zwipet.
+          if (userId && cacheSnapshot) {
+            const nextData: DashboardData = {
+              ...cacheSnapshot,
+              actions: {
+                ...cacheSnapshot.actions,
+                accountabilityPending: false,
+                pendingPrompt: null,
+              },
+            }
+            writeDashboardCache(userId, nextData).catch(() => {})
+          }
+        },
+        rollback: () => {
+          setSubmitted(false)
+          if (userId && cacheSnapshot) {
+            writeDashboardCache(userId, cacheSnapshot).catch(() => {})
+          }
+        },
+        commit: async () => {
+          const res = await fetch('/api/accountability', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              log_id: logId,
+              workout_reason: payloadWorkout,
+              nutrition_reason: payloadNutrition,
+            }),
+          })
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({}))
+            throw new Error(data.error || 'Er ging iets mis')
+          }
+          return res
+        },
+        onSuccess: () => {
+          invalidateCache('/api/dashboard')
+        },
+        onError: (err) => {
+          const msg = err instanceof Error ? err.message : 'Fout bij versturen'
+          setError(msg)
+        },
       })
-
-      if (!res.ok) {
-        const data = await res.json()
-        setError(data.error || 'Er ging iets mis')
-        return
-      }
-
-      setSubmitted(true)
-    } catch (err) {
-      setError('Fout bij versturen')
+    } catch {
+      // Error/rollback zijn al uitgevoerd door optimisticMutate; de catch
+      // voorkomt alleen een unhandled promise rejection in de render-cycle.
     } finally {
       setSubmitting(false)
     }

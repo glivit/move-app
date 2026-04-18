@@ -5,6 +5,10 @@ import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import { SubPageHeader } from '@/components/layout/SubPageHeader'
 import { Camera, Scale, CheckCircle2, Loader2, ChevronRight, X } from 'lucide-react'
+import { invalidateCache } from '@/lib/fetcher'
+import { optimisticMutate } from '@/lib/optimistic'
+import { readDashboardCache, writeDashboardCache } from '@/lib/dashboard-cache'
+import type { DashboardData } from '@/app/client/DashboardClient'
 
 const RATING_LABELS: Record<string, string[]> = {
   energy: ['Zeer laag', 'Laag', 'Oké', 'Goed', 'Top'],
@@ -73,45 +77,100 @@ export default function WeeklyCheckInPage() {
     if (!weight.trim()) return
     setSubmitting(true)
 
+    // Snapshot dashboard-cache + userId vóór optimistic patch — nodig voor rollback.
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id ?? null
+    let cacheSnapshot: DashboardData | null = null
+    if (userId) {
+      const hit = await readDashboardCache<DashboardData>(userId).catch(() => null)
+      cacheSnapshot = hit?.data ?? null
+    }
+
+    const weightNumeric = parseFloat(weight.replace(',', '.'))
+    const todayStr = new Date().toISOString().split('T')[0]
+    const hasPhoto = !!photo
+
     try {
-      let photoUrl: string | null = null
-
-      // Upload photo if selected
-      if (photo) {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          const fileName = `${user.id}/weekly_${Date.now()}.jpg`
-          const { error } = await supabase.storage
-            .from('checkin-photos')
-            .upload(fileName, photo, { upsert: true })
-          if (!error) {
-            const { data: urlData } = supabase.storage
-              .from('checkin-photos')
-              .getPublicUrl(fileName)
-            photoUrl = urlData.publicUrl
+      await optimisticMutate({
+        key: 'weekly-check-in',
+        apply: () => {
+          // UI-voelt-instant: "Check-in verstuurd" verschijnt meteen.
+          // Bij een grote foto-upload voorkomt dit dat de user 2-5s naar een
+          // spinner kijkt — de server reconcilieert op de achtergrond.
+          setSubmitted(true)
+          if (userId && cacheSnapshot) {
+            const nextData: DashboardData = {
+              ...cacheSnapshot,
+              weeklyCheckIn: {
+                submitted: true,
+                date: todayStr,
+                weightKg: Number.isFinite(weightNumeric) ? weightNumeric : (cacheSnapshot.weeklyCheckIn?.weightKg ?? null),
+              },
+              actions: {
+                ...cacheSnapshot.actions,
+                // Check-in is nu gedaan; nudge op home verdwijnt.
+                checkInDue: null,
+              },
+            }
+            writeDashboardCache(userId, nextData).catch(() => {})
           }
-        }
-      }
+        },
+        rollback: () => {
+          setSubmitted(false)
+          if (userId && cacheSnapshot) {
+            writeDashboardCache(userId, cacheSnapshot).catch(() => {})
+          }
+        },
+        commit: async () => {
+          let photoUrl: string | null = null
 
-      const res = await fetch('/api/weekly-check-in', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          weight_kg: weight,
-          photo_url: photoUrl,
-          energy_level: energy || null,
-          sleep_quality: sleep || null,
-          nutrition_adherence: nutritionRating || null,
-          notes: notes.trim() || null,
-        }),
+          // Upload photo if selected — failure throwen we NIET, we sturen
+          // enkel de check-in zonder foto. Zo verlies je je review-data niet
+          // door een hiccup in storage.
+          if (hasPhoto && photo && user) {
+            const fileName = `${user.id}/weekly_${Date.now()}.jpg`
+            const { error: uploadErr } = await supabase.storage
+              .from('checkin-photos')
+              .upload(fileName, photo, { upsert: true })
+            if (!uploadErr) {
+              const { data: urlData } = supabase.storage
+                .from('checkin-photos')
+                .getPublicUrl(fileName)
+              photoUrl = urlData.publicUrl
+            } else {
+              console.warn('[weekly-check-in] photo upload failed, continuing without:', uploadErr)
+            }
+          }
+
+          const res = await fetch('/api/weekly-check-in', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              weight_kg: weight,
+              photo_url: photoUrl,
+              energy_level: energy || null,
+              sleep_quality: sleep || null,
+              nutrition_adherence: nutritionRating || null,
+              notes: notes.trim() || null,
+            }),
+          })
+
+          if (!res.ok) {
+            const body = await res.json().catch(() => ({}))
+            throw new Error(body.error || `Check-in submit failed (${res.status})`)
+          }
+          return res
+        },
+        onSuccess: () => {
+          invalidateCache('/api/dashboard')
+        },
+        onError: (err) => {
+          console.error('[optimistic:weekly-check-in] commit failed:', err)
+        },
       })
-
-      if (res.ok) {
-        setSubmitted(true)
-      }
-    } catch (err) {
-      console.error('Submit error:', err)
+    } catch {
+      // Rollback + error-log zijn al uitgevoerd door optimisticMutate.
     } finally {
       setSubmitting(false)
     }

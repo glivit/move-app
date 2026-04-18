@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { ClientBottomNav } from '@/components/layout/ClientBottomNav'
 import { ClientSidebar } from '@/components/layout/ClientSidebar'
@@ -21,6 +22,19 @@ const SyncStatusIndicator = dynamic(
 
 export default function ClientLayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+
+  // ─── Sync-queue bootstrap ─────────────────────────────────────────
+  // initSyncQueue() hoort 1× te draaien per page-load: het hangt
+  // online/offline listeners aan `window` en processt achterstallige
+  // actions uit IDB. Zonder deze call blijft SyncStatusIndicator eeuwig
+  // op "online=true" staan, ongeacht wat navigator.onLine doet.
+  useEffect(() => {
+    let cancelled = false
+    import('@/lib/sync-queue').then(({ initSyncQueue }) => {
+      if (!cancelled) initSyncQueue()
+    })
+    return () => { cancelled = true }
+  }, [])
   // Workout active page = focus-modus: top-bar + bnav + active-bar weggelaten,
   // page rendert zelf zijn eigen chrome conform design-system/06-workout.html
   const isFocusMode =

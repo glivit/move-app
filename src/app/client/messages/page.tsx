@@ -7,6 +7,10 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { ChatBubble } from '@/components/client/ChatBubble'
 import { ChatInput } from '@/components/client/ChatInput'
+import { invalidateCache } from '@/lib/fetcher'
+import { optimisticMutate } from '@/lib/optimistic'
+import { readDashboardCache, writeDashboardCache } from '@/lib/dashboard-cache'
+import type { DashboardData } from '@/app/client/DashboardClient'
 
 interface Message {
   id: string
@@ -136,17 +140,55 @@ export default function ClientMessagesPage() {
           setMessages(messageData as Message[])
         }
 
-        // Mark messages as read
+        // Mark messages as read — optimistic: patch dashboard cache zodat
+        // de "unread"-badge op home onmiddellijk op 0 staat, ook als de
+        // user terug-zwipet vóór de Supabase-update round-trip klaar is.
         if (messageData && messageData.length > 0) {
           const unreadIds = messageData
             .filter((m) => m.sender_id === coach.id && !m.read_at)
             .map((m) => m.id)
 
           if (unreadIds.length > 0) {
-            await supabase
-              .from('messages')
-              .update({ read_at: new Date().toISOString() })
-              .in('id', unreadIds)
+            const hit = await readDashboardCache<DashboardData>(user.id).catch(() => null)
+            const cacheSnapshot = hit?.data ?? null
+
+            optimisticMutate({
+              key: `messages-mark-read:${unreadIds.length}`,
+              apply: () => {
+                if (cacheSnapshot) {
+                  const nextData: DashboardData = {
+                    ...cacheSnapshot,
+                    actions: {
+                      ...cacheSnapshot.actions,
+                      unreadMessages: 0,
+                    },
+                  }
+                  writeDashboardCache(user.id, nextData).catch(() => {})
+                }
+              },
+              rollback: () => {
+                if (cacheSnapshot) {
+                  writeDashboardCache(user.id, cacheSnapshot).catch(() => {})
+                }
+              },
+              commit: async () => {
+                const { error: updateErr } = await supabase
+                  .from('messages')
+                  .update({ read_at: new Date().toISOString() })
+                  .in('id', unreadIds)
+                if (updateErr) throw updateErr
+                return true
+              },
+              onSuccess: () => {
+                invalidateCache('/api/dashboard')
+              },
+              onError: (err) => {
+                console.error('[optimistic:messages-mark-read] update failed:', err)
+              },
+            }).catch(() => {
+              // Rollback al uitgevoerd; we laten de page draaien — de messages
+              // zelf zijn al geladen en getoond.
+            })
           }
         }
 

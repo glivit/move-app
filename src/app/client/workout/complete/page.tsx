@@ -3,6 +3,10 @@
 import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
+import { invalidateCache } from '@/lib/fetcher'
+import { optimisticMutate } from '@/lib/optimistic'
+import { readDashboardCache, writeDashboardCache } from '@/lib/dashboard-cache'
+import type { DashboardData } from '@/app/client/DashboardClient'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -492,42 +496,90 @@ function WorkoutCompletePage() {
   }, [session, prCount])
 
   // ── Complete (Sluiten) ──
+  //
+  // Fase 4 — optimistic workout-complete:
+  //   • UI navigeert onmiddellijk naar /client/workout (geen blocking spinner).
+  //   • Dashboard IDB-cache krijgt direct training.completedToday=true +
+  //     today in completedDates, zodat home bij volgende mount al "voltooid"
+  //     toont zonder server-round-trip.
+  //   • API-call loopt op de achtergrond. Faalt /api/workout-finish, dan
+  //     valt commit terug op directe DB-update + best-effort /api/workout-complete.
+  //   • Faalt ook dat: rollback van de IDB-cache zodat home authoritatieve
+  //     state ophaalt bij volgend bezoek.
   const handleComplete = async () => {
     if (!session) {
       router.push('/client/workout')
       return
     }
-    try {
-      setSaving(true)
-      const supabase = createClient()
-      const startTime = new Date(session.started_at)
-      const endTime = new Date()
-      const durationSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000)
 
-      const { data: { session: authSession } } = await supabase.auth.getSession()
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-      if (authSession?.access_token) {
-        headers['Authorization'] = `Bearer ${authSession.access_token}`
-      }
+    setSaving(true)
+    const supabase = createClient()
+    const startTime = new Date(session.started_at)
+    const endTime = new Date()
+    const durationSeconds = Math.floor((endTime.getTime() - startTime.getTime()) / 1000)
+    const todayStr = endTime.toISOString().split('T')[0]
 
-      const res = await fetch('/api/workout-finish', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          sessionId,
-          completedAt: endTime.toISOString(),
-          durationSeconds,
-          moodRating: null,
-          difficultyRating: rpe ?? null,
-          notes: notes || null,
-          feedbackText: null,
-          painData: null,
-        }),
-      })
+    const { data: { session: authSession } } = await supabase.auth.getSession()
+    const userId = authSession?.user?.id ?? null
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    if (authSession?.access_token) {
+      headers['Authorization'] = `Bearer ${authSession.access_token}`
+    }
 
-      if (!res.ok) {
-        console.error('[handleComplete] Server error:', await res.json().catch(() => ({})))
-        await supabase
+    // Snapshot dashboard-cache vóór de optimistische patch — nodig voor rollback.
+    let cacheSnapshot: DashboardData | null = null
+    if (userId) {
+      const hit = await readDashboardCache<DashboardData>(userId).catch(() => null)
+      cacheSnapshot = hit?.data ?? null
+    }
+
+    // Navigeer direct — alle volgende werk gebeurt op de achtergrond.
+    router.push('/client/workout')
+
+    optimisticMutate({
+      key: 'workout-complete',
+      apply: () => {
+        if (userId && cacheSnapshot) {
+          const dates = cacheSnapshot.training.completedDates ?? []
+          const nextData: DashboardData = {
+            ...cacheSnapshot,
+            training: {
+              ...cacheSnapshot.training,
+              completedToday: true,
+              completedDates: dates.includes(todayStr) ? dates : [...dates, todayStr],
+            },
+          }
+          writeDashboardCache(userId, nextData).catch(() => {})
+        }
+      },
+      rollback: () => {
+        if (userId && cacheSnapshot) {
+          writeDashboardCache(userId, cacheSnapshot).catch(() => {})
+        }
+      },
+      commit: async () => {
+        const res = await fetch('/api/workout-finish', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            sessionId,
+            completedAt: endTime.toISOString(),
+            durationSeconds,
+            moodRating: null,
+            difficultyRating: rpe ?? null,
+            notes: notes || null,
+            feedbackText: null,
+            painData: null,
+          }),
+        })
+
+        if (res.ok) return res
+
+        // Primary mislukt → fallback op directe DB-update (oude pad blijft intact).
+        const errBody = await res.json().catch(() => ({}))
+        console.warn('[workout-finish] primary failed, trying fallback:', errBody)
+
+        const { error: dbErr } = await supabase
           .from('workout_sessions')
           .update({
             completed_at: endTime.toISOString(),
@@ -537,18 +589,29 @@ function WorkoutCompletePage() {
           })
           .eq('id', sessionId)
 
+        if (dbErr) {
+          throw new Error(
+            `workout-finish + fallback both failed: ${JSON.stringify(errBody)} / ${dbErr.message}`,
+          )
+        }
+
+        // Fallback gelukt → fire-and-forget de post-completion hooks.
         fetch('/api/workout-complete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sessionId }),
         }).catch(() => {})
-      }
-
-      router.push('/client/workout')
-    } catch (error) {
-      console.error('Error completing workout:', error)
-      setSaving(false)
-    }
+        return res
+      },
+      onSuccess: () => {
+        invalidateCache('/api/dashboard')
+      },
+      onError: (err) => {
+        console.error('[optimistic:workout-complete] commit failed:', err)
+      },
+    }).catch(() => {
+      // Rollback al uitgevoerd; user is al genavigeerd, niets meer te doen UI-wise.
+    })
   }
 
   // ── Loading / empty states ──
