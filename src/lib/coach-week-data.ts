@@ -48,6 +48,26 @@ export interface ProgramDayEntry {
   completedOnLabel: string | null // if moved, the dow it was actually done, else null
 }
 
+/**
+ * One entry per day for the diet strip. Dieet heeft geen 'rest' state —
+ * je eet elke dag. Een dag zonder plan = 'open' (neutral ring).
+ */
+export type DietDayState =
+  | 'done'      // logged & hit target band (80–110%)
+  | 'today'     // today, incomplete/partial
+  | 'missed'    // past day, no logging or way under target
+  | 'open'      // no plan or future day
+
+export interface DietDay {
+  dayNumber: number      // 1 = Mon .. 7 = Sun
+  dateIso: string
+  isToday: boolean
+  isFuture: boolean
+  state: DietDayState
+  pct: number            // 0–100, 0 if not logged
+  logged: boolean
+}
+
 export interface ClientWeekRow {
   id: string
   fullName: string
@@ -73,6 +93,11 @@ export interface ClientWeekRow {
   hasNutritionPlan: boolean
   nutritionTodayPct: number      // 0-100
   nutritionLoggedToday: boolean
+  dietWeek: DietDay[]            // 7-day diet strip for the dieet tab
+
+  // One-sentence summaries shown under the week-dots, one per tab
+  workoutSummary: string
+  dietSummary: string
 
   // Messaging
   unreadFromClient: number
@@ -181,8 +206,9 @@ export async function fetchCoachWeekOverview(coachId: string): Promise<CoachWeek
       .eq('is_active', true),
     supabase
       .from('nutrition_daily_summary')
-      .select('client_id, total_calories, total_protein')
-      .eq('date', todayIso),
+      .select('client_id, date, total_calories, total_protein')
+      .gte('date', weekStartIso)
+      .lt('date', toDateIso(weekEnd)),
     supabase
       .from('checkins')
       .select('client_id')
@@ -202,7 +228,7 @@ export async function fetchCoachWeekOverview(coachId: string): Promise<CoachWeek
   const weekSessions = sessionsData || []
   const allSessions = allSessionsData || []
   const nutritionPlans = nutritionPlansData || []
-  const nutritionToday = nutritionTodayData || []
+  const nutritionWeek = nutritionTodayData || []
   const checkins = checkinsData || []
   const unreadMessages = messagesData || []
 
@@ -212,7 +238,7 @@ export async function fetchCoachWeekOverview(coachId: string): Promise<CoachWeek
   type WeekSessionRow = { client_id: string; started_at: string; template_day_id: string | null }
   type AllSessionRow = { client_id: string; started_at: string }
   type NutritionPlanRow = { client_id: string; calories_target: number | null; protein_g: number | null }
-  type NutritionTodayRow = { client_id: string; total_calories: number | null; total_protein: number | null }
+  type NutritionDayRow = { client_id: string; date: string; total_calories: number | null; total_protein: number | null }
   type CheckinRow = { client_id: string }
   type MessageRow = { sender_id: string; created_at: string }
 
@@ -221,7 +247,7 @@ export async function fetchCoachWeekOverview(coachId: string): Promise<CoachWeek
   const typedWeekSessions = weekSessions as WeekSessionRow[]
   const typedAllSessions = allSessions as AllSessionRow[]
   const typedNutritionPlans = nutritionPlans as NutritionPlanRow[]
-  const typedNutritionToday = nutritionToday as NutritionTodayRow[]
+  const typedNutritionWeek = nutritionWeek as NutritionDayRow[]
   const typedCheckins = checkins as CheckinRow[]
   const typedUnread = unreadMessages as MessageRow[]
 
@@ -393,16 +419,91 @@ export async function fetchCoachWeekOverview(coachId: string): Promise<CoachWeek
       else lastActivityLabel = `${Math.floor(days / 7)} weken geleden`
     }
 
-    // Nutrition
+    // Nutrition — plan + 7-day strip
     const plan = typedNutritionPlans.find((np) => np.client_id === p.id)
-    const todaySum = typedNutritionToday.find((n) => n.client_id === p.id)
-    const hasNutritionPlan = !!plan
-    const caloriesLogged = todaySum?.total_calories || 0
     const caloriesTarget = plan?.calories_target || 0
-    const nutritionTodayPct = caloriesTarget > 0
-      ? Math.min(100, Math.round((caloriesLogged / caloriesTarget) * 100))
-      : 0
-    const nutritionLoggedToday = caloriesLogged > 0
+    const hasNutritionPlan = !!plan
+
+    const myNutritionWeek = typedNutritionWeek.filter((n) => n.client_id === p.id)
+    const sumByDate = new Map<string, number>()
+    for (const row of myNutritionWeek) {
+      sumByDate.set(row.date, row.total_calories || 0)
+    }
+
+    const dietWeek: DietDay[] = weekDates.map((dateIso, idx) => {
+      const dayNumber = idx + 1
+      const isToday = dateIso === todayIso
+      const isFuture = dateIso > todayIso
+      const logged = sumByDate.has(dateIso) && (sumByDate.get(dateIso) || 0) > 0
+      const kcal = sumByDate.get(dateIso) || 0
+      const pct = caloriesTarget > 0 ? Math.min(200, Math.round((kcal / caloriesTarget) * 100)) : 0
+
+      let state: DietDayState = 'open'
+      if (!hasNutritionPlan) {
+        state = 'open'
+      } else if (isFuture) {
+        state = 'open'
+      } else if (isToday) {
+        // Today: done if we already hit 80%+, else "today" (pulsing)
+        state = logged && pct >= 80 ? 'done' : 'today'
+      } else {
+        // Past day: done if logged & within 80–120% band, else missed (0% or way off)
+        if (logged && pct >= 60 && pct <= 120) state = 'done'
+        else if (logged && pct > 120) state = 'missed' // over-eating counts as a miss for the strip
+        else state = 'missed'
+      }
+
+      return { dayNumber, dateIso, isToday, isFuture, state, pct, logged }
+    })
+
+    const todayDiet = dietWeek.find((d) => d.isToday)
+    const nutritionTodayPct = todayDiet?.pct || 0
+    const nutritionLoggedToday = todayDiet?.logged || false
+
+    // Build 1-sentence summaries
+    const pastDietDays = dietWeek.filter((d) => !d.isFuture && !d.isToday)
+    const dietDone = pastDietDays.filter((d) => d.state === 'done').length
+    const dietMissed = pastDietDays.filter((d) => d.state === 'missed').length
+
+    let dietSummary: string
+    if (!hasNutritionPlan) {
+      dietSummary = 'Geen voedingsplan actief'
+    } else if (dietMissed >= 3) {
+      dietSummary = `Voeding loopt achter · ${dietMissed} dagen gemist`
+    } else if (dietMissed > 0) {
+      dietSummary = `${dietDone}/${pastDietDays.length} dagen op doel · ${dietMissed} gemist`
+    } else if (todayDiet?.isToday && todayDiet.logged) {
+      dietSummary = `Vandaag ${nutritionTodayPct}% · week strak`
+    } else if (todayDiet?.isToday) {
+      dietSummary = pastDietDays.length > 0
+        ? `Week strak · vandaag nog te loggen`
+        : `Start van de week · nog niks gelogd`
+    } else {
+      dietSummary = 'Alles op koers'
+    }
+
+    // Workout summary — derived from week[] + programDays
+    const todayWorkout = week.find((d) => d.isToday)
+    const todayIsTrainDay = todayWorkout?.state === 'today_open' || todayWorkout?.state === 'done_planned' || todayWorkout?.state === 'done_moved'
+    const plannedName = todayWorkout?.plannedDayName || null
+    let workoutSummary: string
+    if (plannedThisWeek === 0) {
+      workoutSummary = 'Geen programma deze week'
+    } else if (missedSoFar >= 2) {
+      workoutSummary = `${missedSoFar} workouts gemist deze week`
+    } else if (missedSoFar === 1) {
+      workoutSummary = `1 gemist · ${doneThisWeek}/${plannedThisWeek} gedaan`
+    } else if (todayWorkout?.state === 'today_open') {
+      workoutSummary = plannedName
+        ? `${doneThisWeek}/${plannedThisWeek} gedaan · vandaag ${plannedName}`
+        : `${doneThisWeek}/${plannedThisWeek} gedaan · vandaag training`
+    } else if (doneThisWeek >= plannedThisWeek && plannedThisWeek > 0) {
+      workoutSummary = `Week compleet · ${doneThisWeek}/${plannedThisWeek}`
+    } else if (todayIsTrainDay) {
+      workoutSummary = `${doneThisWeek}/${plannedThisWeek} gedaan deze week`
+    } else {
+      workoutSummary = `${doneThisWeek}/${plannedThisWeek} gedaan deze week`
+    }
 
     // Messages: unread from this client to coach
     const unreadFromClient = typedUnread.filter((m) => m.sender_id === p.id).length
