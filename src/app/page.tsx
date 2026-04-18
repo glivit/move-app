@@ -5,8 +5,20 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { Eye, EyeOff } from 'lucide-react'
 
-/* ─── Underline input with floating label ─────────── */
-function UnderlineInput({
+/* ─── v6 Orion tokens (inline omdat login pre-auth draait zonder globals
+ *     garantie) ─────────────────────────────────────────────────────────
+ *   canvas   = #8E9890   (app background)
+ *   dark card= #474B48   (form surface)
+ *   ink      = #FDFDFE   (primary text)
+ *   lime     = #C0FC01   (primary action)
+ *   ink-dark = #0A0E0B   (text op lime)
+ */
+
+/* ─── Floating-label input op dark card ───────────────────────────────
+ * Bottom-border stijl, label drijft naar boven en kleint op focus/value.
+ * Focus-lijn is lime voor brand-consistentie.
+ */
+function FloatingInput({
   id,
   type,
   value,
@@ -29,8 +41,14 @@ function UnderlineInput({
   const isActive = focused || value.length > 0
 
   return (
-    <div className="relative opacity-0 animate-slide-up" style={{ animationDelay: `${delay}ms`, animationFillMode: 'forwards' }}>
-      <div className="relative py-6">
+    <div
+      className="relative opacity-0 animate-slide-up"
+      style={{
+        animationDelay: `${delay}ms`,
+        animationFillMode: 'forwards',
+      }}
+    >
+      <div className="relative" style={{ paddingTop: 22, paddingBottom: 12 }}>
         <input
           id={id}
           type={type}
@@ -41,28 +59,62 @@ function UnderlineInput({
           required
           autoComplete={autoComplete}
           placeholder=" "
-          className="w-full border-0 border-b-[1.5px] border-[#D5D1C9] bg-transparent px-0 pt-2 pb-3 text-[16px] text-[#1A1917] outline-none transition-colors duration-300 focus:border-[#1A1917] placeholder:text-transparent"
-          style={{ fontFamily: 'var(--font-body)' }}
+          style={{
+            width: '100%',
+            background: 'transparent',
+            border: 'none',
+            borderBottom: '1.5px solid rgba(253,253,254,0.18)',
+            borderRadius: 0,
+            padding: '8px 0 10px',
+            paddingRight: endAdornment ? 40 : 0,
+            fontSize: 16, // 16px voorkomt iOS zoom
+            color: '#FDFDFE',
+            outline: 'none',
+            fontFamily: 'inherit',
+            WebkitAppearance: 'none',
+            appearance: 'none',
+            transition: 'border-color 300ms cubic-bezier(0.16,1,0.3,1)',
+          }}
         />
         <label
           htmlFor={id}
-          className="pointer-events-none absolute left-0 transition-all duration-250"
+          className="pointer-events-none absolute"
           style={{
-            top: isActive ? '12px' : '28px',
-            fontSize: isActive ? '11px' : '15px',
-            letterSpacing: isActive ? '1.5px' : '0',
+            left: 0,
+            top: isActive ? 4 : 28,
+            fontSize: isActive ? 11 : 15,
+            letterSpacing: isActive ? '0.08em' : '-0.003em',
             textTransform: isActive ? 'uppercase' : 'none',
-            fontWeight: isActive ? 500 : 400,
-            color: focused ? '#1A1917' : '#A09D96',
-            fontFamily: 'var(--font-body)',
+            fontWeight: isActive ? 600 : 400,
+            color: focused
+              ? '#C0FC01'
+              : isActive
+                ? 'rgba(253,253,254,0.62)'
+                : 'rgba(253,253,254,0.52)',
+            transition: 'all 250ms cubic-bezier(0.16,1,0.3,1)',
           }}
         >
           {label}
         </label>
-        {/* Focus line that expands */}
-        <div className="absolute bottom-3 left-0 h-[1.5px] bg-[#1A1917] transition-all duration-400" style={{ width: focused ? '100%' : '0%', transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }} />
+        {/* Focus-lijn die van links naar rechts uitrolt in lime */}
+        <div
+          className="absolute left-0"
+          style={{
+            bottom: 10,
+            height: 1.5,
+            background: '#C0FC01',
+            width: focused ? '100%' : '0%',
+            transition: 'width 400ms cubic-bezier(0.16,1,0.3,1)',
+          }}
+        />
         {endAdornment && (
-          <div className="absolute right-0 top-[28px]">
+          <div
+            className="absolute"
+            style={{
+              right: 0,
+              top: 22,
+            }}
+          >
             {endAdornment}
           </div>
         )}
@@ -71,40 +123,46 @@ function UnderlineInput({
   )
 }
 
-/* ─── Success sweep overlay ───────────────────────── */
+/* ─── Success sweep overlay — v6 lime sweep ─────────────────────────
+ * Hetzelfde concept als voorheen maar in brand-kleur: lime sweep van
+ * onderaan, donkere tekst op lime (matches v6 action pattern).
+ */
 function SuccessSweep({ active, userName }: { active: boolean; userName: string }) {
   return (
     <div className="pointer-events-none absolute inset-0 z-50 overflow-hidden">
-      {/* Dark sweep from bottom */}
       <div
-        className="absolute bottom-0 left-0 right-0 bg-[#1A1917]"
+        className="absolute bottom-0 left-0 right-0"
         style={{
+          background: '#C0FC01',
           height: active ? '100%' : '0%',
-          transition: active ? 'height 0.7s cubic-bezier(0.65, 0, 0.35, 1)' : 'none',
+          transition: active ? 'height 0.7s cubic-bezier(0.65,0,0.35,1)' : 'none',
         }}
       />
-      {/* Welcome message */}
       <div
-        className="absolute inset-0 flex flex-col items-center justify-center gap-3"
+        className="absolute inset-0 flex flex-col items-center justify-center"
         style={{
+          gap: 12,
           opacity: active ? 1 : 0,
-          transition: active ? 'opacity 0.5s 0.6s cubic-bezier(0.16, 1, 0.3, 1)' : 'none',
+          transition: active ? 'opacity 0.5s 0.6s cubic-bezier(0.16,1,0.3,1)' : 'none',
         }}
       >
         <h2
-          className="text-[38px] font-bold tracking-tight text-[#EEEBE3]"
           style={{
-            fontFamily: 'var(--font-display)',
+            fontSize: 38,
+            fontWeight: 300,
+            letterSpacing: '-0.025em',
+            color: '#0A0E0B',
             opacity: active ? 1 : 0,
             transform: active ? 'translateY(0)' : 'translateY(16px)',
-            transition: active ? 'all 0.6s 0.75s cubic-bezier(0.16, 1, 0.3, 1)' : 'none',
+            transition: active ? 'all 0.6s 0.75s cubic-bezier(0.16,1,0.3,1)' : 'none',
           }}
         >
           Welkom, {userName || 'daar'}
         </h2>
         <div
-          className="flex gap-1.5"
+          className="flex"
           style={{
+            gap: 6,
             opacity: active ? 1 : 0,
             transition: active ? 'opacity 0.4s 1.1s' : 'none',
           }}
@@ -112,8 +170,11 @@ function SuccessSweep({ active, userName }: { active: boolean; userName: string 
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="h-[5px] w-[5px] rounded-full bg-[#EEEBE3]/30"
               style={{
+                width: 5,
+                height: 5,
+                borderRadius: 9999,
+                background: 'rgba(10,14,11,0.35)',
                 animation: active ? `pulse-dot 1.2s ${1.2 + i * 0.2}s ease-in-out infinite` : 'none',
               }}
             />
@@ -124,7 +185,7 @@ function SuccessSweep({ active, userName }: { active: boolean; userName: string 
   )
 }
 
-/* ─── Main login component ───────────────────────── */
+/* ─── Login core ──────────────────────────────────────────────────── */
 function LoginPageInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -186,12 +247,10 @@ function LoginPageInner() {
         .eq('id', data.user.id)
         .single()
 
-      // Trigger success animation
       setFormLoading(false)
       setUserName(profile?.first_name || '')
       setLoginSuccess(true)
 
-      // Navigate after sweep animation completes
       setTimeout(() => {
         router.push(profile?.role === 'coach' ? '/coach' : '/client')
         router.refresh()
@@ -213,7 +272,10 @@ function LoginPageInner() {
       })
 
       if (authError) {
-        if (authError.message?.includes('provider is not enabled') || authError.message?.includes('Unsupported provider')) {
+        if (
+          authError.message?.includes('provider is not enabled') ||
+          authError.message?.includes('Unsupported provider')
+        ) {
           setError(`${provider === 'google' ? 'Google' : 'Apple'} login is nog niet geconfigureerd.`)
         } else {
           setError('Er ging iets mis met inloggen. Probeer opnieuw.')
@@ -253,7 +315,7 @@ function LoginPageInner() {
     setResetLoading(false)
   }
 
-  /* ─── Loading splash — v6 Orion ───────────────────── */
+  /* ─── Loading splash — v6 Orion ────────────────────────────────── */
   if (loading) {
     return (
       <div
@@ -261,11 +323,12 @@ function LoginPageInner() {
         style={{ background: '#8E9890' }}
       >
         <h1
-          className="text-7xl font-medium tracking-[-0.02em] animate-fade-in"
+          className="text-7xl animate-fade-in"
           style={{
             fontFamily: 'var(--font-sans, Outfit), Outfit, sans-serif',
             color: '#FDFDFE',
             fontWeight: 500,
+            letterSpacing: '-0.02em',
           }}
         >
           MŌVE
@@ -291,59 +354,174 @@ function LoginPageInner() {
           70% { transform: translateX(-2px); }
           100% { opacity: 1; transform: translateX(0); }
         }
+        /* Autofill op dark card — forceer donkere surface + witte tekst */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus {
+          -webkit-box-shadow: 0 0 0 1000px #474B48 inset !important;
+          -webkit-text-fill-color: #FDFDFE !important;
+          caret-color: #FDFDFE;
+        }
       `}</style>
 
-      <div className="relative flex min-h-screen flex-col items-center bg-[#EEEBE3] overflow-hidden">
+      <div
+        className="relative flex min-h-screen flex-col items-center overflow-hidden"
+        style={{ background: '#8E9890' }}
+      >
+        {/* Subtiele radial vignette om de card te laten zweven */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            background:
+              'radial-gradient(120% 80% at 50% 0%, rgba(253,253,254,0.04), transparent 60%)',
+          }}
+        />
 
-        {/* ─── Success sweep overlay ─── */}
+        {/* Success sweep — lime overlay bij succesvolle login */}
         <SuccessSweep active={loginSuccess} userName={userName} />
 
-        {/* ─── Single-column centered layout ─── */}
-        <div className="flex w-full max-w-[340px] flex-1 flex-col px-6 sm:px-0" ref={formRef}>
-
-          {/* ─── Logo section ─── */}
-          <div className="pt-[140px] pb-2" style={{ opacity: mounted ? 1 : 0, transition: 'opacity 0.6s 0.1s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-            <h1 className="text-[64px] font-bold leading-none tracking-[-2px] text-[#1A1917]" style={{ fontFamily: 'var(--font-display)' }}>
+        <div
+          ref={formRef}
+          className="flex w-full flex-1 flex-col"
+          style={{
+            maxWidth: 380,
+            padding: '0 22px',
+          }}
+        >
+          {/* ─── Logo + subtitle ─────────────────────────────────── */}
+          <div
+            style={{
+              paddingTop: 96,
+              paddingBottom: 28,
+              opacity: mounted ? 1 : 0,
+              transition: 'opacity 0.6s 0.1s cubic-bezier(0.16,1,0.3,1)',
+            }}
+          >
+            <h1
+              style={{
+                fontSize: 64,
+                fontWeight: 400,
+                lineHeight: 1,
+                letterSpacing: '-0.035em',
+                color: '#FDFDFE',
+                margin: 0,
+              }}
+            >
               MŌVE
             </h1>
-            <p className="mt-2 text-[15px] font-light tracking-[0.2px] text-[#A09D96]" style={{ fontFamily: 'var(--font-body)' }}>
-              {resetMode ? 'Vul je e-mail in voor een reset-link' : 'Log in op je account'}
+            <p
+              style={{
+                marginTop: 10,
+                fontSize: 14,
+                fontWeight: 400,
+                color: 'rgba(253,253,254,0.62)',
+                letterSpacing: '0.01em',
+              }}
+            >
+              {resetMode
+                ? 'Vul je e-mail in voor een reset-link'
+                : 'Welkom terug. Log in om verder te gaan.'}
             </p>
           </div>
 
-          {/* ─── Form section ─── */}
-          <div className="flex flex-1 flex-col pt-12">
-
-            {/* Error */}
+          {/* ─── Form card — donkere v6 surface ──────────────────── */}
+          <div
+            className="opacity-0 animate-slide-up"
+            style={{
+              background: '#474B48',
+              borderRadius: 24,
+              padding: '20px 22px 24px',
+              boxShadow:
+                '0 1px 0 rgba(253,253,254,0.06) inset, 0 20px 60px -20px rgba(10,14,11,0.35)',
+              animationDelay: '100ms',
+              animationFillMode: 'forwards',
+            }}
+          >
+            {/* Error banner — amber op dark */}
             {error && (
-              <div className="mb-2 rounded-xl border border-[#C4372A]/10 bg-[#C4372A]/[0.06] px-4 py-3.5" style={{ animation: 'shake-in 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-                <p className="text-[13px] text-[#C4372A]">{error}</p>
+              <div
+                style={{
+                  marginBottom: 10,
+                  padding: '10px 14px',
+                  borderRadius: 12,
+                  background: 'rgba(232,169,60,0.10)',
+                  border: '1px solid rgba(232,169,60,0.26)',
+                  animation: 'shake-in 0.4s cubic-bezier(0.16,1,0.3,1)',
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: 13,
+                    margin: 0,
+                    color: '#E8A93C',
+                    lineHeight: 1.4,
+                  }}
+                >
+                  {error}
+                </p>
               </div>
             )}
 
             {/* Reset sent success */}
             {resetMode && resetSent ? (
-              <div className="space-y-5 animate-fade-in">
-                <div className="rounded-xl border border-[#3D8B5C]/10 bg-[#3D8B5C]/[0.06] px-4 py-6 text-center">
-                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#3D8B5C]/10">
-                    <svg className="h-6 w-6 text-[#3D8B5C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                <div
+                  style={{
+                    textAlign: 'center',
+                    padding: '20px 16px',
+                    borderRadius: 14,
+                    background: 'rgba(192,252,1,0.08)',
+                    border: '1px solid rgba(192,252,1,0.26)',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: '50%',
+                      background: '#C0FC01',
+                      margin: '0 auto 10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0A0E0B" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="5 13 9 17 19 7" />
                     </svg>
                   </div>
-                  <p className="text-sm font-medium text-[#3D8B5C]">E-mail verstuurd!</p>
-                  <p className="mt-1 text-xs text-[#3D8B5C]/70">Check je inbox voor de reset-link.</p>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: '#FDFDFE' }}>
+                    E-mail verstuurd
+                  </p>
+                  <p style={{ margin: '4px 0 0', fontSize: 12, color: 'rgba(253,253,254,0.62)' }}>
+                    Check je inbox voor de reset-link.
+                  </p>
                 </div>
                 <button
                   onClick={() => { setResetMode(false); setResetSent(false); setError('') }}
-                  className="w-full text-sm font-medium text-[#1A1917] transition-opacity hover:opacity-60"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    background: 'transparent',
+                    border: 'none',
+                    fontSize: 13,
+                    fontWeight: 500,
+                    color: 'rgba(253,253,254,0.78)',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
                 >
                   Terug naar inloggen
                 </button>
               </div>
             ) : resetMode ? (
               /* Reset form */
-              <form onSubmit={handlePasswordReset} className="flex flex-col">
-                <UnderlineInput
+              <form onSubmit={handlePasswordReset} style={{ display: 'flex', flexDirection: 'column' }}>
+                <FloatingInput
                   id="reset-email"
                   type="email"
                   value={email}
@@ -355,10 +533,39 @@ function LoginPageInner() {
                 <button
                   type="submit"
                   disabled={resetLoading}
-                  className="mt-10 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#1A1917] py-[18px] text-[15px] font-medium tracking-[0.3px] text-[#EEEBE3] transition-all duration-200 hover:bg-[#333330] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                  style={{
+                    marginTop: 24,
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                    padding: '16px 20px',
+                    borderRadius: 16,
+                    background: '#C0FC01',
+                    color: '#0A0E0B',
+                    border: 'none',
+                    fontSize: 15,
+                    fontWeight: 600,
+                    letterSpacing: '-0.003em',
+                    cursor: resetLoading ? 'default' : 'pointer',
+                    opacity: resetLoading ? 0.7 : 1,
+                    fontFamily: 'inherit',
+                    WebkitTapHighlightColor: 'transparent',
+                    transition: 'opacity 200ms',
+                  }}
                 >
                   {resetLoading ? (
-                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#EEEBE3]/30 border-t-[#EEEBE3]" />
+                    <div
+                      style={{
+                        width: 18,
+                        height: 18,
+                        borderRadius: '50%',
+                        border: '2px solid rgba(10,14,11,0.25)',
+                        borderTopColor: '#0A0E0B',
+                        animation: 'spin 800ms linear infinite',
+                      }}
+                    />
                   ) : (
                     'Verstuur reset-link'
                   )}
@@ -366,15 +573,26 @@ function LoginPageInner() {
                 <button
                   type="button"
                   onClick={() => { setResetMode(false); setError('') }}
-                  className="mt-5 w-full text-[13px] text-[#A09D96] transition-colors duration-200 hover:text-[#1A1917]"
+                  style={{
+                    marginTop: 14,
+                    width: '100%',
+                    padding: '8px',
+                    background: 'transparent',
+                    border: 'none',
+                    fontSize: 12,
+                    color: 'rgba(253,253,254,0.62)',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
                 >
                   Terug naar inloggen
                 </button>
               </form>
             ) : (
               /* Login form */
-              <form onSubmit={handlePasswordLogin} className="flex flex-col">
-                <UnderlineInput
+              <form onSubmit={handlePasswordLogin} style={{ display: 'flex', flexDirection: 'column' }}>
+                <FloatingInput
                   id="email"
                   type="email"
                   value={email}
@@ -384,54 +602,132 @@ function LoginPageInner() {
                   delay={200}
                 />
 
-                <UnderlineInput
+                <FloatingInput
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   label="Wachtwoord"
                   autoComplete="current-password"
-                  delay={350}
+                  delay={320}
                   endAdornment={
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="p-2 text-[#A09D96] transition-colors duration-200 hover:text-[#1A1917]"
+                      style={{
+                        padding: 8,
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'rgba(253,253,254,0.62)',
+                        cursor: 'pointer',
+                        WebkitTapHighlightColor: 'transparent',
+                      }}
                       aria-label={showPassword ? 'Verberg wachtwoord' : 'Toon wachtwoord'}
                     >
-                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      {showPassword ? <EyeOff size={18} strokeWidth={1.5} /> : <Eye size={18} strokeWidth={1.5} />}
                     </button>
                   }
                 />
 
                 {/* Forgot password */}
-                <div className="flex justify-end pt-3 opacity-0 animate-slide-up" style={{ animationDelay: '450ms', animationFillMode: 'forwards' }}>
+                <div
+                  className="opacity-0 animate-slide-up"
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    paddingTop: 6,
+                    animationDelay: '420ms',
+                    animationFillMode: 'forwards',
+                  }}
+                >
                   <button
                     type="button"
                     onClick={() => { setResetMode(true); setError('') }}
-                    className="text-[13px] text-[#A09D96] transition-colors duration-200 hover:text-[#1A1917]"
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      fontSize: 12,
+                      color: 'rgba(253,253,254,0.62)',
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                      padding: 4,
+                      WebkitTapHighlightColor: 'transparent',
+                      textDecoration: 'underline',
+                      textUnderlineOffset: 3,
+                    }}
                   >
                     Wachtwoord vergeten?
                   </button>
                 </div>
 
-                {/* Submit button */}
-                <div className="opacity-0 animate-slide-up" style={{ animationDelay: '550ms', animationFillMode: 'forwards' }}>
+                {/* Submit — lime primary action */}
+                <div
+                  className="opacity-0 animate-slide-up"
+                  style={{ animationDelay: '520ms', animationFillMode: 'forwards' }}
+                >
                   <button
                     type="submit"
                     disabled={formLoading || loginSuccess}
-                    className={`group mt-10 flex w-full items-center justify-center gap-2 rounded-2xl py-[18px] text-[15px] font-medium tracking-[0.3px] transition-all duration-300 disabled:cursor-not-allowed ${loginSuccess ? 'bg-[#3D8B5C] text-white' : 'bg-[#1A1917] text-[#EEEBE3] hover:bg-[#333330] hover:shadow-[0_8px_24px_rgba(26,25,23,0.15)] active:scale-[0.98] disabled:opacity-60'}`}
+                    style={{
+                      marginTop: 22,
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 10,
+                      padding: '16px 20px',
+                      borderRadius: 16,
+                      background: loginSuccess ? '#C0FC01' : '#C0FC01',
+                      color: '#0A0E0B',
+                      border: 'none',
+                      fontSize: 15,
+                      fontWeight: 600,
+                      letterSpacing: '-0.003em',
+                      cursor: formLoading || loginSuccess ? 'default' : 'pointer',
+                      opacity: formLoading ? 0.7 : 1,
+                      fontFamily: 'inherit',
+                      WebkitTapHighlightColor: 'transparent',
+                      transition: 'opacity 200ms, transform 200ms',
+                    }}
                   >
                     {formLoading ? (
-                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#EEEBE3]/30 border-t-[#EEEBE3]" />
+                      <div
+                        style={{
+                          width: 18,
+                          height: 18,
+                          borderRadius: '50%',
+                          border: '2px solid rgba(10,14,11,0.25)',
+                          borderTopColor: '#0A0E0B',
+                          animation: 'spin 800ms linear infinite',
+                        }}
+                      />
                     ) : loginSuccess ? (
-                      <svg className="h-[22px] w-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'check-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both' }}>
+                      <svg
+                        width={22}
+                        height={22}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#0A0E0B"
+                        strokeWidth={2.5}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        style={{ animation: 'check-pop 0.4s cubic-bezier(0.34,1.56,0.64,1) both' }}
+                      >
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
                     ) : (
                       <>
-                        Inloggen
-                        <svg className="h-[18px] w-[18px] transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                        <span>Inloggen</span>
+                        <svg
+                          width={18}
+                          height={18}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
                           <path d="M5 12h14M12 5l7 7-7 7" />
                         </svg>
                       </>
@@ -442,25 +738,79 @@ function LoginPageInner() {
             )}
           </div>
 
-          {/* ─── Bottom: OAuth + contact ─── */}
+          {/* ─── OAuth + signup footer ──────────────────────────── */}
           {!resetMode && !resetSent && (
-            <div className="pb-12 pt-8 opacity-0 animate-fade-in" style={{ animationDelay: '700ms', animationFillMode: 'forwards' }}>
-              {/* OAuth icon buttons */}
-              <div className="flex justify-center gap-4 mb-6">
+            <div
+              className="opacity-0 animate-fade-in"
+              style={{
+                paddingTop: 28,
+                paddingBottom: 40,
+                animationDelay: '640ms',
+                animationFillMode: 'forwards',
+              }}
+            >
+              {/* OR-divider */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  marginBottom: 18,
+                }}
+              >
+                <div style={{ flex: 1, height: 1, background: 'rgba(253,253,254,0.14)' }} />
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 600,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(253,253,254,0.52)',
+                  }}
+                >
+                  of
+                </span>
+                <div style={{ flex: 1, height: 1, background: 'rgba(253,253,254,0.14)' }} />
+              </div>
+
+              {/* OAuth buttons */}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 14, marginBottom: 26 }}>
                 <button
                   onClick={() => handleOAuthLogin('google')}
                   disabled={oauthLoading !== null}
-                  className="flex h-[52px] w-[52px] items-center justify-center rounded-full border-[1.5px] border-[#D5D1C9] bg-transparent transition-all duration-250 hover:border-[#A09D96] hover:bg-white/50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
                   aria-label="Log in met Google"
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: '50%',
+                    background: '#FDFDFE',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: oauthLoading !== null ? 'default' : 'pointer',
+                    opacity: oauthLoading !== null && oauthLoading !== 'google' ? 0.5 : 1,
+                    WebkitTapHighlightColor: 'transparent',
+                    transition: 'transform 200ms, opacity 200ms',
+                  }}
                 >
                   {oauthLoading === 'google' ? (
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#1A1917]/20 border-t-[#1A1917]" />
+                    <div
+                      style={{
+                        width: 16,
+                        height: 16,
+                        borderRadius: '50%',
+                        border: '2px solid rgba(10,14,11,0.2)',
+                        borderTopColor: '#0A0E0B',
+                        animation: 'spin 800ms linear infinite',
+                      }}
+                    />
                   ) : (
-                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
-                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    <svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+                      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                     </svg>
                   )}
                 </button>
@@ -468,22 +818,59 @@ function LoginPageInner() {
                 <button
                   onClick={() => handleOAuthLogin('apple')}
                   disabled={oauthLoading !== null}
-                  className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[#1A1917] transition-all duration-250 hover:bg-[#333330] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
                   aria-label="Log in met Apple"
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: '50%',
+                    background: '#0A0E0B',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: oauthLoading !== null ? 'default' : 'pointer',
+                    opacity: oauthLoading !== null && oauthLoading !== 'apple' ? 0.5 : 1,
+                    WebkitTapHighlightColor: 'transparent',
+                    transition: 'transform 200ms, opacity 200ms',
+                  }}
                 >
                   {oauthLoading === 'apple' ? (
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    <div
+                      style={{
+                        width: 16,
+                        height: 16,
+                        borderRadius: '50%',
+                        border: '2px solid rgba(253,253,254,0.3)',
+                        borderTopColor: '#FDFDFE',
+                        animation: 'spin 800ms linear infinite',
+                      }}
+                    />
                   ) : (
-                    <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="white">
-                      <path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.18 0-.36-.02-.53-.06-.01-.18-.04-.56-.04-.95 0-1.05.546-2.22 1.223-2.98.34-.38.77-.73 1.275-.98.51-.26 1.003-.41 1.48-.44.02.25.04.5.04.75zm4.035 12.15c-.04.01-2.098.81-2.098 3.33 0 2.97 2.602 4.02 2.682 4.04-.02.07-.41 1.44-1.378 2.85-.858 1.24-1.756 2.48-3.172 2.48-1.396 0-1.852-.83-3.449-.83-1.558 0-2.134.85-3.43.85-1.296 0-2.174-1.15-3.172-2.57C5.04 22.1 4.05 19.23 4.05 16.5c0-4.24 2.77-6.49 5.498-6.49 1.417 0 2.597.93 3.49.93.853 0 2.18-.99 3.796-.99.614 0 2.822.18 4.282 1.38-.11.07-2.556 1.49-2.556 4.45v-.17z"/>
+                    <svg width={18} height={18} viewBox="0 0 24 24" fill="#FDFDFE">
+                      <path d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.18 0-.36-.02-.53-.06-.01-.18-.04-.56-.04-.95 0-1.05.546-2.22 1.223-2.98.34-.38.77-.73 1.275-.98.51-.26 1.003-.41 1.48-.44.02.25.04.5.04.75zm4.035 12.15c-.04.01-2.098.81-2.098 3.33 0 2.97 2.602 4.02 2.682 4.04-.02.07-.41 1.44-1.378 2.85-.858 1.24-1.756 2.48-3.172 2.48-1.396 0-1.852-.83-3.449-.83-1.558 0-2.134.85-3.43.85-1.296 0-2.174-1.15-3.172-2.57C5.04 22.1 4.05 19.23 4.05 16.5c0-4.24 2.77-6.49 5.498-6.49 1.417 0 2.597.93 3.49.93.853 0 2.18-.99 3.796-.99.614 0 2.822.18 4.282 1.38-.11.07-2.556 1.49-2.556 4.45v-.17z" />
                     </svg>
                   )}
                 </button>
               </div>
 
-              <p className="text-center text-[13px] text-[#A09D96]">
+              <p
+                style={{
+                  textAlign: 'center',
+                  fontSize: 13,
+                  color: 'rgba(253,253,254,0.62)',
+                  margin: 0,
+                }}
+              >
                 Nog geen account?{' '}
-                <a href="mailto:contact@movecoaching.be" className="font-medium text-[#1A1917] transition-opacity duration-200 hover:opacity-60">
+                <a
+                  href="mailto:contact@movecoaching.be"
+                  style={{
+                    fontWeight: 600,
+                    color: '#FDFDFE',
+                    textDecoration: 'underline',
+                    textUnderlineOffset: 3,
+                  }}
+                >
                   Neem contact op
                 </a>
               </p>
@@ -497,23 +884,26 @@ function LoginPageInner() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div
-        className="flex min-h-screen items-center justify-center"
-        style={{ background: '#8E9890' }}
-      >
-        <h1
-          className="text-7xl font-medium tracking-[-0.02em]"
-          style={{
-            fontFamily: 'var(--font-sans, Outfit), Outfit, sans-serif',
-            color: '#FDFDFE',
-            fontWeight: 500,
-          }}
+    <Suspense
+      fallback={
+        <div
+          className="flex min-h-screen items-center justify-center"
+          style={{ background: '#8E9890' }}
         >
-          MŌVE
-        </h1>
-      </div>
-    }>
+          <h1
+            className="text-7xl"
+            style={{
+              fontFamily: 'var(--font-sans, Outfit), Outfit, sans-serif',
+              color: '#FDFDFE',
+              fontWeight: 500,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            MŌVE
+          </h1>
+        </div>
+      }
+    >
       <LoginPageInner />
     </Suspense>
   )
