@@ -470,14 +470,16 @@ function AddFoodBottomSheet({
 
     try {
       // ── Optimistic add: instant UI + rollback on commit failure ──────
+      // Bug 80: de green-check was vroeger gescheduled vanaf `apply` met een
+      // 1s timer. Als de commit langer dan 1s duurde (trage netwerken, slow
+      // API), was de check al gedoofd tegen dat de spinner stopte — Glenn zag
+      // dan alleen even groen rond draaien en daarna direct terug naar de +.
+      // Nu starten we de timer pas in onSuccess (post-commit), zodat de check
+      // ALTIJD minstens 1.2s zichtbaar is nadat de spinner verdwijnt.
       await optimisticMutate({
         key: `meal-add-food:${meal.id}:${key}`,
         apply: () => {
           setLogs(upd)
-          setJustAdded(prev => new Set(prev).add(key))
-          justAddedTimer = setTimeout(() => {
-            setJustAdded(prev => { const n = new Set(prev); n.delete(key); return n })
-          }, 1000)
         },
         rollback: () => {
           if (justAddedTimer) clearTimeout(justAddedTimer)
@@ -503,6 +505,12 @@ function AddFoodBottomSheet({
         },
         onSuccess: () => {
           invalidateCache('/api/dashboard')
+          // Green check → 1.2s zichtbaar NA commit-success (niet overlappend
+          // met spinner). Zo weet Glenn met zekerheid dat het gelukt is.
+          setJustAdded(prev => new Set(prev).add(key))
+          justAddedTimer = setTimeout(() => {
+            setJustAdded(prev => { const n = new Set(prev); n.delete(key); return n })
+          }, 1200)
         },
         onError: (err) => {
           console.error('[optimistic:add-food] commit failed:', err)
@@ -722,7 +730,10 @@ function AddFoodBottomSheet({
                             gap: 6,
                             flexShrink: 0,
                             background: wasAdded ? '#2FA65A' : isExpanded ? '#C0FC01' : 'rgba(253,253,254,0.10)',
-                            color: isExpanded && !wasAdded ? '#FDFDFE' : '#FDFDFE',
+                            // Lime knop (#C0FC01) vraagt donkere tekst voor leesbaarheid.
+                            // wasAdded = green (#2FA65A) werkt wel met witte check/tekst.
+                            // Default (grijs) = witte +.
+                            color: isExpanded && !wasAdded ? '#0A0E0B' : '#FDFDFE',
                             fontSize: 13, fontWeight: 600,
                             border: 'none',
                             cursor: 'pointer',
@@ -983,7 +994,8 @@ function AddFoodBottomSheet({
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           flexShrink: 0,
                           background: wasAdded ? '#2FA65A' : isExpanded ? '#C0FC01' : 'rgba(253,253,254,0.10)',
-                          color: isExpanded && !wasAdded ? '#FDFDFE' : '#FDFDFE',
+                          // Lime (#C0FC01) krijgt donkere tekst; groen+grijs krijgen wit.
+                          color: isExpanded && !wasAdded ? '#0A0E0B' : '#FDFDFE',
                           fontSize: 13, fontWeight: 600,
                           border: 'none',
                           cursor: 'pointer',

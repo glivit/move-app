@@ -117,6 +117,11 @@ export default function WorkoutOverviewPage() {
   const router = useRouter()
   const [data, setData] = useState<ProgramResponse>({})
   const [loading, setLoading] = useState(true)
+  // Catchup-hero optie: klant kan ipv onze auto-suggestie een andere
+  // workout uit het programma starten. Inline picker (geen modal) houdt
+  // de flow licht. Reset bij page-load; blijft open zolang de klant
+  // scrolt/kiest.
+  const [showCatchupPicker, setShowCatchupPicker] = useState(false)
 
   useEffect(() => {
     const loadData = async () => {
@@ -331,6 +336,165 @@ export default function WorkoutOverviewPage() {
                 </button>
               </div>
             </div>
+
+            {/* ── Of kies een andere workout uit het programma ─────────────
+             * We suggereren de oudst-gemiste workout, maar Glenn wilde
+             * klanten de vrijheid geven om zelf te kiezen (bvb. Push nog
+             * eens doen ipv Legs inhalen, of Upper-B skippen en Lower doen).
+             * Tap → inline expansion met álle template-dagen; geen modal,
+             * minder cognitive load. Retro-completion blijft werken via
+             * template_day_id-match: als ze een andere day kiezen, telt
+             * die session NIET voor catchupCell — die blijft open tot de
+             * exacte day alsnog gedaan wordt. Dat is correct gedrag:
+             * programma-integriteit boven schedule-netheid. */}
+            {days.length > 1 && (
+              <div style={{ marginTop: 16 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowCatchupPicker(v => !v)}
+                  aria-expanded={showCatchupPicker}
+                  aria-controls="catchup-picker"
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    padding: 0,
+                    fontSize: 12,
+                    fontWeight: 500,
+                    color: 'rgba(253,253,254,0.62)',
+                    letterSpacing: '0.01em',
+                    cursor: 'pointer',
+                    WebkitTapHighlightColor: 'transparent',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <span style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>
+                    Liever een andere workout?
+                  </span>
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{
+                      transform: showCatchupPicker ? 'rotate(180deg)' : 'rotate(0deg)',
+                      transition: 'transform 160ms',
+                    }}
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+
+                {showCatchupPicker && (
+                  <div
+                    id="catchup-picker"
+                    role="region"
+                    aria-label="Kies een workout uit je programma"
+                    style={{
+                      marginTop: 14,
+                      paddingTop: 14,
+                      borderTop: '1px solid rgba(253,253,254,0.08)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 6,
+                    }}
+                  >
+                    {[...days]
+                      .sort((a, b) => a.sort_order - b.sort_order || a.day_number - b.day_number)
+                      .map((d) => {
+                        const isSuggested = catchupCell.day?.id === d.id
+                        return (
+                          <button
+                            key={d.id}
+                            type="button"
+                            onClick={() => handleStart(d)}
+                            aria-label={`${d.name} starten`}
+                            style={{
+                              width: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: 12,
+                              padding: '10px 12px',
+                              background: isSuggested
+                                ? 'rgba(192,252,1,0.06)'
+                                : 'rgba(253,253,254,0.04)',
+                              border: isSuggested
+                                ? '1px solid rgba(192,252,1,0.22)'
+                                : '1px solid rgba(253,253,254,0.06)',
+                              borderRadius: 12,
+                              cursor: 'pointer',
+                              WebkitTapHighlightColor: 'transparent',
+                              transition: 'background 140ms',
+                              textAlign: 'left',
+                            }}
+                          >
+                            <div style={{ minWidth: 0, flex: 1 }}>
+                              <div
+                                style={{
+                                  fontSize: 14,
+                                  fontWeight: 500,
+                                  color: '#FDFDFE',
+                                  letterSpacing: '-0.005em',
+                                  lineHeight: 1.2,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                }}
+                              >
+                                {d.name}
+                                {isSuggested && (
+                                  <span
+                                    style={{
+                                      marginLeft: 8,
+                                      fontSize: 10,
+                                      fontWeight: 600,
+                                      textTransform: 'uppercase',
+                                      letterSpacing: '0.08em',
+                                      color: '#C0FC01',
+                                    }}
+                                  >
+                                    · Aanbevolen
+                                  </span>
+                                )}
+                              </div>
+                              <div
+                                style={{
+                                  fontSize: 11,
+                                  color: 'rgba(253,253,254,0.48)',
+                                  marginTop: 2,
+                                  lineHeight: 1.2,
+                                }}
+                              >
+                                {d.exercise_count ?? '—'} oefeningen · ±{d.estimated_duration_min} min
+                              </div>
+                            </div>
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="rgba(253,253,254,0.62)"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              style={{ flexShrink: 0 }}
+                              aria-hidden="true"
+                            >
+                              <polygon points="6 4 20 12 6 20 6 4" fill="rgba(253,253,254,0.62)" />
+                            </svg>
+                          </button>
+                        )
+                      })}
+                  </div>
+                )}
+              </div>
+            )}
           </>
         ) : (
           <>
