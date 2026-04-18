@@ -1,11 +1,10 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import { SubPageHeader } from '@/components/layout/SubPageHeader'
-import { Camera, Scale, CheckCircle2, Loader2, ChevronRight } from 'lucide-react'
+import { Camera, Scale, CheckCircle2, Loader2, ChevronRight, X } from 'lucide-react'
 
 const RATING_LABELS: Record<string, string[]> = {
   energy: ['Zeer laag', 'Laag', 'Oké', 'Goed', 'Top'],
@@ -13,8 +12,23 @@ const RATING_LABELS: Record<string, string[]> = {
   nutrition: ['Niet gevolgd', 'Weinig', 'Gemiddeld', 'Goed', 'Perfect'],
 }
 
+// v6 Orion — shared card treatment (light surface)
+const LIGHT_CARD: React.CSSProperties = {
+  background: '#A6ADA7',
+  borderRadius: 24,
+  boxShadow:
+    'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+}
+
+const LABEL_STYLE: React.CSSProperties = {
+  fontSize: 10,
+  letterSpacing: '0.16em',
+  textTransform: 'uppercase',
+  color: 'rgba(253,253,254,0.44)',
+  fontWeight: 600,
+}
+
 export default function WeeklyCheckInPage() {
-  const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [loading, setLoading] = useState(true)
@@ -114,20 +128,22 @@ export default function WeeklyCheckInPage() {
     )
   }
 
-  // Already submitted this week
+  // ─── Already submitted / just submitted ──────────────────
   if (alreadyDone || submitted) {
     return (
       <div className="space-y-6">
         <SubPageHeader overline="Wekelijks" title="Check-in" backHref="/client" />
-        <div className="bg-white p-8 border border-[rgba(253,253,254,0.08)] text-center">
-          <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#2FA65A] mx-auto mb-3" />
-          <p className="font-semibold text-[#FDFDFE] text-lg">
-            {submitted ? 'Check-in verstuurd!' : 'Al ingediend deze week'}
+        <div className="p-8 text-center" style={LIGHT_CARD}>
+          <div className="w-16 h-16 rounded-full bg-[rgba(47,166,90,0.18)] mx-auto mb-4 flex items-center justify-center">
+            <CheckCircle2 size={32} strokeWidth={1.5} className="text-[#2FA65A]" />
+          </div>
+          <p className="font-semibold text-[#FDFDFE] text-[18px] tracking-tight">
+            {submitted ? 'Check-in verstuurd' : 'Al ingediend deze week'}
           </p>
-          <p className="text-[14px] text-[rgba(253,253,254,0.55)] mt-2">
+          <p className="text-[14px] text-[rgba(253,253,254,0.55)] mt-2 leading-relaxed">
             {submitted
-              ? 'Goed bezig! Je coach kan je voortgang bekijken.'
-              : 'Je hebt deze week al een check-in gedaan. Volgende week weer!'}
+              ? 'Goed bezig. Je coach kan je voortgang bekijken.'
+              : 'Je hebt deze week al een check-in gedaan. Volgende week weer.'}
           </p>
         </div>
       </div>
@@ -138,50 +154,60 @@ export default function WeeklyCheckInPage() {
   const weightDiff = lastWeight && weightNum ? +(weightNum - lastWeight).toFixed(1) : null
 
   return (
-    <div className="space-y-6 pb-28">
+    <div className="space-y-5 pb-28">
       <div className="animate-slide-up">
         <SubPageHeader overline="Wekelijks" title="Check-in" backHref="/client" />
       </div>
 
-      {/* ─── GEWICHT ─────────────────────────────────────── */}
-      <div className="bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] p-5 animate-slide-up stagger-2">
-        <div className="flex items-center gap-2 mb-4">
-          <Scale size={18} strokeWidth={1.5} className="text-[#FDFDFE]" />
-          <span className="text-[13px] font-semibold text-[#FDFDFE] uppercase tracking-[0.06em]">Gewicht</span>
+      {/* ─── GEWICHT — hero card ─────────────────────────── */}
+      <div className="p-6 animate-slide-up stagger-2" style={LIGHT_CARD}>
+        <div className="flex items-center gap-2 mb-5">
+          <Scale size={14} strokeWidth={1.75} className="text-[rgba(253,253,254,0.55)]" />
+          <span style={LABEL_STYLE}>Gewicht</span>
         </div>
 
-        <div className="flex items-end gap-3">
-          <div className="flex-1">
-            <input
-              type="text"
-              inputMode="decimal"
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              placeholder="0.0"
-              className="w-full text-[32px] font-bold text-[#FDFDFE] bg-transparent border-b-2 border-[rgba(253,253,254,0.08)] focus:border-[#FDFDFE] outline-none pb-1 transition-colors placeholder-[rgba(253,253,254,0.35)]"
-            />
-          </div>
-          <span className="text-[16px] text-[rgba(253,253,254,0.55)] font-medium pb-2">kg</span>
+        <div className="flex items-baseline gap-2">
+          <input
+            type="text"
+            inputMode="decimal"
+            value={weight}
+            onChange={(e) => setWeight(e.target.value)}
+            placeholder="0.0"
+            className="flex-1 min-w-0 text-[44px] leading-none font-semibold text-[#FDFDFE] bg-transparent outline-none tracking-tight placeholder-[rgba(253,253,254,0.28)]"
+          />
+          <span className="text-[16px] text-[rgba(253,253,254,0.55)] font-medium">kg</span>
         </div>
 
-        {lastWeight && (
-          <p className="text-[13px] text-[rgba(253,253,254,0.55)] mt-2">
-            Vorige: {lastWeight} kg
-            {weightDiff !== null && weightDiff !== 0 && (
-              <span className={`ml-2 font-semibold ${weightDiff < 0 ? 'text-[#2FA65A]' : 'text-[#C0FC01]'}`}>
-                {weightDiff > 0 ? '+' : ''}{weightDiff} kg
+        <div className="mt-4 pt-3 border-t border-[rgba(253,253,254,0.12)]">
+          {lastWeight ? (
+            <div className="flex items-center justify-between">
+              <span className="text-[12px] text-[rgba(253,253,254,0.55)]">
+                Vorige week · {lastWeight} kg
               </span>
-            )}
-          </p>
-        )}
+              {weightDiff !== null && weightDiff !== 0 && (
+                <span
+                  className={`text-[12px] font-semibold tabular-nums ${
+                    weightDiff < 0 ? 'text-[#2FA65A]' : 'text-[rgba(253,253,254,0.72)]'
+                  }`}
+                >
+                  {weightDiff > 0 ? '+' : ''}{weightDiff} kg
+                </span>
+              )}
+            </div>
+          ) : (
+            <span className="text-[12px] text-[rgba(253,253,254,0.44)]">
+              Je eerste wekelijkse meting
+            </span>
+          )}
+        </div>
       </div>
 
-      {/* ─── FOTO ────────────────────────────────────────── */}
-      <div className="bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] p-5 animate-slide-up stagger-3">
+      {/* ─── FOTO ──────────────────────────────────────── */}
+      <div className="p-5 animate-slide-up stagger-3" style={LIGHT_CARD}>
         <div className="flex items-center gap-2 mb-4">
-          <Camera size={18} strokeWidth={1.5} className="text-[#FDFDFE]" />
-          <span className="text-[13px] font-semibold text-[#FDFDFE] uppercase tracking-[0.06em]">Foto vooraanzicht</span>
-          <span className="text-[11px] text-[rgba(253,253,254,0.55)] ml-auto">optioneel</span>
+          <Camera size={14} strokeWidth={1.75} className="text-[rgba(253,253,254,0.55)]" />
+          <span style={LABEL_STYLE}>Foto vooraanzicht</span>
+          <span className="ml-auto text-[10px] text-[rgba(253,253,254,0.44)] font-medium">Optioneel</span>
         </div>
 
         <input
@@ -194,33 +220,46 @@ export default function WeeklyCheckInPage() {
         />
 
         {photoPreview ? (
-          <div className="relative">
-            <Image src={photoPreview} alt="Preview" width={400} height={300} className="w-full max-h-[300px] object-cover border border-[rgba(253,253,254,0.08)]" unoptimized loading="lazy" />
+          <div className="relative overflow-hidden rounded-[18px]">
+            <Image
+              src={photoPreview}
+              alt="Preview"
+              width={400}
+              height={300}
+              className="w-full max-h-[320px] object-cover"
+              unoptimized
+              loading="lazy"
+            />
             <button
-              onClick={() => { setPhoto(null); setPhotoPreview(null) }}
-              className="absolute top-2 right-2 w-8 h-8 bg-[#474B48]/70 text-white flex items-center justify-center text-[14px]"
+              onClick={() => {
+                setPhoto(null)
+                setPhotoPreview(null)
+              }}
+              className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-[#474B48]/80 text-[#FDFDFE] flex items-center justify-center hover:bg-[#474B48] transition-colors"
+              aria-label="Verwijder foto"
             >
-              &times;
+              <X size={16} strokeWidth={2} />
             </button>
           </div>
         ) : (
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full py-8 border-2 border-dashed border-[rgba(253,253,254,0.08)] hover:border-[rgba(253,253,254,0.48)] transition-colors flex flex-col items-center gap-2"
+            className="w-full py-10 rounded-[18px] border border-dashed border-[rgba(253,253,254,0.22)] hover:border-[rgba(253,253,254,0.48)] hover:bg-[rgba(253,253,254,0.04)] transition-all flex flex-col items-center gap-2.5"
           >
-            <Camera size={24} strokeWidth={1.5} className="text-[rgba(253,253,254,0.55)]" />
-            <span className="text-[13px] text-[rgba(253,253,254,0.55)]">Tik om foto te nemen</span>
+            <div className="w-11 h-11 rounded-full bg-[rgba(253,253,254,0.10)] flex items-center justify-center">
+              <Camera size={18} strokeWidth={1.75} className="text-[rgba(253,253,254,0.72)]" />
+            </div>
+            <span className="text-[13px] text-[rgba(253,253,254,0.72)] font-medium">Tik om foto te nemen</span>
           </button>
         )}
       </div>
 
-      {/* ─── HOE GAAT HET ────────────────────────────────── */}
-      <div className="bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] p-5 space-y-6 animate-slide-up stagger-4">
-        <span className="text-[13px] font-semibold text-[#FDFDFE] uppercase tracking-[0.06em]">
-          Hoe was je week?
-        </span>
+      {/* ─── HOE WAS JE WEEK ─────────────────────────────── */}
+      <div className="p-6 space-y-6 animate-slide-up stagger-4" style={LIGHT_CARD}>
+        <div className="flex items-center gap-2">
+          <span style={LABEL_STYLE}>Hoe was je week</span>
+        </div>
 
-        {/* Energy */}
         <RatingRow
           label="Energieniveau"
           value={energy}
@@ -228,7 +267,6 @@ export default function WeeklyCheckInPage() {
           labels={RATING_LABELS.energy}
         />
 
-        {/* Sleep */}
         <RatingRow
           label="Slaapkwaliteit"
           value={sleep}
@@ -236,7 +274,6 @@ export default function WeeklyCheckInPage() {
           labels={RATING_LABELS.sleep}
         />
 
-        {/* Nutrition adherence */}
         <RatingRow
           label="Voeding gevolgd"
           value={nutritionRating}
@@ -246,35 +283,35 @@ export default function WeeklyCheckInPage() {
       </div>
 
       {/* ─── NOTITIES ────────────────────────────────────── */}
-      <div className="bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] p-5 animate-slide-up stagger-5">
-        <label className="block text-[13px] font-semibold text-[#FDFDFE] uppercase tracking-[0.06em] mb-3">
-          Iets te melden?
-          <span className="text-[11px] text-[rgba(253,253,254,0.55)] ml-2 normal-case tracking-normal font-normal">optioneel</span>
-        </label>
+      <div className="p-5 animate-slide-up stagger-5" style={LIGHT_CARD}>
+        <div className="flex items-center gap-2 mb-3">
+          <span style={LABEL_STYLE}>Iets te melden</span>
+          <span className="ml-auto text-[10px] text-[rgba(253,253,254,0.44)] font-medium">Optioneel</span>
+        </div>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Hoe voel je je? Pijnklachten? Vragen voor je coach?"
           rows={3}
-          className="w-full px-3 py-2.5 bg-[rgba(253,253,254,0.08)] border border-[rgba(253,253,254,0.08)] text-[14px] placeholder-[rgba(253,253,254,0.48)] focus:outline-none focus:border-[#FDFDFE] resize-none"
+          className="w-full px-3.5 py-3 bg-[rgba(253,253,254,0.08)] rounded-[14px] text-[14px] text-[#FDFDFE] placeholder-[rgba(253,253,254,0.44)] focus:outline-none focus:bg-[rgba(253,253,254,0.12)] transition-colors resize-none"
         />
       </div>
 
-      {/* ─── SUBMIT ──────────────────────────────────────── */}
+      {/* ─── SUBMIT — ink pill ──────────────────────────── */}
       <button
         onClick={handleSubmit}
         disabled={submitting || !weight.trim()}
-        className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#474B48] text-white font-semibold uppercase tracking-wider text-[15px] hover:bg-[#3A3E3B] transition-colors disabled:opacity-40 animate-slide-up stagger-6"
+        className="w-full flex items-center justify-center gap-2 py-4 rounded-full bg-[#FDFDFE] text-[#2A2D2B] font-semibold text-[14px] uppercase tracking-[0.12em] hover:bg-[#F5F5F5] transition-colors disabled:opacity-40 disabled:cursor-not-allowed animate-slide-up stagger-6"
       >
         {submitting ? (
           <>
-            <Loader2 size={18} className="animate-spin" />
-            Versturen...
+            <Loader2 size={16} className="animate-spin" />
+            Versturen
           </>
         ) : (
           <>
             Check-in versturen
-            <ChevronRight size={18} strokeWidth={2} />
+            <ChevronRight size={16} strokeWidth={2.25} />
           </>
         )}
       </button>
@@ -282,9 +319,14 @@ export default function WeeklyCheckInPage() {
   )
 }
 
-// ─── Rating Row Component ─────────────────────────────────
+// ─── Rating Row Component — v6 segmented pill ─────────────
 
-function RatingRow({ label, value, onChange, labels }: {
+function RatingRow({
+  label,
+  value,
+  onChange,
+  labels,
+}: {
   label: string
   value: number
   onChange: (v: number) => void
@@ -293,25 +335,39 @@ function RatingRow({ label, value, onChange, labels }: {
   return (
     <div>
       <div className="flex items-center justify-between mb-2.5">
-        <span className="text-[14px] text-[#FDFDFE]">{label}</span>
-        {value > 0 && (
-          <span className="text-[12px] text-[rgba(253,253,254,0.55)]">{labels[value - 1]}</span>
-        )}
+        <span className="text-[14px] text-[#FDFDFE] font-medium">{label}</span>
+        <span className="text-[11px] text-[rgba(253,253,254,0.55)] min-h-[16px]">
+          {value > 0 ? labels[value - 1] : '—'}
+        </span>
       </div>
-      <div className="flex gap-2">
-        {[1, 2, 3, 4, 5].map((n) => (
-          <button
-            key={n}
-            onClick={() => onChange(n === value ? 0 : n)}
-            className={`flex-1 py-2.5 text-[14px] font-semibold transition-all ${
-              n <= value
-                ? 'bg-[#474B48] text-white'
-                : 'bg-[rgba(253,253,254,0.08)] text-[rgba(253,253,254,0.55)] hover:bg-[rgba(253,253,254,0.08)]'
-            }`}
-          >
-            {n}
-          </button>
-        ))}
+      <div
+        className="flex gap-1 p-1 rounded-full"
+        style={{ background: 'rgba(253,253,254,0.08)' }}
+      >
+        {[1, 2, 3, 4, 5].map((n) => {
+          const active = n <= value
+          const current = n === value
+          return (
+            <button
+              key={n}
+              onClick={() => onChange(n === value ? 0 : n)}
+              className={`flex-1 py-2 rounded-full text-[13px] font-semibold tabular-nums transition-all ${
+                current
+                  ? 'bg-[#FDFDFE] text-[#2A2D2B] shadow-sm'
+                  : active
+                  ? 'text-[#FDFDFE]'
+                  : 'text-[rgba(253,253,254,0.44)]'
+              }`}
+              style={
+                active && !current
+                  ? { background: 'rgba(253,253,254,0.18)' }
+                  : undefined
+              }
+            >
+              {n}
+            </button>
+          )
+        })}
       </div>
     </div>
   )

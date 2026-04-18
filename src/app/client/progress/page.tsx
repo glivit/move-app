@@ -1041,13 +1041,17 @@ export default function ProgressPage() {
                 </div>
 
                 {momentum.map((m, i) => (
-                  <div
+                  <Link
                     key={m.exercise}
+                    href={`/client/progress/exercise/${m.exerciseId}`}
                     className="flex items-center"
                     style={{
                       gap: 14,
                       padding: '10px 0',
                       borderTop: i > 0 ? '1px solid rgba(253,253,254,0.06)' : 'none',
+                      textDecoration: 'none',
+                      color: 'inherit',
+                      WebkitTapHighlightColor: 'transparent',
                     }}
                   >
                     <div
@@ -1091,7 +1095,7 @@ export default function ProgressPage() {
                         {m.delta > 0 ? '+' : ''}{m.delta} kg
                       </span>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </>
@@ -1304,8 +1308,9 @@ export default function ProgressPage() {
               {mainLifts.map((lift) => {
                 const positive = lift.delta > 0
                 return (
-                  <div
+                  <Link
                     key={lift.exerciseId}
+                    href={`/client/progress/exercise/${lift.exerciseId}`}
                     style={{
                       background: '#A6ADA7',
                       padding: '16px 16px 14px',
@@ -1315,6 +1320,9 @@ export default function ProgressPage() {
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
+                      textDecoration: 'none',
+                      color: 'inherit',
+                      WebkitTapHighlightColor: 'transparent',
                     }}
                   >
                     <div>
@@ -1379,7 +1387,7 @@ export default function ProgressPage() {
                         {positive ? '+' : ''}{lift.delta} kg
                       </span>
                     </div>
-                  </div>
+                  </Link>
                 )
               })}
             </div>
@@ -1515,8 +1523,9 @@ export default function ProgressPage() {
               {filteredExercises.map((ex, i) => {
                 const isPlus = ex.current > 0 && ex.rawBodyPart.toLowerCase().includes('bodyweight')
                 return (
-                  <div
+                  <Link
                     key={ex.exerciseId}
+                    href={`/client/progress/exercise/${ex.exerciseId}`}
                     style={{
                       display: 'grid',
                       gridTemplateColumns: '1fr 64px auto',
@@ -1524,6 +1533,9 @@ export default function ProgressPage() {
                       gap: 12,
                       padding: '14px 18px',
                       borderTop: i > 0 ? '1px solid rgba(0,0,0,0.08)' : 'none',
+                      textDecoration: 'none',
+                      color: 'inherit',
+                      WebkitTapHighlightColor: 'transparent',
                     }}
                   >
                     <div style={{ minWidth: 0 }}>
@@ -1576,7 +1588,7 @@ export default function ProgressPage() {
                         kg
                       </small>
                     </div>
-                  </div>
+                  </Link>
                 )
               })}
             </div>

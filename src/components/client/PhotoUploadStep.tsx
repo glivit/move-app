@@ -325,16 +325,34 @@ export function PhotoUploadStep({ photos, onChange, showSilhouette = true }: Pro
         />
       )}
 
-      <div>
-        <h3 className="font-semibold text-[20px] text-[#FDFDFE]">Foto&apos;s</h3>
-        <p className="text-[13px] text-[rgba(253,253,254,0.55)] mt-1">
-          Nuchter, zelfde ondergoed, zelfde locatie, ochtendlicht
+      <div
+        className="px-5 py-4"
+        style={{
+          background: '#A6ADA7',
+          borderRadius: 24,
+          boxShadow:
+            'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+        }}
+      >
+        <div className="flex items-center gap-2 mb-2">
+          <span
+            style={{
+              fontSize: 10,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              color: 'rgba(253,253,254,0.44)',
+              fontWeight: 600,
+            }}
+          >
+            4 posities
+          </span>
+          <span className="ml-auto text-[11px] font-semibold text-[#FDFDFE] tabular-nums">
+            {completedCount}/4
+          </span>
+        </div>
+        <p className="text-[13px] text-[rgba(253,253,254,0.72)] leading-relaxed">
+          Nuchter, zelfde ondergoed, zelfde locatie, ochtendlicht.
         </p>
-        {completedCount > 0 && (
-          <p className="text-[12px] font-semibold text-[var(--color-pop)] mt-1">
-            {completedCount}/4 foto&apos;s genomen
-          </p>
-        )}
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -356,7 +374,7 @@ export function PhotoUploadStep({ photos, onChange, showSilhouette = true }: Pro
 
               {hasPhoto ? (
                 /* ── Photo taken ── */
-                <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[#474B48]">
+                <div className="relative aspect-[3/4] rounded-[20px] overflow-hidden bg-[#474B48]">
                   <Image src={previews[key]} alt={label} width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
                   <button
                     onClick={() => handleRemove(key)}
@@ -377,7 +395,11 @@ export function PhotoUploadStep({ photos, onChange, showSilhouette = true }: Pro
                 /* ── Empty state — tap opens custom camera ── */
                 <button
                   onClick={() => setCameraActive(key)}
-                  className="aspect-[3/4] w-full rounded-2xl border-2 border-dashed border-[rgba(253,253,254,0.22)] hover:border-[#C0FC01]/60 flex flex-col items-center justify-center transition-all bg-[#A6ADA7] relative overflow-hidden group"
+                  className="aspect-[3/4] w-full rounded-[20px] border border-dashed border-[rgba(253,253,254,0.22)] hover:border-[rgba(253,253,254,0.48)] flex flex-col items-center justify-center transition-all bg-[#A6ADA7] relative overflow-hidden group"
+                  style={{
+                    boxShadow:
+                      'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+                  }}
                 >
                   {showSilhouette && (
                     <div className="absolute inset-0 flex items-center justify-center opacity-25 group-hover:opacity-40 transition-opacity">
@@ -400,9 +422,30 @@ export function PhotoUploadStep({ photos, onChange, showSilhouette = true }: Pro
         })}
       </div>
 
-      <div className="bg-[#A6ADA7] rounded-xl p-3.5">
+      <div
+        className="p-4"
+        style={{
+          background: '#A6ADA7',
+          borderRadius: 24,
+          boxShadow:
+            'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+        }}
+      >
+        <div className="flex items-center gap-2 mb-2">
+          <span
+            style={{
+              fontSize: 10,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              color: 'rgba(253,253,254,0.44)',
+              fontWeight: 600,
+            }}
+          >
+            Tip
+          </span>
+        </div>
         <p className="text-[12px] text-[#FDFDFE] leading-relaxed">
-          <span className="font-semibold">Tip:</span> Zet je telefoon op ooghoogte met de timer (3s). Gebruik dezelfde plek en belichting voor de beste vergelijking.
+          Zet je telefoon op ooghoogte met de timer (3s). Gebruik dezelfde plek en belichting voor de beste vergelijking.
         </p>
       </div>
     </div>
