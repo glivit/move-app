@@ -71,8 +71,8 @@ export default function PushTestPage() {
   async function forceSubscribe() {
     setSubStatus('Bezig...')
     try {
-      // Register SW
-      const reg = await navigator.serviceWorker.register('/sw.js')
+      // Register SW — Serwist route-handler variant.
+      const reg = await navigator.serviceWorker.register('/serwist/sw.js', { scope: '/' })
       await navigator.serviceWorker.ready
 
       // Request permission

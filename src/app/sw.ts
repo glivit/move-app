@@ -1,15 +1,22 @@
 /// <reference lib="webworker" />
 
 /**
- * Service Worker source — gecompileerd naar /public/sw.js door @serwist/next.
+ * Service Worker source — geserveerd via Route Handler op
+ *   /serwist/sw.js  (zie src/app/serwist/[path]/route.ts)
+ *
+ * Onder @serwist/turbopack (Next 16) is er geen statisch /public/sw.js
+ * bestand meer: createSerwistRoute() compileert deze source on-demand
+ * en stuurt de juiste `Service-Worker-Allowed: /` header mee zodat de
+ * SW vanuit /serwist/ toch scope '/' krijgt.
  *
  * Fase 3 offline-first: Serwist genereert een precache-manifest voor ALLE
  * Next.js build-assets (JS chunks, CSS, HTML) zodat een warm-open offline
  * kan werken en cold-open geen round-trip nodig heeft voor de app-bundle.
  *
  * Custom handlers hieronder zijn 1-op-1 geport van de oude handwritten
- * /public/sw.js — push notifications, notification click, badge API,
- * en message-based cache clear.
+ * public/sw.js — push notifications, notification click, badge API,
+ * en message-based cache clear. Die legacy file is vervangen door een
+ * self-unregister stub zodat pre-migratie clients schoon ontkoppelen.
  *
  * BELANGRIJK — skipWaiting-beleid:
  *   We zetten `skipWaiting: false`. Dat betekent: wanneer een nieuwe SW

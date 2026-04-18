@@ -34,7 +34,11 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
   if (!('serviceWorker' in navigator)) return null
 
   try {
-    const registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' })
+    // Sinds de Serwist-migratie wordt de SW geserveerd vanuit een Route
+    // Handler op /serwist/sw.js (zie src/app/serwist/[path]/route.ts).
+    // De scope blijft '/' omdat createSerwistRoute() de Service-Worker-Allowed
+    // header automatisch meestuurt.
+    const registration = await navigator.serviceWorker.register('/serwist/sw.js', { scope: '/' })
     return registration
   } catch (error) {
     console.error('[Push] Service Worker registratie mislukt:', error)

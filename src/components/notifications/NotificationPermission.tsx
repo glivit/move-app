@@ -71,8 +71,8 @@ export function NotificationPermission() {
   async function subscribe() {
     setLoading(true)
     try {
-      // Register SW if not already
-      await navigator.serviceWorker.register('/sw.js')
+      // Register SW if not already — Serwist route-handler variant.
+      await navigator.serviceWorker.register('/serwist/sw.js', { scope: '/' })
       await navigator.serviceWorker.ready
 
       // Request permission (must be from user gesture — this is a click handler)
