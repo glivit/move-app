@@ -1,10 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
-import { Plus, Archive, ArchiveRestore } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { Archive, ArchiveRestore, Plus } from 'lucide-react'
 
 export interface ProgramTemplate {
   id: string
@@ -17,174 +16,263 @@ export interface ProgramTemplate {
   is_archived: boolean
 }
 
-const difficultyLabels: Record<string, string> = {
-  beginner: 'Beginner',
-  intermediate: 'Intermediate',
-  advanced: 'Gevorderd',
-}
-
-const difficultyColors: Record<string, string> = {
-  beginner: 'bg-blue-100 text-blue-700',
-  intermediate: 'bg-yellow-100 text-yellow-700',
-  advanced: 'bg-orange-100 text-orange-700',
-}
-
 interface ProgramsViewProps {
   initialPrograms: ProgramTemplate[]
 }
 
+// ─── Difficulty mapping (v3 Orion tones) ─────────────────────────
+// beginner  → lime    (#C0FC01)
+// intermediate → amber (#E8A93C)
+// advanced  → blue    (#A4C7F2)
+const DIFFICULTY: Record<
+  string,
+  { label: string; color: string; bg: string }
+> = {
+  beginner: {
+    label: 'Beginner',
+    color: '#C0FC01',
+    bg: 'rgba(192,252,1,0.12)',
+  },
+  intermediate: {
+    label: 'Intermediate',
+    color: '#E8A93C',
+    bg: 'rgba(232,169,60,0.14)',
+  },
+  advanced: {
+    label: 'Gevorderd',
+    color: '#A4C7F2',
+    bg: 'rgba(164,199,242,0.14)',
+  },
+}
+
+function diffKey(d: string): keyof typeof DIFFICULTY {
+  if (d in DIFFICULTY) return d as keyof typeof DIFFICULTY
+  return 'beginner'
+}
+
+/**
+ * Coach · Programma's (v3 Orion).
+ * Dark cards op canvas, dark-pill "Nieuw programma" CTA, v3 tone chips.
+ */
 export default function ProgramsView({ initialPrograms }: ProgramsViewProps) {
   const [programs, setPrograms] = useState<ProgramTemplate[]>(initialPrograms)
   const [showArchived, setShowArchived] = useState(false)
   const supabase = createClient()
 
-  const filteredPrograms = showArchived
-    ? programs
-    : programs.filter((p) => !p.is_archived)
+  const filteredPrograms = useMemo(
+    () => (showArchived ? programs : programs.filter((p) => !p.is_archived)),
+    [programs, showArchived]
+  )
+
+  const activeCount = programs.filter((p) => !p.is_archived).length
+  const archivedCount = programs.length - activeCount
 
   const handleArchiveToggle = async (program: ProgramTemplate) => {
+    // Optimistic update
+    setPrograms((prev) =>
+      prev.map((p) =>
+        p.id === program.id ? { ...p, is_archived: !p.is_archived } : p
+      )
+    )
     try {
       const { error } = await supabase
         .from('program_templates')
         .update({ is_archived: !program.is_archived })
         .eq('id', program.id)
-
       if (error) throw error
-
-      setPrograms(
-        programs.map((p) =>
-          p.id === program.id ? { ...p, is_archived: !p.is_archived } : p
+    } catch (error) {
+      // Rollback on error
+      setPrograms((prev) =>
+        prev.map((p) =>
+          p.id === program.id ? { ...p, is_archived: program.is_archived } : p
         )
       )
-    } catch (error) {
       console.error('Failed to update program:', error)
     }
   }
 
   return (
-    <div className="min-h-screen bg-[#A6ADA7] p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
+    <div className="pb-32">
+      {/* Header */}
+      <div className="flex items-start justify-between pb-[22px] px-0.5 gap-3">
+        <div className="min-w-0">
           <h1
-            className="text-[32px] font-display font-semibold text-[#FDFDFE] mb-4"
+            className="text-[30px] font-light tracking-[-0.025em] leading-[1.1] text-[#FDFDFE]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
             Programma&apos;s
           </h1>
-
-          {/* Top Actions */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={showArchived}
-                  onChange={(e) => setShowArchived(e.target.checked)}
-                  className="w-4 h-4 rounded border border-[#D0D0CC] text-[#FDFDFE]"
-                />
-                <span className="text-[15px] text-[#D6D9D6]">Gearchiveerde tonen</span>
-              </label>
-            </div>
-
-            <Link href="/coach/programs/new">
-              <Button>
-                <Plus strokeWidth={1.5} className="w-5 h-5 mr-2" />
-                Nieuw programma
-              </Button>
-            </Link>
+          <div className="mt-1.5 text-[12px] tracking-[0.04em] text-[rgba(253,253,254,0.62)]">
+            {activeCount} {activeCount === 1 ? 'template' : 'templates'}
+            {archivedCount > 0 && ` · ${archivedCount} gearchiveerd`}
           </div>
         </div>
 
-        {/* Programs Grid */}
-        {filteredPrograms.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-[15px] text-[#D6D9D6] mb-4">
-              {showArchived ? 'Geen gearchiveerde programma\'s' : 'Nog geen programma\'s'}
-            </p>
-            {!showArchived && (
-              <Link href="/coach/programs/new">
-                <Button variant="secondary">
-                  Maak je eerste programma
-                </Button>
-              </Link>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredPrograms.map((program) => (
-              <Link key={program.id} href={`/coach/programs/${program.id}`}>
-                <div className="bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] p-6 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] transition-shadow cursor-pointer h-full flex flex-col">
-                  {/* Header with Archive Button */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h3 className="text-[17px] font-semibold text-[#FDFDFE] mb-1">
-                        {program.name}
-                      </h3>
-                      {program.description && (
-                        <p className="text-[13px] text-[#D6D9D6] line-clamp-2">
-                          {program.description}
-                        </p>
-                      )}
-                    </div>
+        <Link
+          href="/coach/programs/new"
+          className="inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-[13px] font-medium whitespace-nowrap shrink-0 transition-opacity active:opacity-70"
+          style={{
+            background: '#474B48',
+            color: '#FDFDFE',
+            boxShadow:
+              'inset 0 1px 0 rgba(255,255,255,0.06), 0 1px 2px rgba(0,0,0,0.10)',
+          }}
+        >
+          <Plus strokeWidth={1.75} className="w-4 h-4" />
+          Nieuw programma
+        </Link>
+      </div>
 
-                    {/* Archive Toggle Button */}
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        handleArchiveToggle(program)
-                      }}
-                      className="p-2 text-[#D6D9D6] hover:text-[#FDFDFE] hover:bg-[#A6ADA7] rounded-lg transition-colors ml-2 flex-shrink-0"
-                      title={program.is_archived ? 'Archivering opheffen' : 'Archiveren'}
-                    >
-                      {program.is_archived ? (
-                        <ArchiveRestore strokeWidth={1.5} className="w-5 h-5" />
-                      ) : (
-                        <Archive strokeWidth={1.5} className="w-5 h-5" />
-                      )}
-                    </button>
-                  </div>
+      {/* Toggle archived */}
+      <label className="flex items-center gap-2 mb-4 cursor-pointer select-none px-0.5">
+        <span
+          className={`inline-flex items-center justify-center w-[18px] h-[18px] rounded-[6px] transition-colors ${
+            showArchived ? 'bg-[#C0FC01]' : 'bg-[rgba(253,253,254,0.10)]'
+          }`}
+        >
+          {showArchived && (
+            <svg
+              viewBox="0 0 24 24"
+              className="w-3 h-3"
+              stroke="#0A0E0B"
+              strokeWidth="3"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          )}
+        </span>
+        <input
+          type="checkbox"
+          checked={showArchived}
+          onChange={(e) => setShowArchived(e.target.checked)}
+          className="sr-only"
+        />
+        <span className="text-[12.5px] text-[rgba(253,253,254,0.72)] tracking-[0.01em]">
+          Gearchiveerde tonen
+        </span>
+      </label>
 
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {/* Difficulty Badge */}
-                    <span
-                      className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${
-                        difficultyColors[program.difficulty] || difficultyColors.beginner
+      {/* Programs list */}
+      {filteredPrograms.length === 0 ? (
+        <div className="bg-[rgba(71,75,72,0.55)] rounded-[18px] px-6 py-10 text-center">
+          <p className="text-[14px] text-[rgba(253,253,254,0.62)] mb-4">
+            {showArchived
+              ? 'Geen gearchiveerde programma\'s'
+              : 'Nog geen programma\'s'}
+          </p>
+          {!showArchived && (
+            <Link
+              href="/coach/programs/new"
+              className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[12.5px] font-medium bg-[rgba(192,252,1,0.14)] text-[#C0FC01]"
+            >
+              <Plus strokeWidth={1.75} className="w-3.5 h-3.5" />
+              Maak je eerste programma
+            </Link>
+          )}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {filteredPrograms.map((program) => {
+            const d = DIFFICULTY[diffKey(program.difficulty)]
+            const isArch = program.is_archived
+            return (
+              <div
+                key={program.id}
+                className={`group relative rounded-[18px] px-[16px] py-[14px] transition-colors ${
+                  isArch
+                    ? 'bg-[rgba(71,75,72,0.45)]'
+                    : 'bg-[#474B48] active:bg-[#4d524e]'
+                }`}
+              >
+                <Link
+                  href={`/coach/programs/${program.id}`}
+                  className="block pr-8"
+                >
+                  <div className="flex items-start justify-between gap-3 mb-1">
+                    <h3
+                      className={`text-[15.5px] font-medium tracking-[-0.005em] truncate flex-1 ${
+                        isArch
+                          ? 'text-[rgba(253,253,254,0.55)]'
+                          : 'text-[#FDFDFE]'
                       }`}
                     >
-                      {difficultyLabels[program.difficulty] || program.difficulty}
-                    </span>
+                      {program.name}
+                    </h3>
+                  </div>
+                  {program.description && (
+                    <p
+                      className={`text-[12.5px] leading-[1.42] tracking-[-0.005em] m-0 ${
+                        isArch
+                          ? 'text-[rgba(253,253,254,0.38)]'
+                          : 'text-[rgba(253,253,254,0.62)]'
+                      }`}
+                      style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      {program.description}
+                    </p>
+                  )}
 
-                    {/* Duration and Frequency */}
-                    <span className="text-[11px] bg-[#A6ADA7] text-[#FDFDFE] font-medium px-2.5 py-1 rounded-full">
+                  {/* Meta chips */}
+                  <div className="flex items-center gap-1.5 flex-wrap mt-2.5">
+                    <span
+                      className="inline-flex items-center rounded-full px-2.5 py-[3px] text-[10.5px] font-medium tracking-[0.02em]"
+                      style={{ background: d.bg, color: d.color }}
+                    >
+                      {d.label}
+                    </span>
+                    <span className="inline-flex items-center rounded-full px-2.5 py-[3px] text-[10.5px] font-medium bg-[rgba(253,253,254,0.06)] text-[rgba(253,253,254,0.62)]">
                       {program.duration_weeks}w
                     </span>
-                    <span className="text-[11px] bg-[#A6ADA7] text-[#FDFDFE] font-medium px-2.5 py-1 rounded-full">
+                    <span className="inline-flex items-center rounded-full px-2.5 py-[3px] text-[10.5px] font-medium bg-[rgba(253,253,254,0.06)] text-[rgba(253,253,254,0.62)]">
                       {program.days_per_week}d/w
                     </span>
                   </div>
 
-                  {/* Custom Tags */}
+                  {/* Custom tags — muted */}
                   {program.tags && program.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {program.tags.map((tag) => (
+                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      {program.tags.slice(0, 4).map((tag) => (
                         <span
                           key={tag}
-                          className="text-[11px] bg-[#A6ADA7] text-[#D6D9D6] px-2.5 py-1 rounded-full"
+                          className="text-[10px] text-[rgba(253,253,254,0.44)] tracking-[0.02em]"
                         >
-                          {tag}
+                          #{tag}
                         </span>
                       ))}
                     </div>
                   )}
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
+                </Link>
+
+                {/* Archive toggle — pinned top-right */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    handleArchiveToggle(program)
+                  }}
+                  className="absolute top-[12px] right-[12px] w-8 h-8 rounded-full flex items-center justify-center text-[rgba(253,253,254,0.44)] hover:text-[#FDFDFE] hover:bg-[rgba(253,253,254,0.06)] transition-colors"
+                  aria-label={isArch ? 'Archivering opheffen' : 'Archiveren'}
+                >
+                  {isArch ? (
+                    <ArchiveRestore strokeWidth={1.75} className="w-4 h-4" />
+                  ) : (
+                    <Archive strokeWidth={1.75} className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }
