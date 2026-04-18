@@ -56,8 +56,11 @@ export async function GET(request: NextRequest) {
         .eq('client_id', user.id)
         .eq('client_program_id', activeProgram.id)
         .not('completed_at', 'is', null)
-        .gte('started_at', weekStart.toISOString())
-        .lte('started_at', new Date().toISOString()),
+        // Filter op completed_at (niet started_at): een workout die eergisteren
+        // gestart is maar pas vandaag afgerond, hoort wél bij deze week. Op
+        // started_at filteren liet zulke sessies stil verdwijnen.
+        .gte('completed_at', weekStart.toISOString())
+        .lte('completed_at', new Date().toISOString()),
     ])
 
     const templateDays = templateDaysRes.data

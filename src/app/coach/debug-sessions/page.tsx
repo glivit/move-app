@@ -139,21 +139,44 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
     const now = new Date()
     const since = new Date(now.getTime() - days * 86400000)
 
-    const [{ data: programs }, { data: sessionsRaw }] = await Promise.all([
-      admin
-        .from('client_programs')
-        .select('id, name, is_active, schedule, template_id, start_date, end_date')
-        .eq('client_id', client.id)
-        .order('is_active', { ascending: false }),
-      admin
-        .from('workout_sessions')
-        .select(
-          'id, started_at, completed_at, template_day_id, client_program_id, duration_seconds, duration_minutes, mood_rating, difficulty_rating, feedback_text, coach_seen, notes',
-        )
-        .eq('client_id', client.id)
-        .gte('started_at', since.toISOString())
-        .order('started_at', { ascending: false }),
-    ])
+    const [{ data: programs }, { data: sessionsByStarted }, { data: sessionsByCompleted }] =
+      await Promise.all([
+        admin
+          .from('client_programs')
+          .select('id, name, is_active, schedule, template_id, start_date, end_date')
+          .eq('client_id', client.id)
+          .order('is_active', { ascending: false }),
+        // Sessions whose started_at is in the window
+        admin
+          .from('workout_sessions')
+          .select(
+            'id, started_at, completed_at, template_day_id, client_program_id, duration_seconds, duration_minutes, mood_rating, difficulty_rating, feedback_text, coach_seen, notes',
+          )
+          .eq('client_id', client.id)
+          .gte('started_at', since.toISOString())
+          .order('started_at', { ascending: false }),
+        // ALSO sessions whose completed_at is in the window — catches zombie-minimized
+        // sessions that were started long ago but finished recently.
+        admin
+          .from('workout_sessions')
+          .select(
+            'id, started_at, completed_at, template_day_id, client_program_id, duration_seconds, duration_minutes, mood_rating, difficulty_rating, feedback_text, coach_seen, notes',
+          )
+          .eq('client_id', client.id)
+          .gte('completed_at', since.toISOString())
+          .order('completed_at', { ascending: false }),
+      ])
+
+    // Merge + dedupe by id
+    const byId = new Map<string, SessionRow>()
+    for (const s of (sessionsByStarted as SessionRow[]) || []) byId.set(s.id, s)
+    for (const s of (sessionsByCompleted as SessionRow[]) || []) byId.set(s.id, s)
+    const sessionsRaw = Array.from(byId.values()).sort((a, b) => {
+      // Sort by most-recent (completed if present, else started)
+      const ta = new Date(a.completed_at || a.started_at).getTime()
+      const tb = new Date(b.completed_at || b.started_at).getTime()
+      return tb - ta
+    })
 
     allPrograms = (programs as ProgramRow[]) || []
     activeProgram = allPrograms.find((p) => p.is_active) || null
@@ -175,7 +198,7 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
       allPrograms.map((p) => [p.id, `${p.name || 'Onbekend'}${p.is_active ? ' · actief' : ''}`]),
     )
 
-    const sessionsTyped = (sessionsRaw as SessionRow[]) || []
+    const sessionsTyped = sessionsRaw
 
     const sessionIds = sessionsTyped.map((s) => s.id)
     let setsRows: Array<{ workout_session_id: string; completed: boolean | null }> = []
