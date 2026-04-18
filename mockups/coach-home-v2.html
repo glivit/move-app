@@ -1,0 +1,874 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MŌVE · Coach Cockpit v2 — 5 klanten, auto-diagnose, niet-tracker AI</title>
+<style>
+  :root {
+    --canvas: #8E9890;
+    --card-dark: #474B48;
+    --card-dark-2: #3e4240;
+    --card-dark-3: #2f3330;
+    --card-light: #A6ADA7;
+    --ink: #FDFDFE;
+    --ink-dark: #0A0E0B;
+    --ink-mute: rgba(253,253,254,0.64);
+    --ink-dim: rgba(253,253,254,0.42);
+    --ink-faint: rgba(253,253,254,0.22);
+    --hair: rgba(253,253,254,0.08);
+    --hair-2: rgba(253,253,254,0.14);
+    --lime: #C0FC01;
+    --lime-soft: rgba(192,252,1,0.14);
+    --amber: #E8A93C;
+    --amber-soft: rgba(232,169,60,0.14);
+    --good: #2FA65A;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #1e2221;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  .stage {
+    min-height: 100vh;
+    padding: 64px 32px 96px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 56px;
+    flex-wrap: wrap;
+  }
+
+  /* ---- iPhone frame ---- */
+  .device {
+    width: 393px;
+    height: 852px;
+    border-radius: 54px;
+    background: var(--canvas);
+    overflow: hidden;
+    box-shadow:
+      0 60px 120px -40px rgba(0,0,0,0.75),
+      0 30px 60px -30px rgba(0,0,0,0.6),
+      0 0 0 12px #0b0d0c,
+      0 0 0 13px #3a3e3c,
+      0 0 0 14px #1e2221;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 393px;
+  }
+  .device .dynamic-island {
+    position: absolute;
+    top: 11px; left: 50%;
+    transform: translateX(-50%);
+    width: 120px; height: 34px;
+    background: #000;
+    border-radius: 999px;
+    z-index: 20;
+  }
+  .scrollable {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
+    scrollbar-width: none;
+    position: relative;
+  }
+  .scrollable::-webkit-scrollbar { display: none; }
+
+  /* ---- Status bar ---- */
+  .statusbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 32px 8px;
+    font-size: 15px; font-weight: 600;
+    color: var(--ink);
+    flex-shrink: 0;
+  }
+  .statusbar .right { display: flex; gap: 6px; align-items: center; }
+  .signal-bars { display: flex; gap: 2px; align-items: flex-end; height: 10px; }
+  .signal-bars span { width: 3px; background: var(--ink); border-radius: 1px; }
+  .signal-bars span:nth-child(1) { height: 4px; }
+  .signal-bars span:nth-child(2) { height: 6px; }
+  .signal-bars span:nth-child(3) { height: 8px; }
+  .signal-bars span:nth-child(4) { height: 10px; }
+  .wifi-ico { width: 16px; height: 11px; }
+  .battery { width: 26px; height: 12px; border: 1.5px solid var(--ink); border-radius: 3px; position: relative; }
+  .battery::after { content: ''; position: absolute; right: -3px; top: 3px; width: 2px; height: 4px; background: var(--ink); border-radius: 0 1px 1px 0; }
+  .battery-fill { position: absolute; inset: 1px; width: 82%; background: var(--ink); border-radius: 1px; }
+
+  /* ---- Sections ---- */
+  .scroll-inner { padding: 0 20px 120px; }
+
+  .brand {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 4px 0;
+  }
+  .brand .logo {
+    font-size: 22px; font-weight: 500; letter-spacing: 0.08em;
+    color: var(--ink);
+  }
+  .brand .logo .mark { font-weight: 300; }
+  .brand .bell {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: rgba(253,253,254,0.10);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    color: var(--ink);
+  }
+  .brand .bell svg { width: 18px; height: 18px; stroke: var(--ink); stroke-width: 1.6; fill: none; }
+  .brand .bell .badge {
+    position: absolute; top: -2px; right: -2px;
+    min-width: 18px; height: 18px; border-radius: 999px;
+    background: var(--lime); color: var(--ink-dark);
+    font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 5px;
+    border: 2px solid var(--canvas);
+  }
+
+  /* greeting */
+  .greeting { padding: 28px 4px 0; }
+  .greeting .date {
+    font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 8px;
+  }
+  .greeting h1 {
+    margin: 0;
+    font-size: 36px; font-weight: 300; letter-spacing: -0.02em;
+    line-height: 1.05; color: var(--ink);
+  }
+
+  /* summary ribbon */
+  .ribbon {
+    margin-top: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 4px;
+    font-size: 12.5px;
+    color: var(--ink-mute);
+    letter-spacing: 0.01em;
+  }
+  .ribbon .dot-sep { opacity: 0.38; }
+  .ribbon strong { color: var(--ink); font-weight: 500; }
+  .ribbon .pulse {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--lime);
+    box-shadow: 0 0 0 3px rgba(192,252,1,0.18);
+    margin-right: 4px;
+  }
+
+  /* sort control */
+  .sort-row {
+    margin: 24px 4px 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+  .sort-row .sort {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--ink-mute);
+    letter-spacing: 0.04em;
+    text-transform: none;
+    font-size: 12.5px;
+  }
+  .sort-row .sort svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 1.8; fill: none; }
+
+  /* ===== Client cards ===== */
+  .client {
+    background: var(--card-dark);
+    border-radius: 22px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px 14px;
+    overflow: hidden;
+  }
+
+  .client .c-head {
+    display: flex; align-items: center; gap: 12px;
+    grid-column: 1 / -1;
+  }
+  .client .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #5c6361;
+    color: var(--ink);
+    font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+  }
+  .client .c-name {
+    display: flex; align-items: baseline; gap: 8px;
+    flex: 1; min-width: 0;
+  }
+  .client .c-name .name {
+    font-size: 15.5px; font-weight: 500; color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .client .c-name .tier {
+    font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase;
+    color: var(--ink-dim);
+  }
+  .client .c-msg {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(253,253,254,0.06);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-mute);
+    position: relative;
+  }
+  .client .c-msg svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 1.7; fill: none; }
+  .client .c-msg .bubble-dot {
+    position: absolute; top: 4px; right: 4px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--lime);
+    border: 2px solid var(--card-dark);
+  }
+
+  /* diagnose block */
+  .c-diag {
+    grid-column: 1 / span 1;
+    display: flex; flex-direction: column; gap: 4px;
+    min-width: 0;
+  }
+  .diag-label {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 4px 10px 4px 8px;
+    border-radius: 999px;
+    width: fit-content;
+  }
+  .diag-label.sterker { background: var(--lime-soft); color: var(--lime); }
+  .diag-label.zwakker { background: var(--amber-soft); color: var(--amber); }
+  .diag-label.stil    { background: var(--amber-soft); color: var(--amber); }
+  .diag-label.stabiel { background: rgba(253,253,254,0.08); color: var(--ink-mute); }
+  .diag-label.nieuw   { background: rgba(253,253,254,0.08); color: var(--ink); }
+  .diag-label svg { width: 11px; height: 11px; stroke: currentColor; stroke-width: 2.2; fill: none; }
+  .diag-meta {
+    font-size: 13px; color: var(--ink);
+    line-height: 1.35;
+    font-weight: 500;
+  }
+  .diag-sub {
+    font-size: 12px; color: var(--ink-mute);
+    line-height: 1.3;
+  }
+
+  /* mini chart */
+  .c-chart {
+    grid-column: 2 / -1;
+    grid-row: 2 / span 1;
+    width: 96px; height: 48px;
+    display: flex; align-items: flex-end;
+    position: relative;
+  }
+  .c-chart svg { width: 100%; height: 100%; overflow: visible; }
+  .c-chart polyline { fill: none; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
+  .c-chart .area { fill-opacity: 0.12; stroke: none; }
+  .c-chart .lime { stroke: var(--lime); }
+  .c-chart .amber { stroke: var(--amber); }
+  .c-chart .neutral { stroke: rgba(253,253,254,0.4); }
+  .c-chart .end-dot { }
+  .c-chart .unit {
+    position: absolute; right: 0; top: 0;
+    font-size: 9.5px; letter-spacing: 0.06em;
+    color: var(--ink-dim);
+    text-transform: uppercase;
+  }
+
+  /* today line */
+  .c-today {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--hair);
+    padding-top: 10px;
+    margin-top: 4px;
+    display: flex; align-items: center; gap: 12px;
+    font-size: 12.5px; color: var(--ink-mute);
+    flex-wrap: wrap;
+  }
+  .c-today .slot {
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .c-today .slot svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 1.8; fill: none; }
+  .c-today .slot.done { color: var(--lime); }
+  .c-today .slot.miss { color: var(--amber); }
+  .c-today .slot.pending { color: var(--ink-dim); }
+  .c-today .note {
+    margin-left: auto;
+    color: var(--ink-dim);
+    font-size: 12px;
+  }
+
+  /* ai nudge row, only for stil */
+  .c-ai {
+    grid-column: 1 / -1;
+    background: rgba(232,169,60,0.08);
+    border: 1px solid rgba(232,169,60,0.22);
+    border-radius: 14px;
+    padding: 10px 12px 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 2px;
+  }
+  .c-ai .ai-ico {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(232,169,60,0.22);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .c-ai .ai-ico svg { width: 13px; height: 13px; stroke: var(--amber); stroke-width: 1.8; fill: none; }
+  .c-ai .ai-body { flex: 1; min-width: 0; }
+  .c-ai .ai-title {
+    font-size: 12.5px; color: var(--ink); font-weight: 500;
+    line-height: 1.3;
+  }
+  .c-ai .ai-sub {
+    font-size: 11px; color: var(--ink-mute);
+    margin-top: 1px;
+    line-height: 1.3;
+  }
+  .c-ai .ai-send {
+    background: var(--amber);
+    color: var(--ink-dark);
+    font-size: 12px; font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+    cursor: pointer;
+    border: none;
+  }
+
+  /* action to take - sterker variant (congrats hint) */
+  .c-cta-hint {
+    grid-column: 1 / -1;
+    font-size: 11.5px;
+    color: var(--ink-dim);
+    margin-top: 2px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .c-cta-hint .lime-pulse {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--lime);
+    box-shadow: 0 0 0 3px rgba(192,252,1,0.18);
+  }
+  .c-cta-hint .amber-pulse {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 0 3px rgba(232,169,60,0.18);
+  }
+
+  /* section dividers between diagnosis groups */
+  .group-divider {
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--ink-dim);
+    margin: 18px 6px 8px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .group-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--hair);
+  }
+
+  /* tabbar - 3 tabs */
+  .tabbar {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: rgba(47,51,48,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(253,253,254,0.06);
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    padding: 10px 12px 26px;
+    z-index: 10;
+  }
+  .tab {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    color: var(--ink-dim);
+    font-size: 10.5px; letter-spacing: 0.04em;
+  }
+  .tab svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 1.6; fill: none; }
+  .tab.active { color: var(--ink); }
+  .tab.active .ico-wrap {
+    position: relative;
+  }
+  .tab.active .ico-wrap::after {
+    content: ''; position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%);
+    width: 3px; height: 3px; border-radius: 50%; background: var(--lime);
+  }
+  .tab .ico-wrap { position: relative; }
+  .tab .ico-wrap .inbox-badge {
+    position: absolute; top: -3px; right: -8px;
+    min-width: 14px; height: 14px; padding: 0 4px;
+    border-radius: 999px; background: var(--lime);
+    color: var(--ink-dark); font-size: 9px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #2F3330;
+  }
+
+  /* ---- Notes column ---- */
+  .notes {
+    max-width: 440px;
+    flex: 1 1 360px;
+    color: rgba(255,255,255,0.72);
+    font-size: 14px;
+    line-height: 1.6;
+    padding-top: 12px;
+  }
+  .notes h1 {
+    font-size: 32px; font-weight: 300; letter-spacing: -0.02em;
+    margin: 0 0 12px; color: white;
+  }
+  .notes h2 {
+    font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--lime); font-weight: 500;
+    margin: 28px 0 12px;
+  }
+  .notes h3 {
+    font-size: 15px; font-weight: 500; color: white;
+    margin: 20px 0 6px;
+  }
+  .notes p { margin: 0 0 12px; }
+  .notes strong, .notes b { color: white; font-weight: 500; }
+  .notes .item { margin-bottom: 14px; }
+  .notes .tag {
+    display: inline-block;
+    padding: 2px 8px; border-radius: 999px;
+    font-size: 11px; letter-spacing: 0.04em;
+    margin: 0 4px 4px 0;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.78);
+  }
+  .notes .tag.lime { background: var(--lime-soft); color: var(--lime); }
+  .notes .tag.amber { background: var(--amber-soft); color: var(--amber); }
+  .notes .tag.neutral { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.64); }
+  .notes hr { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 24px 0; }
+  .notes .callout {
+    background: rgba(192,252,1,0.08);
+    border: 1px solid rgba(192,252,1,0.18);
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.85);
+    margin: 16px 0;
+  }
+  .notes .callout b { color: var(--lime); }
+  .notes .comparison {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; margin: 12px 0;
+  }
+  .notes .comparison > div {
+    background: rgba(0,0,0,0.22);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+  .notes .comparison .old {
+    border-left: 3px solid rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.62);
+  }
+  .notes .comparison .new {
+    border-left: 3px solid var(--lime);
+    color: rgba(255,255,255,0.88);
+  }
+  .notes .comparison .hdr {
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 6px; font-weight: 500;
+  }
+
+  @media (max-width: 820px) {
+    .stage { padding: 40px 16px 80px; gap: 32px; }
+    .device { transform: scale(0.94); transform-origin: top center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <!-- ========= iPhone v2 ========= -->
+  <div class="device">
+    <div class="dynamic-island"></div>
+    <div class="scrollable">
+
+      <div class="statusbar">
+        <span>14:11</span>
+        <div class="right">
+          <div class="signal-bars"><span></span><span></span><span></span><span></span></div>
+          <svg class="wifi-ico" viewBox="0 0 16 11" fill="currentColor">
+            <path d="M8 11c.6 0 1-.4 1-1s-.4-1-1-1-1 .4-1 1 .4 1 1 1zM4.5 7.5a4.95 4.95 0 0 1 7 0l-1 1a3.54 3.54 0 0 0-5 0l-1-1zM2 5a8.49 8.49 0 0 1 12 0l-1 1a7.07 7.07 0 0 0-10 0L2 5z"/>
+          </svg>
+          <div class="battery"><div class="battery-fill"></div></div>
+        </div>
+      </div>
+
+      <div class="scroll-inner">
+
+        <!-- brand -->
+        <div class="brand">
+          <div class="logo"><span class="mark">M</span>ŌVE</div>
+          <div class="bell">
+            <svg viewBox="0 0 24 24"><path d="M18 16v-5a6 6 0 0 0-12 0v5l-2 2v1h16v-1l-2-2z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+            <span class="badge">3</span>
+          </div>
+        </div>
+
+        <!-- greeting -->
+        <div class="greeting">
+          <div class="date">Vrijdag 17 april</div>
+          <h1>Dag Glenn.</h1>
+        </div>
+
+        <!-- ribbon -->
+        <div class="ribbon">
+          <span class="pulse"></span>
+          <strong>5</strong>&nbsp;cliënten
+          <span class="dot-sep">·</span>
+          <strong>2</strong>&nbsp;stil
+          <span class="dot-sep">·</span>
+          <strong>1</strong>&nbsp;PR vandaag
+        </div>
+
+        <!-- sort row -->
+        <div class="sort-row">
+          <span>Klanten</span>
+          <span class="sort">
+            Sort: aandacht eerst
+            <svg viewBox="0 0 12 12"><polyline points="3 5 6 8 9 5"/></svg>
+          </span>
+        </div>
+
+        <!-- =========== STIL group (priority 1) =========== -->
+
+        <!-- Cedric · STIL, niet-tracker, AI nudge -->
+        <div class="client">
+          <div class="c-head">
+            <div class="avatar">CD</div>
+            <div class="c-name">
+              <span class="name">Cedric De Lille</span>
+              <span class="tier">Essential</span>
+            </div>
+            <div class="c-msg">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+          </div>
+
+          <div class="c-diag">
+            <span class="diag-label stil">
+              <svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5"/><path d="M6 3v3M6 8h0"/></svg>
+              STIL · 4 dagen
+            </span>
+            <div class="diag-meta">Geen workouts · geen voeding</div>
+            <div class="diag-sub">Laatste sessie vr 10/4 · Pull A</div>
+          </div>
+
+          <div class="c-chart">
+            <span class="unit">activiteit · 14d</span>
+            <svg viewBox="0 0 96 48" preserveAspectRatio="none">
+              <polyline class="amber" points="0,16 8,14 16,18 24,14 32,22 40,28 48,32 56,38 64,42 72,42 80,42 88,42 96,42"/>
+              <circle class="amber end-dot" cx="96" cy="42" r="2.5" fill="var(--amber)"/>
+            </svg>
+          </div>
+
+          <div class="c-today">
+            <span class="slot miss">
+              <svg viewBox="0 0 12 12"><line x1="3" y1="3" x2="9" y2="9"/><line x1="9" y1="3" x2="3" y2="9"/></svg>
+              Workout
+            </span>
+            <span class="slot miss">
+              <svg viewBox="0 0 12 12"><line x1="3" y1="3" x2="9" y2="9"/><line x1="9" y1="3" x2="3" y2="9"/></svg>
+              Voeding
+            </span>
+            <span class="note">Pull B stond gepland</span>
+          </div>
+
+          <div class="c-ai">
+            <div class="ai-ico">
+              <svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/><circle cx="8" cy="8" r="6"/></svg>
+            </div>
+            <div class="ai-body">
+              <div class="ai-title">Nudge klaar — warm, niet dwingend</div>
+              <div class="ai-sub">Op basis van Cedric's laatste check-in over werkdruk</div>
+            </div>
+            <button class="ai-send">Bekijk</button>
+          </div>
+        </div>
+
+        <!-- Tom · STIL, niet-tracker, AI nudge (variant) -->
+        <div class="client">
+          <div class="c-head">
+            <div class="avatar">TL</div>
+            <div class="c-name">
+              <span class="name">Tom Lambrechts</span>
+              <span class="tier">Performance</span>
+            </div>
+            <div class="c-msg">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+          </div>
+
+          <div class="c-diag">
+            <span class="diag-label stil">
+              <svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5"/><path d="M6 3v3M6 8h0"/></svg>
+              STIL · 3 dagen
+            </span>
+            <div class="diag-meta">Trackt workout niet</div>
+            <div class="diag-sub">Voeding wel · 6/7 dagen deze week</div>
+          </div>
+
+          <div class="c-chart">
+            <span class="unit">workouts · 14d</span>
+            <svg viewBox="0 0 96 48" preserveAspectRatio="none">
+              <polyline class="amber" points="0,16 8,14 16,10 24,18 32,12 40,10 48,24 56,28 64,38 72,42 80,42 88,42 96,42"/>
+              <circle class="end-dot" cx="96" cy="42" r="2.5" fill="var(--amber)"/>
+            </svg>
+          </div>
+
+          <div class="c-today">
+            <span class="slot miss">
+              <svg viewBox="0 0 12 12"><line x1="3" y1="3" x2="9" y2="9"/><line x1="9" y1="3" x2="3" y2="9"/></svg>
+              Workout
+            </span>
+            <span class="slot done">
+              <svg viewBox="0 0 12 12"><polyline points="3 6.5 5 8.5 9 4"/></svg>
+              Voeding
+            </span>
+            <span class="note">Trainings-nudge</span>
+          </div>
+
+          <div class="c-ai">
+            <div class="ai-ico">
+              <svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/><circle cx="8" cy="8" r="6"/></svg>
+            </div>
+            <div class="ai-body">
+              <div class="ai-title">Nudge klaar — "kort en krachtig" toon</div>
+              <div class="ai-sub">Refereert aan Tom's eigen doel: 3x/week volhouden</div>
+            </div>
+            <button class="ai-send">Bekijk</button>
+          </div>
+        </div>
+
+        <div class="group-divider">Aandacht</div>
+
+        <!-- Sofie · STERKER, check-in wacht review -->
+        <div class="client">
+          <div class="c-head">
+            <div class="avatar">SB</div>
+            <div class="c-name">
+              <span class="name">Sofie Baert</span>
+              <span class="tier">Elite</span>
+            </div>
+            <div class="c-msg">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span class="bubble-dot"></span>
+            </div>
+          </div>
+
+          <div class="c-diag">
+            <span class="diag-label sterker">
+              <svg viewBox="0 0 12 12"><polyline points="3 8 6 4 9 8"/></svg>
+              STERKER · +8%
+            </span>
+            <div class="diag-meta">Bench e1RM 72 → 78kg in 3 weken</div>
+            <div class="diag-sub">Adherence 7/7 · volume +12% blok</div>
+          </div>
+
+          <div class="c-chart">
+            <span class="unit">e1RM bench · 4w</span>
+            <svg viewBox="0 0 96 48" preserveAspectRatio="none">
+              <polyline class="lime" points="0,32 12,30 24,28 36,24 48,20 60,16 72,12 84,8 96,6"/>
+              <circle class="end-dot" cx="96" cy="6" r="2.5" fill="var(--lime)"/>
+            </svg>
+          </div>
+
+          <div class="c-today">
+            <span class="slot done">
+              <svg viewBox="0 0 12 12"><polyline points="3 6.5 5 8.5 9 4"/></svg>
+              Workout
+            </span>
+            <span class="slot done">
+              <svg viewBox="0 0 12 12"><polyline points="3 6.5 5 8.5 9 4"/></svg>
+              Voeding
+            </span>
+            <span class="note">Check-in wacht review</span>
+          </div>
+
+          <div class="c-cta-hint">
+            <span class="lime-pulse"></span>
+            Nieuwe check-in binnen · bench-PR bijgewerkt
+          </div>
+        </div>
+
+        <!-- Stanley · ZWAKKER subtiel, wel trackt -->
+        <div class="client">
+          <div class="c-head">
+            <div class="avatar">SV</div>
+            <div class="c-name">
+              <span class="name">Stanley Van H.</span>
+              <span class="tier">Essential</span>
+            </div>
+            <div class="c-msg">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+          </div>
+
+          <div class="c-diag">
+            <span class="diag-label zwakker">
+              <svg viewBox="0 0 12 12"><polyline points="3 4 6 8 9 4"/></svg>
+              ZWAKKER · −4%
+            </span>
+            <div class="diag-meta">Squat e1RM dood sinds 3 weken</div>
+            <div class="diag-sub">RPE drift +1.2 · slaap 5.8u gem.</div>
+          </div>
+
+          <div class="c-chart">
+            <span class="unit">e1RM squat · 4w</span>
+            <svg viewBox="0 0 96 48" preserveAspectRatio="none">
+              <polyline class="amber" points="0,10 12,12 24,10 36,12 48,16 60,18 72,22 84,26 96,28"/>
+              <circle class="end-dot" cx="96" cy="28" r="2.5" fill="var(--amber)"/>
+            </svg>
+          </div>
+
+          <div class="c-today">
+            <span class="slot done">
+              <svg viewBox="0 0 12 12"><polyline points="3 6.5 5 8.5 9 4"/></svg>
+              Workout
+            </span>
+            <span class="slot pending">
+              <svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4"/></svg>
+              Voeding
+            </span>
+            <span class="note">Overleg deload?</span>
+          </div>
+
+          <div class="c-cta-hint">
+            <span class="amber-pulse"></span>
+            Drie blokken geen progressie · recovery proxy dalend
+          </div>
+        </div>
+
+        <div class="group-divider">Rustig</div>
+
+        <!-- Jens · NIEUW, dag 2 -->
+        <div class="client">
+          <div class="c-head">
+            <div class="avatar">JP</div>
+            <div class="c-name">
+              <span class="name">Jens Peeters</span>
+              <span class="tier">Essential · dag 2</span>
+            </div>
+            <div class="c-msg">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+          </div>
+
+          <div class="c-diag">
+            <span class="diag-label nieuw">
+              <svg viewBox="0 0 12 12"><polygon points="6 2 7.5 4.5 10 5 8 7 8.5 10 6 8.5 3.5 10 4 7 2 5 4.5 4.5"/></svg>
+              NIEUW
+            </span>
+            <div class="diag-meta">Intake verstuurd · wacht antwoord</div>
+            <div class="diag-sub">Eerste workout gepland ma 20/4</div>
+          </div>
+
+          <div class="c-chart">
+            <span class="unit">geen data</span>
+          </div>
+
+          <div class="c-today">
+            <span class="slot pending">
+              <svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4"/></svg>
+              Nog geen tracking
+            </span>
+            <span class="note">Welkom-bericht?</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Tab bar · 3 tabs -->
+    <div class="tabbar">
+      <div class="tab active">
+        <div class="ico-wrap">
+          <svg viewBox="0 0 24 24"><path d="M3 12 12 4l9 8"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg>
+        </div>
+        <span>Home</span>
+      </div>
+      <div class="tab">
+        <div class="ico-wrap">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.5L4 18z"/></svg>
+          <span class="inbox-badge">4</span>
+        </div>
+        <span>Inbox</span>
+      </div>
+      <div class="tab">
+        <div class="ico-wrap">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4" rx="1"/><rect x="3" y="10" width="18" height="4" rx="1"/><rect x="3" y="16" width="18" height="4" rx="1"/></svg>
+        </div>
+        <span>Studio</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========= Notes ========= -->
+  <div class="notes">
+    <h1>Coach Cockpit · v2</h1>
+    <p>De home is nu je <b>klantenfeed</b> — niet een lijst, niet een dashboard. Vijf klanten, elk met auto-diagnose, elke rij rijk genoeg voor directe actie zonder door te tikken.</p>
+
+    <div class="callout">
+      <b>Drie regels.</b><br/>
+      1. Geen klantenlijst-tab. De 5 klanten staan altijd op home.<br/>
+      2. Diagnose is <i>automatisch</i> — systeem kiest de metric die er het meest toe doet.<br/>
+      3. AI-nudges alleen bij <b>STIL</b>-status (workout of voeding 3+ dagen stil). Geen AI-spam elders.
+    </div>
+
+    <h2>Diagnose-systeem</h2>
+    <p>Elke klant krijgt één label, met de bron-metric erbij:</p>
+    <div>
+      <span class="tag lime">▲ STERKER</span> progressie in hoofdmetric over blok<br/>
+      <span class="tag amber">▼ ZWAKKER</span> drop in e1RM / volume / adherence + RPE-drift<br/>
+      <span class="tag amber">● STIL</span> workout of voeding logs leeg 3+ dagen<br/>
+      <span class="tag neutral">= STABIEL</span> op schema, niets bijzonders<br/>
+      <span class="tag neutral">★ NIEUW</span> onboarding-fase, nog geen baseline
+    </div>
+    <p>De sparkline onder de diagnose toont <i>dezelfde</i> metric (e1RM bench, squat, activiteit), niet een generieke lijn. Unit-label ernaast zodat altijd duidelijk is wat je kijkt.</p>
+
+    <h2>AI-nudge, alleen bij STIL</h2>
+    <p>De amber banner onderaan de stille cards is klaargelegd door het systeem. Warm, refereert aan de laatste check-in of het eigen doel van de klant. <b>"Bekijk" → sheet met concept → verstuur / skip / aanpassen.</b> Nooit auto-verzonden.</p>
+    <p>Wanneer klant weer trackt, verdwijnt de AI-rij automatisch en schuift de diagnose naar STERKER / ZWAKKER / STABIEL.</p>
+
+    <h2>Vergeleken met v1</h2>
+    <div class="comparison">
+      <div class="old">
+        <div class="hdr">v1 — "dashboard"</div>
+        "Vandaag · 3 taken"-strip met generieke notifications, spark-decoratie, 6 dezelfde client-cards, 4 tabs.
+      </div>
+      <div class="new">
+        <div class="hdr">v2 — "feed"</div>
+        Geen aparte strip. Elk signaal leeft op de klant-card zelf. Diagnose-label is primair. 3 tabs.
+      </div>
+    </div>
+
+    <h2>Bottom nav · 3 tabs</h2>
+    <p>
+      <b>Home</b> — de 5 klanten, gesorteerd op aandacht.<br/>
+      <b>Inbox</b> — alle conversaties + check-in antwoorden in één feed.<br/>
+      <b>Studio</b> — programma-bibliotheek, voedingssjablonen, nieuwe klant, instellingen.
+    </p>
+    <p>Met max 5 klanten is een aparte "Cliënten"-tab overbodig — home doet dat werk.</p>
+
+    <h2>Open punten voor jou</h2>
+    <div class="item"><b>Sort-logica</b> — nu: STIL > ZWAKKER > STERKER (met nieuwe data) > STABIEL > NIEUW. Alternatief: handmatige pin, of tijdsgebaseerd (wie komt vandaag trainen). Wat voelt beter?</div>
+    <div class="item"><b>Diagnose-venster</b> — nu 3–4 weken (blok). Bij kortere cycli (1w) wordt elke kleine dip "ZWAKKER". Wil je de window per klant kunnen instellen?</div>
+    <div class="item"><b>Voeding als co-metric</b> — hoort voeding naast workout in de today-line, of zou het als aparte signaal-lijn op de card (naast e1RM) moeten?</div>
+    <div class="item"><b>Hero op PR-dag</b> — moet Sofie's PR visueel meer oplichten (bijv. lichte card-gradient) of is de lime sparkline genoeg?</div>
+  </div>
+</div>
+
+</body>
+</html>
