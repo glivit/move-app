@@ -1,26 +1,32 @@
 import { getAuthFast } from '@/lib/auth-fast'
-import { fetchDashboardData } from '@/lib/dashboard-data'
+import { redirect } from 'next/navigation'
 import DashboardClient from './DashboardClient'
 
 // Force dynamic rendering (uses cookies for auth)
 export const dynamic = 'force-dynamic'
 
 /**
- * Server Component — fetches dashboard data on the server.
- * Data arrives with the initial HTML, no extra client-side API call needed.
- * Eliminates an entire HTTP round trip + JS hydration wait.
+ * Server Component — thin auth-gate.
+ *
+ * Fase 2 offline-first: de data-fetch is verhuisd naar de client
+ * (IDB-first, dan /api/dashboard). We blocken hier niet meer op een
+ * server-side DB-roundtrip. Resultaat:
+ *   - HTML shell komt in ~20-50ms aan (alleen een auth-cookie check)
+ *   - Warm start: DashboardClient rendert direct uit IDB-cache
+ *   - Cold start: skeleton verschijnt onmiddellijk, fetch vult in
+ *
+ * Auth blijft server-side omdat:
+ *   1. getAuthFast() is een lokale JWT-parse (~0ms, geen netwerk)
+ *   2. We hebben de userId nodig voor IDB-cache namespacing
+ *   3. Defense-in-depth — middleware redirect is de primaire guard,
+ *      deze redirect is backup mocht die ooit misgaan
  */
 export default async function DashboardPage() {
-  let initialData = null
+  const { user } = await getAuthFast()
 
-  try {
-    const { user } = await getAuthFast()
-    if (user) {
-      initialData = await fetchDashboardData(user.id)
-    }
-  } catch {
-    // Auth failed or data fetch failed — client component will handle fallback
+  if (!user) {
+    redirect('/')
   }
 
-  return <DashboardClient initialData={initialData} />
+  return <DashboardClient initialData={null} userId={user.id} />
 }

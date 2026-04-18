@@ -4,6 +4,11 @@ import { useEffect, useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import { cachedFetch, invalidateCache } from '@/lib/fetcher'
 import { ChatFAB } from '@/components/home/ChatFAB'
+import {
+  readDashboardCache,
+  writeDashboardCache,
+  STALE_AFTER_MS,
+} from '@/lib/dashboard-cache'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -141,20 +146,74 @@ function formatNumber(n: number): string {
 
 // ─── Component ──────────────────────────────────────────────
 
-export default function ClientDashboard({ initialData }: { initialData: DashboardData | null }) {
+export default function ClientDashboard({
+  initialData,
+  userId,
+}: {
+  initialData: DashboardData | null
+  userId: string | null
+}) {
   const [data, setData] = useState<DashboardData | null>(initialData)
   const [loading, setLoading] = useState(!initialData)
+  const [cacheAgeMs, setCacheAgeMs] = useState<number | null>(null)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [weightInput, setWeightInput] = useState('')
   const [weightSaving, setWeightSaving] = useState(false)
   const [weightSaved, setWeightSaved] = useState(false)
 
+  // ────────────────────────────────────────────────────────────
+  // Fase 1 — Offline-first read path
+  //
+  //   - SSR-pad (initialData aanwezig): data is fresh. Persist naar IDB
+  //     zodat volgende cold-start instant kan renderen. Geen extra fetch.
+  //   - Fallback-pad (geen initialData; Fase 2 steady state): probeer
+  //     eerst IDB voor directe render, fire parallel een fresh fetch
+  //     via /api/dashboard. Write IDB na succes.
+  //
+  //   cacheAgeMs wordt alleen gezet wanneer data uit IDB komt. `null`
+  //   betekent "net vers van server". Stale-indicator triggert op
+  //   cacheAgeMs > STALE_AFTER_MS (5 min).
+  // ────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (initialData) return
+    if (!userId) return
+
+    // SSR delivered fresh data → cache it for next time, no extra fetch.
+    if (initialData) {
+      writeDashboardCache(userId, initialData).catch(() => {})
+      return
+    }
+
+    // No SSR data → instant IDB render + bg fresh fetch.
+    let cancelled = false
+    setIsRefreshing(true)
+
+    readDashboardCache<DashboardData>(userId).then((hit) => {
+      if (cancelled || !hit) return
+      // Only paint cache if we don't already have fresher data.
+      // (fresh fetch might finish before IDB read on fast connections)
+      setData((current) => current ?? hit.data)
+      setCacheAgeMs((current) => current ?? hit.ageMs)
+      setLoading(false)
+    })
+
     cachedFetch<DashboardData>('/api/dashboard', { maxAge: 120_000 })
-      .then(d => setData(d))
-      .catch(err => console.error('Dashboard load error:', err))
-      .finally(() => setLoading(false))
-  }, [initialData])
+      .then((fresh) => {
+        if (cancelled) return
+        setData(fresh)
+        setCacheAgeMs(null) // fresh from server
+        writeDashboardCache(userId, fresh).catch(() => {})
+      })
+      .catch((err) => console.error('Dashboard load error:', err))
+      .finally(() => {
+        if (cancelled) return
+        setLoading(false)
+        setIsRefreshing(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [initialData, userId])
 
   const submitWeight = useCallback(async () => {
     const val = parseFloat(weightInput.replace(',', '.'))
@@ -172,7 +231,11 @@ export default function ClientDashboard({ initialData }: { initialData: Dashboar
       setTimeout(() => setWeightSaved(false), 2500)
       invalidateCache('/api/dashboard')
       cachedFetch<DashboardData>('/api/dashboard', { forceRefresh: true })
-        .then(d => setData(d))
+        .then((d) => {
+          setData(d)
+          setCacheAgeMs(null)
+          if (userId) writeDashboardCache(userId, d).catch(() => {})
+        })
         .catch(() => {})
     } catch (err) {
       console.error('Weight log error:', err)
@@ -271,6 +334,11 @@ export default function ClientDashboard({ initialData }: { initialData: Dashboar
     return result
   }, [pendingTodos, actions])
 
+  // Stale = cached data ouder dan drempel. `cacheAgeMs === null` betekent
+  // dat we net vers van de server kwamen — dan nooit stale.
+  const isStale = cacheAgeMs !== null && cacheAgeMs > STALE_AFTER_MS
+  const showFreshnessPill = !loading && data && (isRefreshing || isStale)
+
   if (!loading && !data) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center" style={{ color: 'rgba(253,253,254,0.62)' }}>
@@ -281,6 +349,46 @@ export default function ClientDashboard({ initialData }: { initialData: Dashboar
 
   return (
     <div className="pb-28">
+
+      {/* Freshness-pill — subtiele aanduiding dat data uit cache komt. */}
+      {showFreshnessPill && (
+        <div
+          className="animate-fade-in"
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            marginBottom: 10,
+            paddingRight: 2,
+          }}
+          aria-live="polite"
+        >
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: 11,
+              color: 'rgba(253,253,254,0.62)',
+              letterSpacing: 0.01,
+              padding: '4px 10px',
+              borderRadius: 9999,
+              background: 'rgba(253,253,254,0.06)',
+              border: '1px solid rgba(253,253,254,0.10)',
+            }}
+          >
+            <span
+              style={{
+                width: 5,
+                height: 5,
+                borderRadius: 9999,
+                background: isRefreshing ? '#FDFDFE' : 'rgba(253,253,254,0.44)',
+                animation: isRefreshing ? 'pulse 1.4s ease-in-out infinite' : undefined,
+              }}
+            />
+            {isRefreshing ? 'Bijwerken…' : 'Verouderd'}
+          </span>
+        </div>
+      )}
 
       {/* ═══ VANDAAG HERO — één vraag: wat doe ik nu? ═══════════ */}
       <section className="mb-4 animate-up-v6 stagger-3">

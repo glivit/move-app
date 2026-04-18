@@ -4,8 +4,12 @@ import { NextRequest, NextResponse } from 'next/server'
 
 /**
  * GET /api/dashboard
- * Thin wrapper around fetchDashboardData() for client-side revalidation.
- * Initial page load uses the Server Component (no API call needed).
+ * Primary data source voor de client dashboard sinds Fase 2 (offline-first).
+ *
+ * De client component (DashboardClient) rendert eerst uit IDB-cache voor
+ * instant paint, en roept dan parallel deze endpoint aan voor verse data.
+ * Cache-Control geeft de browser ook nog SWR-mogelijkheden voor
+ * tussen-route navigatie binnen dezelfde sessie.
  */
 export async function GET(request: NextRequest) {
   try {
