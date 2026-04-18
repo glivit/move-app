@@ -128,7 +128,7 @@ export default function NewProgramPage() {
 
         // Clone exercises for this day
         if (exercises && exercises.length > 0) {
-          const newExercises = exercises.map((exercise: any) => ({
+          const newExercises = exercises.map((exercise: Record<string, unknown>) => ({
             ...exercise,
             template_day_id: newDayId,
             id: undefined,

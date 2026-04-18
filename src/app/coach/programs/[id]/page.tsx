@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
-  ChevronLeft,
+  ArrowLeft,
   Plus,
   X,
   GripVertical,
@@ -16,11 +16,12 @@ import {
   Unlink,
   Trash2,
   Copy,
+  Minus,
 } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
 import { ExerciseSearchModal } from '@/components/coach/ExerciseSearchModal'
 import { ProgramAssignModal } from '@/components/coach/ProgramAssignModal'
 
+// ─── Types ────────────────────────────────────────────────────────
 interface Exercise {
   id: string
   name: string
@@ -66,6 +67,131 @@ interface ProgramTemplate {
   is_archived: boolean
 }
 
+// Supabase row shapes for the nested selects
+interface RawExerciseRow {
+  id: string
+  exercise_id: string
+  sets: number
+  reps_min: number
+  reps_max: number | null
+  rest_seconds: number
+  tempo: string | null
+  rpe_target: number | null
+  weight_suggestion: string | null
+  notes: string | null
+  sort_order: number
+  superset_group_id: string | null
+  exercises: Exercise | Exercise[] | null
+}
+
+interface RawDayRow {
+  id: string
+  day_number: number
+  name: string
+  focus: string | null
+  estimated_duration_min: number
+  sort_order: number
+  program_template_exercises: RawExerciseRow[] | null
+}
+
+// ─── Tokens ───────────────────────────────────────────────────────
+const INK = '#FDFDFE'
+const INK_MUTED = 'rgba(253,253,254,0.62)'
+const INK_DIM = 'rgba(253,253,254,0.44)'
+const CARD = '#474B48'
+const CARD_SOFT = 'rgba(71,75,72,0.55)'
+const HAIR = 'rgba(253,253,254,0.08)'
+const LIME = '#C0FC01'
+const AMBER = '#E8A93C'
+const BLUE = '#A4C7F2'
+
+// ─── Stepper primitive ────────────────────────────────────────────
+function Stepper({
+  value,
+  onChange,
+  min = 0,
+  step = 1,
+  suffix,
+}: {
+  value: number
+  onChange: (v: number) => void
+  min?: number
+  step?: number
+  suffix?: string
+}) {
+  const dec = () => onChange(Math.max(min, value - step))
+  const inc = () => onChange(value + step)
+  return (
+    <div
+      className="inline-flex items-center rounded-full"
+      style={{ background: 'rgba(253,253,254,0.06)' }}
+    >
+      <button
+        type="button"
+        onClick={dec}
+        className="w-7 h-7 flex items-center justify-center rounded-full active:bg-[rgba(253,253,254,0.08)] transition-colors"
+        style={{ color: INK_MUTED }}
+        aria-label="Verlagen"
+      >
+        <Minus strokeWidth={1.75} className="w-3.5 h-3.5" />
+      </button>
+      <span
+        className="px-2 text-[13px] font-medium tabular-nums select-none"
+        style={{ color: INK, minWidth: suffix ? 44 : 28, textAlign: 'center' }}
+      >
+        {value}
+        {suffix && (
+          <span className="text-[10.5px] ml-0.5" style={{ color: INK_MUTED }}>
+            {suffix}
+          </span>
+        )}
+      </span>
+      <button
+        type="button"
+        onClick={inc}
+        className="w-7 h-7 flex items-center justify-center rounded-full active:bg-[rgba(253,253,254,0.08)] transition-colors"
+        style={{ color: INK_MUTED }}
+        aria-label="Verhogen"
+      >
+        <Plus strokeWidth={1.75} className="w-3.5 h-3.5" />
+      </button>
+    </div>
+  )
+}
+
+// ─── Field label + input primitives ───────────────────────────────
+function FieldLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <label
+      className="block text-[10.5px] font-medium uppercase tracking-[0.08em] mb-1.5"
+      style={{ color: INK_DIM }}
+    >
+      {children}
+    </label>
+  )
+}
+
+function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
+  const { className = '', style, ...rest } = props
+  return (
+    <input
+      {...rest}
+      className={`w-full px-3 py-2 rounded-xl text-[13.5px] transition-colors ${className}`}
+      style={{
+        background: 'rgba(253,253,254,0.05)',
+        color: INK,
+        border: '1px solid rgba(253,253,254,0.06)',
+        outline: 'none',
+        ...style,
+      }}
+    />
+  )
+}
+
+/**
+ * Coach · Programma-editor (v3 Orion).
+ * Sticky dark-chip header, chip-pill day tabs, dark cards, stepper prescriptions.
+ */
 export default function ProgramEditorPage() {
   const params = useParams() as unknown as { id: string }
   const router = useRouter()
@@ -75,23 +201,20 @@ export default function ProgramEditorPage() {
   const [days, setDays] = useState<ProgramDay[]>([])
   const [activeDayId, setActiveDayId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
   const [showExerciseModal, setShowExerciseModal] = useState(false)
   const [showAssignModal, setShowAssignModal] = useState(false)
-  const [editingFieldId, setEditingFieldId] = useState<string | null>(null)
   const [confirmDeleteDay, setConfirmDeleteDay] = useState<string | null>(null)
   const [deletingDay, setDeletingDay] = useState(false)
   const [duplicatingDay, setDuplicatingDay] = useState(false)
 
   const templateId = params.id
 
-  // Fetch program and days
+  // ─── Fetch program + days ────────────────────────────────────────
   useEffect(() => {
     const fetchProgram = async () => {
       try {
         setLoading(true)
 
-        // Fetch template
         const { data: templateData, error: templateError } = await supabase
           .from('program_templates')
           .select('*')
@@ -101,7 +224,6 @@ export default function ProgramEditorPage() {
         if (templateError) throw templateError
         setProgram(templateData)
 
-        // Fetch days with exercises
         const { data: daysData, error: daysError } = await supabase
           .from('program_template_days')
           .select(
@@ -142,7 +264,7 @@ export default function ProgramEditorPage() {
 
         if (daysError) throw daysError
 
-        const formattedDays: ProgramDay[] = (daysData || []).map((day: any) => ({
+        const formattedDays: ProgramDay[] = ((daysData || []) as RawDayRow[]).map((day) => ({
           id: day.id,
           day_number: day.day_number,
           name: day.name,
@@ -150,24 +272,26 @@ export default function ProgramEditorPage() {
           estimated_duration_min: day.estimated_duration_min,
           sort_order: day.sort_order,
           exercises: (day.program_template_exercises || [])
-            .map((exe: any) => {
+            .map((exe) => {
               const exerciseData = Array.isArray(exe.exercises) ? exe.exercises[0] : exe.exercises
+              if (!exerciseData) return null
               return {
-              ...exerciseData,
-              prescription_id: exe.id,
-              sets: exe.sets,
-              reps_min: exe.reps_min,
-              reps_max: exe.reps_max,
-              rest_seconds: exe.rest_seconds,
-              tempo: exe.tempo,
-              rpe_target: exe.rpe_target,
-              weight_suggestion: exe.weight_suggestion,
-              notes: exe.notes,
-              sort_order: exe.sort_order,
-              superset_group_id: exe.superset_group_id || null,
-            }})
-            .filter((ex: any) => ex.id)
-            .sort((a: ExerciseWithPrescription, b: ExerciseWithPrescription) => a.sort_order - b.sort_order),
+                ...exerciseData,
+                prescription_id: exe.id,
+                sets: exe.sets,
+                reps_min: exe.reps_min,
+                reps_max: exe.reps_max,
+                rest_seconds: exe.rest_seconds,
+                tempo: exe.tempo,
+                rpe_target: exe.rpe_target,
+                weight_suggestion: exe.weight_suggestion,
+                notes: exe.notes,
+                sort_order: exe.sort_order,
+                superset_group_id: exe.superset_group_id || null,
+              }
+            })
+            .filter((ex): ex is ExerciseWithPrescription => ex !== null && !!ex.id)
+            .sort((a, b) => a.sort_order - b.sort_order),
         }))
 
         setDays(formattedDays)
@@ -186,6 +310,7 @@ export default function ProgramEditorPage() {
 
   const activeDay = days.find((d) => d.id === activeDayId)
 
+  // ─── Day handlers ────────────────────────────────────────────────
   const handleAddDay = async () => {
     const newDayNumber = Math.max(0, ...days.map((d) => d.day_number)) + 1
     const newSortOrder = Math.max(0, ...days.map((d) => d.sort_order)) + 1
@@ -215,7 +340,6 @@ export default function ProgramEditorPage() {
           sort_order: data[0].sort_order,
           exercises: [],
         }
-
         setDays([...days, newDay])
         setActiveDayId(newDay.id)
       }
@@ -227,32 +351,26 @@ export default function ProgramEditorPage() {
   const handleRemoveDay = async (dayId: string) => {
     setDeletingDay(true)
     try {
-      // First delete all exercises for this day
       const { error: exError } = await supabase
         .from('program_template_exercises')
         .delete()
         .eq('template_day_id', dayId)
-
       if (exError) throw exError
 
-      // Then delete the day itself
       const { error: dayError } = await supabase
         .from('program_template_days')
         .delete()
         .eq('id', dayId)
-
       if (dayError) throw dayError
 
       const remainingDays = days.filter((d) => d.id !== dayId)
       setDays(remainingDays)
       setConfirmDeleteDay(null)
 
-      // Switch to first remaining day or null
       if (activeDayId === dayId) {
         setActiveDayId(remainingDays.length > 0 ? remainingDays[0].id : null)
       }
 
-      // Update days_per_week on template
       if (program) {
         const newCount = remainingDays.length
         setProgram({ ...program, days_per_week: newCount })
@@ -277,7 +395,6 @@ export default function ProgramEditorPage() {
       const newDayNumber = Math.max(0, ...days.map((d) => d.day_number)) + 1
       const newSortOrder = Math.max(0, ...days.map((d) => d.sort_order)) + 1
 
-      // 1. Create the new day
       const { data: newDayRow, error: dayError } = await supabase
         .from('program_template_days')
         .insert({
@@ -293,7 +410,6 @@ export default function ProgramEditorPage() {
 
       if (dayError || !newDayRow) throw dayError
 
-      // 2. Duplicate all exercises
       let newExercises: ExerciseWithPrescription[] = []
       if (sourceDayData.exercises.length > 0) {
         const exerciseInserts = sourceDayData.exercises.map((ex) => ({
@@ -308,7 +424,7 @@ export default function ProgramEditorPage() {
           weight_suggestion: ex.weight_suggestion,
           notes: ex.notes,
           sort_order: ex.sort_order,
-          superset_group_id: null, // Reset superset links for new day
+          superset_group_id: null,
         }))
 
         const { data: insertedExercises, error: exError } = await supabase
@@ -319,26 +435,29 @@ export default function ProgramEditorPage() {
         if (exError) throw exError
 
         if (insertedExercises) {
-          newExercises = insertedExercises.map((row: any) => {
-            const exerciseData = Array.isArray(row.exercises) ? row.exercises[0] : row.exercises
-            return {
-            ...exerciseData,
-            prescription_id: row.id,
-            sets: row.sets,
-            reps_min: row.reps_min,
-            reps_max: row.reps_max,
-            rest_seconds: row.rest_seconds,
-            tempo: row.tempo,
-            rpe_target: row.rpe_target,
-            weight_suggestion: row.weight_suggestion,
-            notes: row.notes,
-            sort_order: row.sort_order,
-            superset_group_id: row.superset_group_id,
-          }})
+          newExercises = (insertedExercises as RawExerciseRow[])
+            .map((row) => {
+              const exerciseData = Array.isArray(row.exercises) ? row.exercises[0] : row.exercises
+              if (!exerciseData) return null
+              return {
+                ...exerciseData,
+                prescription_id: row.id,
+                sets: row.sets,
+                reps_min: row.reps_min,
+                reps_max: row.reps_max,
+                rest_seconds: row.rest_seconds,
+                tempo: row.tempo,
+                rpe_target: row.rpe_target,
+                weight_suggestion: row.weight_suggestion,
+                notes: row.notes,
+                sort_order: row.sort_order,
+                superset_group_id: row.superset_group_id,
+              }
+            })
+            .filter((ex): ex is ExerciseWithPrescription => ex !== null)
         }
       }
 
-      // 3. Build the new day object and add to state
       const newDay: ProgramDay = {
         id: newDayRow.id,
         day_number: newDayRow.day_number,
@@ -352,7 +471,6 @@ export default function ProgramEditorPage() {
       setDays([...days, newDay])
       setActiveDayId(newDay.id)
 
-      // 4. Update days_per_week
       if (program) {
         const newCount = days.length + 1
         setProgram({ ...program, days_per_week: newCount })
@@ -369,6 +487,7 @@ export default function ProgramEditorPage() {
     }
   }
 
+  // ─── Exercise handlers ───────────────────────────────────────────
   const handleAddExercise = async (exercise: Exercise) => {
     if (!activeDay) return
 
@@ -413,15 +532,11 @@ export default function ProgramEditorPage() {
         }
 
         setDays(
-          days.map((d) => {
-            if (d.id === activeDay.id) {
-              return {
-                ...d,
-                exercises: [...d.exercises, newExerciseWithPrescription],
-              }
-            }
-            return d
-          })
+          days.map((d) =>
+            d.id === activeDay.id
+              ? { ...d, exercises: [...d.exercises, newExerciseWithPrescription] }
+              : d
+          )
         )
       }
     } catch (error) {
@@ -441,29 +556,24 @@ export default function ProgramEditorPage() {
       if (error) throw error
 
       setDays(
-        days.map((d) => {
-          if (d.id === activeDay.id) {
-            return {
-              ...d,
-              exercises: d.exercises.filter((e) => e.prescription_id !== prescriptionId),
-            }
-          }
-          return d
-        })
+        days.map((d) =>
+          d.id === activeDay.id
+            ? { ...d, exercises: d.exercises.filter((e) => e.prescription_id !== prescriptionId) }
+            : d
+        )
       )
     } catch (error) {
       console.error('Failed to remove exercise:', error)
     }
   }
 
-  // Drag & drop state
+  // ─── Drag & drop ─────────────────────────────────────────────────
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
 
   const handleDragStart = useCallback((e: React.DragEvent, index: number) => {
     setDraggedIndex(index)
     e.dataTransfer.effectAllowed = 'move'
-    // Set a small transparent drag image
     const dragEl = e.currentTarget as HTMLElement
     e.dataTransfer.setDragImage(dragEl, 20, 20)
   }, [])
@@ -479,72 +589,71 @@ export default function ProgramEditorPage() {
     setDragOverIndex(null)
   }, [])
 
-  const handleDrop = useCallback(async (e: React.DragEvent, dropIndex: number) => {
-    e.preventDefault()
-    if (draggedIndex === null || draggedIndex === dropIndex || !activeDay) {
+  const handleDrop = useCallback(
+    async (e: React.DragEvent, dropIndex: number) => {
+      e.preventDefault()
+      if (draggedIndex === null || draggedIndex === dropIndex || !activeDay) {
+        setDraggedIndex(null)
+        setDragOverIndex(null)
+        return
+      }
+
+      const updatedExercises = [...activeDay.exercises]
+      const [moved] = updatedExercises.splice(draggedIndex, 1)
+      updatedExercises.splice(dropIndex, 0, moved)
+
+      const reordered = updatedExercises.map((ex, i) => ({ ...ex, sort_order: i }))
+
+      setDays(
+        days.map((d) => (d.id === activeDay.id ? { ...d, exercises: reordered } : d))
+      )
+
       setDraggedIndex(null)
       setDragOverIndex(null)
-      return
-    }
 
-    const updatedExercises = [...activeDay.exercises]
-    const [moved] = updatedExercises.splice(draggedIndex, 1)
-    updatedExercises.splice(dropIndex, 0, moved)
-
-    // Update sort orders for all exercises
-    const reordered = updatedExercises.map((ex, i) => ({
-      ...ex,
-      sort_order: i,
-    }))
-
-    // Optimistic UI update
-    setDays(
-      days.map((d) =>
-        d.id === activeDay.id ? { ...d, exercises: reordered } : d
-      )
-    )
-
-    setDraggedIndex(null)
-    setDragOverIndex(null)
-
-    // Persist all sort_orders to DB
-    try {
-      for (const ex of reordered) {
-        await supabase
-          .from('program_template_exercises')
-          .update({ sort_order: ex.sort_order })
-          .eq('id', ex.prescription_id)
+      try {
+        for (const ex of reordered) {
+          await supabase
+            .from('program_template_exercises')
+            .update({ sort_order: ex.sort_order })
+            .eq('id', ex.prescription_id)
+        }
+      } catch (error) {
+        console.error('Failed to reorder exercises:', error)
       }
-    } catch (error) {
-      console.error('Failed to reorder exercises:', error)
-    }
-  }, [draggedIndex, activeDay, days, supabase])
+    },
+    [draggedIndex, activeDay, days, supabase]
+  )
 
-  // Debounce refs for DB saves
+  // ─── Debounced save ──────────────────────────────────────────────
   const saveTimers = useRef<Record<string, NodeJS.Timeout>>({})
 
-  const debouncedSave = useCallback((key: string, saveFn: () => Promise<void>, delay = 600) => {
-    if (saveTimers.current[key]) clearTimeout(saveTimers.current[key])
-    saveTimers.current[key] = setTimeout(async () => {
-      try { await saveFn() } catch (error) { console.error('Save failed:', error) }
-    }, delay)
-  }, [])
+  const debouncedSave = useCallback(
+    (key: string, saveFn: () => Promise<void>, delay = 600) => {
+      if (saveTimers.current[key]) clearTimeout(saveTimers.current[key])
+      saveTimers.current[key] = setTimeout(async () => {
+        try {
+          await saveFn()
+        } catch (error) {
+          console.error('Save failed:', error)
+        }
+      }, delay)
+    },
+    []
+  )
 
   const handleUpdateExercisePrescription = (
     prescriptionId: string,
     field: string,
-    value: any
+    value: string | number | null
   ) => {
-    // Update local state immediately (fast UI)
     setDays(
       days.map((d) => {
         if (d.id === activeDay?.id) {
           return {
             ...d,
             exercises: d.exercises.map((e) =>
-              e.prescription_id === prescriptionId
-                ? { ...e, [field]: value }
-                : e
+              e.prescription_id === prescriptionId ? { ...e, [field]: value } : e
             ),
           }
         }
@@ -552,7 +661,6 @@ export default function ProgramEditorPage() {
       })
     )
 
-    // Debounce DB save
     debouncedSave(`exercise-${prescriptionId}-${field}`, async () => {
       const { error } = await supabase
         .from('program_template_exercises')
@@ -562,13 +670,9 @@ export default function ProgramEditorPage() {
     })
   }
 
-  const handleUpdateDayField = (dayId: string, field: string, value: any) => {
-    // Update local state immediately
-    setDays(
-      days.map((d) => (d.id === dayId ? { ...d, [field]: value } : d))
-    )
+  const handleUpdateDayField = (dayId: string, field: string, value: string | number | null) => {
+    setDays(days.map((d) => (d.id === dayId ? { ...d, [field]: value } : d)))
 
-    // Debounce DB save
     debouncedSave(`day-${dayId}-${field}`, async () => {
       const { error } = await supabase
         .from('program_template_days')
@@ -578,589 +682,698 @@ export default function ProgramEditorPage() {
     })
   }
 
-  const handleUpdateTemplate = (field: string, value: any) => {
-    if (!program) return
-
-    setProgram({ ...program, [field]: value })
-
-    debouncedSave(`template-${field}`, async () => {
-      const { error } = await supabase
-        .from('program_templates')
-        .update({ [field]: value })
-        .eq('id', templateId)
-      if (error) throw error
-    })
-  }
-
+  // ─── Loading / empty states ──────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#A6ADA7] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#FDFDFE]" />
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="w-6 h-6 animate-spin" style={{ color: INK_MUTED }} />
       </div>
     )
   }
 
   if (!program) {
     return (
-      <div className="min-h-screen bg-[#A6ADA7] p-6">
-        <div className="max-w-7xl mx-auto text-center">
-          <p className="text-[15px] text-[#D6D9D6]">Programma niet gevonden</p>
-          <Link href="/coach/programs" className="mt-4 inline-block">
-            <Button variant="secondary">Terug naar programma's</Button>
-          </Link>
-        </div>
+      <div className="pb-32 text-center">
+        <p className="text-[14px]" style={{ color: INK_MUTED }}>
+          Programma niet gevonden
+        </p>
+        <Link
+          href="/coach/programs"
+          className="mt-4 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[12.5px] font-medium"
+          style={{ background: CARD, color: INK }}
+        >
+          <ArrowLeft strokeWidth={1.75} className="w-4 h-4" />
+          Terug
+        </Link>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#A6ADA7]">
-      {/* Header */}
-      <div className="bg-[#A6ADA7] border-b border-[#A6ADA7] sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-5">
-          <Link href="/coach/programs" className="inline-flex items-center gap-2 text-[#FDFDFE] mb-4 hover:text-[#FDFDFE] transition-colors">
-            <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
-            <span className="text-[15px] font-medium">Terug</span>
-          </Link>
+    <div className="pb-32">
+      {/* ═══ Header ═══ */}
+      <div className="flex items-center gap-3 pb-4">
+        <button
+          onClick={() => router.push('/coach/programs')}
+          className="flex items-center gap-1.5 transition-opacity active:opacity-70"
+          style={{
+            background: CARD,
+            color: INK,
+            padding: '7px 12px 7px 9px',
+            borderRadius: 999,
+            fontSize: 13,
+            fontWeight: 500,
+            boxShadow:
+              'inset 0 1px 0 rgba(255,255,255,0.06), 0 1px 2px rgba(0,0,0,0.10)',
+          }}
+          aria-label="Terug"
+        >
+          <ArrowLeft strokeWidth={1.75} className="w-[15px] h-[15px]" />
+          Terug
+        </button>
 
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <h1
-                className="text-[32px] font-display font-semibold text-[#FDFDFE] mb-1"
-                style={{ fontFamily: 'var(--font-display)' }}
-              >
-                {program.name}
-              </h1>
-              <p className="text-[13px] text-[#D6D9D6]">
-                {program.duration_weeks} weken · {program.days_per_week} dagen/week
-              </p>
-            </div>
+        <div className="flex-1" />
 
-            <Button
-              onClick={() => setShowAssignModal(true)}
-              className="flex items-center gap-2"
-            >
-              <Users strokeWidth={1.5} className="w-5 h-5" />
-              <span>Toewijzen</span>
-            </Button>
-          </div>
+        <button
+          onClick={() => setShowAssignModal(true)}
+          className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-[7px] text-[13px] font-medium transition-opacity active:opacity-70"
+          style={{
+            background: LIME,
+            color: '#0A0E0B',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.32), 0 1px 2px rgba(0,0,0,0.10)',
+          }}
+        >
+          <Users strokeWidth={2} className="w-4 h-4" />
+          Toewijzen
+        </button>
+      </div>
+
+      {/* Title block */}
+      <div className="mb-5 px-0.5">
+        <h1
+          className="text-[28px] font-light tracking-[-0.025em] leading-[1.1]"
+          style={{ fontFamily: 'var(--font-display)', color: INK }}
+        >
+          {program.name}
+        </h1>
+        <div
+          className="mt-1.5 text-[12px] tracking-[0.04em]"
+          style={{ color: INK_MUTED }}
+        >
+          {program.duration_weeks} {program.duration_weeks === 1 ? 'week' : 'weken'}
+          {' · '}
+          {program.days_per_week} {program.days_per_week === 1 ? 'dag' : 'dagen'}/week
         </div>
       </div>
 
-      {/* Day Tabs */}
-      <div className="bg-[#A6ADA7] border-b border-[#A6ADA7] overflow-x-auto">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex gap-2 py-4">
-            {days.map((day) => (
+      {/* ═══ Day tabs (horizontal scroll) ═══ */}
+      <div className="-mx-[22px] px-[22px] overflow-x-auto pb-1 mb-4 scrollbar-hide">
+        <div className="flex gap-1.5 min-w-max">
+          {days.map((day) => {
+            const isActive = activeDayId === day.id
+            return (
               <button
                 key={day.id}
                 onClick={() => setActiveDayId(day.id)}
-                className={`px-4 py-2 rounded-full text-[15px] font-medium whitespace-nowrap transition-colors ${
-                  activeDayId === day.id
-                    ? 'bg-[#474B48] text-white'
-                    : 'bg-[#A6ADA7] text-[#FDFDFE] hover:bg-[#ECEAE3]'
-                }`}
+                className="inline-flex items-center rounded-full px-3.5 py-[7px] text-[12.5px] font-medium whitespace-nowrap transition-colors"
+                style={
+                  isActive
+                    ? {
+                        background: CARD,
+                        color: INK,
+                        boxShadow:
+                          'inset 0 1px 0 rgba(255,255,255,0.06), 0 1px 2px rgba(0,0,0,0.10)',
+                      }
+                    : {
+                        background: 'rgba(253,253,254,0.06)',
+                        color: INK_MUTED,
+                      }
+                }
               >
                 {day.name}
               </button>
-            ))}
+            )
+          })}
 
-            <button
-              onClick={handleAddDay}
-              className="px-4 py-2 rounded-full text-[15px] font-medium text-[#FDFDFE] bg-[#A6ADA7] hover:bg-[#ECEAE3] transition-colors flex items-center gap-1 whitespace-nowrap"
-            >
-              <Plus strokeWidth={1.5} className="w-5 h-5" />
-              Dag toevoegen
-            </button>
-          </div>
+          <button
+            onClick={handleAddDay}
+            className="inline-flex items-center gap-1 rounded-full px-3 py-[7px] text-[12.5px] font-medium whitespace-nowrap transition-colors"
+            style={{
+              background: 'rgba(192,252,1,0.14)',
+              color: LIME,
+            }}
+          >
+            <Plus strokeWidth={1.75} className="w-3.5 h-3.5" />
+            Dag
+          </button>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {activeDay && (
-          <div>
-            {/* Day Details */}
-            <div className="bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] p-6 mb-8">
-              <div className="grid grid-cols-3 gap-6">
-                {/* Day Name */}
-                <div>
-                  <label className="block text-[13px] font-medium text-[#D6D9D6] mb-2">
-                    Dag naam
-                  </label>
-                  <input
-                    type="text"
-                    value={activeDay.name}
-                    onChange={(e) =>
-                      handleUpdateDayField(activeDay.id, 'name', e.target.value)
-                    }
-                    className="w-full px-4 py-3 bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl text-[15px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
-                  />
-                </div>
-
-                {/* Focus Area */}
-                <div>
-                  <label className="block text-[13px] font-medium text-[#D6D9D6] mb-2">
-                    Focus (optioneel)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="bijv. Upper Body"
-                    value={activeDay.focus || ''}
-                    onChange={(e) =>
-                      handleUpdateDayField(activeDay.id, 'focus', e.target.value || null)
-                    }
-                    className="w-full px-4 py-3 bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl text-[15px] text-[#FDFDFE] placeholder:text-[#D6D9D6] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
-                  />
-                </div>
-
-                {/* Duration */}
-                <div>
-                  <label className="block text-[13px] font-medium text-[#D6D9D6] mb-2">
-                    Geschatte duur (min)
-                  </label>
-                  <input
-                    type="number"
-                    value={activeDay.estimated_duration_min}
-                    onChange={(e) =>
-                      handleUpdateDayField(
-                        activeDay.id,
-                        'estimated_duration_min',
-                        parseInt(e.target.value) || 0
-                      )
-                    }
-                    className="w-full px-4 py-3 bg-[#A6ADA7] border border-[#A6ADA7] rounded-2xl text-[15px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
-                  />
-                </div>
+      {/* ═══ Active day content ═══ */}
+      {activeDay && (
+        <div>
+          {/* Day details card */}
+          <div
+            className="rounded-[18px] p-4 mb-4"
+            style={{ background: CARD }}
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+              <div>
+                <FieldLabel>Dag naam</FieldLabel>
+                <TextInput
+                  type="text"
+                  value={activeDay.name}
+                  onChange={(e) =>
+                    handleUpdateDayField(activeDay.id, 'name', e.target.value)
+                  }
+                />
               </div>
-
-              {/* Day Actions: Duplicate & Delete */}
-              <div className="mt-5 pt-5 border-t border-[#A6ADA7]">
-                {confirmDeleteDay === activeDay.id ? (
-                  <div className="flex items-center gap-3">
-                    <p className="text-[13px] text-[#B55A4A] font-medium flex-1">
-                      &quot;{activeDay.name}&quot; verwijderen? Alle oefeningen worden ook verwijderd.
-                    </p>
-                    <button
-                      onClick={() => setConfirmDeleteDay(null)}
-                      className="px-3 py-1.5 rounded-lg text-[12px] font-medium border border-[#A6ADA7] text-[#D6D9D6] hover:bg-[#A6ADA7] transition-colors"
-                    >
-                      Annuleren
-                    </button>
-                    <button
-                      onClick={() => handleRemoveDay(activeDay.id)}
-                      disabled={deletingDay}
-                      className="px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-[#B55A4A] text-white hover:bg-[#B83A3A] transition-colors disabled:opacity-50 flex items-center gap-1"
-                    >
-                      {deletingDay ? (
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                      ) : (
-                        <Trash2 className="w-3 h-3" />
-                      )}
-                      Verwijderen
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-4">
-                    <button
-                      onClick={() => handleDuplicateDay(activeDay.id)}
-                      disabled={duplicatingDay}
-                      className="inline-flex items-center gap-1.5 text-[12px] font-medium text-[#FDFDFE] hover:underline disabled:opacity-50"
-                    >
-                      {duplicatingDay ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      ) : (
-                        <Copy strokeWidth={1.5} className="w-3.5 h-3.5" />
-                      )}
-                      Dag dupliceren
-                    </button>
-                    <button
-                      onClick={() => setConfirmDeleteDay(activeDay.id)}
-                      className="inline-flex items-center gap-1.5 text-[12px] font-medium text-[#B55A4A] hover:underline"
-                    >
-                      <Trash2 strokeWidth={1.5} className="w-3.5 h-3.5" />
-                      Dag verwijderen
-                    </button>
-                  </div>
-                )}
+              <div>
+                <FieldLabel>Focus (optioneel)</FieldLabel>
+                <TextInput
+                  type="text"
+                  placeholder="bv. Upper Body"
+                  value={activeDay.focus || ''}
+                  onChange={(e) =>
+                    handleUpdateDayField(activeDay.id, 'focus', e.target.value || null)
+                  }
+                />
+              </div>
+              <div>
+                <FieldLabel>Duur (min)</FieldLabel>
+                <TextInput
+                  type="number"
+                  value={activeDay.estimated_duration_min}
+                  onChange={(e) =>
+                    handleUpdateDayField(
+                      activeDay.id,
+                      'estimated_duration_min',
+                      parseInt(e.target.value) || 0
+                    )
+                  }
+                />
               </div>
             </div>
 
-            {/* Exercises */}
-            <div className="space-y-3">
-              <h2 className="text-[17px] font-semibold text-[#FDFDFE]">Oefeningen</h2>
-
-              {activeDay.exercises.length === 0 ? (
-                <div className="bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-[#A6ADA7] p-8 text-center">
-                  <p className="text-[15px] text-[#D6D9D6] mb-4">
-                    Voeg oefeningen toe om aan de slag te gaan
+            {/* Day actions */}
+            <div
+              className="mt-4 pt-3 flex items-center gap-3"
+              style={{ borderTop: `1px solid ${HAIR}` }}
+            >
+              {confirmDeleteDay === activeDay.id ? (
+                <>
+                  <p
+                    className="text-[12px] font-medium flex-1"
+                    style={{ color: AMBER }}
+                  >
+                    &quot;{activeDay.name}&quot; verwijderen? Alle oefeningen ook.
                   </p>
-                  <Button onClick={() => setShowExerciseModal(true)}>
-                    <Plus strokeWidth={1.5} className="w-5 h-5 mr-2" />
-                    Oefening toevoegen
-                  </Button>
-                </div>
+                  <button
+                    onClick={() => setConfirmDeleteDay(null)}
+                    className="px-3 py-1.5 rounded-full text-[11.5px] font-medium"
+                    style={{ background: 'rgba(253,253,254,0.06)', color: INK_MUTED }}
+                  >
+                    Annuleer
+                  </button>
+                  <button
+                    onClick={() => handleRemoveDay(activeDay.id)}
+                    disabled={deletingDay}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[11.5px] font-semibold disabled:opacity-50"
+                    style={{ background: 'rgba(232,169,60,0.18)', color: AMBER }}
+                  >
+                    {deletingDay ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <Trash2 className="w-3 h-3" />
+                    )}
+                    Verwijder
+                  </button>
+                </>
               ) : (
-                <div className="space-y-3">
-                  {activeDay.exercises.map((exercise, index) => {
-                    const isInSuperset = !!exercise.superset_group_id
-                    const nextExercise = activeDay.exercises[index + 1]
-                    const prevExercise = activeDay.exercises[index - 1]
-                    const sameGroupAsNext = isInSuperset && nextExercise?.superset_group_id === exercise.superset_group_id
-                    const sameGroupAsPrev = isInSuperset && prevExercise?.superset_group_id === exercise.superset_group_id
-                    const isDragged = draggedIndex === index
-                    const isDragOver = dragOverIndex === index && draggedIndex !== index
+                <>
+                  <button
+                    onClick={() => handleDuplicateDay(activeDay.id)}
+                    disabled={duplicatingDay}
+                    className="inline-flex items-center gap-1.5 text-[12px] font-medium transition-opacity active:opacity-70 disabled:opacity-50"
+                    style={{ color: INK_MUTED }}
+                  >
+                    {duplicatingDay ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Copy strokeWidth={1.75} className="w-3.5 h-3.5" />
+                    )}
+                    Dupliceren
+                  </button>
+                  <div className="flex-1" />
+                  <button
+                    onClick={() => setConfirmDeleteDay(activeDay.id)}
+                    className="inline-flex items-center gap-1.5 text-[12px] font-medium transition-opacity active:opacity-70"
+                    style={{ color: AMBER }}
+                  >
+                    <Trash2 strokeWidth={1.75} className="w-3.5 h-3.5" />
+                    Verwijder dag
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
 
-                    return (
+          {/* Exercises section */}
+          <div className="flex items-baseline justify-between mb-2 px-0.5">
+            <h2
+              className="text-[13px] font-semibold uppercase tracking-[0.08em]"
+              style={{ color: INK_DIM }}
+            >
+              Oefeningen
+            </h2>
+            <span
+              className="text-[11px] tabular-nums"
+              style={{ color: INK_DIM }}
+            >
+              {activeDay.exercises.length}
+            </span>
+          </div>
+
+          {activeDay.exercises.length === 0 ? (
+            <div
+              className="rounded-[18px] px-6 py-10 text-center"
+              style={{ background: CARD_SOFT }}
+            >
+              <p className="text-[14px] mb-4" style={{ color: INK_MUTED }}>
+                Nog geen oefeningen
+              </p>
+              <button
+                onClick={() => setShowExerciseModal(true)}
+                className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[12.5px] font-medium"
+                style={{ background: 'rgba(192,252,1,0.14)', color: LIME }}
+              >
+                <Plus strokeWidth={1.75} className="w-3.5 h-3.5" />
+                Eerste oefening toevoegen
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {activeDay.exercises.map((exercise, index) => {
+                const isInSuperset = !!exercise.superset_group_id
+                const nextExercise = activeDay.exercises[index + 1]
+                const prevExercise = activeDay.exercises[index - 1]
+                const sameGroupAsNext =
+                  isInSuperset && nextExercise?.superset_group_id === exercise.superset_group_id
+                const sameGroupAsPrev =
+                  isInSuperset && prevExercise?.superset_group_id === exercise.superset_group_id
+                const isDragged = draggedIndex === index
+                const isDragOver = dragOverIndex === index && draggedIndex !== index
+                const isCardio = exercise.category === 'cardio'
+
+                return (
+                  <div
+                    key={exercise.prescription_id}
+                    className={`relative transition-all duration-200 ${
+                      isDragged ? 'opacity-40 scale-[0.98]' : ''
+                    }`}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, index)}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDragEnd={handleDragEnd}
+                    onDrop={(e) => handleDrop(e, index)}
+                  >
+                    {/* Drop indicator */}
+                    {isDragOver && draggedIndex !== null && draggedIndex > index && (
+                      <div
+                        className="absolute -top-1 left-0 right-0 h-[2px] rounded-full z-10"
+                        style={{ background: LIME }}
+                      />
+                    )}
+                    {isDragOver && draggedIndex !== null && draggedIndex < index && (
+                      <div
+                        className="absolute -bottom-1 left-0 right-0 h-[2px] rounded-full z-10"
+                        style={{ background: LIME }}
+                      />
+                    )}
+
+                    {/* Superset connector (lime) */}
+                    {sameGroupAsPrev && (
+                      <div
+                        className="absolute -top-2 left-5 w-[2px] h-2 z-10"
+                        style={{ background: LIME }}
+                      />
+                    )}
+
                     <div
-                      key={exercise.prescription_id}
-                      className={`relative transition-all duration-200 ${isDragged ? 'opacity-40 scale-[0.98]' : ''} ${isDragOver ? 'translate-y-1' : ''}`}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, index)}
-                      onDragOver={(e) => handleDragOver(e, index)}
-                      onDragEnd={handleDragEnd}
-                      onDrop={(e) => handleDrop(e, index)}
+                      className="rounded-[18px] p-4"
+                      style={{
+                        background: CARD,
+                        boxShadow: isInSuperset
+                          ? `inset 3px 0 0 ${LIME}, 0 1px 2px rgba(0,0,0,0.10)`
+                          : '0 1px 2px rgba(0,0,0,0.10)',
+                      }}
                     >
-                      {/* Drop indicator line */}
-                      {isDragOver && draggedIndex !== null && draggedIndex > index && (
-                        <div className="absolute -top-1.5 left-0 right-0 h-[3px] bg-[#FDFDFE] rounded-full z-10" />
-                      )}
-                      {isDragOver && draggedIndex !== null && draggedIndex < index && (
-                        <div className="absolute -bottom-1.5 left-0 right-0 h-[3px] bg-[#FDFDFE] rounded-full z-10" />
-                      )}
-                      {/* Superset connector line */}
-                      {sameGroupAsPrev && (
-                        <div className="absolute -top-3 left-6 w-[2px] h-3 bg-[#8A7BA8]" />
-                      )}
                       {isInSuperset && (
-                        <div className="absolute top-0 left-4 bottom-0 w-1 rounded-full bg-[#8A7BA8]/20" />
+                        <div className="mb-2">
+                          <span
+                            className="text-[9.5px] font-semibold uppercase tracking-[0.12em] rounded-full px-2 py-[3px]"
+                            style={{
+                              background: 'rgba(192,252,1,0.14)',
+                              color: LIME,
+                            }}
+                          >
+                            {sameGroupAsPrev || sameGroupAsNext ? 'Superset' : 'Superset'}
+                          </span>
+                        </div>
                       )}
-                      <div className={`bg-[#A6ADA7] rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] border p-5 ${
-                        isInSuperset ? 'border-[#8A7BA8]/30 ml-3' : 'border-[#A6ADA7]'
-                      } ${isDragOver ? 'border-[#FDFDFE] shadow-[0_0_0_1px_rgba(139,105,20,0.3)]' : ''}`}>
-                        {isInSuperset && (
-                          <div className="mb-2 -mt-1">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#8A7BA8] bg-[#8A7BA8]/10 px-2 py-0.5 rounded-full">
-                              Superset
-                            </span>
-                          </div>
-                        )}
-                      {/* Exercise Header */}
-                      <div className="flex items-start gap-3 mb-4 pb-4 border-b border-[#A6ADA7]">
-                        {/* Drag Handle */}
-                        <div className="flex-shrink-0 pt-1 cursor-grab active:cursor-grabbing touch-none">
-                          <GripVertical strokeWidth={1.5} className="w-5 h-5 text-[#CDD1CE] hover:text-[#D6D9D6] transition-colors" />
+
+                      {/* Exercise header */}
+                      <div className="flex items-start gap-3">
+                        <div
+                          className="flex-shrink-0 pt-0.5 cursor-grab active:cursor-grabbing touch-none"
+                          style={{ color: INK_DIM }}
+                        >
+                          <GripVertical strokeWidth={1.75} className="w-4 h-4" />
                         </div>
 
-                        {/* GIF Thumbnail */}
-                        <div className="w-12 h-12 rounded-lg bg-[#A6ADA7] flex-shrink-0 overflow-hidden flex items-center justify-center">
+                        <div
+                          className="w-11 h-11 rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center"
+                          style={{ background: 'rgba(253,253,254,0.08)' }}
+                        >
                           {exercise.gif_url ? (
                             <Image
                               src={exercise.gif_url}
                               alt={exercise.name}
-                              width={48}
-                              height={48}
+                              width={44}
+                              height={44}
                               className="w-full h-full object-cover"
                               unoptimized
-                              style={{ mixBlendMode: 'multiply' }}
+                              style={{ mixBlendMode: 'luminosity' }}
                             />
-                          ) : (
-                            <div className="w-full h-full bg-[#A6ADA7]" />
-                          )}
+                          ) : null}
                         </div>
 
-                        {/* Exercise Info */}
-                        <div className="flex-1">
-                          <h3 className="text-[15px] font-semibold text-[#FDFDFE]">
+                        <div className="flex-1 min-w-0">
+                          <h3
+                            className="text-[14.5px] font-medium tracking-[-0.005em] truncate"
+                            style={{ color: INK }}
+                          >
                             {exercise.name_nl || exercise.name}
                           </h3>
-                          <div className="flex gap-2 mt-2">
-                            <span className="text-[11px] bg-[#A6ADA7] text-[#FDFDFE] px-2 py-0.5 rounded-full">
+                          <div className="flex flex-wrap gap-1.5 mt-1">
+                            <span
+                              className="text-[10.5px] rounded-full px-2 py-[2px] tracking-[0.02em]"
+                              style={{
+                                background: 'rgba(253,253,254,0.06)',
+                                color: INK_MUTED,
+                              }}
+                            >
                               {exercise.body_part}
                             </span>
                             {exercise.equipment && (
-                              <span className="text-[11px] bg-[#A6ADA7] text-[#D6D9D6] px-2 py-0.5 rounded-full">
+                              <span
+                                className="text-[10.5px] rounded-full px-2 py-[2px] tracking-[0.02em]"
+                                style={{
+                                  background: 'rgba(253,253,254,0.06)',
+                                  color: INK_DIM,
+                                }}
+                              >
                                 {exercise.equipment}
+                              </span>
+                            )}
+                            {isCardio && (
+                              <span
+                                className="text-[10.5px] rounded-full px-2 py-[2px] tracking-[0.02em] font-medium"
+                                style={{
+                                  background: 'rgba(164,199,242,0.14)',
+                                  color: BLUE,
+                                }}
+                              >
+                                Cardio
                               </span>
                             )}
                           </div>
                         </div>
 
-                        {/* Actions */}
                         <div className="flex gap-1">
-                          {/* Superset toggle */}
                           {index > 0 && (
                             <button
                               onClick={() => {
                                 if (exercise.superset_group_id) {
-                                  handleUpdateExercisePrescription(exercise.prescription_id, 'superset_group_id', null)
+                                  handleUpdateExercisePrescription(
+                                    exercise.prescription_id,
+                                    'superset_group_id',
+                                    null
+                                  )
                                 } else {
                                   const prev = activeDay.exercises[index - 1]
-                                  const groupId = prev.superset_group_id || `ss-${Date.now()}`
+                                  const groupId =
+                                    prev.superset_group_id || `ss-${Date.now()}`
                                   if (!prev.superset_group_id) {
-                                    handleUpdateExercisePrescription(prev.prescription_id, 'superset_group_id', groupId)
+                                    handleUpdateExercisePrescription(
+                                      prev.prescription_id,
+                                      'superset_group_id',
+                                      groupId
+                                    )
                                   }
-                                  handleUpdateExercisePrescription(exercise.prescription_id, 'superset_group_id', groupId)
+                                  handleUpdateExercisePrescription(
+                                    exercise.prescription_id,
+                                    'superset_group_id',
+                                    groupId
+                                  )
                                 }
                               }}
-                              className={`p-2 rounded-lg transition-colors ${
+                              className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+                              style={{
+                                background: exercise.superset_group_id
+                                  ? 'rgba(192,252,1,0.14)'
+                                  : 'transparent',
+                                color: exercise.superset_group_id ? LIME : INK_DIM,
+                              }}
+                              title={
                                 exercise.superset_group_id
-                                  ? 'text-[#8A7BA8] bg-[#8A7BA8]/10 hover:bg-[#8A7BA8]/20'
-                                  : 'text-[#D6D9D6] hover:text-[#8A7BA8] hover:bg-[#A6ADA7]'
-                              }`}
-                              title={exercise.superset_group_id ? 'Superset opheffen' : 'Superset met vorige'}
+                                  ? 'Superset opheffen'
+                                  : 'Superset met vorige'
+                              }
                             >
                               {exercise.superset_group_id ? (
-                                <Unlink strokeWidth={1.5} className="w-5 h-5" />
+                                <Unlink strokeWidth={1.75} className="w-4 h-4" />
                               ) : (
-                                <Link2 strokeWidth={1.5} className="w-5 h-5" />
+                                <Link2 strokeWidth={1.75} className="w-4 h-4" />
                               )}
                             </button>
                           )}
 
                           <button
-                            onClick={() => handleRemoveExercise(exercise.prescription_id)}
-                            className="p-2 text-[#D6D9D6] hover:text-red-600 hover:bg-[#A6ADA7] rounded-lg transition-colors"
+                            onClick={() =>
+                              handleRemoveExercise(exercise.prescription_id)
+                            }
+                            className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+                            style={{ color: INK_DIM }}
                           >
-                            <X strokeWidth={1.5} className="w-5 h-5" />
+                            <X strokeWidth={1.75} className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
 
-                      {/* Prescription Fields */}
-                      {exercise.category === 'cardio' ? (
-                        /* Cardio-specific fields */
-                        <div className="grid grid-cols-2 gap-4">
-                          {/* Duration (min) — stored in reps_min */}
-                          <div>
-                            <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
-                              Duur (min)
-                            </label>
-                            <input
-                              type="number"
-                              value={exercise.reps_min}
-                              onChange={(e) =>
-                                handleUpdateExercisePrescription(
-                                  exercise.prescription_id,
-                                  'reps_min',
-                                  parseInt(e.target.value) || 10
-                                )
-                              }
-                              min="1"
-                              placeholder="20"
-                              className="w-full px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
-                            />
+                      {/* Prescription rows */}
+                      <div
+                        className="mt-3 pt-3"
+                        style={{ borderTop: `1px solid ${HAIR}` }}
+                      >
+                        {isCardio ? (
+                          <div className="flex flex-col gap-2.5">
+                            <div className="flex items-center justify-between gap-3">
+                              <span
+                                className="text-[12px] font-medium"
+                                style={{ color: INK_MUTED }}
+                              >
+                                Duur
+                              </span>
+                              <Stepper
+                                value={exercise.reps_min}
+                                onChange={(v) =>
+                                  handleUpdateExercisePrescription(
+                                    exercise.prescription_id,
+                                    'reps_min',
+                                    v
+                                  )
+                                }
+                                min={1}
+                                suffix="min"
+                              />
+                            </div>
+                            <div>
+                              <FieldLabel>Notities</FieldLabel>
+                              <TextInput
+                                type="text"
+                                placeholder="bv. helling 12%, 5.5 km/u"
+                                value={exercise.notes || ''}
+                                onChange={(e) =>
+                                  handleUpdateExercisePrescription(
+                                    exercise.prescription_id,
+                                    'notes',
+                                    e.target.value || null
+                                  )
+                                }
+                              />
+                            </div>
                           </div>
+                        ) : (
+                          <div className="flex flex-col gap-2.5">
+                            <div className="flex items-center justify-between gap-3">
+                              <span
+                                className="text-[12px] font-medium"
+                                style={{ color: INK_MUTED }}
+                              >
+                                Sets
+                              </span>
+                              <Stepper
+                                value={exercise.sets}
+                                onChange={(v) =>
+                                  handleUpdateExercisePrescription(
+                                    exercise.prescription_id,
+                                    'sets',
+                                    v
+                                  )
+                                }
+                                min={1}
+                              />
+                            </div>
 
-                          {/* Notes */}
-                          <div>
-                            <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
-                              Notities
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="bv. helling 12%, 5.5 km/u"
-                              value={exercise.notes || ''}
-                              onChange={(e) =>
-                                handleUpdateExercisePrescription(
-                                  exercise.prescription_id,
-                                  'notes',
-                                  e.target.value || null
-                                )
-                              }
-                              className="w-full px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
-                            />
+                            <div className="flex items-center justify-between gap-3">
+                              <span
+                                className="text-[12px] font-medium"
+                                style={{ color: INK_MUTED }}
+                              >
+                                Reps
+                              </span>
+                              <div className="inline-flex items-center gap-1.5">
+                                <Stepper
+                                  value={exercise.reps_min}
+                                  onChange={(v) =>
+                                    handleUpdateExercisePrescription(
+                                      exercise.prescription_id,
+                                      'reps_min',
+                                      v
+                                    )
+                                  }
+                                  min={1}
+                                />
+                                <span
+                                  className="text-[11px]"
+                                  style={{ color: INK_DIM }}
+                                >
+                                  ─
+                                </span>
+                                <Stepper
+                                  value={exercise.reps_max || exercise.reps_min}
+                                  onChange={(v) =>
+                                    handleUpdateExercisePrescription(
+                                      exercise.prescription_id,
+                                      'reps_max',
+                                      v
+                                    )
+                                  }
+                                  min={1}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between gap-3">
+                              <span
+                                className="text-[12px] font-medium"
+                                style={{ color: INK_MUTED }}
+                              >
+                                Rust
+                              </span>
+                              <Stepper
+                                value={exercise.rest_seconds}
+                                onChange={(v) =>
+                                  handleUpdateExercisePrescription(
+                                    exercise.prescription_id,
+                                    'rest_seconds',
+                                    v
+                                  )
+                                }
+                                min={0}
+                                step={15}
+                                suffix="s"
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2 pt-1">
+                              <div>
+                                <FieldLabel>Tempo</FieldLabel>
+                                <TextInput
+                                  type="text"
+                                  placeholder="3-1-1-0"
+                                  value={exercise.tempo || ''}
+                                  onChange={(e) =>
+                                    handleUpdateExercisePrescription(
+                                      exercise.prescription_id,
+                                      'tempo',
+                                      e.target.value || null
+                                    )
+                                  }
+                                />
+                              </div>
+                              <div>
+                                <FieldLabel>RPE</FieldLabel>
+                                <TextInput
+                                  type="number"
+                                  placeholder="6-10"
+                                  value={exercise.rpe_target || ''}
+                                  onChange={(e) =>
+                                    handleUpdateExercisePrescription(
+                                      exercise.prescription_id,
+                                      'rpe_target',
+                                      e.target.value ? parseInt(e.target.value) : null
+                                    )
+                                  }
+                                  min={0}
+                                  max={10}
+                                />
+                              </div>
+                            </div>
+
+                            <div>
+                              <FieldLabel>Gewicht (optioneel)</FieldLabel>
+                              <TextInput
+                                type="text"
+                                placeholder="50-60 kg"
+                                value={exercise.weight_suggestion || ''}
+                                onChange={(e) =>
+                                  handleUpdateExercisePrescription(
+                                    exercise.prescription_id,
+                                    'weight_suggestion',
+                                    e.target.value || null
+                                  )
+                                }
+                              />
+                            </div>
+
+                            <div>
+                              <FieldLabel>Aantekeningen</FieldLabel>
+                              <textarea
+                                placeholder="Bijzondere instructies..."
+                                value={exercise.notes || ''}
+                                onChange={(e) =>
+                                  handleUpdateExercisePrescription(
+                                    exercise.prescription_id,
+                                    'notes',
+                                    e.target.value || null
+                                  )
+                                }
+                                rows={2}
+                                className="w-full px-3 py-2 rounded-xl text-[13.5px] resize-none transition-colors"
+                                style={{
+                                  background: 'rgba(253,253,254,0.05)',
+                                  color: INK,
+                                  border: '1px solid rgba(253,253,254,0.06)',
+                                  outline: 'none',
+                                }}
+                              />
+                            </div>
                           </div>
-                        </div>
-                      ) : (
-                      /* Strength exercise fields */
-                      <>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {/* Sets */}
-                        <div>
-                          <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
-                            Sets
-                          </label>
-                          <input
-                            type="number"
-                            value={exercise.sets}
-                            onChange={(e) =>
-                              handleUpdateExercisePrescription(
-                                exercise.prescription_id,
-                                'sets',
-                                parseInt(e.target.value) || 1
-                              )
-                            }
-                            min="1"
-                            className="w-full px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
-                          />
-                        </div>
-
-                        {/* Reps */}
-                        <div>
-                          <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
-                            Reps
-                          </label>
-                          <div className="flex gap-1">
-                            <input
-                              type="number"
-                              value={exercise.reps_min}
-                              onChange={(e) =>
-                                handleUpdateExercisePrescription(
-                                  exercise.prescription_id,
-                                  'reps_min',
-                                  parseInt(e.target.value) || 1
-                                )
-                              }
-                              min="1"
-                              className="flex-1 px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
-                            />
-                            <span className="text-[#D6D9D6] px-1 py-2">-</span>
-                            <input
-                              type="number"
-                              value={exercise.reps_max || exercise.reps_min}
-                              onChange={(e) =>
-                                handleUpdateExercisePrescription(
-                                  exercise.prescription_id,
-                                  'reps_max',
-                                  parseInt(e.target.value) || null
-                                )
-                              }
-                              min="1"
-                              className="flex-1 px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Rest */}
-                        <div>
-                          <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
-                            Rest (s)
-                          </label>
-                          <input
-                            type="number"
-                            value={exercise.rest_seconds}
-                            onChange={(e) =>
-                              handleUpdateExercisePrescription(
-                                exercise.prescription_id,
-                                'rest_seconds',
-                                parseInt(e.target.value) || 60
-                              )
-                            }
-                            min="0"
-                            step="15"
-                            className="w-full px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
-                          />
-                        </div>
-
-                        {/* Tempo */}
-                        <div>
-                          <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
-                            Tempo
-                          </label>
-                          <input
-                            type="text"
-                            placeholder="3-1-1-0"
-                            value={exercise.tempo || ''}
-                            onChange={(e) =>
-                              handleUpdateExercisePrescription(
-                                exercise.prescription_id,
-                                'tempo',
-                                e.target.value || null
-                              )
-                            }
-                            className="w-full px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] placeholder:text-[#D6D9D6] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
-                          />
-                        </div>
+                        )}
                       </div>
-
-                      {/* Additional Fields */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                        {/* RPE Target */}
-                        <div>
-                          <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
-                            RPE Target (optioneel)
-                          </label>
-                          <input
-                            type="number"
-                            placeholder="6-10"
-                            value={exercise.rpe_target || ''}
-                            onChange={(e) =>
-                              handleUpdateExercisePrescription(
-                                exercise.prescription_id,
-                                'rpe_target',
-                                e.target.value ? parseInt(e.target.value) : null
-                              )
-                            }
-                            min="0"
-                            max="10"
-                            className="w-full px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
-                          />
-                        </div>
-
-                        {/* Weight Suggestion */}
-                        <div>
-                          <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
-                            Weight Suggestion (optioneel)
-                          </label>
-                          <input
-                            type="text"
-                            placeholder="50-60 kg"
-                            value={exercise.weight_suggestion || ''}
-                            onChange={(e) =>
-                              handleUpdateExercisePrescription(
-                                exercise.prescription_id,
-                                'weight_suggestion',
-                                e.target.value || null
-                              )
-                            }
-                            className="w-full px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] placeholder:text-[#D6D9D6] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors"
-                          />
-                        </div>
-                      </div>
-                      </>
-                      )}
-
-                      {/* Notes (for strength exercises only — cardio has notes inline) */}
-                      {exercise.category !== 'cardio' && (
-                      <div className="mt-4">
-                        <label className="block text-[11px] font-medium text-[#D6D9D6] mb-1 uppercase">
-                          Aantekeningen (optioneel)
-                        </label>
-                        <textarea
-                          placeholder="Bijzondere instructies..."
-                          value={exercise.notes || ''}
-                          onChange={(e) =>
-                            handleUpdateExercisePrescription(
-                              exercise.prescription_id,
-                              'notes',
-                              e.target.value || null
-                            )
-                          }
-                          rows={2}
-                          className="w-full px-3 py-2 bg-[#A6ADA7] border border-[#A6ADA7] rounded-lg text-[13px] text-[#FDFDFE] placeholder:text-[#D6D9D6] focus:outline-none focus:ring-2 focus:ring-[#FDFDFE] focus:bg-[#A6ADA7] transition-colors resize-none"
-                        />
-                      </div>
-                      )}
                     </div>
-                    </div>
-                    )
-                  })}
+                  </div>
+                )
+              })}
 
-                  {/* Add Exercise Button */}
-                  <button
-                    onClick={() => setShowExerciseModal(true)}
-                    className="w-full py-4 border-2 border-dashed border-[#A6ADA7] rounded-2xl text-[15px] font-medium text-[#FDFDFE] hover:border-[#FDFDFE] hover:bg-[#A6ADA7] transition-colors flex items-center justify-center gap-2"
-                  >
-                    <Plus strokeWidth={1.5} className="w-5 h-5" />
-                    Oefening toevoegen
-                  </button>
-                </div>
-              )}
+              {/* Add exercise CTA */}
+              <button
+                onClick={() => setShowExerciseModal(true)}
+                className="w-full py-3.5 rounded-[18px] text-[13px] font-medium flex items-center justify-center gap-1.5 transition-opacity active:opacity-70"
+                style={{
+                  background: 'rgba(192,252,1,0.14)',
+                  color: LIME,
+                }}
+              >
+                <Plus strokeWidth={1.75} className="w-4 h-4" />
+                Oefening toevoegen
+              </button>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* Modals */}
       <ExerciseSearchModal
