@@ -203,36 +203,40 @@ export default function LiftDetailPage() {
           })
         }
 
-        // All sets for this exercise (join sessions for date + client filter).
-        // NOTE: FK column is `workout_session_id` (not `session_id`); using the wrong
-        // name made PostgREST 400 → setRows null → empty state even when sets exist.
-        const { data: setRows, error: setErr } = await supabase
-          .from('workout_sets')
-          .select('weight_kg, actual_reps, is_warmup, workout_session_id, workout_sessions!inner(id, client_id, started_at, completed_at)')
-          .eq('exercise_id', exerciseId)
-          .eq('workout_sessions.client_id', user.id)
-          .not('workout_sessions.completed_at', 'is', null)
+        // Sessions-first query (mirrors progress page pattern that's proven to work).
+        // Querying workout_sets directly with !inner-join filters returned silent 400s
+        // under RLS — going via workout_sessions and embedding the filtered sets is
+        // the pattern Supabase + RLS actually plays nicely with.
+        const { data: sessionRows, error: sessErr } = await supabase
+          .from('workout_sessions')
+          .select('id, started_at, completed_at, workout_sets(weight_kg, actual_reps, is_warmup, exercise_id)')
+          .eq('client_id', user.id)
+          .not('completed_at', 'is', null)
+          .order('started_at', { ascending: false })
 
-        if (setErr) {
-          console.error('Lift-detail sets query error:', setErr)
+        if (sessErr) {
+          console.error('Lift-detail sessions query error:', sessErr)
         }
 
-        if (setRows) {
+        if (sessionRows) {
           const entries: SetEntry[] = []
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          for (const r of setRows as any[]) {
-            const sess = Array.isArray(r.workout_sessions) ? r.workout_sessions[0] : r.workout_sessions
-            if (!sess) continue
-            const weight = Number(r.weight_kg) || 0
-            const reps = Number(r.actual_reps) || 0
-            if (weight <= 0 || reps <= 0) continue
-            entries.push({
-              weight_kg: weight,
-              reps,
-              is_warmup: !!r.is_warmup,
-              sessionId: sess.id,
-              sessionDate: sess.completed_at || sess.started_at,
-            })
+          for (const sess of sessionRows as any[]) {
+            const setsArr = Array.isArray(sess.workout_sets) ? sess.workout_sets : []
+            const sessionDate = sess.completed_at || sess.started_at
+            for (const s of setsArr) {
+              if (s.exercise_id !== exerciseId) continue
+              const weight = Number(s.weight_kg) || 0
+              const reps = Number(s.actual_reps) || 0
+              if (weight <= 0 || reps <= 0) continue
+              entries.push({
+                weight_kg: weight,
+                reps,
+                is_warmup: !!s.is_warmup,
+                sessionId: sess.id,
+                sessionDate,
+              })
+            }
           }
           entries.sort((a, b) => new Date(b.sessionDate).getTime() - new Date(a.sessionDate).getTime())
           setSets(entries)
