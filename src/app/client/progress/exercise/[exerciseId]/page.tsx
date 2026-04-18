@@ -203,13 +203,19 @@ export default function LiftDetailPage() {
           })
         }
 
-        // All sets for this exercise (join sessions for date + client filter)
-        const { data: setRows } = await supabase
+        // All sets for this exercise (join sessions for date + client filter).
+        // NOTE: FK column is `workout_session_id` (not `session_id`); using the wrong
+        // name made PostgREST 400 → setRows null → empty state even when sets exist.
+        const { data: setRows, error: setErr } = await supabase
           .from('workout_sets')
-          .select('weight_kg, actual_reps, is_warmup, session_id, workout_sessions!inner(id, client_id, started_at, completed_at)')
+          .select('weight_kg, actual_reps, is_warmup, workout_session_id, workout_sessions!inner(id, client_id, started_at, completed_at)')
           .eq('exercise_id', exerciseId)
           .eq('workout_sessions.client_id', user.id)
           .not('workout_sessions.completed_at', 'is', null)
+
+        if (setErr) {
+          console.error('Lift-detail sets query error:', setErr)
+        }
 
         if (setRows) {
           const entries: SetEntry[] = []
