@@ -43,16 +43,27 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.redirect(new URL('/', request.url))
-  }
-
-  // Fast path: check cached role cookie to avoid DB query on every request
+  // ──────────────────────────────────────────────────────────────
+  // Hybride auth — cookie-first:
+  //   1. Als `move_role` cookie aanwezig is → getSession() (lokaal,
+  //      geen netwerk). Vertrouwt het JWT dat bij login door getUser()
+  //      al geverifieerd werd. Ban-latency = max 30min (cookie TTL).
+  //   2. Als cookie mist → getUser() (netwerk, verifieert signature).
+  //      Dit gebeurt alleen bij eerste request of na cookie-verval.
+  // Vervangt een vaste ~200-400ms getUser()-call op elke navigatie.
+  // ──────────────────────────────────────────────────────────────
   const cachedRole = request.cookies.get('move_role')?.value
 
   if (cachedRole) {
+    // Fast path: trust cached role cookie + local JWT parse
+    const { data: { session } } = await supabase.auth.getSession()
+
+    if (!session?.user) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+
+    const user = session.user
+
     // Validate route access using cached role
     if (pathname.startsWith('/coach') && cachedRole !== 'coach') {
       // Don't blindly redirect — verify from DB first in case cookie is stale
@@ -119,7 +130,15 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
-  // No cached role — fetch from DB (only happens once per session)
+  // Slow path: no cached role → verify JWT via getUser() (netwerk)
+  //   en haal profile op. Dit zet de role-cookie zodat volgende
+  //   requests via de fast path gaan.
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.redirect(new URL('/', request.url))
+  }
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('role, intake_completed')

@@ -5,7 +5,10 @@ import { cookies } from 'next/headers'
  * Fast auth for API routes.
  *
  * Uses getSession() (local JWT parse, ~0ms) instead of getUser() (network call, ~300ms).
- * Safe because middleware already verified the user via getUser() before the API route runs.
+ *
+ * Trust chain: middleware verifies via getUser() op cookie-miss (eerste request
+ * of na 30min TTL). Tijdens cache-hit-window vertrouwen middleware én deze
+ * helper het JWT op basis van de eerdere verificatie. Ban-latency = max 30min.
  *
  * Returns { user, supabase } or { user: null } if not authenticated.
  */
