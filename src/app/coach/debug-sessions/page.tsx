@@ -1,8 +1,47 @@
 import { getAuthFast } from '@/lib/auth-fast'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 
 export const dynamic = 'force-dynamic'
+
+/**
+ * Server action: repair an abandoned session by setting completed_at.
+ * Alleen coach-role mag dit gebruiken.
+ */
+async function repairSessionAction(formData: FormData) {
+  'use server'
+  const sessionId = String(formData.get('sessionId') || '')
+  const completedAt = String(formData.get('completedAt') || '')
+  const q = String(formData.get('q') || '')
+  const days = String(formData.get('days') || '6')
+  if (!sessionId) return
+
+  const { user, supabase } = await getAuthFast()
+  if (!user) return
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+  if (profile?.role !== 'coach') return
+
+  const admin = createAdminClient()
+  const iso = completedAt && !isNaN(new Date(completedAt).getTime())
+    ? new Date(completedAt).toISOString()
+    : new Date().toISOString()
+
+  await admin
+    .from('workout_sessions')
+    .update({ completed_at: iso })
+    .eq('id', sessionId)
+
+  // Suppress unused-param lint — q/days nodig voor redirect-parity (nu enkel voor revalidate)
+  void q
+  void days
+  revalidatePath('/coach/debug-sessions')
+}
 
 /**
  * Coach-only diagnostische pagina. Laat sessies van een specifieke client
@@ -21,7 +60,6 @@ interface SessionRow {
   template_day_id: string | null
   client_program_id: string | null
   duration_seconds: number | null
-  duration_minutes: number | null
   mood_rating: number | null
   difficulty_rating: number | null
   feedback_text: string | null
@@ -81,8 +119,7 @@ function fmtTime(iso: string | null): string {
   return `${date} ${time}`
 }
 
-function fmtDuration(seconds: number | null, minutes: number | null): string {
-  if (minutes != null) return `${minutes} min`
+function fmtDuration(seconds: number | null): string {
   if (seconds != null) return `${Math.round(seconds / 60)} min`
   return '—'
 }
@@ -177,7 +214,7 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
       admin
         .from('workout_sessions')
         .select(
-          'id, started_at, completed_at, template_day_id, client_program_id, duration_seconds, duration_minutes, mood_rating, difficulty_rating, feedback_text, coach_seen, notes',
+          'id, started_at, completed_at, template_day_id, client_program_id, duration_seconds, mood_rating, difficulty_rating, feedback_text, coach_seen, notes',
         )
         .eq('client_id', client.id)
         .gte('started_at', since.toISOString())
@@ -187,7 +224,7 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
       admin
         .from('workout_sessions')
         .select(
-          'id, started_at, completed_at, template_day_id, client_program_id, duration_seconds, duration_minutes, mood_rating, difficulty_rating, feedback_text, coach_seen, notes',
+          'id, started_at, completed_at, template_day_id, client_program_id, duration_seconds, mood_rating, difficulty_rating, feedback_text, coach_seen, notes',
         )
         .eq('client_id', client.id)
         .gte('completed_at', since.toISOString())
@@ -588,7 +625,13 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
             ) : (
               <div className="space-y-3">
                 {sessions.map((s) => (
-                  <SessionCard key={s.id} s={s} />
+                  <SessionCard
+                    key={s.id}
+                    s={s}
+                    q={q}
+                    days={String(days)}
+                    action={repairSessionAction}
+                  />
                 ))}
               </div>
             )}
@@ -613,10 +656,36 @@ function SummaryChip({ label, value, tint }: { label: string; value: number; tin
   )
 }
 
-function SessionCard({ s }: { s: EnrichedSession }) {
+function SessionCard({
+  s,
+  q,
+  days,
+  action,
+}: {
+  s: EnrichedSession
+  q: string
+  days: string
+  action: (formData: FormData) => Promise<void>
+}) {
   const completed = !!s.completed_at
   const badgeColor = completed ? LIME : AMBER
   const badgeLabel = completed ? 'Voltooid' : 'Open'
+
+  // Default completedAt suggestion = started_at + sets_completed activity window.
+  // Als er geen sets zijn, pak started_at + 45 min als redelijke gok.
+  // Format: datetime-local (no seconds, no TZ suffix).
+  const suggestedCompletedAt = (() => {
+    if (!s.started_at) return ''
+    const started = new Date(s.started_at)
+    // Voeg duration_seconds toe als beschikbaar, anders 45 min default
+    const fallbackMs = s.duration_seconds ? s.duration_seconds * 1000 : 45 * 60 * 1000
+    const suggested = new Date(started.getTime() + fallbackMs)
+    // Als gok > nu, cap op nu
+    const capped = suggested.getTime() > Date.now() ? new Date() : suggested
+    // YYYY-MM-DDTHH:mm in local time
+    const pad = (n: number) => String(n).padStart(2, '0')
+    return `${capped.getFullYear()}-${pad(capped.getMonth() + 1)}-${pad(capped.getDate())}T${pad(capped.getHours())}:${pad(capped.getMinutes())}`
+  })()
 
   return (
     <div
@@ -647,7 +716,7 @@ function SessionCard({ s }: { s: EnrichedSession }) {
 
       <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[12px]" style={{ color: INK_MUTED }}>
         <Kv k="Sets" v={`${s.sets_completed} / ${s.sets_total}`} />
-        <Kv k="Duur" v={fmtDuration(s.duration_seconds, s.duration_minutes)} />
+        <Kv k="Duur" v={fmtDuration(s.duration_seconds)} />
         <Kv k="RPE" v={s.difficulty_rating != null ? String(s.difficulty_rating) : '—'} />
         <Kv k="Mood" v={s.mood_rating != null ? String(s.mood_rating) : '—'} />
         <Kv
@@ -676,6 +745,40 @@ function SessionCard({ s }: { s: EnrichedSession }) {
       <div className="mt-3 text-[11px] tabular-nums" style={{ color: 'rgba(253,253,254,0.35)' }}>
         {s.id}
       </div>
+
+      {!completed && (
+        <form
+          action={action}
+          className="mt-3 flex flex-wrap items-center gap-2 border-t pt-3"
+          style={{ borderColor: HAIR }}
+        >
+          <input type="hidden" name="sessionId" value={s.id} />
+          <input type="hidden" name="q" value={q} />
+          <input type="hidden" name="days" value={days} />
+          <label className="text-[11px]" style={{ color: INK_MUTED }}>
+            Voltooid op:
+          </label>
+          <input
+            type="datetime-local"
+            name="completedAt"
+            defaultValue={suggestedCompletedAt}
+            className="rounded-lg px-2 py-1 text-[11px] tabular-nums outline-none"
+            style={{
+              background: 'rgba(0,0,0,0.18)',
+              color: INK,
+              border: `1px solid ${HAIR}`,
+              colorScheme: 'dark',
+            }}
+          />
+          <button
+            type="submit"
+            className="ml-auto rounded-full px-3 py-1.5 text-[11px] font-medium"
+            style={{ background: LIME, color: '#0a0a0a' }}
+          >
+            Mark voltooid
+          </button>
+        </form>
+      )}
     </div>
   )
 }

@@ -608,6 +608,48 @@ function WorkoutCompletePage() {
       },
       onError: (err) => {
         console.error('[optimistic:workout-complete] commit failed:', err)
+        // Log naar bug_reports zodat coach dit ziet ipv stille fail.
+        try {
+          const msg = err instanceof Error ? err.message : String(err)
+          void supabase.from('bug_reports').insert({
+            user_id: userId,
+            page_url: typeof window !== 'undefined' ? window.location.href : '/client/workout/complete',
+            description:
+              '[auto] workout-complete commit failed — ' +
+              msg +
+              ' | session=' +
+              sessionId +
+              ' started=' +
+              session.started_at,
+            viewport_width: typeof window !== 'undefined' ? window.innerWidth : null,
+            viewport_height: typeof window !== 'undefined' ? window.innerHeight : null,
+            user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+          })
+        } catch {
+          /* best-effort */
+        }
+        // Queue voor retry bij volgende mount (localStorage-gebaseerd).
+        try {
+          if (typeof window !== 'undefined') {
+            const raw = window.localStorage.getItem('pending-workout-finish') || '[]'
+            const queue: Array<Record<string, unknown>> = JSON.parse(raw)
+            queue.push({
+              sessionId,
+              completedAt: endTime.toISOString(),
+              durationSeconds,
+              difficultyRating: rpe ?? null,
+              notes: notes || null,
+              queuedAt: new Date().toISOString(),
+            })
+            // Keep queue bounded — max 10 items.
+            window.localStorage.setItem(
+              'pending-workout-finish',
+              JSON.stringify(queue.slice(-10)),
+            )
+          }
+        } catch {
+          /* best-effort */
+        }
       },
     }).catch(() => {
       // Rollback al uitgevoerd; user is al genavigeerd, niets meer te doen UI-wise.
