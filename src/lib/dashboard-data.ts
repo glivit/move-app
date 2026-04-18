@@ -71,7 +71,9 @@ export async function fetchDashboardData(userId: string) {
       .eq('client_id', userId).gte('started_at', `${today}T00:00:00`).lte('started_at', `${today}T23:59:59`),
 
     // Workouts COMPLETED this week (completion date — not start date — drives weekview + voltooid counter)
-    db.from('workout_sessions').select('id, completed_at')
+    // template_day_id nodig voor inhaal-logica: een sessie die op woensdag Upper-A
+    // (gescheduled voor maandag) heeft afgerond, vervult de maandag-slot.
+    db.from('workout_sessions').select('id, completed_at, template_day_id')
       .eq('client_id', userId).not('completed_at', 'is', null)
       .gte('completed_at', getWeekStart()),
 
@@ -169,6 +171,34 @@ export async function fetchDashboardData(userId: string) {
 
   const todayWorkoutDone = todayWorkouts.some((w: any) => w.completed_at)
   const streak = streakResult
+
+  // ── Inhaal-detectie ──────────────────────────────────────
+  // Als er vandaag geen workout is (of de rustdag-sprint voorbij is), kijk dan
+  // terug door de huidige week: eerste gescheduled-day die nog niet is voltooid
+  // (via template_day_id-match over álle sessies deze week) wordt getoond als
+  // inhaal-kandidaat. Reden: Glenn wil dat clients niet verloren lopen op
+  // rustdagen — liever subtiel nudgen dat ze nog iets kunnen inhalen.
+  const weekCompletedTemplateDayIds = new Set(
+    (weekWorkouts || [])
+      .map((w: any) => w.template_day_id)
+      .filter((id: any): id is string => typeof id === 'string' && id.length > 0)
+  )
+  const dayNamesNl = ['', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
+  let catchupTemplateDay: any = null
+  let catchupMissedDow = 0
+  for (let dow = 1; dow < todayDow; dow++) {
+    const dayId = schedule[String(dow)] || null
+    if (!dayId) continue
+    if (weekCompletedTemplateDayIds.has(dayId)) continue
+    const d = templateDays.find((x: any) => x.id === dayId)
+    if (!d) continue
+    catchupTemplateDay = d
+    catchupMissedDow = dow
+    break // chronologisch = oudste gemiste eerst
+  }
+  const catchupExerciseCount: number | null = catchupTemplateDay
+    ? (catchupTemplateDay as any).program_template_exercises?.[0]?.count ?? null
+    : null
 
   const planMeals = (nutritionPlan as any)?.meals || []
   const mealStatus = planMeals.map((meal: any, index: number) => {
@@ -320,6 +350,17 @@ export async function fetchDashboardData(userId: string) {
       next: nextTrainingDay ? {
         name: nextTrainingDay.name,
         label: nextTrainingDay.label,
+      } : null,
+      // Gemiste workout deze week die nog ingehaald kan worden (chronologisch
+      // oudste eerst). null als er niets in te halen is OF als vandaag al een
+      // training heeft — inhaal-card surfaced enkel bij rustdag.
+      catchup: catchupTemplateDay ? {
+        id: catchupTemplateDay.id,
+        name: catchupTemplateDay.name,
+        focus: catchupTemplateDay.focus,
+        durationMin: catchupTemplateDay.estimated_duration_min,
+        exerciseCount: catchupExerciseCount,
+        missedOnLabel: dayNamesNl[catchupMissedDow] || '',
       } : null,
       completedToday: todayWorkoutDone,
       isRestDay: !todayTemplateDay,

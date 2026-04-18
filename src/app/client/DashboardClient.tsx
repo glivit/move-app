@@ -37,6 +37,17 @@ export interface DashboardData {
       name: string
       label: string
     } | null
+    // Inhaal-kandidaat: gemiste workout eerder deze week, chronologisch
+    // oudste eerst. Surfaced alleen als vandaag rust is (of als today
+    // al completed is) — anders prioriseren we de today-workout.
+    catchup: {
+      id: string
+      name: string
+      focus: string | null
+      durationMin: number
+      exerciseCount: number | null
+      missedOnLabel: string
+    } | null
     isRestDay: boolean
     scheduleDays: Array<{ dayNumber: number; name: string; focus: string | null }>
     completedDates: string[]
@@ -339,13 +350,17 @@ export default function ClientDashboard({
   const caloriesConsumed = useMemo(() => getCaloriesConsumed(nutrition ?? null), [nutrition])
   const caloriesTarget = nutrition?.targets?.calories || 0
 
-  // Vandaag-hero kan één van vier states zijn.
+  // Vandaag-hero kan één van vijf states zijn.
+  // `catchup` surfaced enkel op rustdagen (geen today-workout). Als vandaag
+  // voltooid of nog te doen is, blijft die primair — celebratory "Voltooid"
+  // of play-CTA wint van de amber inhaal-nudge.
   const heroState = useMemo(() => {
     if (!data) return 'rest' as const
     if (showOnboarding) return 'onboarding' as const
     if (isDay1) return 'day1' as const
     if (training?.today?.completed || training?.completedToday) return 'done' as const
     if (training?.today && !training.today.completed) return 'training' as const
+    if (training?.catchup) return 'catchup' as const
     if (actions?.checkInDue?.overdue) return 'checkin' as const
     return 'rest' as const
   }, [data, showOnboarding, isDay1, training, actions?.checkInDue])
@@ -556,7 +571,7 @@ function HeroCard({
   onboarding,
   loading,
 }: {
-  state: 'training' | 'done' | 'rest' | 'checkin' | 'onboarding' | 'day1'
+  state: 'training' | 'done' | 'rest' | 'checkin' | 'onboarding' | 'day1' | 'catchup'
   training: DashboardData['training'] | undefined
   onboarding: DashboardData['onboarding'] | null
   loading: boolean
@@ -638,6 +653,34 @@ function HeroCard({
           {dur ? `±${dur} min` : 'Voltooid'}
         </p>
         <Slider fill={1} knobRight label="Voltooid" ticksCount={34} />
+      </Link>
+    )
+  }
+
+  if (state === 'catchup' && training?.catchup) {
+    // Inhaal-card: gemiste workout deze week die nog kan afgerond worden.
+    // Amber-accent eyebrow onderscheidt van primaire today-card (lime). Tap
+    // → overview-page (zelfde flow als today-card), waar de gemiste day als
+    // tapbare rij verschijnt; server-side vervult de slot via template_day_id.
+    const c = training.catchup
+    return (
+      <Link
+        href="/client/workout"
+        className="block v6-card"
+        aria-label={`${c.name} inhalen`}
+      >
+        <Arr />
+        <div className="eyebrow mb-3" style={{ color: '#E8A93C' }}>
+          <span className="pulse" style={{ background: '#E8A93C' }} /> Inhalen · {c.missedOnLabel}
+        </div>
+        <h2 style={{ fontSize: 22, fontWeight: 300, letterSpacing: '-0.018em', lineHeight: 1.15, marginBottom: 6 }}>
+          {c.name}
+        </h2>
+        <p className="meta" style={{ marginBottom: 18 }}>
+          {c.exerciseCount ? `${c.exerciseCount} oefeningen · ` : ''}
+          ±{c.durationMin ?? 50} min
+        </p>
+        <Slider fill={0} knobRight={false} label="Inhalen" ticksCount={34} />
       </Link>
     )
   }

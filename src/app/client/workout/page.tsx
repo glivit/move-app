@@ -49,6 +49,7 @@ interface WeekCell {
 
 // ─── Constants ─────────────────────────────────────────────────────────
 const WEEKDAY_SHORT_NL = ['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za']
+const WEEKDAY_LONG_NL = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag']
 const MONTH_SHORT_NL = ['Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec']
 
 /**
@@ -152,6 +153,15 @@ export default function WorkoutOverviewPage() {
     [schedule, days, weekCompletedDayIds],
   )
 
+  // Inhaal-kandidaat: eerste past-cell deze week met scheduled day die nog
+  // niet voltooid is. Chronologisch = Ma → Zo, dus gewoon find() op volgorde.
+  // Surfaced in hero enkel als vandaag rust is (todayDay null); anders wint
+  // de today-workout de primaire plek.
+  const catchupCell = useMemo(
+    () => week.find(c => c.isPast && c.day && !c.completed) || null,
+    [week],
+  )
+
   // Loading skeleton
   if (loading) {
     return (
@@ -210,9 +220,16 @@ export default function WorkoutOverviewPage() {
     <div className="pb-28">
       {/* ─── Hero · Vandaag (DARK) ─── */}
       <div className="v6-card-dark" style={{ padding: '22px 22px 24px', marginBottom: 6, width: '100%' }}>
-        <div className="eyebrow">
+        <div className="eyebrow" style={!todayDay && catchupCell ? { color: '#E8A93C' } : undefined}>
           {todayDay && !todayCompleted && <span className="pulse" />}
-          {todayDay ? 'Vandaag' : 'Rustdag'}
+          {!todayDay && catchupCell && (
+            <span className="pulse" style={{ background: '#E8A93C' }} />
+          )}
+          {todayDay
+            ? 'Vandaag'
+            : catchupCell
+              ? `Inhalen · ${WEEKDAY_LONG_NL[catchupCell.date.getDay()]}`
+              : 'Rustdag'}
         </div>
 
         {todayDay ? (
@@ -265,6 +282,55 @@ export default function WorkoutOverviewPage() {
                       <polygon points="8 5 19 12 8 19 8 5" />
                     </svg>
                   )}
+                </button>
+              </div>
+            </div>
+          </>
+        ) : catchupCell && catchupCell.day ? (
+          // Inhaal-hero: gemiste workout van eerder deze week. Tap play →
+          // handleStart(catchupCell.day) → /client/workout/active?dayId=X.
+          // Server-side vervult via template_day_id-match de gemiste slot.
+          <>
+            <div
+              style={{
+                fontSize: 22,
+                fontWeight: 300,
+                letterSpacing: '-0.018em',
+                lineHeight: 1.1,
+                color: '#FDFDFE',
+                margin: '14px 0 4px',
+              }}
+            >
+              {catchupCell.day.name}
+            </div>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 400,
+                color: 'rgba(253,253,254,0.44)',
+                letterSpacing: '0.01em',
+                marginBottom: 22,
+              }}
+            >
+              {catchupCell.day.exercise_count ?? '—'} oefeningen · ±{catchupCell.day.estimated_duration_min} min
+              {' · Gemist op '}{WEEKDAY_LONG_NL[catchupCell.date.getDay()]}
+            </div>
+
+            <div className="start-row">
+              <div>
+                <div className="start-lbl">Inhalen</div>
+                <div className="start-sub">Start alsnog — telt voor {WEEKDAY_LONG_NL[catchupCell.date.getDay()]}</div>
+              </div>
+              <div className="start-cta">
+                <button
+                  className="ring"
+                  aria-label={`${catchupCell.day.name} inhalen`}
+                  onClick={() => catchupCell.day && handleStart(catchupCell.day)}
+                  style={{ border: 'none', cursor: 'pointer' }}
+                >
+                  <svg viewBox="0 0 24 24">
+                    <polygon points="8 5 19 12 8 19 8 5" />
+                  </svg>
                 </button>
               </div>
             </div>
