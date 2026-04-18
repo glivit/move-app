@@ -1122,6 +1122,87 @@ a, button {
   background: #FDFDFE;
 }
 .ex-drag:active { cursor: grabbing; }
+/* Active = reorderMode aan: lime dots + meer opacity zodat het visueel duidelijk
+ * is dat je in herschik-modus zit. Tap nogmaals op de dots → uit. */
+.ex-drag.active {
+  opacity: 1;
+}
+.ex-drag.active span {
+  background: #C0FC01;
+}
+/* Compact card in reorderMode — geen body, kleinere margin tussen rijen, en
+ * iets opvallendere achtergrond zodat sleepbaarheid duidelijk is. */
+.ex.compact {
+  padding: 12px 14px !important;
+  margin-bottom: 8px;
+}
+.ex.compact .ex-head {
+  margin-bottom: 0;
+}
+
+/* ═══ Reorder-mode banner ═══════════════════════════════════════════
+ * Sticky aan top van scroll-container. Lime accent-bar links + Klaar-cta
+ * rechts. v6 dark surface zodat het visueel los staat van de cards. */
+.reorder-banner {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 0 -2px 12px;
+  padding: 12px 14px 12px 18px;
+  border-radius: 14px;
+  background: rgba(71, 75, 72, 0.96);
+  border: 1px solid rgba(192, 252, 1, 0.18);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.reorder-banner::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 2px;
+  background: #C0FC01;
+}
+.reorder-banner-text {
+  flex: 1;
+  min-width: 0;
+}
+.reorder-banner-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: #FDFDFE;
+  letter-spacing: -0.01em;
+}
+.reorder-banner-sub {
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(253, 253, 254, 0.62);
+  letter-spacing: 0.01em;
+  margin-top: 2px;
+}
+.reorder-banner-done {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: #C0FC01;
+  color: #1a1d1b;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.reorder-banner-done:active {
+  transform: scale(0.97);
+}
 .ex-title {
   flex: 1;
   font-size: 15px;

@@ -1190,6 +1190,10 @@ function ActiveWorkoutPage() {
   const [loading, setLoading] = useState(true)
   const [session, setSession] = useState<WorkoutSession | null>(null)
   const [expandedExercise, setExpandedExercise] = useState<string | null>(null)
+  // Reorder-mode: tap op de drag-dots → compact view (alleen titels), zodat
+  // je in één scherm de volgorde kan wijzigen. Long-press blijft drag — het
+  // verschil is enkel dat in reorderMode de cards ingeklapt zijn.
+  const [reorderMode, setReorderMode] = useState(false)
   const [closeConfirm, setCloseConfirm] = useState(false)
   const [prCelebration, setPrCelebration] = useState<string | null>(null)
   const [workoutSeconds, setWorkoutSeconds] = useState(0)
@@ -2163,6 +2167,28 @@ function ActiveWorkoutPage() {
 
       {/* ═══ EXERCISE LIST ═══════════════════════════ */}
       <main className="flex-1 overflow-y-auto w-full" style={{ padding: '0 5% 120px' }}>
+        {reorderMode && (
+          // Sticky banner zodat je in reorderMode altijd "Klaar" kan klikken
+          // terwijl je scrolt. position:sticky werkt in de overflow-container
+          // van main — z-index boven de cards. Lime copy signaleert "modus aan".
+          <div
+            className="reorder-banner"
+            role="region"
+            aria-label="Herschik-modus actief"
+          >
+            <div className="reorder-banner-text">
+              <div className="reorder-banner-title">Herschikken</div>
+              <div className="reorder-banner-sub">Sleep oefeningen om de volgorde te wijzigen</div>
+            </div>
+            <button
+              className="reorder-banner-done"
+              onClick={() => setReorderMode(false)}
+              type="button"
+            >
+              Klaar
+            </button>
+          </div>
+        )}
         <DndContext sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={exerciseIds} strategy={verticalListSortingStrategy}>
         {exercises.map((ex, exIndex) => {
@@ -2196,12 +2222,16 @@ function ActiveWorkoutPage() {
                   SUPERSET
                 </div>
               )}
-              <div className="ex" style={isSuperset ? { borderLeft: '3px solid #C0FC01', marginLeft: -3 } : {}}>
+              <div className={`ex${reorderMode ? ' compact' : ''}`} style={isSuperset ? { borderLeft: '3px solid #C0FC01', marginLeft: -3 } : {}}>
               {/* Exercise header */}
               <div className="ex-head">
                 {/* Drag-region: zowel de 6-dots handle als de titel triggeren
                    reorder bij long-press (120ms). Verbeterde hitbox want enkel
-                   de 32×36 dots was te klein op mobiel en slecht discoverable. */}
+                   de 32×36 dots was te klein op mobiel en slecht discoverable.
+                   QUICK-TAP op de dots zelf → compact reorder-mode aan/uit. We
+                   onderscheppen pointerdown op .ex-drag NIET met stopPropagation
+                   want dnd-kit moet de drag-trigger nog kunnen meten — quick
+                   tap (<120ms) fired alleen onClick, hold start drag. */}
                 <div
                   className="ex-handle"
                   {...listeners}
@@ -2219,23 +2249,36 @@ function ActiveWorkoutPage() {
                     WebkitUserSelect: 'none',
                   }}
                 >
-                  <div className="ex-drag" aria-hidden="true">
+                  <div
+                    className={`ex-drag${reorderMode ? ' active' : ''}`}
+                    aria-label={reorderMode ? 'Sluit herschik-modus' : 'Open herschik-modus'}
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => {
+                      // Voorkom dat klik op dots ook andere card-acties triggert.
+                      e.stopPropagation()
+                      setReorderMode(prev => !prev)
+                      setExpandedExercise(null)
+                    }}
+                  >
                     <span/><span/><span/><span/><span/><span/>
                   </div>
                   <div className="ex-title">{exerciseData.name_nl || exerciseData.name}</div>
                 </div>
-                <button className="ex-kebab" onClick={() => setExpandedExercise(isExpanded ? null : ex.id)} aria-label="Opties" style={{ WebkitTapHighlightColor: 'transparent' }}>
-                  <span/>
-                </button>
+                {!reorderMode && (
+                  <button className="ex-kebab" onClick={() => setExpandedExercise(isExpanded ? null : ex.id)} aria-label="Opties" style={{ WebkitTapHighlightColor: 'transparent' }}>
+                    <span/>
+                  </button>
+                )}
               </div>
 
-              {/* Expanded: large GIF + collapsible tips */}
-              {isExpanded && (
+              {/* Expanded: large GIF + collapsible tips — verborgen in reorderMode */}
+              {!reorderMode && isExpanded && (
                 <ExerciseInfoPanel exerciseData={exerciseData} />
               )}
 
-              {/* Cardio or Sets */}
-              {exerciseData.category === 'cardio' ? (
+              {/* Cardio or Sets — verborgen in reorderMode (compact view) */}
+              {!reorderMode && (exerciseData.category === 'cardio' ? (
                 // ─── Cardio exercise: show timer ───
                 cardioCompleted[ex.id] ? (
                   <div
@@ -2352,7 +2395,7 @@ function ActiveWorkoutPage() {
                     </span>
                   </button>
                 </>
-              )}
+              ))}
             </div>
           </div>
           )}
