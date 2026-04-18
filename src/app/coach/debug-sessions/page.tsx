@@ -144,17 +144,19 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
   // (ooit=0) of een window-probleem (ooit>0, maar windowed=0).
   let everCount: number | null = null
   let recentEver: SessionRow[] = []
+  // Error capture per query — zo zien we als de SELECT silently faalt
+  const queryErrors: { query: string; message: string }[] = []
 
   if (client) {
     const now = new Date()
     const since = new Date(now.getTime() - days * 86400000)
 
     const [
-      { data: programs },
-      { data: sessionsByStarted },
-      { data: sessionsByCompleted },
-      { count: everCountRes },
-      { data: recentEverRes },
+      programsRes,
+      sessionsByStartedRes,
+      sessionsByCompletedRes,
+      everCountResWrap,
+      recentEverResWrap,
     ] = await Promise.all([
       admin
         .from('client_programs')
@@ -180,24 +182,37 @@ export default async function CoachDebugSessionsPage({ searchParams }: Props) {
         .eq('client_id', client.id)
         .gte('completed_at', since.toISOString())
         .order('completed_at', { ascending: false }),
-      // Total ever — diagnostic
+      // Total ever — diagnostic (count only, geen kolom-select dus geen failure-mode)
       admin
         .from('workout_sessions')
         .select('id', { count: 'exact', head: true })
         .eq('client_id', client.id),
-      // 5 meest recente ooit — diagnostic
+      // 5 meest recente ooit — START minimaal: alleen guaranteed-existing kolommen
+      // (id/started_at/completed_at/template_day_id/client_program_id) zodat we 100%
+      // zeker zijn dat 0 rijen NIET door een ontbrekende kolom komt.
       admin
         .from('workout_sessions')
-        .select(
-          'id, started_at, completed_at, template_day_id, client_program_id, duration_seconds, duration_minutes, mood_rating, difficulty_rating, feedback_text, coach_seen, notes',
-        )
+        .select('id, started_at, completed_at, template_day_id, client_program_id, created_at')
         .eq('client_id', client.id)
-        .order('started_at', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(5),
     ])
 
-    everCount = everCountRes ?? null
-    recentEver = (recentEverRes as SessionRow[]) || []
+    if (programsRes.error) queryErrors.push({ query: 'client_programs', message: programsRes.error.message })
+    if (sessionsByStartedRes.error)
+      queryErrors.push({ query: 'sessions by started_at', message: sessionsByStartedRes.error.message })
+    if (sessionsByCompletedRes.error)
+      queryErrors.push({ query: 'sessions by completed_at', message: sessionsByCompletedRes.error.message })
+    if (everCountResWrap.error)
+      queryErrors.push({ query: 'count ever', message: everCountResWrap.error.message })
+    if (recentEverResWrap.error)
+      queryErrors.push({ query: 'recent ever (limit 5)', message: recentEverResWrap.error.message })
+
+    const programs = programsRes.data
+    const sessionsByStarted = sessionsByStartedRes.data
+    const sessionsByCompleted = sessionsByCompletedRes.data
+    everCount = everCountResWrap.count ?? null
+    recentEver = (recentEverResWrap.data as SessionRow[]) || []
 
     // Merge + dedupe by id
     const byId = new Map<string, SessionRow>()
