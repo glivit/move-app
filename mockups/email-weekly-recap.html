@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MŌVE · Weekly recap e-mail</title>
+<style>
+  :root {
+    --canvas: #8E9890;
+    --canvas-shade: #818c84;
+    --card: #474B48;
+    --card-soft: #3e4240;
+    --ink: #FDFDFE;
+    --ink-mute: rgba(253,253,254,0.62);
+    --ink-dim: rgba(253,253,254,0.38);
+    --hair: rgba(253,253,254,0.08);
+    --hair-strong: rgba(253,253,254,0.14);
+    --lime: #C0FC01;
+    --amber: #E8A93C;
+    --protein: #A4C7F2;
+    --carbs: #C0FC01;
+    --fat: #CBB0D6;
+    --calories: #E8A93C;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #1e2221;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Helvetica Neue', system-ui, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* ── client chrome (design scaffold only, not part of the real email) ── */
+  .client-chrome {
+    padding: 48px 32px 80px;
+    display: flex; flex-direction: column; align-items: center; gap: 24px;
+  }
+  .client-chrome .pane-title {
+    color: var(--ink-mute);
+    font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* ── email container ── */
+  .email-wrapper {
+    width: 100%;
+    max-width: 560px;
+    background: var(--canvas);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow:
+      0 40px 80px -30px rgba(0,0,0,0.55),
+      0 20px 40px -20px rgba(0,0,0,0.4);
+  }
+  .email-body {
+    padding: 36px 28px 40px;
+  }
+
+  /* ── top row ── */
+  .top-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 4px 28px;
+  }
+  .logo {
+    font-size: 18px; font-weight: 700; letter-spacing: 0.12em;
+    color: var(--ink);
+  }
+  .week-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 600;
+    color: var(--ink-mute);
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(253,253,254,0.06);
+    border: 1px solid var(--hair);
+  }
+
+  /* ── hero ── */
+  .hero {
+    padding: 4px 4px 28px;
+  }
+  .hero .kicker {
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-mute); font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .hero h1 {
+    margin: 0;
+    font-size: 30px; line-height: 1.12;
+    font-weight: 700; letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .hero p {
+    margin: 12px 0 0;
+    font-size: 15px; line-height: 1.55;
+    color: var(--ink-mute);
+    max-width: 440px;
+  }
+
+  /* ── compliance card (big) ── */
+  .compliance {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .compliance .label {
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-mute); font-weight: 600;
+  }
+  .compliance .score {
+    display: flex; align-items: baseline; gap: 8px;
+    margin: 6px 0 4px;
+  }
+  .compliance .score .num {
+    font-size: 56px; line-height: 1; font-weight: 700;
+    color: var(--lime);
+    letter-spacing: -0.03em;
+  }
+  .compliance .score .pct {
+    font-size: 22px; font-weight: 600; color: var(--ink);
+  }
+  .compliance .trend {
+    font-size: 13px; color: var(--ink-mute);
+  }
+  .compliance .trend .up {
+    color: var(--lime); font-weight: 600;
+  }
+
+  /* breakdown mini-bars */
+  .breakdown {
+    margin-top: 20px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  .break-item {
+    background: var(--card-soft);
+    border-radius: 14px;
+    padding: 14px;
+  }
+  .break-item .b-label {
+    font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink-mute); font-weight: 600;
+  }
+  .break-item .b-value {
+    font-size: 20px; font-weight: 700; color: var(--ink);
+    margin-top: 4px;
+  }
+  .break-item .b-sub {
+    font-size: 12px; color: var(--ink-mute); margin-top: 2px;
+  }
+  .bar-track {
+    margin-top: 10px;
+    height: 4px;
+    background: rgba(253,253,254,0.08);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .bar-fill { height: 100%; border-radius: 999px; }
+
+  /* ── generic section card ── */
+  .card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 22px 22px 20px;
+    margin-bottom: 16px;
+  }
+  .card h3 {
+    margin: 0 0 14px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+  .card h3 .muted {
+    color: var(--ink-mute); font-weight: 500;
+  }
+
+  /* workout list */
+  .session-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 0;
+    border-top: 1px solid var(--hair);
+  }
+  .session-row:first-of-type { border-top: none; padding-top: 4px; }
+  .session-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex: 0 0 8px;
+  }
+  .session-dot.done { background: var(--lime); box-shadow: 0 0 0 4px rgba(192,252,1,0.12); }
+  .session-dot.missed { background: rgba(253,253,254,0.22); }
+  .session-name {
+    flex: 1;
+    font-size: 14px; font-weight: 600; color: var(--ink);
+  }
+  .session-day {
+    color: var(--ink-mute); font-weight: 500; font-size: 12px;
+    margin-left: 4px;
+  }
+  .session-meta {
+    font-size: 12px; color: var(--ink-mute);
+  }
+  .session-meta.missed { color: var(--ink-dim); font-style: italic; }
+
+  /* macros row */
+  .macros {
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px;
+  }
+  .macro {
+    background: var(--card-soft);
+    border-radius: 14px;
+    padding: 12px 10px 12px;
+    text-align: left;
+  }
+  .macro .top {
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 8px;
+  }
+  .macro .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .macro .name {
+    font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink-mute); font-weight: 600;
+  }
+  .macro .value {
+    font-size: 18px; font-weight: 700; color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .macro .goal {
+    font-size: 11px; color: var(--ink-mute);
+    margin-top: 2px;
+  }
+
+  /* weight tile */
+  .weight-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+  .weight-col .label {
+    font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink-mute); font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .weight-col .value {
+    font-size: 20px; font-weight: 700; color: var(--ink);
+  }
+  .weight-col .unit {
+    color: var(--ink-mute); font-weight: 500; font-size: 13px;
+    margin-left: 2px;
+  }
+  .delta-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(192,252,1,0.14);
+    color: var(--lime);
+    font-size: 12px; font-weight: 600;
+  }
+  .spark {
+    display: flex; align-items: flex-end; gap: 3px;
+    height: 36px;
+    padding: 0 2px;
+  }
+  .spark span {
+    flex: 1;
+    background: rgba(192,252,1,0.35);
+    border-radius: 2px;
+    min-height: 8px;
+  }
+
+  /* highlight */
+  .highlight {
+    background: var(--lime);
+    color: #0a0e0b;
+    border-radius: 20px;
+    padding: 22px;
+    margin-bottom: 16px;
+  }
+  .highlight .kicker {
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    font-weight: 700;
+    opacity: 0.72;
+  }
+  .highlight .title {
+    font-size: 17px; font-weight: 700;
+    margin: 8px 0 6px;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+  .highlight .body {
+    font-size: 13px; color: rgba(10,14,11,0.72);
+    line-height: 1.5;
+  }
+
+  /* coach note */
+  .coach-note {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 22px;
+    margin-bottom: 28px;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .coach-avatar {
+    flex: 0 0 38px;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #C0FC01, #7aa800);
+    color: #0a0e0b;
+    font-weight: 700; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .coach-note .content .label {
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-mute); font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .coach-note .content .msg {
+    font-size: 14px; color: var(--ink); line-height: 1.55;
+  }
+  .coach-note .content .author {
+    font-size: 12px; color: var(--ink-mute);
+    margin-top: 8px;
+  }
+
+  /* CTA */
+  .cta-wrap {
+    text-align: center;
+    padding: 4px 0 20px;
+  }
+  a.cta {
+    display: inline-block;
+    background: var(--lime);
+    color: #0a0e0b !important;
+    text-decoration: none;
+    padding: 16px 28px;
+    border-radius: 999px;
+    font-weight: 700; font-size: 15px;
+    letter-spacing: -0.005em;
+    box-shadow: 0 10px 24px -10px rgba(192,252,1,0.55);
+  }
+  .cta-sub {
+    margin-top: 10px;
+    font-size: 12px; color: var(--ink-mute);
+  }
+
+  /* footer */
+  .footer {
+    border-top: 1px solid var(--hair);
+    padding: 24px 4px 8px;
+    font-size: 11px;
+    color: var(--ink-mute);
+    text-align: center;
+    line-height: 1.6;
+  }
+  .footer a {
+    color: var(--ink-mute);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* mobile */
+  @media (max-width: 480px) {
+    .email-body { padding: 28px 20px 32px; }
+    .hero h1 { font-size: 26px; }
+    .compliance .score .num { font-size: 48px; }
+    .breakdown { grid-template-columns: 1fr; }
+    .macros { grid-template-columns: 1fr 1fr; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+  <div class="client-chrome">
+    <div class="pane-title">Weekly recap · e-mail preview</div>
+
+    <div class="email-wrapper">
+      <div class="email-body">
+
+        <!-- top row -->
+        <div class="top-row">
+          <div class="logo">MŌVE</div>
+          <div class="week-pill">Week 16 · 13 – 19 apr</div>
+        </div>
+
+        <!-- hero -->
+        <div class="hero">
+          <div class="kicker">Jouw week in beeld</div>
+          <h1>Sterke week,<br/>Jan.</h1>
+          <p>Je zat dicht tegen je doelen aan op elk vlak. Eén beensdag geskipt — geen drama. Eén cijfer om trots op te zijn vind je hieronder.</p>
+        </div>
+
+        <!-- compliance big card -->
+        <div class="compliance">
+          <div class="label">Consistentie deze week</div>
+          <div class="score">
+            <span class="num">82</span>
+            <span class="pct">%</span>
+          </div>
+          <div class="trend"><span class="up">+7%</span> vs vorige week</div>
+
+          <div class="breakdown">
+            <div class="break-item">
+              <div class="b-label">Trainingen</div>
+              <div class="b-value">3 / 4</div>
+              <div class="b-sub">Push · Pull · Upper</div>
+              <div class="bar-track"><div class="bar-fill" style="width: 75%; background: var(--lime);"></div></div>
+            </div>
+            <div class="break-item">
+              <div class="b-label">Maaltijden gelogd</div>
+              <div class="b-value">17 / 21</div>
+              <div class="b-sub">81% · 4 gemist</div>
+              <div class="bar-track"><div class="bar-fill" style="width: 81%; background: var(--amber);"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- workouts card -->
+        <div class="card">
+          <h3>Trainingen <span class="muted">· 3 van 4</span></h3>
+
+          <div class="session-row">
+            <span class="session-dot done"></span>
+            <div class="session-name">Push <span class="session-day">· ma 13/04</span></div>
+            <div class="session-meta">6 oef · 52 min</div>
+          </div>
+          <div class="session-row">
+            <span class="session-dot done"></span>
+            <div class="session-name">Pull <span class="session-day">· di 14/04</span></div>
+            <div class="session-meta">6 oef · 58 min</div>
+          </div>
+          <div class="session-row">
+            <span class="session-dot missed"></span>
+            <div class="session-name">Legs <span class="session-day">· do 16/04</span></div>
+            <div class="session-meta missed">overgeslagen</div>
+          </div>
+          <div class="session-row">
+            <span class="session-dot done"></span>
+            <div class="session-name">Upper <span class="session-day">· vr 17/04</span></div>
+            <div class="session-meta">6 oef · 47 min</div>
+          </div>
+        </div>
+
+        <!-- macros card -->
+        <div class="card">
+          <h3>Voeding — gemiddeld per dag</h3>
+          <div class="macros">
+            <div class="macro">
+              <div class="top"><span class="dot" style="background: var(--calories);"></span><span class="name">kcal</span></div>
+              <div class="value">2 340</div>
+              <div class="goal">doel 2 500</div>
+            </div>
+            <div class="macro">
+              <div class="top"><span class="dot" style="background: var(--protein);"></span><span class="name">eiwit</span></div>
+              <div class="value">168 g</div>
+              <div class="goal">doel 180 g</div>
+            </div>
+            <div class="macro">
+              <div class="top"><span class="dot" style="background: var(--carbs);"></span><span class="name">kh</span></div>
+              <div class="value">264 g</div>
+              <div class="goal">doel 280 g</div>
+            </div>
+            <div class="macro">
+              <div class="top"><span class="dot" style="background: var(--fat);"></span><span class="name">vet</span></div>
+              <div class="value">75 g</div>
+              <div class="goal">doel 80 g</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- weight card -->
+        <div class="card">
+          <h3>Gewicht</h3>
+          <div class="weight-row">
+            <div class="weight-col">
+              <div class="label">Start week</div>
+              <div class="value">82,4<span class="unit"> kg</span></div>
+            </div>
+            <div class="weight-col" style="text-align: right;">
+              <div class="label">Eind week</div>
+              <div class="value">82,1<span class="unit"> kg</span></div>
+            </div>
+          </div>
+          <div class="spark">
+            <span style="height: 70%;"></span>
+            <span style="height: 85%;"></span>
+            <span style="height: 62%;"></span>
+            <span style="height: 78%;"></span>
+            <span style="height: 54%;"></span>
+            <span style="height: 68%;"></span>
+            <span style="height: 46%;"></span>
+          </div>
+          <div style="margin-top: 12px;">
+            <span class="delta-pill">− 0,3 kg &nbsp;·&nbsp; op koers</span>
+          </div>
+        </div>
+
+        <!-- highlight -->
+        <div class="highlight">
+          <div class="kicker">Win van de week</div>
+          <div class="title">52 kg op de Chest Press — 3 reps meer dan vorige week.</div>
+          <div class="body">Dat is de derde week op rij progressie op deze oefening. Je bovenlichaam krijgt er stilaan vorm van.</div>
+        </div>
+
+        <!-- coach note -->
+        <div class="coach-note">
+          <div class="coach-avatar">G</div>
+          <div class="content">
+            <div class="label">Focus volgende week</div>
+            <div class="msg">"Beensdag doorzetten, ook als 'm korter moet. Liever 30 min dan helemaal skippen — momentum is belangrijker dan perfectie."</div>
+            <div class="author">— Glenn, je coach</div>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-wrap">
+          <a href="#" class="cta">Open je dashboard →</a>
+          <div class="cta-sub">Volledig overzicht, grafieken en sessies per dag.</div>
+        </div>
+
+        <!-- footer -->
+        <div class="footer">
+          Deze mail krijg je elke zondag om 20:00. <br/>
+          <a href="#">Instellingen</a> &nbsp;·&nbsp; <a href="#">Pauzeer recap</a> &nbsp;·&nbsp; <a href="#">Uitschrijven</a><br/><br/>
+          MŌVE Coaching · Antwerpen, BE
+        </div>
+
+      </div>
+    </div>
+
+    <div class="pane-title">einde preview</div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MŌVE · Plan voor deze week — e-mail</title>
+<style>
+  :root {
+    --canvas: #8E9890;
+    --canvas-shade: #818c84;
+    --card: #474B48;
+    --card-soft: #3e4240;
+    --ink: #FDFDFE;
+    --ink-mute: rgba(253,253,254,0.62);
+    --ink-dim: rgba(253,253,254,0.38);
+    --hair: rgba(253,253,254,0.08);
+    --hair-strong: rgba(253,253,254,0.14);
+    --lime: #C0FC01;
+    --amber: #E8A93C;
+    --protein: #A4C7F2;
+    --carbs: #C0FC01;
+    --fat: #CBB0D6;
+    --calories: #E8A93C;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #1e2221;
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Helvetica Neue', system-ui, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* ── client chrome (design scaffold only) ── */
+  .client-chrome {
+    padding: 48px 32px 80px;
+    display: flex; flex-direction: column; align-items: center; gap: 24px;
+  }
+  .client-chrome .pane-title {
+    color: var(--ink-mute);
+    font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* ── email container ── */
+  .email-wrapper {
+    width: 100%;
+    max-width: 560px;
+    background: var(--canvas);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow:
+      0 40px 80px -30px rgba(0,0,0,0.55),
+      0 20px 40px -20px rgba(0,0,0,0.4);
+  }
+  .email-body { padding: 36px 28px 40px; }
+
+  /* ── top row ── */
+  .top-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 4px 28px;
+  }
+  .logo {
+    font-size: 18px; font-weight: 700; letter-spacing: 0.12em;
+    color: var(--ink);
+  }
+  .week-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 600;
+    color: var(--ink-mute);
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(253,253,254,0.06);
+    border: 1px solid var(--hair);
+  }
+
+  /* ── hero ── */
+  .hero { padding: 4px 4px 24px; }
+  .hero .kicker {
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-mute); font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .hero h1 {
+    margin: 0;
+    font-size: 30px; line-height: 1.12;
+    font-weight: 700; letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--lime);
+  }
+  .hero p {
+    margin: 12px 0 0;
+    font-size: 15px; line-height: 1.55;
+    color: var(--ink-mute);
+    max-width: 460px;
+  }
+
+  /* ── week strip ── */
+  .week-strip {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 18px 16px 20px;
+    margin-bottom: 16px;
+  }
+  .week-strip .label {
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-mute); font-weight: 600;
+    padding: 0 6px 12px;
+  }
+  .week-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
+  }
+  .day {
+    background: var(--card-soft);
+    border-radius: 12px;
+    padding: 10px 4px 12px;
+    text-align: center;
+    position: relative;
+    min-height: 86px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .day.today {
+    background: var(--lime);
+    color: #0a0e0b;
+  }
+  .day .dow {
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-mute);
+  }
+  .day.today .dow { color: rgba(10,14,11,0.62); }
+  .day .date {
+    font-size: 14px; font-weight: 700;
+    color: var(--ink);
+    margin-top: 2px;
+  }
+  .day.today .date { color: #0a0e0b; }
+  .day .tag {
+    margin-top: 8px;
+    font-size: 10px; font-weight: 700;
+    padding: 4px 0;
+    border-radius: 6px;
+    background: rgba(192,252,1,0.14);
+    color: var(--lime);
+    letter-spacing: 0.04em;
+  }
+  .day.today .tag {
+    background: #0a0e0b;
+    color: var(--lime);
+  }
+  .day .tag.rest {
+    background: rgba(253,253,254,0.05);
+    color: var(--ink-dim);
+    font-weight: 600;
+    text-transform: lowercase;
+    letter-spacing: 0;
+  }
+
+  /* ── session cards ── */
+  .section-label {
+    font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-mute); font-weight: 600;
+    padding: 10px 4px 12px;
+  }
+  .session-card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 18px 20px;
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 16px;
+    position: relative;
+  }
+  .session-card.today::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 18px; bottom: 18px;
+    width: 3px;
+    background: var(--lime);
+    border-radius: 0 3px 3px 0;
+  }
+  .sess-day {
+    flex: 0 0 44px;
+    text-align: center;
+  }
+  .sess-day .dow-lg {
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    font-weight: 700;
+    color: var(--ink-mute);
+  }
+  .sess-day .date-lg {
+    font-size: 20px; font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+    margin-top: 2px;
+  }
+  .session-card.today .sess-day .dow-lg,
+  .session-card.today .sess-day .date-lg {
+    color: var(--lime);
+  }
+  .sess-body { flex: 1; min-width: 0; }
+  .sess-name {
+    font-size: 15px; font-weight: 700; color: var(--ink);
+    letter-spacing: -0.005em;
+  }
+  .sess-focus {
+    font-size: 12px; color: var(--ink-mute);
+    margin-top: 2px;
+  }
+  .sess-meta {
+    font-size: 11px; color: var(--ink-dim);
+    margin-top: 6px;
+  }
+  .sess-arrow {
+    flex: 0 0 auto;
+    color: var(--ink-mute);
+    font-size: 18px;
+  }
+
+  /* ── macros card ── */
+  .card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 22px 22px 20px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+  }
+  .card h3 {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .card .sub {
+    font-size: 12px; color: var(--ink-mute);
+    margin-bottom: 16px;
+  }
+  .macros {
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px;
+  }
+  .macro {
+    background: var(--card-soft);
+    border-radius: 14px;
+    padding: 12px 10px;
+    text-align: left;
+  }
+  .macro .top {
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 8px;
+  }
+  .macro .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .macro .name {
+    font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink-mute); font-weight: 600;
+  }
+  .macro .value {
+    font-size: 18px; font-weight: 700; color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .macro .unit {
+    font-size: 11px; color: var(--ink-mute);
+    margin-top: 2px;
+  }
+
+  /* ── commitment / focus card ── */
+  .focus {
+    background: var(--lime);
+    color: #0a0e0b;
+    border-radius: 20px;
+    padding: 22px;
+    margin-bottom: 16px;
+  }
+  .focus .kicker {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    font-weight: 700;
+    opacity: 0.65;
+  }
+  .focus .title {
+    font-size: 20px; font-weight: 700;
+    margin: 8px 0 14px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .commit-list {
+    margin: 0; padding: 0; list-style: none;
+  }
+  .commit-list li {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0;
+    border-top: 1px solid rgba(10,14,11,0.14);
+    font-size: 14px; line-height: 1.45;
+    color: #0a0e0b;
+    font-weight: 500;
+  }
+  .commit-list li:first-child { border-top: none; padding-top: 4px; }
+  .checkbox {
+    flex: 0 0 18px;
+    width: 18px; height: 18px;
+    border: 1.5px solid #0a0e0b;
+    border-radius: 5px;
+    margin-top: 1px;
+  }
+
+  /* coach sentence */
+  .coach-note {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 22px;
+    margin-bottom: 28px;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .coach-avatar {
+    flex: 0 0 38px;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #C0FC01, #7aa800);
+    color: #0a0e0b;
+    font-weight: 700; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .coach-note .content .label {
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-mute); font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .coach-note .content .msg {
+    font-size: 14px; color: var(--ink); line-height: 1.55;
+  }
+  .coach-note .content .author {
+    font-size: 12px; color: var(--ink-mute);
+    margin-top: 8px;
+  }
+
+  /* CTA */
+  .cta-wrap {
+    text-align: center;
+    padding: 4px 0 20px;
+  }
+  a.cta {
+    display: inline-block;
+    background: var(--lime);
+    color: #0a0e0b !important;
+    text-decoration: none;
+    padding: 16px 28px;
+    border-radius: 999px;
+    font-weight: 700; font-size: 15px;
+    letter-spacing: -0.005em;
+    box-shadow: 0 10px 24px -10px rgba(192,252,1,0.55);
+  }
+  .cta-sub {
+    margin-top: 10px;
+    font-size: 12px; color: var(--ink-mute);
+  }
+
+  /* footer */
+  .footer {
+    border-top: 1px solid var(--hair);
+    padding: 24px 4px 8px;
+    font-size: 11px;
+    color: var(--ink-mute);
+    text-align: center;
+    line-height: 1.6;
+  }
+  .footer a {
+    color: var(--ink-mute);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* mobile */
+  @media (max-width: 480px) {
+    .email-body { padding: 28px 20px 32px; }
+    .hero h1 { font-size: 26px; }
+    .day { min-height: 72px; padding: 8px 3px 10px; }
+    .day .date { font-size: 13px; }
+    .day .tag { font-size: 9px; margin-top: 6px; }
+    .macros { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .sess-day { flex: 0 0 38px; }
+    .sess-day .date-lg { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+  <div class="client-chrome">
+    <div class="pane-title">Plan voor deze week · e-mail preview</div>
+
+    <div class="email-wrapper">
+      <div class="email-body">
+
+        <!-- top row -->
+        <div class="top-row">
+          <div class="logo">MŌVE</div>
+          <div class="week-pill">Week 17 · 20 – 26 apr</div>
+        </div>
+
+        <!-- hero -->
+        <div class="hero">
+          <div class="kicker">Jouw plan voor deze week</div>
+          <h1>Nieuwe week.<br/><em>4 sessies.</em> Go.</h1>
+          <p>Hier is wat er op je staat te wachten. Push vandaag, beensdag donderdag — die gaan we deze keer niet laten liggen.</p>
+        </div>
+
+        <!-- week strip -->
+        <div class="week-strip">
+          <div class="label">Week in één blik</div>
+          <div class="week-grid">
+            <div class="day today">
+              <div class="dow">Ma</div>
+              <div class="date">20</div>
+              <div class="tag">Push</div>
+            </div>
+            <div class="day">
+              <div class="dow">Di</div>
+              <div class="date">21</div>
+              <div class="tag">Pull</div>
+            </div>
+            <div class="day">
+              <div class="dow">Wo</div>
+              <div class="date">22</div>
+              <div class="tag rest">rust</div>
+            </div>
+            <div class="day">
+              <div class="dow">Do</div>
+              <div class="date">23</div>
+              <div class="tag">Legs</div>
+            </div>
+            <div class="day">
+              <div class="dow">Vr</div>
+              <div class="date">24</div>
+              <div class="tag">Upper</div>
+            </div>
+            <div class="day">
+              <div class="dow">Za</div>
+              <div class="date">25</div>
+              <div class="tag rest">rust</div>
+            </div>
+            <div class="day">
+              <div class="dow">Zo</div>
+              <div class="date">26</div>
+              <div class="tag rest">rust</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- session cards -->
+        <div class="section-label">Je trainingsdagen</div>
+
+        <div class="session-card today">
+          <div class="sess-day">
+            <div class="dow-lg">Ma</div>
+            <div class="date-lg">20</div>
+          </div>
+          <div class="sess-body">
+            <div class="sess-name">Push</div>
+            <div class="sess-focus">Borst · Schouders · Triceps</div>
+            <div class="sess-meta">6 oefeningen · ~ 55 min · vandaag</div>
+          </div>
+          <div class="sess-arrow">›</div>
+        </div>
+
+        <div class="session-card">
+          <div class="sess-day">
+            <div class="dow-lg">Di</div>
+            <div class="date-lg">21</div>
+          </div>
+          <div class="sess-body">
+            <div class="sess-name">Pull</div>
+            <div class="sess-focus">Rug · Biceps · Rear delts</div>
+            <div class="sess-meta">6 oefeningen · ~ 60 min</div>
+          </div>
+          <div class="sess-arrow">›</div>
+        </div>
+
+        <div class="session-card">
+          <div class="sess-day">
+            <div class="dow-lg">Do</div>
+            <div class="date-lg">23</div>
+          </div>
+          <div class="sess-body">
+            <div class="sess-name">Legs</div>
+            <div class="sess-focus">Quads · Hamstrings · Core</div>
+            <div class="sess-meta">4 oefeningen · ~ 55 min</div>
+          </div>
+          <div class="sess-arrow">›</div>
+        </div>
+
+        <div class="session-card">
+          <div class="sess-day">
+            <div class="dow-lg">Vr</div>
+            <div class="date-lg">24</div>
+          </div>
+          <div class="sess-body">
+            <div class="sess-name">Upper</div>
+            <div class="sess-focus">Volledig bovenlichaam</div>
+            <div class="sess-meta">6 oefeningen · ~ 50 min</div>
+          </div>
+          <div class="sess-arrow">›</div>
+        </div>
+
+        <!-- macros card -->
+        <div class="card">
+          <h3>Voedingsdoelen per dag</h3>
+          <div class="sub">Richtlijn — streef ernaar, forceer niet.</div>
+          <div class="macros">
+            <div class="macro">
+              <div class="top"><span class="dot" style="background: var(--calories);"></span><span class="name">kcal</span></div>
+              <div class="value">2 500</div>
+              <div class="unit">per dag</div>
+            </div>
+            <div class="macro">
+              <div class="top"><span class="dot" style="background: var(--protein);"></span><span class="name">eiwit</span></div>
+              <div class="value">180 g</div>
+              <div class="unit">per dag</div>
+            </div>
+            <div class="macro">
+              <div class="top"><span class="dot" style="background: var(--carbs);"></span><span class="name">kh</span></div>
+              <div class="value">280 g</div>
+              <div class="unit">per dag</div>
+            </div>
+            <div class="macro">
+              <div class="top"><span class="dot" style="background: var(--fat);"></span><span class="name">vet</span></div>
+              <div class="value">80 g</div>
+              <div class="unit">per dag</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- commitment / focus -->
+        <div class="focus">
+          <div class="kicker">Focus deze week</div>
+          <div class="title">Drie dingen — en je wint de week.</div>
+          <ul class="commit-list">
+            <li><span class="checkbox"></span><span><strong>Beensdag doorzetten</strong> — kort mag, skippen niet.</span></li>
+            <li><span class="checkbox"></span><span><strong>18 van 21 maaltijden loggen</strong> — 1 per dag extra dan vorige week.</span></li>
+            <li><span class="checkbox"></span><span><strong>Gewicht richting 81,8 kg</strong> — stabiel dalend.</span></li>
+          </ul>
+        </div>
+
+        <!-- coach note -->
+        <div class="coach-note">
+          <div class="coach-avatar">G</div>
+          <div class="content">
+            <div class="label">Mijn boodschap</div>
+            <div class="msg">"Push vandaag moet niet perfect — moet gewoon gebeuren. Zet 'm in je agenda en we lossen de rest onderweg op."</div>
+            <div class="author">— Glenn, je coach</div>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-wrap">
+          <a href="#" class="cta">Start met vandaag →</a>
+          <div class="cta-sub">Open Push in de app — alles staat klaar.</div>
+        </div>
+
+        <!-- footer -->
+        <div class="footer">
+          Deze mail krijg je elke maandag om 07:00. <br/>
+          <a href="#">Instellingen</a> &nbsp;·&nbsp; <a href="#">Pauzeer plan-mail</a> &nbsp;·&nbsp; <a href="#">Uitschrijven</a><br/><br/>
+          MŌVE Coaching · Antwerpen, BE
+        </div>
+
+      </div>
+    </div>
+
+    <div class="pane-title">einde preview</div>
+  </div>
+</body>
+</html>
