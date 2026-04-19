@@ -50,7 +50,11 @@ export async function POST(request: NextRequest) {
 
   // Try magiclink first (works for existing confirmed users),
   // then fall back to invite type (works for new/unconfirmed users)
-  let linkData: any = null
+  type GenerateLinkResult = Awaited<
+    ReturnType<typeof admin.auth.admin.generateLink>
+  >
+  type GenerateLinkData = NonNullable<GenerateLinkResult['data']>
+  let linkData: GenerateLinkData | null = null
   let linkType: 'magiclink' | 'invite' | 'recovery' = 'magiclink'
 
   // First attempt: magiclink
