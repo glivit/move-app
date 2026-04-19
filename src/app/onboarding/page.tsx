@@ -502,7 +502,24 @@ export default function OnboardingPage() {
   const [error, setError] = useState<string | null>(null)
   const [animatingOut, setAnimatingOut] = useState(false)
   const [showPhotoStep, setShowPhotoStep] = useState(false)
-  const [draftNotice, setDraftNotice] = useState<DraftShape | null>(null)
+  const [draftNotice, setDraftNotice] = useState<DraftShape | null>(() => {
+    if (typeof window === 'undefined') return null
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY)
+      if (!raw) return null
+      const parsed = JSON.parse(raw) as DraftShape
+      if (parsed.step > 0) return parsed
+      localStorage.removeItem(DRAFT_KEY)
+      return null
+    } catch {
+      try {
+        localStorage.removeItem(DRAFT_KEY)
+      } catch {
+        /* ignore */
+      }
+      return null
+    }
+  })
   const [draftLoaded, setDraftLoaded] = useState(false)
 
   const initialData: OnboardingData = {
@@ -569,26 +586,6 @@ export default function OnboardingPage() {
     left_calf_cm: '',
     right_calf_cm: '',
   })
-
-  /* ─── Draft restore on mount ────────────────────────── */
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(DRAFT_KEY)
-      if (raw) {
-        const parsed = JSON.parse(raw) as DraftShape
-        // Only offer restore if user made real progress
-        if (parsed.step > 0) {
-          setDraftNotice(parsed)
-        } else {
-          localStorage.removeItem(DRAFT_KEY)
-        }
-      }
-    } catch {
-      // ignore corrupted draft
-      localStorage.removeItem(DRAFT_KEY)
-    }
-  }, [])
 
   /* ─── Draft save on mutation (debounced via effect) ─── */
 
@@ -1893,9 +1890,11 @@ function OverviewScreen({
   showPhotoStep: boolean
   onEdit: (step: number) => void
 }) {
+  // Pin "now" on mount so the component stays idempotent across re-renders.
+  const [nowMs] = useState(() => Date.now())
   const age = data.date_of_birth
     ? Math.floor(
-        (Date.now() - new Date(data.date_of_birth).getTime()) /
+        (nowMs - new Date(data.date_of_birth).getTime()) /
           (365.25 * 24 * 60 * 60 * 1000),
       )
     : null
