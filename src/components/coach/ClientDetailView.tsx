@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ResendInviteButton } from '@/components/coach/ResendInviteButton'
+import { RequestReintakeButton } from '@/components/coach/RequestReintakeButton'
 import type {
   ClientWeekTimeline,
   TimelineState,
@@ -90,6 +91,14 @@ export function ClientDetailView({ data, coachId }: Props) {
           Terug
         </Link>
         <div className="flex items-center gap-2">
+          {data.intakeCompleted && (
+            <RequestReintakeButton
+              clientId={data.clientId}
+              clientName={data.fullName}
+              requestedAt={data.reintakeRequestedAt}
+              variant="chip"
+            />
+          )}
           <ResendInviteButton
             clientId={data.clientId}
             clientName={data.fullName}

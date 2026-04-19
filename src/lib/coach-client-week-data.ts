@@ -416,6 +416,8 @@ export async function fetchClientWeekTimeline(
     avatar_url: string | null
     package: string | null
     start_date: string | null
+    intake_completed: boolean | null
+    reintake_requested_at: string | null
   }
   type TemplateDayRow = { id: string; name: string }
   type SessionRow = {

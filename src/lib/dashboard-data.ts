@@ -37,7 +37,7 @@ export async function fetchDashboardData(userId: string) {
     weeklyCheckinRes,
     weightLogsThisWeekRes,
   ] = await Promise.all([
-    db.from('profiles').select('id, full_name, role, package, start_date, intake_completed')
+    db.from('profiles').select('id, full_name, role, package, start_date, intake_completed, reintake_requested_at')
       .eq('id', userId).single(),
 
     // Collapsed: client_programs + nested template_days + per-day exercise count
@@ -293,6 +293,23 @@ export async function fetchDashboardData(userId: string) {
   })()
 
   const pendingTodos: Array<{ key: string; label: string; sub: string; href: string; priority: 'high' | 'medium' }> = []
+
+  // Coach vroeg een re-intake → eerste prioriteit op het dashboard.
+  // We flippen `intake_completed` niet (dat zou de middleware-gate triggeren
+  // en de klant hard naar /onboarding redirecten), dus de klant ziet dit als
+  // zachte task en kan 'm op een moment-dat-het-past invullen.
+  const reintakeRequestedAt =
+    (profile as { reintake_requested_at?: string | null } | null)?.reintake_requested_at ?? null
+  if (reintakeRequestedAt) {
+    pendingTodos.push({
+      key: 'reintake',
+      label: 'Je coach vraagt je intake opnieuw in te vullen',
+      sub: 'Paar minuten — zodat we je plan scherper kunnen maken',
+      href: '/onboarding',
+      priority: 'high',
+    })
+  }
+
   const hasPhotos = !!(intakeForm as any)?.photo_front_url
   if (!hasPhotos) {
     pendingTodos.push({

@@ -833,6 +833,10 @@ export default function OnboardingPage() {
           date_of_birth: data.date_of_birth || null,
           height_cm: parseNum(data.height_cm),
           intake_completed: true,
+          // Als de coach om een re-intake vroeg, is die hierbij beantwoord —
+          // task verdwijnt automatisch van het dashboard.
+          reintake_requested_at: null,
+          reintake_requested_by: null,
         })
         .eq('id', user.id)
 
