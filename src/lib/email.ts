@@ -102,8 +102,47 @@ export async function sendNotificationEmail(params: {
 
 
 // ══════════════════════════════════════════════════════════
-// EMAIL TEMPLATES — MŌVE branded
+// EMAIL TEMPLATES — MŌVE · v3 Orion
+// Canvas #8E9890 · dark card #474B48 · ivory ink · lime accent
 // ══════════════════════════════════════════════════════════
+
+// Design tokens (solid hex for email-client safety)
+const T = {
+  canvas: '#8E9890',
+  card: '#474B48',
+  cardSoft: '#3E4240',
+  ink: '#FDFDFE',
+  inkMute: '#B5B8B6',
+  inkDim: '#8A8C8B',
+  hair: '#5A5D5B',
+  lime: '#C0FC01',
+  inkDark: '#0A0E0B',
+}
+
+// Primary CTA button — table-based for max client compatibility
+function ctaButton(href: string, label: string) {
+  return `
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+      <tr>
+        <td align="center" style="background-color:${T.lime};border-radius:999px;">
+          <a href="${href}" target="_blank" style="display:inline-block;padding:15px 32px;color:${T.inkDark};font-family:'Inter',-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;font-size:15px;font-weight:700;text-decoration:none;letter-spacing:-0.005em;">
+            ${label}
+          </a>
+        </td>
+      </tr>
+    </table>`
+}
+
+// Fallback-link strip (shown at bottom when main button might not render)
+function linkFallback(href: string, label = 'Werkt de knop niet? Kopieer deze link:') {
+  return `
+    <div style="background-color:${T.cardSoft};padding:18px 24px;border-top:1px solid ${T.hair};">
+      <p style="margin:0;font-size:12px;color:${T.inkMute};line-height:1.55;font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;">
+        ${label}<br>
+        <a href="${href}" style="color:${T.lime};text-decoration:none;word-break:break-all;font-size:11px;">${href}</a>
+      </p>
+    </div>`
+}
 
 function baseLayout(content: string, preheader?: string) {
   return `<!DOCTYPE html>
@@ -112,38 +151,45 @@ function baseLayout(content: string, preheader?: string) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
   <title>MŌVE</title>
-  ${preheader ? `<span style="display:none;font-size:1px;color:#ffffff;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">${preheader}</span>` : ''}
+  ${preheader ? `<span style="display:none;font-size:1px;color:${T.canvas};line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;">${preheader}</span>` : ''}
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @media (max-width: 480px) {
+      .mv-body { padding: 28px 20px 32px !important; }
+      .mv-wrap { border-radius: 18px !important; }
+      .mv-h1 { font-size: 24px !important; }
+    }
   </style>
 </head>
-<body style="margin:0;padding:0;background-color:#F5F2ED;font-family:'Inter',Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F5F2ED;">
+<body style="margin:0;padding:0;background-color:${T.canvas};font-family:'Inter',-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:${T.canvas};">
     <tr>
       <td align="center" style="padding:40px 16px;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
 
-          <!-- Logo -->
+          <!-- Wordmark -->
           <tr>
-            <td align="center" style="padding-bottom:32px;">
-              <span style="font-family:'Inter',Arial,sans-serif;font-size:28px;font-weight:700;color:#1A1917;letter-spacing:0.02em;">MŌVE</span>
+            <td align="left" style="padding:0 8px 24px;">
+              <span style="font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;font-size:18px;font-weight:700;color:${T.ink};letter-spacing:0.14em;">MŌVE</span>
             </td>
           </tr>
 
           <!-- Card -->
           <tr>
-            <td style="background-color:#FFFFFF;border-radius:20px;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow:hidden;">
+            <td class="mv-wrap" style="background-color:${T.card};border-radius:22px;overflow:hidden;">
               ${content}
             </td>
           </tr>
 
           <!-- Footer -->
           <tr>
-            <td align="center" style="padding-top:32px;">
-              <p style="margin:0;font-size:12px;color:#C5C2BC;line-height:1.5;">
-                MŌVE — Personal Training Studio Knokke<br>
-                <a href="${APP_URL}" style="color:#1A1917;text-decoration:none;">movestudio.be</a>
+            <td align="center" style="padding:24px 8px 0;">
+              <p style="margin:0;font-size:11px;color:${T.ink};opacity:0.55;line-height:1.6;font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;">
+                MŌVE · Personal Training Studio<br>
+                <a href="${APP_URL}" style="color:${T.ink};opacity:0.75;text-decoration:underline;text-underline-offset:2px;">movestudio.be</a>
               </p>
             </td>
           </tr>
@@ -156,7 +202,7 @@ function baseLayout(content: string, preheader?: string) {
 </html>`
 }
 
-function inviteTemplate(params: {
+export function inviteTemplate(params: {
   firstName: string
   clientName: string
   inviteLink: string
@@ -164,131 +210,102 @@ function inviteTemplate(params: {
 }) {
   const { firstName, inviteLink, packageName } = params
 
+  const bullet = (text: string) => `
+    <tr>
+      <td width="22" valign="top" style="padding-top:8px;">
+        <div style="width:8px;height:8px;border-radius:50%;background-color:${T.lime};"></div>
+      </td>
+      <td style="font-size:14px;color:${T.ink};opacity:0.88;line-height:1.55;padding:3px 0 12px;font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;">
+        ${text}
+      </td>
+    </tr>`
+
   const content = `
-    <!-- Gold accent bar -->
-    <div style="height:4px;background:linear-gradient(90deg,#333330,#1A1917);"></div>
+    <div class="mv-body" style="padding:36px 28px 32px;">
+      <!-- Kicker -->
+      <p style="margin:0 0 10px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:${T.inkMute};font-weight:600;font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;">
+        Welkom bij MŌVE
+      </p>
 
-    <div style="padding:40px 36px;">
-      <!-- Greeting -->
-      <h1 style="margin:0 0 8px;font-size:24px;font-weight:600;color:#1A1917;letter-spacing:-0.02em;">
-        Welkom, ${firstName}
+      <!-- Heading -->
+      <h1 class="mv-h1" style="margin:0 0 14px;font-size:28px;font-weight:700;color:${T.ink};letter-spacing:-0.02em;line-height:1.15;font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;">
+        Klaar wanneer jij bent, ${firstName}.
       </h1>
-      <p style="margin:0 0 28px;font-size:15px;color:#A09D96;line-height:1.5;">
-        Je bent uitgenodigd voor MŌVE ${packageName}.
+      <p style="margin:0 0 28px;font-size:15px;color:${T.ink};opacity:0.72;line-height:1.55;font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;">
+        Je coaching-omgeving voor <strong style="color:${T.ink};opacity:1;">${packageName}</strong> staat klaar. Stel een wachtwoord in en we beginnen.
       </p>
 
-      <!-- Info -->
-      <p style="margin:0 0 28px;font-size:15px;color:#3A3835;line-height:1.7;">
-        Je persoonlijke coaching-omgeving staat klaar. Activeer je account door een wachtwoord in te stellen — daarna kun je meteen aan de slag.
-      </p>
-
-      <!-- CTA Button -->
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <!-- CTA -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td align="center" style="padding:4px 0 32px;">
-            <a href="${inviteLink}" target="_blank" style="display:inline-block;background-color:#1A1917;color:#FFFFFF;font-size:15px;font-weight:600;text-decoration:none;padding:14px 40px;border-radius:14px;letter-spacing:-0.01em;">
-              Account activeren
-            </a>
+            ${ctaButton(inviteLink, 'Account activeren →')}
           </td>
         </tr>
       </table>
 
       <!-- Divider -->
-      <div style="height:1px;background-color:#E8E4DC;margin-bottom:24px;"></div>
+      <div style="height:1px;background-color:${T.hair};margin:0 0 24px;"></div>
 
       <!-- What to expect -->
-      <p style="margin:0 0 16px;font-size:13px;font-weight:600;color:#1A1917;text-transform:uppercase;letter-spacing:0.08em;">
-        Wat je kunt verwachten
+      <p style="margin:0 0 12px;font-size:11px;font-weight:700;color:${T.inkMute};text-transform:uppercase;letter-spacing:0.1em;font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;">
+        Wat je kan verwachten
       </p>
 
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
-        <tr>
-          <td width="28" valign="top" style="padding-top:2px;">
-            <span style="color:#333330;font-size:14px;">●</span>
-          </td>
-          <td style="font-size:14px;color:#6B6862;line-height:1.5;padding-bottom:12px;">
-            Persoonlijk trainingsschema op maat
-          </td>
-        </tr>
-        <tr>
-          <td width="28" valign="top" style="padding-top:2px;">
-            <span style="color:#333330;font-size:14px;">●</span>
-          </td>
-          <td style="font-size:14px;color:#6B6862;line-height:1.5;padding-bottom:12px;">
-            Voedingsplan en macro-tracking
-          </td>
-        </tr>
-        <tr>
-          <td width="28" valign="top" style="padding-top:2px;">
-            <span style="color:#333330;font-size:14px;">●</span>
-          </td>
-          <td style="font-size:14px;color:#6B6862;line-height:1.5;padding-bottom:12px;">
-            Direct contact met je coach via chat
-          </td>
-        </tr>
-        <tr>
-          <td width="28" valign="top" style="padding-top:2px;">
-            <span style="color:#333330;font-size:14px;">●</span>
-          </td>
-          <td style="font-size:14px;color:#6B6862;line-height:1.5;">
-            Voortgang bijhouden met check-ins en foto's
-          </td>
-        </tr>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        ${bullet('Persoonlijk trainingsschema op maat')}
+        ${bullet('Voedingsplan met macro-tracking')}
+        ${bullet('Direct contact met je coach via chat')}
+        ${bullet("Voortgang bijhouden met check-ins en foto's")}
       </table>
     </div>
 
-    <!-- Bottom strip -->
-    <div style="background-color:#FAF8F3;padding:20px 36px;border-top:1px solid #E8E4DC;">
-      <p style="margin:0;font-size:12px;color:#C5C2BC;line-height:1.5;">
-        Werkt de knop niet? Kopieer deze link in je browser:<br>
-        <a href="${inviteLink}" style="color:#1A1917;text-decoration:none;word-break:break-all;font-size:11px;">${inviteLink}</a>
-      </p>
-    </div>`
+    ${linkFallback(inviteLink)}`
 
   return baseLayout(content, `${firstName}, je MŌVE account staat klaar`)
 }
 
-function resetTemplate(params: {
+export function resetTemplate(params: {
   firstName: string
   resetLink: string
 }) {
   const { firstName, resetLink } = params
 
   const content = `
-    <div style="padding:40px 36px;">
-      <h1 style="margin:0 0 8px;font-size:24px;font-weight:600;color:#1A1917;letter-spacing:-0.02em;">
+    <div class="mv-body" style="padding:36px 28px 32px;">
+      <!-- Kicker -->
+      <p style="margin:0 0 10px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:${T.inkMute};font-weight:600;font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;">
+        Account
+      </p>
+
+      <h1 class="mv-h1" style="margin:0 0 14px;font-size:28px;font-weight:700;color:${T.ink};letter-spacing:-0.02em;line-height:1.15;font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;">
         Wachtwoord resetten
       </h1>
-      <p style="margin:0 0 28px;font-size:15px;color:#3A3835;line-height:1.7;">
+      <p style="margin:0 0 28px;font-size:15px;color:${T.ink};opacity:0.72;line-height:1.55;font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;">
         ${firstName ? `Hé ${firstName}, je` : 'Je'} hebt een wachtwoord reset aangevraagd. Klik hieronder om een nieuw wachtwoord in te stellen.
       </p>
 
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td align="center" style="padding:4px 0 32px;">
-            <a href="${resetLink}" target="_blank" style="display:inline-block;background-color:#1A1917;color:#FFFFFF;font-size:15px;font-weight:600;text-decoration:none;padding:14px 40px;border-radius:14px;">
-              Nieuw wachtwoord instellen
-            </a>
+          <td align="center" style="padding:4px 0 28px;">
+            ${ctaButton(resetLink, 'Nieuw wachtwoord instellen →')}
           </td>
         </tr>
       </table>
 
-      <p style="margin:0;font-size:13px;color:#A09D96;line-height:1.5;">
-        Heb je dit niet aangevraagd? Dan kun je deze email negeren. Je wachtwoord blijft ongewijzigd.
+      <div style="height:1px;background-color:${T.hair};margin:0 0 20px;"></div>
+
+      <p style="margin:0;font-size:13px;color:${T.inkMute};line-height:1.55;font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;">
+        Heb je dit niet aangevraagd? Dan kun je deze mail negeren — je wachtwoord blijft ongewijzigd.
       </p>
     </div>
 
-    <div style="background-color:#FAF8F3;padding:20px 36px;border-top:1px solid #E8E4DC;">
-      <p style="margin:0;font-size:12px;color:#C5C2BC;line-height:1.5;">
-        Werkt de knop niet? Kopieer deze link:<br>
-        <a href="${resetLink}" style="color:#1A1917;text-decoration:none;word-break:break-all;font-size:11px;">${resetLink}</a>
-      </p>
-    </div>`
+    ${linkFallback(resetLink)}`
 
   return baseLayout(content, 'Stel een nieuw wachtwoord in voor MŌVE')
 }
 
-function notificationTemplate(params: {
+export function notificationTemplate(params: {
   preheader?: string
   heading: string
   body: string
@@ -298,22 +315,20 @@ function notificationTemplate(params: {
   const { preheader, heading, body, ctaText, ctaUrl } = params
 
   const ctaBlock = ctaText && ctaUrl ? `
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
-        <td align="center" style="padding:24px 0 8px;">
-          <a href="${ctaUrl}" target="_blank" style="display:inline-block;background-color:#1A1917;color:#FFFFFF;font-size:15px;font-weight:600;text-decoration:none;padding:14px 40px;border-radius:14px;">
-            ${ctaText}
-          </a>
+        <td align="center" style="padding:24px 0 4px;">
+          ${ctaButton(ctaUrl, ctaText)}
         </td>
       </tr>
     </table>` : ''
 
   const content = `
-    <div style="padding:40px 36px;">
-      <h1 style="margin:0 0 16px;font-size:22px;font-weight:600;color:#1A1917;letter-spacing:-0.02em;">
+    <div class="mv-body" style="padding:36px 28px 32px;">
+      <h1 class="mv-h1" style="margin:0 0 14px;font-size:24px;font-weight:700;color:${T.ink};letter-spacing:-0.02em;line-height:1.2;font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;">
         ${heading}
       </h1>
-      <p style="margin:0;font-size:15px;color:#3A3835;line-height:1.7;">
+      <p style="margin:0;font-size:15px;color:${T.ink};opacity:0.82;line-height:1.6;font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;">
         ${body}
       </p>
       ${ctaBlock}
