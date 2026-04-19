@@ -127,7 +127,7 @@ export async function fetchSessionDetail(
       supabase
         .from('workout_sessions')
         .select(
-          'id, client_id, template_day_id, started_at, completed_at, duration_seconds, duration_minutes, mood_rating, difficulty_rating, feedback_text, coach_seen'
+          'id, client_id, template_day_id, started_at, completed_at, duration_seconds, mood_rating, difficulty_rating, feedback_text, coach_seen'
         )
         .eq('id', sessionId)
         .eq('client_id', clientId)
@@ -155,7 +155,6 @@ export async function fetchSessionDetail(
     started_at: string
     completed_at: string | null
     duration_seconds: number | null
-    duration_minutes: number | null
     mood_rating: number | null
     difficulty_rating: number | null
     feedback_text: string | null
@@ -207,7 +206,7 @@ export async function fetchSessionDetail(
       ? supabase
           .from('workout_sessions')
           .select(
-            'id, started_at, completed_at, duration_seconds, duration_minutes'
+            'id, started_at, completed_at, duration_seconds'
           )
           .eq('client_id', clientId)
           .eq('template_day_id', session.template_day_id)
@@ -226,7 +225,6 @@ export async function fetchSessionDetail(
     started_at: string
     completed_at: string | null
     duration_seconds: number | null
-    duration_minutes: number | null
   }
 
   const exerciseNameById: Record<string, string> = {}
@@ -299,8 +297,7 @@ export async function fetchSessionDetail(
   const hasPain = sets.some((s) => s.pain_flag === true)
 
   const durationMin =
-    session.duration_minutes ??
-    (session.duration_seconds ? Math.round(session.duration_seconds / 60) : null)
+    session.duration_seconds ? Math.round(session.duration_seconds / 60) : null
 
   // ─── Compare with prior session of same template day ────────
   let compare: SessionDetailCompare | null = null

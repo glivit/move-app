@@ -135,7 +135,7 @@ export async function GET(request: NextRequest) {
     const { data: sessions } = await admin
       .from('workout_sessions')
       .select(
-        'id, started_at, completed_at, template_day_id, client_program_id, duration_seconds, duration_minutes, mood_rating, difficulty_rating, feedback_text, coach_seen, notes',
+        'id, started_at, completed_at, template_day_id, client_program_id, duration_seconds, mood_rating, difficulty_rating, feedback_text, coach_seen, notes',
       )
       .eq('client_id', clientProfile.id)
       .gte('started_at', since.toISOString())
@@ -178,7 +178,7 @@ export async function GET(request: NextRequest) {
         sets_total: sets.total,
         sets_completed: sets.completed,
         duration_seconds: s.duration_seconds,
-        duration_minutes: s.duration_minutes,
+        duration_minutes: s.duration_seconds ? Math.round(s.duration_seconds / 60) : null,
         mood_rating: s.mood_rating,
         difficulty_rating: s.difficulty_rating,
         feedback_text: s.feedback_text,

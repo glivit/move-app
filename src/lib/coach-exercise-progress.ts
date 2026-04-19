@@ -202,14 +202,13 @@ export async function fetchExerciseProgress(
     started_at: string
     completed_at: string | null
     duration_seconds: number | null
-    duration_minutes: number | null
     template_day_id: string | null
     client_id: string
   }> = []
   if (sessionIds.length > 0) {
     const { data: sessionsData } = await admin
       .from('workout_sessions')
-      .select('id, started_at, completed_at, duration_seconds, duration_minutes, template_day_id, client_id')
+      .select('id, started_at, completed_at, duration_seconds, template_day_id, client_id')
       .in('id', sessionIds)
       .eq('client_id', clientId)
     sessions = (sessionsData || []) as typeof sessions
@@ -264,8 +263,7 @@ export async function fetchExerciseProgress(
       0,
     )
     const durationMin =
-      session.duration_minutes ??
-      (session.duration_seconds ? Math.round(session.duration_seconds / 60) : null)
+      session.duration_seconds ? Math.round(session.duration_seconds / 60) : null
     const dateIso = (session.completed_at || session.started_at).split('T')[0]
     series.push({
       sessionId: sid,

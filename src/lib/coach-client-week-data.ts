@@ -321,7 +321,7 @@ export async function fetchClientWeekTimeline(
     supabase
       .from('workout_sessions')
       .select(
-        'id, template_day_id, started_at, completed_at, duration_seconds, duration_minutes, mood_rating, difficulty_rating, feedback_text, coach_seen'
+        'id, template_day_id, started_at, completed_at, duration_seconds, mood_rating, difficulty_rating, feedback_text, coach_seen'
       )
       .eq('client_id', clientId)
       // OR op started_at óf completed_at binnen de week, zodat zowel
@@ -373,7 +373,7 @@ export async function fetchClientWeekTimeline(
     supabase
       .from('workout_sessions')
       .select(
-        'id, template_day_id, started_at, completed_at, duration_seconds, duration_minutes'
+        'id, template_day_id, started_at, completed_at, duration_seconds'
       )
       .eq('client_id', clientId)
       .not('completed_at', 'is', null)
@@ -414,7 +414,6 @@ export async function fetchClientWeekTimeline(
     started_at: string
     completed_at: string | null
     duration_seconds: number | null
-    duration_minutes: number | null
     mood_rating: number | null
     difficulty_rating: number | null
     feedback_text: string | null
@@ -426,7 +425,6 @@ export async function fetchClientWeekTimeline(
     started_at: string
     completed_at: string | null
     duration_seconds: number | null
-    duration_minutes: number | null
   }
   type NutritionSummaryRow = {
     date: string
@@ -699,7 +697,7 @@ export async function fetchClientWeekTimeline(
         topByExercise: {},
       }
       const durationMin =
-        s.duration_minutes ?? (s.duration_seconds ? Math.round(s.duration_seconds / 60) : null)
+        s.duration_seconds ? Math.round(s.duration_seconds / 60) : null
       return {
         id: s.id,
         templateDayId: s.template_day_id,
@@ -937,7 +935,7 @@ export async function fetchClientWeekTimeline(
   const sessionLogs: SessionLogEntry[] = olderSessions.map((s) => {
     const stats = setsById[s.id]
     const durationMin =
-      s.duration_minutes ?? (s.duration_seconds ? Math.round(s.duration_seconds / 60) : null)
+      s.duration_seconds ? Math.round(s.duration_seconds / 60) : null
     const title = `${
       s.template_day_id ? dayNameMap[s.template_day_id] || 'Training' : 'Training'
     }${durationMin ? ` · ${durationMin} min` : ''}`
@@ -1024,7 +1022,7 @@ export async function fetchClientWeekTimeline(
     for (const s of recentSessionEvents) {
       const stats = setsById[s.id]
       const durationMin =
-        s.duration_minutes ?? (s.duration_seconds ? Math.round(s.duration_seconds / 60) : null)
+        s.duration_seconds ? Math.round(s.duration_seconds / 60) : null
       const name = s.template_day_id ? dayNameMap[s.template_day_id] || 'Training' : 'Training'
       const topLift = stats
         ? Object.values(stats.topByExercise).sort((a, b) => b.weight - a.weight)[0]
