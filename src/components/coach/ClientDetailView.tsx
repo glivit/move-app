@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { ResendInviteButton } from '@/components/coach/ResendInviteButton'
 import type {
   ClientWeekTimeline,
   TimelineState,
@@ -69,7 +70,7 @@ export function ClientDetailView({ data, coachId }: Props) {
 
   return (
     <div className="pb-32">
-      {/* Top bar: back + chat */}
+      {/* Top bar: back + resend-invite + chat */}
       <div className="flex items-center justify-between pt-[18px] pb-[18px] px-0.5">
         <Link
           href="/coach"
@@ -88,26 +89,33 @@ export function ClientDetailView({ data, coachId }: Props) {
           </svg>
           Terug
         </Link>
-        <Link
-          href={`/coach/messages/${data.clientId}`}
-          className="relative w-[38px] h-[38px] rounded-full bg-[rgba(253,253,254,0.10)] flex items-center justify-center text-[#FDFDFE]"
-          aria-label="Open chat"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            className="w-[18px] h-[18px]"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        <div className="flex items-center gap-2">
+          <ResendInviteButton
+            clientId={data.clientId}
+            clientName={data.fullName}
+            variant="chip"
+          />
+          <Link
+            href={`/coach/messages/${data.clientId}`}
+            className="relative w-[38px] h-[38px] rounded-full bg-[rgba(253,253,254,0.10)] flex items-center justify-center text-[#FDFDFE]"
+            aria-label="Open chat"
           >
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
-          {hasUnreadMsg && (
-            <span className="absolute top-[6px] right-[6px] w-2 h-2 rounded-full bg-[#C0FC01] border-2 border-[#8E9890]" />
-          )}
-        </Link>
+            <svg
+              viewBox="0 0 24 24"
+              className="w-[18px] h-[18px]"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            {hasUnreadMsg && (
+              <span className="absolute top-[6px] right-[6px] w-2 h-2 rounded-full bg-[#C0FC01] border-2 border-[#8E9890]" />
+            )}
+          </Link>
+        </div>
       </div>
 
       {/* Identity */}
