@@ -1,13 +1,24 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Dumbbell, ArrowLeft, ChevronDown, Plus, Calendar, ExternalLink, StopCircle, RefreshCw } from 'lucide-react'
+import {
+  ArrowLeft,
+  ChevronDown,
+  Plus,
+  Calendar,
+  ExternalLink,
+  StopCircle,
+  RefreshCw,
+  X,
+  Dumbbell,
+} from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
-import { Card } from '@/components/ui/Card'
 import { PeriodizationTimeline } from '@/components/coach/PeriodizationTimeline'
 import { ProgramAssignModal } from '@/components/coach/ProgramAssignModal'
 import { useParams } from 'next/navigation'
+
+// ─── Types ─────────────────────────────────────────────────
 
 interface Profile {
   full_name: string
@@ -56,6 +67,30 @@ interface PageParams {
   id: string
 }
 
+type ClientProgramRow = {
+  id: string
+  name: string
+  template_id: string
+  current_week: number | null
+  start_date: string
+  end_date: string | null
+  coach_notes: string | null
+  program_templates?: ProgramTemplate | null
+}
+
+// ─── Difficulty mapping (v3 Orion) ─────────────────────────
+
+const DIFFICULTY: Record<string, { label: string; color: string }> = {
+  beginner: { label: 'Beginner', color: '#C0FC01' },
+  intermediate: { label: 'Intermediate', color: '#E8A93C' },
+  advanced: { label: 'Gevorderd', color: '#A4C7F2' },
+}
+
+function diffKey(d: string | undefined): keyof typeof DIFFICULTY {
+  if (d && d in DIFFICULTY) return d as keyof typeof DIFFICULTY
+  return 'beginner'
+}
+
 export default function ProgramPage() {
   const params = useParams() as unknown as PageParams
   const supabase = createClient()
@@ -64,18 +99,22 @@ export default function ProgramPage() {
   const [activeProgram, setActiveProgram] = useState<ActiveProgram | null>(null)
   const [templateInfo, setTemplateInfo] = useState<ProgramTemplate | null>(null)
   const [templateDays, setTemplateDays] = useState<TemplateDay[]>([])
-  const [exercisesByDay, setExercisesByDay] = useState<Record<string, TemplateExercise[]>>({})
+  const [exercisesByDay, setExercisesByDay] = useState<
+    Record<string, TemplateExercise[]>
+  >({})
   const [loading, setLoading] = useState(true)
   const [expandedDays, setExpandedDays] = useState<string[]>([])
   const [templates, setTemplates] = useState<ProgramTemplate[]>([])
   const [showAssignModal, setShowAssignModal] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<ProgramTemplate | null>(null)
+  const [selectedTemplate, setSelectedTemplate] =
+    useState<ProgramTemplate | null>(null)
   const [showStopConfirm, setShowStopConfirm] = useState(false)
   const [stopping, setStopping] = useState(false)
   const [showSwitchPicker, setShowSwitchPicker] = useState(false)
 
   useEffect(() => {
     loadData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function loadData() {
@@ -89,12 +128,14 @@ export default function ProgramPage() {
         .eq('id', params.id)
         .single()
 
-      setProfile(profileData)
+      setProfile(profileData as Profile | null)
 
       // Load active client_program (the actual source of truth)
       const { data: cpData } = await supabase
         .from('client_programs')
-        .select('*, program_templates(id, name, duration_weeks, days_per_week, difficulty, description)')
+        .select(
+          '*, program_templates(id, name, duration_weeks, days_per_week, difficulty, description)'
+        )
         .eq('client_id', params.id)
         .eq('is_active', true)
         .order('created_at', { ascending: false })
@@ -102,31 +143,32 @@ export default function ProgramPage() {
         .single()
 
       if (cpData) {
+        const row = cpData as ClientProgramRow
         setActiveProgram({
-          id: cpData.id,
-          name: cpData.name,
-          template_id: cpData.template_id,
-          current_week: cpData.current_week || 1,
-          start_date: cpData.start_date,
-          end_date: cpData.end_date,
-          coach_notes: cpData.coach_notes,
+          id: row.id,
+          name: row.name,
+          template_id: row.template_id,
+          current_week: row.current_week || 1,
+          start_date: row.start_date,
+          end_date: row.end_date,
+          coach_notes: row.coach_notes,
         })
 
-        const tmpl = (cpData as any).program_templates
+        const tmpl = row.program_templates
         if (tmpl) setTemplateInfo(tmpl)
 
         // Load template days
         const { data: daysData } = await supabase
           .from('program_template_days')
           .select('*')
-          .eq('template_id', cpData.template_id)
+          .eq('template_id', row.template_id)
           .order('sort_order', { ascending: true })
 
         if (daysData && daysData.length > 0) {
-          setTemplateDays(daysData)
+          setTemplateDays(daysData as TemplateDay[])
 
           // Load exercises for all days
-          const dayIds = daysData.map((d: any) => d.id)
+          const dayIds = (daysData as TemplateDay[]).map((d) => d.id)
           const { data: exercisesData } = await supabase
             .from('program_template_exercises')
             .select('*')
@@ -135,7 +177,7 @@ export default function ProgramPage() {
 
           if (exercisesData) {
             const grouped: Record<string, TemplateExercise[]> = {}
-            exercisesData.forEach((ex: any) => {
+            ;(exercisesData as TemplateExercise[]).forEach((ex) => {
               if (!grouped[ex.template_day_id]) grouped[ex.template_day_id] = []
               grouped[ex.template_day_id].push(ex)
             })
@@ -151,7 +193,7 @@ export default function ProgramPage() {
         .eq('is_archived', false)
         .order('name', { ascending: true })
 
-      if (templatesData) setTemplates(templatesData)
+      if (templatesData) setTemplates(templatesData as ProgramTemplate[])
     } catch (error) {
       console.error('Error loading data:', error)
     } finally {
@@ -188,179 +230,211 @@ export default function ProgramPage() {
     )
   }
 
-  const difficultyLabels: Record<string, string> = {
-    beginner: 'Beginner',
-    intermediate: 'Intermediate',
-    advanced: 'Gevorderd',
-  }
+  const formatDate = (s: string) =>
+    new Date(s).toLocaleDateString('nl-BE', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    })
+
+  // ─── Loading state ──────────────────────────────────────
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-client-bg">
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <div className="flex items-center justify-center h-96">
-            <div className="animate-spin rounded-full h-12 w-12 border-2 border-accent-dark border-t-transparent" />
-          </div>
-        </div>
+      <div className="pb-32 flex items-center justify-center min-h-[60vh]">
+        <div
+          className="animate-spin rounded-full h-10 w-10 border-2 border-[rgba(253,253,254,0.20)] border-t-[#FDFDFE]"
+          aria-label="Laden"
+        />
       </div>
     )
   }
 
+  // ─── Page ───────────────────────────────────────────────
+
+  const diff = templateInfo ? DIFFICULTY[diffKey(templateInfo.difficulty)] : null
+
   return (
-    <div className="min-h-screen bg-client-bg">
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* Back Link */}
-        <Link
-          href={`/coach/clients/${params.id}`}
-          className="inline-flex items-center gap-2 mb-8 text-[13px] font-medium transition-colors hover:opacity-75 text-text-primary"
+    <div className="pb-32">
+      {/* Back link */}
+      <Link
+        href={`/coach/clients/${params.id}`}
+        className="inline-flex items-center gap-1.5 mb-5 text-[13px] text-[rgba(253,253,254,0.62)] hover:text-[#FDFDFE] transition-colors"
+      >
+        <ArrowLeft strokeWidth={1.5} size={16} />
+        Terug naar {clientName}
+      </Link>
+
+      {/* Header */}
+      <div className="mb-7">
+        <h1
+          className="text-[30px] font-light tracking-[-0.025em] leading-[1.1] text-[#FDFDFE]"
+          style={{ fontFamily: 'var(--font-display)' }}
         >
-          <ArrowLeft strokeWidth={1.5} size={18} />
-          Terug naar {clientName}
-        </Link>
+          Trainingsprogramma
+        </h1>
+        <p className="mt-1.5 text-[12px] tracking-[0.04em] text-[rgba(253,253,254,0.62)]">
+          {clientName} · beheer & volg
+        </p>
+      </div>
 
-        {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-4xl font-display font-semibold mb-2 text-text-primary">
-            {clientName} — Trainingsprogramma
-          </h1>
-          <p className="text-[13px] text-client-text-secondary">
-            Beheer en volg het trainingsprogramma van je client
-          </p>
+      {/* Periodization timeline — kept as existing component */}
+      {activeProgram && templateInfo && (
+        <div className="mb-6">
+          <PeriodizationTimeline
+            clientProgramId={activeProgram.id}
+            totalWeeks={templateInfo.duration_weeks}
+            currentWeek={activeProgram.current_week}
+          />
         </div>
+      )}
 
-        {/* Periodization Timeline */}
-        {activeProgram && templateInfo && (
-          <div className="mb-8">
-            <PeriodizationTimeline
-              clientProgramId={activeProgram.id}
-              totalWeeks={templateInfo.duration_weeks}
-              currentWeek={activeProgram.current_week}
-            />
-          </div>
-        )}
+      {/* Active program or empty state */}
+      {activeProgram ? (
+        <>
+          {/* Program info card */}
+          <div className="relative rounded-[22px] px-[22px] pt-5 pb-[22px] mb-4 bg-[#474B48]">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <h2 className="text-[18px] font-medium tracking-[-0.01em] leading-[1.25] text-[#FDFDFE]">
+                  {activeProgram.name}
+                </h2>
 
-        {/* Current Program or Empty State */}
-        {activeProgram ? (
-          <div className="space-y-6 mb-10">
-            {/* Program Info Card */}
-            <Card className="rounded-2xl p-8 bg-[#A6ADA7] shadow-clean border border-client-border">
-              <div className="mb-6">
-                <div className="flex items-start justify-between gap-4 mb-4">
-                  <div>
-                    <h2 className="text-2xl font-bold mb-2 text-text-primary">
-                      {activeProgram.name}
-                    </h2>
-                    <div className="flex items-center gap-3 flex-wrap">
-                      {templateInfo?.difficulty && (
-                        <span className="text-xs font-semibold px-3 py-1 rounded-full bg-accent-light text-accent-dark">
-                          {difficultyLabels[templateInfo.difficulty] || templateInfo.difficulty}
-                        </span>
-                      )}
-                      {templateInfo?.duration_weeks && (
-                        <span className="text-[13px] text-client-text-secondary">
-                          {templateInfo.duration_weeks} weken · {templateInfo.days_per_week} dagen/week
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[12px] text-client-text-secondary uppercase font-medium">Week</p>
-                    <p className="text-2xl font-bold text-accent-dark">
-                      {activeProgram.current_week}
-                      <span className="text-[14px] font-normal text-client-text-secondary">
-                        /{templateInfo?.duration_weeks || '—'}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-
-                {/* Date Info */}
-                <div className="flex items-center gap-4 text-[13px] text-client-text-secondary pt-3 border-t border-client-border">
-                  <div className="flex items-center gap-1.5">
-                    <Calendar strokeWidth={1.5} className="w-3.5 h-3.5" />
-                    Start: {new Date(activeProgram.start_date).toLocaleDateString('nl-BE')}
-                  </div>
-                  {activeProgram.end_date && (
-                    <div className="flex items-center gap-1.5">
-                      <Calendar strokeWidth={1.5} className="w-3.5 h-3.5" />
-                      Einde: {new Date(activeProgram.end_date).toLocaleDateString('nl-BE')}
-                    </div>
+                {/* Meta line: difficulty dot + plain text */}
+                <div className="mt-[8px] flex items-center gap-[8px] text-[12px] text-[rgba(253,253,254,0.62)] tracking-[0.005em]">
+                  {diff && (
+                    <span
+                      className="inline-block w-[7px] h-[7px] rounded-full shrink-0"
+                      style={{ background: diff.color }}
+                      aria-hidden
+                    />
                   )}
+                  <span className="truncate">
+                    {[
+                      diff?.label,
+                      templateInfo?.duration_weeks
+                        ? `${templateInfo.duration_weeks} weken`
+                        : null,
+                      templateInfo?.days_per_week
+                        ? `${templateInfo.days_per_week}×/week`
+                        : null,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </span>
                 </div>
-
-                {activeProgram.coach_notes && (
-                  <p className="text-[13px] text-client-text-secondary mt-3 italic">
-                    {activeProgram.coach_notes}
-                  </p>
-                )}
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center gap-3 flex-wrap">
-                <Link
-                  href={`/coach/programs/${activeProgram.template_id}`}
-                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-accent-dark hover:underline"
-                >
-                  Template bewerken <ExternalLink strokeWidth={1.5} className="w-3.5 h-3.5" />
-                </Link>
-
-                <div className="w-px h-4 bg-client-border" />
-
-                <button
-                  onClick={() => setShowSwitchPicker(true)}
-                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#5A7FB5] hover:underline"
-                >
-                  <RefreshCw strokeWidth={1.5} className="w-3.5 h-3.5" />
-                  Ander programma toewijzen
-                </button>
-
-                <button
-                  onClick={() => setShowStopConfirm(true)}
-                  className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#B55A4A] hover:underline"
-                >
-                  <StopCircle strokeWidth={1.5} className="w-3.5 h-3.5" />
-                  Programma stoppen
-                </button>
+              {/* Week counter */}
+              <div className="text-right shrink-0">
+                <p className="text-[10px] uppercase tracking-[0.12em] text-[rgba(253,253,254,0.45)]">
+                  Week
+                </p>
+                <p className="mt-0.5 text-[22px] font-light tracking-[-0.02em] text-[#FDFDFE] leading-none">
+                  {activeProgram.current_week}
+                  <span className="text-[12px] text-[rgba(253,253,254,0.45)]">
+                    /{templateInfo?.duration_weeks || '—'}
+                  </span>
+                </p>
               </div>
+            </div>
 
-              {/* Stop Confirmation */}
-              {showStopConfirm && (
-                <div className="mt-4 p-4 bg-[rgba(181,90,74,0.08)] border border-[#FFD4D4] rounded-xl">
-                  <p className="text-[14px] text-[#B55A4A] font-medium mb-3">
-                    Weet je zeker dat je het huidige programma wilt stoppen voor {clientName}?
-                  </p>
-                  <p className="text-[12px] text-[#D6D9D6] mb-4">
-                    De trainingshistorie blijft bewaard. Je kan altijd een nieuw programma toewijzen.
-                  </p>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => setShowStopConfirm(false)}
-                      className="px-4 py-2 rounded-lg text-[13px] font-medium border border-[#A6ADA7] text-[#D6D9D6] hover:bg-[#A6ADA7] transition-colors"
-                    >
-                      Annuleren
-                    </button>
-                    <button
-                      onClick={stopProgram}
-                      disabled={stopping}
-                      className="px-4 py-2 rounded-lg text-[13px] font-semibold bg-[#B55A4A] text-white hover:bg-[#B83A3A] transition-colors disabled:opacity-50 flex items-center gap-1.5"
-                    >
-                      {stopping ? (
-                        <><span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" /> Stoppen...</>
-                      ) : (
-                        'Ja, stop programma'
-                      )}
-                    </button>
-                  </div>
-                </div>
+            {/* Dates */}
+            <div className="mt-4 pt-3 border-t border-[rgba(253,253,254,0.08)] flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-[rgba(253,253,254,0.55)]">
+              <span className="inline-flex items-center gap-1.5">
+                <Calendar strokeWidth={1.5} className="w-3.5 h-3.5" />
+                Start {formatDate(activeProgram.start_date)}
+              </span>
+              {activeProgram.end_date && (
+                <span className="inline-flex items-center gap-1.5">
+                  <Calendar strokeWidth={1.5} className="w-3.5 h-3.5" />
+                  Einde {formatDate(activeProgram.end_date)}
+                </span>
               )}
-            </Card>
+            </div>
 
-            {/* Training Days */}
-            {templateDays.length > 0 ? (
-              <div className="space-y-4">
-                <h3 className="text-[15px] font-bold text-text-primary">
-                  Trainingsschema — {templateDays.length} dagen
-                </h3>
+            {activeProgram.coach_notes && (
+              <p className="mt-3 text-[13px] italic text-[rgba(253,253,254,0.62)] leading-[1.45]">
+                {activeProgram.coach_notes}
+              </p>
+            )}
+
+            {/* Action row */}
+            <div className="mt-4 pt-4 border-t border-[rgba(253,253,254,0.08)] flex flex-wrap items-center gap-3">
+              <Link
+                href={`/coach/programs/${activeProgram.template_id}`}
+                className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-[#FDFDFE] transition-opacity active:opacity-70"
+              >
+                Template bewerken
+                <ExternalLink strokeWidth={1.5} className="w-3.5 h-3.5" />
+              </Link>
+
+              <span className="text-[rgba(253,253,254,0.22)]">·</span>
+
+              <button
+                type="button"
+                onClick={() => setShowSwitchPicker(true)}
+                className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-[#A4C7F2] transition-opacity active:opacity-70"
+              >
+                <RefreshCw strokeWidth={1.5} className="w-3.5 h-3.5" />
+                Ander programma toewijzen
+              </button>
+
+              <span className="text-[rgba(253,253,254,0.22)]">·</span>
+
+              <button
+                type="button"
+                onClick={() => setShowStopConfirm(true)}
+                className="inline-flex items-center gap-1.5 text-[12.5px] font-medium text-[#E89A8F] transition-opacity active:opacity-70"
+              >
+                <StopCircle strokeWidth={1.5} className="w-3.5 h-3.5" />
+                Programma stoppen
+              </button>
+            </div>
+
+            {/* Inline stop confirmation */}
+            {showStopConfirm && (
+              <div className="mt-4 p-4 rounded-[14px] bg-[rgba(232,154,143,0.10)] border border-[rgba(232,154,143,0.24)]">
+                <p className="text-[13.5px] font-medium text-[#E89A8F]">
+                  Weet je zeker dat je het programma wilt stoppen?
+                </p>
+                <p className="mt-1 text-[12px] text-[rgba(253,253,254,0.55)] leading-[1.4]">
+                  De trainingshistorie blijft bewaard. Je kan altijd een nieuw
+                  programma toewijzen.
+                </p>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    onClick={() => setShowStopConfirm(false)}
+                    className="px-3.5 py-2 rounded-full text-[12.5px] font-medium bg-[rgba(253,253,254,0.08)] text-[#FDFDFE] transition-opacity active:opacity-70"
+                  >
+                    Annuleren
+                  </button>
+                  <button
+                    onClick={stopProgram}
+                    disabled={stopping}
+                    className="px-3.5 py-2 rounded-full text-[12.5px] font-semibold bg-[#E89A8F] text-[#1f1918] transition-opacity active:opacity-70 disabled:opacity-50 inline-flex items-center gap-1.5"
+                  >
+                    {stopping ? (
+                      <>
+                        <span className="w-3 h-3 border-2 border-[#1f1918] border-t-transparent rounded-full animate-spin" />
+                        Stoppen...
+                      </>
+                    ) : (
+                      'Ja, stop'
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Training days */}
+          {templateDays.length > 0 ? (
+            <div className="mt-6">
+              <h3 className="px-0.5 mb-3 text-[11px] uppercase tracking-[0.14em] text-[rgba(253,253,254,0.45)]">
+                Trainingsschema — {templateDays.length} dagen
+              </h3>
+              <div className="flex flex-col gap-2">
                 {templateDays.map((day) => {
                   const dayExercises = exercisesByDay[day.id] || []
                   const isExpanded = expandedDays.includes(day.id)
@@ -368,188 +442,266 @@ export default function ProgramPage() {
                   return (
                     <div
                       key={day.id}
-                      className="rounded-2xl overflow-hidden transition-all bg-client-surface-muted border border-client-border"
+                      className="rounded-[18px] bg-[#474B48] overflow-hidden transition-colors"
                     >
                       <button
+                        type="button"
                         onClick={() => toggleDayExpanded(day.id)}
-                        className="w-full flex items-center justify-between p-4 hover:opacity-80 transition-opacity border-l-4 border-accent-dark"
+                        className="w-full flex items-center justify-between px-[18px] py-[14px] text-left transition-opacity active:opacity-70"
                       >
-                        <div>
-                          <h4 className="text-[15px] font-semibold text-text-primary">
+                        <div className="min-w-0 flex-1">
+                          <h4 className="text-[15px] font-medium tracking-[-0.005em] text-[#FDFDFE] truncate">
                             {day.name}
                           </h4>
-                          <p className="text-[12px] text-client-text-secondary mt-0.5">
-                            {day.focus && <span>{day.focus} · </span>}
-                            {dayExercises.length} oefeningen
-                            {day.estimated_duration_min > 0 && <span> · ±{day.estimated_duration_min} min</span>}
+                          <p className="mt-[4px] text-[11.5px] text-[rgba(253,253,254,0.55)] tracking-[0.005em] truncate">
+                            {[
+                              day.focus || null,
+                              `${dayExercises.length} ${dayExercises.length === 1 ? 'oefening' : 'oefeningen'}`,
+                              day.estimated_duration_min > 0
+                                ? `±${day.estimated_duration_min} min`
+                                : null,
+                            ]
+                              .filter(Boolean)
+                              .join(' · ')}
                           </p>
                         </div>
                         <ChevronDown
-                          strokeWidth={1.5}
-                          size={20}
-                          className={`text-accent-dark transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                          strokeWidth={1.75}
+                          className={`w-4 h-4 text-[rgba(253,253,254,0.55)] transition-transform shrink-0 ${
+                            isExpanded ? 'rotate-180' : ''
+                          }`}
                         />
                       </button>
 
-                      {isExpanded && dayExercises.length > 0 && (
-                        <div className="px-4 pb-4 border-t border-client-border">
-                          <div className="space-y-3 mt-4">
-                            {dayExercises.map((exercise, exIndex) => (
-                              <div
-                                key={exercise.id}
-                                className="p-4 rounded-2xl bg-[#A6ADA7] border border-client-border"
-                              >
-                                <div className="flex items-start justify-between gap-4">
-                                  <div className="flex-1">
-                                    <h5 className="font-semibold mb-2 text-text-primary">
-                                      {exIndex + 1}. {exercise.name}
+                      {isExpanded && (
+                        <div className="px-[14px] pb-[14px]">
+                          {dayExercises.length === 0 ? (
+                            <div className="px-[14px] py-3 text-[12.5px] text-[rgba(253,253,254,0.45)]">
+                              Geen oefeningen toegevoegd.
+                            </div>
+                          ) : (
+                            <ul className="flex flex-col gap-1.5">
+                              {dayExercises.map((ex, idx) => (
+                                <li
+                                  key={ex.id}
+                                  className="rounded-[14px] bg-[rgba(253,253,254,0.05)] px-[14px] py-[12px]"
+                                >
+                                  <div className="flex items-baseline gap-2">
+                                    <span className="text-[11px] tabular-nums text-[rgba(253,253,254,0.40)] shrink-0 mt-[1px]">
+                                      {idx + 1}.
+                                    </span>
+                                    <h5 className="text-[14px] font-medium text-[#FDFDFE] leading-[1.3]">
+                                      {ex.name}
                                     </h5>
-                                    <div className="flex items-center gap-4 text-[13px] flex-wrap">
-                                      <span className="text-client-text-secondary">
-                                        <strong>Sets × Reps:</strong> {exercise.sets} × {exercise.reps}
+                                  </div>
+                                  <div className="mt-1.5 pl-[18px] flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[rgba(253,253,254,0.62)]">
+                                    <span>
+                                      <span className="text-[rgba(253,253,254,0.40)]">
+                                        Sets × Reps:{' '}
                                       </span>
-                                      {exercise.rest_seconds > 0 && (
-                                        <span className="text-client-text-secondary">
-                                          <strong>Rust:</strong> {exercise.rest_seconds}s
+                                      {ex.sets} × {ex.reps}
+                                    </span>
+                                    {ex.rest_seconds > 0 && (
+                                      <span>
+                                        <span className="text-[rgba(253,253,254,0.40)]">
+                                          Rust:{' '}
                                         </span>
-                                      )}
-                                    </div>
+                                        {ex.rest_seconds}s
+                                      </span>
+                                    )}
                                   </div>
-                                </div>
-
-                                {exercise.notes && (
-                                  <div className="mt-3 pt-3 border-t border-client-border">
-                                    <p className="text-[13px] italic text-client-text-secondary">
-                                      <strong>Notities:</strong> {exercise.notes}
+                                  {ex.notes && (
+                                    <p className="mt-2 pl-[18px] text-[12px] italic text-[rgba(253,253,254,0.55)] leading-[1.4]">
+                                      {ex.notes}
                                     </p>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
                         </div>
                       )}
                     </div>
                   )
                 })}
               </div>
-            ) : (
-              <Card className="rounded-2xl p-8 text-center bg-[#A6ADA7] shadow-clean border border-client-border">
-                <p className="text-client-text-secondary">
-                  Dit programma heeft nog geen trainingsschema. Voeg dagen en oefeningen toe via de template editor.
-                </p>
-                <Link
-                  href={`/coach/programs/${activeProgram.template_id}`}
-                  className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-semibold text-accent-dark hover:underline"
-                >
-                  Template bewerken <ExternalLink strokeWidth={1.5} className="w-3.5 h-3.5" />
-                </Link>
-              </Card>
-            )}
-          </div>
-        ) : (
-          <Card className="rounded-2xl p-12 mb-10 text-center bg-[#A6ADA7] shadow-clean border border-client-border">
-            <Dumbbell
-              size={48}
-              strokeWidth={1.5}
-              className="mx-auto mb-4 text-accent-dark"
-            />
-            <h2 className="text-2xl font-bold mb-2 text-text-primary">
-              Geen trainingsprogramma toegewezen
+            </div>
+          ) : (
+            <div className="rounded-[18px] bg-[rgba(71,75,72,0.55)] px-6 py-8 text-center">
+              <p className="text-[13.5px] text-[rgba(253,253,254,0.62)] leading-[1.45]">
+                Dit programma heeft nog geen trainingsschema. Voeg dagen en
+                oefeningen toe via de template editor.
+              </p>
+              <Link
+                href={`/coach/programs/${activeProgram.template_id}`}
+                className="inline-flex items-center gap-1.5 mt-4 rounded-full px-4 py-2 text-[12.5px] font-medium bg-[rgba(192,252,1,0.14)] text-[#C0FC01] transition-opacity active:opacity-70"
+              >
+                Template bewerken
+                <ExternalLink strokeWidth={1.5} className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          )}
+        </>
+      ) : (
+        // ─── Empty state (no active program) ──────────────
+        <div className="flex flex-col gap-5">
+          <div className="rounded-[22px] bg-[#474B48] px-6 py-8 text-center">
+            <div className="w-12 h-12 rounded-full bg-[rgba(253,253,254,0.06)] flex items-center justify-center mx-auto mb-3">
+              <Dumbbell
+                strokeWidth={1.5}
+                className="w-5 h-5 text-[rgba(253,253,254,0.62)]"
+              />
+            </div>
+            <h2 className="text-[18px] font-medium tracking-[-0.01em] text-[#FDFDFE]">
+              Geen programma actief
             </h2>
-            <p className="mb-8 text-client-text-secondary">
-              Wijs een programma toe vanuit je programmabibliotheek
+            <p className="mt-1.5 text-[13px] text-[rgba(253,253,254,0.62)] leading-[1.45]">
+              Wijs een programma toe vanuit je bibliotheek.
             </p>
+          </div>
 
-            {/* Available Templates */}
-            {templates.length > 0 && (
-              <div className="max-w-lg mx-auto space-y-3 mb-6">
-                {templates.map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => {
-                      setSelectedTemplate(t)
-                      setShowAssignModal(true)
-                    }}
-                    className="w-full flex items-center justify-between p-4 bg-client-surface-muted rounded-2xl border border-client-border hover:shadow-md transition-shadow text-left"
-                  >
-                    <div>
-                      <h5 className="text-[15px] font-semibold text-text-primary">{t.name}</h5>
-                      <p className="text-[12px] text-client-text-secondary mt-0.5">
-                        {t.duration_weeks}w · {t.days_per_week}d/w · {difficultyLabels[t.difficulty] || t.difficulty}
-                      </p>
-                    </div>
-                    <span className="text-[13px] font-semibold text-accent-dark flex items-center gap-1">
-                      Toewijzen <Plus strokeWidth={1.5} className="w-4 h-4" />
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <Link
-              href="/coach/programs/new"
-              className="inline-flex items-center gap-2 text-[13px] font-medium text-accent-dark hover:underline"
-            >
-              <Plus strokeWidth={1.5} className="w-4 h-4" />
-              Nieuw programma aanmaken
-            </Link>
-          </Card>
-        )}
-      </div>
-
-      {/* Switch Program Picker Overlay */}
-      {showSwitchPicker && (
-        <>
-          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" onClick={() => setShowSwitchPicker(false)} />
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-[#A6ADA7] rounded-2xl shadow-xl w-full max-w-md max-h-[80vh] overflow-hidden">
-              <div className="p-5 border-b border-[#A6ADA7] flex items-center justify-between">
-                <div>
-                  <h2 className="text-[17px] font-semibold text-[#FDFDFE]">Ander programma kiezen</h2>
-                  <p className="text-[12px] text-[#D6D9D6] mt-0.5">Het huidige programma wordt automatisch gestopt</p>
-                </div>
-                <button onClick={() => setShowSwitchPicker(false)} className="text-[#D6D9D6] hover:text-[#FDFDFE] p-1">
-                  <span className="sr-only">Sluiten</span>✕
-                </button>
-              </div>
-              <div className="p-5 overflow-y-auto max-h-[60vh] space-y-3">
-                {templates.filter(t => t.id !== activeProgram?.template_id).length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-[14px] text-[#D6D9D6]">Geen andere templates beschikbaar</p>
-                    <Link
-                      href="/coach/programs/new"
-                      className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-semibold text-accent-dark hover:underline"
-                    >
-                      <Plus strokeWidth={1.5} className="w-4 h-4" />
-                      Nieuw programma aanmaken
-                    </Link>
-                  </div>
-                ) : (
-                  templates.filter(t => t.id !== activeProgram?.template_id).map((t) => (
+          {templates.length > 0 && (
+            <div>
+              <h3 className="px-0.5 mb-3 text-[11px] uppercase tracking-[0.14em] text-[rgba(253,253,254,0.45)]">
+                Beschikbare templates
+              </h3>
+              <div className="flex flex-col gap-2">
+                {templates.map((t) => {
+                  const d = DIFFICULTY[diffKey(t.difficulty)]
+                  return (
                     <button
                       key={t.id}
                       onClick={() => {
                         setSelectedTemplate(t)
-                        setShowSwitchPicker(false)
                         setShowAssignModal(true)
                       }}
-                      className="w-full flex items-center justify-between p-4 bg-[#A6ADA7] rounded-xl border border-[#A6ADA7] hover:border-[#FDFDFE] hover:bg-[#A6ADA7] transition-all text-left"
+                      className="w-full rounded-[18px] bg-[#474B48] px-[18px] py-[14px] text-left transition-colors active:bg-[#4d524e]"
                     >
-                      <div>
-                        <h5 className="text-[14px] font-semibold text-[#FDFDFE]">{t.name}</h5>
-                        <p className="text-[12px] text-[#D6D9D6] mt-0.5">
-                          {t.duration_weeks}w · {t.days_per_week}d/w · {difficultyLabels[t.difficulty] || t.difficulty}
-                        </p>
-                        {t.description && (
-                          <p className="text-[11px] text-[#989F99] mt-1 line-clamp-1">{t.description}</p>
-                        )}
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <h4 className="text-[15px] font-medium tracking-[-0.005em] text-[#FDFDFE] truncate">
+                            {t.name}
+                          </h4>
+                          <div className="mt-[6px] flex items-center gap-[8px] text-[11.5px] text-[rgba(253,253,254,0.55)]">
+                            <span
+                              className="inline-block w-[6px] h-[6px] rounded-full shrink-0"
+                              style={{ background: d.color }}
+                              aria-hidden
+                            />
+                            <span className="truncate">
+                              {d.label} · {t.duration_weeks} weken ·{' '}
+                              {t.days_per_week}×/week
+                            </span>
+                          </div>
+                        </div>
+                        <Plus
+                          strokeWidth={1.75}
+                          className="w-4 h-4 text-[rgba(253,253,254,0.62)] shrink-0"
+                        />
                       </div>
-                      <span className="text-[12px] font-semibold text-[#FDFDFE] shrink-0 ml-3">
-                        Selecteer →
-                      </span>
                     </button>
-                  ))
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          <Link
+            href="/coach/programs/new"
+            className="self-center inline-flex items-center gap-1.5 rounded-full px-4 py-2.5 text-[13px] font-medium whitespace-nowrap bg-[rgba(192,252,1,0.14)] text-[#C0FC01] transition-opacity active:opacity-70"
+          >
+            <Plus strokeWidth={1.75} className="w-4 h-4" />
+            Nieuw programma aanmaken
+          </Link>
+        </div>
+      )}
+
+      {/* Switch Program Picker Overlay */}
+      {showSwitchPicker && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40"
+            onClick={() => setShowSwitchPicker(false)}
+          />
+          <div className="fixed inset-x-0 bottom-0 z-50 flex justify-center pointer-events-none">
+            <div className="pointer-events-auto w-full max-w-[480px] bg-[#474B48] rounded-t-[24px] shadow-2xl max-h-[82vh] overflow-hidden animate-slide-up">
+              <div className="px-5 py-4 border-b border-[rgba(253,253,254,0.08)] flex items-center justify-between">
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-[16px] font-medium text-[#FDFDFE]">
+                    Ander programma kiezen
+                  </h2>
+                  <p className="mt-0.5 text-[12px] text-[rgba(253,253,254,0.55)]">
+                    Het huidige programma wordt automatisch gestopt
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowSwitchPicker(false)}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-[rgba(253,253,254,0.62)] hover:text-[#FDFDFE] hover:bg-[rgba(253,253,254,0.06)] transition-colors"
+                  aria-label="Sluiten"
+                >
+                  <X strokeWidth={1.75} className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="px-4 py-4 overflow-y-auto max-h-[66vh] flex flex-col gap-2">
+                {templates.filter((t) => t.id !== activeProgram?.template_id)
+                  .length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-[13px] text-[rgba(253,253,254,0.55)]">
+                      Geen andere templates beschikbaar
+                    </p>
+                    <Link
+                      href="/coach/programs/new"
+                      className="inline-flex items-center gap-1.5 mt-3 rounded-full px-4 py-2 text-[12.5px] font-medium bg-[rgba(192,252,1,0.14)] text-[#C0FC01]"
+                    >
+                      <Plus strokeWidth={1.75} className="w-3.5 h-3.5" />
+                      Nieuw programma
+                    </Link>
+                  </div>
+                ) : (
+                  templates
+                    .filter((t) => t.id !== activeProgram?.template_id)
+                    .map((t) => {
+                      const d = DIFFICULTY[diffKey(t.difficulty)]
+                      return (
+                        <button
+                          key={t.id}
+                          onClick={() => {
+                            setSelectedTemplate(t)
+                            setShowSwitchPicker(false)
+                            setShowAssignModal(true)
+                          }}
+                          className="w-full rounded-[16px] bg-[rgba(253,253,254,0.05)] px-[16px] py-[13px] text-left transition-colors active:bg-[rgba(253,253,254,0.10)]"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0 flex-1">
+                              <h5 className="text-[14px] font-medium text-[#FDFDFE] truncate">
+                                {t.name}
+                              </h5>
+                              <div className="mt-1 flex items-center gap-[7px] text-[11.5px] text-[rgba(253,253,254,0.55)]">
+                                <span
+                                  className="inline-block w-[6px] h-[6px] rounded-full shrink-0"
+                                  style={{ background: d.color }}
+                                  aria-hidden
+                                />
+                                <span className="truncate">
+                                  {d.label} · {t.duration_weeks}w ·{' '}
+                                  {t.days_per_week}d/w
+                                </span>
+                              </div>
+                              {t.description && (
+                                <p className="mt-1.5 text-[11.5px] text-[rgba(253,253,254,0.45)] line-clamp-1">
+                                  {t.description}
+                                </p>
+                              )}
+                            </div>
+                            <span className="text-[12px] font-medium text-[#A4C7F2] shrink-0 mt-0.5">
+                              Kies →
+                            </span>
+                          </div>
+                        </button>
+                      )
+                    })
                 )}
               </div>
             </div>

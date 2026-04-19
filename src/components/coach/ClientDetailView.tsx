@@ -743,7 +743,7 @@ function VoedingPanel({ data }: { data: ClientWeekTimeline }) {
         <Card
           editable
           editAriaLabel="Bewerk macro's"
-          editHref={`/coach/clients/${data.clientId}/meal-plan`}
+          editHref={`/coach/clients/${data.clientId}/nutrition`}
         >
           <div className="flex items-baseline justify-between gap-[14px]">
             <span className="text-[13px] font-medium uppercase tracking-[0.14em] text-[rgba(253,253,254,0.62)]">
@@ -763,7 +763,7 @@ function VoedingPanel({ data }: { data: ClientWeekTimeline }) {
         <Card
           editable
           editAriaLabel="Stel macro-target in"
-          editHref={`/coach/clients/${data.clientId}/meal-plan`}
+          editHref={`/coach/clients/${data.clientId}/nutrition`}
         >
           <p className="text-[13.5px] leading-[1.45] text-[rgba(253,253,254,0.62)] m-0">
             Nog geen voedingsplan actief.
