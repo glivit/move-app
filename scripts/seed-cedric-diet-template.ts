@@ -145,11 +145,12 @@ const meals: Meal[] = [
   ]),
 
   mkMeal('meal-4-thuiskomen', 'Thuiskomen', '18:00', [
-    // Protein pudding of protein bar (1 stuk) → 150–200 kcal / 20g proteïne
+    // Protein pudding of protein bar (1 stuk) → 150 kcal / 20g proteïne
+    // (dagtotaal-claim van 1955 gebruikt de ondergrens 150)
     {
       name: 'Protein pudding of protein bar (1 stuk)',
-      grams: 60,
-      per100g: { calories: 300, protein: 33, carbs: 25, fat: 8 },
+      grams: 200,
+      per100g: { calories: 75, protein: 10, carbs: 6, fat: 1.5 },
     },
   ]),
 
