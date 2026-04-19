@@ -10,6 +10,7 @@ import type {
   SessionLogEntry,
   DayLogEntry,
   LiftProgressEntry,
+  PrEntry,
 } from '@/lib/coach-client-week-data'
 
 interface Props {
@@ -791,6 +792,8 @@ function VoortgangPanel({ data }: { data: ClientWeekTimeline }) {
   const hasAny =
     !!data.bodyWeight ||
     data.liftsProgress.length > 0 ||
+    data.topPRs.length > 0 ||
+    data.sessionLogs.length > 0 ||
     !!data.measurements ||
     (data.photos && data.photos.urls.length > 0)
 
@@ -861,25 +864,42 @@ function VoortgangPanel({ data }: { data: ClientWeekTimeline }) {
         <>
           <SectionTitle>Sleutelliften · e1RM</SectionTitle>
           <Card>
-            <div className="flex flex-col gap-[10px]">
+            <div className="flex flex-col">
               {data.liftsProgress.map((l) => (
-                <div key={l.name} className="flex items-center justify-between text-[13px]">
-                  <span className="text-[#FDFDFE] font-medium">{l.name}</span>
-                  <span
-                    className={`text-[12.5px] ${
-                      l.deltaLabel === 'up'
-                        ? 'text-[#C0FC01]'
-                        : l.deltaLabel === 'down'
-                        ? 'text-[#E8A93C]'
-                        : 'text-[rgba(253,253,254,0.62)]'
-                    }`}
-                  >
-                    {l.display}
-                  </span>
-                </div>
+                <LiftRow key={`${l.name}-${l.exerciseId ?? 'na'}`} lift={l} clientId={data.clientId} />
               ))}
             </div>
           </Card>
+        </>
+      )}
+
+      {data.topPRs.length > 0 && (
+        <>
+          <SectionTitle>PR&apos;s · laatste 8</SectionTitle>
+          <ActivityList>
+            {data.topPRs.map((pr) => (
+              <PrRow key={pr.id} pr={pr} clientId={data.clientId} />
+            ))}
+          </ActivityList>
+        </>
+      )}
+
+      {data.sessionLogs.length > 0 && (
+        <>
+          <SectionTitle>Sessie-logs</SectionTitle>
+          <ActivityList>
+            {data.sessionLogs.map((s) => (
+              <ActivityRow
+                key={s.id}
+                state={s.state === 'missed' ? 'missed' : 'done'}
+                title={s.title}
+                sub={s.sub}
+                timeLabel={s.timeLabel}
+                tappable
+                href={`/coach/sessions/${s.id}`}
+              />
+            ))}
+          </ActivityList>
         </>
       )}
 
@@ -948,6 +968,78 @@ function VoortgangPanel({ data }: { data: ClientWeekTimeline }) {
         </>
       )}
     </div>
+  )
+}
+
+// ─── LiftRow / PrRow (Voortgang) ────────────────────────────────
+//
+// LiftRow: klikbaar als we een exerciseId hebben — dan gaat-ie naar
+// /coach/clients/[id]/exercises/[exId] waar de volledige historie leeft.
+// Zonder exerciseId (legacy data) blijft het een plain row.
+
+function LiftRow({ lift, clientId }: { lift: LiftProgressEntry; clientId: string }) {
+  const body = (
+    <>
+      <div className="min-w-0">
+        <div className="text-[14px] text-[#FDFDFE] tracking-[-0.005em] truncate font-medium">
+          {lift.name}
+        </div>
+      </div>
+      <span
+        className={`text-[12.5px] whitespace-nowrap ${
+          lift.deltaLabel === 'up'
+            ? 'text-[#C0FC01]'
+            : lift.deltaLabel === 'down'
+            ? 'text-[#E8A93C]'
+            : 'text-[rgba(253,253,254,0.62)]'
+        }`}
+      >
+        {lift.display}
+      </span>
+      {lift.exerciseId && (
+        <span className="text-[rgba(253,253,254,0.40)] text-[16px] leading-none justify-self-end">›</span>
+      )}
+    </>
+  )
+  const grid = lift.exerciseId
+    ? 'grid-cols-[1fr_auto_10px]'
+    : 'grid-cols-[1fr_auto]'
+  const cls = `grid ${grid} gap-3 items-center py-[12px] border-b border-[rgba(253,253,254,0.08)] last:border-b-0`
+
+  if (lift.exerciseId) {
+    return (
+      <Link
+        href={`/coach/clients/${clientId}/exercises/${lift.exerciseId}`}
+        className={`${cls} hover:bg-[rgba(253,253,254,0.02)] transition-colors`}
+      >
+        {body}
+      </Link>
+    )
+  }
+  return <div className={cls}>{body}</div>
+}
+
+function PrRow({ pr, clientId }: { pr: PrEntry; clientId: string }) {
+  return (
+    <Link
+      href={`/coach/clients/${clientId}/exercises/${pr.exerciseId}`}
+      className="grid grid-cols-[14px_1fr_auto_10px] gap-3 items-center py-[14px] border-b border-[rgba(253,253,254,0.08)] last:border-b-0 hover:bg-[rgba(253,253,254,0.02)] transition-colors"
+    >
+      <span className="block w-2 h-2 rounded-full bg-[#C0FC01] justify-self-center" />
+      <div className="min-w-0">
+        <div className="text-[14px] text-[#FDFDFE] tracking-[-0.005em] truncate">
+          {pr.exerciseName}
+        </div>
+        <div className="text-[12px] text-[rgba(253,253,254,0.62)] mt-[2px] truncate">
+          {pr.display}
+          {pr.recordType === 'weight' ? '' : pr.recordType === '1rm' ? ' · 1RM' : pr.recordType === 'reps' ? '' : ` · ${pr.recordType}`}
+        </div>
+      </div>
+      <span className="text-[12px] text-[rgba(253,253,254,0.40)] whitespace-nowrap">
+        {pr.dateLabel}
+      </span>
+      <span className="text-[rgba(253,253,254,0.40)] text-[16px] leading-none justify-self-end">›</span>
+    </Link>
   )
 }
 

@@ -98,9 +98,23 @@ export interface DayLogEntry {
 
 export interface LiftProgressEntry {
   name: string
+  /** exerciseId for click-through to /coach/clients/[id]/exercises/[exId] */
+  exerciseId: string | null
   latestKg: number | null
   deltaPct: number | null
   deltaLabel: 'up' | 'down' | 'flat' | null
+  display: string
+}
+
+export interface PrEntry {
+  id: string
+  exerciseId: string
+  exerciseName: string
+  recordType: 'weight' | '1rm' | 'reps' | string
+  value: number
+  achievedAt: string
+  dateLabel: string
+  /** "120kg × 5" or "+2 reps" — formatted for display */
   display: string
 }
 
@@ -183,6 +197,8 @@ export interface ClientWeekTimeline {
   } | null
 
   liftsProgress: LiftProgressEntry[]
+
+  topPRs: PrEntry[]
 
   measurements: {
     chestCm: number | null
@@ -294,7 +310,7 @@ export async function fetchClientWeekTimeline(
       .single(),
     supabase
       .from('client_programs')
-      .select('schedule, name, current_week, start_date, end_date, coach_notes')
+      .select('schedule, name, current_week, start_date, end_date, coach_notes, template_id')
       .eq('client_id', clientId)
       .eq('is_active', true)
       .limit(1)
@@ -479,8 +495,9 @@ export async function fetchClientWeekTimeline(
     start_date?: string | null
     end_date?: string | null
     coach_notes?: string | null
+    template_id?: string | null
   } | null
-  const schedule = (programRow?.schedule || {}) as Record<string, string>
+  const rawSchedule = (programRow?.schedule || {}) as Record<string, string>
   const templateDays = (templateDaysData || []) as TemplateDayRow[]
   const sessions = (sessionsData || []) as SessionRow[]
   const nutritionPlan = nutritionPlanData as {
@@ -500,6 +517,45 @@ export async function fetchClientWeekTimeline(
 
   const dayNameMap: Record<string, string> = {}
   for (const td of templateDays) dayNameMap[td.id] = td.name
+
+  // ─── Schedule resilience ────────────────────────────────────
+  // client_programs.schedule kan in de praktijk corrupt zijn:
+  //   - slot-waarde is de STRING naam ipv UUID (e.g. {"1":"Push"})
+  //   - slot-waarde is een stale UUID (template_day deleted+replaced)
+  // Vang dit af door te resolven via name-match binnen het actieve template.
+  // Ook vereist voor Charles (2026-04-19: schedule["1"] = "Push" ipv UUID).
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  const nameToIdInTemplate: Record<string, string> = {}
+  // templateDays (all rows) heeft geen template_id in de select. Fetchen
+  // we pas als er écht iets te resolven is — anders geen extra round-trip.
+  let scheduleNeedsResolving = false
+  for (const v of Object.values(rawSchedule)) {
+    if (!v) continue
+    if (!UUID_RE.test(v) || !dayNameMap[v]) {
+      scheduleNeedsResolving = true
+      break
+    }
+  }
+  const schedule: Record<string, string> = { ...rawSchedule }
+  if (scheduleNeedsResolving && programRow?.template_id) {
+    const { data: tdRowsForTemplate } = await supabase
+      .from('program_template_days')
+      .select('id, name')
+      .eq('template_id', programRow.template_id)
+    type TdrowForTemplate = { id: string; name: string }
+    for (const td of (tdRowsForTemplate || []) as TdrowForTemplate[]) {
+      nameToIdInTemplate[String(td.name).toLowerCase()] = td.id
+      // Zorg dat dayNameMap ook de canonieke naam kent (voor rendering).
+      if (!dayNameMap[td.id]) dayNameMap[td.id] = td.name
+    }
+    for (const [dow, val] of Object.entries(rawSchedule)) {
+      if (!val) continue
+      if (UUID_RE.test(val) && dayNameMap[val]) continue // al geldig
+      const resolved = nameToIdInTemplate[String(val).toLowerCase()]
+      if (resolved) schedule[dow] = resolved
+      // anders: laat staan — state-logic valt terug op 'rest' voor deze slot
+    }
+  }
 
   // ─── Sets-per-session for this week ─────────────────────────
   let setsById: Record<
@@ -1079,32 +1135,36 @@ export async function fetchClientWeekTimeline(
     }
   }
 
-  // ─── Lifts progress (top 4 by freq of PRs, with trend) ──────
+  // ─── Lifts progress (top 6 by freq of PRs, with trend) ──────
+  // Geeft per oefening: latestKg, delta, deltaLabel, display, EN exerciseId
+  // zodat de Voortgang-tab naar de per-oefening subpage kan linken.
   const liftsProgress: LiftProgressEntry[] = []
   {
-    // Group PRs by exercise name (prefer name_nl)
+    // Group PRs by exercise_id (not name — naam kan verschillen per locale)
     const exerciseNameFromPr = (pr: PrRow): string => {
       const ex = Array.isArray(pr.exercises) ? pr.exercises[0] : pr.exercises
       return ex?.name_nl || ex?.name || 'Oefening'
     }
-    const byExercise = new Map<string, PrRow[]>()
+    const byExercise = new Map<string, { name: string; list: PrRow[] }>()
     for (const pr of prs) {
+      if (!pr.exercise_id) continue
       const n = exerciseNameFromPr(pr)
-      if (!byExercise.has(n)) byExercise.set(n, [])
-      byExercise.get(n)!.push(pr)
+      if (!byExercise.has(pr.exercise_id)) byExercise.set(pr.exercise_id, { name: n, list: [] })
+      byExercise.get(pr.exercise_id)!.list.push(pr)
     }
-    // Pick top 4 exercises by most recent PR count in the last 90 days
+    // Pick top 6 exercises by most recent PR count in the last 90 days
     const ninetyDaysAgoIso = toDateIso(new Date(today.getTime() - 90 * 86400000))
     const ranked = Array.from(byExercise.entries())
-      .map(([name, list]) => ({
+      .map(([exerciseId, { name, list }]) => ({
+        exerciseId,
         name,
         list,
         recent: list.filter((p) => p.achieved_at >= ninetyDaysAgoIso).length,
       }))
       .sort((a, b) => b.recent - a.recent || b.list.length - a.list.length)
-      .slice(0, 4)
+      .slice(0, 6)
 
-    for (const { name, list } of ranked) {
+    for (const { exerciseId, name, list } of ranked) {
       // Latest weight-type PR, and 4-weeks-ago comparison
       const weightPrs = list
         .filter((p) => p.record_type === 'weight' || p.record_type === '1rm')
@@ -1118,6 +1178,7 @@ export async function fetchClientWeekTimeline(
           const latest = repPrs[repPrs.length - 1]
           liftsProgress.push({
             name,
+            exerciseId,
             latestKg: null,
             deltaPct: null,
             deltaLabel: 'up',
@@ -1142,9 +1203,45 @@ export async function fetchClientWeekTimeline(
           : `${pct > 0 ? '+' : ''}${pct}% · ${latestKg} kg`
       liftsProgress.push({
         name,
+        exerciseId,
         latestKg,
         deltaPct: pct,
         deltaLabel,
+        display,
+      })
+    }
+  }
+
+  // ─── Top PRs (meest recente 8) ───────────────────────────────
+  // Voor het PR-blok in de Voortgang-tab. Klikbaar naar de per-oefening
+  // subpage, zodat de coach het verhaal achter een PR kan lezen.
+  const topPRs: PrEntry[] = []
+  {
+    const sorted = [...prs].sort((a, b) => (a.achieved_at < b.achieved_at ? 1 : -1)).slice(0, 8)
+    for (const pr of sorted) {
+      if (!pr.exercise_id) continue
+      const ex = Array.isArray(pr.exercises) ? pr.exercises[0] : pr.exercises
+      const exerciseName = ex?.name_nl || ex?.name || 'Oefening'
+      const dateIso = pr.achieved_at.split('T')[0]
+      const dateLabel = formatRelativeDayLabel(dateIso, todayIso)
+      let display = ''
+      if (pr.record_type === 'weight' || pr.record_type === '1rm') {
+        display = `${Math.round(Number(pr.value))} kg`
+      } else if (pr.record_type === 'reps') {
+        display = `${Math.round(Number(pr.value))} reps`
+      } else if (pr.record_type === 'volume') {
+        display = `${Math.round(Number(pr.value))} kg vol.`
+      } else {
+        display = `${Math.round(Number(pr.value))}`
+      }
+      topPRs.push({
+        id: pr.id,
+        exerciseId: pr.exercise_id,
+        exerciseName,
+        recordType: pr.record_type,
+        value: Number(pr.value),
+        achievedAt: pr.achieved_at,
+        dateLabel,
         display,
       })
     }
@@ -1229,6 +1326,7 @@ export async function fetchClientWeekTimeline(
     activityLog,
     bodyWeight,
     liftsProgress,
+    topPRs,
     measurements,
     photos,
   }
