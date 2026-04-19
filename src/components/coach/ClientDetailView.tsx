@@ -233,42 +233,60 @@ function Card({
   children,
   editable,
   onEdit,
+  editHref,
   editAriaLabel,
   subtle,
 }: {
   children: React.ReactNode
   editable?: boolean
+  /** Callback voor bewerk-knop. Gebruik OFWEL onEdit OFWEL editHref. */
   onEdit?: () => void
+  /** Als gezet, rendert het potloodje als Link (ondersteunt middle-click / right-click → open in tab). */
+  editHref?: string
   editAriaLabel?: string
   subtle?: boolean
 }) {
+  const editIconSvg = (
+    <svg
+      viewBox="0 0 16 16"
+      className="w-[13px] h-[13px]"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M11 1.5l3.5 3.5-9 9H2v-3.5l9-9z" />
+      <path d="M10 2.5l3.5 3.5" />
+    </svg>
+  )
+  const editBtnClass =
+    'absolute top-[14px] right-[14px] w-[30px] h-[30px] rounded-full bg-[rgba(253,253,254,0.07)] hover:bg-[rgba(253,253,254,0.14)] text-[rgba(253,253,254,0.62)] hover:text-[#FDFDFE] flex items-center justify-center transition-colors z-10'
+
   return (
     <div
       className={`relative rounded-[22px] px-[22px] pt-5 pb-[22px] mb-3 ${
         subtle ? 'bg-[rgba(71,75,72,0.45)]' : 'bg-[#474B48]'
       }`}
     >
-      {editable && (
+      {editable && editHref ? (
+        <Link
+          href={editHref}
+          aria-label={editAriaLabel || 'Bewerken'}
+          className={editBtnClass}
+        >
+          {editIconSvg}
+        </Link>
+      ) : editable ? (
         <button
           type="button"
           aria-label={editAriaLabel || 'Bewerken'}
           onClick={onEdit}
-          className="absolute top-[14px] right-[14px] w-[30px] h-[30px] rounded-full bg-[rgba(253,253,254,0.07)] hover:bg-[rgba(253,253,254,0.14)] text-[rgba(253,253,254,0.62)] hover:text-[#FDFDFE] flex items-center justify-center transition-colors z-10"
+          className={editBtnClass}
         >
-          <svg
-            viewBox="0 0 16 16"
-            className="w-[13px] h-[13px]"
-            stroke="currentColor"
-            strokeWidth="1.7"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M11 1.5l3.5 3.5-9 9H2v-3.5l9-9z" />
-            <path d="M10 2.5l3.5 3.5" />
-          </svg>
+          {editIconSvg}
         </button>
-      )}
+      ) : null}
       {children}
     </div>
   )
@@ -588,7 +606,11 @@ function ProgrammaPanel({ data }: { data: ClientWeekTimeline }) {
     <div>
       <SectionTitle>Huidig programma</SectionTitle>
       {data.programInfo ? (
-        <Card editable editAriaLabel="Bewerk programma">
+        <Card
+          editable
+          editAriaLabel="Bewerk programma"
+          editHref={`/coach/clients/${data.clientId}/program`}
+        >
           <div className="flex items-baseline justify-between gap-[14px]">
             <span className="text-[13px] font-medium uppercase tracking-[0.14em] text-[rgba(253,253,254,0.62)]">
               {data.programInfo.name}
@@ -607,7 +629,11 @@ function ProgrammaPanel({ data }: { data: ClientWeekTimeline }) {
           </div>
         </Card>
       ) : (
-        <Card editable editAriaLabel="Stel programma in">
+        <Card
+          editable
+          editAriaLabel="Stel programma in"
+          editHref={`/coach/clients/${data.clientId}/program`}
+        >
           <p className="text-[13.5px] leading-[1.45] text-[rgba(253,253,254,0.62)] m-0">
             Nog geen actief programma.
           </p>
@@ -714,7 +740,11 @@ function VoedingPanel({ data }: { data: ClientWeekTimeline }) {
     <div>
       <SectionTitle>Macro-target</SectionTitle>
       {data.macroTarget ? (
-        <Card editable editAriaLabel="Bewerk macro's">
+        <Card
+          editable
+          editAriaLabel="Bewerk macro's"
+          editHref={`/coach/clients/${data.clientId}/meal-plan`}
+        >
           <div className="flex items-baseline justify-between gap-[14px]">
             <span className="text-[13px] font-medium uppercase tracking-[0.14em] text-[rgba(253,253,254,0.62)]">
               {data.macroTarget.goalLabel || 'Macro-plan'}
@@ -730,7 +760,11 @@ function VoedingPanel({ data }: { data: ClientWeekTimeline }) {
           />
         </Card>
       ) : (
-        <Card editable editAriaLabel="Stel macro-target in">
+        <Card
+          editable
+          editAriaLabel="Stel macro-target in"
+          editHref={`/coach/clients/${data.clientId}/meal-plan`}
+        >
           <p className="text-[13.5px] leading-[1.45] text-[rgba(253,253,254,0.62)] m-0">
             Nog geen voedingsplan actief.
           </p>
