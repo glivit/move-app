@@ -36,13 +36,22 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
     return () => { cancelled = true }
   }, [])
 
-  // ─── Workout-finish retry-queue ──────────────────────────────────
-  // Als handleComplete in /client/workout/complete eerder vandaag failde,
-  // staat de payload in localStorage. Retry hier 1× bij volgende mount —
-  // Supabase access_token wordt via createClient gepakt zodat de
-  // server-route de gebruiker authenticeert via Bearer header. Zonder
-  // deze loop bleven mislukte sessies eeuwig op completed_at=NULL hangen
-  // (Charles' Upper-sessie van 2026-04-18).
+  // ─── Workout-finish retry-queue + auto-finish safety-net ─────────
+  //
+  // Twee stappen bij elke mount:
+  //
+  //  1. processPendingWorkoutFinish — loopt de localStorage retry-queue
+  //     af. Vangt scenario B: handleComplete runde wél maar fetch faalde.
+  //
+  //  2. /api/workout-auto-finish — vindt open sessies (completed_at IS NULL)
+  //     van de user en sluit die af als:
+  //        - laatste set > 90 min geleden  → completed_at = last_set + 2min
+  //        - geen sets en started_at > 6u  → completed_at = started_at + 1min
+  //     Vangt scenario A: user drukte nooit op Sluiten. We sturen de
+  //     currently-active sessionId mee als excludeSessionId zodat we een
+  //     minimized workout (background-bar) niet per ongeluk afsluiten.
+  //
+  // Beide stappen zijn best-effort — niks fataals als ze falen.
   useEffect(() => {
     let cancelled = false
     ;(async () => {
@@ -59,7 +68,28 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
           headers['Authorization'] = `Bearer ${authSession.access_token}`
         }
         if (cancelled) return
+
+        // 1. retry-queue
         await processPendingWorkoutFinish(headers)
+        if (cancelled) return
+
+        // 2. auto-finish abandoned sessions
+        let excludeSessionId: string | null = null
+        try {
+          const raw = window.localStorage.getItem('move_minimized_workout')
+          if (raw) {
+            const parsed = JSON.parse(raw) as { sessionId?: string }
+            if (parsed?.sessionId) excludeSessionId = parsed.sessionId
+          }
+        } catch {
+          /* ignore */
+        }
+
+        await fetch('/api/workout-auto-finish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...headers },
+          body: JSON.stringify({ excludeSessionId }),
+        })
       } catch {
         /* best-effort */
       }
