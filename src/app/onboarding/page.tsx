@@ -497,7 +497,13 @@ export default function OnboardingPage() {
   /* ─── Progress ──────────────────────────────────────── */
 
   const progress = (step / (TOTAL - 1)) * 100
-  const lastFormStep = TOTAL - 3 // photos step index
+  // Last interactive form step is the photos step (TOTAL - 1). Previously this
+  // was TOTAL - 3 because the flow had "generating" + "complete" screens after
+  // photos — those were removed (flow now goes straight to /client), but the
+  // math wasn't updated. Bug: footer was hidden on Voeding step because the
+  // condition `step === lastFormStep && !showPhotoStep` matched incorrectly —
+  // user could not click Volgende on snacks/dieet, completely stuck.
+  const lastFormStep = TOTAL - 1 // photos step index
 
   /* ─── Render ────────────────────────────────────────── */
 
