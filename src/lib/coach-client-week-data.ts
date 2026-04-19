@@ -129,6 +129,14 @@ export interface ClientWeekTimeline {
   startDateIso: string | null
   startDateLabel: string | null
 
+  /** Heeft de klant z'n intake afgerond? (profiles.intake_completed) */
+  intakeCompleted: boolean
+  /**
+   * ISO-string van de laatste re-intake-vraag van de coach, of null.
+   * Zolang niet-null: task op client-dashboard.
+   */
+  reintakeRequestedAt: string | null
+
   weekStartIso: string
   weekEndIso: string
 
@@ -305,7 +313,9 @@ export async function fetchClientWeekTimeline(
   ] = await Promise.all([
     supabase
       .from('profiles')
-      .select('id, full_name, avatar_url, package, start_date')
+      .select(
+        'id, full_name, avatar_url, package, start_date, intake_completed, reintake_requested_at',
+      )
       .eq('id', clientId)
       .single(),
     supabase
@@ -1303,6 +1313,8 @@ export async function fetchClientWeekTimeline(
     packageTier: profile.package || null,
     startDateIso,
     startDateLabel,
+    intakeCompleted: !!profile.intake_completed,
+    reintakeRequestedAt: profile.reintake_requested_at || null,
     weekStartIso,
     weekEndIso,
     days,
