@@ -145,7 +145,11 @@ function SetPasswordContent() {
 
       // 2. If we have a token_hash, verify it (legacy direct-link flow)
       if (tokenHash) {
-        const otpType = (type as 'invite' | 'magiclink' | 'email') || 'invite'
+        // Accept invite/magiclink/recovery/email — all four are valid verifyOtp
+        // types and are all used by the resend-invite flow depending on which
+        // admin.generateLink call succeeded.
+        const otpType =
+          (type as 'invite' | 'magiclink' | 'recovery' | 'email') || 'invite'
         const { error: otpError } = await supabase.auth.verifyOtp({
           token_hash: tokenHash,
           type: otpType,

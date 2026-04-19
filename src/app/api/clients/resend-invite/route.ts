@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
   // Try magiclink first (works for existing confirmed users),
   // then fall back to invite type (works for new/unconfirmed users)
   let linkData: any = null
-  let linkError: any = null
+  let linkType: 'magiclink' | 'invite' | 'recovery' = 'magiclink'
 
   // First attempt: magiclink
   const magicResult = await admin.auth.admin.generateLink({
@@ -96,6 +96,7 @@ export async function POST(request: NextRequest) {
           )
         }
         linkData = recoveryResult.data
+        linkType = 'recovery'
       } else {
         console.error('Invite link error:', inviteResult.error)
         return NextResponse.json(
@@ -105,33 +106,38 @@ export async function POST(request: NextRequest) {
       }
     } else {
       linkData = inviteResult.data
+      linkType = 'invite'
     }
   } else {
     linkData = magicResult.data
+    linkType = 'magiclink'
   }
 
-  // Use action_link (goes through Supabase's server-side verification).
-  // This is more reliable than client-side verifyOtp with token_hash because:
-  // 1. Token is verified server-side by Supabase (no React double-render issues)
-  // 2. Session is established via PKCE code exchange in our auth callback
-  // 3. No URL encoding or timing issues
-  let inviteLink = linkData.properties?.action_link || ''
-  if (inviteLink) {
-    const actionUrl = new URL(inviteLink)
-    actionUrl.searchParams.set('redirect_to', `${appUrl}/auth/callback`)
-    inviteLink = actionUrl.toString()
-  } else {
-    // Fallback: use hashed_token directly (legacy approach)
-    const tokenHash = linkData.properties?.hashed_token || ''
-    if (!tokenHash) {
-      console.error('No token found in link data:', JSON.stringify(linkData.properties))
-      return NextResponse.json(
-        { error: 'Kon geen geldige token genereren. Probeer later opnieuw.' },
-        { status: 500 }
-      )
-    }
-    inviteLink = `${appUrl}/auth/set-password?token_hash=${encodeURIComponent(tokenHash)}&type=magiclink`
+  // IMPORTANT — we build the email link with token_hash, NOT action_link.
+  //
+  // action_link sends the user through Supabase's /auth/v1/verify which then
+  // redirects to /auth/callback?code=xxx for PKCE code exchange. That PKCE flow
+  // requires a `code_verifier` cookie stored in the BROWSER that requested the
+  // link — but admin.generateLink is called server-side by the coach, so the
+  // client's browser never stored a verifier. exchangeCodeForSession() fails
+  // with "both auth code and code verifier should be non-empty", and Cedric
+  // sees "Er ging iets mis met de verificatie."
+  //
+  // Using token_hash directly sends the user to /auth/set-password which calls
+  // verifyOtp({ token_hash, type }) client-side. verifyOtp is a direct OTP
+  // verification that does NOT use PKCE, so no verifier is needed — the session
+  // is established purely from the hashed token. Works for magiclink + invite +
+  // recovery, and the set-password page's verifyAttempted ref already handles
+  // the React strict-mode double-render case.
+  const tokenHash = linkData.properties?.hashed_token || ''
+  if (!tokenHash) {
+    console.error('No token_hash found in link data:', JSON.stringify(linkData.properties))
+    return NextResponse.json(
+      { error: 'Kon geen geldige token genereren. Probeer later opnieuw.' },
+      { status: 500 }
+    )
   }
+  const inviteLink = `${appUrl}/auth/set-password?token_hash=${encodeURIComponent(tokenHash)}&type=${linkType}`
 
   try {
     await sendInviteEmail({
