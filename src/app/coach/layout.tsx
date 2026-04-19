@@ -14,8 +14,8 @@ export default function CoachLayout({ children }: { children: React.ReactNode })
         <CoachSidebar />
       </div>
 
-      <main className="lg:pl-[280px]">
-        <div className="max-w-[420px] lg:max-w-5xl mx-auto px-[22px] lg:px-10 pb-8 pt-[calc(env(safe-area-inset-top,0px)+18px)] lg:pt-10">
+      <main className="lg:pl-[264px]">
+        <div className="max-w-[420px] md:max-w-[600px] lg:max-w-[820px] mx-auto px-[22px] lg:px-10 pb-8 pt-[calc(env(safe-area-inset-top,0px)+18px)] lg:pt-10">
           {children}
         </div>
       </main>

@@ -448,7 +448,7 @@ export function DietEditView({ data }: { data: DietEditData }) {
 
   return (
     <div style={{ background: CANVAS, minHeight: '100dvh', color: INK }}>
-      <div className="mx-auto w-full max-w-[420px] px-[22px] pb-32 pt-4">
+      <div className="mx-auto w-full max-w-[420px] md:max-w-[600px] lg:max-w-[760px] px-[22px] pb-32 pt-4">
         {/* Top bar */}
         <div className="flex items-center justify-between py-[14px]">
           <button

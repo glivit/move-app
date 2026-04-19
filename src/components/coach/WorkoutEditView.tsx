@@ -255,7 +255,7 @@ export function WorkoutEditView({ data }: Props) {
 
   return (
     <div className="min-h-screen bg-[#8E9890] text-[#FDFDFE] pb-[40px]">
-      <div className="mx-auto max-w-[420px] px-[22px]">
+      <div className="mx-auto max-w-[420px] md:max-w-[600px] lg:max-w-[760px] px-[22px]">
         {/* Top bar: cancel + save */}
         <div className="flex items-center justify-between px-[2px] pt-[14px] pb-[18px]">
           <button
