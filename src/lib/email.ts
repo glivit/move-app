@@ -72,6 +72,33 @@ export async function sendPasswordResetEmail(params: {
 }
 
 /**
+ * Send the weekly recap email (sent every Sunday 20:00)
+ */
+export async function sendWeeklyRecapEmail(params: {
+  to: string
+  subject?: string
+  recap: import('./emails/weekly-recap').WeeklyRecapParams
+}) {
+  const { renderWeeklyRecap } = await import('./emails/weekly-recap')
+  const { to, subject, recap } = params
+  const subj = subject ?? `Jouw week in beeld · week ${recap.weekNumber}`
+
+  const { data, error } = await getResend().emails.send({
+    from: FROM_EMAIL,
+    to,
+    subject: subj,
+    html: renderWeeklyRecap(recap),
+  })
+
+  if (error) {
+    console.error('Resend recap error:', error)
+    throw new Error(`Email verzenden mislukt: ${error.message}`)
+  }
+
+  return data
+}
+
+/**
  * Send a generic notification email
  */
 export async function sendNotificationEmail(params: {
@@ -107,7 +134,7 @@ export async function sendNotificationEmail(params: {
 // ══════════════════════════════════════════════════════════
 
 // Design tokens (solid hex for email-client safety)
-const T = {
+export const T = {
   canvas: '#8E9890',
   card: '#474B48',
   cardSoft: '#3E4240',
@@ -120,7 +147,7 @@ const T = {
 }
 
 // Primary CTA button — table-based for max client compatibility
-function ctaButton(href: string, label: string) {
+export function ctaButton(href: string, label: string) {
   return `
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
       <tr>
@@ -144,7 +171,7 @@ function linkFallback(href: string, label = 'Werkt de knop niet? Kopieer deze li
     </div>`
 }
 
-function baseLayout(content: string, preheader?: string) {
+export function baseLayout(content: string, preheader?: string) {
   return `<!DOCTYPE html>
 <html lang="nl">
 <head>

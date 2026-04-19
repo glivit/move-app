@@ -15,6 +15,7 @@ process.env.NEXT_PUBLIC_APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://ap
 process.env.EMAIL_FROM = process.env.EMAIL_FROM || 'MŌVE <noreply@movestudio.be>'
 
 import { inviteTemplate, resetTemplate, notificationTemplate } from '../src/lib/email'
+import { renderWeeklyRecap } from '../src/lib/emails/weekly-recap'
 
 const out = join(process.cwd(), 'mockups')
 
@@ -58,5 +59,52 @@ writeFileSync(
   'utf-8',
 )
 console.log('✓ email-notification.html')
+
+// 4. Weekly recap (parametric render — identical to what sendWeeklyRecapEmail would dispatch)
+writeFileSync(
+  join(out, 'email-weekly-recap-rendered.html'),
+  renderWeeklyRecap({
+    firstName: 'Jan',
+    weekNumber: 16,
+    dateRange: '13 – 19 apr',
+    complianceScore: 82,
+    complianceTrendPct: 7,
+    heroIntro:
+      'Je zat dicht tegen je doelen aan op elk vlak. Eén beensdag geskipt — geen drama. Eén cijfer om trots op te zijn vind je hieronder.',
+    workouts: {
+      done: 3,
+      planned: 4,
+      sessions: [
+        { name: 'Push', day: 'ma', date: '13/04', done: true, meta: '6 oef · 52 min' },
+        { name: 'Pull', day: 'di', date: '14/04', done: true, meta: '6 oef · 58 min' },
+        { name: 'Legs', day: 'do', date: '16/04', done: false },
+        { name: 'Upper', day: 'vr', date: '17/04', done: true, meta: '6 oef · 47 min' },
+      ],
+    },
+    meals: { logged: 17, planned: 21 },
+    nutrition: {
+      kcal: { actual: 2340, goal: 2500 },
+      protein: { actual: 168, goal: 180 },
+      carbs: { actual: 264, goal: 280 },
+      fat: { actual: 75, goal: 80 },
+    },
+    weight: { start: 82.4, end: 82.1, delta: -0.3, unit: 'kg', onTrack: true },
+    highlight: {
+      title: '52 kg op de Chest Press — 3 reps meer dan vorige week.',
+      body:
+        'Dat is de derde week op rij progressie op deze oefening. Je bovenlichaam krijgt er stilaan vorm van.',
+    },
+    coachNote: {
+      message:
+        "Beensdag doorzetten, ook als 'm korter moet. Liever 30 min dan helemaal skippen — momentum is belangrijker dan perfectie.",
+      coachName: 'Glenn',
+      initial: 'G',
+    },
+    dashboardUrl: 'https://app.movestudio.be/dashboard',
+    settingsUrl: 'https://app.movestudio.be/settings/notifications',
+  }),
+  'utf-8',
+)
+console.log('✓ email-weekly-recap-rendered.html')
 
 console.log('\nPreviews written to mockups/')
