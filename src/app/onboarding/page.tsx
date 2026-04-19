@@ -833,12 +833,23 @@ export default function OnboardingPage() {
           date_of_birth: data.date_of_birth || null,
           height_cm: parseNum(data.height_cm),
           intake_completed: true,
-          // Als de coach om een re-intake vroeg, is die hierbij beantwoord —
-          // task verdwijnt automatisch van het dashboard.
-          reintake_requested_at: null,
-          reintake_requested_by: null,
         })
         .eq('id', user.id)
+
+      // Best-effort: als de coach een re-intake had aangevraagd,
+      // wissen we die nu. Kolommen bestaan alleen na migration
+      // 20260419_reintake_request.sql — voordien silent fallback.
+      try {
+        await supabase
+          .from('profiles')
+          .update({
+            reintake_requested_at: null,
+            reintake_requested_by: null,
+          })
+          .eq('id', user.id)
+      } catch {
+        // kolom bestaat nog niet — geen probleem, niets te wissen
+      }
 
       if (data.weight_kg) {
         await supabase

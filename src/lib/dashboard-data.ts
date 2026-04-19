@@ -37,7 +37,7 @@ export async function fetchDashboardData(userId: string) {
     weeklyCheckinRes,
     weightLogsThisWeekRes,
   ] = await Promise.all([
-    db.from('profiles').select('id, full_name, role, package, start_date, intake_completed, reintake_requested_at')
+    db.from('profiles').select('id, full_name, role, package, start_date, intake_completed')
       .eq('id', userId).single(),
 
     // Collapsed: client_programs + nested template_days + per-day exercise count
@@ -298,8 +298,21 @@ export async function fetchDashboardData(userId: string) {
   // We flippen `intake_completed` niet (dat zou de middleware-gate triggeren
   // en de klant hard naar /onboarding redirecten), dus de klant ziet dit als
   // zachte task en kan 'm op een moment-dat-het-past invullen.
-  const reintakeRequestedAt =
-    (profile as { reintake_requested_at?: string | null } | null)?.reintake_requested_at ?? null
+  // Best-effort: deze kolom bestaat alleen na migration
+  // 20260419_reintake_request.sql. Tot dan: silent fallback → null.
+  let reintakeRequestedAt: string | null = null
+  try {
+    const reintakeRes = await db
+      .from('profiles')
+      .select('reintake_requested_at')
+      .eq('id', userId)
+      .single()
+    reintakeRequestedAt =
+      (reintakeRes.data as { reintake_requested_at?: string | null } | null)
+        ?.reintake_requested_at ?? null
+  } catch {
+    reintakeRequestedAt = null
+  }
   if (reintakeRequestedAt) {
     pendingTodos.push({
       key: 'reintake',

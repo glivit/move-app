@@ -100,22 +100,38 @@ export function ProgramAssignModal({
           if (template?.default_schedule && Object.keys(template.default_schedule).length > 0) {
             setSchedule(template.default_schedule as Record<string, string>)
           } else {
-            // Auto-distribute days across weekdays (skip Sun by default)
-            const weekdaySlots = ['1', '2', '3', '4', '5', '6'] // Ma-Za
+            // Auto-distribute days across weekdays (Ma=1 … Zo=7).
+            // Vroeger: cap op 6 slots → 7-daagse templates verloren zondag.
+            const weekdaySlots = ['1', '2', '3', '4', '5', '6', '7']
             const auto: Record<string, string> = {}
-            dayData.forEach((day, idx) => {
-              if (idx < weekdaySlots.length) {
-                // Spread evenly
-                const slotIdx = Math.round((idx / dayData.length) * weekdaySlots.length)
-                const slot = weekdaySlots[Math.min(slotIdx, weekdaySlots.length - 1)]
+
+            if (dayData.length === 7) {
+              // 1-op-1 mapping bij volle week — respecteert day_number-volgorde.
+              dayData.forEach((day, idx) => {
+                auto[String(idx + 1)] = day.id
+              })
+            } else {
+              // Minder dan 7 dagen: evenredig spreiden over de week,
+              // met voorkeur voor weekdagen (slot "7" = zondag blijft vrij
+              // zolang er nog slots 1–6 open zijn).
+              const primarySlots =
+                dayData.length <= 6
+                  ? ['1', '2', '3', '4', '5', '6']
+                  : weekdaySlots
+              dayData.forEach((day, idx) => {
+                const slotIdx = Math.round((idx / dayData.length) * primarySlots.length)
+                const slot = primarySlots[Math.min(slotIdx, primarySlots.length - 1)]
                 if (!auto[slot]) {
                   auto[slot] = day.id
                 } else {
-                  const free = weekdaySlots.find(s => !auto[s])
+                  const free =
+                    primarySlots.find((s) => !auto[s]) ||
+                    weekdaySlots.find((s) => !auto[s])
                   if (free) auto[free] = day.id
                 }
-              }
-            })
+              })
+            }
+
             setSchedule(auto)
           }
         }

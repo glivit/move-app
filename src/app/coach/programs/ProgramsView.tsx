@@ -178,10 +178,15 @@ export default function ProgramsView({ initialPrograms }: ProgramsViewProps) {
           {filteredPrograms.map((program) => {
             const d = DIFFICULTY[diffKey(program.difficulty)]
             const isArch = program.is_archived
+            const metaParts = [
+              d.label,
+              `${program.duration_weeks} ${program.duration_weeks === 1 ? 'week' : 'weken'}`,
+              `${program.days_per_week}×/week`,
+            ]
             return (
               <div
                 key={program.id}
-                className={`group relative rounded-[18px] px-[16px] py-[14px] transition-colors ${
+                className={`group relative rounded-[18px] px-[18px] py-[16px] transition-colors ${
                   isArch
                     ? 'bg-[rgba(71,75,72,0.45)]'
                     : 'bg-[#474B48] active:bg-[#4d524e]'
@@ -189,22 +194,35 @@ export default function ProgramsView({ initialPrograms }: ProgramsViewProps) {
               >
                 <Link
                   href={`/coach/programs/${program.id}`}
-                  className="block pr-8"
+                  className="block pr-9"
                 >
-                  <div className="flex items-start justify-between gap-3 mb-1">
-                    <h3
-                      className={`text-[15.5px] font-medium tracking-[-0.005em] truncate flex-1 ${
-                        isArch
-                          ? 'text-[rgba(253,253,254,0.55)]'
-                          : 'text-[#FDFDFE]'
-                      }`}
-                    >
-                      {program.name}
-                    </h3>
+                  {/* Title */}
+                  <h3
+                    className={`text-[16px] font-medium tracking-[-0.01em] leading-[1.3] truncate ${
+                      isArch
+                        ? 'text-[rgba(253,253,254,0.55)]'
+                        : 'text-[#FDFDFE]'
+                    }`}
+                  >
+                    {program.name}
+                  </h3>
+
+                  {/* Meta line: difficulty dot + plain-text meta with separators */}
+                  <div className="mt-[6px] flex items-center gap-[8px] text-[12px] text-[rgba(253,253,254,0.55)] tracking-[0.005em]">
+                    <span
+                      className="inline-block w-[7px] h-[7px] rounded-full shrink-0"
+                      style={{ background: d.color }}
+                      aria-hidden
+                    />
+                    <span className="truncate">
+                      {metaParts.join(' · ')}
+                    </span>
                   </div>
+
+                  {/* Description — 2-line clamp, muted */}
                   {program.description && (
                     <p
-                      className={`text-[12.5px] leading-[1.42] tracking-[-0.005em] m-0 ${
+                      className={`mt-[10px] text-[13px] leading-[1.45] tracking-[-0.003em] m-0 ${
                         isArch
                           ? 'text-[rgba(253,253,254,0.38)]'
                           : 'text-[rgba(253,253,254,0.62)]'
@@ -219,36 +237,6 @@ export default function ProgramsView({ initialPrograms }: ProgramsViewProps) {
                       {program.description}
                     </p>
                   )}
-
-                  {/* Meta chips */}
-                  <div className="flex items-center gap-1.5 flex-wrap mt-2.5">
-                    <span
-                      className="inline-flex items-center rounded-full px-2.5 py-[3px] text-[10.5px] font-medium tracking-[0.02em]"
-                      style={{ background: d.bg, color: d.color }}
-                    >
-                      {d.label}
-                    </span>
-                    <span className="inline-flex items-center rounded-full px-2.5 py-[3px] text-[10.5px] font-medium bg-[rgba(253,253,254,0.06)] text-[rgba(253,253,254,0.62)]">
-                      {program.duration_weeks}w
-                    </span>
-                    <span className="inline-flex items-center rounded-full px-2.5 py-[3px] text-[10.5px] font-medium bg-[rgba(253,253,254,0.06)] text-[rgba(253,253,254,0.62)]">
-                      {program.days_per_week}d/w
-                    </span>
-                  </div>
-
-                  {/* Custom tags — muted */}
-                  {program.tags && program.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-1.5">
-                      {program.tags.slice(0, 4).map((tag) => (
-                        <span
-                          key={tag}
-                          className="text-[10px] text-[rgba(253,253,254,0.44)] tracking-[0.02em]"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </Link>
 
                 {/* Archive toggle — pinned top-right */}
@@ -259,7 +247,7 @@ export default function ProgramsView({ initialPrograms }: ProgramsViewProps) {
                     e.stopPropagation()
                     handleArchiveToggle(program)
                   }}
-                  className="absolute top-[12px] right-[12px] w-8 h-8 rounded-full flex items-center justify-center text-[rgba(253,253,254,0.44)] hover:text-[#FDFDFE] hover:bg-[rgba(253,253,254,0.06)] transition-colors"
+                  className="absolute top-[12px] right-[12px] w-8 h-8 rounded-full flex items-center justify-center text-[rgba(253,253,254,0.40)] hover:text-[#FDFDFE] hover:bg-[rgba(253,253,254,0.06)] transition-colors"
                   aria-label={isArch ? 'Archivering opheffen' : 'Archiveren'}
                 >
                   {isArch ? (

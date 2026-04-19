@@ -409,6 +409,24 @@ export async function fetchClientWeekTimeline(
 
   if (!profileData) return null
 
+  // ─── Best-effort: fetch reintake-vraag state ─────────────────
+  // Deze kolom bestaat alleen als migration 20260419_reintake_request.sql
+  // is toegepast. Tot dan falen we silently → veld blijft null en de UI
+  // gedraagt zich alsof er geen vraag open staat.
+  let reintakeRequestedAt: string | null = null
+  try {
+    const { data: reintakeRow } = await supabase
+      .from('profiles')
+      .select('reintake_requested_at')
+      .eq('id', clientId)
+      .single()
+    reintakeRequestedAt =
+      (reintakeRow as { reintake_requested_at?: string | null } | null)
+        ?.reintake_requested_at ?? null
+  } catch {
+    reintakeRequestedAt = null
+  }
+
   // ─── Types for rows ────────────────────────────────────────
   type ProfileRow = {
     id: string
@@ -1315,7 +1333,7 @@ export async function fetchClientWeekTimeline(
     startDateIso,
     startDateLabel,
     intakeCompleted: !!profile.intake_completed,
-    reintakeRequestedAt: profile.reintake_requested_at || null,
+    reintakeRequestedAt,
     weekStartIso,
     weekEndIso,
     days,
