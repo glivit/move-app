@@ -314,7 +314,7 @@ export async function fetchClientWeekTimeline(
     supabase
       .from('profiles')
       .select(
-        'id, full_name, avatar_url, package, start_date, intake_completed, reintake_requested_at',
+        'id, full_name, avatar_url, package, start_date, intake_completed',
       )
       .eq('id', clientId)
       .single(),
@@ -417,7 +417,6 @@ export async function fetchClientWeekTimeline(
     package: string | null
     start_date: string | null
     intake_completed: boolean | null
-    reintake_requested_at: string | null
   }
   type TemplateDayRow = { id: string; name: string }
   type SessionRow = {
