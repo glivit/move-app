@@ -26,7 +26,7 @@ async function main() {
       complianceScore: 82,
       complianceTrendPct: 7,
       heroIntro:
-        'Je zat dicht tegen je doelen aan op elk vlak. Eén beensdag geskipt — geen drama. Eén cijfer om trots op te zijn vind je hieronder.',
+        'Je zat dicht tegen je doelen aan op elk vlak. Eén leg day geskipt, geen drama. Eén cijfer om trots op te zijn vind je hieronder.',
       workouts: {
         done: 3,
         planned: 4,
@@ -52,18 +52,18 @@ async function main() {
         onTrack: true,
       },
       highlight: {
-        title: '52 kg op de Chest Press — 3 reps meer dan vorige week.',
+        title: '52 kg op de Chest Press · 3 reps meer dan vorige week.',
         body:
           'Dat is de derde week op rij progressie op deze oefening. Je bovenlichaam krijgt er stilaan vorm van.',
       },
       coachNote: {
         message:
-          'Beensdag doorzetten, ook als \'m korter moet. Liever 30 min dan helemaal skippen — momentum is belangrijker dan perfectie.',
+          "Leg day doorzetten, ook als 'm korter moet. Liever 30 min dan helemaal skippen. Momentum is belangrijker dan perfectie.",
         coachName: 'Glenn',
         initial: 'G',
       },
-      dashboardUrl: 'https://app.movestudio.be/dashboard',
-      settingsUrl: 'https://app.movestudio.be/settings/notifications',
+      dashboardUrl: 'https://movestudio.be/dashboard',
+      settingsUrl: 'https://movestudio.be/settings/notifications',
     },
   })
 

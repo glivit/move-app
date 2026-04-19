@@ -59,7 +59,7 @@ export async function sendPasswordResetEmail(params: {
   const { data, error } = await getResend().emails.send({
     from: FROM_EMAIL,
     to,
-    subject: 'Wachtwoord resetten — MŌVE',
+    subject: 'Wachtwoord resetten · MŌVE',
     html: resetTemplate({ firstName, resetLink }),
   })
 
@@ -92,6 +92,33 @@ export async function sendWeeklyRecapEmail(params: {
 
   if (error) {
     console.error('Resend recap error:', error)
+    throw new Error(`Email verzenden mislukt: ${error.message}`)
+  }
+
+  return data
+}
+
+/**
+ * Send the weekly plan email (sent every Monday 07:00)
+ */
+export async function sendWeeklyPlanEmail(params: {
+  to: string
+  subject?: string
+  plan: import('./emails/weekly-plan').WeeklyPlanParams
+}) {
+  const { renderWeeklyPlan } = await import('./emails/weekly-plan')
+  const { to, subject, plan } = params
+  const subj = subject ?? `Plan voor deze week · week ${plan.weekNumber}`
+
+  const { data, error } = await getResend().emails.send({
+    from: FROM_EMAIL,
+    to,
+    subject: subj,
+    html: renderWeeklyPlan(plan),
+  })
+
+  if (error) {
+    console.error('Resend plan error:', error)
     throw new Error(`Email verzenden mislukt: ${error.message}`)
   }
 
@@ -323,7 +350,7 @@ export function resetTemplate(params: {
       <div style="height:1px;background-color:${T.hair};margin:0 0 20px;"></div>
 
       <p style="margin:0;font-size:13px;color:${T.inkMute};line-height:1.55;font-family:'Inter',-apple-system,Helvetica,Arial,sans-serif;">
-        Heb je dit niet aangevraagd? Dan kun je deze mail negeren — je wachtwoord blijft ongewijzigd.
+        Heb je dit niet aangevraagd? Dan kun je deze mail gewoon negeren. Je wachtwoord blijft ongewijzigd.
       </p>
     </div>
 

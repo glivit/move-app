@@ -218,7 +218,7 @@ export function renderWeeklyRecap(p: WeeklyRecapParams): string {
         <tr>
           <td style="padding:20px 18px;">
             <h3 style="margin:0 0 14px;padding:0 4px;font-family:${font};font-size:15px;font-weight:600;color:${T.ink};">
-              Voeding — gemiddeld per dag
+              Voeding · gemiddeld per dag
             </h3>
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
@@ -290,7 +290,7 @@ export function renderWeeklyRecap(p: WeeklyRecapParams): string {
                 <td valign="top">
                   <div style="font-family:${font};font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:${T.inkMute};font-weight:600;margin-bottom:4px;">Focus volgende week</div>
                   <div style="font-family:${font};font-size:14px;color:${T.ink};line-height:1.55;">"${p.coachNote.message}"</div>
-                  <div style="font-family:${font};font-size:12px;color:${T.inkMute};margin-top:8px;">— ${p.coachNote.coachName}, je coach</div>
+                  <div style="font-family:${font};font-size:12px;color:${T.inkMute};margin-top:8px;">${p.coachNote.coachName}, je coach</div>
                 </td>
               </tr>
             </table>
