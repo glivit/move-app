@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import {
   ArrowLeft,
-  ChevronDown,
+  ChevronRight,
   Plus,
   Calendar,
   ExternalLink,
@@ -40,17 +40,6 @@ interface TemplateDay {
   name: string
   focus: string
   estimated_duration_min: number
-  sort_order: number
-}
-
-interface TemplateExercise {
-  id: string
-  template_day_id: string
-  name: string
-  sets: number
-  reps: string
-  rest_seconds: number
-  notes: string | null
   sort_order: number
 }
 
@@ -99,11 +88,10 @@ export default function ProgramPage() {
   const [activeProgram, setActiveProgram] = useState<ActiveProgram | null>(null)
   const [templateInfo, setTemplateInfo] = useState<ProgramTemplate | null>(null)
   const [templateDays, setTemplateDays] = useState<TemplateDay[]>([])
-  const [exercisesByDay, setExercisesByDay] = useState<
-    Record<string, TemplateExercise[]>
+  const [exerciseCountByDay, setExerciseCountByDay] = useState<
+    Record<string, number>
   >({})
   const [loading, setLoading] = useState(true)
-  const [expandedDays, setExpandedDays] = useState<string[]>([])
   const [templates, setTemplates] = useState<ProgramTemplate[]>([])
   const [showAssignModal, setShowAssignModal] = useState(false)
   const [selectedTemplate, setSelectedTemplate] =
@@ -167,21 +155,20 @@ export default function ProgramPage() {
         if (daysData && daysData.length > 0) {
           setTemplateDays(daysData as TemplateDay[])
 
-          // Load exercises for all days
+          // Load exercise counts per day (names + details live in the editor)
           const dayIds = (daysData as TemplateDay[]).map((d) => d.id)
           const { data: exercisesData } = await supabase
             .from('program_template_exercises')
-            .select('*')
+            .select('template_day_id')
             .in('template_day_id', dayIds)
-            .order('sort_order', { ascending: true })
 
           if (exercisesData) {
-            const grouped: Record<string, TemplateExercise[]> = {}
-            ;(exercisesData as TemplateExercise[]).forEach((ex) => {
-              if (!grouped[ex.template_day_id]) grouped[ex.template_day_id] = []
-              grouped[ex.template_day_id].push(ex)
+            const counts: Record<string, number> = {}
+            ;(exercisesData as { template_day_id: string }[]).forEach((ex) => {
+              counts[ex.template_day_id] =
+                (counts[ex.template_day_id] || 0) + 1
             })
-            setExercisesByDay(grouped)
+            setExerciseCountByDay(counts)
           }
         }
       }
@@ -213,7 +200,7 @@ export default function ProgramPage() {
       setActiveProgram(null)
       setTemplateInfo(null)
       setTemplateDays([])
-      setExercisesByDay({})
+      setExerciseCountByDay({})
       setShowStopConfirm(false)
     } catch (err) {
       console.error('Stop error:', err)
@@ -223,12 +210,6 @@ export default function ProgramPage() {
   }
 
   const clientName = profile?.full_name || 'Client'
-
-  const toggleDayExpanded = (dayId: string) => {
-    setExpandedDays((prev) =>
-      prev.includes(dayId) ? prev.filter((d) => d !== dayId) : [...prev, dayId]
-    )
-  }
 
   const formatDate = (s: string) =>
     new Date(s).toLocaleDateString('nl-BE', {
@@ -431,97 +412,44 @@ export default function ProgramPage() {
           {/* Training days */}
           {templateDays.length > 0 ? (
             <div className="mt-6">
-              <h3 className="px-0.5 mb-3 text-[11px] uppercase tracking-[0.14em] text-[rgba(253,253,254,0.45)]">
-                Trainingsschema — {templateDays.length} dagen
-              </h3>
+              <div className="px-0.5 mb-3 flex items-baseline justify-between">
+                <h3 className="text-[11px] uppercase tracking-[0.14em] text-[rgba(253,253,254,0.45)]">
+                  Trainingsschema — {templateDays.length} dagen
+                </h3>
+                <span className="text-[11px] text-[rgba(253,253,254,0.40)]">
+                  Tik om te bewerken
+                </span>
+              </div>
               <div className="flex flex-col gap-2">
                 {templateDays.map((day) => {
-                  const dayExercises = exercisesByDay[day.id] || []
-                  const isExpanded = expandedDays.includes(day.id)
-
+                  const count = exerciseCountByDay[day.id] || 0
                   return (
-                    <div
+                    <Link
                       key={day.id}
-                      className="rounded-[18px] bg-[#474B48] overflow-hidden transition-colors"
+                      href={`/coach/programs/${activeProgram.template_id}/days/${day.id}/edit`}
+                      className="group rounded-[18px] bg-[#474B48] px-[18px] py-[14px] transition-colors active:bg-[#4d524e] flex items-center gap-3"
                     >
-                      <button
-                        type="button"
-                        onClick={() => toggleDayExpanded(day.id)}
-                        className="w-full flex items-center justify-between px-[18px] py-[14px] text-left transition-opacity active:opacity-70"
-                      >
-                        <div className="min-w-0 flex-1">
-                          <h4 className="text-[15px] font-medium tracking-[-0.005em] text-[#FDFDFE] truncate">
-                            {day.name}
-                          </h4>
-                          <p className="mt-[4px] text-[11.5px] text-[rgba(253,253,254,0.55)] tracking-[0.005em] truncate">
-                            {[
-                              day.focus || null,
-                              `${dayExercises.length} ${dayExercises.length === 1 ? 'oefening' : 'oefeningen'}`,
-                              day.estimated_duration_min > 0
-                                ? `±${day.estimated_duration_min} min`
-                                : null,
-                            ]
-                              .filter(Boolean)
-                              .join(' · ')}
-                          </p>
-                        </div>
-                        <ChevronDown
-                          strokeWidth={1.75}
-                          className={`w-4 h-4 text-[rgba(253,253,254,0.55)] transition-transform shrink-0 ${
-                            isExpanded ? 'rotate-180' : ''
-                          }`}
-                        />
-                      </button>
-
-                      {isExpanded && (
-                        <div className="px-[14px] pb-[14px]">
-                          {dayExercises.length === 0 ? (
-                            <div className="px-[14px] py-3 text-[12.5px] text-[rgba(253,253,254,0.45)]">
-                              Geen oefeningen toegevoegd.
-                            </div>
-                          ) : (
-                            <ul className="flex flex-col gap-1.5">
-                              {dayExercises.map((ex, idx) => (
-                                <li
-                                  key={ex.id}
-                                  className="rounded-[14px] bg-[rgba(253,253,254,0.05)] px-[14px] py-[12px]"
-                                >
-                                  <div className="flex items-baseline gap-2">
-                                    <span className="text-[11px] tabular-nums text-[rgba(253,253,254,0.40)] shrink-0 mt-[1px]">
-                                      {idx + 1}.
-                                    </span>
-                                    <h5 className="text-[14px] font-medium text-[#FDFDFE] leading-[1.3]">
-                                      {ex.name}
-                                    </h5>
-                                  </div>
-                                  <div className="mt-1.5 pl-[18px] flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[rgba(253,253,254,0.62)]">
-                                    <span>
-                                      <span className="text-[rgba(253,253,254,0.40)]">
-                                        Sets × Reps:{' '}
-                                      </span>
-                                      {ex.sets} × {ex.reps}
-                                    </span>
-                                    {ex.rest_seconds > 0 && (
-                                      <span>
-                                        <span className="text-[rgba(253,253,254,0.40)]">
-                                          Rust:{' '}
-                                        </span>
-                                        {ex.rest_seconds}s
-                                      </span>
-                                    )}
-                                  </div>
-                                  {ex.notes && (
-                                    <p className="mt-2 pl-[18px] text-[12px] italic text-[rgba(253,253,254,0.55)] leading-[1.4]">
-                                      {ex.notes}
-                                    </p>
-                                  )}
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                        </div>
-                      )}
-                    </div>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-[15px] font-medium tracking-[-0.005em] text-[#FDFDFE] truncate">
+                          {day.name}
+                        </h4>
+                        <p className="mt-[4px] text-[11.5px] text-[rgba(253,253,254,0.55)] tracking-[0.005em] truncate">
+                          {[
+                            day.focus || null,
+                            `${count} ${count === 1 ? 'oefening' : 'oefeningen'}`,
+                            day.estimated_duration_min > 0
+                              ? `±${day.estimated_duration_min} min`
+                              : null,
+                          ]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </p>
+                      </div>
+                      <ChevronRight
+                        strokeWidth={1.75}
+                        className="w-4 h-4 text-[rgba(253,253,254,0.45)] shrink-0 transition-transform group-active:translate-x-0.5"
+                      />
+                    </Link>
                   )
                 })}
               </div>
