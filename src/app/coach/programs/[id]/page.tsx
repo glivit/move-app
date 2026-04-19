@@ -17,6 +17,8 @@ import {
   Trash2,
   Copy,
   Minus,
+  Check,
+  AlertCircle,
 } from 'lucide-react'
 import { ExerciseSearchModal } from '@/components/coach/ExerciseSearchModal'
 import { ProgramAssignModal } from '@/components/coach/ProgramAssignModal'
@@ -185,6 +187,55 @@ function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
         ...style,
       }}
     />
+  )
+}
+
+// ─── SaveStatePill ───────────────────────────────────────────────
+// Visuele feedback voor de debounced-save. Geen knop — coach hoeft niets te
+// doen, maar wel bevestiging dat zijn wijzigingen gelanden.
+function SaveStatePill({ state }: { state: 'idle' | 'pending' | 'saving' | 'saved' | 'error' }) {
+  if (state === 'idle') {
+    return (
+      <span
+        className="inline-flex items-center gap-1.5 rounded-full px-3 py-[6px] text-[11.5px] font-medium"
+        style={{ background: 'rgba(253,253,254,0.06)', color: INK_DIM }}
+        title="Wijzigingen worden automatisch opgeslagen"
+      >
+        Auto-opslaan
+      </span>
+    )
+  }
+  if (state === 'pending' || state === 'saving') {
+    return (
+      <span
+        className="inline-flex items-center gap-1.5 rounded-full px-3 py-[6px] text-[11.5px] font-medium"
+        style={{ background: 'rgba(253,253,254,0.08)', color: INK_MUTED }}
+      >
+        <Loader2 className="w-3 h-3 animate-spin" />
+        Opslaan…
+      </span>
+    )
+  }
+  if (state === 'saved') {
+    return (
+      <span
+        className="inline-flex items-center gap-1.5 rounded-full px-3 py-[6px] text-[11.5px] font-medium transition-opacity"
+        style={{ background: 'rgba(192,252,1,0.14)', color: LIME }}
+      >
+        <Check className="w-3 h-3" strokeWidth={2.25} />
+        Opgeslagen
+      </span>
+    )
+  }
+  // error
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full px-3 py-[6px] text-[11.5px] font-medium"
+      style={{ background: 'rgba(232,169,60,0.18)', color: AMBER }}
+    >
+      <AlertCircle className="w-3 h-3" />
+      Niet opgeslagen
+    </span>
   )
 }
 
@@ -626,15 +677,34 @@ export default function ProgramEditorPage() {
   )
 
   // ─── Debounced save ──────────────────────────────────────────────
+  // Program-editor slaat per field debounced op (600ms). Er is geen expliciete
+  // 'Opslaan'-knop want we wilden geen "dirty state" UI. Coach vroeg terecht:
+  // "is er wel een opslaan-knop?" → antwoord: nee, maar we tonen nu wel een
+  // visuele save-state pill zodat je weet dat je wijzigingen gelanden.
   const saveTimers = useRef<Record<string, NodeJS.Timeout>>({})
+  const inflightCount = useRef(0)
+  const savedTimer = useRef<NodeJS.Timeout | null>(null)
+  const [saveState, setSaveState] = useState<'idle' | 'pending' | 'saving' | 'saved' | 'error'>('idle')
 
   const debouncedSave = useCallback(
     (key: string, saveFn: () => Promise<void>, delay = 600) => {
       if (saveTimers.current[key]) clearTimeout(saveTimers.current[key])
+      setSaveState('pending')
       saveTimers.current[key] = setTimeout(async () => {
+        inflightCount.current += 1
+        setSaveState('saving')
         try {
           await saveFn()
+          inflightCount.current -= 1
+          if (inflightCount.current <= 0) {
+            inflightCount.current = 0
+            setSaveState('saved')
+            if (savedTimer.current) clearTimeout(savedTimer.current)
+            savedTimer.current = setTimeout(() => setSaveState('idle'), 1800)
+          }
         } catch (error) {
+          inflightCount.current = Math.max(0, inflightCount.current - 1)
+          setSaveState('error')
           console.error('Save failed:', error)
         }
       }, delay)
@@ -733,6 +803,8 @@ export default function ProgramEditorPage() {
         </button>
 
         <div className="flex-1" />
+
+        <SaveStatePill state={saveState} />
 
         <button
           onClick={() => setShowAssignModal(true)}

@@ -1,6 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { signOut } from '@/lib/auth'
 import type { CoachStudioData, TemplateRow, NutritionTemplateRow } from '@/lib/coach-studio-data'
 
 interface Props {
@@ -11,16 +14,33 @@ interface Props {
 /**
  * Coach · Studio (v3 Orion).
  * Library + coaching-stats + account, pixel-matched to the coach-studio.html mockup.
+ *
+ * Width: mobile = 420px (zoals mockup), md/lg worden breder zodat het op tablet/
+ * desktop niet als een smal PWA-kolom oogt. Coach zit vaak achter een laptop.
  */
 export function StudioView({ data, coachId }: Props) {
   void coachId
+  const router = useRouter()
+  const [signingOut, setSigningOut] = useState(false)
+
+  const handleSignOut = async () => {
+    if (signingOut) return
+    setSigningOut(true)
+    try {
+      await signOut()
+      router.replace('/')
+    } catch (err) {
+      console.error('[studio] signout failed', err)
+      setSigningOut(false)
+    }
+  }
 
   const headerSub = `${data.activeClients} ${data.activeClients === 1 ? 'klant' : 'klanten'} actief · ${data.templateCount} templates`
   const insightSub = `${data.activeClients} actieve klanten${data.trialClients > 0 ? ` · ${data.trialClients} trial` : ''}`
 
   return (
     <div className="min-h-screen bg-[#8E9890] text-[#FDFDFE] pb-[110px]">
-      <div className="mx-auto max-w-[420px] px-[22px]">
+      <div className="mx-auto max-w-[420px] md:max-w-[600px] lg:max-w-[760px] px-[22px]">
         {/* Header */}
         <div className="pt-[14px] pb-[22px] px-[2px]">
           <div className="text-[30px] leading-[1.1] font-light tracking-[-0.025em] text-[#FDFDFE]">
@@ -179,6 +199,12 @@ export function StudioView({ data, coachId }: Props) {
             label="Hulp & support"
             value=""
             icon={<IconHelp />}
+          />
+          <SetRowButton
+            onClick={handleSignOut}
+            disabled={signingOut}
+            label={signingOut ? 'Uitloggen…' : 'Uitloggen'}
+            icon={<IconLogout />}
             last
           />
         </div>
@@ -431,6 +457,43 @@ function SetRow({
   )
 }
 
+/**
+ * Button-variant van SetRow. Zelfde visuele pattern maar met onClick ipv href.
+ * Gebruikt voor uitloggen — geen destructieve rood styling (uitloggen is geen
+ * paniek-actie) maar wel amber-getinte label zodat het subtiel opvalt.
+ */
+function SetRowButton({
+  onClick,
+  disabled,
+  label,
+  icon,
+  last,
+}: {
+  onClick: () => void
+  disabled?: boolean
+  label: string
+  icon: React.ReactNode
+  last?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`grid w-full grid-cols-[30px_1fr_auto_14px] items-center gap-[14px] px-[18px] py-[14px] text-left hover:bg-[rgba(253,253,254,0.03)] transition-colors disabled:opacity-60 disabled:cursor-default ${
+        last ? '' : 'border-b border-[rgba(253,253,254,0.08)]'
+      }`}
+    >
+      <span className="flex h-[30px] w-[30px] items-center justify-center rounded-[10px] bg-[rgba(232,169,60,0.14)] text-[#E8A93C]">
+        {icon}
+      </span>
+      <span className="text-[14px] tracking-[-0.005em] text-[#E8A93C]">{label}</span>
+      <span />
+      <span className="text-[15px] leading-none text-[rgba(253,253,254,0.40)]">›</span>
+    </button>
+  )
+}
+
 // ─── Icons ──────────────────────────────────────────────────────
 
 function IconProfile() {
@@ -514,6 +577,24 @@ function IconHelp() {
     >
       <circle cx="12" cy="12" r="9" />
       <path d="M12 8v4m0 4h.01" />
+    </svg>
+  )
+}
+
+function IconLogout() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-[15px] w-[15px]"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4" />
+      <polyline points="14 17 19 12 14 7" />
+      <line x1="19" y1="12" x2="9" y2="12" />
     </svg>
   )
 }
