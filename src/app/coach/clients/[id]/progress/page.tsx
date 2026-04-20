@@ -5,15 +5,10 @@ import dynamic from 'next/dynamic'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
-import { ArrowLeft, Trophy, Camera, ImageOff, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Trophy, Camera, ImageOff } from 'lucide-react'
 import Link from 'next/link'
 
 const ProgressLineChart = dynamic(() => import('@/components/coach/ProgressCharts').then(mod => ({ default: mod.ProgressLineChart })), {
-  ssr: false,
-  loading: () => <div className="h-64 bg-[#A6ADA7] rounded animate-pulse" />
-})
-
-const ProgressBarChart = dynamic(() => import('@/components/coach/ProgressCharts').then(mod => ({ default: mod.ProgressBarChart })), {
   ssr: false,
   loading: () => <div className="h-64 bg-[#A6ADA7] rounded animate-pulse" />
 })
@@ -236,7 +231,6 @@ export default function CoachClientProgressPage() {
   const [personalRecords, setPersonalRecords] = useState<PersonalRecord[]>([])
   const [workoutSessions, setWorkoutSessions] = useState<WorkoutSession[]>([])
   const [workoutSets, setWorkoutSets] = useState<WorkoutSet[]>([])
-  const [selectedExerciseId, setSelectedExerciseId] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [photoPosition, setPhotoPosition] = useState<'front' | 'back' | 'left' | 'right'>('front')
   const [signedUrls, setSignedUrls] = useState<Record<string, string>>({})
@@ -413,27 +407,6 @@ export default function CoachClientProgressPage() {
     { key: 'right_calf_cm', label: 'R. Kuit' },
   ]
 
-  // Kracht data
-  const krachtData = useMemo(() => {
-    if (!selectedExerciseId || workoutSets.length === 0) return []
-    const relevantSets = workoutSets
-      .filter(set => set.exercise_id === selectedExerciseId && set.completed && set.weight_kg)
-      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-    const groupedByDate: { [key: string]: number } = {}
-    relevantSets.forEach(set => {
-      const date = new Date(set.created_at).toLocaleDateString('nl-BE')
-      groupedByDate[date] = Math.max(groupedByDate[date] || 0, set.weight_kg || 0)
-    })
-    return Object.entries(groupedByDate).map(([date, maxWeight]) => ({ date, weight: maxWeight }))
-  }, [selectedExerciseId, workoutSets])
-
-  const exercisesWithData = useMemo(() => {
-    const exerciseIds = new Set(workoutSets.map(s => s.exercise_id))
-    return exercises.filter(e => exerciseIds.has(e.id))
-  }, [exercises, workoutSets])
-
-  const selectedExercise = useMemo(() => exercises.find(e => e.id === selectedExerciseId), [exercises, selectedExerciseId])
-
   // ─── Full per-exercise aggregation (12 weeks, e1RM series) ───
   // Mirrors client /client/progress Kracht tab. Uses the sessions + sets
   // already loaded; filters to last 12 weeks so sparkline has meaningful
@@ -533,12 +506,6 @@ export default function CoachClientProgressPage() {
       .filter((e) => !q || e.name.toLowerCase().includes(q))
       .sort((a, b) => b.count - a.count)
   }, [exerciseAgg, krachtSearch, krachtMuscle])
-
-  useEffect(() => {
-    if (!selectedExerciseId && exercisesWithData.length > 0) {
-      setSelectedExerciseId(exercisesWithData[0].id)
-    }
-  }, [exercisesWithData, selectedExerciseId])
 
   // Compliance
   const complianceData = useMemo(() => {
@@ -869,39 +836,358 @@ export default function CoachClientProgressPage() {
       )}
 
       {/* ═══ KRACHT TAB ═══ */}
+      {/* Mirrors /client/progress Kracht tab: compounds grid + search +
+          muscle-filter chips + full exercise list. Each row links to the
+          existing coach per-exercise detail page. */}
       {activeTab === 'kracht' && (
-        <div className="space-y-6">
-          <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-card border border-[#A6ADA7]">
-            <label className="text-[13px] font-semibold text-[#FDFDFE] block mb-3">Selecteer oefening</label>
-            <select
-              value={selectedExerciseId}
-              onChange={(e) => setSelectedExerciseId(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl border border-[#A6ADA7] bg-[#A6ADA7] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#5A7FB5]"
+        <div>
+          {/* Page sub-title */}
+          <div
+            style={{
+              padding: '0 4px',
+              marginBottom: 14,
+              fontSize: 22,
+              fontWeight: 300,
+              letterSpacing: '-0.025em',
+              color: '#FDFDFE',
+            }}
+          >
+            Compounds
+            <small
+              style={{
+                fontSize: 13,
+                color: 'rgba(253,253,254,0.62)',
+                marginLeft: 8,
+                fontWeight: 300,
+                letterSpacing: '-0.005em',
+              }}
             >
-              {exercisesWithData.map(ex => (
-                <option key={ex.id} value={ex.id}>{ex.name_nl || ex.name}</option>
-              ))}
-            </select>
+              estimated 1RM · 12 weken
+            </small>
           </div>
 
-          {krachtData.length > 0 && selectedExercise ? (
-            <div className="bg-[#A6ADA7] rounded-2xl p-5 shadow-card border border-[#A6ADA7]">
-              <h3 className="text-[17px] font-semibold text-[#FDFDFE] mb-4">{selectedExercise.name_nl || selectedExercise.name}</h3>
-              <div style={{ height: 250 }}>
-                <ProgressLineChart
-                  data={krachtData}
-                  dataKey="weight"
-                  name="Gewicht (kg)"
-                  color="#5A7FB5"
-                  height={250}
-                  xAxisKey="date"
-                  tooltip={{ backgroundColor: 'white', border: '1px solid #A6ADA7', borderRadius: '0.75rem' }}
-                />
-              </div>
+          {/* Top-4 compounds grid */}
+          {mainLifts.length > 0 ? (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 8,
+                marginBottom: 6,
+              }}
+            >
+              {mainLifts.map((lift) => {
+                const positive = lift.delta > 0
+                return (
+                  <Link
+                    key={lift.exerciseId}
+                    href={`/coach/clients/${clientId}/exercises/${lift.exerciseId}`}
+                    style={{
+                      background: '#A6ADA7',
+                      padding: '16px 16px 14px',
+                      borderRadius: 24,
+                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+                      minHeight: 128,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      textDecoration: 'none',
+                      color: 'inherit',
+                      WebkitTapHighlightColor: 'transparent',
+                    }}
+                  >
+                    <div>
+                      <div
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 500,
+                          letterSpacing: '0.16em',
+                          textTransform: 'uppercase',
+                          color: 'rgba(253,253,254,0.62)',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {lift.name}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 26,
+                          fontWeight: 250,
+                          letterSpacing: '-0.025em',
+                          color: '#FDFDFE',
+                          fontFeatureSettings: '"tnum"',
+                          lineHeight: 1.05,
+                          marginTop: 6,
+                        }}
+                      >
+                        {lift.current}
+                        <small
+                          style={{
+                            fontSize: 11,
+                            color: 'rgba(253,253,254,0.62)',
+                            marginLeft: 2,
+                            letterSpacing: 0,
+                            fontWeight: 300,
+                          }}
+                        >
+                          kg
+                        </small>
+                      </div>
+                    </div>
+                    <div style={{ width: '100%', height: 26, margin: '6px 0 4px' }}>
+                      <LiftSpark data={lift.weekly} positive={positive} />
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        fontSize: 11,
+                        color: 'rgba(253,253,254,0.62)',
+                        fontWeight: 400,
+                      }}
+                    >
+                      <span>vs. 12w</span>
+                      <span
+                        style={{
+                          color: positive ? '#FDFDFE' : 'rgba(253,253,254,0.62)',
+                          fontWeight: positive ? 500 : 400,
+                          letterSpacing: '-0.005em',
+                        }}
+                      >
+                        {positive ? '+' : ''}{lift.delta} kg
+                      </span>
+                    </div>
+                  </Link>
+                )
+              })}
             </div>
           ) : (
-            <div className="bg-[#A6ADA7] rounded-2xl p-12 shadow-card border border-[#A6ADA7] text-center">
-              <p className="text-[#CDD1CE] text-[15px]">Geen data beschikbaar</p>
+            <div
+              style={{
+                background: '#A6ADA7',
+                padding: '28px 22px',
+                borderRadius: 24,
+                textAlign: 'center',
+                marginBottom: 6,
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+              }}
+            >
+              <p style={{ color: '#FDFDFE', fontSize: 14, fontWeight: 400 }}>
+                Nog geen kracht-data
+              </p>
+              <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 12, marginTop: 4 }}>
+                Deze klant heeft nog geen sets gelogd met gewicht + reps.
+              </p>
+            </div>
+          )}
+
+          {/* Alle oefeningen cap */}
+          <div
+            style={{
+              padding: '22px 4px 10px',
+              fontSize: 10,
+              fontWeight: 500,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: 'rgba(253,253,254,0.62)',
+            }}
+          >
+            Alle oefeningen
+          </div>
+
+          {/* Search pill */}
+          <div
+            style={{
+              padding: '11px 16px',
+              borderRadius: 999,
+              background: 'rgba(253,253,254,0.06)',
+              border: '1px solid rgba(253,253,254,0.10)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              marginBottom: 10,
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(253,253,254,0.62)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+              <circle cx="11" cy="11" r="7" />
+              <line x1="20" y1="20" x2="16.5" y2="16.5" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Zoek een oefening…"
+              value={krachtSearch}
+              onChange={(e) => setKrachtSearch(e.target.value)}
+              style={{
+                flex: 1,
+                background: 'transparent',
+                border: 'none',
+                color: '#FDFDFE',
+                fontSize: 13,
+                fontWeight: 400,
+                letterSpacing: '-0.005em',
+                outline: 'none',
+                fontFamily: 'inherit',
+              }}
+            />
+            {krachtSearch && (
+              <button
+                onClick={() => setKrachtSearch('')}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'rgba(253,253,254,0.62)',
+                  cursor: 'pointer',
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+                aria-label="Leeg zoekopdracht"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {/* Muscle chips */}
+          <div
+            className="overflow-x-auto"
+            style={{
+              display: 'flex',
+              gap: 6,
+              marginBottom: 12,
+              paddingBottom: 2,
+              scrollbarWidth: 'none',
+            }}
+          >
+            {(['Alle', 'Borst', 'Rug', 'Benen', 'Schouders', 'Armen', 'Core'] as MuscleFilter[]).map((m) => {
+              const active = krachtMuscle === m
+              return (
+                <button
+                  key={m}
+                  onClick={() => setKrachtMuscle(m)}
+                  style={{
+                    flexShrink: 0,
+                    padding: '6px 12px',
+                    borderRadius: 999,
+                    fontSize: 11,
+                    fontWeight: 400,
+                    color: active ? '#FDFDFE' : 'rgba(253,253,254,0.78)',
+                    background: active ? 'rgba(253,253,254,0.12)' : 'transparent',
+                    border: `1px solid ${active ? 'rgba(253,253,254,0.18)' : 'rgba(253,253,254,0.10)'}`,
+                    cursor: 'pointer',
+                    letterSpacing: '0.005em',
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
+                >
+                  {m}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Exercise list */}
+          {filteredExercises.length > 0 ? (
+            <div
+              style={{
+                background: '#A6ADA7',
+                borderRadius: 24,
+                overflow: 'hidden',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+              }}
+            >
+              {filteredExercises.map((ex, i) => (
+                <Link
+                  key={ex.exerciseId}
+                  href={`/coach/clients/${clientId}/exercises/${ex.exerciseId}`}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 64px auto',
+                    alignItems: 'center',
+                    gap: 12,
+                    padding: '14px 18px',
+                    borderTop: i > 0 ? '1px solid rgba(0,0,0,0.08)' : 'none',
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
+                >
+                  <div style={{ minWidth: 0 }}>
+                    <div
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 400,
+                        color: '#FDFDFE',
+                        letterSpacing: '-0.005em',
+                        lineHeight: 1.25,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {ex.name}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 400,
+                        color: 'rgba(253,253,254,0.62)',
+                        marginTop: 2,
+                        letterSpacing: '0.005em',
+                      }}
+                    >
+                      {ex.bodyPart} · {ex.count}× gelogd · laatst {formatShortDate(ex.lastDate)}
+                    </div>
+                  </div>
+                  <div style={{ width: '100%', height: 22 }}>
+                    <ExSpark data={ex.weekly} positive={ex.delta > 0} />
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 400,
+                      color: '#FDFDFE',
+                      letterSpacing: '-0.005em',
+                      fontFeatureSettings: '"tnum"',
+                      textAlign: 'right',
+                    }}
+                  >
+                    {ex.current}
+                    <small
+                      style={{
+                        fontSize: 10,
+                        color: 'rgba(253,253,254,0.62)',
+                        marginLeft: 2,
+                        letterSpacing: 0,
+                      }}
+                    >
+                      kg
+                    </small>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div
+              style={{
+                background: '#A6ADA7',
+                padding: '28px 22px',
+                borderRadius: 24,
+                textAlign: 'center',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
+              }}
+            >
+              <p style={{ color: '#FDFDFE', fontSize: 14, fontWeight: 400 }}>
+                {krachtSearch ? 'Geen oefeningen gevonden' : 'Geen oefeningen in deze groep'}
+              </p>
+              <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 12, marginTop: 4 }}>
+                {krachtSearch ? 'Probeer een andere zoekterm.' : 'Kies een andere spiergroep of wacht tot de klant meer logt.'}
+              </p>
             </div>
           )}
         </div>
