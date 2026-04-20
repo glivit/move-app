@@ -2171,7 +2171,9 @@ function ActiveWorkoutPage() {
       )}
 
       {/* ═══ TOP BAR ═══════════════════════════════ */}
-      <div style={{ padding: 'calc(env(safe-area-inset-top, 0px) + 14px) 5% 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+      {/* Safe-area wordt al gezet op de outer container via pt-safe — hier */}
+      {/* enkel de visuele spacing, zodat er geen dubbele inset ontstaat.   */}
+      <div style={{ padding: '10px 5% 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <button
           type="button"
           aria-label="Minimaliseer training en ga naar home"

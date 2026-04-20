@@ -183,7 +183,7 @@ export default function CardioSessionPage() {
   // ─── Exercise selection ───
   if (mode === 'select') {
     return (
-      <div className="min-h-screen pt-safe">
+      <div className="min-h-screen">
         {/* Header */}
         <header className="sticky top-0 z-10 px-5 py-4 flex items-center gap-3 border-b border-[rgba(253,253,254,0.08)]">
           <button
@@ -246,7 +246,7 @@ export default function CardioSessionPage() {
   // ─── Steady state timer ───
   if (mode === 'steady') {
     return (
-      <div className="min-h-screen pt-safe">
+      <div className="min-h-screen">
         <header className="sticky top-0 z-10 px-5 py-4 flex items-center gap-3 border-b border-[rgba(253,253,254,0.08)]">
           <button
             onClick={() => { setRunning(false); setMode('select') }}
@@ -335,7 +335,7 @@ export default function CardioSessionPage() {
 
     if (phase === 'idle') {
       return (
-        <div className="min-h-screen pt-safe">
+        <div className="min-h-screen">
           <header className="sticky top-0 z-10 px-5 py-4 flex items-center gap-3 border-b border-[rgba(253,253,254,0.08)]">
             <button
               onClick={() => setMode('select')}
@@ -437,7 +437,7 @@ export default function CardioSessionPage() {
       const doneCals = Math.round((totalElapsed / 60) * 11)
 
       return (
-        <div className="min-h-screen pt-safe">
+        <div className="min-h-screen">
           <main className="max-w-lg mx-auto px-5 py-12 flex flex-col items-center">
             <div className="w-full bg-[rgba(47,166,90,0.10)] border border-[#2FA65A]/15 rounded-3xl p-10 text-center mb-8">
               <div className="w-16 h-16 bg-[#2FA65A] rounded-full flex items-center justify-center mx-auto mb-4">
@@ -469,7 +469,7 @@ export default function CardioSessionPage() {
       : ((restSeconds - timeLeft) / restSeconds) * 100
 
     return (
-      <div className={`min-h-screen pt-safe transition-colors duration-500 ${
+      <div className={`min-h-screen transition-colors duration-500 ${
         phase === 'work' ? 'bg-[rgba(47,166,90,0.14)]' : 'bg-[rgba(232,185,72,0.14)]'
       }`}>
         <main className="max-w-lg mx-auto px-5 py-12 flex flex-col items-center">
@@ -545,7 +545,7 @@ export default function CardioSessionPage() {
   // ─── Done screen (steady state) ───
   const doneMinutes = Math.floor(elapsed / 60)
   return (
-    <div className="min-h-screen pt-safe">
+    <div className="min-h-screen">
       <main className="max-w-lg mx-auto px-5 py-12 flex flex-col items-center">
         <div className="w-full bg-[rgba(47,166,90,0.10)] border border-[#2FA65A]/15 rounded-3xl p-10 text-center mb-8">
           <div className="w-16 h-16 bg-[#2FA65A] rounded-full flex items-center justify-center mx-auto mb-4">
