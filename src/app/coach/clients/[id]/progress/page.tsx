@@ -90,8 +90,122 @@ interface WorkoutSet {
   actual_reps: number | null
   weight_kg: number | null
   is_pr: boolean
+  is_warmup: boolean | null
   completed: boolean
   created_at: string
+}
+
+// ─── Kracht tab aggregation ────────────────────────────────
+// Mirrors the client /client/progress logic so coach sees the same
+// filterable breakdown (search + muscle-group chips + sparklines)
+// instead of a one-at-a-time dropdown.
+
+type MuscleFilter = 'Alle' | 'Borst' | 'Rug' | 'Benen' | 'Schouders' | 'Armen' | 'Core'
+
+interface ExerciseAgg {
+  exerciseId: string
+  name: string
+  bodyPart: MuscleFilter | 'Overig'
+  rawBodyPart: string
+  count: number
+  lastDate: string
+  weekly: number[]  // 12-week e1RM, forward-filled
+  current: number
+  delta: number
+}
+
+function e1RM(weight: number, reps: number): number {
+  if (!weight || !reps || reps <= 0) return 0
+  const r = Math.min(reps, 12)
+  return weight * (1 + r / 30)
+}
+
+function weekKey(date: Date): string {
+  const d = new Date(date)
+  d.setHours(0, 0, 0, 0)
+  const dow = d.getDay()
+  d.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1))
+  return d.toISOString().slice(0, 10)
+}
+
+function normaliseBodyPart(raw: string | null | undefined): MuscleFilter | 'Overig' {
+  if (!raw) return 'Overig'
+  const s = raw.toLowerCase()
+  if (s.includes('chest') || s.includes('borst') || s.includes('pectoral')) return 'Borst'
+  if (s.includes('back') || s.includes('rug') || s.includes('lat')) return 'Rug'
+  if (s.includes('leg') || s.includes('ben') || s.includes('quad') || s.includes('ham') || s.includes('glut') || s.includes('calf') || s.includes('kuit') || s.includes('hip')) return 'Benen'
+  if (s.includes('shoulder') || s.includes('schou') || s.includes('delt')) return 'Schouders'
+  if (s.includes('arm') || s.includes('bicep') || s.includes('tricep') || s.includes('forearm')) return 'Armen'
+  if (s.includes('core') || s.includes('waist') || s.includes('abs') || s.includes('abdom')) return 'Core'
+  return 'Overig'
+}
+
+function formatShortDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('nl-BE', { day: '2-digit', month: 'short' })
+}
+
+// Sparkline (100×22) used inside a list row
+function ExSpark({ data, positive }: { data: number[]; positive: boolean }) {
+  if (data.length < 2 || data.every((v) => v === 0)) {
+    return <svg style={{ width: '100%', height: 22 }} />
+  }
+  const w = 100, h = 22
+  const max = Math.max(...data)
+  const min = Math.min(...data)
+  const range = max - min || 1
+  const pts = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * w
+    const y = h - ((v - min) / range) * (h - 4) - 2
+    return `${x.toFixed(1)},${y.toFixed(1)}`
+  }).join(' ')
+  const lastX = w
+  const lastY = h - ((data[data.length - 1] - min) / range) * (h - 4) - 2
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{ width: '100%', height: 22 }}>
+      <polyline
+        points={pts}
+        fill="none"
+        stroke="#FDFDFE"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity={positive ? 0.82 : 0.62}
+      />
+      <circle cx={lastX} cy={lastY} r="1.8" fill="#FDFDFE" opacity={positive ? 1 : 0.85} />
+    </svg>
+  )
+}
+
+// Larger sparkline (full-width × 26) used inside the compounds cards
+function LiftSpark({ data, positive }: { data: number[]; positive: boolean }) {
+  if (data.length < 2 || data.every((v) => v === 0)) {
+    return <svg style={{ width: '100%', height: 26 }} />
+  }
+  const w = 140, h = 26
+  const max = Math.max(...data)
+  const min = Math.min(...data)
+  const range = max - min || 1
+  const pts = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * w
+    const y = h - ((v - min) / range) * (h - 4) - 2
+    return `${x.toFixed(1)},${y.toFixed(1)}`
+  }).join(' ')
+  const lastX = w
+  const lastY = h - ((data[data.length - 1] - min) / range) * (h - 4) - 2
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{ width: '100%', height: 26 }}>
+      <polyline
+        points={pts}
+        fill="none"
+        stroke="#FDFDFE"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity={positive ? 0.92 : 0.7}
+      />
+      <circle cx={lastX} cy={lastY} r="2.2" fill="#FDFDFE" opacity={positive ? 1 : 0.85} />
+    </svg>
+  )
 }
 
 interface WorkoutSession {
@@ -126,6 +240,9 @@ export default function CoachClientProgressPage() {
   const [loading, setLoading] = useState(true)
   const [photoPosition, setPhotoPosition] = useState<'front' | 'back' | 'left' | 'right'>('front')
   const [signedUrls, setSignedUrls] = useState<Record<string, string>>({})
+  // Kracht tab filters (mirrors /client/progress)
+  const [krachtSearch, setKrachtSearch] = useState('')
+  const [krachtMuscle, setKrachtMuscle] = useState<MuscleFilter>('Alle')
 
   useEffect(() => {
     async function load() {
@@ -316,6 +433,106 @@ export default function CoachClientProgressPage() {
   }, [exercises, workoutSets])
 
   const selectedExercise = useMemo(() => exercises.find(e => e.id === selectedExerciseId), [exercises, selectedExerciseId])
+
+  // ─── Full per-exercise aggregation (12 weeks, e1RM series) ───
+  // Mirrors client /client/progress Kracht tab. Uses the sessions + sets
+  // already loaded; filters to last 12 weeks so sparkline has meaningful
+  // shape. Sessions dict maps session_id → started_at for date lookup.
+  const exerciseAgg = useMemo<ExerciseAgg[]>(() => {
+    if (!workoutSets.length || !exercises.length) return []
+
+    const sessionDate: Record<string, string> = {}
+    for (const s of workoutSessions) sessionDate[s.id] = s.started_at
+
+    const exerciseById: Record<string, Exercise> = {}
+    for (const e of exercises) exerciseById[e.id] = e
+
+    const now = new Date()
+    const twelveWeeksAgo = new Date(now)
+    twelveWeeksAgo.setDate(twelveWeeksAgo.getDate() - 12 * 7)
+
+    // Build 12 week-keys oldest → newest
+    const twelveWeekKeys: string[] = []
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now)
+      d.setDate(d.getDate() - i * 7)
+      twelveWeekKeys.push(weekKey(d))
+    }
+
+    interface Agg {
+      name: string
+      bodyPart: string
+      count: number
+      lastDate: string
+      weekly: Record<string, number>
+    }
+    const agg: Record<string, Agg> = {}
+
+    for (const set of workoutSets) {
+      if (set.is_warmup) continue
+      if (!set.weight_kg || set.weight_kg <= 0) continue
+      if (!set.actual_reps || set.actual_reps <= 0) continue
+
+      const startedAt = sessionDate[set.workout_session_id]
+      if (!startedAt) continue
+      const date = new Date(startedAt)
+      if (date < twelveWeeksAgo) continue
+
+      const ex = exerciseById[set.exercise_id]
+      if (!ex) continue
+
+      const name = ex.name_nl || ex.name || 'Oefening'
+      const bp = ex.body_part || ''
+
+      if (!agg[set.exercise_id]) {
+        agg[set.exercise_id] = { name, bodyPart: bp, count: 0, lastDate: startedAt, weekly: {} }
+      }
+      agg[set.exercise_id].count++
+      if (new Date(startedAt) > new Date(agg[set.exercise_id].lastDate)) {
+        agg[set.exercise_id].lastDate = startedAt
+      }
+      const wk = weekKey(date)
+      const est = e1RM(set.weight_kg, set.actual_reps)
+      if (!agg[set.exercise_id].weekly[wk] || est > agg[set.exercise_id].weekly[wk]) {
+        agg[set.exercise_id].weekly[wk] = est
+      }
+    }
+
+    return Object.entries(agg).map<ExerciseAgg>(([exerciseId, a]) => {
+      let last = 0
+      const weekly = twelveWeekKeys.map((k) => {
+        if (a.weekly[k]) last = a.weekly[k]
+        return last
+      })
+      const firstNonZero = weekly.find((v) => v > 0) || 0
+      const current = weekly[weekly.length - 1] || 0
+      const bodyPart = normaliseBodyPart(a.bodyPart)
+      return {
+        exerciseId,
+        name: a.name,
+        bodyPart,
+        rawBodyPart: a.bodyPart,
+        count: a.count,
+        lastDate: a.lastDate,
+        weekly,
+        current: Math.round(current),
+        delta: Math.round(current - firstNonZero),
+      }
+    }).filter((m) => m.current > 0)
+  }, [workoutSets, workoutSessions, exercises])
+
+  const mainLifts = useMemo(
+    () => [...exerciseAgg].sort((a, b) => b.count - a.count).slice(0, 4),
+    [exerciseAgg],
+  )
+
+  const filteredExercises = useMemo(() => {
+    const q = krachtSearch.trim().toLowerCase()
+    return exerciseAgg
+      .filter((e) => krachtMuscle === 'Alle' || e.bodyPart === krachtMuscle)
+      .filter((e) => !q || e.name.toLowerCase().includes(q))
+      .sort((a, b) => b.count - a.count)
+  }, [exerciseAgg, krachtSearch, krachtMuscle])
 
   useEffect(() => {
     if (!selectedExerciseId && exercisesWithData.length > 0) {

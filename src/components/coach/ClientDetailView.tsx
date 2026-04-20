@@ -555,15 +555,28 @@ function OverzichtPanel({ data }: { data: ClientWeekTimeline }) {
         <>
           <SectionTitle>Laatste activiteit</SectionTitle>
           <ActivityList>
-            {data.activityLog.map((a) => (
-              <ActivityRow
-                key={a.id}
-                state={a.state}
-                title={a.title}
-                sub={a.sub}
-                timeLabel={a.timeLabel}
-              />
-            ))}
+            {data.activityLog.map((a) => {
+              // activityLog.id is prefix-encoded: `sess:<uuid>`, `check:<uuid>`,
+              // `nut:<date>`, `msg:<uuid>`. We mappen die naar de bestaande
+              // coach-routes. Geen match → row blijft niet-klikbaar.
+              const [kind, ref] = a.id.split(':')
+              let href: string | undefined
+              if (kind === 'sess' && ref) href = `/coach/clients/${data.clientId}/sessions/${ref}`
+              else if (kind === 'check' && ref) href = `/coach/check-ins/${ref}`
+              else if (kind === 'nut' && ref) href = `/coach/clients/${data.clientId}/nutrition/${ref}`
+              else if (kind === 'msg') href = `/coach/messages/${data.clientId}`
+              return (
+                <ActivityRow
+                  key={a.id}
+                  state={a.state}
+                  title={a.title}
+                  sub={a.sub}
+                  timeLabel={a.timeLabel}
+                  tappable={!!href}
+                  href={href}
+                />
+              )
+            })}
           </ActivityList>
         </>
       )}
