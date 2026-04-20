@@ -6,25 +6,54 @@ import { DayPicker } from '@/components/client/DayPicker'
 import { ExerciseCard } from '@/components/client/ExerciseCard'
 import { PeriodizationBar } from '@/components/client/PeriodizationBar'
 import { Dumbbell, Moon } from 'lucide-react'
-import type { Program } from '@/types'
 
-interface ProgramDescription {
-  days: Array<{
-    name: string
-    exercises: Array<{
-      name: string
-      sets: number
-      reps: string
-      rest: number
-      notes?: string
-      videoUrl?: string
-    }>
-  }>
+// ─── Types ──────────────────────────────────────────────────
+// Deze pagina leest *niet* meer uit de legacy `programs`-tabel, maar
+// uit `client_programs` → `program_templates` → `program_template_days`
+// → `program_template_exercises` → `exercises`. Dat is de enige bron
+// van waarheid sinds de v3 editor en ook wat het dashboard, de
+// weekly-plan mail en de coach-app gebruiken.
+
+interface ResolvedExercise {
+  name: string
+  nameNl?: string
+  bodyPart?: string
+  targetMuscle?: string
+  equipment?: string
+  gifUrl?: string
+  videoUrl?: string
+  sets: number
+  reps: string
+  rest: number
+  notes?: string
+}
+
+interface ResolvedDay {
+  name: string
+  focus?: string | null
+  exercises: ResolvedExercise[]
+}
+
+interface ProgramSummary {
+  id: string
+  name: string
+  coachNotes: string | null
+}
+
+// Replace em/en dashes with "·" (user-preference: email/UI zonder em dashes).
+function scrub(s: string | null | undefined): string | undefined {
+  if (!s) return undefined
+  return s.replace(/\s*[—–]\s*/g, ' · ')
+}
+
+function formatReps(min: number, max: number | null): string {
+  if (max && max !== min) return `${min}-${max}`
+  return `${min}`
 }
 
 export default function ClientProgramPage() {
-  const [program, setProgram] = useState<Program | null>(null)
-  const [programData, setProgramData] = useState<ProgramDescription | null>(null)
+  const [program, setProgram] = useState<ProgramSummary | null>(null)
+  const [days, setDays] = useState<ResolvedDay[]>([])
   const [loading, setLoading] = useState(true)
   const [activeDay, setActiveDay] = useState(0)
   const [completedExercises, setCompletedExercises] = useState<Set<string>>(
@@ -38,52 +67,134 @@ export default function ClientProgramPage() {
         setLoading(true)
         const supabase = createClient()
 
-        // Get current user
         const {
           data: { user },
         } = await supabase.auth.getUser()
-
         if (!user) {
           setLoading(false)
           return
         }
 
-        // Get active program for current user
-        const { data: activeProgram, error: programError } = await supabase
-          .from('programs')
-          .select('*')
+        // 1. Actief client_program
+        const { data: cp, error: cpErr } = await supabase
+          .from('client_programs')
+          .select('id, name, coach_notes, template_id, schedule')
           .eq('client_id', user.id)
           .eq('is_active', true)
-          .single()
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
 
-        if (programError && programError.code !== 'PGRST116') {
-          console.error('Error loading program:', programError)
+        if (cpErr) {
+          console.error('Error loading client_program:', cpErr)
+          setLoading(false)
+          return
+        }
+        if (!cp) {
           setLoading(false)
           return
         }
 
-        if (!activeProgram) {
+        setProgram({
+          id: cp.id,
+          name: cp.name,
+          coachNotes: cp.coach_notes,
+        })
+
+        // 2. Template days
+        const { data: tplDays, error: tdErr } = await supabase
+          .from('program_template_days')
+          .select('id, day_number, name, focus, sort_order')
+          .eq('template_id', cp.template_id)
+          .order('sort_order', { ascending: true })
+
+        if (tdErr) {
+          console.error('Error loading template_days:', tdErr)
           setLoading(false)
           return
         }
 
-        setProgram(activeProgram as Program)
+        const daysById = new Map<string, typeof tplDays[0]>()
+        ;(tplDays ?? []).forEach((d) => daysById.set(d.id, d))
 
-        // Parse program description if it's not a HEVY program
-        if (!activeProgram.hevy_program_id && activeProgram.description) {
-          try {
-            const parsed = JSON.parse(
-              typeof activeProgram.description === 'string'
-                ? activeProgram.description
-                : JSON.stringify(activeProgram.description)
-            ) as ProgramDescription
-            if (parsed.days && Array.isArray(parsed.days)) {
-              setProgramData(parsed)
+        // 3. Oefeningen — alle template_day_ids in 1 query, geresolvd via
+        // de nested join naar `exercises`.
+        const dayIds = (tplDays ?? []).map((d) => d.id)
+        const exercisesByDay = new Map<string, ResolvedExercise[]>()
+        if (dayIds.length > 0) {
+          const { data: exRows, error: exErr } = await supabase
+            .from('program_template_exercises')
+            .select(
+              `
+              template_day_id, sort_order, sets, reps_min, reps_max, rest_seconds, notes,
+              exercises (
+                name, name_nl, body_part, target_muscle, equipment, gif_url, video_url
+              )
+              `,
+            )
+            .in('template_day_id', dayIds)
+            .order('sort_order', { ascending: true })
+          if (exErr) {
+            console.error('Error loading template_exercises:', exErr)
+          }
+          ;(exRows ?? []).forEach((row: any) => {
+            const list = exercisesByDay.get(row.template_day_id) ?? []
+            const ex = row.exercises
+            if (ex) {
+              list.push({
+                name: ex.name,
+                nameNl: ex.name_nl ?? undefined,
+                bodyPart: ex.body_part ?? undefined,
+                targetMuscle: ex.target_muscle ?? undefined,
+                equipment: ex.equipment ?? undefined,
+                gifUrl: ex.gif_url ?? undefined,
+                videoUrl: ex.video_url ?? undefined,
+                sets: row.sets ?? 3,
+                reps: formatReps(row.reps_min ?? 8, row.reps_max ?? null),
+                rest: row.rest_seconds ?? 90,
+                notes: scrub(row.notes),
+              })
             }
-          } catch (parseError) {
-            console.log('Could not parse program description as JSON')
+            exercisesByDay.set(row.template_day_id, list)
+          })
+        }
+
+        // 4. Schedule → 7 weekdagen (Ma..Zo = 1..7)
+        const schedule = (cp.schedule ?? {}) as Record<string, string>
+        const dutchDowLong = [
+          'Maandag',
+          'Dinsdag',
+          'Woensdag',
+          'Donderdag',
+          'Vrijdag',
+          'Zaterdag',
+          'Zondag',
+        ]
+        const week: ResolvedDay[] = []
+        for (let i = 0; i < 7; i++) {
+          const weekday = i + 1 // 1..7
+          const templateDayId = schedule[String(weekday)]
+          const td = templateDayId ? daysById.get(templateDayId) : undefined
+          if (td) {
+            week.push({
+              name: scrub(td.name) ?? td.name,
+              focus: scrub(td.focus),
+              exercises: exercisesByDay.get(td.id) ?? [],
+            })
+          } else {
+            week.push({
+              name: dutchDowLong[i],
+              focus: null,
+              exercises: [],
+            })
           }
         }
+        setDays(week)
+
+        // Default active day = vandaag (Ma=0..Zo=6).
+        const today = new Date().getDay() // 0=Sun..6=Sat
+        const idx = today === 0 ? 6 : today - 1
+        setActiveDay(idx)
       } catch (err) {
         console.error('Error loading program:', err)
       } finally {
@@ -103,31 +214,32 @@ export default function ClientProgramPage() {
     }
     setCompletedExercises(newCompleted)
 
-    // Check if all exercises in current day are completed
-    const currentDayExercises = programData?.days[activeDay]?.exercises || []
+    const currentDayExercises = days[activeDay]?.exercises || []
     const allCompleted = currentDayExercises.every((ex) =>
       newCompleted.has(`${activeDay}-${ex.name}`)
     )
 
+    const newCompletedDays = new Set(completedDays)
     if (allCompleted && currentDayExercises.length > 0) {
-      const newCompletedDays = new Set(completedDays)
       newCompletedDays.add(activeDay)
-      setCompletedDays(newCompletedDays)
     } else {
-      const newCompletedDays = new Set(completedDays)
       newCompletedDays.delete(activeDay)
-      setCompletedDays(newCompletedDays)
     }
+    setCompletedDays(newCompletedDays)
   }
 
-  const dayNames = programData?.days.map((day) => day.name) || []
-  const currentDay = programData?.days[activeDay]
-  const currentDayExercises = currentDay?.exercises || []
+  const currentDay = days[activeDay]
+  const currentDayExercises = currentDay?.exercises ?? []
   const completedCount = currentDayExercises.filter((ex) =>
     completedExercises.has(`${activeDay}-${ex.name}`)
   ).length
-
   const isRestDay = currentDayExercises.length === 0
+
+  // DayPicker: een dag met exercises = trainingsdag, leeg = rust.
+  // We geven namen door; DayPicker zelf rendert Ma/Di/Wo bolletjes
+  // via weekday-index, dus de exacte string maakt enkel uit voor
+  // `hasExercises` logic. Lege string = rust, niet-leeg = training.
+  const dayNames = days.map((d) => (d.exercises.length > 0 ? d.name : ''))
 
   if (loading) {
     return (
@@ -149,16 +261,12 @@ export default function ClientProgramPage() {
     )
   }
 
-  if (!program || !programData) {
+  if (!program) {
     return (
       <div className="space-y-6">
         <div className="mb-8 animate-slide-up">
           <p className="text-label mb-3 text-[rgba(253,253,254,0.55)]">Schema</p>
-          <h1
-            className="page-title"
-          >
-            Training
-          </h1>
+          <h1 className="page-title">Training</h1>
         </div>
         <div className="bg-[#A6ADA7] rounded-2xl p-8 border border-[rgba(253,253,254,0.08)] text-center animate-slide-up stagger-2">
           <Dumbbell
@@ -182,12 +290,10 @@ export default function ClientProgramPage() {
       {/* Hero Section */}
       <div className="mb-8 animate-slide-up">
         <p className="text-label mb-3 text-[rgba(253,253,254,0.55)]">Schema</p>
-        <h1 className="page-title">
-          Training
-        </h1>
-        {program && (
-          <p className="text-[15px] text-[rgba(253,253,254,0.55)] mt-1">{program.title}</p>
-        )}
+        <h1 className="page-title">Training</h1>
+        <p className="text-[15px] text-[rgba(253,253,254,0.55)] mt-1">
+          {program.name}
+        </p>
       </div>
 
       {/* Periodization Bar */}
@@ -224,9 +330,12 @@ export default function ClientProgramPage() {
 
       {/* Day Title Hero */}
       <div className="mt-12 animate-slide-up stagger-4">
-        <h2 className="page-title">
-          {currentDay?.name}
-        </h2>
+        <h2 className="page-title">{currentDay?.name}</h2>
+        {currentDay?.focus && (
+          <p className="text-[14px] text-[rgba(253,253,254,0.55)] mt-1">
+            {currentDay.focus}
+          </p>
+        )}
       </div>
 
       {/* Rest Day Message */}
@@ -238,7 +347,7 @@ export default function ClientProgramPage() {
             className="text-[rgba(253,253,254,0.35)] mx-auto mb-3"
           />
           <p className="font-medium text-[#FDFDFE]">
-            Rustdag — geniet ervan!
+            Rustdag · geniet ervan!
           </p>
         </div>
       ) : (
@@ -246,7 +355,7 @@ export default function ClientProgramPage() {
         <div className="divide-y divide-[rgba(253,253,254,0.08)]">
           {currentDayExercises.map((exercise, index) => (
             <div
-              key={`${activeDay}-${exercise.name}`}
+              key={`${activeDay}-${exercise.name}-${index}`}
               className="py-5 animate-slide-up"
               style={{ animationDelay: `${260 + index * 40}ms` }}
             >
@@ -264,13 +373,18 @@ export default function ClientProgramPage() {
       )}
 
       {/* Coach Notes */}
-      {program.coach_notes && (
-        <div className="mt-12 mb-12 pl-4 border-l-2 border-[#C0FC01] animate-slide-up" style={{ animationDelay: `${isRestDay ? '300ms' : 260 + currentDayExercises.length * 40 + 40}ms` }}>
+      {program.coachNotes && (
+        <div
+          className="mt-12 mb-12 pl-4 border-l-2 border-[#C0FC01] animate-slide-up"
+          style={{
+            animationDelay: `${isRestDay ? '300ms' : 260 + currentDayExercises.length * 40 + 40}ms`,
+          }}
+        >
           <p className="text-[13px] text-[#FDFDFE] font-medium mb-2">
             Coach notities
           </p>
           <p className="text-[14px] text-[#FDFDFE] whitespace-pre-wrap">
-            {program.coach_notes}
+            {program.coachNotes}
           </p>
         </div>
       )}

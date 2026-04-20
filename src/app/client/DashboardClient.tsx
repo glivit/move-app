@@ -169,6 +169,11 @@ export default function ClientDashboard({
   const [loading, setLoading] = useState(!initialData)
   const [cacheAgeMs, setCacheAgeMs] = useState<number | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  // loadError wordt alleen getoond als we écht niets hebben om te renderen
+  // (geen IDB-cache én fetch gefaald). Tijdens een background-refresh tonen
+  // we de pill, niet de dead-end.
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [retryTick, setRetryTick] = useState(0)
   const [weightInput, setWeightInput] = useState('')
   const [weightSaving, setWeightSaving] = useState(false)
   const [weightSaved, setWeightSaved] = useState(false)
@@ -198,6 +203,7 @@ export default function ClientDashboard({
     // No SSR data → instant IDB render + bg fresh fetch.
     let cancelled = false
     setIsRefreshing(true)
+    setLoadError(null)
 
     readDashboardCache<DashboardData>(userId).then((hit) => {
       if (cancelled || !hit) return
@@ -208,14 +214,27 @@ export default function ClientDashboard({
       setLoading(false)
     })
 
-    cachedFetch<DashboardData>('/api/dashboard', { maxAge: 120_000 })
+    // retryTick in de URL forceert cachedFetch om de in-memory cache over
+    // te slaan bij een manuele retry.
+    const fetchUrl = retryTick > 0
+      ? `/api/dashboard?retry=${retryTick}`
+      : '/api/dashboard'
+
+    cachedFetch<DashboardData>(fetchUrl, { maxAge: 120_000 })
       .then((fresh) => {
         if (cancelled) return
         setData(fresh)
         setCacheAgeMs(null) // fresh from server
+        setLoadError(null)
         writeDashboardCache(userId, fresh).catch(() => {})
       })
-      .catch((err) => console.error('Dashboard load error:', err))
+      .catch((err) => {
+        if (cancelled) return
+        console.error('Dashboard load error:', err)
+        // Alleen harde error tonen als we géén IDB-data hebben. Is er wél
+        // cache, dan blijft die zichtbaar en de stale-pill vertelt dat.
+        setLoadError((current) => current ?? (err?.message || 'Load failed'))
+      })
       .finally(() => {
         if (cancelled) return
         setLoading(false)
@@ -225,7 +244,7 @@ export default function ClientDashboard({
     return () => {
       cancelled = true
     }
-  }, [initialData, userId])
+  }, [initialData, userId, retryTick])
 
   // ────────────────────────────────────────────────────────────
   // Fase 4 — Optimistic weight-log
@@ -420,9 +439,32 @@ export default function ClientDashboard({
   const showFreshnessPill = !loading && data && (isRefreshing || isStale)
 
   if (!loading && !data) {
+    // Dead-end: geen IDB-cache EN de fetch faalde. Meest voorkomende oorzaken
+    // zijn kort netwerkverlies of verlopen auth-cookie na lang wegleggen.
+    // Een retry-knop lost beide scenario's op zonder de app te moeten killen.
     return (
-      <div className="flex min-h-[60vh] items-center justify-center" style={{ color: 'rgba(253,253,254,0.62)' }}>
-        Er ging iets mis bij het laden.
+      <div
+        className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-6 text-center"
+        style={{ color: 'rgba(253,253,254,0.62)' }}
+      >
+        <p>Geen verbinding met de server.</p>
+        <button
+          type="button"
+          onClick={() => {
+            setLoadError(null)
+            setLoading(true)
+            setRetryTick((t) => t + 1)
+          }}
+          className="px-5 py-2.5 rounded-full bg-[#474B48] text-[#FDFDFE] text-[14px] font-medium"
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+        >
+          Opnieuw proberen
+        </button>
+        {loadError && (
+          <p className="text-[12px]" style={{ color: 'rgba(253,253,254,0.35)' }}>
+            {loadError}
+          </p>
+        )}
       </div>
     )
   }
