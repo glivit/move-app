@@ -1197,7 +1197,8 @@ function ActiveWorkoutPage() {
   const [closeConfirm, setCloseConfirm] = useState(false)
   const [prCelebration, setPrCelebration] = useState<string | null>(null)
   const [workoutSeconds, setWorkoutSeconds] = useState(0)
-  // (v6) Rest-timer verwijderd per Glenn's request — geen UI blok meer na set complete.
+  // Inline rest bars: key = "exerciseId-setIndex", value = rest seconds
+  const [activeRestBars, setActiveRestBars] = useState<Record<string, number>>({})
   const [exerciseNotes, setExerciseNotes] = useState<Record<string, string>>({})
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false)
   const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>(() => {
@@ -1636,11 +1637,17 @@ function ActiveWorkoutPage() {
         }
       }
 
-      // (v6) Rest-timer verwijderd: geen UI-blok meer na set-complete.
-      // (v6) Geen auto-focus meer op reps/weight van volgende set — voelde verwarrend
-      //      omdat iOS keyboard niet automatisch opende; clean laten.
+      // Inline rest bar: toon een 1px groene bar onder de afgevinkte set
+      const restDuration = exerciseRef?.rest_seconds || 90
+      const exSets = sets[exerciseId] || []
+      const isLastSet = setIndex === exSets.length - 1
+      // Alleen rest bar tonen als er nog sets na deze zijn
+      if (!isLastSet) {
+        const key = `${exerciseId}-${setIndex}`
+        setActiveRestBars(prev => ({ ...prev, [key]: restDuration }))
+      }
     } catch (error) { console.error('Error completing set:', error) }
-  }, [session, exercises, haptic])
+  }, [session, exercises, haptic, sets])
 
   // --- Reorder exercises ---
   const moveExercise = useCallback((fromIndex: number, direction: 'up' | 'down') => {
@@ -2404,7 +2411,15 @@ function ActiveWorkoutPage() {
                             displayWeight={displayWeight}
                             toKg={toKg}
                           />
-                          {/* (v6) Rest-timer UI verwijderd — zie activeRestTimer state comment. */}
+                          {activeRestBars[`${ex.id}-${idx}`] && (
+                            <InlineRestBar
+                              durationSeconds={activeRestBars[`${ex.id}-${idx}`]}
+                              onDismiss={() => setActiveRestBars(prev => {
+                                const { [`${ex.id}-${idx}`]: _, ...rest } = prev
+                                return rest
+                              })}
+                            />
+                          )}
                         </div>
                       )
                     })}
@@ -2598,6 +2613,65 @@ function ActiveWorkoutPage() {
     </div>
   )
 }
+
+// --- Inline rest bar — 1px green fill ---
+function InlineRestBarComponent({ durationSeconds, onDismiss }: { durationSeconds: number; onDismiss: () => void }) {
+  const startRef = useRef(Date.now())
+  const [progress, setProgress] = useState(0)
+  const [finished, setFinished] = useState(false)
+  const rafRef = useRef<number | null>(null)
+  const durationMs = durationSeconds * 1000
+
+  useEffect(() => {
+    startRef.current = Date.now()
+    const tick = () => {
+      const elapsed = Date.now() - startRef.current
+      const pct = Math.min(1, elapsed / durationMs)
+      setProgress(pct)
+      if (pct >= 1) {
+        setFinished(true)
+        // subtle haptic
+        if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(40)
+        // auto-dismiss
+        setTimeout(onDismiss, 1200)
+        return
+      }
+      rafRef.current = requestAnimationFrame(tick)
+    }
+    rafRef.current = requestAnimationFrame(tick)
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
+  }, [durationMs, onDismiss])
+
+  return (
+    <div
+      onClick={onDismiss}
+      style={{
+        position: 'relative',
+        height: 2,
+        cursor: 'pointer',
+        overflow: 'hidden',
+        opacity: finished ? 0 : 1,
+        transition: 'opacity 500ms ease',
+      }}
+    >
+      {/* Fill — 1px bright green line */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          bottom: 0,
+          width: `${progress * 100}%`,
+          background: '#C0FC01',
+          boxShadow: finished ? '0 0 8px rgba(192,252,1,0.5)' : 'none',
+          transition: finished ? 'box-shadow 200ms ease' : undefined,
+        }}
+      />
+    </div>
+  )
+}
+
+const InlineRestBar = memo(InlineRestBarComponent)
 
 // --- Set row component ---
 function SetRowComponent({
