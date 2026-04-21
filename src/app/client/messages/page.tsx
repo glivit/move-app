@@ -86,6 +86,27 @@ export default function ClientMessagesPage() {
   const [coachName, setCoachName] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const shellRef = useRef<HTMLDivElement>(null)
+
+  // iOS keyboard: visualViewport resize → shrink container to actual visible area
+  useEffect(() => {
+    const vv = typeof window !== 'undefined' ? window.visualViewport : null
+    if (!vv || !shellRef.current) return
+    const update = () => {
+      if (shellRef.current) {
+        shellRef.current.style.height = `${vv.height}px`
+      }
+      // Scroll to bottom when keyboard opens/closes
+      setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 80)
+    }
+    update()
+    vv.addEventListener('resize', update)
+    vv.addEventListener('scroll', update)
+    return () => {
+      vv.removeEventListener('resize', update)
+      vv.removeEventListener('scroll', update)
+    }
+  }, [loading])
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -403,8 +424,9 @@ export default function ClientMessagesPage() {
 
   return (
     <div
+      ref={shellRef}
       className="flex flex-col relative"
-      style={{ height: '100dvh', background: CANVAS }}
+      style={{ height: '100dvh', background: CANVAS, overflow: 'hidden' }}
     >
       {/* ═══ Chat top — back arrow · peer name ═══ */}
       <div
@@ -572,7 +594,7 @@ export default function ClientMessagesPage() {
       </div>
 
       {/* ═══ Input pill ═══ */}
-      <div className="sticky bottom-0 left-0 right-0">
+      <div style={{ flexShrink: 0 }}>
         <ChatInput onSend={handleSendMessage} loading={sending} />
       </div>
     </div>
