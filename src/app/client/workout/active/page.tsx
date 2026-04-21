@@ -2616,45 +2616,47 @@ function ActiveWorkoutPage() {
 
 // --- Inline rest bar — 1px green fill ---
 function InlineRestBarComponent({ durationSeconds, onDismiss }: { durationSeconds: number; onDismiss: () => void }) {
-  const startRef = useRef(Date.now())
   const [progress, setProgress] = useState(0)
   const [finished, setFinished] = useState(false)
-  const rafRef = useRef<number | null>(null)
-  const durationMs = durationSeconds * 1000
+  const dismissRef = useRef(onDismiss)
+  dismissRef.current = onDismiss
 
+  // Single stable effect — no deps that change on every render
   useEffect(() => {
-    startRef.current = Date.now()
+    const start = Date.now()
+    const ms = durationSeconds * 1000
+    let raf: number
+
     const tick = () => {
-      const elapsed = Date.now() - startRef.current
-      const pct = Math.min(1, elapsed / durationMs)
+      const pct = Math.min(1, (Date.now() - start) / ms)
       setProgress(pct)
       if (pct >= 1) {
         setFinished(true)
-        // subtle haptic
         if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(40)
-        // auto-dismiss
-        setTimeout(onDismiss, 1200)
+        setTimeout(() => dismissRef.current(), 1200)
         return
       }
-      rafRef.current = requestAnimationFrame(tick)
+      raf = requestAnimationFrame(tick)
     }
-    rafRef.current = requestAnimationFrame(tick)
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
-  }, [durationMs, onDismiss])
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [durationSeconds])
 
   return (
     <div
       onClick={onDismiss}
       style={{
         position: 'relative',
-        height: 2,
+        height: 3,
+        marginTop: 6,
+        borderRadius: 2,
         cursor: 'pointer',
         overflow: 'hidden',
+        background: 'rgba(253,253,254,0.06)',
         opacity: finished ? 0 : 1,
         transition: 'opacity 500ms ease',
       }}
     >
-      {/* Fill — 1px bright green line */}
       <div
         style={{
           position: 'absolute',
@@ -2662,9 +2664,9 @@ function InlineRestBarComponent({ durationSeconds, onDismiss }: { durationSecond
           left: 0,
           bottom: 0,
           width: `${progress * 100}%`,
+          borderRadius: 2,
           background: '#C0FC01',
           boxShadow: finished ? '0 0 8px rgba(192,252,1,0.5)' : 'none',
-          transition: finished ? 'box-shadow 200ms ease' : undefined,
         }}
       />
     </div>
