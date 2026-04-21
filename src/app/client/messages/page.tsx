@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { MessageCircle, ChevronLeft, Info } from 'lucide-react'
+import { MessageCircle, ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { ChatBubble } from '@/components/client/ChatBubble'
@@ -321,15 +321,15 @@ export default function ClientMessagesPage() {
   if (loading) {
     return (
       <div
-        className="flex flex-col -mx-4 -mt-4"
-        style={{ height: 'calc(100dvh - 140px)', background: CANVAS }}
+        className="flex flex-col"
+        style={{ height: '100dvh', background: CANVAS }}
       >
-        {/* Ghost header — zelfde vorm als echte .chat-top, zonder data */}
+        {/* Ghost header */}
         <div
           style={{
-            padding: '18px 5% 14px',
+            padding: 'calc(env(safe-area-inset-top, 0px) + 18px) 5% 14px',
             display: 'grid',
-            gridTemplateColumns: '32px 1fr 32px',
+            gridTemplateColumns: '32px 1fr',
             alignItems: 'center',
             gap: 14,
           }}
@@ -362,15 +362,6 @@ export default function ClientMessagesPage() {
               />
             </div>
           </div>
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 999,
-              background: 'rgba(255,255,255,0.06)',
-              justifySelf: 'end',
-            }}
-          />
         </div>
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-pulse space-y-3">
@@ -391,8 +382,8 @@ export default function ClientMessagesPage() {
   if (!currentUserId || !coachId) {
     return (
       <div
-        className="flex flex-col items-center justify-center -mx-4 -mt-4"
-        style={{ height: 'calc(100dvh - 140px)', background: CANVAS }}
+        className="flex flex-col items-center justify-center"
+        style={{ height: '100dvh', background: CANVAS }}
       >
         <div
           className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
@@ -412,19 +403,17 @@ export default function ClientMessagesPage() {
 
   return (
     <div
-      className="flex flex-col -mx-4 -mt-4 relative"
-      style={{ height: 'calc(100dvh - 140px)', background: CANVAS }}
+      className="flex flex-col relative"
+      style={{ height: '100dvh', background: CANVAS }}
     >
-      {/* ═══ Chat top — back · peer · info (design-system 09 .chat-top) ═══
-           Licht gradient naar canvas zodat messages eronder “inzwemmen”. */}
+      {/* ═══ Chat top — back arrow · peer name ═══ */}
       <div
         className="animate-slide-up"
         style={{
-          padding: '18px 5% 14px',
-          display: 'grid',
-          gridTemplateColumns: '32px 1fr 32px',
+          padding: 'calc(env(safe-area-inset-top, 0px) + 14px) 5% 14px',
+          display: 'flex',
           alignItems: 'center',
-          gap: 14,
+          gap: 12,
           background:
             'linear-gradient(180deg, rgba(142,152,144,1) 0%, rgba(142,152,144,1) 72%, rgba(142,152,144,0) 100%)',
           position: 'relative',
@@ -438,18 +427,17 @@ export default function ClientMessagesPage() {
             width: 32,
             height: 32,
             borderRadius: '50%',
-            background: 'rgba(255,255,255,0.06)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.10)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             textDecoration: 'none',
+            WebkitTapHighlightColor: 'transparent',
           }}
         >
-          <ChevronLeft size={14} strokeWidth={1.8} style={{ color: WHITE }} />
+          <ChevronLeft size={20} strokeWidth={1.8} style={{ color: WHITE }} />
         </Link>
 
-        {/* Peer (coach) — avatar + name + status */}
+        {/* Peer (coach) — avatar + name */}
         <div className="flex items-center gap-[10px] min-w-0">
           <div
             style={{
@@ -508,26 +496,6 @@ export default function ClientMessagesPage() {
             </div>
           </div>
         </div>
-
-        {/* Info — placeholder-knop; toont later coach-bio/contact */}
-        <button
-          aria-label="Info"
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,0.06)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.10)',
-            border: 'none',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            justifySelf: 'end',
-          }}
-        >
-          <Info size={14} strokeWidth={1.8} style={{ color: WHITE }} />
-        </button>
       </div>
 
       {/* ═══ Messages ═══ */}

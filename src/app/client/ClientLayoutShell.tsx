@@ -102,7 +102,8 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
   // page rendert zelf zijn eigen chrome conform design-system/06-workout.html
   const isFocusMode =
     pathname?.startsWith('/client/workout/active') ||
-    pathname?.startsWith('/client/workout/complete')
+    pathname?.startsWith('/client/workout/complete') ||
+    pathname?.startsWith('/client/messages')
 
   return (
     <div
