@@ -1529,7 +1529,10 @@ function ActiveWorkoutPage() {
           return
         }
 
-        // Fresh session — prefill with previous session data
+        // Preview mode — prefill sets but DON'T create a session yet.
+        // Session wordt pas aangemaakt wanneer de user de eerste set afvinkt
+        // (zie ensureSession). Zo kan je je workout bekijken zonder dat de
+        // timer al loopt.
         const setsMap: Record<string, SetData[]> = {}
         for (const ex of exercisesData) {
           const prevSets = apiPreviousSets[ex.id] || []
@@ -1551,56 +1554,56 @@ function ActiveWorkoutPage() {
           setsMap[ex.id] = setsList
         }
         setSets(setsMap)
-
-        const { data: newSession, error: insertErr } = await supabase
-          .from('workout_sessions')
-          .insert({ client_id: authUser.id, client_program_id: programId, template_day_id: dayId, started_at: new Date().toISOString() })
-          .select().single()
-        if (insertErr || !newSession) {
-          // CRITICAL: zonder session.id kan completeSet() niets bewaren —
-          // sets verdwijnen stil. Toon expliciet aan de user en log naar
-          // bug_reports zodat coach het ziet.
-          console.error('[workout/active] session INSERT failed', {
-            insertErr,
-            programId,
-            dayId,
-            clientId: authUser.id,
-          })
-          try {
-            await supabase.from('bug_reports').insert({
-              user_id: authUser.id,
-              page_url: typeof window !== 'undefined' ? window.location.href : '/client/workout/active',
-              description:
-                '[auto] workout_sessions INSERT failed — ' +
-                (insertErr?.message || 'no row') +
-                ' | program=' + String(programId) +
-                ' day=' + String(dayId) +
-                (insertErr?.code ? ' code=' + insertErr.code : '') +
-                (insertErr?.details ? ' details=' + insertErr.details : ''),
-              viewport_width: typeof window !== 'undefined' ? window.innerWidth : null,
-              viewport_height: typeof window !== 'undefined' ? window.innerHeight : null,
-              user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
-            })
-          } catch { /* best effort */ }
-          alert(
-            'Workout kon niet gestart worden — neem contact op met je coach.\n\n' +
-              'Reden: ' +
-              (insertErr?.message || 'onbekend') +
-              '\nDit is gelogd zodat je sets niet verloren gaan.',
-          )
-          router.push('/client')
-          return
-        }
-        setSession(newSession as WorkoutSession)
+        // No session created here — preview mode until first set complete
       } catch (error) { console.error('Error loading workout:', error) }
       finally { setLoading(false) }
     }
     loadData()
   }, [dayId, programId, router])
 
+  // --- Lazy session creation: alleen bij eerste interactie ---
+  const ensureSession = useCallback(async (): Promise<WorkoutSession | null> => {
+    if (session) return session
+    if (!dayId || !programId) return null
+    try {
+      const supabase = createClient()
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      if (!authUser) return null
+
+      const { data: newSession, error: insertErr } = await supabase
+        .from('workout_sessions')
+        .insert({ client_id: authUser.id, client_program_id: programId, template_day_id: dayId, started_at: new Date().toISOString() })
+        .select().single()
+
+      if (insertErr || !newSession) {
+        console.error('[workout/active] session INSERT failed', insertErr)
+        try {
+          await supabase.from('bug_reports').insert({
+            user_id: authUser.id,
+            page_url: typeof window !== 'undefined' ? window.location.href : '/client/workout/active',
+            description: '[auto] workout_sessions INSERT failed — ' + (insertErr?.message || 'no row'),
+            viewport_width: typeof window !== 'undefined' ? window.innerWidth : null,
+            viewport_height: typeof window !== 'undefined' ? window.innerHeight : null,
+            user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+          })
+        } catch { /* best effort */ }
+        return null
+      }
+
+      const ws = newSession as WorkoutSession
+      setSession(ws)
+      return ws
+    } catch (error) {
+      console.error('Error creating session:', error)
+      return null
+    }
+  }, [session, dayId, programId])
+
   // --- Complete a set: PR check + rest timer + haptic + auto-focus ---
   const completeSet = useCallback(async (exerciseId: string, setIndex: number, weight: number | null) => {
-    if (!session) return
+    // Lazy session creation — start timer op eerste set
+    const activeSession = await ensureSession()
+    if (!activeSession) return
 
     // Haptic on set completion
     haptic(25)
@@ -1647,7 +1650,7 @@ function ActiveWorkoutPage() {
         setActiveRestBars(prev => ({ ...prev, [key]: restDuration }))
       }
     } catch (error) { console.error('Error completing set:', error) }
-  }, [session, exercises, haptic, sets])
+  }, [ensureSession, exercises, haptic, sets])
 
   // --- Reorder exercises ---
   const moveExercise = useCallback((fromIndex: number, direction: 'up' | 'down') => {
@@ -2009,7 +2012,11 @@ function ActiveWorkoutPage() {
 
   // --- Minimize workout (persistent bar) ---
   const handleMinimize = () => {
-    if (!session || !dayId || !programId) return
+    // Preview mode (geen session) → gewoon terug navigeren
+    if (!session || !dayId || !programId) {
+      router.push('/client/workout')
+      return
+    }
     const addedExercises: AddedExerciseData[] = exercises
       .filter(e => e.id.startsWith('added-'))
       .map(e => ({
@@ -2199,14 +2206,18 @@ function ActiveWorkoutPage() {
       <div className="page-head workout-head" style={{ padding: '4px 5% 18px', flexShrink: 0 }}>
         <div>
           <div className="page-title">{session?.started_at ? new Date(session.started_at).toLocaleDateString('nl-NL', { weekday: 'long' }).replace(/^\w/, c => c.toUpperCase()) : 'Training'}</div>
-          <div className="page-sub">{formatTimer(workoutSeconds)}</div>
+          <div className="page-sub">{session ? formatTimer(workoutSeconds) : 'Preview'}</div>
           <button onClick={toggleWeightUnit} style={{ marginTop: 6, fontSize: 11, fontWeight: 500, color: 'rgba(253,253,254,0.44)', background: 'transparent', border: 'none', padding: 0, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
             {weightUnit}
           </button>
         </div>
-        <button className="klaar-link" onClick={handleFinish} disabled={saving}>
-          {saving ? 'Opslaan...' : 'Klaar'}
-        </button>
+        {session ? (
+          <button className="klaar-link" onClick={handleFinish} disabled={saving}>
+            {saving ? 'Opslaan...' : 'Klaar'}
+          </button>
+        ) : (
+          <div />
+        )}
       </div>
 
       {/* ═══ EXERCISE LIST ═══════════════════════════ */}

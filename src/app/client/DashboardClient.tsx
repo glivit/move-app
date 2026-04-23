@@ -438,7 +438,7 @@ export default function ClientDashboard({
   const isStale = cacheAgeMs !== null && cacheAgeMs > STALE_AFTER_MS
   const showFreshnessPill = !loading && data && (isRefreshing || isStale)
 
-  if (!loading && !data) {
+  if (!data && loadError) {
     // Dead-end: geen IDB-cache EN de fetch faalde. Meest voorkomende oorzaken
     // zijn kort netwerkverlies of verlopen auth-cookie na lang wegleggen.
     // Een retry-knop lost beide scenario's op zonder de app te moeten killen.
@@ -460,11 +460,22 @@ export default function ClientDashboard({
         >
           Opnieuw proberen
         </button>
-        {loadError && (
-          <p className="text-[12px]" style={{ color: 'rgba(253,253,254,0.35)' }}>
-            {loadError}
-          </p>
-        )}
+        <p className="text-[12px]" style={{ color: 'rgba(253,253,254,0.35)' }}>
+          {loadError}
+        </p>
+      </div>
+    )
+  }
+
+  if (!data) {
+    // Fetch is nog bezig — toon loading skeleton ipv error
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="animate-pulse space-y-4 w-full max-w-sm px-6">
+          <div className="h-5 rounded w-32" style={{ background: 'rgba(253,253,254,0.10)' }} />
+          <div className="h-28 rounded-2xl" style={{ background: 'rgba(253,253,254,0.06)' }} />
+          <div className="h-28 rounded-2xl" style={{ background: 'rgba(253,253,254,0.06)' }} />
+        </div>
       </div>
     )
   }
