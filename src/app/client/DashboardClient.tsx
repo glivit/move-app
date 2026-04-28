@@ -220,7 +220,16 @@ export default function ClientDashboard({
       ? `/api/dashboard?retry=${retryTick}`
       : '/api/dashboard'
 
-    cachedFetch<DashboardData>(fetchUrl, { maxAge: 120_000 })
+    // Direct fetch met timeout — cachedFetch deduplicatie kan stale state
+    // veroorzaken bij PWA cold start + React strict mode remounts.
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 8000)
+
+    fetch(fetchUrl, { signal: controller.signal })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`Fetch failed: ${res.status}`)
+        return res.json() as Promise<DashboardData>
+      })
       .then((fresh) => {
         if (cancelled) return
         setData(fresh)
@@ -231,11 +240,13 @@ export default function ClientDashboard({
       .catch((err) => {
         if (cancelled) return
         console.error('Dashboard load error:', err)
-        // Alleen harde error tonen als we géén IDB-data hebben. Is er wél
-        // cache, dan blijft die zichtbaar en de stale-pill vertelt dat.
-        setLoadError((current) => current ?? (err?.message || 'Load failed'))
+        const msg = err?.name === 'AbortError'
+          ? 'Verbinding duurt te lang'
+          : (err?.message || 'Laden mislukt')
+        setLoadError((current) => current ?? msg)
       })
       .finally(() => {
+        clearTimeout(timeoutId)
         if (cancelled) return
         setLoading(false)
         setIsRefreshing(false)
@@ -243,6 +254,8 @@ export default function ClientDashboard({
 
     return () => {
       cancelled = true
+      controller.abort()
+      clearTimeout(timeoutId)
     }
   }, [initialData, userId, retryTick])
 
@@ -468,14 +481,28 @@ export default function ClientDashboard({
   }
 
   if (!data) {
-    // Fetch is nog bezig — toon loading skeleton ipv error
+    // Fetch is nog bezig of net klaar zonder data — toon skeleton met retry
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="animate-pulse space-y-4 w-full max-w-sm px-6">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-6">
+        <div className="animate-pulse space-y-4 w-full max-w-sm">
           <div className="h-5 rounded w-32" style={{ background: 'rgba(253,253,254,0.10)' }} />
           <div className="h-28 rounded-2xl" style={{ background: 'rgba(253,253,254,0.06)' }} />
           <div className="h-28 rounded-2xl" style={{ background: 'rgba(253,253,254,0.06)' }} />
         </div>
+        {!loading && (
+          <button
+            type="button"
+            onClick={() => {
+              setLoadError(null)
+              setLoading(true)
+              setRetryTick((t) => t + 1)
+            }}
+            className="px-5 py-2.5 rounded-full bg-[#474B48] text-[#FDFDFE] text-[14px] font-medium"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+          >
+            Opnieuw proberen
+          </button>
+        )}
       </div>
     )
   }
