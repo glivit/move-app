@@ -169,17 +169,19 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .client-app {
-  background-color: #EDECE3;
+  /* Subtiele tonale variatie binnen dezelfde beige-familie geeft het
+   * frosted glass iets om te diffuseren — anders zou alles wit-op-wit zijn. */
+  background:
+    radial-gradient(900px 700px at 0% 0%,    #F4F1E6 0%, transparent 60%),
+    radial-gradient(800px 600px at 100% 30%, #E5E3D8 0%, transparent 60%),
+    radial-gradient(700px 600px at 0% 100%,  #F2EEDF 0%, transparent 60%),
+    #EDECE3;
+  background-attachment: scroll;
   color: #1C1E18;
 }
 
-/* P3 canvas-correctie — off-white #EDECE3 als P3-triplet voor consistente
- * weergave op iPhone/iPad/P3-Macs (sRGB rgb(237 236 227) → P3 equivalent). */
 @media (color-gamut: p3) {
   body {
-    background-color: color(display-p3 0.929 0.925 0.890);
-  }
-  .client-app {
     background-color: color(display-p3 0.929 0.925 0.890);
   }
 }
@@ -214,27 +216,26 @@ h1, h2, h3, h4, h5, h6 {
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 .v6-card {
-  /* Card-scoped text tokens — utility classes (eyebrow/cap/stat) gebruiken deze.
-   * Alpha-tiers zijn DONKERDER dan op donkere cards — anders lossen ze op
-   * tegen het lichte glas + off-white canvas. */
+  /* Card-scoped text tokens — utility classes (eyebrow/cap/stat) gebruiken deze. */
   --card-text:        #1C1E18;
   --card-text-soft:   rgba(28,30,24,0.82);
   --card-text-muted:  rgba(28,30,24,0.65);
   --card-text-faint:  rgba(28,30,24,0.50);
   --card-divider:     rgba(28,30,24,0.10);
-  --card-arr-bg:      rgba(255,255,255,0.55);
+  --card-arr-bg:      rgba(255,255,255,0.65);
   --card-arr-stroke:  #1C1E18;
 
-  background: rgba(255,255,255,0.38);
-  backdrop-filter: blur(80px) saturate(180%);
-  -webkit-backdrop-filter: blur(80px) saturate(180%);
+  background: rgba(255,255,255,0.50);
+  backdrop-filter: blur(60px) saturate(170%);
+  -webkit-backdrop-filter: blur(60px) saturate(170%);
   border-radius: 28px;
   padding: 22px 22px 24px;
   color: var(--card-text);
   box-shadow:
-    0 1px 2px rgba(28,30,24,0.03),
-    0 14px 40px -16px rgba(28,30,24,0.10),
-    inset 0 1px 0 rgba(255,255,255,0.55);
+    0 1px 1px rgba(28,30,24,0.04),
+    0 8px 24px -8px rgba(28,30,24,0.10),
+    0 24px 60px -20px rgba(28,30,24,0.16),
+    inset 0 1px 0 rgba(255,255,255,0.7);
   position: relative;
   transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -299,9 +300,9 @@ h1, h2, h3, h4, h5, h6 {
   --card-text-faint:  rgba(28,30,24,0.50);
   --card-divider:     rgba(28,30,24,0.10);
 
-  background: rgba(255,255,255,0.38);
-  backdrop-filter: blur(80px) saturate(180%);
-  -webkit-backdrop-filter: blur(80px) saturate(180%);
+  background: rgba(255,255,255,0.50);
+  backdrop-filter: blur(60px) saturate(170%);
+  -webkit-backdrop-filter: blur(60px) saturate(170%);
   border-radius: 28px;
   box-shadow:
     0 1px 2px rgba(28,30,24,0.03),
@@ -1027,13 +1028,14 @@ a, button {
   width: 100%;
   padding: 6px 4px;
   border-radius: 28px;
-  background: rgba(255,255,255,0.38);
-  backdrop-filter: blur(80px) saturate(180%);
-  -webkit-backdrop-filter: blur(80px) saturate(180%);
+  background: rgba(255,255,255,0.50);
+  backdrop-filter: blur(60px) saturate(170%);
+  -webkit-backdrop-filter: blur(60px) saturate(170%);
   box-shadow:
-    0 1px 2px rgba(28,30,24,0.03),
-    0 14px 40px -16px rgba(28,30,24,0.10),
-    inset 0 1px 0 rgba(255,255,255,0.55);
+    0 1px 1px rgba(28,30,24,0.04),
+    0 8px 24px -8px rgba(28,30,24,0.10),
+    0 24px 60px -20px rgba(28,30,24,0.16),
+    inset 0 1px 0 rgba(255,255,255,0.7);
   overflow: hidden;
 }
 .week-row {
@@ -1101,28 +1103,28 @@ a, button {
 .week-row.peek .wr-meta { color: rgba(28,30,24,0.32); }
 .week-row.peek .wr-chip { background: rgba(28,30,24,0.05); color: rgba(28,30,24,0.32); }
 
-/* Today — subtiele lime-tint op de date-column, zodat "nu" zichtbaar is
- * tussen de andere rows zonder dat de hele rij luid wordt (hero-card boven
- * blijft primary CTA). */
-.week-row.today .wr-date .n { color: #C0FC01; }
-.week-row.today .wr-date .d { color: rgba(192,252,1,0.62); }
+/* Today — donker + bold (geen lime meer) zodat "nu" duidelijk is zonder kleur-stunt. */
+.week-row.today .wr-date .n { color: #1C1E18; font-weight: 500; }
+.week-row.today .wr-date .d { color: rgba(28,30,24,0.78); font-weight: 500; }
 
-/* Voltooid — lime chip + dimmed body zodat done-rows rustig zijn, maar de
- * ✓-state vanuit de ooghoek direct herkenbaar. */
+/* Voltooid — lime is hier het ENIGE kleur-accent in de week-rij. Een rustige
+ * subtiele tint, donkere tekst i.p.v. fluo lime tekst — voelt premium, niet
+ * neon. */
 .week-row.done .wr-name { color: rgba(28,30,24,0.70); }
 .week-row.done .wr-meta { color: rgba(28,30,24,0.55); }
 .week-row.done .wr-chip {
-  background: rgba(192,252,1,0.14);
-  color: #C0FC01;
+  background: rgba(192,252,1,0.22);
+  color: #1C1E18;
+  font-weight: 500;
 }
 
-/* Gemist — past-day met gescheduled workout die niet afgevinkt is. Amber-
- * warning chip zonder de hele rij te alarmeren; de user kán nog steeds
- * tappen om alsnog in te halen. */
+/* Gemist — geen amber meer, gewoon subtiele grey met bold weight zodat het
+ * leesbaar afwijkt van "Gepland" zonder een 2e accent-kleur toe te voegen. */
 .week-row.missed .wr-name { color: rgba(28,30,24,0.82); }
 .week-row.missed .wr-chip {
-  background: rgba(232,169,60,0.14);
-  color: #E8A93C;
+  background: rgba(28,30,24,0.06);
+  color: rgba(28,30,24,0.78);
+  font-weight: 500;
 }
 
 .week-more {
@@ -1205,18 +1207,19 @@ a, button {
   --card-text-faint:  rgba(28,30,24,0.50);
   --card-divider:     rgba(28,30,24,0.10);
 
-  background: rgba(255,255,255,0.38);
-  backdrop-filter: blur(80px) saturate(180%);
-  -webkit-backdrop-filter: blur(80px) saturate(180%);
+  background: rgba(255,255,255,0.50);
+  backdrop-filter: blur(60px) saturate(170%);
+  -webkit-backdrop-filter: blur(60px) saturate(170%);
   border-radius: 28px;
   padding: 20px 20px 18px;
   margin-bottom: 6px;
   width: 100%;
   color: #1C1E18;
   box-shadow:
-    0 1px 2px rgba(28,30,24,0.03),
-    0 14px 40px -16px rgba(28,30,24,0.10),
-    inset 0 1px 0 rgba(255,255,255,0.55);
+    0 1px 1px rgba(28,30,24,0.04),
+    0 8px 24px -8px rgba(28,30,24,0.10),
+    0 24px 60px -20px rgba(28,30,24,0.16),
+    inset 0 1px 0 rgba(255,255,255,0.7);
   position: relative;
   overflow: hidden;
 }
