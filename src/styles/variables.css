@@ -1,9 +1,9 @@
 :root {
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   * MŌVE v6 — Orion palette
-   * Canvas: sage (#8E9890). Cards: licht (#A6ADA7) + dark (#474B48).
-   * Lime (#C0FC01) enkel voor event-paint. Outfit font.
-   * Zie: /design-system/shared.css voor de volledige token-bron.
+   * MŌVE v7 — Aurora palette
+   * Off-white canvas met colorful orbs · Frosted glass cards
+   * Dark text op glass · Lime voor event-paint · Outfit font
+   * Bron: design-proposal.html (v6 iteratie)
    * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
   /* 4-color core */
@@ -14,63 +14,74 @@
   --color-check: #2FA65A;
 
   /* Canvas & cards */
-  --color-bg:        #8E9890;   /* canvas */
-  --color-bg-elevated: #A6ADA7; /* licht card */
-  --color-bg-dark:   #474B48;   /* donker card — tracking + bnav */
-  --color-surface:   #A6ADA7;
-  --color-surface-muted: #98A097;
-  --color-arr-bg:    #989F99;
+  --color-bg:            #EDECE3;   /* off-white canvas */
+  --color-bg-elevated:   rgba(255,255,255,0.32);  /* frosted card */
+  --color-bg-dark:       rgba(28,30,24,0.88);     /* dark glass — FAB / nav */
+  --color-bg-subtle:     rgba(28,30,24,0.05);     /* inner panel inset */
+  --color-surface:       rgba(255,255,255,0.32);
+  --color-surface-warm:  rgba(255,255,255,0.42);
+  --color-surface-muted: rgba(255,255,255,0.20);
+  --color-arr-bg:        rgba(255,255,255,0.45);
 
-  /* Ink (near-white + alpha-tiers) */
-  --color-ink:        #FDFDFE;
-  --color-ink-soft:   rgba(253,253,254,0.78);
-  --color-ink-muted:  rgba(253,253,254,0.62);
-  --color-ink-faint:  rgba(253,253,254,0.44);
-  --color-ink-ghost:  rgba(253,253,254,0.18);
+  /* Ink — DARK on light */
+  --color-ink:        #1C1E18;
+  --color-ink-soft:   rgba(28,30,24,0.75);
+  --color-ink-muted:  rgba(28,30,24,0.52);
+  --color-ink-faint:  rgba(28,30,24,0.32);
+  --color-ink-ghost:  rgba(28,30,24,0.16);
 
-  /* Text roles — mapped to ink-tiers voor legacy compat */
-  --color-text-primary:   #FDFDFE;
-  --color-text-secondary: rgba(253,253,254,0.78);
-  --color-text-muted:     rgba(253,253,254,0.62);
-  --color-text-faint:     rgba(253,253,254,0.44);
+  /* Text roles */
+  --color-text-primary:   #1C1E18;
+  --color-text-secondary: rgba(28,30,24,0.75);
+  --color-text-muted:     rgba(28,30,24,0.52);
+  --color-text-faint:     rgba(28,30,24,0.32);
 
-  /* Borders — barely there, alpha op donker */
-  --color-border:         rgba(253,253,254,0.10);
-  --color-border-subtle:  rgba(253,253,254,0.06);
-  --color-border-strong:  rgba(253,253,254,0.18);
+  /* Borders — subtle dark hairlines */
+  --color-border:         rgba(28,30,24,0.06);
+  --color-border-subtle:  rgba(28,30,24,0.04);
+  --color-border-strong:  rgba(28,30,24,0.12);
 
   /* Status */
   --color-success: #2FA65A;
   --color-warning: #E8A93C;
   --color-error:   #E06B5C;
 
-  /* Client surfaces — alias naar v6 tokens */
-  --color-client-bg:              #8E9890;
-  --color-client-surface:         #A6ADA7;
-  --color-client-surface-muted:   #98A097;
-  --color-client-border:          rgba(253,253,254,0.10);
-  --color-client-border-strong:   rgba(253,253,254,0.18);
-  --color-client-text-secondary:  rgba(253,253,254,0.78);
-  --color-client-text-muted:      rgba(253,253,254,0.62);
+  /* Client surfaces — alias naar v7 tokens */
+  --color-client-bg:              #EDECE3;
+  --color-client-surface:         rgba(255,255,255,0.32);
+  --color-client-surface-muted:   rgba(255,255,255,0.20);
+  --color-client-border:          rgba(28,30,24,0.06);
+  --color-client-border-strong:   rgba(28,30,24,0.12);
+  --color-client-text-secondary:  rgba(28,30,24,0.75);
+  --color-client-text-muted:      rgba(28,30,24,0.52);
 
-  /* Accent-alias — lime voor event-paint only */
-  --color-accent:         #FDFDFE;
-  --color-accent-dark:    #FDFDFE;
-  --color-accent-hover:   rgba(253,253,254,0.88);
-  --color-accent-light:   rgba(253,253,254,0.06);
-  --color-accent-subtle:  rgba(253,253,254,0.10);
-  --color-accent-surface: #98A097;
+  /* Accent — LIME als enige kleur-accent */
+  --color-accent:         #C0FC01;
+  --color-accent-dark:    #A8DC1E;
+  --color-accent-hover:   #DBFF50;
+  --color-accent-light:   rgba(192,252,1,0.14);
+  --color-accent-subtle:  rgba(192,252,1,0.08);
+  --color-accent-surface: rgba(192,252,1,0.06);
 
-  /* Pop = lime, maar enkel voor events (nieuwe log, unread dot, recent-done). */
+  /* Pop / streak */
   --color-pop:        #C0FC01;
   --color-pop-light:  rgba(192,252,1,0.14);
   --color-pop-muted:  rgba(192,252,1,0.28);
   --color-streak:     #C0FC01;
 
-  /* Data viz — rustige alpha-whites; lime enkel voor event-highlight */
-  --color-data-white:  rgba(253,253,254,0.85);
+  /* Data viz */
+  --color-data-white:  rgba(28,30,24,0.85);
   --color-data-lime:   #C0FC01;
-  --color-data-muted:  rgba(253,253,254,0.32);
+  --color-data-muted:  rgba(28,30,24,0.32);
+
+  /* Glass tokens — NIEUW */
+  --glass-blur:         60px;
+  --glass-blur-strong:  80px;
+  --glass-blur-light:   30px;
+  --glass-saturate:     200%;
+  --glass-tint:         rgba(255,255,255,0.32);
+  --glass-tint-strong:  rgba(255,255,255,0.45);
+  --glass-tint-subtle:  rgba(255,255,255,0.20);
 
   /* Typography */
   --font-display: var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
@@ -109,18 +120,18 @@
   --radius-lg:  20px;
   --radius-xl:  24px;
   --radius-2xl: 28px;
-  --radius-card: 24px;
+  --radius-card: 28px;
   --radius-full: 9999px;
 
-  /* Shadows — subtiel, op donkere canvas werken inset-highlights ipv drop */
-  --shadow-sm:   inset 0 1px 0 rgba(255,255,255,0.10), 0 1px 2px rgba(0,0,0,0.14);
-  --shadow-md:   inset 0 1px 0 rgba(255,255,255,0.12), 0 2px 6px rgba(0,0,0,0.18);
-  --shadow-lg:   inset 0 1px 0 rgba(255,255,255,0.14), 0 8px 22px rgba(0,0,0,0.22);
-  --shadow-xl:   inset 0 1px 0 rgba(255,255,255,0.16), 0 16px 38px rgba(0,0,0,0.28);
-  --shadow-card: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
-  --shadow-card-dark: inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.22);
-  --shadow-card-hover: inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 12px rgba(0,0,0,0.20);
-  --shadow-elevated: 0 8px 22px rgba(0,0,0,0.28), 0 2px 6px rgba(0,0,0,0.18);
+  /* Shadows — afgestemd op lichte cards (geen inset white-edge meer voor dark) */
+  --shadow-sm:   0 1px 2px rgba(28,30,24,0.04);
+  --shadow-md:   0 2px 6px rgba(28,30,24,0.06), inset 0 1px 0 rgba(255,255,255,0.5);
+  --shadow-lg:   0 14px 40px -16px rgba(28,30,24,0.10), inset 0 1px 0 rgba(255,255,255,0.55);
+  --shadow-xl:   0 22px 60px -18px rgba(28,30,24,0.14), inset 0 1px 0 rgba(255,255,255,0.65);
+  --shadow-card:        0 1px 2px rgba(28,30,24,0.03), 0 14px 40px -16px rgba(28,30,24,0.10), inset 0 1px 0 rgba(255,255,255,0.55);
+  --shadow-card-dark:   0 12px 28px rgba(28,30,24,0.20), inset 0 1px 0 rgba(255,255,255,0.10);
+  --shadow-card-hover:  0 18px 50px -18px rgba(28,30,24,0.14), inset 0 1px 0 rgba(255,255,255,0.65);
+  --shadow-elevated:    0 22px 60px -18px rgba(28,30,24,0.16), 0 2px 6px rgba(28,30,24,0.04);
 
   /* Motion */
   --ease-premium:  cubic-bezier(0.4, 0, 0.2, 1);

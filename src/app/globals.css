@@ -12,77 +12,86 @@
 
 @theme {
   /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   * MŌVE v6 — Orion Design System
-   * Sage canvas (#8E9890) · Licht card (#A6ADA7) · Dark card (#474B48)
-   * Lime (#C0FC01) voor event-paint. Outfit font (200/300/400/500).
-   * Bron: /design-system/shared.css
+   * MŌVE v7 — Aurora Design System
+   * Off-white canvas (#EDECE3) met colorful orbs · Frosted glass cards
+   * Dark text op glass · Lime (#C0FC01) voor event-paint · Outfit
+   * Bron: /src/styles/variables.css
    * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
   /* Surfaces */
-  --color-bg:            #8E9890;
-  --color-bg-elevated:   #A6ADA7;
-  --color-bg-dark:       #474B48;
-  --color-bg-subtle:     #98A097;
-  --color-surface:       #A6ADA7;
-  --color-surface-warm:  #A6ADA7;
-  --color-surface-muted: #98A097;
-  --color-arr-bg:        #989F99;
+  --color-bg:            #EDECE3;
+  --color-bg-elevated:   rgba(255,255,255,0.32);
+  --color-bg-dark:       rgba(28,30,24,0.88);
+  --color-bg-subtle:     rgba(28,30,24,0.05);
+  --color-surface:       rgba(255,255,255,0.32);
+  --color-surface-warm:  rgba(255,255,255,0.42);
+  --color-surface-muted: rgba(255,255,255,0.20);
+  --color-arr-bg:        rgba(255,255,255,0.45);
 
   /* Core palette */
   --color-sage:  #899089;
   --color-lime:  #C0FC01;
   --color-check: #2FA65A;
 
-  /* Ink */
-  --color-ink:       #FDFDFE;
-  --color-ink-soft:  rgba(253,253,254,0.78);
-  --color-ink-muted: rgba(253,253,254,0.62);
-  --color-ink-faint: rgba(253,253,254,0.44);
-  --color-ink-ghost: rgba(253,253,254,0.18);
+  /* Ink — DARK on light */
+  --color-ink:       #1C1E18;
+  --color-ink-soft:  rgba(28,30,24,0.75);
+  --color-ink-muted: rgba(28,30,24,0.52);
+  --color-ink-faint: rgba(28,30,24,0.32);
+  --color-ink-ghost: rgba(28,30,24,0.16);
 
-  /* Text roles (ink-tiers) */
-  --color-text-primary:   #FDFDFE;
-  --color-text-secondary: rgba(253,253,254,0.78);
-  --color-text-muted:     rgba(253,253,254,0.62);
-  --color-text-faint:     rgba(253,253,254,0.44);
+  /* Text roles */
+  --color-text-primary:   #1C1E18;
+  --color-text-secondary: rgba(28,30,24,0.75);
+  --color-text-muted:     rgba(28,30,24,0.52);
+  --color-text-faint:     rgba(28,30,24,0.32);
 
-  /* Accent — op canvas is "accent" = ink-white; lime is event-only */
-  --color-accent:         #FDFDFE;
-  --color-accent-dark:    #FDFDFE;
-  --color-accent-hover:   rgba(253,253,254,0.88);
-  --color-accent-light:   rgba(253,253,254,0.06);
-  --color-accent-subtle:  rgba(253,253,254,0.10);
-  --color-accent-surface: #98A097;
+  /* Accent — LIME als enige kleur-accent */
+  --color-accent:         #C0FC01;
+  --color-accent-dark:    #A8DC1E;
+  --color-accent-hover:   #DBFF50;
+  --color-accent-light:   rgba(192,252,1,0.14);
+  --color-accent-subtle:  rgba(192,252,1,0.08);
+  --color-accent-surface: rgba(192,252,1,0.06);
 
-  /* Pop / streak — LIME, enkel voor nieuwe events & recent-done */
+  /* Pop / streak */
   --color-pop:        #C0FC01;
   --color-pop-light:  rgba(192,252,1,0.14);
   --color-pop-muted:  rgba(192,252,1,0.28);
   --color-streak:     #C0FC01;
 
-  /* Borders */
-  --color-border:        rgba(253,253,254,0.10);
-  --color-border-subtle: rgba(253,253,254,0.06);
-  --color-border-strong: rgba(253,253,254,0.18);
+  /* Borders — subtle dark hairlines */
+  --color-border:        rgba(28,30,24,0.06);
+  --color-border-subtle: rgba(28,30,24,0.04);
+  --color-border-strong: rgba(28,30,24,0.12);
 
   /* Status */
   --color-success: #2FA65A;
   --color-warning: #E8A93C;
   --color-error:   #E06B5C;
 
-  /* Client surfaces — alias */
-  --color-client-bg:             #8E9890;
-  --color-client-surface:        #A6ADA7;
-  --color-client-surface-muted:  #98A097;
-  --color-client-border:         rgba(253,253,254,0.10);
-  --color-client-border-strong:  rgba(253,253,254,0.18);
-  --color-client-text-secondary: rgba(253,253,254,0.78);
-  --color-client-text-muted:     rgba(253,253,254,0.62);
+  /* Client surfaces */
+  --color-client-bg:             #EDECE3;
+  --color-client-surface:        rgba(255,255,255,0.32);
+  --color-client-surface-muted:  rgba(255,255,255,0.20);
+  --color-client-border:         rgba(28,30,24,0.06);
+  --color-client-border-strong:  rgba(28,30,24,0.12);
+  --color-client-text-secondary: rgba(28,30,24,0.75);
+  --color-client-text-muted:     rgba(28,30,24,0.52);
 
   /* Data viz */
-  --color-data-white: rgba(253,253,254,0.85);
+  --color-data-white: rgba(28,30,24,0.85);
   --color-data-lime:  #C0FC01;
-  --color-data-muted: rgba(253,253,254,0.32);
+  --color-data-muted: rgba(28,30,24,0.32);
+
+  /* Glass tokens */
+  --glass-blur:         60px;
+  --glass-blur-strong:  80px;
+  --glass-blur-light:   30px;
+  --glass-saturate:     200%;
+  --glass-tint:         rgba(255,255,255,0.32);
+  --glass-tint-strong:  rgba(255,255,255,0.45);
+  --glass-tint-subtle:  rgba(255,255,255,0.20);
 
   /* Fonts — Outfit everywhere */
   --font-display: var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
@@ -99,24 +108,25 @@
   --radius-lg:  20px;
   --radius-xl:  24px;
   --radius-2xl: 28px;
-  --radius-card: 24px;
+  --radius-card: 28px;
   --radius-pill: 9999px;
 
-  /* Shadows */
-  --shadow-card:       inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
-  --shadow-card-dark:  inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.22);
-  --shadow-card-hover: inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 12px rgba(0,0,0,0.20);
-  --shadow-elevated:   0 8px 22px rgba(0,0,0,0.28), 0 2px 6px rgba(0,0,0,0.18);
-  --shadow-clean:      inset 0 1px 0 rgba(255,255,255,0.12);
+  /* Shadows — voor lichte cards */
+  --shadow-card:       0 1px 2px rgba(28,30,24,0.03), 0 14px 40px -16px rgba(28,30,24,0.10), inset 0 1px 0 rgba(255,255,255,0.55);
+  --shadow-card-dark:  0 12px 28px rgba(28,30,24,0.20), inset 0 1px 0 rgba(255,255,255,0.10);
+  --shadow-card-hover: 0 18px 50px -18px rgba(28,30,24,0.14), inset 0 1px 0 rgba(255,255,255,0.65);
+  --shadow-elevated:   0 22px 60px -18px rgba(28,30,24,0.16), 0 2px 6px rgba(28,30,24,0.04);
+  --shadow-clean:      inset 0 1px 0 rgba(255,255,255,0.55);
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- * BASE STYLES — sage canvas, Outfit everywhere, ink-white text
+ * BASE STYLES — off-white canvas met colorful orbs (frosted glass bron)
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #EDECE3;
 }
 
 body {
@@ -124,9 +134,33 @@ body {
   font-weight: 400;
   font-size: 15px;
   line-height: 1.5;
-  background-color: #8E9890;
-  color: #FDFDFE;
+  background-color: #EDECE3;
+  color: #1C1E18;
   letter-spacing: -0.011em;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Colorful orbs achter alles — geven het frosted glass z'n bron */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(380px 380px at 8% 6%,    rgba(242,217,179,0.85) 0%, transparent 60%),
+    radial-gradient(340px 340px at 96% 22%,  rgba(200,224,171,0.75) 0%, transparent 60%),
+    radial-gradient(300px 300px at 4% 62%,   rgba(221,197,221,0.70) 0%, transparent 60%),
+    radial-gradient(280px 280px at 88% 78%,  rgba(192,252,1,0.45)   0%, transparent 65%),
+    radial-gradient(300px 300px at 18% 92%,  rgba(232,201,168,0.65) 0%, transparent 60%);
+  filter: blur(40px);
+}
+
+/* Alle directe app-content moet boven de orbs staan */
+body > * {
+  position: relative;
+  z-index: 1;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -183,45 +217,65 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- * V6 CARD SYSTEM — licht (#A6ADA7) + dark (#474B48)
- * Licht = eenmalig execute (workout, week-check)
- * Dark  = doorlopende tracking (kcal, progressie, bnav)
+ * V7 CARD SYSTEM — frosted glass op off-white canvas
+ * Licht-glass = eenmalig execute (workout, week-check)
+ * Dark-glass  = doorlopende tracking (kcal, progressie, bnav)
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 .v6-card {
-  background: #A6ADA7;
-  border-radius: 24px;
+  background: rgba(255,255,255,0.32);
+  backdrop-filter: blur(60px) saturate(200%);
+  -webkit-backdrop-filter: blur(60px) saturate(200%);
+  border-radius: 28px;
   padding: 22px 22px 24px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
+  color: #1C1E18;
+  box-shadow:
+    0 1px 2px rgba(28,30,24,0.03),
+    0 14px 40px -16px rgba(28,30,24,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.55);
   position: relative;
   transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .v6-card:active { transform: scale(0.99); }
 
 .v6-card-dark {
-  background: #474B48;
-  border-radius: 24px;
+  background: rgba(28,30,24,0.88);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border-radius: 28px;
   padding: 22px 22px 24px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.22);
+  color: #F2F2EC;
+  box-shadow:
+    0 12px 28px rgba(28,30,24,0.20),
+    inset 0 1px 0 rgba(255,255,255,0.08);
   position: relative;
   transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .v6-card-dark:active { transform: scale(0.99); }
 
-/* Arrow-button rechterhoek */
+/* Arrow-button rechterhoek — glass i.p.v. solid */
 .v6-arr {
   position: absolute;
   top: 18px; right: 18px;
   width: 38px; height: 38px;
   border-radius: 50%;
-  background: #989F99;
+  background: rgba(255,255,255,0.45);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   display: flex; align-items: center; justify-content: center;
   border: none;
   cursor: pointer;
+  transition: all 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-.v6-arr svg { width: 13px; height: 13px; stroke: #FDFDFE; stroke-width: 1.8; fill: none; }
+.v6-arr:hover { background: rgba(255,255,255,0.65); }
+.v6-arr svg { width: 13px; height: 13px; stroke: #1C1E18; stroke-width: 1.8; fill: none; }
 
-/* Legacy card aliases → v6 licht */
+.v6-card-dark .v6-arr {
+  background: rgba(255,255,255,0.10);
+}
+.v6-card-dark .v6-arr svg { stroke: #F2F2EC; }
+
+/* Legacy card aliases → v7 frosted */
 .card-v2,
 .card-editorial,
 .card-bordered,
@@ -229,24 +283,33 @@ h1, h2, h3, h4, h5, h6 {
 .card-elevated,
 .premium-card,
 .card-v2-interactive {
-  background: #A6ADA7;
-  border-radius: 24px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10);
-  color: #FDFDFE;
+  background: rgba(255,255,255,0.32);
+  backdrop-filter: blur(60px) saturate(200%);
+  -webkit-backdrop-filter: blur(60px) saturate(200%);
+  border-radius: 28px;
+  box-shadow:
+    0 1px 2px rgba(28,30,24,0.03),
+    0 14px 40px -16px rgba(28,30,24,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.55);
+  color: #1C1E18;
   transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .card-v2-interactive { cursor: pointer; }
 .card-v2-interactive:active { transform: scale(0.99); }
 
 .card-v2-flat {
-  background: #98A097;
+  background: rgba(255,255,255,0.20);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
   border-radius: 20px;
-  color: #FDFDFE;
+  color: #1C1E18;
 }
 
 .card-elevated-v2 {
-  background: #474B48;
-  border-radius: 24px;
+  background: rgba(28,30,24,0.88);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border-radius: 28px;
   box-shadow: 0 8px 22px rgba(0,0,0,0.28), 0 2px 6px rgba(0,0,0,0.18);
   color: #FDFDFE;
 }
