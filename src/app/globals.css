@@ -214,12 +214,21 @@ h1, h2, h3, h4, h5, h6 {
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 .v6-card {
+  /* Card-scoped text tokens — utility classes (eyebrow/cap/stat) gebruiken deze */
+  --card-text:        #1C1E18;
+  --card-text-soft:   rgba(28,30,24,0.78);
+  --card-text-muted:  rgba(28,30,24,0.52);
+  --card-text-faint:  rgba(28,30,24,0.32);
+  --card-divider:     rgba(28,30,24,0.10);
+  --card-arr-bg:      rgba(255,255,255,0.55);
+  --card-arr-stroke:  #1C1E18;
+
   background: rgba(255,255,255,0.50);
   backdrop-filter: blur(60px) saturate(180%);
   -webkit-backdrop-filter: blur(60px) saturate(180%);
   border-radius: 28px;
   padding: 22px 22px 24px;
-  color: #1C1E18;
+  color: var(--card-text);
   box-shadow:
     0 1px 2px rgba(28,30,24,0.03),
     0 14px 40px -16px rgba(28,30,24,0.10),
@@ -230,12 +239,20 @@ h1, h2, h3, h4, h5, h6 {
 .v6-card:active { transform: scale(0.99); }
 
 .v6-card-dark {
+  --card-text:        #F2F2EC;
+  --card-text-soft:   rgba(242,242,236,0.78);
+  --card-text-muted:  rgba(242,242,236,0.55);
+  --card-text-faint:  rgba(242,242,236,0.32);
+  --card-divider:     rgba(255,255,255,0.10);
+  --card-arr-bg:      rgba(255,255,255,0.10);
+  --card-arr-stroke:  #F2F2EC;
+
   background: rgba(28,30,24,0.88);
   backdrop-filter: blur(30px) saturate(180%);
   -webkit-backdrop-filter: blur(30px) saturate(180%);
   border-radius: 28px;
   padding: 22px 22px 24px;
-  color: #F2F2EC;
+  color: var(--card-text);
   box-shadow:
     0 12px 28px rgba(28,30,24,0.20),
     inset 0 1px 0 rgba(255,255,255,0.08);
@@ -244,13 +261,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 .v6-card-dark:active { transform: scale(0.99); }
 
-/* Arrow-button rechterhoek — glass i.p.v. solid */
+/* Arrow-button rechterhoek — glass i.p.v. solid; adaptief via card-scoped vars */
 .v6-arr {
   position: absolute;
   top: 18px; right: 18px;
   width: 38px; height: 38px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.45);
+  background: var(--card-arr-bg, rgba(255,255,255,0.55));
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   display: flex; align-items: center; justify-content: center;
@@ -258,13 +275,13 @@ h1, h2, h3, h4, h5, h6 {
   cursor: pointer;
   transition: all 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-.v6-arr:hover { background: rgba(255,255,255,0.65); }
-.v6-arr svg { width: 13px; height: 13px; stroke: #1C1E18; stroke-width: 1.8; fill: none; }
-
-.v6-card-dark .v6-arr {
-  background: rgba(255,255,255,0.10);
+.v6-arr:hover { filter: brightness(1.08); }
+.v6-arr svg {
+  width: 13px; height: 13px;
+  stroke: var(--card-arr-stroke, #1C1E18);
+  stroke-width: 1.8;
+  fill: none;
 }
-.v6-card-dark .v6-arr svg { stroke: #F2F2EC; }
 
 /* Legacy card aliases → v7 frosted */
 .card-v2,
@@ -441,7 +458,7 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.03em;
   line-height: 1;
   font-feature-settings: "tnum";
-  color: #FDFDFE;
+  color: var(--card-text, #1C1E18);
 }
 .stat-number-hero {
   font-family: var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
@@ -450,7 +467,7 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.03em;
   line-height: 0.95;
   font-feature-settings: "tnum";
-  color: #FDFDFE;
+  color: var(--card-text, #1C1E18);
 }
 .stat-number-lg {
   font-family: var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
@@ -459,7 +476,7 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.03em;
   line-height: 1;
   font-feature-settings: "tnum";
-  color: #FDFDFE;
+  color: var(--card-text, #1C1E18);
 }
 .stat-number-md {
   font-family: var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
@@ -468,7 +485,7 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.025em;
   line-height: 1;
   font-feature-settings: "tnum";
-  color: #FDFDFE;
+  color: var(--card-text, #1C1E18);
 }
 
 /* Eyebrow — Title Case regular (géén uppercase in v6) */
@@ -477,7 +494,7 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 14px;
   font-weight: 300;
   letter-spacing: -0.003em;
-  color: rgba(253,253,254,0.78);
+  color: var(--card-text-soft, rgba(28,30,24,0.78));
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -489,7 +506,7 @@ h1, h2, h3, h4, h5, h6 {
   background: #C0FC01;
 }
 
-/* Kleine label — caps + wider tracking (gebruikt voor refs-only now) */
+/* Kleine label — caps + wider tracking */
 .text-label,
 .text-overline {
   font-family: var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
@@ -498,7 +515,7 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.4;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(253,253,254,0.44);
+  color: var(--card-text-faint, rgba(28,30,24,0.44));
 }
 
 /* Page title — v6 dun + licht expressief */
@@ -508,7 +525,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 200;
   letter-spacing: -0.03em;
   line-height: 1.05;
-  color: #FDFDFE;
+  color: var(--card-text, #1C1E18);
 }
 .page-title-sm {
   font-family: var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
@@ -516,7 +533,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 300;
   letter-spacing: -0.025em;
   line-height: 1.1;
-  color: #FDFDFE;
+  color: var(--card-text, #1C1E18);
 }
 .section-title {
   font-family: var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
@@ -524,14 +541,14 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 400;
   letter-spacing: -0.012em;
   line-height: 1.2;
-  color: #FDFDFE;
+  color: var(--card-text, #1C1E18);
 }
 
 /* Cap / meta rows */
 .cap {
   font-size: 12px;
   font-weight: 400;
-  color: rgba(253,253,254,0.44);
+  color: var(--card-text-faint, rgba(28,30,24,0.44));
   letter-spacing: 0.01em;
 }
 .cap-row {
@@ -544,7 +561,7 @@ h1, h2, h3, h4, h5, h6 {
 .meta {
   font-size: 12px;
   font-weight: 400;
-  color: rgba(253,253,254,0.44);
+  color: var(--card-text-faint, rgba(28,30,24,0.44));
   letter-spacing: 0.01em;
 }
 

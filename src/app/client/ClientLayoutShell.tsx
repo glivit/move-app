@@ -146,7 +146,7 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
               fontSize: 22,
               fontWeight: 500,
               letterSpacing: '-0.02em',
-              color: '#FDFDFE',
+              color: '#1C1E18',
               textDecoration: 'none',
               WebkitTapHighlightColor: 'transparent',
             }}
