@@ -20,12 +20,12 @@
 
   /* Surfaces */
   --color-bg:            #EDECE3;
-  --color-bg-elevated:   rgba(255,255,255,0.32);
+  --color-bg-elevated:   rgba(255,255,255,0.50);
   --color-bg-dark:       rgba(28,30,24,0.88);
   --color-bg-subtle:     rgba(28,30,24,0.05);
-  --color-surface:       rgba(255,255,255,0.32);
-  --color-surface-warm:  rgba(255,255,255,0.42);
-  --color-surface-muted: rgba(255,255,255,0.20);
+  --color-surface:       rgba(255,255,255,0.50);
+  --color-surface-warm:  rgba(255,255,255,0.62);
+  --color-surface-muted: rgba(255,255,255,0.32);
   --color-arr-bg:        rgba(255,255,255,0.45);
 
   /* Core palette */
@@ -89,9 +89,9 @@
   --glass-blur-strong:  80px;
   --glass-blur-light:   30px;
   --glass-saturate:     200%;
-  --glass-tint:         rgba(255,255,255,0.32);
-  --glass-tint-strong:  rgba(255,255,255,0.45);
-  --glass-tint-subtle:  rgba(255,255,255,0.20);
+  --glass-tint:         rgba(255,255,255,0.50);
+  --glass-tint-strong:  rgba(255,255,255,0.62);
+  --glass-tint-subtle:  rgba(255,255,255,0.32);
 
   /* Fonts — Outfit everywhere */
   --font-display: var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
@@ -141,7 +141,7 @@ body {
   min-height: 100vh;
 }
 
-/* Colorful orbs achter alles — geven het frosted glass z'n bron */
+/* Subtiele tonale variatie in dezelfde beige-familie — frosted glass bron zonder lightshow */
 body::before {
   content: '';
   position: fixed;
@@ -149,12 +149,9 @@ body::before {
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(380px 380px at 8% 6%,    rgba(242,217,179,0.85) 0%, transparent 60%),
-    radial-gradient(340px 340px at 96% 22%,  rgba(200,224,171,0.75) 0%, transparent 60%),
-    radial-gradient(300px 300px at 4% 62%,   rgba(221,197,221,0.70) 0%, transparent 60%),
-    radial-gradient(280px 280px at 88% 78%,  rgba(192,252,1,0.45)   0%, transparent 65%),
-    radial-gradient(300px 300px at 18% 92%,  rgba(232,201,168,0.65) 0%, transparent 60%);
-  filter: blur(40px);
+    radial-gradient(900px 700px at 0% 0%,    #F4F1E6 0%, transparent 60%),
+    radial-gradient(800px 600px at 100% 30%, #E5E3D8 0%, transparent 60%),
+    radial-gradient(700px 600px at 0% 100%,  #F2EEDF 0%, transparent 60%);
 }
 
 /* Alle directe app-content moet boven de orbs staan */
@@ -223,9 +220,9 @@ h1, h2, h3, h4, h5, h6 {
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 .v6-card {
-  background: rgba(255,255,255,0.32);
-  backdrop-filter: blur(60px) saturate(200%);
-  -webkit-backdrop-filter: blur(60px) saturate(200%);
+  background: rgba(255,255,255,0.50);
+  backdrop-filter: blur(60px) saturate(180%);
+  -webkit-backdrop-filter: blur(60px) saturate(180%);
   border-radius: 28px;
   padding: 22px 22px 24px;
   color: #1C1E18;
@@ -283,9 +280,9 @@ h1, h2, h3, h4, h5, h6 {
 .card-elevated,
 .premium-card,
 .card-v2-interactive {
-  background: rgba(255,255,255,0.32);
-  backdrop-filter: blur(60px) saturate(200%);
-  -webkit-backdrop-filter: blur(60px) saturate(200%);
+  background: rgba(255,255,255,0.50);
+  backdrop-filter: blur(60px) saturate(180%);
+  -webkit-backdrop-filter: blur(60px) saturate(180%);
   border-radius: 28px;
   box-shadow:
     0 1px 2px rgba(28,30,24,0.03),
@@ -298,9 +295,9 @@ h1, h2, h3, h4, h5, h6 {
 .card-v2-interactive:active { transform: scale(0.99); }
 
 .card-v2-flat {
-  background: rgba(255,255,255,0.20);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  background: rgba(255,255,255,0.32);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
   border-radius: 20px;
   color: #1C1E18;
 }

@@ -15,12 +15,12 @@
 
   /* Canvas & cards */
   --color-bg:            #EDECE3;   /* off-white canvas */
-  --color-bg-elevated:   rgba(255,255,255,0.32);  /* frosted card */
+  --color-bg-elevated:   rgba(255,255,255,0.50);  /* frosted card */
   --color-bg-dark:       rgba(28,30,24,0.88);     /* dark glass — FAB / nav */
   --color-bg-subtle:     rgba(28,30,24,0.05);     /* inner panel inset */
-  --color-surface:       rgba(255,255,255,0.32);
-  --color-surface-warm:  rgba(255,255,255,0.42);
-  --color-surface-muted: rgba(255,255,255,0.20);
+  --color-surface:       rgba(255,255,255,0.50);
+  --color-surface-warm:  rgba(255,255,255,0.62);
+  --color-surface-muted: rgba(255,255,255,0.32);
   --color-arr-bg:        rgba(255,255,255,0.45);
 
   /* Ink — DARK on light */
@@ -48,8 +48,8 @@
 
   /* Client surfaces — alias naar v7 tokens */
   --color-client-bg:              #EDECE3;
-  --color-client-surface:         rgba(255,255,255,0.32);
-  --color-client-surface-muted:   rgba(255,255,255,0.20);
+  --color-client-surface:         rgba(255,255,255,0.50);
+  --color-client-surface-muted:   rgba(255,255,255,0.32);
   --color-client-border:          rgba(28,30,24,0.06);
   --color-client-border-strong:   rgba(28,30,24,0.12);
   --color-client-text-secondary:  rgba(28,30,24,0.75);
@@ -79,9 +79,9 @@
   --glass-blur-strong:  80px;
   --glass-blur-light:   30px;
   --glass-saturate:     200%;
-  --glass-tint:         rgba(255,255,255,0.32);
-  --glass-tint-strong:  rgba(255,255,255,0.45);
-  --glass-tint-subtle:  rgba(255,255,255,0.20);
+  --glass-tint:         rgba(255,255,255,0.50);
+  --glass-tint-strong:  rgba(255,255,255,0.62);
+  --glass-tint-subtle:  rgba(255,255,255,0.32);
 
   /* Typography */
   --font-display: var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
