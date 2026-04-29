@@ -169,24 +169,18 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .client-app {
-  background-color: #8E9890;
-  color: #FDFDFE;
+  background-color: #EDECE3;
+  color: #1C1E18;
 }
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- * Display P3 canvas-correctie
- * iPhone/iPad (en P3-capable Macs) renderen sRGB #8E9890 met meer groen-
- * saturatie waardoor de sage-grijze canvas als olive/mosgroen leest.
- * Op P3-displays pinnen we de canvas via een native P3-triplet dat visueel
- * overeenkomt met de sRGB design-intent (Mac mockups, Figma exports).
- * sRGB ref: rgb(142 152 144)  →  P3 equivalent met iets minder groen.
- * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* P3 canvas-correctie — off-white #EDECE3 als P3-triplet voor consistente
+ * weergave op iPhone/iPad/P3-Macs (sRGB rgb(237 236 227) → P3 equivalent). */
 @media (color-gamut: p3) {
   body {
-    background-color: color(display-p3 0.552 0.579 0.560);
+    background-color: color(display-p3 0.929 0.925 0.890);
   }
   .client-app {
-    background-color: color(display-p3 0.552 0.579 0.560);
+    background-color: color(display-p3 0.929 0.925 0.890);
   }
 }
 
@@ -210,7 +204,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 300;
   letter-spacing: -0.02em;
   line-height: 1.12;
-  color: #FDFDFE;
+  color: #1C1E18;
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -130,9 +130,9 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
           className="lg:hidden fixed top-0 left-0 right-0 z-40"
           style={{
             padding: 'calc(env(safe-area-inset-top, 0px) + 14px) 5% 10px',
-            background: 'linear-gradient(to bottom, rgba(142,152,144,0.96), rgba(142,152,144,0.82))',
-            backdropFilter: 'blur(14px) saturate(1.1)',
-            WebkitBackdropFilter: 'blur(14px) saturate(1.1)',
+            background: 'linear-gradient(to bottom, rgba(237,236,227,0.85), rgba(237,236,227,0.65))',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
