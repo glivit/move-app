@@ -485,9 +485,9 @@ export default function ClientDashboard({
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-6">
         <div className="animate-pulse space-y-4 w-full max-w-sm">
-          <div className="h-5 rounded w-32" style={{ background: 'rgba(28,30,24,0.10)' }} />
-          <div className="h-28 rounded-2xl" style={{ background: 'rgba(28,30,24,0.06)' }} />
-          <div className="h-28 rounded-2xl" style={{ background: 'rgba(28,30,24,0.06)' }} />
+          <div className="h-5 rounded w-32" style={{ background: 'rgba(28,30,24,0.14)' }} />
+          <div className="h-28 rounded-2xl" style={{ background: 'rgba(28,30,24,0.14)' }} />
+          <div className="h-28 rounded-2xl" style={{ background: 'rgba(28,30,24,0.14)' }} />
         </div>
         {!loading && (
           <button
@@ -532,8 +532,8 @@ export default function ClientDashboard({
               letterSpacing: 0.01,
               padding: '4px 10px',
               borderRadius: 9999,
-              background: 'rgba(28,30,24,0.06)',
-              border: '1px solid rgba(28,30,24,0.10)',
+              background: 'rgba(28,30,24,0.14)',
+              border: '1px solid rgba(28,30,24,0.14)',
             }}
           >
             <span
@@ -541,7 +541,7 @@ export default function ClientDashboard({
                 width: 5,
                 height: 5,
                 borderRadius: 9999,
-                background: isRefreshing ? '#1C1E18' : 'rgba(28,30,24,0.44)',
+                background: isRefreshing ? '#1C1E18' : 'rgba(28,30,24,0.62)',
                 animation: isRefreshing ? 'pulse 1.4s ease-in-out infinite' : undefined,
               }}
             />
@@ -602,7 +602,7 @@ export default function ClientDashboard({
       {/* ═══ NUDGES ═══════════════════════════════════════════ */}
       {!loading && nudges.length > 0 && (
         <section className="animate-up-v6 stagger-7" style={{ paddingTop: 6 }}>
-          <div className="px-1 mb-2.5" style={{ fontSize: 12, color: 'rgba(28,30,24,0.44)', letterSpacing: 0.01 }}>
+          <div className="px-1 mb-2.5" style={{ fontSize: 12, color: 'rgba(28,30,24,0.62)', letterSpacing: 0.01 }}>
             Aandacht nodig
           </div>
           <div className="space-y-0">
@@ -611,19 +611,19 @@ export default function ClientDashboard({
                 key={n.key}
                 href={n.href}
                 className="flex items-center gap-3 py-[14px] group transition-opacity hover:opacity-70"
-                style={{ borderTop: '1px solid rgba(28,30,24,0.10)' }}
+                style={{ borderTop: '1px solid rgba(28,30,24,0.14)' }}
               >
                 <span
                   style={{
                     width: 6, height: 6, borderRadius: 9999, flexShrink: 0,
-                    background: n.lime ? '#C0FC01' : 'rgba(28,30,24,0.44)',
+                    background: n.lime ? '#C0FC01' : 'rgba(28,30,24,0.62)',
                     boxShadow: n.lime ? '0 0 6px rgba(192,252,1,0.5)' : 'none',
                   }}
                 />
                 <div className="min-w-0 flex-1">
                   <p style={{ fontSize: 14, fontWeight: 400, color: '#1C1E18' }}>{n.text}</p>
                   {n.sub && (
-                    <p className="truncate" style={{ marginTop: 2, fontSize: 12, color: 'rgba(28,30,24,0.44)' }}>
+                    <p className="truncate" style={{ marginTop: 2, fontSize: 12, color: 'rgba(28,30,24,0.62)' }}>
                       {n.sub}
                     </p>
                   )}
@@ -660,9 +660,9 @@ function HeroCard({
     return (
       <div className="v6-card" style={{ minHeight: 180 }}>
         <div className="animate-pulse space-y-3">
-          <div className="h-3 w-24 rounded" style={{ background: 'rgba(28,30,24,0.14)' }} />
-          <div className="h-7 w-48 rounded" style={{ background: 'rgba(28,30,24,0.18)' }} />
-          <div className="h-3 w-32 rounded mt-1" style={{ background: 'rgba(28,30,24,0.14)' }} />
+          <div className="h-3 w-24 rounded" style={{ background: 'rgba(28,30,24,0.18)' }} />
+          <div className="h-7 w-48 rounded" style={{ background: 'rgba(28,30,24,0.32)' }} />
+          <div className="h-3 w-32 rounded mt-1" style={{ background: 'rgba(28,30,24,0.18)' }} />
         </div>
       </div>
     )
@@ -678,7 +678,7 @@ function HeroCard({
         <h2 style={{ fontSize: 22, fontWeight: 300, letterSpacing: '-0.018em', lineHeight: 1.15, marginBottom: 18 }}>
           Vul je intake in zodat je coach je programma kan opstellen
         </h2>
-        <div style={{ height: 2, borderRadius: 9999, background: 'rgba(28,30,24,0.18)', overflow: 'hidden' }}>
+        <div style={{ height: 2, borderRadius: 9999, background: 'rgba(28,30,24,0.32)', overflow: 'hidden' }}>
           <div
             style={{
               height: '100%',
@@ -837,11 +837,11 @@ function WeekCard({
     return (
       <div className="v6-card">
         <div className="animate-pulse">
-          <div className="h-3 w-20 rounded mb-5" style={{ background: 'rgba(28,30,24,0.14)' }} />
-          <div className="h-10 w-24 rounded mb-5" style={{ background: 'rgba(28,30,24,0.18)' }} />
+          <div className="h-3 w-20 rounded mb-5" style={{ background: 'rgba(28,30,24,0.18)' }} />
+          <div className="h-10 w-24 rounded mb-5" style={{ background: 'rgba(28,30,24,0.32)' }} />
           <div className="flex justify-between gap-2">
             {Array.from({ length: 7 }).map((_, i) => (
-              <div key={i} className="h-9 w-9 rounded-full" style={{ background: 'rgba(28,30,24,0.14)' }} />
+              <div key={i} className="h-9 w-9 rounded-full" style={{ background: 'rgba(28,30,24,0.18)' }} />
             ))}
           </div>
         </div>
@@ -855,7 +855,7 @@ function WeekCard({
       <div className="eyebrow mb-3">Deze Week</div>
       <div className="stat-number-lg" style={{ marginBottom: 22 }}>
         {done}
-        <sup style={{ fontSize: 13, fontWeight: 300, color: 'rgba(28,30,24,0.44)', verticalAlign: 'top', position: 'relative', top: 8, marginLeft: 2, letterSpacing: 0 }}>
+        <sup style={{ fontSize: 13, fontWeight: 300, color: 'rgba(28,30,24,0.62)', verticalAlign: 'top', position: 'relative', top: 8, marginLeft: 2, letterSpacing: 0 }}>
           /{total}
         </sup>
       </div>
@@ -866,7 +866,7 @@ function WeekCard({
               style={{
                 fontSize: 11,
                 fontWeight: d.isToday ? 500 : 400,
-                color: d.isToday ? '#1C1E18' : 'rgba(28,30,24,0.44)',
+                color: d.isToday ? '#1C1E18' : 'rgba(28,30,24,0.62)',
               }}
             >
               {d.label}
@@ -893,7 +893,7 @@ function WeekDot({
       <div
         style={{
           width: size, height: size, borderRadius: '50%',
-          background: isRecent ? '#C0FC01' : 'rgba(28,30,24,0.14)',
+          background: isRecent ? '#C0FC01' : 'rgba(28,30,24,0.18)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}
         aria-label="Voltooid"
@@ -915,7 +915,7 @@ function WeekDot({
       <div
         style={{
           width: size, height: size, borderRadius: '50%',
-          background: 'rgba(28,30,24,0.10)',
+          background: 'rgba(28,30,24,0.14)',
           boxShadow: 'inset 0 0 0 1.5px #1C1E18',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}
@@ -932,7 +932,7 @@ function WeekDot({
           width: size, height: size, borderRadius: '50%',
           background: 'rgba(28,30,24,0.08)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 11, color: 'rgba(28,30,24,0.44)',
+          fontSize: 11, color: 'rgba(28,30,24,0.62)',
         }}
         aria-label="Rustdag"
       >—</div>
@@ -1132,8 +1132,8 @@ function CheckInWeightCard({
               onKeyDown={(e) => { if (e.key === 'Enter') onSubmit() }}
               className="input-v3 flex-1"
               style={{
-                background: 'rgba(28,30,24,0.10)',
-                border: '1px solid rgba(28,30,24,0.18)',
+                background: 'rgba(28,30,24,0.14)',
+                border: '1px solid rgba(28,30,24,0.32)',
                 color: '#1C1E18',
               }}
             />
@@ -1159,7 +1159,7 @@ function CheckInWeightCard({
           </div>
         )}
         {weightLog?.lastValue && !weightSaved && (
-          <p style={{ marginTop: 8, fontSize: 11, color: 'rgba(28,30,24,0.44)' }}>
+          <p style={{ marginTop: 8, fontSize: 11, color: 'rgba(28,30,24,0.62)' }}>
             Laatste: {weightLog.lastValue} kg
             {weightLog.lastDate && (
               <> ({new Date(weightLog.lastDate).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })})</>
@@ -1190,7 +1190,7 @@ function Chevron() {
   return (
     <svg
       width={16} height={16} viewBox="0 0 24 24" fill="none"
-      stroke="rgba(28,30,24,0.44)" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round"
+      stroke="rgba(28,30,24,0.62)" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round"
       className="shrink-0 transition-colors group-hover:stroke-white"
     >
       <polyline points="9 6 15 12 9 18" />

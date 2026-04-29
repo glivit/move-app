@@ -173,11 +173,11 @@ export default function WorkoutOverviewPage() {
       <div className="pb-28 animate-pulse">
         <div
           className="mb-4 rounded-[24px]"
-          style={{ height: 200, background: 'rgba(253,253,254,0.08)' }}
+          style={{ height: 200, background: 'rgba(28,30,24,0.06)' }}
         />
         <div
           className="rounded-[24px]"
-          style={{ height: 340, background: 'rgba(253,253,254,0.05)' }}
+          style={{ height: 340, background: 'rgba(28,30,24,0.04)' }}
         />
       </div>
     )
@@ -188,10 +188,10 @@ export default function WorkoutOverviewPage() {
       <div className="pb-28">
         <h1 className="page-title mb-6">Training</h1>
         <div className="py-16 text-center">
-          <p style={{ fontSize: 20, fontWeight: 300, color: '#FDFDFE', marginBottom: 8 }}>
+          <p style={{ fontSize: 20, fontWeight: 300, color: '#1C1E18', marginBottom: 8 }}>
             Geen programma
           </p>
-          <p style={{ fontSize: 14, color: 'rgba(253,253,254,0.62)' }}>
+          <p style={{ fontSize: 14, color: 'rgba(28,30,24,0.65)' }}>
             Je coach zal binnenkort een trainingsplan opstellen.
           </p>
         </div>
