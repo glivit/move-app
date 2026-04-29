@@ -405,7 +405,7 @@ export default function LiftDetailPage() {
       <div className="pb-28 animate-fade-in">
         <div style={{ height: 32, marginBottom: 18 }} />
         <div className="rounded-[24px] mb-4 animate-pulse" style={{ height: 200, background: '#474B48' }} />
-        <div className="rounded-[24px] mb-2 animate-pulse" style={{ height: 180, background: '#A6ADA7' }} />
+        <div className="rounded-[24px] mb-2 animate-pulse" style={{ height: 180, background: 'rgba(255,255,255,0.50)' }} />
       </div>
     )
   }
@@ -416,7 +416,7 @@ export default function LiftDetailPage() {
         <TopBar title={info?.name || 'Oefening'} subtitle={info?.bodyPart} onBack={() => router.back()} />
         <div
           style={{
-            background: '#A6ADA7',
+            background: 'rgba(255,255,255,0.50)',
             padding: '48px 22px',
             borderRadius: 24,
             textAlign: 'center',
@@ -610,7 +610,7 @@ export default function LiftDetailPage() {
             <div
               className="animate-slide-up stagger-4"
               style={{
-                background: '#A6ADA7',
+                background: 'rgba(255,255,255,0.50)',
                 borderRadius: 24,
                 overflow: 'hidden',
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
@@ -708,7 +708,7 @@ export default function LiftDetailPage() {
           ) : (
             <div
               style={{
-                background: '#A6ADA7',
+                background: 'rgba(255,255,255,0.50)',
                 padding: '28px 22px',
                 borderRadius: 24,
                 textAlign: 'center',
@@ -742,7 +742,7 @@ export default function LiftDetailPage() {
             <div
               className="animate-slide-up stagger-4"
               style={{
-                background: '#A6ADA7',
+                background: 'rgba(255,255,255,0.50)',
                 borderRadius: 24,
                 overflow: 'hidden',
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
@@ -801,7 +801,7 @@ export default function LiftDetailPage() {
           ) : (
             <div
               style={{
-                background: '#A6ADA7',
+                background: 'rgba(255,255,255,0.50)',
                 padding: '28px 22px',
                 borderRadius: 24,
                 textAlign: 'center',
@@ -833,7 +833,7 @@ export default function LiftDetailPage() {
             <div
               className="animate-slide-up stagger-4"
               style={{
-                background: '#A6ADA7',
+                background: 'rgba(255,255,255,0.50)',
                 borderRadius: 24,
                 overflow: 'hidden',
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
@@ -915,7 +915,7 @@ export default function LiftDetailPage() {
           ) : (
             <div
               style={{
-                background: '#A6ADA7',
+                background: 'rgba(255,255,255,0.50)',
                 padding: '28px 22px',
                 borderRadius: 24,
                 textAlign: 'center',

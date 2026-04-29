@@ -40,7 +40,7 @@ const DARK_CARD: React.CSSProperties = {
 }
 
 const LIGHT_CARD: React.CSSProperties = {
-  background: '#A6ADA7',
+  background: 'rgba(255,255,255,0.50)',
   borderRadius: 24,
   boxShadow:
     'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',

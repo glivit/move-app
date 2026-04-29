@@ -28,11 +28,27 @@ interface ChatBubbleProps {
  * Voice note krijgt eigen waveform-pill (geen native <audio controls>).
  */
 
-const CARD_LIGHT = '#A6ADA7' // coach bubble
-const CARD_DARK = '#474B48' // me bubble
-const INK = '#FDFDFE'
-const INK_FAINT = 'rgba(253,253,254,0.44)'
-const INK_SOFT = 'rgba(253,253,254,0.78)'
+const CARD_LIGHT = 'rgba(255,255,255,0.55)' // coach bubble — frosted light
+const CARD_DARK = 'rgba(28,30,24,0.88)' // me bubble — dark glass
+// Bubble-scoped tokens via CSS vars op de container:
+//   - coach bubble setup: --card-text: #1C1E18 (dark on light)
+//   - me bubble setup:    --card-text: #F2F2EC (light on dark)
+// INK/INK_SOFT/INK_FAINT verwijzen naar var(...) zodat ze auto-adapteren.
+const INK = 'var(--card-text)'
+const INK_FAINT = 'var(--card-text-faint)'
+const INK_SOFT = 'var(--card-text-soft)'
+
+const COACH_VARS = {
+  '--card-text': '#1C1E18',
+  '--card-text-soft': 'rgba(28,30,24,0.82)',
+  '--card-text-faint': 'rgba(28,30,24,0.55)',
+} as React.CSSProperties
+
+const ME_VARS = {
+  '--card-text': '#F2F2EC',
+  '--card-text-soft': 'rgba(242,242,236,0.82)',
+  '--card-text-faint': 'rgba(242,242,236,0.55)',
+} as React.CSSProperties
 
 function formatTime(dateString: string): string {
   const date = new Date(dateString)
@@ -368,13 +384,16 @@ export function ChatBubble({ message, isCoach }: ChatBubbleProps) {
       <div className="flex justify-start">
         <div
           style={{
+            ...COACH_VARS,
             maxWidth: '76%',
             padding: '11px 14px',
             borderRadius: 18,
             borderTopLeftRadius: 8,
             background: CARD_LIGHT,
+            backdropFilter: 'blur(40px) saturate(170%)',
+            WebkitBackdropFilter: 'blur(40px) saturate(170%)',
             color: INK,
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 6px rgba(0,0,0,0.14)',
+            boxShadow: '0 1px 1px rgba(28,30,24,0.04), 0 8px 24px -8px rgba(28,30,24,0.10), inset 0 1px 0 rgba(255,255,255,0.55)',
             wordWrap: 'break-word',
           }}
         >
@@ -402,13 +421,16 @@ export function ChatBubble({ message, isCoach }: ChatBubbleProps) {
     <div className="flex justify-end">
       <div
         style={{
+          ...ME_VARS,
           maxWidth: '76%',
           padding: '11px 14px',
           borderRadius: 18,
           borderTopRightRadius: 8,
           background: CARD_DARK,
+          backdropFilter: 'blur(30px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(30px) saturate(180%)',
           color: INK,
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.22)',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 12px 28px rgba(28,30,24,0.20)',
           wordWrap: 'break-word',
         }}
       >
@@ -444,6 +466,8 @@ export function TypingIndicator() {
         style={{
           padding: '13px 16px',
           background: CARD_LIGHT,
+          backdropFilter: 'blur(40px) saturate(170%)',
+          WebkitBackdropFilter: 'blur(40px) saturate(170%)',
           borderRadius: 18,
           borderTopLeftRadius: 8,
           display: 'inline-flex',
@@ -460,7 +484,7 @@ export function TypingIndicator() {
           width: 6px;
           height: 6px;
           border-radius: 50%;
-          background: rgba(253, 253, 254, 0.58);
+          background: rgba(28, 30, 24, 0.55);
           animation: typing-bounce 1.2s infinite;
           display: inline-block;
         }

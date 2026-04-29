@@ -52,7 +52,7 @@ function getInitials(name: string): string {
 }
 
 // v6 tokens
-const CANVAS = '#8E9890'
+const CANVAS = '#EDECE3'
 const WHITE = '#1C1E18'
 const INK_FAINT = 'rgba(28,30,24,0.58)'
 

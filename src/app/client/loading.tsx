@@ -9,7 +9,7 @@ export default function ClientLoading() {
         className="rounded-[24px] mb-4"
         style={{
           padding: '22px 22px 24px',
-          background: '#A6ADA7',
+          background: 'rgba(255,255,255,0.50)',
           boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
         }}
       >
@@ -30,7 +30,7 @@ export default function ClientLoading() {
         className="rounded-[24px] mb-4"
         style={{
           padding: '22px 22px 24px',
-          background: '#A6ADA7',
+          background: 'rgba(255,255,255,0.50)',
           boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
         }}
       >

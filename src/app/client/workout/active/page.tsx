@@ -2077,7 +2077,7 @@ function ActiveWorkoutPage() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col overflow-hidden pt-safe" style={{ background: '#8E9890' }}>
+      <div className="fixed inset-0 z-50 flex flex-col overflow-hidden pt-safe client-app" style={{ background: 'radial-gradient(900px 700px at 0% 0%, #F4F1E6 0%, transparent 60%), radial-gradient(800px 600px at 100% 30%, #E5E3D8 0%, transparent 60%), radial-gradient(700px 600px at 0% 100%, #F2EEDF 0%, transparent 60%), #EDECE3', color: '#1C1E18' }}>
         {/* Skeleton header */}
         <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: '1px solid var(--card-divider)' }}>
           <div className="h-5 w-5 rounded animate-pulse" style={{ background: 'var(--card-bg-tint)' }} />
@@ -2111,7 +2111,7 @@ function ActiveWorkoutPage() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden pt-safe" style={{ background: '#8E9890' }}>
+    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden pt-safe client-app" style={{ background: 'radial-gradient(900px 700px at 0% 0%, #F4F1E6 0%, transparent 60%), radial-gradient(800px 600px at 100% 30%, #E5E3D8 0%, transparent 60%), radial-gradient(700px 600px at 0% 100%, #F2EEDF 0%, transparent 60%), #EDECE3', color: '#1C1E18' }}>
       {/* PR Celebration */}
       {prCelebration && (
         <>

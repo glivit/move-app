@@ -111,7 +111,7 @@ export default function WorkoutCompletePageWrapper() {
           style={{
             position: 'fixed',
             inset: 0,
-            background: '#8E9890',
+            background: '#EDECE3',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -663,7 +663,7 @@ function WorkoutCompletePage() {
         style={{
           position: 'fixed',
           inset: 0,
-          background: '#8E9890',
+          background: '#EDECE3',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -690,7 +690,7 @@ function WorkoutCompletePage() {
         style={{
           position: 'fixed',
           inset: 0,
-          background: '#8E9890',
+          background: '#EDECE3',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -767,7 +767,7 @@ function WorkoutCompletePage() {
       style={{
         position: 'fixed',
         inset: 0,
-        background: '#8E9890',
+        background: '#EDECE3',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',

@@ -310,7 +310,7 @@ export default function ProfilePage() {
             />
             <div
               className="animate-pulse rounded-[24px]"
-              style={{ height: 180, background: '#A6ADA7', opacity: 0.6 }}
+              style={{ height: 180, background: 'rgba(255,255,255,0.50)', opacity: 0.6 }}
             />
           </div>
         ))}

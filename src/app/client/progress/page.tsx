@@ -680,7 +680,7 @@ export default function ProgressPage() {
           </div>
         </div>
         <div className="rounded-[24px] mb-2 animate-pulse" style={{ height: 64, background: '#474B48' }} />
-        <div className="rounded-[24px] mb-2 animate-pulse" style={{ height: 84, background: '#A6ADA7' }} />
+        <div className="rounded-[24px] mb-2 animate-pulse" style={{ height: 84, background: 'rgba(255,255,255,0.50)' }} />
         <div className="rounded-[24px] mb-2 animate-pulse" style={{ height: 200, background: '#474B48' }} />
       </div>
     )
@@ -693,7 +693,7 @@ export default function ProgressPage() {
           className="rounded-[24px]"
           style={{
             padding: '48px 22px',
-            background: '#A6ADA7',
+            background: 'rgba(255,255,255,0.50)',
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
             textAlign: 'center',
           }}
@@ -961,7 +961,7 @@ export default function ProgressPage() {
               <div
                 className="flex items-center mb-2 animate-slide-up stagger-3"
                 style={{
-                  background: '#A6ADA7',
+                  background: 'rgba(255,255,255,0.50)',
                   padding: '18px 20px',
                   borderRadius: 24,
                   gap: 14,
@@ -1108,7 +1108,7 @@ export default function ProgressPage() {
               <div
                 className="mb-4 animate-slide-up stagger-5"
                 style={{
-                  background: '#A6ADA7',
+                  background: 'rgba(255,255,255,0.50)',
                   padding: '18px 20px 20px',
                   borderRadius: 24,
                   boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
@@ -1222,7 +1222,7 @@ export default function ProgressPage() {
             <div
               className="mb-4 animate-slide-up stagger-4"
               style={{
-                background: '#A6ADA7',
+                background: 'rgba(255,255,255,0.50)',
                 padding: '18px 20px',
                 borderRadius: 24,
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
@@ -1312,7 +1312,7 @@ export default function ProgressPage() {
                     key={lift.exerciseId}
                     href={`/client/progress/exercise/${lift.exerciseId}`}
                     style={{
-                      background: '#A6ADA7',
+                      background: 'rgba(255,255,255,0.50)',
                       padding: '16px 16px 14px',
                       borderRadius: 24,
                       boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
@@ -1395,7 +1395,7 @@ export default function ProgressPage() {
             <div
               className="animate-fade-in"
               style={{
-                background: '#A6ADA7',
+                background: 'rgba(255,255,255,0.50)',
                 padding: '28px 22px',
                 borderRadius: 24,
                 textAlign: 'center',
@@ -1514,7 +1514,7 @@ export default function ProgressPage() {
             <div
               className="animate-slide-up stagger-5"
               style={{
-                background: '#A6ADA7',
+                background: 'rgba(255,255,255,0.50)',
                 borderRadius: 24,
                 overflow: 'hidden',
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
@@ -1595,7 +1595,7 @@ export default function ProgressPage() {
           ) : (
             <div
               style={{
-                background: '#A6ADA7',
+                background: 'rgba(255,255,255,0.50)',
                 padding: '28px 22px',
                 borderRadius: 24,
                 textAlign: 'center',
@@ -1801,7 +1801,7 @@ export default function ProgressPage() {
                     <div
                       key={m.key}
                       style={{
-                        background: '#A6ADA7',
+                        background: 'rgba(255,255,255,0.50)',
                         padding: '14px 16px',
                         borderRadius: 18,
                         boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
@@ -1863,7 +1863,7 @@ export default function ProgressPage() {
               <div
                 className="animate-slide-up stagger-5"
                 style={{
-                  background: '#A6ADA7',
+                  background: 'rgba(255,255,255,0.50)',
                   padding: '18px 18px 20px',
                   borderRadius: 24,
                   boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
@@ -2329,7 +2329,7 @@ export default function ProgressPage() {
                     key={w.id}
                     className="animate-slide-up"
                     style={{
-                      background: '#A6ADA7',
+                      background: 'rgba(255,255,255,0.50)',
                       padding: '14px 18px',
                       borderRadius: 18,
                       boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',

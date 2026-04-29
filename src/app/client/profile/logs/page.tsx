@@ -367,7 +367,7 @@ export default function LogsPage() {
       {loading ? (
         <div
           style={{
-            background: '#A6ADA7',
+            background: 'rgba(255,255,255,0.50)',
             borderRadius: 24,
             padding: '36px 22px',
             textAlign: 'center',
@@ -380,7 +380,7 @@ export default function LogsPage() {
         <div
           className="animate-fade-in"
           style={{
-            background: '#A6ADA7',
+            background: 'rgba(255,255,255,0.50)',
             borderRadius: 24,
             padding: '48px 22px',
             textAlign: 'center',
@@ -398,7 +398,7 @@ export default function LogsPage() {
         <div
           className="animate-slide-up stagger-5"
           style={{
-            background: '#A6ADA7',
+            background: 'rgba(255,255,255,0.50)',
             borderRadius: 24,
             overflow: 'hidden',
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
