@@ -42,7 +42,7 @@ function Row({
         alignItems: 'center',
         gap: 14,
         padding: '14px 0',
-        borderTop: '1px solid rgba(253,253,254,0.08)',
+        borderTop: '1px solid rgba(28,30,24,0.10)',
         cursor: href ? 'pointer' : 'default',
         WebkitTapHighlightColor: 'transparent',
       }}
@@ -59,7 +59,7 @@ function Row({
       <div style={{ minWidth: 0 }}>
         <div
           style={{
-            fontSize: 15, fontWeight: 400, color: '#FDFDFE',
+            fontSize: 15, fontWeight: 400, color: '#1C1E18',
             letterSpacing: '-0.003em', lineHeight: 1.2,
           }}
         >
@@ -68,7 +68,7 @@ function Row({
         {meta && (
           <div
             style={{
-              fontSize: 11, fontWeight: 400, color: 'rgba(253,253,254,0.52)',
+              fontSize: 11, fontWeight: 400, color: 'rgba(28,30,24,0.62)',
               letterSpacing: '0.01em', marginTop: 2,
             }}
           >
@@ -78,7 +78,7 @@ function Row({
       </div>
       <div
         style={{
-          fontSize: 13, fontWeight: 400, color: 'rgba(253,253,254,0.78)',
+          fontSize: 13, fontWeight: 400, color: 'rgba(28,30,24,0.82)',
           textAlign: 'right', fontVariantNumeric: 'tabular-nums',
           minWidth: 0,
         }}
@@ -89,7 +89,7 @@ function Row({
         viewBox="0 0 24 24"
         style={{
           width: 12, height: 12,
-          stroke: 'rgba(253,253,254,0.44)',
+          stroke: 'rgba(28,30,24,0.58)',
           strokeWidth: 1.8, fill: 'none',
           opacity: href ? 1 : 0,
         }}
@@ -109,7 +109,7 @@ function Row({
 }
 
 // Icon helpers (stroke var(--ink-soft) per 10-ik.html)
-const icoColor = 'rgba(253,253,254,0.78)'
+const icoColor = 'rgba(28,30,24,0.82)'
 const icoStyle: React.CSSProperties = {
   width: 17, height: 17,
   stroke: icoColor, strokeWidth: 1.6, fill: 'none',
@@ -191,7 +191,7 @@ function AppearanceValue() {
     setDark(document.documentElement.classList.contains('dark'))
   }, [])
   return (
-    <span style={{ fontSize: 13, color: 'rgba(253,253,254,0.78)' }}>
+    <span style={{ fontSize: 13, color: 'rgba(28,30,24,0.82)' }}>
       {dark ? 'Donker' : 'Auto'}
     </span>
   )
@@ -207,7 +207,7 @@ function SectionLabel({ children, delay = 0 }: { children: React.ReactNode; dela
         fontSize: 10, fontWeight: 500,
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
-        color: 'rgba(253,253,254,0.52)',
+        color: 'rgba(28,30,24,0.62)',
         animationDelay: `${delay}ms`,
         animationFillMode: 'both',
       }}
@@ -288,16 +288,16 @@ export default function ProfilePage() {
         <div style={{ padding: '4px 4px 22px', display: 'flex', alignItems: 'center', gap: 16 }}>
           <div
             className="animate-pulse"
-            style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(253,253,254,0.12)' }}
+            style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(28,30,24,0.14)' }}
           />
           <div style={{ flex: 1 }}>
             <div
               className="animate-pulse"
-              style={{ height: 18, width: '60%', borderRadius: 6, background: 'rgba(253,253,254,0.14)', marginBottom: 6 }}
+              style={{ height: 18, width: '60%', borderRadius: 6, background: 'rgba(28,30,24,0.18)', marginBottom: 6 }}
             />
             <div
               className="animate-pulse"
-              style={{ height: 11, width: '40%', borderRadius: 999, background: 'rgba(253,253,254,0.08)' }}
+              style={{ height: 11, width: '40%', borderRadius: 999, background: 'rgba(28,30,24,0.10)' }}
             />
           </div>
         </div>
@@ -306,7 +306,7 @@ export default function ProfilePage() {
           <div key={i} style={{ marginBottom: 6 }}>
             <div
               className="animate-pulse"
-              style={{ height: 10, width: 90, borderRadius: 999, background: 'rgba(253,253,254,0.10)', margin: '18px 4px 8px' }}
+              style={{ height: 10, width: 90, borderRadius: 999, background: 'rgba(28,30,24,0.12)', margin: '18px 4px 8px' }}
             />
             <div
               className="animate-pulse rounded-[24px]"
@@ -361,7 +361,7 @@ export default function ProfilePage() {
         <div style={{ minWidth: 0, flex: 1 }}>
           <div
             style={{
-              fontSize: 22, fontWeight: 300, color: '#FDFDFE',
+              fontSize: 22, fontWeight: 300, color: '#1C1E18',
               letterSpacing: '-0.02em', lineHeight: 1.1,
               whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
             }}
@@ -370,7 +370,7 @@ export default function ProfilePage() {
           </div>
           <div
             style={{
-              fontSize: 12, fontWeight: 400, color: 'rgba(253,253,254,0.52)',
+              fontSize: 12, fontWeight: 400, color: 'rgba(28,30,24,0.62)',
               letterSpacing: '0.01em', marginTop: 3,
             }}
           >
@@ -400,7 +400,7 @@ export default function ProfilePage() {
               style={{
                 fontSize: 20, fontWeight: 300,
                 letterSpacing: '-0.01em',
-                color: '#FDFDFE',
+                color: '#1C1E18',
                 fontVariantNumeric: 'tabular-nums',
                 lineHeight: 1.1,
               }}
@@ -412,7 +412,7 @@ export default function ProfilePage() {
                 fontSize: 9, fontWeight: 500,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
-                color: 'rgba(253,253,254,0.52)',
+                color: 'rgba(28,30,24,0.62)',
                 marginTop: 3,
               }}
             >
@@ -503,7 +503,7 @@ export default function ProfilePage() {
           label="Pakket"
           meta={profile?.package || 'Standaard'}
           trailing={
-            <span style={{ fontSize: 13, fontWeight: 500, color: '#FDFDFE' }}>
+            <span style={{ fontSize: 13, fontWeight: 500, color: '#1C1E18' }}>
               {profile?.package || '—'}
             </span>
           }
@@ -536,7 +536,7 @@ export default function ProfilePage() {
           href="/client/profile/notifications"
           leading={<IcoNotif />}
           label="Notificaties"
-          value={<span style={{ fontSize: 13, color: 'rgba(253,253,254,0.78)' }}>Aan</span>}
+          value={<span style={{ fontSize: 13, color: 'rgba(28,30,24,0.82)' }}>Aan</span>}
         />
         <Row
           href="/client/profile/diet"
@@ -576,11 +576,11 @@ export default function ProfilePage() {
             alignItems: 'center',
             gap: 14,
             padding: '14px 0',
-            borderTop: '1px solid rgba(253,253,254,0.08)',
+            borderTop: '1px solid rgba(28,30,24,0.10)',
             border: 'none',
             borderTopWidth: 1,
             borderTopStyle: 'solid',
-            borderTopColor: 'rgba(253,253,254,0.08)',
+            borderTopColor: 'rgba(28,30,24,0.10)',
             background: 'transparent',
             width: '100%',
             cursor: signingOut ? 'default' : 'pointer',
@@ -603,7 +603,7 @@ export default function ProfilePage() {
           <div style={{ minWidth: 0 }}>
             <div
               style={{
-                fontSize: 15, fontWeight: 400, color: '#FDFDFE',
+                fontSize: 15, fontWeight: 400, color: '#1C1E18',
                 letterSpacing: '-0.003em', lineHeight: 1.2,
               }}
             >
@@ -615,7 +615,7 @@ export default function ProfilePage() {
             viewBox="0 0 24 24"
             style={{
               width: 12, height: 12,
-              stroke: 'rgba(253,253,254,0.44)',
+              stroke: 'rgba(28,30,24,0.58)',
               strokeWidth: 1.8, fill: 'none',
             }}
           >
@@ -629,7 +629,7 @@ export default function ProfilePage() {
         style={{
           textAlign: 'center',
           fontSize: 10, fontWeight: 400,
-          color: 'rgba(253,253,254,0.32)',
+          color: 'rgba(28,30,24,0.50)',
           letterSpacing: '0.04em',
           padding: '4px 0 16px',
           fontVariantNumeric: 'tabular-nums',

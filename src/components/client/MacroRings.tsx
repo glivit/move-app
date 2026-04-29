@@ -26,8 +26,8 @@ interface RingProps {
 
 // v6 Orion — zachte warm neutrals voor macro-semantiek, geen v3 shout-kleuren
 const TRACK = 'rgba(255,255,255,0.14)';
-const INK = '#FDFDFE';
-const INK_FAINT = 'rgba(253,253,254,0.62)';
+const INK = '#1C1E18';
+const INK_FAINT = 'rgba(28,30,24,0.65)';
 const PROTEIN = '#D9A645';   // warm amber (eiwit)
 const CARBS = '#B56A53';     // earthy terracotta (koolhydraten)
 const FAT = '#8A7BA8';       // muted plum (vet)

@@ -92,7 +92,7 @@ export default function DietPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-[#FDFDFE]" />
+        <Loader2 className="w-6 h-6 animate-spin text-[#1C1E18]" />
       </div>
     )
   }
@@ -101,18 +101,18 @@ export default function DietPage() {
     <div className="space-y-6 pb-20">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#FDFDFE]">
+        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#1C1E18]">
           <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
         </button>
-        <h1 className="text-editorial-h2 text-[#FDFDFE]">
+        <h1 className="text-editorial-h2 text-[#1C1E18]">
           Voedingsvoorkeuren
         </h1>
       </div>
 
       {/* Diet Type */}
       <div>
-        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Dieettype</p>
-        <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] divide-y divide-[rgba(253,253,254,0.08)]">
+        <p className="text-[13px] font-medium text-[rgba(28,30,24,0.62)] uppercase tracking-wide px-1 mb-2">Dieettype</p>
+        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
           {DIET_TYPES.map((diet) => (
             <button
               key={diet.id}
@@ -120,8 +120,8 @@ export default function DietPage() {
               className="w-full px-5 py-4 flex items-center justify-between hover:bg-[#FAFAFA] transition-colors"
             >
               <div>
-                <p className="text-[15px] text-[#FDFDFE] text-left">{diet.label}</p>
-                <p className="text-[13px] text-[rgba(253,253,254,0.55)] text-left">{diet.desc}</p>
+                <p className="text-[15px] text-[#1C1E18] text-left">{diet.label}</p>
+                <p className="text-[13px] text-[rgba(28,30,24,0.62)] text-left">{diet.desc}</p>
               </div>
               {dietType === diet.id && (
                 <div className="w-6 h-6 rounded-full bg-[#FDFDFE] flex items-center justify-center flex-shrink-0">
@@ -135,7 +135,7 @@ export default function DietPage() {
 
       {/* Allergies */}
       <div>
-        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Allergieën & intoleranties</p>
+        <p className="text-[13px] font-medium text-[rgba(28,30,24,0.62)] uppercase tracking-wide px-1 mb-2">Allergieën & intoleranties</p>
         <div className="flex flex-wrap gap-2">
           {ALLERGY_OPTIONS.map((allergy) => {
             const selected = allergies.includes(allergy)
@@ -146,7 +146,7 @@ export default function DietPage() {
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
                     ? 'bg-[#B55A4A] text-white'
-                    : 'bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] text-[#FDFDFE] hover:border-[#B55A4A]'
+                    : 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] text-[#1C1E18] hover:border-[#B55A4A]'
                 }`}
               >
                 {allergy}
@@ -158,14 +158,14 @@ export default function DietPage() {
 
       {/* Other */}
       <div>
-        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Overige opmerkingen</p>
-        <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] p-5">
+        <p className="text-[13px] font-medium text-[rgba(28,30,24,0.62)] uppercase tracking-wide px-1 mb-2">Overige opmerkingen</p>
+        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] p-5">
           <textarea
             value={otherRestrictions}
             onChange={(e) => setOtherRestrictions(e.target.value)}
             placeholder="Bijv. ik eet niet graag aubergine, intermittent fasting, ..."
             rows={3}
-            className="w-full text-[15px] text-[#FDFDFE] bg-transparent placeholder:text-[rgba(253,253,254,0.48)] focus:outline-none resize-none"
+            className="w-full text-[15px] text-[#1C1E18] bg-transparent placeholder:text-[rgba(28,30,24,0.60)] focus:outline-none resize-none"
           />
         </div>
       </div>

@@ -106,7 +106,7 @@ function HeroChart({ points, labels }: { points: Array<{ x: number; y: number }>
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: 'rgba(253,253,254,0.44)',
+          color: 'var(--card-text-muted)',
           fontSize: 11,
           letterSpacing: '-0.005em',
         }}
@@ -151,7 +151,7 @@ function HeroChart({ points, labels }: { points: Array<{ x: number; y: number }>
             fontWeight: 500,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: 'rgba(253,253,254,0.44)',
+            color: 'var(--card-text-muted)',
             marginTop: 6,
           }}
         >
@@ -424,10 +424,10 @@ export default function LiftDetailPage() {
             margin: '0 0 6px',
           }}
         >
-          <p style={{ color: '#FDFDFE', fontSize: 16, fontWeight: 300, letterSpacing: '-0.012em', marginBottom: 8 }}>
+          <p style={{ color: 'var(--card-text)', fontSize: 16, fontWeight: 300, letterSpacing: '-0.012em', marginBottom: 8 }}>
             Nog geen werksets gelogd
           </p>
-          <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 13, maxWidth: 240, margin: '0 auto' }}>
+          <p style={{ color: 'var(--card-text-muted)', fontSize: 13, maxWidth: 240, margin: '0 auto' }}>
             Log een werkset om je PR&apos;s en e1RM-trend te zien verschijnen.
           </p>
         </div>
@@ -463,7 +463,7 @@ export default function LiftDetailPage() {
               fontWeight: 500,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
-              color: 'rgba(253,253,254,0.44)',
+              color: 'var(--card-text-muted)',
             }}
           >
             Geschatte 1RM
@@ -501,7 +501,7 @@ export default function LiftDetailPage() {
               fontSize: 44,
               fontWeight: 200,
               letterSpacing: '-0.03em',
-              color: '#FDFDFE',
+              color: 'var(--card-text)',
               fontFeatureSettings: '"tnum"',
               lineHeight: 1,
             }}
@@ -510,7 +510,7 @@ export default function LiftDetailPage() {
             <small
               style={{
                 fontSize: 14,
-                color: 'rgba(253,253,254,0.62)',
+                color: 'var(--card-text-muted)',
                 marginLeft: 3,
                 letterSpacing: 0,
                 fontWeight: 300,
@@ -524,12 +524,12 @@ export default function LiftDetailPage() {
               style={{
                 fontSize: 12,
                 fontWeight: 400,
-                color: 'rgba(253,253,254,0.78)',
+                color: 'var(--card-text-soft)',
                 letterSpacing: '-0.005em',
               }}
             >
               {heroDelta > 0 ? '+' : ''}
-              <strong style={{ color: '#FDFDFE', fontWeight: 500 }}>
+              <strong style={{ color: 'var(--card-text)', fontWeight: 500 }}>
                 {formatKg(Math.round(heroDelta * 10) / 10)} kg
               </strong>{' '}
               sinds {rangeStartLabel}
@@ -539,7 +539,7 @@ export default function LiftDetailPage() {
         <div
           style={{
             fontSize: 11,
-            color: 'rgba(253,253,254,0.44)',
+            color: 'var(--card-text-muted)',
             letterSpacing: '-0.002em',
             marginTop: -2,
             marginBottom: 14,
@@ -600,7 +600,7 @@ export default function LiftDetailPage() {
               fontWeight: 500,
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
-              color: 'rgba(253,253,254,0.44)',
+              color: 'var(--card-text-muted)',
             }}
           >
             Beste rep-max · alle tijden
@@ -634,7 +634,7 @@ export default function LiftDetailPage() {
                       fontSize: 11,
                       fontWeight: 500,
                       letterSpacing: '0.1em',
-                      color: 'rgba(253,253,254,0.78)',
+                      color: 'var(--card-text-soft)',
                       fontFeatureSettings: '"tnum"',
                     }}
                   >
@@ -643,7 +643,7 @@ export default function LiftDetailPage() {
                         fontSize: 17,
                         fontWeight: 300,
                         letterSpacing: '-0.015em',
-                        color: '#FDFDFE',
+                        color: 'var(--card-text)',
                         marginRight: 2,
                       }}
                     >
@@ -657,20 +657,20 @@ export default function LiftDetailPage() {
                         fontSize: 16,
                         fontWeight: 300,
                         letterSpacing: '-0.015em',
-                        color: '#FDFDFE',
+                        color: 'var(--card-text)',
                         fontFeatureSettings: '"tnum"',
                         lineHeight: 1.1,
                       }}
                     >
                       {formatKg(row.weight)}
-                      <small style={{ fontSize: 10, color: 'rgba(253,253,254,0.62)', marginLeft: 2, fontWeight: 400 }}>
+                      <small style={{ fontSize: 10, color: 'var(--card-text-muted)', marginLeft: 2, fontWeight: 400 }}>
                         kg
                       </small>
                     </div>
                     <div
                       style={{
                         fontSize: 11,
-                        color: 'rgba(253,253,254,0.44)',
+                        color: 'var(--card-text-muted)',
                         letterSpacing: '-0.002em',
                       }}
                     >
@@ -715,7 +715,7 @@ export default function LiftDetailPage() {
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
               }}
             >
-              <p style={{ color: '#FDFDFE', fontSize: 14, fontWeight: 400 }}>
+              <p style={{ color: 'var(--card-text)', fontSize: 14, fontWeight: 400 }}>
                 Nog geen rep-max data
               </p>
             </div>
@@ -733,7 +733,7 @@ export default function LiftDetailPage() {
               fontWeight: 500,
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
-              color: 'rgba(253,253,254,0.44)',
+              color: 'var(--card-text-muted)',
             }}
           >
             Volume per week · laatste 12
@@ -764,7 +764,7 @@ export default function LiftDetailPage() {
                   <div
                     style={{
                       fontSize: 13,
-                      color: '#FDFDFE',
+                      color: 'var(--card-text)',
                       letterSpacing: '-0.005em',
                     }}
                   >
@@ -773,7 +773,7 @@ export default function LiftDetailPage() {
                   <div
                     style={{
                       fontSize: 11,
-                      color: 'rgba(253,253,254,0.44)',
+                      color: 'var(--card-text-muted)',
                       fontFeatureSettings: '"tnum"',
                     }}
                   >
@@ -783,7 +783,7 @@ export default function LiftDetailPage() {
                     style={{
                       fontSize: 14,
                       fontWeight: 400,
-                      color: '#FDFDFE',
+                      color: 'var(--card-text)',
                       fontFeatureSettings: '"tnum"',
                       letterSpacing: '-0.005em',
                       textAlign: 'right',
@@ -791,7 +791,7 @@ export default function LiftDetailPage() {
                     }}
                   >
                     {formatKg(Math.round(row.volume / 10) / 100)}
-                    <small style={{ fontSize: 10, color: 'rgba(253,253,254,0.62)', marginLeft: 2 }}>
+                    <small style={{ fontSize: 10, color: 'var(--card-text-muted)', marginLeft: 2 }}>
                       ton
                     </small>
                   </div>
@@ -808,7 +808,7 @@ export default function LiftDetailPage() {
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
               }}
             >
-              <p style={{ color: '#FDFDFE', fontSize: 14, fontWeight: 400 }}>Nog geen volume-data</p>
+              <p style={{ color: 'var(--card-text)', fontSize: 14, fontWeight: 400 }}>Nog geen volume-data</p>
             </div>
           )}
         </>
@@ -824,7 +824,7 @@ export default function LiftDetailPage() {
               fontWeight: 500,
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
-              color: 'rgba(253,253,254,0.44)',
+              color: 'var(--card-text-muted)',
             }}
           >
             Recente sessies
@@ -859,7 +859,7 @@ export default function LiftDetailPage() {
                         fontWeight: 500,
                         letterSpacing: '0.1em',
                         textTransform: 'uppercase',
-                        color: 'rgba(253,253,254,0.44)',
+                        color: 'var(--card-text-muted)',
                         marginBottom: 3,
                       }}
                     >
@@ -869,7 +869,7 @@ export default function LiftDetailPage() {
                       style={{
                         fontSize: 13,
                         fontWeight: 400,
-                        color: '#FDFDFE',
+                        color: 'var(--card-text)',
                         letterSpacing: '-0.005em',
                         fontFeatureSettings: '"tnum"',
                       }}
@@ -879,7 +879,7 @@ export default function LiftDetailPage() {
                         <span key={j}>
                           {formatKg(s.weight)}×{s.reps}
                           {j < sess.sets.length - 1 && (
-                            <span style={{ color: 'rgba(253,253,254,0.44)', margin: '0 6px' }}>·</span>
+                            <span style={{ color: 'var(--card-text-muted)', margin: '0 6px' }}>·</span>
                           )}
                         </span>
                       ))}
@@ -889,7 +889,7 @@ export default function LiftDetailPage() {
                     style={{
                       fontSize: 12,
                       fontWeight: 400,
-                      color: 'rgba(253,253,254,0.78)',
+                      color: 'var(--card-text-soft)',
                       fontFeatureSettings: '"tnum"',
                       textAlign: 'right',
                     }}
@@ -902,7 +902,7 @@ export default function LiftDetailPage() {
                         fontWeight: 500,
                         letterSpacing: '0.1em',
                         textTransform: 'uppercase',
-                        color: 'rgba(253,253,254,0.44)',
+                        color: 'var(--card-text-muted)',
                         marginTop: 2,
                       }}
                     >
@@ -922,7 +922,7 @@ export default function LiftDetailPage() {
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
               }}
             >
-              <p style={{ color: '#FDFDFE', fontSize: 14, fontWeight: 400 }}>Nog geen sessies gelogd</p>
+              <p style={{ color: 'var(--card-text)', fontSize: 14, fontWeight: 400 }}>Nog geen sessies gelogd</p>
             </div>
           )}
         </>
@@ -952,12 +952,12 @@ function TopBar({ title, subtitle, onBack }: { title: string; subtitle?: string;
           width: 32,
           height: 32,
           borderRadius: 999,
-          background: 'rgba(253,253,254,0.06)',
-          border: '1px solid rgba(253,253,254,0.10)',
+          background: 'var(--card-bg-subtle)',
+          border: '1px solid var(--card-divider)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#FDFDFE',
+          color: 'var(--card-text)',
           cursor: 'pointer',
           WebkitTapHighlightColor: 'transparent',
         }}
@@ -972,7 +972,7 @@ function TopBar({ title, subtitle, onBack }: { title: string; subtitle?: string;
           fontSize: 15,
           fontWeight: 400,
           letterSpacing: '-0.005em',
-          color: '#FDFDFE',
+          color: 'var(--card-text)',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -985,7 +985,7 @@ function TopBar({ title, subtitle, onBack }: { title: string; subtitle?: string;
               fontWeight: 500,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
-              color: 'rgba(253,253,254,0.44)',
+              color: 'var(--card-text-muted)',
               marginBottom: 2,
               lineHeight: 1,
             }}

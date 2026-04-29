@@ -89,7 +89,7 @@ export default function NotificationsPage() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-[1.5px] border-[rgba(253,253,254,0.48)] border-t-[#FDFDFE]" />
+        <div className="animate-spin rounded-full h-8 w-8 border-[1.5px] border-[rgba(28,30,24,0.60)] border-t-[#1C1E18]" />
       </div>
     )
   }
@@ -102,8 +102,8 @@ export default function NotificationsPage() {
     <div className="pb-24 space-y-6">
       {/* Hero Section */}
       <div className="flex items-center gap-3 pt-1 animate-slide-up">
-        <Link href="/client" className="p-2 -ml-2 rounded-xl hover:bg-[rgba(253,253,254,0.08)] transition-colors">
-          <ArrowLeft strokeWidth={1.5} className="w-5 h-5 text-[rgba(253,253,254,0.55)]" />
+        <Link href="/client" className="p-2 -ml-2 rounded-xl hover:bg-[rgba(28,30,24,0.10)] transition-colors">
+          <ArrowLeft strokeWidth={1.5} className="w-5 h-5 text-[rgba(28,30,24,0.62)]" />
         </Link>
         <div>
           <p className="text-label mb-1">Inbox</p>
@@ -116,34 +116,34 @@ export default function NotificationsPage() {
       {/* Empty state */}
       {hasNothing && (
         <div className="text-center py-16 animate-slide-up stagger-2">
-          <div className="w-14 h-14 rounded-full bg-[rgba(253,253,254,0.08)] flex items-center justify-center mx-auto mb-4">
-            <Megaphone strokeWidth={1.5} className="w-6 h-6 text-[rgba(253,253,254,0.48)]" />
+          <div className="w-14 h-14 rounded-full bg-[rgba(28,30,24,0.10)] flex items-center justify-center mx-auto mb-4">
+            <Megaphone strokeWidth={1.5} className="w-6 h-6 text-[rgba(28,30,24,0.60)]" />
           </div>
-          <p className="text-[15px] text-[rgba(253,253,254,0.55)]">Geen meldingen</p>
+          <p className="text-[15px] text-[rgba(28,30,24,0.62)]">Geen meldingen</p>
         </div>
       )}
 
       {/* Pending prompts */}
       {prompts.length > 0 && (
         <div className="space-y-3 animate-slide-up stagger-3">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[rgba(253,253,254,0.48)] px-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[rgba(28,30,24,0.60)] px-1">
             Openstaande vragen
           </p>
           {prompts.map(prompt => (
             <Link
               key={prompt.id}
               href="/client/prompts"
-              className="block rounded-2xl border-2 border-[#5A5E5B]/20 bg-white p-5 transition-all hover:border-[#FDFDFE]/30"
+              className="block rounded-2xl border-2 border-[#5A5E5B]/20 bg-white p-5 transition-all hover:border-[#1C1E18]/30"
             >
               <div className="flex items-start gap-3.5">
                 <div className="w-10 h-10 rounded-xl bg-[#5A5E5B]/12 flex items-center justify-center flex-shrink-0">
-                  <FileText strokeWidth={1.5} className="w-5 h-5 text-[#FDFDFE]" />
+                  <FileText strokeWidth={1.5} className="w-5 h-5 text-[#1C1E18]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-semibold text-[#FDFDFE] tracking-[-0.01em]">
+                  <p className="text-[15px] font-semibold text-[#1C1E18] tracking-[-0.01em]">
                     {prompt.question}
                   </p>
-                  <p className="text-[13px] text-[#FDFDFE] font-medium mt-1">
+                  <p className="text-[13px] text-[#1C1E18] font-medium mt-1">
                     Tik om te beantwoorden
                   </p>
                 </div>
@@ -157,7 +157,7 @@ export default function NotificationsPage() {
       {/* Unread broadcasts */}
       {unreadBroadcasts.length > 0 && (
         <div className="space-y-3 animate-slide-up stagger-5">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[rgba(253,253,254,0.48)] px-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[rgba(28,30,24,0.60)] px-1">
             Nieuw
           </p>
           {unreadBroadcasts.map(b => (
@@ -173,7 +173,7 @@ export default function NotificationsPage() {
       {/* Read broadcasts */}
       {readBroadcasts.length > 0 && (
         <div className="space-y-3 animate-slide-up stagger-7">
-          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[rgba(253,253,254,0.48)] px-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[rgba(28,30,24,0.60)] px-1">
             Gelezen
           </p>
           {readBroadcasts.map(b => (
@@ -200,22 +200,22 @@ function BroadcastCard({ broadcast, onTap }: {
       onClick={onTap}
       className={`w-full text-left rounded-2xl p-5 transition-all active:scale-[0.98] ${
         isUnread
-          ? 'border-2 border-[#3068C4]/25 bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)]'
-          : 'border border-[rgba(253,253,254,0.08)] bg-white'
+          ? 'border-2 border-[#3068C4]/25 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)]'
+          : 'border border-[rgba(28,30,24,0.10)] bg-white'
       }`}
     >
       <div className="flex items-start gap-3.5">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-          isUnread ? 'bg-[#3068C4]/10' : 'bg-[rgba(253,253,254,0.08)]'
+          isUnread ? 'bg-[#3068C4]/10' : 'bg-[rgba(28,30,24,0.10)]'
         }`}>
           <Megaphone strokeWidth={1.5} className={`w-5 h-5 ${
-            isUnread ? 'text-[#3068C4]' : 'text-[rgba(253,253,254,0.48)]'
+            isUnread ? 'text-[#3068C4]' : 'text-[rgba(28,30,24,0.60)]'
           }`} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <p className={`text-[15px] font-semibold tracking-[-0.01em] ${
-              isUnread ? 'text-[#FDFDFE]' : 'text-[rgba(253,253,254,0.55)]'
+              isUnread ? 'text-[#1C1E18]' : 'text-[rgba(28,30,24,0.62)]'
             }`}>
               {broadcast.title}
             </p>
@@ -224,12 +224,12 @@ function BroadcastCard({ broadcast, onTap }: {
             )}
           </div>
 
-          <p className="text-[14px] text-[rgba(253,253,254,0.55)] mt-1 line-clamp-2">
+          <p className="text-[14px] text-[rgba(28,30,24,0.62)] mt-1 line-clamp-2">
             {broadcast.content}
           </p>
 
           <div className="flex items-center gap-2 mt-2.5">
-            <p className="text-[12px] text-[rgba(253,253,254,0.48)]">
+            <p className="text-[12px] text-[rgba(28,30,24,0.60)]">
               {formatDistanceToNow(new Date(broadcast.created_at), { addSuffix: true, locale: nl })}
             </p>
             {broadcast.read && (
@@ -241,7 +241,7 @@ function BroadcastCard({ broadcast, onTap }: {
           </div>
         </div>
         <ChevronRight strokeWidth={1.5} className={`w-5 h-5 flex-shrink-0 mt-2 ${
-          isUnread ? 'text-[#3068C4]' : 'text-[rgba(253,253,254,0.48)]'
+          isUnread ? 'text-[#3068C4]' : 'text-[rgba(28,30,24,0.60)]'
         }`} />
       </div>
     </button>

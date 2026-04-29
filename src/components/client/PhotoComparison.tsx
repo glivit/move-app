@@ -92,7 +92,7 @@ export function PhotoComparison() {
       style={{
         borderRadius: 18,
         overflow: 'hidden',
-        background: 'rgba(253,253,254,0.04)',
+        background: 'var(--card-bg-subtle)',
       }}
     >
       {/* Angle picker */}
@@ -136,7 +136,7 @@ export function PhotoComparison() {
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
           gap: 2,
-          background: 'rgba(253,253,254,0.10)',
+          background: 'var(--card-bg-tint)',
         }}
       >
         {/* Before */}
@@ -153,7 +153,7 @@ export function PhotoComparison() {
             />
           ) : (
             <div style={{ width: '100%', aspectRatio: '3 / 4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Camera size={24} style={{ color: 'rgba(253,253,254,0.44)' }} />
+              <Camera size={24} style={{ color: 'var(--card-text-muted)' }} />
             </div>
           )}
           <div
@@ -163,10 +163,10 @@ export function PhotoComparison() {
               padding: '24px 12px 10px',
             }}
           >
-            <p style={{ fontSize: 10, fontWeight: 500, color: 'rgba(253,253,254,0.62)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>
+            <p style={{ fontSize: 10, fontWeight: 500, color: 'var(--card-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>
               Before
             </p>
-            <p style={{ fontSize: 12, fontWeight: 500, color: '#FDFDFE', margin: 0 }}>
+            <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--card-text)', margin: 0 }}>
               {formatDate(before.date)}
             </p>
           </div>
@@ -183,7 +183,7 @@ export function PhotoComparison() {
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
-              <ChevronLeft size={14} style={{ color: '#FDFDFE' }} />
+              <ChevronLeft size={14} style={{ color: 'var(--card-text)' }} />
             </button>
           )}
           {beforeIdx < afterIdx - 1 && (
@@ -199,7 +199,7 @@ export function PhotoComparison() {
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
-              <ChevronRight size={14} style={{ color: '#FDFDFE' }} />
+              <ChevronRight size={14} style={{ color: 'var(--card-text)' }} />
             </button>
           )}
         </div>
@@ -218,7 +218,7 @@ export function PhotoComparison() {
             />
           ) : (
             <div style={{ width: '100%', aspectRatio: '3 / 4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Camera size={24} style={{ color: 'rgba(253,253,254,0.44)' }} />
+              <Camera size={24} style={{ color: 'var(--card-text-muted)' }} />
             </div>
           )}
           <div
@@ -231,7 +231,7 @@ export function PhotoComparison() {
             <p style={{ fontSize: 10, fontWeight: 500, color: '#C0FC01', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>
               After
             </p>
-            <p style={{ fontSize: 12, fontWeight: 500, color: '#FDFDFE', margin: 0 }}>
+            <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--card-text)', margin: 0 }}>
               {formatDate(after.date)}
             </p>
           </div>
@@ -248,7 +248,7 @@ export function PhotoComparison() {
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
-              <ChevronLeft size={14} style={{ color: '#FDFDFE' }} />
+              <ChevronLeft size={14} style={{ color: 'var(--card-text)' }} />
             </button>
           )}
           {afterIdx < checkins.length - 1 && (
@@ -264,7 +264,7 @@ export function PhotoComparison() {
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
-              <ChevronRight size={14} style={{ color: '#FDFDFE' }} />
+              <ChevronRight size={14} style={{ color: 'var(--card-text)' }} />
             </button>
           )}
         </div>
@@ -272,7 +272,7 @@ export function PhotoComparison() {
 
       {/* Time difference */}
       <div style={{ padding: '10px 14px 14px', textAlign: 'center' }}>
-        <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.52)', letterSpacing: '0.02em' }}>
+        <span style={{ fontSize: 11, color: 'var(--card-text-muted)', letterSpacing: '0.02em' }}>
           {Math.round((new Date(after.date).getTime() - new Date(before.date).getTime()) / 86400000)} dagen verschil
         </span>
       </div>

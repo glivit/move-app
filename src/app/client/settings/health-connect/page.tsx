@@ -149,9 +149,9 @@ export default function HealthConnectPage() {
     return (
       <div className="min-h-[80vh] bg-[#FFFFFF] px-4 py-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-[#A6ADA7] rounded-xl w-48" />
-          <div className="h-24 bg-[#A6ADA7] rounded-2xl" />
-          <div className="h-24 bg-[#A6ADA7] rounded-2xl" />
+          <div className="h-8 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-xl w-48" />
+          <div className="h-24 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl" />
+          <div className="h-24 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl" />
         </div>
       </div>
     )
@@ -159,12 +159,12 @@ export default function HealthConnectPage() {
 
   return (
     <div className="min-h-[80vh] bg-[#FFFFFF] -mx-4 -mt-4 px-4 py-6">
-      <button onClick={() => router.back()} className="flex items-center gap-2 text-[rgba(253,253,254,0.55)] mb-6">
+      <button onClick={() => router.back()} className="flex items-center gap-2 text-[rgba(28,30,24,0.62)] mb-6">
         <ArrowLeft size={18} /> Terug
       </button>
 
-      <h1 className="text-[24px] font-semibold text-[#FDFDFE] mb-2">Gezondheidsdata</h1>
-      <p className="text-[14px] text-[rgba(253,253,254,0.55)] mb-6">
+      <h1 className="text-[24px] font-semibold text-[#1C1E18] mb-2">Gezondheidsdata</h1>
+      <p className="text-[14px] text-[rgba(28,30,24,0.62)] mb-6">
         Koppel je wearable om automatisch stappen, slaap en hartslag te synchroniseren.
       </p>
 
@@ -175,7 +175,7 @@ export default function HealthConnectPage() {
           const Icon = provider.icon
 
           return (
-            <div key={provider.id} className="bg-[#A6ADA7] rounded-2xl p-5 border border-[rgba(253,253,254,0.08)]">
+            <div key={provider.id} className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl p-5 border border-[rgba(28,30,24,0.10)]">
               <div className="flex items-center gap-4">
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center"
@@ -186,16 +186,16 @@ export default function HealthConnectPage() {
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-[#FDFDFE]">{provider.name}</h3>
+                    <h3 className="font-semibold text-[#1C1E18]">{provider.name}</h3>
                     {isConnected && (
                       <span className="px-2 py-0.5 rounded-full bg-[#2FA65A]/10 text-[#2FA65A] text-[10px] font-bold uppercase">
                         Gekoppeld
                       </span>
                     )}
                   </div>
-                  <p className="text-[13px] text-[rgba(253,253,254,0.55)] mt-0.5">{provider.description}</p>
+                  <p className="text-[13px] text-[rgba(28,30,24,0.62)] mt-0.5">{provider.description}</p>
                   {isConnected && (
-                    <p className="text-[11px] text-[rgba(253,253,254,0.48)] mt-1">
+                    <p className="text-[11px] text-[rgba(28,30,24,0.60)] mt-1">
                       Laatste sync: {formatLastSync(integration.last_sync_at)}
                     </p>
                   )}
@@ -230,7 +230,7 @@ export default function HealthConnectPage() {
       </div>
 
       <div className="mt-6 p-4 bg-white/50 rounded-2xl">
-        <p className="text-[12px] text-[rgba(253,253,254,0.55)] leading-relaxed">
+        <p className="text-[12px] text-[rgba(28,30,24,0.62)] leading-relaxed">
           Je data wordt veilig gesynchroniseerd en alleen gedeeld met je coach.
           Je kunt de koppeling op elk moment verbreken. Handmatig ingevoerde data wordt niet overschreven.
         </p>

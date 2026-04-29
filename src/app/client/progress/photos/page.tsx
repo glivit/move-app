@@ -167,8 +167,8 @@ export default function PhotoComparisonPage() {
           gap: 12,
         }}
       >
-        <Camera size={40} style={{ color: 'rgba(253,253,254,0.44)' }} />
-        <p style={{ fontSize: 13, color: 'rgba(253,253,254,0.62)' }}>Foto&rsquo;s laden&hellip;</p>
+        <Camera size={40} style={{ color: 'var(--card-text-muted)' }} />
+        <p style={{ fontSize: 13, color: 'var(--card-text-muted)' }}>Foto&rsquo;s laden&hellip;</p>
       </div>
     )
   }
@@ -183,7 +183,7 @@ export default function PhotoComparisonPage() {
             alignItems: 'center',
             gap: 8,
             fontSize: 13,
-            color: 'rgba(253,253,254,0.62)',
+            color: 'var(--card-text-muted)',
             background: 'transparent',
             border: 'none',
             padding: 0,
@@ -198,11 +198,11 @@ export default function PhotoComparisonPage() {
           className="v6-card"
           style={{ padding: '40px 22px', textAlign: 'center' }}
         >
-          <Camera size={44} style={{ color: 'rgba(253,253,254,0.44)', margin: '0 auto 12px' }} />
-          <p style={{ fontSize: 18, fontWeight: 300, color: '#FDFDFE', letterSpacing: '-0.012em', margin: 0 }}>
+          <Camera size={44} style={{ color: 'var(--card-text-muted)', margin: '0 auto 12px' }} />
+          <p style={{ fontSize: 18, fontWeight: 300, color: 'var(--card-text)', letterSpacing: '-0.012em', margin: 0 }}>
             Niet genoeg foto&rsquo;s
           </p>
-          <p style={{ fontSize: 13, color: 'rgba(253,253,254,0.62)', marginTop: 8, maxWidth: 280, marginLeft: 'auto', marginRight: 'auto' }}>
+          <p style={{ fontSize: 13, color: 'var(--card-text-muted)', marginTop: 8, maxWidth: 280, marginLeft: 'auto', marginRight: 'auto' }}>
             Je hebt minimaal 2 check-ins met foto&rsquo;s nodig om te vergelijken.
           </p>
         </div>
@@ -243,7 +243,7 @@ export default function PhotoComparisonPage() {
             alignItems: 'center',
             gap: 8,
             fontSize: 13,
-            color: 'rgba(253,253,254,0.62)',
+            color: 'var(--card-text-muted)',
             background: 'transparent',
             border: 'none',
             padding: 0,
@@ -259,26 +259,26 @@ export default function PhotoComparisonPage() {
             aria-label="Exporteer"
             style={{
               width: 36, height: 36, borderRadius: '50%',
-              background: 'rgba(253,253,254,0.14)',
+              background: 'var(--card-bg-tint)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               border: 'none', cursor: 'pointer',
               WebkitTapHighlightColor: 'transparent',
             }}
           >
-            <Download size={16} style={{ color: '#FDFDFE' }} />
+            <Download size={16} style={{ color: 'var(--card-text)' }} />
           </button>
           <button
             onClick={() => setFullscreen(!fullscreen)}
             aria-label="Volledig scherm"
             style={{
               width: 36, height: 36, borderRadius: '50%',
-              background: 'rgba(253,253,254,0.14)',
+              background: 'var(--card-bg-tint)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               border: 'none', cursor: 'pointer',
               WebkitTapHighlightColor: 'transparent',
             }}
           >
-            <Maximize2 size={16} style={{ color: '#FDFDFE' }} />
+            <Maximize2 size={16} style={{ color: 'var(--card-text)' }} />
           </button>
         </div>
       </div>
@@ -383,8 +383,8 @@ export default function PhotoComparisonPage() {
                   gap: 1,
                 }}
               >
-                <ChevronLeft size={12} strokeWidth={2.5} style={{ color: '#FDFDFE' }} />
-                <ChevronRight size={12} strokeWidth={2.5} style={{ color: '#FDFDFE' }} />
+                <ChevronLeft size={12} strokeWidth={2.5} style={{ color: 'var(--card-text)' }} />
+                <ChevronRight size={12} strokeWidth={2.5} style={{ color: 'var(--card-text)' }} />
               </div>
             </div>
 
@@ -394,7 +394,7 @@ export default function PhotoComparisonPage() {
                 position: 'absolute', top: 10, left: 10,
                 background: 'rgba(0,0,0,0.55)',
                 backdropFilter: 'blur(6px)',
-                color: '#FDFDFE',
+                color: 'var(--card-text)',
                 fontSize: 10,
                 fontWeight: 500,
                 padding: '4px 10px',
@@ -437,7 +437,7 @@ export default function PhotoComparisonPage() {
                 <NextImage src={beforeUrl} alt="Before" width={400} height={500} style={{ width: '100%', height: '100%', objectFit: 'cover' }} unoptimized loading="lazy" />
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                  <Camera size={24} style={{ color: 'rgba(253,253,254,0.44)' }} />
+                  <Camera size={24} style={{ color: 'var(--card-text-muted)' }} />
                 </div>
               )}
               <div
@@ -447,8 +447,8 @@ export default function PhotoComparisonPage() {
                   padding: '24px 10px 10px',
                 }}
               >
-                <p style={{ fontSize: 10, color: 'rgba(253,253,254,0.62)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 500, margin: 0 }}>Before</p>
-                <p style={{ fontSize: 12, color: '#FDFDFE', fontWeight: 500, margin: 0 }}>{formatDate(before.date)}</p>
+                <p style={{ fontSize: 10, color: 'var(--card-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 500, margin: 0 }}>Before</p>
+                <p style={{ fontSize: 12, color: 'var(--card-text)', fontWeight: 500, margin: 0 }}>{formatDate(before.date)}</p>
               </div>
             </div>
             <div style={{ position: 'relative', aspectRatio: '3 / 4', background: '#474B48' }}>
@@ -456,7 +456,7 @@ export default function PhotoComparisonPage() {
                 <NextImage src={afterUrl} alt="After" width={400} height={500} style={{ width: '100%', height: '100%', objectFit: 'cover' }} unoptimized loading="lazy" />
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                  <Camera size={24} style={{ color: 'rgba(253,253,254,0.44)' }} />
+                  <Camera size={24} style={{ color: 'var(--card-text-muted)' }} />
                 </div>
               )}
               <div
@@ -467,7 +467,7 @@ export default function PhotoComparisonPage() {
                 }}
               >
                 <p style={{ fontSize: 10, color: '#C0FC01', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 500, margin: 0 }}>After</p>
-                <p style={{ fontSize: 12, color: '#FDFDFE', fontWeight: 500, margin: 0 }}>{formatDate(after.date)}</p>
+                <p style={{ fontSize: 12, color: 'var(--card-text)', fontWeight: 500, margin: 0 }}>{formatDate(after.date)}</p>
               </div>
             </div>
           </div>
@@ -476,19 +476,19 @@ export default function PhotoComparisonPage() {
         {/* Stats bar */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: 28, padding: '14px 0 4px' }}>
           <div style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: 9, color: 'rgba(253,253,254,0.44)', textTransform: 'uppercase', fontWeight: 500, letterSpacing: '0.1em', margin: 0 }}>
+            <p style={{ fontSize: 9, color: 'var(--card-text-muted)', textTransform: 'uppercase', fontWeight: 500, letterSpacing: '0.1em', margin: 0 }}>
               Periode
             </p>
-            <p style={{ fontSize: 14, color: '#FDFDFE', fontWeight: 500, margin: 0, marginTop: 4 }}>
+            <p style={{ fontSize: 14, color: 'var(--card-text)', fontWeight: 500, margin: 0, marginTop: 4 }}>
               {isNaN(daysDiff) ? '—' : `${daysDiff} dagen`}
             </p>
           </div>
           {before.weight_kg && after.weight_kg && (
             <div style={{ textAlign: 'center' }}>
-              <p style={{ fontSize: 9, color: 'rgba(253,253,254,0.44)', textTransform: 'uppercase', fontWeight: 500, letterSpacing: '0.1em', margin: 0 }}>
+              <p style={{ fontSize: 9, color: 'var(--card-text-muted)', textTransform: 'uppercase', fontWeight: 500, letterSpacing: '0.1em', margin: 0 }}>
                 Gewicht
               </p>
-              <p style={{ fontSize: 14, color: '#FDFDFE', fontWeight: 500, margin: 0, marginTop: 4 }}>
+              <p style={{ fontSize: 14, color: 'var(--card-text)', fontWeight: 500, margin: 0, marginTop: 4 }}>
                 {before.weight_kg}kg → {after.weight_kg}kg
                 <span
                   style={{
@@ -508,10 +508,10 @@ export default function PhotoComparisonPage() {
       {/* Timeline — eigen card */}
       <div className="v6-card-dark mb-4" style={{ padding: 18 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-          <p className="text-label" style={{ color: 'rgba(253,253,254,0.62)' }}>
+          <p className="text-label" style={{ color: 'var(--card-text-muted)' }}>
             Tijdlijn
           </p>
-          <p style={{ fontSize: 11, color: 'rgba(253,253,254,0.38)', letterSpacing: '0.02em' }}>
+          <p style={{ fontSize: 11, color: 'var(--card-text-faint)', letterSpacing: '0.02em' }}>
             {formatDate(before.date)} · {formatDate(after.date)}
           </p>
         </div>
@@ -523,7 +523,7 @@ export default function PhotoComparisonPage() {
               top: '50%',
               left: 8, right: 8,
               height: 2,
-              background: 'rgba(253,253,254,0.10)',
+              background: 'var(--card-bg-tint)',
               transform: 'translateY(-50%)',
             }}
           />
@@ -646,13 +646,13 @@ export default function PhotoComparisonPage() {
               zIndex: 1,
               width: 40, height: 40,
               borderRadius: '50%',
-              background: 'rgba(253,253,254,0.14)',
+              background: 'var(--card-bg-tint)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               border: 'none',
               cursor: 'pointer',
             }}
           >
-            <X size={18} style={{ color: '#FDFDFE' }} />
+            <X size={18} style={{ color: 'var(--card-text)' }} />
           </button>
           <div style={{ width: '100%', height: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
             <NextImage src={beforeUrl!} alt="Before" width={800} height={1000} style={{ width: '100%', height: '100%', objectFit: 'contain' }} unoptimized loading="lazy" />
@@ -668,7 +668,7 @@ export default function PhotoComparisonPage() {
               gap: 32,
             }}
           >
-            <p style={{ fontSize: 13, color: '#FDFDFE', fontWeight: 500, margin: 0 }}>
+            <p style={{ fontSize: 13, color: 'var(--card-text)', fontWeight: 500, margin: 0 }}>
               Before — {formatDate(before.date)}
             </p>
             <p style={{ fontSize: 13, color: '#C0FC01', fontWeight: 500, margin: 0 }}>

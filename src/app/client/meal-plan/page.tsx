@@ -70,22 +70,22 @@ function MealRow({ meal }: { meal: Meal }) {
       >
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{
-            fontSize: 14, fontWeight: 600, color: '#FDFDFE',
+            fontSize: 14, fontWeight: 600, color: 'var(--card-text)',
             margin: 0, letterSpacing: '-0.01em',
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}>
             {meal.name}
           </p>
           <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-            <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.62)', fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ fontSize: 11, color: 'var(--card-text-muted)', fontVariantNumeric: 'tabular-nums' }}>
               P {Math.round(meal.protein)}g
             </span>
-            <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.32)' }}>·</span>
-            <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.62)', fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ fontSize: 11, color: 'var(--card-text-faint)' }}>·</span>
+            <span style={{ fontSize: 11, color: 'var(--card-text-muted)', fontVariantNumeric: 'tabular-nums' }}>
               K {Math.round(meal.carbs)}g
             </span>
-            <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.32)' }}>·</span>
-            <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.62)', fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ fontSize: 11, color: 'var(--card-text-faint)' }}>·</span>
+            <span style={{ fontSize: 11, color: 'var(--card-text-muted)', fontVariantNumeric: 'tabular-nums' }}>
               V {Math.round(meal.fat)}g
             </span>
           </div>
@@ -93,18 +93,18 @@ function MealRow({ meal }: { meal: Meal }) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
           <span style={{
-            fontSize: 14, fontWeight: 600, color: '#FDFDFE',
+            fontSize: 14, fontWeight: 600, color: 'var(--card-text)',
             fontVariantNumeric: 'tabular-nums',
           }}>
             {Math.round(meal.calories)}
-            <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.52)', marginLeft: 2 }}>kcal</span>
+            <span style={{ fontSize: 11, color: 'var(--card-text-muted)', marginLeft: 2 }}>kcal</span>
           </span>
           {ingredients.length > 0 && (
             <ChevronDown
               strokeWidth={1.5}
               size={16}
               style={{
-                color: 'rgba(253,253,254,0.44)',
+                color: 'var(--card-text-muted)',
                 transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
                 transition: 'transform 200ms',
               }}
@@ -122,7 +122,7 @@ function MealRow({ meal }: { meal: Meal }) {
               key={i}
               style={{
                 fontSize: 13, lineHeight: 1.5,
-                color: 'rgba(253,253,254,0.72)',
+                color: 'var(--card-text-soft)',
                 display: 'flex', gap: 8,
                 padding: '4px 0',
               }}
@@ -184,7 +184,7 @@ export default function ClientMealPlanPage() {
         display: 'flex', alignItems: 'center', gap: 4,
         marginTop: 8, marginBottom: 14,
         background: 'transparent', border: 'none', cursor: 'pointer',
-        color: 'rgba(253,253,254,0.62)',
+        color: 'var(--card-text-muted)',
         WebkitTapHighlightColor: 'transparent',
         padding: 0,
       }}
@@ -215,7 +215,7 @@ export default function ClientMealPlanPage() {
       <div className="pb-28">
         {BackBtn}
         <div className="v6-card-dark" style={{ textAlign: 'center', padding: '32px 22px' }}>
-          <p style={{ fontSize: 14, color: '#FDFDFE', margin: 0 }}>{error}</p>
+          <p style={{ fontSize: 14, color: 'var(--card-text)', margin: 0 }}>{error}</p>
         </div>
       </div>
     )
@@ -227,12 +227,12 @@ export default function ClientMealPlanPage() {
         {BackBtn}
         <div className="v6-card" style={{ textAlign: 'center', padding: '40px 22px' }}>
           <UtensilsCrossed size={36} strokeWidth={1.5} style={{
-            color: 'rgba(253,253,254,0.44)', margin: '0 auto 14px',
+            color: 'var(--card-text-muted)', margin: '0 auto 14px',
           }} />
-          <p style={{ fontSize: 15, fontWeight: 600, color: '#FDFDFE', margin: '0 0 6px' }}>
+          <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--card-text)', margin: '0 0 6px' }}>
             Je voedingsplan wordt opgesteld
           </p>
-          <p style={{ fontSize: 13, color: 'rgba(253,253,254,0.62)', margin: 0 }}>
+          <p style={{ fontSize: 13, color: 'var(--card-text-muted)', margin: 0 }}>
             Je ontvangt een bericht zodra het klaar is
           </p>
         </div>
@@ -247,13 +247,13 @@ export default function ClientMealPlanPage() {
         {BackBtn}
         <div className="v6-card-dark" style={{ marginBottom: 14 }}>
           <p style={{
-            fontSize: 10, color: 'rgba(253,253,254,0.52)',
+            fontSize: 10, color: 'var(--card-text-muted)',
             textTransform: 'uppercase', letterSpacing: '0.1em',
             margin: '0 0 6px',
           }}>
             Voeding
           </p>
-          <p style={{ fontSize: 18, fontWeight: 600, color: '#FDFDFE', margin: 0, letterSpacing: '-0.015em' }}>
+          <p style={{ fontSize: 18, fontWeight: 600, color: 'var(--card-text)', margin: 0, letterSpacing: '-0.015em' }}>
             {mealPlan.title}
           </p>
         </div>
@@ -261,7 +261,7 @@ export default function ClientMealPlanPage() {
           <FileText size={36} strokeWidth={1.5} style={{
             color: '#C0FC01', margin: '0 auto 14px',
           }} />
-          <p style={{ fontSize: 15, fontWeight: 600, color: '#FDFDFE', margin: '0 0 16px' }}>
+          <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--card-text)', margin: '0 0 16px' }}>
             Je voedingsplan is beschikbaar als PDF
           </p>
           <a
@@ -272,7 +272,7 @@ export default function ClientMealPlanPage() {
               display: 'inline-block',
               padding: '12px 22px',
               background: '#C0FC01',
-              color: '#FDFDFE',
+              color: 'var(--card-text)',
               borderRadius: 14,
               fontSize: 13, fontWeight: 600,
               textDecoration: 'none',
@@ -291,7 +291,7 @@ export default function ClientMealPlanPage() {
       <div className="pb-28">
         {BackBtn}
         <div className="v6-card-dark" style={{ textAlign: 'center', padding: '32px 22px' }}>
-          <p style={{ fontSize: 13, color: 'rgba(253,253,254,0.62)', margin: 0 }}>
+          <p style={{ fontSize: 13, color: 'var(--card-text-muted)', margin: 0 }}>
             Geen maaltijden ingepland
           </p>
         </div>
@@ -323,13 +323,13 @@ export default function ClientMealPlanPage() {
       {/* Title card */}
       <div className="v6-card-dark animate-slide-up" style={{ marginBottom: 14 }}>
         <p style={{
-          fontSize: 10, color: 'rgba(253,253,254,0.52)',
+          fontSize: 10, color: 'var(--card-text-muted)',
           textTransform: 'uppercase', letterSpacing: '0.1em',
           margin: '0 0 6px',
         }}>
           Voeding
         </p>
-        <p style={{ fontSize: 20, fontWeight: 600, color: '#FDFDFE', margin: 0, letterSpacing: '-0.02em' }}>
+        <p style={{ fontSize: 20, fontWeight: 600, color: 'var(--card-text)', margin: 0, letterSpacing: '-0.02em' }}>
           {mealPlan.title}
         </p>
       </div>
@@ -392,11 +392,11 @@ export default function ClientMealPlanPage() {
             display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
             marginBottom: 8,
           }}>
-            <span style={{ fontSize: 10, color: 'rgba(253,253,254,0.52)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <span style={{ fontSize: 10, color: 'var(--card-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               Calorieën
             </span>
             <span style={{
-              fontSize: 12, color: 'rgba(253,253,254,0.62)',
+              fontSize: 12, color: 'var(--card-text-muted)',
               fontVariantNumeric: 'tabular-nums',
             }}>
               {Math.round(dayTotals.calories)} / {targetCal} kcal
@@ -404,7 +404,7 @@ export default function ClientMealPlanPage() {
           </div>
           <div style={{
             height: 6, borderRadius: 999,
-            background: 'rgba(253,253,254,0.10)', overflow: 'hidden',
+            background: 'var(--card-bg-tint)', overflow: 'hidden',
           }}>
             <div style={{
               height: '100%',
@@ -432,21 +432,21 @@ export default function ClientMealPlanPage() {
               <div
                 key={macro.label}
                 style={{
-                  background: 'rgba(253,253,254,0.06)',
+                  background: 'var(--card-bg-subtle)',
                   borderRadius: 14,
                   padding: '12px 10px 10px',
                   textAlign: 'center',
                 }}
               >
                 <div style={{
-                  fontSize: 15, fontWeight: 600, color: '#FDFDFE',
+                  fontSize: 15, fontWeight: 600, color: 'var(--card-text)',
                   fontVariantNumeric: 'tabular-nums',
                 }}>
                   {Math.round(macro.actual)}
-                  <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(253,253,254,0.52)' }}>g</span>
+                  <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--card-text-muted)' }}>g</span>
                 </div>
                 <div style={{
-                  fontSize: 10, color: 'rgba(253,253,254,0.44)',
+                  fontSize: 10, color: 'var(--card-text-muted)',
                   marginTop: 2, fontVariantNumeric: 'tabular-nums',
                 }}>
                   / {macro.target}g
@@ -454,7 +454,7 @@ export default function ClientMealPlanPage() {
                 <div style={{
                   marginTop: 8,
                   height: 3, borderRadius: 999,
-                  background: 'rgba(253,253,254,0.10)',
+                  background: 'var(--card-bg-tint)',
                   overflow: 'hidden',
                 }}>
                   <div style={{
@@ -466,7 +466,7 @@ export default function ClientMealPlanPage() {
                 </div>
                 <div style={{
                   fontSize: 10, fontWeight: 500,
-                  color: 'rgba(253,253,254,0.62)',
+                  color: 'var(--card-text-muted)',
                   textTransform: 'uppercase', letterSpacing: '0.08em',
                   marginTop: 8,
                 }}>
@@ -482,7 +482,7 @@ export default function ClientMealPlanPage() {
       {selectedDay.meals.length > 0 ? (
         <div className="v6-card-dark animate-slide-up" style={{ padding: '10px 22px 18px' }}>
           <p style={{
-            fontSize: 10, color: 'rgba(253,253,254,0.52)',
+            fontSize: 10, color: 'var(--card-text-muted)',
             textTransform: 'uppercase', letterSpacing: '0.1em',
             margin: '8px 0 4px',
           }}>
@@ -502,9 +502,9 @@ export default function ClientMealPlanPage() {
       ) : (
         <div className="v6-card-dark animate-slide-up" style={{ textAlign: 'center', padding: '32px 22px' }}>
           <Moon size={28} strokeWidth={1.5} style={{
-            color: 'rgba(253,253,254,0.38)', margin: '0 auto 10px',
+            color: 'var(--card-text-faint)', margin: '0 auto 10px',
           }} />
-          <p style={{ fontSize: 13, color: 'rgba(253,253,254,0.62)', margin: 0 }}>
+          <p style={{ fontSize: 13, color: 'var(--card-text-muted)', margin: 0 }}>
             Geen maaltijden voor deze dag
           </p>
         </div>

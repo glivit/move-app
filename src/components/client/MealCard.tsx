@@ -36,7 +36,7 @@ export function MealCard({ meal }: MealCardProps) {
     : []
 
   return (
-    <div className="bg-[#A6ADA7] rounded-2xl overflow-hidden border border-[rgba(253,253,254,0.08)]">
+    <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl overflow-hidden border border-[rgba(28,30,24,0.10)]">
       {/* Header - always visible, clickable */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}

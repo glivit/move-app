@@ -243,7 +243,7 @@ export default function WorkoutOverviewPage() {
                 fontWeight: 300,
                 letterSpacing: '-0.018em',
                 lineHeight: 1.1,
-                color: '#FDFDFE',
+                color: 'var(--card-text)',
                 margin: '14px 0 4px',
               }}
             >
@@ -253,7 +253,7 @@ export default function WorkoutOverviewPage() {
               style={{
                 fontSize: 12,
                 fontWeight: 400,
-                color: 'rgba(253,253,254,0.44)',
+                color: 'var(--card-text-muted)',
                 letterSpacing: '0.01em',
                 marginBottom: 22,
               }}
@@ -300,7 +300,7 @@ export default function WorkoutOverviewPage() {
                 fontWeight: 300,
                 letterSpacing: '-0.018em',
                 lineHeight: 1.1,
-                color: '#FDFDFE',
+                color: 'var(--card-text)',
                 margin: '14px 0 4px',
               }}
             >
@@ -310,7 +310,7 @@ export default function WorkoutOverviewPage() {
               style={{
                 fontSize: 12,
                 fontWeight: 400,
-                color: 'rgba(253,253,254,0.44)',
+                color: 'var(--card-text-muted)',
                 letterSpacing: '0.01em',
                 marginBottom: 22,
               }}
@@ -360,7 +360,7 @@ export default function WorkoutOverviewPage() {
                     padding: 0,
                     fontSize: 12,
                     fontWeight: 500,
-                    color: 'rgba(253,253,254,0.62)',
+                    color: 'var(--card-text-muted)',
                     letterSpacing: '0.01em',
                     cursor: 'pointer',
                     WebkitTapHighlightColor: 'transparent',
@@ -398,7 +398,7 @@ export default function WorkoutOverviewPage() {
                     style={{
                       marginTop: 14,
                       paddingTop: 14,
-                      borderTop: '1px solid rgba(253,253,254,0.08)',
+                      borderTop: '1px solid var(--card-divider)',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: 6,
@@ -439,7 +439,7 @@ export default function WorkoutOverviewPage() {
                                 style={{
                                   fontSize: 14,
                                   fontWeight: 500,
-                                  color: '#FDFDFE',
+                                  color: 'var(--card-text)',
                                   letterSpacing: '-0.005em',
                                   lineHeight: 1.2,
                                   whiteSpace: 'nowrap',
@@ -466,7 +466,7 @@ export default function WorkoutOverviewPage() {
                               <div
                                 style={{
                                   fontSize: 11,
-                                  color: 'rgba(253,253,254,0.48)',
+                                  color: 'var(--card-text-muted)',
                                   marginTop: 2,
                                   lineHeight: 1.2,
                                 }}
@@ -503,7 +503,7 @@ export default function WorkoutOverviewPage() {
                 fontSize: 22,
                 fontWeight: 300,
                 letterSpacing: '-0.018em',
-                color: '#FDFDFE',
+                color: 'var(--card-text)',
                 margin: '14px 0 4px',
               }}
             >
@@ -513,7 +513,7 @@ export default function WorkoutOverviewPage() {
               style={{
                 fontSize: 12,
                 fontWeight: 400,
-                color: 'rgba(253,253,254,0.44)',
+                color: 'var(--card-text-muted)',
                 letterSpacing: '0.01em',
               }}
             >

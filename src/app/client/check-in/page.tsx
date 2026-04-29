@@ -50,7 +50,7 @@ const LABEL_STYLE: React.CSSProperties = {
   fontSize: 10,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
-  color: 'rgba(253,253,254,0.44)',
+  color: 'var(--card-text-muted)',
   fontWeight: 600,
 }
 
@@ -231,10 +231,10 @@ export default function CheckInPage() {
             </div>
           </div>
           <div className="space-y-2">
-            <h2 className="text-[22px] font-semibold text-[#FDFDFE] tracking-tight">
+            <h2 className="text-[22px] font-semibold text-[#1C1E18] tracking-tight">
               Check-in ingediend
             </h2>
-            <p className="text-[14px] text-[rgba(253,253,254,0.55)] leading-relaxed">
+            <p className="text-[14px] text-[rgba(28,30,24,0.62)] leading-relaxed">
               Je coach bekijkt je resultaten binnen 24 uur.
             </p>
           </div>
@@ -259,14 +259,14 @@ export default function CheckInPage() {
         >
           <div className="flex justify-center">
             <div className="w-20 h-20 rounded-full bg-[rgba(253,253,254,0.12)] flex items-center justify-center">
-              <Calendar className="h-10 w-10 text-[#FDFDFE]" strokeWidth={1.5} />
+              <Calendar className="h-10 w-10 text-[#1C1E18]" strokeWidth={1.5} />
             </div>
           </div>
           <div className="space-y-2">
-            <h2 className="text-[22px] font-semibold text-[#FDFDFE] tracking-tight">
+            <h2 className="text-[22px] font-semibold text-[#1C1E18] tracking-tight">
               Check-in
             </h2>
-            <p className="text-[14px] text-[rgba(253,253,254,0.55)] leading-relaxed">
+            <p className="text-[14px] text-[rgba(28,30,24,0.62)] leading-relaxed">
               {windowMessage}
             </p>
           </div>
@@ -296,10 +296,10 @@ export default function CheckInPage() {
           </span>
         </div>
 
-        <h1 className="text-[26px] leading-[1.1] font-semibold text-[#FDFDFE] tracking-tight">
+        <h1 className="text-[26px] leading-[1.1] font-semibold text-[#1C1E18] tracking-tight">
           {step.title}
         </h1>
-        <p className="text-[13px] text-[rgba(253,253,254,0.55)] mt-1.5">
+        <p className="text-[13px] text-[rgba(28,30,24,0.62)] mt-1.5">
           {step.description}
         </p>
 
@@ -327,7 +327,7 @@ export default function CheckInPage() {
                 <p
                   className={`text-[9px] font-semibold uppercase tracking-[0.12em] truncate ${
                     i === currentStep
-                      ? 'text-[#FDFDFE]'
+                      ? 'text-[#1C1E18]'
                       : i < currentStep
                       ? 'text-[#2FA65A]'
                       : 'text-[rgba(253,253,254,0.28)]'
@@ -390,7 +390,7 @@ export default function CheckInPage() {
         {currentStep > 0 && (
           <button
             onClick={() => setCurrentStep(currentStep - 1)}
-            className="flex items-center justify-center gap-1.5 px-5 py-3.5 rounded-full border border-[rgba(253,253,254,0.18)] text-[rgba(253,253,254,0.72)] font-semibold text-[13px] uppercase tracking-[0.08em] hover:border-[rgba(253,253,254,0.48)] hover:text-[#FDFDFE] transition-colors"
+            className="flex items-center justify-center gap-1.5 px-5 py-3.5 rounded-full border border-[rgba(253,253,254,0.18)] text-[rgba(253,253,254,0.72)] font-semibold text-[13px] uppercase tracking-[0.08em] hover:border-[rgba(253,253,254,0.48)] hover:text-[#1C1E18] transition-colors"
             aria-label="Vorige stap"
           >
             <ChevronLeft size={16} strokeWidth={2} />

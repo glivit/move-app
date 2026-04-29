@@ -4,7 +4,7 @@ export default function NutritionLoading() {
       {/* Back button placeholder */}
       <div style={{
         height: 16, width: 52,
-        background: 'rgba(253,253,254,0.10)',
+        background: 'var(--card-bg-tint)',
         borderRadius: 4,
         margin: '8px 0 14px',
       }} />
@@ -14,14 +14,14 @@ export default function NutritionLoading() {
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
           <div style={{
             height: 24, width: 96,
-            background: 'rgba(253,253,254,0.08)',
+            background: 'var(--card-bg-tint)',
             borderRadius: 6,
           }} />
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
           <div style={{
             width: 176, height: 176, borderRadius: '50%',
-            background: 'rgba(253,253,254,0.06)',
+            background: 'var(--card-bg-subtle)',
           }} />
         </div>
         <div style={{
@@ -32,7 +32,7 @@ export default function NutritionLoading() {
           {[1, 2, 3].map(i => (
             <div key={i} style={{
               height: 76,
-              background: 'rgba(253,253,254,0.06)',
+              background: 'var(--card-bg-subtle)',
               borderRadius: 14,
             }} />
           ))}
@@ -51,13 +51,13 @@ export default function NutritionLoading() {
           >
             <div style={{
               height: 16, width: 112,
-              background: 'rgba(253,253,254,0.10)',
+              background: 'var(--card-bg-tint)',
               borderRadius: 4,
               marginBottom: 6,
             }} />
             <div style={{
               height: 12, width: 72,
-              background: 'rgba(253,253,254,0.08)',
+              background: 'var(--card-bg-tint)',
               borderRadius: 4,
             }} />
           </div>

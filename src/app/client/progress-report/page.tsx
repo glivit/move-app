@@ -310,10 +310,10 @@ Bekijk mijn voortgang in Move!`
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[rgba(253,253,254,0.08)] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[rgba(28,30,24,0.10)] flex items-center justify-center p-4">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#C0FC01]"></div>
-          <p className="mt-4 text-[rgba(253,253,254,0.55)]">Voortgangsrapport laden...</p>
+          <p className="mt-4 text-[rgba(28,30,24,0.62)]">Voortgangsrapport laden...</p>
         </div>
       </div>
     )
@@ -321,17 +321,17 @@ Bekijk mijn voortgang in Move!`
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[rgba(253,253,254,0.08)] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[rgba(28,30,24,0.10)] flex items-center justify-center p-4">
         <div className="text-center max-w-md">
-          <h1 className="text-2xl font-bold text-[#FDFDFE] mb-2">Oops!</h1>
-          <p className="text-[rgba(253,253,254,0.55)]">{error}</p>
+          <h1 className="text-2xl font-bold text-[#1C1E18] mb-2">Oops!</h1>
+          <p className="text-[rgba(28,30,24,0.62)]">{error}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[rgba(253,253,254,0.08)] py-8 px-4">
+    <div className="min-h-screen bg-[rgba(28,30,24,0.10)] py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -339,15 +339,15 @@ Bekijk mijn voortgang in Move!`
             <h1 className="page-title text-4xl mb-2">
               Voortgangsrapport
             </h1>
-            <p className="text-[rgba(253,253,254,0.55)]">Volg je vooruitgang en feest je successen</p>
+            <p className="text-[rgba(28,30,24,0.62)]">Volg je vooruitgang en feest je successen</p>
           </div>
         </div>
 
         {/* Period Selector */}
-        <div className="mb-6 bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] p-5">
+        <div className="mb-6 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] p-5">
           <div className="flex items-center gap-2 mb-3">
             <Calendar className="w-5 h-5 text-[#C0FC01]" />
-            <span className="font-semibold text-[#FDFDFE]">Periode</span>
+            <span className="font-semibold text-[#1C1E18]">Periode</span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {PERIOD_OPTIONS.map(option => (
@@ -357,7 +357,7 @@ Bekijk mijn voortgang in Move!`
                 className={`py-2 px-3 rounded-lg font-medium transition-all ${
                   selectedPeriod === option.key
                     ? 'bg-[#C0FC01] text-white'
-                    : 'bg-[rgba(253,253,254,0.08)] text-[rgba(253,253,254,0.55)] hover:bg-[rgba(253,253,254,0.08)]'
+                    : 'bg-[rgba(28,30,24,0.10)] text-[rgba(28,30,24,0.62)] hover:bg-[rgba(28,30,24,0.10)]'
                 }`}
               >
                 {option.label}
@@ -367,11 +367,11 @@ Bekijk mijn voortgang in Move!`
         </div>
 
         {/* Report Card Container */}
-        <div ref={reportRef} className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] p-8 mb-6">
+        <div ref={reportRef} className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] p-8 mb-6">
           {/* Report Header */}
-          <div className="text-center mb-8 pb-6 border-b border-[rgba(253,253,254,0.08)]">
-            <h2 className="text-3xl font-bold text-[#FDFDFE] mb-1">{clientName}</h2>
-            <p className="text-[rgba(253,253,254,0.55)]">
+          <div className="text-center mb-8 pb-6 border-b border-[rgba(28,30,24,0.10)]">
+            <h2 className="text-3xl font-bold text-[#1C1E18] mb-1">{clientName}</h2>
+            <p className="text-[rgba(28,30,24,0.62)]">
               {periodLabel} • {reportDate}
             </p>
           </div>
@@ -379,39 +379,39 @@ Bekijk mijn voortgang in Move!`
           {/* Key Metrics */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {/* Total Workouts */}
-            <div className="bg-[rgba(253,253,254,0.08)] rounded-xl p-4">
+            <div className="bg-[rgba(28,30,24,0.10)] rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[rgba(253,253,254,0.55)]">Totaal workouts</span>
+                <span className="text-sm font-medium text-[rgba(28,30,24,0.62)]">Totaal workouts</span>
                 <TrendingUp className="w-5 h-5 text-[#C0FC01]" />
               </div>
-              <p className="text-3xl font-bold text-[#FDFDFE]">{totalWorkouts}</p>
+              <p className="text-3xl font-bold text-[#1C1E18]">{totalWorkouts}</p>
             </div>
 
             {/* Average Per Week */}
-            <div className="bg-[rgba(253,253,254,0.08)] rounded-xl p-4">
+            <div className="bg-[rgba(28,30,24,0.10)] rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[rgba(253,253,254,0.55)]">Gemiddeld/week</span>
+                <span className="text-sm font-medium text-[rgba(28,30,24,0.62)]">Gemiddeld/week</span>
                 <TrendingUp className="w-5 h-5 text-[#C0FC01]" />
               </div>
-              <p className="text-3xl font-bold text-[#FDFDFE]">{averagePerWeek}</p>
+              <p className="text-3xl font-bold text-[#1C1E18]">{averagePerWeek}</p>
             </div>
 
             {/* Current Streak */}
-            <div className="bg-[rgba(253,253,254,0.08)] rounded-xl p-4">
+            <div className="bg-[rgba(28,30,24,0.10)] rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[rgba(253,253,254,0.55)]">Huidige streak</span>
+                <span className="text-sm font-medium text-[rgba(28,30,24,0.62)]">Huidige streak</span>
                 <Flame className="w-5 h-5 text-[#C0FC01]" />
               </div>
-              <p className="text-3xl font-bold text-[#FDFDFE]">{currentStreak}d</p>
+              <p className="text-3xl font-bold text-[#1C1E18]">{currentStreak}d</p>
             </div>
 
             {/* Weight Change */}
-            <div className="bg-[rgba(253,253,254,0.08)] rounded-xl p-4">
+            <div className="bg-[rgba(28,30,24,0.10)] rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[rgba(253,253,254,0.55)]">Gewichtsverandering</span>
+                <span className="text-sm font-medium text-[rgba(28,30,24,0.62)]">Gewichtsverandering</span>
                 <Scale className="w-5 h-5 text-[#C0FC01]" />
               </div>
-              <p className={`text-3xl font-bold ${weightChange ? (weightChange < 0 ? 'text-green-600' : 'text-[#FDFDFE]') : 'text-[rgba(253,253,254,0.55)]'}`}>
+              <p className={`text-3xl font-bold ${weightChange ? (weightChange < 0 ? 'text-green-600' : 'text-[#1C1E18]') : 'text-[rgba(28,30,24,0.62)]'}`}>
                 {weightChange ? `${weightChange > 0 ? '+' : ''}${weightChange}kg` : '—'}
               </p>
             </div>
@@ -420,8 +420,8 @@ Bekijk mijn voortgang in Move!`
           {/* Weight Trend Chart */}
           {weightChartData.length > 1 && (
             <div className="mb-8">
-              <h3 className="text-xl font-bold text-[#FDFDFE] mb-4">Gewichtsverloop</h3>
-              <div className="bg-[rgba(253,253,254,0.08)] rounded-xl p-4 h-80">
+              <h3 className="text-xl font-bold text-[#1C1E18] mb-4">Gewichtsverloop</h3>
+              <div className="bg-[rgba(28,30,24,0.10)] rounded-xl p-4 h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={weightChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <defs>
@@ -430,23 +430,23 @@ Bekijk mijn voortgang in Move!`
                         <stop offset="95%" stopColor="#C0FC01" stopOpacity={0.1} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(253,253,254,0.08)" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(28,30,24,0.10)" />
                     <XAxis
                       dataKey="date"
                       tick={{ fill: 'rgba(253,253,254,0.55)', fontSize: 12 }}
-                      stroke="rgba(253,253,254,0.08)"
+                      stroke="rgba(28,30,24,0.10)"
                     />
                     <YAxis
                       tick={{ fill: 'rgba(253,253,254,0.55)', fontSize: 12 }}
-                      stroke="rgba(253,253,254,0.08)"
+                      stroke="rgba(28,30,24,0.10)"
                     />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: '#fff',
-                        border: '1px solid rgba(253,253,254,0.08)',
+                        border: '1px solid rgba(28,30,24,0.10)',
                         borderRadius: '8px',
                       }}
-                      labelStyle={{ color: '#FDFDFE' }}
+                      labelStyle={{ color: '#1C1E18' }}
                     />
                     <Area
                       type="monotone"
@@ -464,27 +464,27 @@ Bekijk mijn voortgang in Move!`
           {/* Weekly Workouts Chart */}
           {weeklyData.length > 0 && (
             <div className="mb-8">
-              <h3 className="text-xl font-bold text-[#FDFDFE] mb-4">Wekelijkse activiteit</h3>
-              <div className="bg-[rgba(253,253,254,0.08)] rounded-xl p-4 h-80">
+              <h3 className="text-xl font-bold text-[#1C1E18] mb-4">Wekelijkse activiteit</h3>
+              <div className="bg-[rgba(28,30,24,0.10)] rounded-xl p-4 h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={weeklyData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(253,253,254,0.08)" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(28,30,24,0.10)" />
                     <XAxis
                       dataKey="week"
                       tick={{ fill: 'rgba(253,253,254,0.55)', fontSize: 12 }}
-                      stroke="rgba(253,253,254,0.08)"
+                      stroke="rgba(28,30,24,0.10)"
                     />
                     <YAxis
                       tick={{ fill: 'rgba(253,253,254,0.55)', fontSize: 12 }}
-                      stroke="rgba(253,253,254,0.08)"
+                      stroke="rgba(28,30,24,0.10)"
                     />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: '#fff',
-                        border: '1px solid rgba(253,253,254,0.08)',
+                        border: '1px solid rgba(28,30,24,0.10)',
                         borderRadius: '8px',
                       }}
-                      labelStyle={{ color: '#FDFDFE' }}
+                      labelStyle={{ color: '#1C1E18' }}
                     />
                     <Bar
                       dataKey="workouts"
@@ -500,27 +500,27 @@ Bekijk mijn voortgang in Move!`
           {/* Top PRs */}
           {prs.length > 0 && (
             <div>
-              <h3 className="text-xl font-bold text-[#FDFDFE] mb-4 flex items-center gap-2">
+              <h3 className="text-xl font-bold text-[#1C1E18] mb-4 flex items-center gap-2">
                 <Trophy className="w-6 h-6 text-[#C0FC01]" />
                 Persoonlijke Records
               </h3>
               <div className="space-y-3">
                 {prs.map((pr, index) => (
-                  <div key={pr.id} className="flex items-center justify-between bg-[rgba(253,253,254,0.08)] rounded-xl p-4">
+                  <div key={pr.id} className="flex items-center justify-between bg-[rgba(28,30,24,0.10)] rounded-xl p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-[#C0FC01] text-white flex items-center justify-center font-bold text-sm">
                         {index + 1}
                       </div>
                       <div>
-                        <p className="font-semibold text-[#FDFDFE]">{pr.exercises?.name}</p>
-                        <p className="text-sm text-[rgba(253,253,254,0.55)]">
+                        <p className="font-semibold text-[#1C1E18]">{pr.exercises?.name}</p>
+                        <p className="text-sm text-[rgba(28,30,24,0.62)]">
                           {new Date(pr.workout_sessions?.started_at).toLocaleDateString('nl-NL')}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-[#FDFDFE]">{pr.weight_kg} kg</p>
-                      <p className="text-sm text-[rgba(253,253,254,0.55)]">{pr.reps} reps</p>
+                      <p className="font-bold text-[#1C1E18]">{pr.weight_kg} kg</p>
+                      <p className="text-sm text-[rgba(28,30,24,0.62)]">{pr.reps} reps</p>
                     </div>
                   </div>
                 ))}
@@ -530,7 +530,7 @@ Bekijk mijn voortgang in Move!`
 
           {prs.length === 0 && weightChartData.length === 0 && weeklyData.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-[rgba(253,253,254,0.55)] mb-2">Nog geen gegevens beschikbaar voor deze periode</p>
+              <p className="text-[rgba(28,30,24,0.62)] mb-2">Nog geen gegevens beschikbaar voor deze periode</p>
               <p className="text-sm text-[#B5B1AA]">Start met trainingen en loggen van je voortgang</p>
             </div>
           )}
@@ -561,7 +561,7 @@ Bekijk mijn voortgang in Move!`
           </button>
           <a
             href="/client/dashboard"
-            className="flex items-center gap-2 bg-[rgba(253,253,254,0.08)] text-[#FDFDFE] px-6 py-3 rounded-xl font-semibold border border-[rgba(253,253,254,0.08)] hover:bg-[rgba(253,253,254,0.08)] transition-colors"
+            className="flex items-center gap-2 bg-[rgba(28,30,24,0.10)] text-[#1C1E18] px-6 py-3 rounded-xl font-semibold border border-[rgba(28,30,24,0.10)] hover:bg-[rgba(28,30,24,0.10)] transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
             Terug naar dashboard

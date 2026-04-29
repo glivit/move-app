@@ -97,10 +97,10 @@ export default function ClientVideoPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[rgba(253,253,254,0.08)]">
+      <div className="min-h-screen bg-[rgba(28,30,24,0.10)]">
         <div className="max-w-lg mx-auto px-5 py-8">
           <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-10 w-10 border-2 border-[rgba(253,253,254,0.48)] border-t-[#FDFDFE]" />
+            <div className="animate-spin rounded-full h-10 w-10 border-2 border-[rgba(28,30,24,0.60)] border-t-[#1C1E18]" />
           </div>
         </div>
       </div>
@@ -108,20 +108,20 @@ export default function ClientVideoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[rgba(253,253,254,0.08)]">
+    <div className="min-h-screen bg-[rgba(28,30,24,0.10)]">
       <div className="max-w-lg mx-auto px-5 py-8 pb-28">
         {/* Header */}
-        <h1 className="text-[28px] font-[family-name:var(--font-display)] text-[#FDFDFE] mb-1">
+        <h1 className="text-[28px] font-[family-name:var(--font-display)] text-[#1C1E18] mb-1">
           Video Calls
         </h1>
-        <p className="text-[13px] text-[rgba(253,253,254,0.55)] mb-8">
+        <p className="text-[13px] text-[rgba(28,30,24,0.62)] mb-8">
           Je geplande videocalls met je coach
         </p>
 
         {/* Upcoming Sessions */}
         {upcoming.length > 0 && (
           <div className="mb-8">
-            <p className="text-[12px] text-[rgba(253,253,254,0.55)] uppercase font-medium tracking-wide mb-3">
+            <p className="text-[12px] text-[rgba(28,30,24,0.62)] uppercase font-medium tracking-wide mb-3">
               Aankomend
             </p>
             <div className="space-y-3">
@@ -132,7 +132,7 @@ export default function ClientVideoPage() {
                 return (
                   <div
                     key={session.id}
-                    className="bg-[#A6ADA7] rounded-2xl p-5 border border-[rgba(253,253,254,0.08)]"
+                    className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl p-5 border border-[rgba(28,30,24,0.10)]"
                   >
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-center gap-3">
@@ -140,12 +140,12 @@ export default function ClientVideoPage() {
                           <Video strokeWidth={1.5} className="w-5 h-5 text-[#3068C4]" />
                         </div>
                         <div>
-                          <p className="text-[15px] font-semibold text-[#FDFDFE]">
+                          <p className="text-[15px] font-semibold text-[#1C1E18]">
                             {formatDate(session.scheduled_at)}
                           </p>
                           <div className="flex items-center gap-2 mt-0.5">
-                            <Clock strokeWidth={1.5} className="w-3.5 h-3.5 text-[rgba(253,253,254,0.55)]" />
-                            <span className="text-[13px] text-[rgba(253,253,254,0.55)]">
+                            <Clock strokeWidth={1.5} className="w-3.5 h-3.5 text-[rgba(28,30,24,0.62)]" />
+                            <span className="text-[13px] text-[rgba(28,30,24,0.62)]">
                               {formatTime(session.scheduled_at)} · {session.duration_minutes} min
                             </span>
                           </div>
@@ -168,7 +168,7 @@ export default function ClientVideoPage() {
                         Nu deelnemen
                       </Link>
                     ) : (
-                      <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#F5F5F3] text-[13px] text-[rgba(253,253,254,0.55)]">
+                      <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#F5F5F3] text-[13px] text-[rgba(28,30,24,0.62)]">
                         <Calendar strokeWidth={1.5} className="w-4 h-4" />
                         Je kunt 5 minuten voor de start deelnemen
                       </div>
@@ -180,14 +180,14 @@ export default function ClientVideoPage() {
                         href={getGoogleCalendarUrl(getCalendarEvent(session))}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[rgba(253,253,254,0.35)] text-[12px] font-medium text-[rgba(253,253,254,0.55)] hover:bg-[rgba(253,253,254,0.08)] transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[rgba(253,253,254,0.35)] text-[12px] font-medium text-[rgba(28,30,24,0.62)] hover:bg-[rgba(28,30,24,0.10)] transition-colors"
                       >
                         <ExternalLink strokeWidth={1.5} className="w-3.5 h-3.5" />
                         Google Calendar
                       </a>
                       <button
                         onClick={() => downloadICS(getCalendarEvent(session), `move-call-${session.id.slice(0, 8)}.ics`)}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[rgba(253,253,254,0.35)] text-[12px] font-medium text-[rgba(253,253,254,0.55)] hover:bg-[rgba(253,253,254,0.08)] transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-[rgba(253,253,254,0.35)] text-[12px] font-medium text-[rgba(28,30,24,0.62)] hover:bg-[rgba(28,30,24,0.10)] transition-colors"
                       >
                         <Download strokeWidth={1.5} className="w-3.5 h-3.5" />
                         Download .ics
@@ -203,27 +203,27 @@ export default function ClientVideoPage() {
         {/* Past Sessions */}
         {past.length > 0 && (
           <div>
-            <p className="text-[12px] text-[rgba(253,253,254,0.55)] uppercase font-medium tracking-wide mb-3">
+            <p className="text-[12px] text-[rgba(28,30,24,0.62)] uppercase font-medium tracking-wide mb-3">
               Eerdere videocalls
             </p>
             <div className="space-y-2">
               {past.map((session) => (
                 <div
                   key={session.id}
-                  className="bg-[#A6ADA7] rounded-2xl p-4 border border-[rgba(253,253,254,0.08)] flex items-center gap-3"
+                  className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl p-4 border border-[rgba(28,30,24,0.10)] flex items-center gap-3"
                 >
-                  <div className="w-9 h-9 rounded-lg bg-[rgba(253,253,254,0.08)] flex items-center justify-center">
-                    <Video strokeWidth={1.5} className="w-4 h-4 text-[rgba(253,253,254,0.55)]" />
+                  <div className="w-9 h-9 rounded-lg bg-[rgba(28,30,24,0.10)] flex items-center justify-center">
+                    <Video strokeWidth={1.5} className="w-4 h-4 text-[rgba(28,30,24,0.62)]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-medium text-[#FDFDFE]">
+                    <p className="text-[14px] font-medium text-[#1C1E18]">
                       {formatDate(session.scheduled_at)}
                     </p>
-                    <p className="text-[12px] text-[rgba(253,253,254,0.55)]">
+                    <p className="text-[12px] text-[rgba(28,30,24,0.62)]">
                       {formatTime(session.scheduled_at)} · {session.duration_minutes} min
                     </p>
                   </div>
-                  <span className="text-[11px] text-[rgba(253,253,254,0.55)]">
+                  <span className="text-[11px] text-[rgba(28,30,24,0.62)]">
                     {statusLabel(session.status).text}
                   </span>
                 </div>
@@ -234,14 +234,14 @@ export default function ClientVideoPage() {
 
         {/* Empty State */}
         {sessions.length === 0 && (
-          <div className="bg-[#A6ADA7] rounded-2xl p-12 border border-[rgba(253,253,254,0.08)] text-center">
+          <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl p-12 border border-[rgba(28,30,24,0.10)] text-center">
             <div className="w-16 h-16 rounded-full bg-[#3068C4]/10 flex items-center justify-center mx-auto mb-4">
               <Video strokeWidth={1.5} className="w-8 h-8 text-[#3068C4]" />
             </div>
-            <h2 className="text-[17px] font-semibold text-[#FDFDFE] mb-2">
+            <h2 className="text-[17px] font-semibold text-[#1C1E18] mb-2">
               Geen video calls gepland
             </h2>
-            <p className="text-[13px] text-[rgba(253,253,254,0.55)] max-w-xs mx-auto">
+            <p className="text-[13px] text-[rgba(28,30,24,0.62)] max-w-xs mx-auto">
               Je coach plant videocalls in wanneer nodig. Je ziet ze hier verschijnen.
             </p>
           </div>

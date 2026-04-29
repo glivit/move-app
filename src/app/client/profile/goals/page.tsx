@@ -87,7 +87,7 @@ export default function GoalsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-6 h-6 animate-spin text-[#FDFDFE]" />
+        <Loader2 className="w-6 h-6 animate-spin text-[#1C1E18]" />
       </div>
     )
   }
@@ -96,18 +96,18 @@ export default function GoalsPage() {
     <div className="space-y-6 pb-20">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#FDFDFE]">
+        <button onClick={() => router.back()} className="p-2 -ml-2 text-[#1C1E18]">
           <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
         </button>
-        <h1 className="text-editorial-h2 text-[#FDFDFE]">
+        <h1 className="text-editorial-h2 text-[#1C1E18]">
           Mijn doelen
         </h1>
       </div>
 
       {/* Primary Goal */}
       <div>
-        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Hoofddoel</p>
-        <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] divide-y divide-[rgba(253,253,254,0.08)]">
+        <p className="text-[13px] font-medium text-[rgba(28,30,24,0.62)] uppercase tracking-wide px-1 mb-2">Hoofddoel</p>
+        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
           {GOAL_OPTIONS.map((goal) => (
             <button
               key={goal.id}
@@ -116,7 +116,7 @@ export default function GoalsPage() {
             >
               <div className="flex items-center gap-3">
                 <span className="text-xl">{goal.emoji}</span>
-                <span className="text-[15px] text-[#FDFDFE]">{goal.label}</span>
+                <span className="text-[15px] text-[#1C1E18]">{goal.label}</span>
               </div>
               {primaryGoal === goal.id && (
                 <div className="w-6 h-6 rounded-full bg-[#FDFDFE] flex items-center justify-center">
@@ -130,7 +130,7 @@ export default function GoalsPage() {
 
       {/* Secondary Goals */}
       <div>
-        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Nevendoelen (optioneel)</p>
+        <p className="text-[13px] font-medium text-[rgba(28,30,24,0.62)] uppercase tracking-wide px-1 mb-2">Nevendoelen (optioneel)</p>
         <div className="flex flex-wrap gap-2">
           {GOAL_OPTIONS.filter(g => g.id !== primaryGoal).map((goal) => {
             const selected = secondaryGoals.includes(goal.id)
@@ -141,7 +141,7 @@ export default function GoalsPage() {
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
                     ? 'bg-[#474B48] text-white'
-                    : 'bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] text-[#FDFDFE] hover:border-[#FDFDFE]'
+                    : 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] text-[#1C1E18] hover:border-[#FDFDFE]'
                 }`}
               >
                 {goal.emoji} {goal.label}
@@ -153,14 +153,14 @@ export default function GoalsPage() {
 
       {/* Motivation */}
       <div>
-        <p className="text-[13px] font-medium text-[rgba(253,253,254,0.55)] uppercase tracking-wide px-1 mb-2">Motivatie</p>
-        <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] p-5">
+        <p className="text-[13px] font-medium text-[rgba(28,30,24,0.62)] uppercase tracking-wide px-1 mb-2">Motivatie</p>
+        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] p-5">
           <textarea
             value={motivation}
             onChange={(e) => setMotivation(e.target.value)}
             placeholder="Waarom wil je dit bereiken? Wat drijft je?"
             rows={4}
-            className="w-full text-[15px] text-[#FDFDFE] bg-transparent placeholder:text-[rgba(253,253,254,0.48)] focus:outline-none resize-none"
+            className="w-full text-[15px] text-[#1C1E18] bg-transparent placeholder:text-[rgba(28,30,24,0.60)] focus:outline-none resize-none"
           />
         </div>
       </div>

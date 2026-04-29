@@ -53,8 +53,8 @@ function getInitials(name: string): string {
 
 // v6 tokens
 const CANVAS = '#8E9890'
-const WHITE = '#FDFDFE'
-const INK_FAINT = 'rgba(253,253,254,0.44)'
+const WHITE = '#1C1E18'
+const INK_FAINT = 'rgba(28,30,24,0.58)'
 
 export default function ClientMessagesPage() {
   const router = useRouter()
@@ -180,13 +180,13 @@ export default function ClientMessagesPage() {
           <div style={{ width: 32, height: 32, borderRadius: 999, background: 'rgba(255,255,255,0.06)' }} />
           <div style={{ width: 36, height: 36, borderRadius: 999, background: 'rgba(255,255,255,0.08)' }} />
           <div className="animate-pulse" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <div style={{ width: 80, height: 12, borderRadius: 4, background: 'rgba(253,253,254,0.14)' }} />
-            <div style={{ width: 40, height: 8, borderRadius: 4, background: 'rgba(253,253,254,0.08)' }} />
+            <div style={{ width: 80, height: 12, borderRadius: 4, background: 'rgba(28,30,24,0.18)' }} />
+            <div style={{ width: 40, height: 8, borderRadius: 4, background: 'rgba(28,30,24,0.10)' }} />
           </div>
         </div>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="animate-pulse" style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
-            <div style={{ width: 180, height: 12, borderRadius: 4, background: 'rgba(253,253,254,0.10)' }} />
+            <div style={{ width: 180, height: 12, borderRadius: 4, background: 'rgba(28,30,24,0.12)' }} />
           </div>
         </div>
       </div>
@@ -269,7 +269,7 @@ export default function ClientMessagesPage() {
               <div style={{ textAlign: 'center' }}>
                 <div style={{
                   width: 56, height: 56, borderRadius: '50%', margin: '0 auto 16px',
-                  background: 'rgba(253,253,254,0.08)',
+                  background: 'rgba(28,30,24,0.10)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   <MessageCircle size={24} style={{ color: WHITE }} strokeWidth={1.5} />

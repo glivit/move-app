@@ -28,7 +28,7 @@ const LABEL_STYLE: React.CSSProperties = {
   fontSize: 10,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
-  color: 'rgba(253,253,254,0.44)',
+  color: 'var(--card-text-muted)',
   fontWeight: 600,
 }
 
@@ -196,10 +196,10 @@ export default function WeeklyCheckInPage() {
           <div className="w-16 h-16 rounded-full bg-[rgba(47,166,90,0.18)] mx-auto mb-4 flex items-center justify-center">
             <CheckCircle2 size={32} strokeWidth={1.5} className="text-[#2FA65A]" />
           </div>
-          <p className="font-semibold text-[#FDFDFE] text-[18px] tracking-tight">
+          <p className="font-semibold text-[#1C1E18] text-[18px] tracking-tight">
             {submitted ? 'Check-in verstuurd' : 'Al ingediend deze week'}
           </p>
-          <p className="text-[14px] text-[rgba(253,253,254,0.55)] mt-2 leading-relaxed">
+          <p className="text-[14px] text-[rgba(28,30,24,0.62)] mt-2 leading-relaxed">
             {submitted
               ? 'Goed bezig. Je coach kan je voortgang bekijken.'
               : 'Je hebt deze week al een check-in gedaan. Volgende week weer.'}
@@ -221,7 +221,7 @@ export default function WeeklyCheckInPage() {
       {/* ─── GEWICHT — hero card ─────────────────────────── */}
       <div className="p-6 animate-slide-up stagger-2" style={LIGHT_CARD}>
         <div className="flex items-center gap-2 mb-5">
-          <Scale size={14} strokeWidth={1.75} className="text-[rgba(253,253,254,0.55)]" />
+          <Scale size={14} strokeWidth={1.75} className="text-[rgba(28,30,24,0.62)]" />
           <span style={LABEL_STYLE}>Gewicht</span>
         </div>
 
@@ -232,15 +232,15 @@ export default function WeeklyCheckInPage() {
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
             placeholder="0.0"
-            className="flex-1 min-w-0 text-[44px] leading-none font-semibold text-[#FDFDFE] bg-transparent outline-none tracking-tight placeholder-[rgba(253,253,254,0.28)]"
+            className="flex-1 min-w-0 text-[44px] leading-none font-semibold text-[#1C1E18] bg-transparent outline-none tracking-tight placeholder-[rgba(253,253,254,0.28)]"
           />
-          <span className="text-[16px] text-[rgba(253,253,254,0.55)] font-medium">kg</span>
+          <span className="text-[16px] text-[rgba(28,30,24,0.62)] font-medium">kg</span>
         </div>
 
         <div className="mt-4 pt-3 border-t border-[rgba(253,253,254,0.12)]">
           {lastWeight ? (
             <div className="flex items-center justify-between">
-              <span className="text-[12px] text-[rgba(253,253,254,0.55)]">
+              <span className="text-[12px] text-[rgba(28,30,24,0.62)]">
                 Vorige week · {lastWeight} kg
               </span>
               {weightDiff !== null && weightDiff !== 0 && (
@@ -254,7 +254,7 @@ export default function WeeklyCheckInPage() {
               )}
             </div>
           ) : (
-            <span className="text-[12px] text-[rgba(253,253,254,0.44)]">
+            <span className="text-[12px] text-[rgba(28,30,24,0.58)]">
               Je eerste wekelijkse meting
             </span>
           )}
@@ -264,9 +264,9 @@ export default function WeeklyCheckInPage() {
       {/* ─── FOTO ──────────────────────────────────────── */}
       <div className="p-5 animate-slide-up stagger-3" style={LIGHT_CARD}>
         <div className="flex items-center gap-2 mb-4">
-          <Camera size={14} strokeWidth={1.75} className="text-[rgba(253,253,254,0.55)]" />
+          <Camera size={14} strokeWidth={1.75} className="text-[rgba(28,30,24,0.62)]" />
           <span style={LABEL_STYLE}>Foto vooraanzicht</span>
-          <span className="ml-auto text-[10px] text-[rgba(253,253,254,0.44)] font-medium">Optioneel</span>
+          <span className="ml-auto text-[10px] text-[rgba(28,30,24,0.58)] font-medium">Optioneel</span>
         </div>
 
         <input
@@ -294,7 +294,7 @@ export default function WeeklyCheckInPage() {
                 setPhoto(null)
                 setPhotoPreview(null)
               }}
-              className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-[#474B48]/80 text-[#FDFDFE] flex items-center justify-center hover:bg-[#474B48] transition-colors"
+              className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-[#474B48]/80 text-[#1C1E18] flex items-center justify-center hover:bg-[#474B48] transition-colors"
               aria-label="Verwijder foto"
             >
               <X size={16} strokeWidth={2} />
@@ -303,9 +303,9 @@ export default function WeeklyCheckInPage() {
         ) : (
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full py-10 rounded-[18px] border border-dashed border-[rgba(253,253,254,0.22)] hover:border-[rgba(253,253,254,0.48)] hover:bg-[rgba(253,253,254,0.04)] transition-all flex flex-col items-center gap-2.5"
+            className="w-full py-10 rounded-[18px] border border-dashed border-[rgba(253,253,254,0.22)] hover:border-[rgba(253,253,254,0.48)] hover:bg-[rgba(255,255,255,0.50)] transition-all flex flex-col items-center gap-2.5"
           >
-            <div className="w-11 h-11 rounded-full bg-[rgba(253,253,254,0.10)] flex items-center justify-center">
+            <div className="w-11 h-11 rounded-full bg-[rgba(255,255,255,0.55)] flex items-center justify-center">
               <Camera size={18} strokeWidth={1.75} className="text-[rgba(253,253,254,0.72)]" />
             </div>
             <span className="text-[13px] text-[rgba(253,253,254,0.72)] font-medium">Tik om foto te nemen</span>
@@ -345,14 +345,14 @@ export default function WeeklyCheckInPage() {
       <div className="p-5 animate-slide-up stagger-5" style={LIGHT_CARD}>
         <div className="flex items-center gap-2 mb-3">
           <span style={LABEL_STYLE}>Iets te melden</span>
-          <span className="ml-auto text-[10px] text-[rgba(253,253,254,0.44)] font-medium">Optioneel</span>
+          <span className="ml-auto text-[10px] text-[rgba(28,30,24,0.58)] font-medium">Optioneel</span>
         </div>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Hoe voel je je? Pijnklachten? Vragen voor je coach?"
           rows={3}
-          className="w-full px-3.5 py-3 bg-[rgba(253,253,254,0.08)] rounded-[14px] text-[14px] text-[#FDFDFE] placeholder-[rgba(253,253,254,0.44)] focus:outline-none focus:bg-[rgba(253,253,254,0.12)] transition-colors resize-none"
+          className="w-full px-3.5 py-3 bg-[rgba(255,255,255,0.50)] rounded-[14px] text-[14px] text-[#1C1E18] placeholder-[rgba(253,253,254,0.44)] focus:outline-none focus:bg-[rgba(253,253,254,0.12)] transition-colors resize-none"
         />
       </div>
 
@@ -394,14 +394,14 @@ function RatingRow({
   return (
     <div>
       <div className="flex items-center justify-between mb-2.5">
-        <span className="text-[14px] text-[#FDFDFE] font-medium">{label}</span>
-        <span className="text-[11px] text-[rgba(253,253,254,0.55)] min-h-[16px]">
+        <span className="text-[14px] text-[#1C1E18] font-medium">{label}</span>
+        <span className="text-[11px] text-[rgba(28,30,24,0.62)] min-h-[16px]">
           {value > 0 ? labels[value - 1] : '—'}
         </span>
       </div>
       <div
         className="flex gap-1 p-1 rounded-full"
-        style={{ background: 'rgba(253,253,254,0.08)' }}
+        style={{ background: 'var(--card-bg-tint)' }}
       >
         {[1, 2, 3, 4, 5].map((n) => {
           const active = n <= value
@@ -414,8 +414,8 @@ function RatingRow({
                 current
                   ? 'bg-[#FDFDFE] text-[#2A2D2B] shadow-sm'
                   : active
-                  ? 'text-[#FDFDFE]'
-                  : 'text-[rgba(253,253,254,0.44)]'
+                  ? 'text-[#1C1E18]'
+                  : 'text-[rgba(28,30,24,0.58)]'
               }`}
               style={
                 active && !current

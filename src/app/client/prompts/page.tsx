@@ -25,7 +25,7 @@ function PromptCardSkeleton() {
   return (
     <div
       className="p-6 border animate-shimmer rounded-2xl"
-      style={{ backgroundColor: '#FFFFFF', borderColor: 'rgba(253,253,254,0.08)' }}
+      style={{ backgroundColor: '#FFFFFF', borderColor: 'rgba(28,30,24,0.10)' }}
     >
       <div className="h-6 w-3/4 bg-gray-200 rounded animate-shimmer mb-4" />
       <div className="space-y-3 mb-6">
@@ -53,7 +53,7 @@ function ScoreSelector({
     <div>
       <label
         className="block text-[13px] font-medium mb-2.5"
-        style={{ color: '#FDFDFE' }}
+        style={{ color: '#1C1E18' }}
       >
         {label}
       </label>
@@ -64,9 +64,9 @@ function ScoreSelector({
             onClick={() => onChange(score)}
             className="w-10 h-10 font-medium text-sm uppercase tracking-[0.12em] transition-all border rounded-xl"
             style={{
-              backgroundColor: value === score ? '#FDFDFE' : '#FFFFFF',
+              backgroundColor: value === score ? '#1C1E18' : '#FFFFFF',
               color: value === score ? '#FFFFFF' : 'rgba(253,253,254,0.55)',
-              borderColor: value === score ? '#FDFDFE' : 'rgba(253,253,254,0.35)',
+              borderColor: value === score ? '#1C1E18' : 'rgba(253,253,254,0.35)',
             }}
           >
             {score}
@@ -128,14 +128,14 @@ function PromptCard({
   return (
     <div
       className="p-6 overflow-hidden border rounded-2xl"
-      style={{ backgroundColor: '#FFFFFF', borderColor: 'rgba(253,253,254,0.08)' }}
+      style={{ backgroundColor: '#FFFFFF', borderColor: 'rgba(28,30,24,0.10)' }}
     >
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Question */}
         <div>
           <h3
             className="text-lg font-semibold mb-4"
-            style={{ color: '#FDFDFE' }}
+            style={{ color: '#1C1E18' }}
           >
             {question}
           </h3>
@@ -148,10 +148,10 @@ function PromptCard({
             rows={4}
             className="w-full px-4 py-3 border focus:outline-none focus:ring-2 transition-all rounded-xl"
             style={{
-              backgroundColor: 'rgba(253,253,254,0.08)',
-              color: '#FDFDFE',
-              outlineColor: '#FDFDFE',
-              borderColor: 'rgba(253,253,254,0.08)',
+              backgroundColor: 'rgba(28,30,24,0.10)',
+              color: '#1C1E18',
+              outlineColor: '#1C1E18',
+              borderColor: 'rgba(28,30,24,0.10)',
             }}
           />
         </div>
@@ -182,11 +182,11 @@ function PromptCard({
             disabled={isSubmitting}
             className="w-full px-6 py-3 font-medium uppercase tracking-[0.12em] transition-all flex items-center justify-center gap-2 border rounded-xl"
             style={{
-              backgroundColor: '#FDFDFE',
+              backgroundColor: '#1C1E18',
               color: '#FFFFFF',
               opacity: isSubmitting ? 0.6 : 1,
               cursor: isSubmitting ? 'not-allowed' : 'pointer',
-              borderColor: '#FDFDFE',
+              borderColor: '#1C1E18',
             }}
           >
             {isSubmitting ? 'Opslaan...' : 'Opslaan'}
@@ -329,11 +329,11 @@ export default function ClientPromptsPage() {
   };
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: 'rgba(253,253,254,0.08)' }}>
+    <div className="min-h-screen p-6" style={{ backgroundColor: 'rgba(28,30,24,0.10)' }}>
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-editorial-h2 text-[#FDFDFE]">
+          <h1 className="text-editorial-h2 text-[#1C1E18]">
             Reflectie vragen
           </h1>
           <p className="text-[15px]" style={{ color: 'rgba(253,253,254,0.55)' }}>
@@ -367,16 +367,16 @@ export default function ClientPromptsPage() {
             ))}
           </div>
         ) : unansweredPrompts.length === 0 ? (
-          <div className="p-12 text-center bg-[#A6ADA7] rounded-2xl">
+          <div className="p-12 text-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl">
             <MessageSquare
               size={48}
-              style={{ color: '#FDFDFE' }}
+              style={{ color: '#1C1E18' }}
               className="mx-auto mb-4"
               strokeWidth={1.5}
             />
             <p
               className="text-[15px] font-medium mb-2"
-              style={{ color: '#FDFDFE' }}
+              style={{ color: '#1C1E18' }}
             >
               Geen openstaande reflectie vragen
             </p>
@@ -409,20 +409,20 @@ export default function ClientPromptsPage() {
               <div>
                 <button
                   onClick={() => setShowAnswered(!showAnswered)}
-                  className="w-full flex items-center justify-between px-6 py-4 transition-all bg-[#A6ADA7] rounded-2xl"
+                  className="w-full flex items-center justify-between px-6 py-4 transition-all bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl"
                   style={{
-                    color: '#FDFDFE',
+                    color: '#1C1E18',
                   }}
                 >
                   <span className="font-semibold text-[15px]">
                     Eerdere antwoorden ({answeredPrompts.length})
                   </span>
                   {showAnswered ? (
-                    <ChevronUp size={20} style={{ color: '#FDFDFE' }} strokeWidth={1.5} />
+                    <ChevronUp size={20} style={{ color: '#1C1E18' }} strokeWidth={1.5} />
                   ) : (
                     <ChevronDown
                       size={20}
-                      style={{ color: '#FDFDFE' }}
+                      style={{ color: '#1C1E18' }}
                       strokeWidth={1.5}
                     />
                   )}
@@ -433,11 +433,11 @@ export default function ClientPromptsPage() {
                     {answeredPrompts.map((prompt) => (
                       <div
                         key={prompt.id}
-                        className="p-6 bg-[#A6ADA7] rounded-2xl"
+                        className="p-6 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl"
                       >
                         <p
                           className="text-sm font-medium mb-3"
-                          style={{ color: '#FDFDFE' }}
+                          style={{ color: '#1C1E18' }}
                         >
                           {prompt.prompt.question}
                         </p>
@@ -449,7 +449,7 @@ export default function ClientPromptsPage() {
                         </p>
                         <div
                           className="flex gap-4 text-[12px]"
-                          style={{ color: '#FDFDFE' }}
+                          style={{ color: '#1C1E18' }}
                         >
                           {prompt.mood_score && (
                             <span>Stemming: {prompt.mood_score}/5</span>

@@ -302,7 +302,7 @@ function CheckInStatRow({ label, value, unit, delta, first }: {
         style={{
           fontSize: 11,
           fontWeight: 400,
-          color: 'rgba(253,253,254,0.44)',
+          color: 'var(--card-text-muted)',
           letterSpacing: '0.005em',
         }}
       >
@@ -312,13 +312,13 @@ function CheckInStatRow({ label, value, unit, delta, first }: {
         style={{
           fontSize: 13,
           fontWeight: 400,
-          color: '#FDFDFE',
+          color: 'var(--card-text)',
           letterSpacing: '-0.005em',
         }}
       >
         {value}
         {(unit || delta) && (
-          <small style={{ fontSize: 10, color: 'rgba(253,253,254,0.62)', marginLeft: 2, letterSpacing: 0 }}>
+          <small style={{ fontSize: 10, color: 'var(--card-text-muted)', marginLeft: 2, letterSpacing: 0 }}>
             {unit}
             {delta && unit ? ' · ' : ''}
             {delta}
@@ -338,14 +338,14 @@ function BodySummaryCell({ value, unit, label }: { value: string; unit: string; 
           fontSize: 18,
           fontWeight: 300,
           letterSpacing: '-0.015em',
-          color: '#FDFDFE',
+          color: 'var(--card-text)',
           fontFeatureSettings: '"tnum"',
           lineHeight: 1.1,
         }}
       >
         {value}
         {unit && (
-          <small style={{ fontSize: 10, color: 'rgba(253,253,254,0.62)', marginLeft: 2, letterSpacing: 0 }}>
+          <small style={{ fontSize: 10, color: 'var(--card-text-muted)', marginLeft: 2, letterSpacing: 0 }}>
             {unit}
           </small>
         )}
@@ -356,7 +356,7 @@ function BodySummaryCell({ value, unit, label }: { value: string; unit: string; 
           fontWeight: 500,
           letterSpacing: '0.14em',
           textTransform: 'uppercase',
-          color: 'rgba(253,253,254,0.44)',
+          color: 'var(--card-text-muted)',
           marginTop: 3,
         }}
       >
@@ -663,7 +663,7 @@ export default function ProgressPage() {
       <div className="pb-28 animate-fade-in">
         <div className="flex gap-1.5 mb-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex-1 h-9 rounded-full" style={{ background: 'rgba(253,253,254,0.06)' }} />
+            <div key={i} className="flex-1 h-9 rounded-full" style={{ background: 'var(--card-bg-subtle)' }} />
           ))}
         </div>
         <div
@@ -674,9 +674,9 @@ export default function ProgressPage() {
           }}
         >
           <div className="space-y-3">
-            <div className="h-3 w-24 rounded-full" style={{ background: 'rgba(253,253,254,0.14)' }} />
+            <div className="h-3 w-24 rounded-full" style={{ background: 'var(--card-bg-tint)' }} />
             <div className="h-14 w-40 rounded-lg" style={{ background: 'rgba(253,253,254,0.22)' }} />
-            <div className="h-3 w-48 rounded-full" style={{ background: 'rgba(253,253,254,0.10)' }} />
+            <div className="h-3 w-48 rounded-full" style={{ background: 'var(--card-bg-tint)' }} />
           </div>
         </div>
         <div className="rounded-[24px] mb-2 animate-pulse" style={{ height: 64, background: '#474B48' }} />
@@ -698,10 +698,10 @@ export default function ProgressPage() {
             textAlign: 'center',
           }}
         >
-          <p style={{ color: '#FDFDFE', fontSize: 18, fontWeight: 300, letterSpacing: '-0.012em', marginBottom: 8 }}>
+          <p style={{ color: 'var(--card-text)', fontSize: 18, fontWeight: 300, letterSpacing: '-0.012em', marginBottom: 8 }}>
             Nog geen data
           </p>
-          <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 14, maxWidth: 260, margin: '0 auto' }}>
+          <p style={{ color: 'var(--card-text-muted)', fontSize: 14, maxWidth: 260, margin: '0 auto' }}>
             Start je eerste workout en je voortgang verschijnt hier.
           </p>
         </div>
@@ -770,7 +770,7 @@ export default function ProgressPage() {
     fontWeight: 500,
     letterSpacing: '0.18em',
     textTransform: 'uppercase',
-    color: 'rgba(253,253,254,0.44)',
+    color: 'var(--card-text-muted)',
   }
 
   return (
@@ -821,7 +821,7 @@ export default function ProgressPage() {
                 fontWeight: 500,
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
-                color: 'rgba(253,253,254,0.44)',
+                color: 'var(--card-text-muted)',
                 marginBottom: 10,
               }}
             >
@@ -834,14 +834,14 @@ export default function ProgressPage() {
                   fontSize: 52,
                   fontWeight: 200,
                   letterSpacing: '-0.035em',
-                  color: '#FDFDFE',
+                  color: 'var(--card-text)',
                   lineHeight: 0.95,
                   fontFeatureSettings: '"tnum"',
                 }}
               >
                 <AnimatedNumber value={week.done} />
               </span>
-              <span style={{ fontSize: 15, fontWeight: 300, color: 'rgba(253,253,254,0.62)', letterSpacing: '-0.01em' }}>
+              <span style={{ fontSize: 15, fontWeight: 300, color: 'var(--card-text-muted)', letterSpacing: '-0.01em' }}>
                 / {week.target} trainingen
               </span>
             </div>
@@ -851,18 +851,18 @@ export default function ProgressPage() {
                 marginTop: 10,
                 fontSize: 13,
                 fontWeight: 300,
-                color: 'rgba(253,253,254,0.78)',
+                color: 'var(--card-text-soft)',
                 letterSpacing: '-0.005em',
                 lineHeight: 1.5,
               }}
             >
               {remaining === 0 ? (
-                <>Je hebt je weekdoel gehaald. <strong style={{ color: '#FDFDFE', fontWeight: 400 }}>Topprestatie.</strong></>
+                <>Je hebt je weekdoel gehaald. <strong style={{ color: 'var(--card-text)', fontWeight: 400 }}>Topprestatie.</strong></>
               ) : week.done === 0 ? (
-                <>Nog <strong style={{ color: '#FDFDFE', fontWeight: 400 }}>{week.target} sessies</strong> voor zondag.</>
+                <>Nog <strong style={{ color: 'var(--card-text)', fontWeight: 400 }}>{week.target} sessies</strong> voor zondag.</>
               ) : (
                 <>
-                  Je ligt op koers — nog <strong style={{ color: '#FDFDFE', fontWeight: 400 }}>
+                  Je ligt op koers — nog <strong style={{ color: 'var(--card-text)', fontWeight: 400 }}>
                     {remaining} {remaining === 1 ? 'sessie' : 'sessies'}
                   </strong> voor zondag.
                 </>
@@ -931,10 +931,10 @@ export default function ProgressPage() {
                 }}
               />
               <div style={{ flex: 1 }}>
-                <p style={{ fontSize: 14, fontWeight: 400, color: '#FDFDFE', letterSpacing: '-0.005em', margin: 0 }}>
+                <p style={{ fontSize: 14, fontWeight: 400, color: 'var(--card-text)', letterSpacing: '-0.005em', margin: 0 }}>
                   Wekelijkse check-in staat klaar
                 </p>
-                <p style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)', marginTop: 2 }}>
+                <p style={{ fontSize: 11, color: 'var(--card-text-muted)', marginTop: 2 }}>
                   {coach?.name ? `${coach.name} wacht op je antwoord · 3 min` : 'Geeft je coach inzicht · 3 min'}
                 </p>
               </div>
@@ -942,7 +942,7 @@ export default function ProgressPage() {
                 style={{
                   width: 28, height: 28,
                   borderRadius: '50%',
-                  background: 'rgba(253,253,254,0.08)',
+                  background: 'var(--card-bg-tint)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0,
                 }}
@@ -972,7 +972,7 @@ export default function ProgressPage() {
                   style={{
                     width: 36, height: 36,
                     borderRadius: '50%',
-                    background: 'rgba(253,253,254,0.10)',
+                    background: 'var(--card-bg-tint)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                   }}
@@ -990,7 +990,7 @@ export default function ProgressPage() {
                       fontWeight: 500,
                       letterSpacing: '0.16em',
                       textTransform: 'uppercase',
-                      color: 'rgba(253,253,254,0.44)',
+                      color: 'var(--card-text-muted)',
                       marginBottom: 3,
                     }}
                   >
@@ -1001,16 +1001,16 @@ export default function ProgressPage() {
                       fontSize: 19,
                       fontWeight: 300,
                       letterSpacing: '-0.015em',
-                      color: '#FDFDFE',
+                      color: 'var(--card-text)',
                       fontFeatureSettings: '"tnum"',
                     }}
                   >
                     {latestPr.value}
-                    <small style={{ fontSize: 12, color: 'rgba(253,253,254,0.62)', marginLeft: 3, letterSpacing: 0 }}>
+                    <small style={{ fontSize: 12, color: 'var(--card-text-muted)', marginLeft: 3, letterSpacing: 0 }}>
                       {latestPr.type === 'weight' ? 'kg' : latestPr.type === 'reps' ? 'reps' : 'kg'}
                     </small>
                   </div>
-                  <div style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)', marginTop: 2 }}>
+                  <div style={{ fontSize: 11, color: 'var(--card-text-muted)', marginTop: 2 }}>
                     {new Date(latestPr.date).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'short' })}
                   </div>
                 </div>
@@ -1032,10 +1032,10 @@ export default function ProgressPage() {
                 }}
               >
                 <div className="flex items-baseline justify-between" style={{ marginBottom: 14 }}>
-                  <span style={{ fontSize: 14, fontWeight: 400, color: '#FDFDFE', letterSpacing: '-0.005em' }}>
+                  <span style={{ fontSize: 14, fontWeight: 400, color: 'var(--card-text)', letterSpacing: '-0.005em' }}>
                     Compounds e1RM
                   </span>
-                  <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)' }}>
+                  <span style={{ fontSize: 11, color: 'var(--card-text-muted)' }}>
                     vs. 8 weken terug
                   </span>
                 </div>
@@ -1058,7 +1058,7 @@ export default function ProgressPage() {
                       style={{
                         fontSize: 13,
                         fontWeight: 400,
-                        color: 'rgba(253,253,254,0.78)',
+                        color: 'var(--card-text-soft)',
                         letterSpacing: '-0.005em',
                         width: 78,
                         flexShrink: 0,
@@ -1075,13 +1075,13 @@ export default function ProgressPage() {
                         style={{
                           fontSize: 13,
                           fontWeight: 400,
-                          color: '#FDFDFE',
+                          color: 'var(--card-text)',
                           fontFeatureSettings: '"tnum"',
                           letterSpacing: '-0.01em',
                         }}
                       >
                         {m.current}
-                        <small style={{ fontSize: 10, color: 'rgba(253,253,254,0.44)', marginLeft: 2 }}>kg</small>
+                        <small style={{ fontSize: 10, color: 'var(--card-text-muted)', marginLeft: 2 }}>kg</small>
                       </span>
                       <span
                         style={{
@@ -1115,7 +1115,7 @@ export default function ProgressPage() {
                 }}
               >
                 <div className="flex items-baseline justify-between" style={{ marginBottom: 16 }}>
-                  <span style={{ fontSize: 14, fontWeight: 400, color: '#FDFDFE', letterSpacing: '-0.005em' }}>
+                  <span style={{ fontSize: 14, fontWeight: 400, color: 'var(--card-text)', letterSpacing: '-0.005em' }}>
                     Binnen kcal-budget
                   </span>
                   {week.adherence !== null ? (
@@ -1124,15 +1124,15 @@ export default function ProgressPage() {
                         fontSize: 22,
                         fontWeight: 300,
                         letterSpacing: '-0.02em',
-                        color: '#FDFDFE',
+                        color: 'var(--card-text)',
                         fontFeatureSettings: '"tnum"',
                       }}
                     >
                       <AnimatedNumber value={week.adherence} />
-                      <small style={{ fontSize: 10, color: 'rgba(253,253,254,0.44)', marginLeft: 2, letterSpacing: 0 }}>%</small>
+                      <small style={{ fontSize: 10, color: 'var(--card-text-muted)', marginLeft: 2, letterSpacing: 0 }}>%</small>
                     </span>
                   ) : (
-                    <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)' }}>geen data</span>
+                    <span style={{ fontSize: 11, color: 'var(--card-text-muted)' }}>geen data</span>
                   )}
                 </div>
 
@@ -1193,7 +1193,7 @@ export default function ProgressPage() {
                           fontSize: 18,
                           fontWeight: 300,
                           letterSpacing: '-0.015em',
-                          color: '#FDFDFE',
+                          color: 'var(--card-text)',
                           fontFeatureSettings: '"tnum"',
                         }}
                       >
@@ -1205,7 +1205,7 @@ export default function ProgressPage() {
                           fontWeight: 500,
                           letterSpacing: '0.14em',
                           textTransform: 'uppercase',
-                          color: 'rgba(253,253,254,0.44)',
+                          color: 'var(--card-text-muted)',
                         }}
                       >
                         {c.lbl}
@@ -1241,7 +1241,7 @@ export default function ProgressPage() {
                       fontSize: 20,
                       fontWeight: 300,
                       letterSpacing: '-0.015em',
-                      color: '#FDFDFE',
+                      color: 'var(--card-text)',
                       fontFeatureSettings: '"tnum"',
                     }}
                   >
@@ -1253,7 +1253,7 @@ export default function ProgressPage() {
                       fontWeight: 500,
                       letterSpacing: '0.14em',
                       textTransform: 'uppercase',
-                      color: 'rgba(253,253,254,0.44)',
+                      color: 'var(--card-text-muted)',
                     }}
                   >
                     {c.lbl}
@@ -1277,14 +1277,14 @@ export default function ProgressPage() {
               fontSize: 26,
               fontWeight: 250,
               letterSpacing: '-0.028em',
-              color: '#FDFDFE',
+              color: 'var(--card-text)',
             }}
           >
             Compounds
             <small
               style={{
                 fontSize: 13,
-                color: 'rgba(253,253,254,0.44)',
+                color: 'var(--card-text-muted)',
                 marginLeft: 8,
                 fontWeight: 300,
                 letterSpacing: '-0.005em',
@@ -1332,7 +1332,7 @@ export default function ProgressPage() {
                           fontWeight: 500,
                           letterSpacing: '0.16em',
                           textTransform: 'uppercase',
-                          color: 'rgba(253,253,254,0.44)',
+                          color: 'var(--card-text-muted)',
                         }}
                         className="truncate"
                       >
@@ -1343,7 +1343,7 @@ export default function ProgressPage() {
                           fontSize: 26,
                           fontWeight: 250,
                           letterSpacing: '-0.025em',
-                          color: '#FDFDFE',
+                          color: 'var(--card-text)',
                           fontFeatureSettings: '"tnum"',
                           lineHeight: 1.05,
                           marginTop: 6,
@@ -1353,7 +1353,7 @@ export default function ProgressPage() {
                         <small
                           style={{
                             fontSize: 11,
-                            color: 'rgba(253,253,254,0.62)',
+                            color: 'var(--card-text-muted)',
                             marginLeft: 2,
                             letterSpacing: 0,
                             fontWeight: 300,
@@ -1372,7 +1372,7 @@ export default function ProgressPage() {
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         fontSize: 11,
-                        color: 'rgba(253,253,254,0.62)',
+                        color: 'var(--card-text-muted)',
                         fontWeight: 400,
                       }}
                     >
@@ -1403,10 +1403,10 @@ export default function ProgressPage() {
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
               }}
             >
-              <p style={{ color: '#FDFDFE', fontSize: 14, fontWeight: 400 }}>
+              <p style={{ color: 'var(--card-text)', fontSize: 14, fontWeight: 400 }}>
                 Nog geen kracht-data
               </p>
-              <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 12, marginTop: 4 }}>
+              <p style={{ color: 'var(--card-text-muted)', fontSize: 12, marginTop: 4 }}>
                 Log je eerste set om je compounds te zien.
               </p>
             </div>
@@ -1421,8 +1421,8 @@ export default function ProgressPage() {
             style={{
               padding: '11px 16px',
               borderRadius: 999,
-              background: 'rgba(253,253,254,0.06)',
-              border: '1px solid rgba(253,253,254,0.10)',
+              background: 'var(--card-bg-subtle)',
+              border: '1px solid var(--card-divider)',
               display: 'flex',
               alignItems: 'center',
               gap: 10,
@@ -1442,7 +1442,7 @@ export default function ProgressPage() {
                 flex: 1,
                 background: 'transparent',
                 border: 'none',
-                color: '#FDFDFE',
+                color: 'var(--card-text)',
                 fontSize: 13,
                 fontWeight: 400,
                 letterSpacing: '-0.005em',
@@ -1456,7 +1456,7 @@ export default function ProgressPage() {
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  color: 'rgba(253,253,254,0.62)',
+                  color: 'var(--card-text-muted)',
                   cursor: 'pointer',
                   padding: 0,
                   display: 'flex',
@@ -1543,7 +1543,7 @@ export default function ProgressPage() {
                         style={{
                           fontSize: 14,
                           fontWeight: 400,
-                          color: '#FDFDFE',
+                          color: 'var(--card-text)',
                           letterSpacing: '-0.005em',
                           lineHeight: 1.25,
                         }}
@@ -1555,7 +1555,7 @@ export default function ProgressPage() {
                         style={{
                           fontSize: 11,
                           fontWeight: 400,
-                          color: 'rgba(253,253,254,0.44)',
+                          color: 'var(--card-text-muted)',
                           marginTop: 2,
                           letterSpacing: '0.005em',
                         }}
@@ -1570,7 +1570,7 @@ export default function ProgressPage() {
                       style={{
                         fontSize: 13,
                         fontWeight: 400,
-                        color: '#FDFDFE',
+                        color: 'var(--card-text)',
                         letterSpacing: '-0.005em',
                         fontFeatureSettings: '"tnum"',
                         textAlign: 'right',
@@ -1580,7 +1580,7 @@ export default function ProgressPage() {
                       <small
                         style={{
                           fontSize: 10,
-                          color: 'rgba(253,253,254,0.62)',
+                          color: 'var(--card-text-muted)',
                           marginLeft: 2,
                           letterSpacing: 0,
                         }}
@@ -1602,10 +1602,10 @@ export default function ProgressPage() {
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
               }}
             >
-              <p style={{ color: '#FDFDFE', fontSize: 14, fontWeight: 400 }}>
+              <p style={{ color: 'var(--card-text)', fontSize: 14, fontWeight: 400 }}>
                 {search ? 'Geen oefeningen gevonden' : 'Geen oefeningen in deze groep'}
               </p>
-              <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 12, marginTop: 4 }}>
+              <p style={{ color: 'var(--card-text-muted)', fontSize: 12, marginTop: 4 }}>
                 {search ? 'Probeer een andere zoekterm.' : 'Kies een andere spiergroep of start een workout.'}
               </p>
             </div>
@@ -1636,7 +1636,7 @@ export default function ProgressPage() {
                       fontWeight: 500,
                       letterSpacing: '0.16em',
                       textTransform: 'uppercase',
-                      color: 'rgba(253,253,254,0.44)',
+                      color: 'var(--card-text-muted)',
                     }}
                   >
                     Dagelijks
@@ -1674,7 +1674,7 @@ export default function ProgressPage() {
                       fontSize: 38,
                       fontWeight: 200,
                       letterSpacing: '-0.03em',
-                      color: '#FDFDFE',
+                      color: 'var(--card-text)',
                       fontFeatureSettings: '"tnum"',
                       lineHeight: 1,
                     }}
@@ -1683,7 +1683,7 @@ export default function ProgressPage() {
                     <small
                       style={{
                         fontSize: 14,
-                        color: 'rgba(253,253,254,0.62)',
+                        color: 'var(--card-text-muted)',
                         marginLeft: 3,
                         letterSpacing: 0,
                         fontWeight: 300,
@@ -1697,15 +1697,15 @@ export default function ProgressPage() {
                       style={{
                         fontSize: 12,
                         fontWeight: 400,
-                        color: 'rgba(253,253,254,0.78)',
+                        color: 'var(--card-text-soft)',
                         letterSpacing: '-0.005em',
                       }}
                     >
                       {body.weightChange === 0 ? '—' : body.weightChange > 0 ? '+' : '−'}{' '}
-                      <strong style={{ color: '#FDFDFE', fontWeight: 500 }}>
+                      <strong style={{ color: 'var(--card-text)', fontWeight: 500 }}>
                         {Math.abs(body.weightChange).toString().replace('.', ',')} kg
                       </strong>
-                      <span style={{ color: 'rgba(253,253,254,0.44)', marginLeft: 6 }}>
+                      <span style={{ color: 'var(--card-text-muted)', marginLeft: 6 }}>
                         sinds start
                       </span>
                     </span>
@@ -1723,7 +1723,7 @@ export default function ProgressPage() {
                         fontWeight: 500,
                         letterSpacing: '0.14em',
                         textTransform: 'uppercase',
-                        color: 'rgba(253,253,254,0.44)',
+                        color: 'var(--card-text-muted)',
                         marginTop: 6,
                       }}
                     >
@@ -1736,7 +1736,7 @@ export default function ProgressPage() {
                   <p
                     style={{
                       fontSize: 11,
-                      color: 'rgba(253,253,254,0.44)',
+                      color: 'var(--card-text-muted)',
                       marginTop: 4,
                       letterSpacing: '-0.005em',
                     }}
@@ -1813,7 +1813,7 @@ export default function ProgressPage() {
                           fontWeight: 500,
                           letterSpacing: '0.16em',
                           textTransform: 'uppercase',
-                          color: 'rgba(253,253,254,0.44)',
+                          color: 'var(--card-text-muted)',
                           marginBottom: 4,
                         }}
                       >
@@ -1825,13 +1825,13 @@ export default function ProgressPage() {
                             fontSize: 20,
                             fontWeight: 300,
                             letterSpacing: '-0.015em',
-                            color: '#FDFDFE',
+                            color: 'var(--card-text)',
                             fontFeatureSettings: '"tnum"',
                           }}
                         >
                           {hasVal ? m.current!.toString().replace('.', ',') : '—'}
                           {hasVal && (
-                            <small style={{ fontSize: 10, color: 'rgba(253,253,254,0.62)', marginLeft: 2, letterSpacing: 0 }}>
+                            <small style={{ fontSize: 10, color: 'var(--card-text-muted)', marginLeft: 2, letterSpacing: 0 }}>
                               cm
                             </small>
                           )}
@@ -1870,14 +1870,14 @@ export default function ProgressPage() {
                 }}
               >
                 <div className="flex items-baseline justify-between" style={{ marginBottom: 12 }}>
-                  <span style={{ fontSize: 14, fontWeight: 400, color: '#FDFDFE' }}>
+                  <span style={{ fontSize: 14, fontWeight: 400, color: 'var(--card-text)' }}>
                     {body.photos.length} foto&rsquo;s · {body.photos.length >= 2
                       ? `${Math.round((new Date(body.photos[0].date).getTime() - new Date(body.photos[body.photos.length - 1].date).getTime()) / (86400000 * 7))} weken`
                       : 'nu'}
                   </span>
                   <Link
                     href="/client/progress/photos"
-                    style={{ fontSize: 11, fontWeight: 400, color: 'rgba(253,253,254,0.62)', textDecoration: 'none' }}
+                    style={{ fontSize: 11, fontWeight: 400, color: 'var(--card-text-muted)', textDecoration: 'none' }}
                   >
                     Alles tonen
                   </Link>
@@ -1952,7 +1952,7 @@ export default function ProgressPage() {
                         fontWeight: 500,
                         letterSpacing: '0.12em',
                         textTransform: 'uppercase',
-                        color: 'rgba(253,253,254,0.62)',
+                        color: 'var(--card-text-muted)',
                       }}
                     >
                       Nieuw
@@ -1975,10 +1975,10 @@ export default function ProgressPage() {
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18)',
               }}
             >
-              <p style={{ color: '#FDFDFE', fontSize: 16, fontWeight: 400, marginBottom: 6 }}>
+              <p style={{ color: 'var(--card-text)', fontSize: 16, fontWeight: 400, marginBottom: 6 }}>
                 Nog geen metingen
               </p>
-              <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 13, maxWidth: 260, margin: '0 auto 18px' }}>
+              <p style={{ color: 'var(--card-text-muted)', fontSize: 13, maxWidth: 260, margin: '0 auto 18px' }}>
                 Voer je eerste check-in in om je lichaam evolutie te zien.
               </p>
               <Link
@@ -1990,7 +1990,7 @@ export default function ProgressPage() {
                   padding: '12px 20px',
                   borderRadius: 14,
                   background: '#C0FC01',
-                  color: '#FDFDFE',
+                  color: 'var(--card-text)',
                   fontSize: 13,
                   fontWeight: 600,
                   textDecoration: 'none',
@@ -2057,7 +2057,7 @@ export default function ProgressPage() {
                     fontWeight: 500,
                     letterSpacing: '0.16em',
                     textTransform: 'uppercase',
-                    color: 'rgba(253,253,254,0.44)',
+                    color: 'var(--card-text-muted)',
                   }}
                 >
                   Staat klaar · {weekdayNl(new Date())}
@@ -2070,7 +2070,7 @@ export default function ProgressPage() {
                   fontSize: 22,
                   fontWeight: 250,
                   letterSpacing: '-0.025em',
-                  color: '#FDFDFE',
+                  color: 'var(--card-text)',
                   lineHeight: 1.15,
                   marginBottom: 6,
                   position: 'relative',
@@ -2082,7 +2082,7 @@ export default function ProgressPage() {
                 style={{
                   fontSize: 13,
                   fontWeight: 300,
-                  color: 'rgba(253,253,254,0.78)',
+                  color: 'var(--card-text-soft)',
                   letterSpacing: '-0.005em',
                   lineHeight: 1.45,
                   marginBottom: 16,
@@ -2121,7 +2121,7 @@ export default function ProgressPage() {
                     marginLeft: 12,
                     fontSize: 11,
                     fontWeight: 400,
-                    color: 'rgba(253,253,254,0.44)',
+                    color: 'var(--card-text-muted)',
                     letterSpacing: '0.005em',
                   }}
                 >
@@ -2176,7 +2176,7 @@ export default function ProgressPage() {
                           style={{
                             fontSize: 11,
                             fontWeight: 400,
-                            color: 'rgba(253,253,254,0.44)',
+                            color: 'var(--card-text-muted)',
                             letterSpacing: '0.005em',
                           }}
                         >
@@ -2189,7 +2189,7 @@ export default function ProgressPage() {
                           fontWeight: 500,
                           letterSpacing: '0.16em',
                           textTransform: 'uppercase',
-                          color: 'rgba(253,253,254,0.44)',
+                          color: 'var(--card-text-muted)',
                         }}
                       >
                         #{num}
@@ -2255,9 +2255,9 @@ export default function ProgressPage() {
                         style={{
                           gap: 10,
                           padding: '14px 14px 14px 12px',
-                          background: 'rgba(253,253,254,0.04)',
+                          background: 'var(--card-bg-subtle)',
                           borderRadius: 12,
-                          border: '1px solid rgba(253,253,254,0.06)',
+                          border: '1px solid var(--card-divider)',
                         }}
                       >
                         <div
@@ -2283,13 +2283,13 @@ export default function ProgressPage() {
                               style={{
                                 fontSize: 12,
                                 fontWeight: 500,
-                                color: '#FDFDFE',
+                                color: 'var(--card-text)',
                                 letterSpacing: '-0.005em',
                               }}
                             >
                               {coach?.name?.split(' ')[0] || 'Coach'}
                             </span>
-                            <span style={{ fontSize: 10, fontWeight: 400, color: 'rgba(253,253,254,0.44)' }}>
+                            <span style={{ fontSize: 10, fontWeight: 400, color: 'var(--card-text-muted)' }}>
                               feedback · {formatShortDate(ci.date)}
                             </span>
                           </div>
@@ -2297,7 +2297,7 @@ export default function ProgressPage() {
                             style={{
                               fontSize: 12,
                               fontWeight: 300,
-                              color: 'rgba(253,253,254,0.78)',
+                              color: 'var(--card-text-soft)',
                               lineHeight: 1.55,
                               letterSpacing: '-0.005em',
                               whiteSpace: 'pre-wrap',
@@ -2360,7 +2360,7 @@ export default function ProgressPage() {
                         style={{
                           fontSize: 13,
                           fontWeight: 400,
-                          color: '#FDFDFE',
+                          color: 'var(--card-text)',
                           letterSpacing: '-0.005em',
                           lineHeight: 1.2,
                         }}
@@ -2371,7 +2371,7 @@ export default function ProgressPage() {
                         style={{
                           fontSize: 11,
                           fontWeight: 400,
-                          color: 'rgba(253,253,254,0.44)',
+                          color: 'var(--card-text-muted)',
                           marginTop: 2,
                           letterSpacing: '0.005em',
                         }}
@@ -2386,7 +2386,7 @@ export default function ProgressPage() {
                         fontWeight: 500,
                         letterSpacing: '0.12em',
                         textTransform: 'uppercase',
-                        color: 'rgba(253,253,254,0.44)',
+                        color: 'var(--card-text-muted)',
                       }}
                     >
                       {formatShortDate(w.date)}
@@ -2409,10 +2409,10 @@ export default function ProgressPage() {
                 boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18)',
               }}
             >
-              <p style={{ color: '#FDFDFE', fontSize: 16, fontWeight: 400, marginBottom: 6 }}>
+              <p style={{ color: 'var(--card-text)', fontSize: 16, fontWeight: 400, marginBottom: 6 }}>
                 Nog geen check-ins
               </p>
-              <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 13, maxWidth: 260, margin: '0 auto 18px' }}>
+              <p style={{ color: 'var(--card-text-muted)', fontSize: 13, maxWidth: 260, margin: '0 auto 18px' }}>
                 Je eerste check-in toont je startpunt en voortgang.
               </p>
               <Link
@@ -2424,7 +2424,7 @@ export default function ProgressPage() {
                   padding: '12px 20px',
                   borderRadius: 14,
                   background: '#C0FC01',
-                  color: '#FDFDFE',
+                  color: 'var(--card-text)',
                   fontSize: 13,
                   fontWeight: 600,
                   textDecoration: 'none',

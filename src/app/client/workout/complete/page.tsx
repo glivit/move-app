@@ -123,7 +123,7 @@ export default function WorkoutCompletePageWrapper() {
               height: 32,
               borderRadius: '50%',
               border: '2px solid rgba(253,253,254,0.20)',
-              borderTopColor: '#FDFDFE',
+              borderTopColor: '#1C1E18',
               animation: 'spin 1s linear infinite',
             }}
           />
@@ -675,7 +675,7 @@ function WorkoutCompletePage() {
             height: 32,
             borderRadius: '50%',
             border: '2px solid rgba(253,253,254,0.20)',
-            borderTopColor: '#FDFDFE',
+            borderTopColor: '#1C1E18',
             animation: 'spin 1s linear infinite',
           }}
         />
@@ -694,7 +694,7 @@ function WorkoutCompletePage() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: 'rgba(253,253,254,0.62)',
+          color: 'rgba(28,30,24,0.65)',
           fontSize: 14,
         }}
       >
@@ -789,7 +789,7 @@ function WorkoutCompletePage() {
             const delay = Math.random() * 0.6
             const dur = 1.5 + Math.random() * 1
             const size = 6 + Math.random() * 6
-            const colors = ['#C0FC01', '#A6ADA7', '#FDFDFE', '#2FA65A']
+            const colors = ['#C0FC01', '#A6ADA7', '#1C1E18', '#2FA65A']
             return (
               <div
                 key={i}
@@ -831,7 +831,7 @@ function WorkoutCompletePage() {
             fontSize: 22,
             fontWeight: 500,
             letterSpacing: '-0.02em',
-            color: '#FDFDFE',
+            color: '#1C1E18',
             background: 'transparent',
             border: 'none',
             padding: 0,
@@ -853,7 +853,7 @@ function WorkoutCompletePage() {
               justifyContent: 'center',
               fontSize: 12,
               fontWeight: 500,
-              color: '#FDFDFE',
+              color: '#1C1E18',
             }}
           >
             G
@@ -927,12 +927,12 @@ function WorkoutCompletePage() {
                   y1="88"
                   x2="300"
                   y2="88"
-                  stroke="rgba(253,253,254,0.08)"
+                  stroke="rgba(28,30,24,0.10)"
                   strokeWidth="1"
                 />
                 <path
                   d={trendD}
-                  stroke="rgba(253,253,254,0.65)"
+                  stroke="rgba(28,30,24,0.68)"
                   strokeWidth="1.5"
                   fill="none"
                   strokeLinecap="round"
@@ -944,7 +944,7 @@ function WorkoutCompletePage() {
                 <text
                   x={lastX}
                   y={Math.max(lastY - 10, 10)}
-                  fill="#FDFDFE"
+                  fill="#1C1E18"
                   fontFamily="Outfit"
                   fontSize="11"
                   fontWeight="500"
@@ -956,7 +956,7 @@ function WorkoutCompletePage() {
                 <text
                   x={firstX}
                   y={firstY + 16}
-                  fill="rgba(253,253,254,0.44)"
+                  fill="rgba(28,30,24,0.58)"
                   fontFamily="Outfit"
                   fontSize="10"
                   fontWeight="400"
@@ -1071,7 +1071,7 @@ function WorkoutCompletePage() {
                   >
                     <path
                       d={spark.d}
-                      stroke="rgba(253,253,254,0.50)"
+                      stroke="rgba(28,30,24,0.62)"
                       strokeWidth="1.3"
                       fill="none"
                       strokeLinecap="round"

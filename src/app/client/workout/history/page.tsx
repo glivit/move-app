@@ -336,8 +336,8 @@ export default function WorkoutHistoryPage() {
         className="flex items-center gap-1.5 mb-7 mt-2 group min-h-[44px] touch-manipulation"
         style={{ WebkitTapHighlightColor: 'transparent' }}
       >
-        <ChevronLeft strokeWidth={1.5} className="w-[18px] h-[18px] text-[rgba(253,253,254,0.48)] group-hover:text-[#FDFDFE] transition-colors" />
-        <span className="text-[14px] text-[rgba(253,253,254,0.48)] group-hover:text-[#FDFDFE] transition-colors" style={{ fontFamily: 'var(--font-body)' }}>
+        <ChevronLeft strokeWidth={1.5} className="w-[18px] h-[18px] text-[rgba(28,30,24,0.60)] group-hover:text-[#1C1E18] transition-colors" />
+        <span className="text-[14px] text-[rgba(28,30,24,0.60)] group-hover:text-[#1C1E18] transition-colors" style={{ fontFamily: 'var(--font-body)' }}>
           Training
         </span>
       </button>
@@ -349,31 +349,31 @@ export default function WorkoutHistoryPage() {
       {/* ── Summary stats row ── */}
       {workouts.length > 0 && (
         <div className="grid grid-cols-4 gap-2 mb-8">
-          <div className="bg-[rgba(253,253,254,0.08)] rounded-xl p-3 text-center">
-            <p className="text-[18px] font-bold text-[#FDFDFE] tabular-nums">{stats.totalWorkouts}</p>
-            <p className="text-[9px] text-[rgba(253,253,254,0.55)] uppercase tracking-[0.06em] mt-0.5">Workouts</p>
+          <div className="bg-[rgba(255,255,255,0.50)] rounded-xl p-3 text-center">
+            <p className="text-[18px] font-bold text-[#1C1E18] tabular-nums">{stats.totalWorkouts}</p>
+            <p className="text-[9px] text-[rgba(28,30,24,0.62)] uppercase tracking-[0.06em] mt-0.5">Workouts</p>
           </div>
-          <div className="bg-[rgba(253,253,254,0.08)] rounded-xl p-3 text-center">
-            <p className="text-[18px] font-bold text-[#FDFDFE] tabular-nums">{Math.round(stats.totalDuration / 3600)}u</p>
-            <p className="text-[9px] text-[rgba(253,253,254,0.55)] uppercase tracking-[0.06em] mt-0.5">Totaal</p>
+          <div className="bg-[rgba(255,255,255,0.50)] rounded-xl p-3 text-center">
+            <p className="text-[18px] font-bold text-[#1C1E18] tabular-nums">{Math.round(stats.totalDuration / 3600)}u</p>
+            <p className="text-[9px] text-[rgba(28,30,24,0.62)] uppercase tracking-[0.06em] mt-0.5">Totaal</p>
           </div>
-          <div className="bg-[rgba(253,253,254,0.08)] rounded-xl p-3 text-center">
+          <div className="bg-[rgba(255,255,255,0.50)] rounded-xl p-3 text-center">
             <p className="text-[18px] font-bold text-[#C0FC01] tabular-nums">{stats.totalPRs}</p>
-            <p className="text-[9px] text-[rgba(253,253,254,0.55)] uppercase tracking-[0.06em] mt-0.5">PR&apos;s</p>
+            <p className="text-[9px] text-[rgba(28,30,24,0.62)] uppercase tracking-[0.06em] mt-0.5">PR&apos;s</p>
           </div>
-          <div className="bg-[rgba(253,253,254,0.08)] rounded-xl p-3 text-center">
+          <div className="bg-[rgba(255,255,255,0.50)] rounded-xl p-3 text-center">
             <p className="text-[18px] font-bold text-[#2FA65A] tabular-nums">{stats.streak}w</p>
-            <p className="text-[9px] text-[rgba(253,253,254,0.55)] uppercase tracking-[0.06em] mt-0.5">Streak</p>
+            <p className="text-[9px] text-[rgba(28,30,24,0.62)] uppercase tracking-[0.06em] mt-0.5">Streak</p>
           </div>
         </div>
       )}
 
       {/* ── Tab switcher ── */}
-      <div className="flex gap-1 bg-[rgba(253,253,254,0.08)] rounded-xl p-1 mb-8">
+      <div className="flex gap-1 bg-[rgba(255,255,255,0.50)] rounded-xl p-1 mb-8">
         <button
           onClick={() => setActiveTab('history')}
           className={`flex-1 py-2.5 text-[12px] font-semibold uppercase tracking-[0.06em] rounded-lg transition-all touch-manipulation ${
-            activeTab === 'history' ? 'bg-[#A6ADA7] text-[#FDFDFE] shadow-sm' : 'text-[rgba(253,253,254,0.55)]'
+            activeTab === 'history' ? 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl text-[#1C1E18] shadow-sm' : 'text-[rgba(28,30,24,0.62)]'
           }`}
           style={{ WebkitTapHighlightColor: 'transparent' }}
         >
@@ -382,7 +382,7 @@ export default function WorkoutHistoryPage() {
         <button
           onClick={() => setActiveTab('progress')}
           className={`flex-1 py-2.5 text-[12px] font-semibold uppercase tracking-[0.06em] rounded-lg transition-all touch-manipulation ${
-            activeTab === 'progress' ? 'bg-[#A6ADA7] text-[#FDFDFE] shadow-sm' : 'text-[rgba(253,253,254,0.55)]'
+            activeTab === 'progress' ? 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl text-[#1C1E18] shadow-sm' : 'text-[rgba(28,30,24,0.62)]'
           }`}
           style={{ WebkitTapHighlightColor: 'transparent' }}
         >
@@ -398,13 +398,13 @@ export default function WorkoutHistoryPage() {
           {/* ── Calendar heatmap ── */}
           <div className="mb-10">
             <div className="flex items-center justify-between mb-5">
-              <button onClick={handlePrevMonth} className="w-[44px] h-[44px] flex items-center justify-center text-[rgba(253,253,254,0.42)] hover:text-[#FDFDFE] transition-colors touch-manipulation" style={{ WebkitTapHighlightColor: 'transparent' }}>
+              <button onClick={handlePrevMonth} className="w-[44px] h-[44px] flex items-center justify-center text-[rgba(253,253,254,0.42)] hover:text-[#1C1E18] transition-colors touch-manipulation" style={{ WebkitTapHighlightColor: 'transparent' }}>
                 <ChevronLeft strokeWidth={1.5} className="w-5 h-5" />
               </button>
-              <span className="text-[14px] font-medium text-[#FDFDFE] capitalize" style={{ fontFamily: 'var(--font-body)' }}>
+              <span className="text-[14px] font-medium text-[#1C1E18] capitalize" style={{ fontFamily: 'var(--font-body)' }}>
                 {monthName}
               </span>
-              <button onClick={handleNextMonth} className="w-[44px] h-[44px] flex items-center justify-center text-[rgba(253,253,254,0.42)] hover:text-[#FDFDFE] transition-colors touch-manipulation" style={{ WebkitTapHighlightColor: 'transparent' }}>
+              <button onClick={handleNextMonth} className="w-[44px] h-[44px] flex items-center justify-center text-[rgba(253,253,254,0.42)] hover:text-[#1C1E18] transition-colors touch-manipulation" style={{ WebkitTapHighlightColor: 'transparent' }}>
                 <ChevronRight strokeWidth={1.5} className="w-5 h-5" />
               </button>
             </div>
@@ -412,7 +412,7 @@ export default function WorkoutHistoryPage() {
             {/* Day labels */}
             <div className="grid grid-cols-7 gap-0 mb-1">
               {['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo'].map((day) => (
-                <div key={day} className="text-[10px] font-medium text-[rgba(253,253,254,0.48)] text-center py-1 uppercase tracking-[0.06em]">
+                <div key={day} className="text-[10px] font-medium text-[rgba(28,30,24,0.60)] text-center py-1 uppercase tracking-[0.06em]">
                   {day}
                 </div>
               ))}
@@ -428,7 +428,7 @@ export default function WorkoutHistoryPage() {
                   <div
                     key={index}
                     className={`aspect-square flex items-center justify-center text-[12px] font-medium rounded-lg relative transition-all ${
-                      !isCurrentMonth ? 'text-[rgba(253,253,254,0.22)]' : day.hasWorkout ? 'text-[#FDFDFE]' : 'text-[rgba(253,253,254,0.55)]'
+                      !isCurrentMonth ? 'text-[rgba(253,253,254,0.22)]' : day.hasWorkout ? 'text-[#1C1E18]' : 'text-[rgba(28,30,24,0.62)]'
                     } ${day.isToday ? 'ring-2 ring-[#FDFDFE] ring-offset-1' : ''}`}
                     style={{ backgroundColor: bgColor }}
                   >
@@ -445,20 +445,20 @@ export default function WorkoutHistoryPage() {
 
             {/* Heatmap legend */}
             <div className="flex items-center justify-end gap-1.5 mt-3">
-              <span className="text-[9px] text-[rgba(253,253,254,0.48)]">Minder</span>
+              <span className="text-[9px] text-[rgba(28,30,24,0.60)]">Minder</span>
               {['rgba(192,252,1,0.14)', 'rgba(192,252,1,0.32)', 'rgba(192,252,1,0.56)', '#C0FC01'].map((color) => (
                 <div key={color} className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
               ))}
-              <span className="text-[9px] text-[rgba(253,253,254,0.48)]">Meer volume</span>
+              <span className="text-[9px] text-[rgba(28,30,24,0.60)]">Meer volume</span>
             </div>
           </div>
 
           {/* ── Weekly volume chart ── */}
           {weeklyVolume.length >= 2 && (
-            <div className="mb-10 bg-[rgba(253,253,254,0.08)] rounded-2xl p-5">
+            <div className="mb-10 bg-[rgba(255,255,255,0.50)] rounded-2xl p-5">
               <div className="flex items-center gap-2 mb-4">
-                <BarChart3 size={14} strokeWidth={1.5} className="text-[rgba(253,253,254,0.55)]" />
-                <p className="text-[11px] font-bold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.06em]">Weekvolume (kg)</p>
+                <BarChart3 size={14} strokeWidth={1.5} className="text-[rgba(28,30,24,0.62)]" />
+                <p className="text-[11px] font-bold text-[rgba(28,30,24,0.62)] uppercase tracking-[0.06em]">Weekvolume (kg)</p>
               </div>
               <div className="flex items-end gap-[6px] h-[80px]">
                 {weeklyVolume.map((w, i) => {
@@ -472,7 +472,7 @@ export default function WorkoutHistoryPage() {
                         style={{ height: `${Math.max(heightPct, 4)}%` }}
                       />
                       {(i === 0 || isLast || i === Math.floor(weeklyVolume.length / 2)) && (
-                        <span className="text-[8px] text-[rgba(253,253,254,0.48)] tabular-nums">
+                        <span className="text-[8px] text-[rgba(28,30,24,0.60)] tabular-nums">
                           {new Date(w.week).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                         </span>
                       )}
@@ -486,7 +486,7 @@ export default function WorkoutHistoryPage() {
           {/* ── Recent workouts ── */}
           {recentWorkouts.length > 0 ? (
             <div>
-              <p className="text-[11px] font-bold text-[rgba(253,253,254,0.55)] uppercase tracking-[1px] mb-4">
+              <p className="text-[11px] font-bold text-[rgba(28,30,24,0.62)] uppercase tracking-[1px] mb-4">
                 Recente trainingen
               </p>
 
@@ -504,12 +504,12 @@ export default function WorkoutHistoryPage() {
                   <div key={workout.id}>
                     <button
                       onClick={() => setExpandedWorkoutId(isExpanded ? null : workout.id)}
-                      className="w-full text-left flex items-center gap-3 py-4 border-t border-[rgba(253,253,254,0.08)] min-h-[56px] touch-manipulation"
+                      className="w-full text-left flex items-center gap-3 py-4 border-t border-[rgba(28,30,24,0.10)] min-h-[56px] touch-manipulation"
                       style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-[14px] font-medium text-[#FDFDFE]" style={{ fontFamily: 'var(--font-body)' }}>
+                          <p className="text-[14px] font-medium text-[#1C1E18]" style={{ fontFamily: 'var(--font-body)' }}>
                             {dayName}
                           </p>
                           {prCount > 0 && (
@@ -518,7 +518,7 @@ export default function WorkoutHistoryPage() {
                             </span>
                           )}
                         </div>
-                        <div className="mt-0.5 flex items-center gap-3 text-[12px] text-[rgba(253,253,254,0.48)]" style={{ fontFamily: 'var(--font-body)' }}>
+                        <div className="mt-0.5 flex items-center gap-3 text-[12px] text-[rgba(28,30,24,0.60)]" style={{ fontFamily: 'var(--font-body)' }}>
                           <span>{dateStr}</span>
                           <span>{formatDuration(workout.duration_seconds)}</span>
                           <span>{volume > 1000 ? `${(volume / 1000).toFixed(1)}t` : `${volume} kg`}</span>
@@ -533,10 +533,10 @@ export default function WorkoutHistoryPage() {
                     </button>
 
                     {isExpanded && (
-                      <div className="pb-4 border-b border-[rgba(253,253,254,0.08)]">
+                      <div className="pb-4 border-b border-[rgba(28,30,24,0.10)]">
                         {workout.notes && (
-                          <div className="mb-3 px-3 py-2 bg-[rgba(253,253,254,0.08)] rounded-lg">
-                            <p className="text-[12px] text-[#FDFDFE] whitespace-pre-wrap" style={{ fontFamily: 'var(--font-body)' }}>
+                          <div className="mb-3 px-3 py-2 bg-[rgba(255,255,255,0.50)] rounded-lg">
+                            <p className="text-[12px] text-[#1C1E18] whitespace-pre-wrap" style={{ fontFamily: 'var(--font-body)' }}>
                               {workout.notes}
                             </p>
                           </div>
@@ -553,10 +553,10 @@ export default function WorkoutHistoryPage() {
                           }
                           return Object.entries(grouped).map(([exId, group]) => (
                             <div key={exId} className="mb-2">
-                              <p className="text-[12px] font-semibold text-[#FDFDFE] mb-1">{group.name}</p>
+                              <p className="text-[12px] font-semibold text-[#1C1E18] mb-1">{group.name}</p>
                               <div className="flex flex-wrap gap-1.5">
                                 {group.sets.map((set, idx) => (
-                                  <span key={idx} className={`text-[11px] tabular-nums px-2 py-1 rounded-md ${set.is_pr ? 'bg-[#C0FC01]/10 text-[#C0FC01] font-bold' : 'bg-[rgba(253,253,254,0.08)] text-[#FDFDFE]'}`}>
+                                  <span key={idx} className={`text-[11px] tabular-nums px-2 py-1 rounded-md ${set.is_pr ? 'bg-[#C0FC01]/10 text-[#C0FC01] font-bold' : 'bg-[rgba(255,255,255,0.50)] text-[#1C1E18]'}`}>
                                     {set.weight_kg || '—'} × {set.actual_reps || '—'}
                                     {set.is_pr && ' 🏆'}
                                   </span>
@@ -586,7 +586,7 @@ export default function WorkoutHistoryPage() {
           ) : (
             <div className="py-16 text-center">
               <p className="text-editorial-h1 mb-3">Nog geen data</p>
-              <p className="text-[14px] text-[rgba(253,253,254,0.55)]" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="text-[14px] text-[rgba(28,30,24,0.62)]" style={{ fontFamily: 'var(--font-body)' }}>
                 Voltooi je eerste training om te beginnen
               </p>
             </div>
@@ -602,8 +602,8 @@ export default function WorkoutHistoryPage() {
           {exerciseHistories.length === 0 ? (
             <div className="py-16 text-center">
               <Target size={32} strokeWidth={1} className="mx-auto text-[rgba(253,253,254,0.35)] mb-4" />
-              <p className="text-[16px] font-semibold text-[#FDFDFE] mb-2">Nog geen progressiedata</p>
-              <p className="text-[13px] text-[rgba(253,253,254,0.55)]">Na 2+ trainingen verschijnen hier je grafieken</p>
+              <p className="text-[16px] font-semibold text-[#1C1E18] mb-2">Nog geen progressiedata</p>
+              <p className="text-[13px] text-[rgba(28,30,24,0.62)]">Na 2+ trainingen verschijnen hier je grafieken</p>
             </div>
           ) : (
             <>
@@ -616,7 +616,7 @@ export default function WorkoutHistoryPage() {
                     className={`px-3 py-2 rounded-xl text-[12px] font-medium transition-all touch-manipulation ${
                       selectedExercise === ex.exerciseId
                         ? 'bg-[#474B48] text-white'
-                        : 'bg-[rgba(253,253,254,0.08)] text-[#FDFDFE] hover:bg-[rgba(253,253,254,0.14)]'
+                        : 'bg-[rgba(255,255,255,0.50)] text-[#1C1E18] hover:bg-[rgba(253,253,254,0.14)]'
                     }`}
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
@@ -628,14 +628,14 @@ export default function WorkoutHistoryPage() {
               {/* Selected exercise detail */}
               {selectedExHistory && (
                 <div className="mb-8">
-                  <div className="bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] rounded-2xl p-5">
-                    <h3 className="text-[16px] font-semibold text-[#FDFDFE] mb-1">{selectedExHistory.name}</h3>
-                    <p className="text-[11px] text-[rgba(253,253,254,0.55)] mb-4">{selectedExHistory.sessions.length} trainingen</p>
+                  <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] rounded-2xl p-5">
+                    <h3 className="text-[16px] font-semibold text-[#1C1E18] mb-1">{selectedExHistory.name}</h3>
+                    <p className="text-[11px] text-[rgba(28,30,24,0.62)] mb-4">{selectedExHistory.sessions.length} trainingen</p>
 
                     {/* 1RM progression sparkline */}
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] font-bold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.06em]">Geschatte 1RM (Epley)</span>
+                        <span className="text-[10px] font-bold text-[rgba(28,30,24,0.62)] uppercase tracking-[0.06em]">Geschatte 1RM (Epley)</span>
                         <span className="text-[14px] font-bold text-[#C0FC01] tabular-nums">
                           {selectedExHistory.sessions[selectedExHistory.sessions.length - 1]?.estimated1RM || '—'} kg
                         </span>
@@ -651,7 +651,7 @@ export default function WorkoutHistoryPage() {
                     {/* Best weight progression */}
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] font-bold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.06em]">Beste gewicht</span>
+                        <span className="text-[10px] font-bold text-[rgba(28,30,24,0.62)] uppercase tracking-[0.06em]">Beste gewicht</span>
                         <span className="text-[14px] font-bold text-[#2FA65A] tabular-nums">
                           {selectedExHistory.sessions[selectedExHistory.sessions.length - 1]?.bestWeight || '—'} kg
                         </span>
@@ -665,18 +665,18 @@ export default function WorkoutHistoryPage() {
                     </div>
 
                     {/* Session history list */}
-                    <div className="border-t border-[rgba(253,253,254,0.08)] pt-3 mt-3">
-                      <p className="text-[10px] font-bold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.06em] mb-2">Sessies</p>
+                    <div className="border-t border-[rgba(28,30,24,0.10)] pt-3 mt-3">
+                      <p className="text-[10px] font-bold text-[rgba(28,30,24,0.62)] uppercase tracking-[0.06em] mb-2">Sessies</p>
                       <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
                         {[...selectedExHistory.sessions].reverse().map((s, i) => (
                           <div key={s.date} className="flex items-center justify-between py-1">
-                            <span className="text-[11px] text-[rgba(253,253,254,0.55)] tabular-nums">
+                            <span className="text-[11px] text-[rgba(28,30,24,0.62)] tabular-nums">
                               {new Date(s.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                             </span>
-                            <span className="text-[11px] font-medium text-[#FDFDFE] tabular-nums">
+                            <span className="text-[11px] font-medium text-[#1C1E18] tabular-nums">
                               {s.bestWeight} kg × {s.bestReps}
                             </span>
-                            <span className="text-[11px] text-[rgba(253,253,254,0.55)] tabular-nums">
+                            <span className="text-[11px] text-[rgba(28,30,24,0.62)] tabular-nums">
                               1RM: {s.estimated1RM} kg
                             </span>
                           </div>
@@ -701,12 +701,12 @@ export default function WorkoutHistoryPage() {
                       <button
                         key={ex.exerciseId}
                         onClick={() => setSelectedExercise(ex.exerciseId)}
-                        className="w-full bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] rounded-xl p-4 text-left flex items-center gap-4 hover:border-[rgba(253,253,254,0.35)] transition-all touch-manipulation"
+                        className="w-full bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] rounded-xl p-4 text-left flex items-center gap-4 hover:border-[rgba(253,253,254,0.35)] transition-all touch-manipulation"
                         style={{ WebkitTapHighlightColor: 'transparent' }}
                       >
                         <div className="flex-1 min-w-0">
-                          <p className="text-[14px] font-semibold text-[#FDFDFE] mb-0.5">{ex.name}</p>
-                          <div className="flex items-center gap-3 text-[11px] text-[rgba(253,253,254,0.55)]">
+                          <p className="text-[14px] font-semibold text-[#1C1E18] mb-0.5">{ex.name}</p>
+                          <div className="flex items-center gap-3 text-[11px] text-[rgba(28,30,24,0.62)]">
                             <span>{ex.sessions.length}x getraind</span>
                             <span>Beste: {latest?.bestWeight} kg</span>
                             <span>1RM: {latest?.estimated1RM} kg</span>
@@ -715,7 +715,7 @@ export default function WorkoutHistoryPage() {
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <Sparkline data={ex.sessions.map(s => s.estimated1RM)} color="#C0FC01" height={28} width={60} />
                           {improvement !== 0 && (
-                            <span className={`text-[11px] font-bold tabular-nums ${improvement > 0 ? 'text-[#2FA65A]' : 'text-[rgba(253,253,254,0.55)]'}`}>
+                            <span className={`text-[11px] font-bold tabular-nums ${improvement > 0 ? 'text-[#2FA65A]' : 'text-[rgba(28,30,24,0.62)]'}`}>
                               {improvement > 0 ? '+' : ''}{improvement}%
                             </span>
                           )}

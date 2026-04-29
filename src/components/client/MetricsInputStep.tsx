@@ -23,7 +23,7 @@ const LABEL_STYLE: React.CSSProperties = {
   fontSize: 10,
   letterSpacing: '0.16em',
   textTransform: 'uppercase',
-  color: 'rgba(253,253,254,0.44)',
+  color: 'rgba(28,30,24,0.58)',
   fontWeight: 600,
 }
 
@@ -47,7 +47,7 @@ export function MetricsInputStep({ metrics, onChange }: Props) {
         <div className="flex items-center gap-2 mb-4">
           <span style={LABEL_STYLE}>InBody metingen</span>
         </div>
-        <p className="text-[13px] text-[rgba(253,253,254,0.55)] leading-relaxed mb-5">
+        <p className="text-[13px] text-[rgba(28,30,24,0.62)] leading-relaxed mb-5">
           Voer je InBody resultaten in. Gebruik komma als decimaalteken.
         </p>
 
@@ -56,11 +56,11 @@ export function MetricsInputStep({ metrics, onChange }: Props) {
             <label
               key={key}
               className="block rounded-[14px] px-3.5 py-3"
-              style={{ background: 'rgba(253,253,254,0.08)' }}
+              style={{ background: 'rgba(28,30,24,0.10)' }}
             >
-              <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-[rgba(253,253,254,0.55)] mb-1">
+              <span className="block text-[10px] font-semibold uppercase tracking-[0.12em] text-[rgba(28,30,24,0.62)] mb-1">
                 {label}
-                {unit && <span className="ml-1 text-[rgba(253,253,254,0.44)]">({unit})</span>}
+                {unit && <span className="ml-1 text-[rgba(28,30,24,0.58)]">({unit})</span>}
               </span>
               <input
                 type="text"
@@ -68,7 +68,7 @@ export function MetricsInputStep({ metrics, onChange }: Props) {
                 value={metrics[key]}
                 onChange={(e) => handleChange(key, e.target.value)}
                 placeholder={placeholder}
-                className="w-full bg-transparent text-[18px] font-semibold text-[#FDFDFE] placeholder-[rgba(253,253,254,0.28)] outline-none tabular-nums"
+                className="w-full bg-transparent text-[18px] font-semibold text-[#1C1E18] placeholder-[rgba(28,30,24,0.42)] outline-none tabular-nums"
               />
             </label>
           ))}

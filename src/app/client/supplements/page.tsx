@@ -146,15 +146,15 @@ export default function SupplementsPage() {
     return (
       <div className="space-y-6">
         {/* Hero skeleton */}
-        <div className="animate-shimmer bg-[rgba(253,253,254,0.08)] h-40 rounded-2xl" />
+        <div className="animate-shimmer bg-[rgba(255,255,255,0.50)] h-40 rounded-2xl" />
 
         {/* Form skeleton */}
-        <div className="animate-shimmer bg-[rgba(253,253,254,0.08)] h-32 rounded-2xl" />
+        <div className="animate-shimmer bg-[rgba(255,255,255,0.50)] h-32 rounded-2xl" />
 
         {/* Cards skeleton */}
         <div className="space-y-4">
           {[1, 2].map(i => (
-            <div key={i} className="animate-shimmer bg-[rgba(253,253,254,0.08)] h-24 rounded-2xl" />
+            <div key={i} className="animate-shimmer bg-[rgba(255,255,255,0.50)] h-24 rounded-2xl" />
           ))}
         </div>
       </div>
@@ -166,14 +166,14 @@ export default function SupplementsPage() {
       {/* Hero section with stats */}
       <div className="mb-14 animate-slide-up">
         <p className="text-label mb-3">Supplementen</p>
-        <p className="stat-number-hero text-[#FDFDFE]">
+        <p className="stat-number-hero text-[#1C1E18]">
           {totalCount > 0 ? Math.round((loggedCount / totalCount) * 100) : 0}<span className="text-[36px]">%</span>
         </p>
-        <p className="text-[16px] text-[rgba(253,253,254,0.55)] mt-2">vandaag ingenomen</p>
+        <p className="text-[16px] text-[rgba(28,30,24,0.62)] mt-2">vandaag ingenomen</p>
 
         {/* Thin progress bar */}
         {totalCount > 0 && (
-          <div className="w-full h-[3px] bg-[rgba(253,253,254,0.08)] rounded-full mt-5 overflow-hidden">
+          <div className="w-full h-[3px] bg-[rgba(255,255,255,0.50)] rounded-full mt-5 overflow-hidden">
             <div className="h-full bg-[#2FA65A] rounded-full transition-all duration-500" style={{ width: `${totalCount > 0 ? (loggedCount / totalCount) * 100 : 0}%` }} />
           </div>
         )}
@@ -181,39 +181,39 @@ export default function SupplementsPage() {
 
       {/* Add form */}
       {showAdd && (
-        <form onSubmit={addSupplement} className="bg-white p-5 rounded-2xl border border-[rgba(253,253,254,0.08)] space-y-4 animate-slide-up stagger-2">
-          <h3 className="text-[15px] font-semibold text-[#FDFDFE]">Nieuw supplement toevoegen</h3>
+        <form onSubmit={addSupplement} className="bg-white p-5 rounded-2xl border border-[rgba(28,30,24,0.10)] space-y-4 animate-slide-up stagger-2">
+          <h3 className="text-[15px] font-semibold text-[#1C1E18]">Nieuw supplement toevoegen</h3>
 
           <div>
-            <label className="text-[11px] font-semibold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.12em] block mb-1.5">Naam *</label>
+            <label className="text-[11px] font-semibold text-[rgba(28,30,24,0.62)] uppercase tracking-[0.12em] block mb-1.5">Naam *</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="bijv. Creatine, Vitamine D, Omega-3..."
               required
-              className="w-full px-3 py-2.5 border border-[rgba(253,253,254,0.08)] rounded-xl bg-white text-[14px] text-[#FDFDFE] placeholder-[rgba(253,253,254,0.48)] focus:outline-none focus:border-[#FDFDFE]"
+              className="w-full px-3 py-2.5 border border-[rgba(28,30,24,0.10)] rounded-xl bg-white text-[14px] text-[#1C1E18] placeholder-[rgba(253,253,254,0.48)] focus:outline-none focus:border-[#FDFDFE]"
             />
           </div>
 
           <div>
-            <label className="text-[11px] font-semibold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.12em] block mb-1.5">Dosering</label>
+            <label className="text-[11px] font-semibold text-[rgba(28,30,24,0.62)] uppercase tracking-[0.12em] block mb-1.5">Dosering</label>
             <input
               type="text"
               value={dosage}
               onChange={(e) => setDosage(e.target.value)}
               placeholder="bijv. 5g, 2000 IU, 1 capsule..."
-              className="w-full px-3 py-2.5 border border-[rgba(253,253,254,0.08)] rounded-xl bg-white text-[14px] text-[#FDFDFE] placeholder-[rgba(253,253,254,0.48)] focus:outline-none focus:border-[#FDFDFE]"
+              className="w-full px-3 py-2.5 border border-[rgba(28,30,24,0.10)] rounded-xl bg-white text-[14px] text-[#1C1E18] placeholder-[rgba(253,253,254,0.48)] focus:outline-none focus:border-[#FDFDFE]"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[11px] font-semibold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.12em] block mb-1.5">Frequentie</label>
+              <label className="text-[11px] font-semibold text-[rgba(28,30,24,0.62)] uppercase tracking-[0.12em] block mb-1.5">Frequentie</label>
               <select
                 value={frequency}
                 onChange={(e) => setFrequency(e.target.value)}
-                className="w-full px-3 py-2.5 border border-[rgba(253,253,254,0.08)] rounded-xl bg-white text-[14px] text-[#FDFDFE] focus:outline-none focus:border-[#FDFDFE]"
+                className="w-full px-3 py-2.5 border border-[rgba(28,30,24,0.10)] rounded-xl bg-white text-[14px] text-[#1C1E18] focus:outline-none focus:border-[#FDFDFE]"
               >
                 {FREQUENCY_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -221,11 +221,11 @@ export default function SupplementsPage() {
               </select>
             </div>
             <div>
-              <label className="text-[11px] font-semibold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.12em] block mb-1.5">Tijdstip</label>
+              <label className="text-[11px] font-semibold text-[rgba(28,30,24,0.62)] uppercase tracking-[0.12em] block mb-1.5">Tijdstip</label>
               <select
                 value={timeOfDay}
                 onChange={(e) => setTimeOfDay(e.target.value)}
-                className="w-full px-3 py-2.5 border border-[rgba(253,253,254,0.08)] rounded-xl bg-white text-[14px] text-[#FDFDFE] focus:outline-none focus:border-[#FDFDFE]"
+                className="w-full px-3 py-2.5 border border-[rgba(28,30,24,0.10)] rounded-xl bg-white text-[14px] text-[#1C1E18] focus:outline-none focus:border-[#FDFDFE]"
               >
                 {TIME_OPTIONS.map(opt => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -252,10 +252,10 @@ export default function SupplementsPage() {
             const GroupIcon = group.icon
             return (
               <div key={group.value} className="animate-slide-up" style={{ animationDelay: `${60 + groupIndex * 60}ms` }}>
-                <div className="border-t border-[rgba(253,253,254,0.08)] pt-6 mt-10 first:border-t-0 first:pt-0 first:mt-0">
+                <div className="border-t border-[rgba(28,30,24,0.10)] pt-6 mt-10 first:border-t-0 first:pt-0 first:mt-0">
                   <div className="flex items-center gap-2 mb-4">
-                    <GroupIcon className="w-4 h-4 text-[rgba(253,253,254,0.55)]" strokeWidth={1.5} />
-                    <h3 className="text-label text-[rgba(253,253,254,0.55)]">{group.label}</h3>
+                    <GroupIcon className="w-4 h-4 text-[rgba(28,30,24,0.62)]" strokeWidth={1.5} />
+                    <h3 className="text-label text-[rgba(28,30,24,0.62)]">{group.label}</h3>
                   </div>
                   {group.items.map((supplement, itemIndex) => {
                     const logged = isLoggedToday(supplement.id)
@@ -264,7 +264,7 @@ export default function SupplementsPage() {
                     return (
                       <div
                         key={supplement.id}
-                        className={`flex items-center gap-3 py-4 ${!isLastItem ? 'border-b border-[rgba(253,253,254,0.08)]' : ''} hover:opacity-60 transition-opacity`}
+                        className={`flex items-center gap-3 py-4 ${!isLastItem ? 'border-b border-[rgba(28,30,24,0.10)]' : ''} hover:opacity-60 transition-opacity`}
                       >
                         <button
                           onClick={() => toggleLog(supplement.id)}
@@ -276,20 +276,20 @@ export default function SupplementsPage() {
                           }}
                         >
                           {toggling ? (
-                            <Loader2 className="w-4 h-4 animate-spin text-[rgba(253,253,254,0.55)]" />
+                            <Loader2 className="w-4 h-4 animate-spin text-[rgba(28,30,24,0.62)]" />
                           ) : logged ? (
                             <Check className="w-4 h-4 text-white" strokeWidth={2.5} />
                           ) : null}
                         </button>
                         <div className="flex-1 min-w-0">
-                          <p className={`text-[15px] font-semibold ${logged ? 'text-[rgba(253,253,254,0.55)] line-through' : 'text-[#FDFDFE]'}`}>
+                          <p className={`text-[15px] font-semibold ${logged ? 'text-[rgba(28,30,24,0.62)] line-through' : 'text-[#1C1E18]'}`}>
                             {supplement.name}
                           </p>
                           <div className="flex items-center gap-2 mt-0.5">
                             {supplement.dosage && (
-                              <span className="text-[12px] text-[rgba(253,253,254,0.55)]">{supplement.dosage}</span>
+                              <span className="text-[12px] text-[rgba(28,30,24,0.62)]">{supplement.dosage}</span>
                             )}
-                            <span className="text-[12px] text-[rgba(253,253,254,0.48)]">{supplement.frequency}</span>
+                            <span className="text-[12px] text-[rgba(28,30,24,0.60)]">{supplement.frequency}</span>
                           </div>
                         </div>
                         <button
@@ -298,7 +298,7 @@ export default function SupplementsPage() {
                               deactivate(supplement.id)
                             }
                           }}
-                          className="p-2 text-[rgba(253,253,254,0.48)] hover:text-[#B55A4A] transition-colors"
+                          className="p-2 text-[rgba(28,30,24,0.60)] hover:text-[#B55A4A] transition-colors"
                         >
                           <Trash2 className="w-4 h-4" strokeWidth={1.5} />
                         </button>
@@ -311,10 +311,10 @@ export default function SupplementsPage() {
           })}
         </div>
       ) : !showAdd ? (
-        <div className="bg-white p-12 rounded-2xl border border-[rgba(253,253,254,0.08)] text-center">
-          <Pill strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[rgba(253,253,254,0.48)]" />
-          <p className="text-[15px] font-semibold text-[#FDFDFE] mb-2">Nog geen supplementen</p>
-          <p className="text-[13px] text-[rgba(253,253,254,0.55)] mb-4">
+        <div className="bg-white p-12 rounded-2xl border border-[rgba(28,30,24,0.10)] text-center">
+          <Pill strokeWidth={1.5} className="w-12 h-12 mx-auto mb-4 text-[rgba(28,30,24,0.60)]" />
+          <p className="text-[15px] font-semibold text-[#1C1E18] mb-2">Nog geen supplementen</p>
+          <p className="text-[13px] text-[rgba(28,30,24,0.62)] mb-4">
             Voeg je supplementen en medicatie toe om ze dagelijks bij te houden.
           </p>
           <button

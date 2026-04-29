@@ -150,7 +150,7 @@ export default function AccountabilityPage() {
         </div>
         <div className="space-y-3">
           {[1, 2].map(i => (
-            <div key={i} className="h-32 bg-[rgba(253,253,254,0.08)] animate-pulse rounded-2xl" />
+            <div key={i} className="h-32 bg-[rgba(255,255,255,0.50)] animate-pulse rounded-2xl" />
           ))}
         </div>
       </div>
@@ -167,10 +167,10 @@ export default function AccountabilityPage() {
             Check
           </h1>
         </div>
-        <div className="bg-white p-8 rounded-2xl border border-[rgba(253,253,254,0.08)] text-center animate-slide-up stagger-2">
+        <div className="bg-white p-8 rounded-2xl border border-[rgba(28,30,24,0.10)] text-center animate-slide-up stagger-2">
           <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#2FA65A] mx-auto mb-3" />
-          <p className="font-semibold text-[#FDFDFE] text-lg">Alles op schema!</p>
-          <p className="text-[14px] text-[rgba(253,253,254,0.55)] mt-2">
+          <p className="font-semibold text-[#1C1E18] text-lg">Alles op schema!</p>
+          <p className="text-[14px] text-[rgba(28,30,24,0.62)] mt-2">
             Je hebt vandaag alles gedaan. Ga zo door!
           </p>
         </div>
@@ -188,10 +188,10 @@ export default function AccountabilityPage() {
             Check
           </h1>
         </div>
-        <div className="bg-white p-8 rounded-2xl border border-[rgba(253,253,254,0.08)] text-center animate-slide-up stagger-2">
+        <div className="bg-white p-8 rounded-2xl border border-[rgba(28,30,24,0.10)] text-center animate-slide-up stagger-2">
           <CheckCircle2 size={48} strokeWidth={1.5} className="text-[#2FA65A] mx-auto mb-3" />
-          <p className="font-semibold text-[#FDFDFE] text-lg">Bedankt voor je feedback!</p>
-          <p className="text-[14px] text-[rgba(253,253,254,0.55)] mt-2">
+          <p className="font-semibold text-[#1C1E18] text-lg">Bedankt voor je feedback!</p>
+          <p className="text-[14px] text-[rgba(28,30,24,0.62)] mt-2">
             Je coach bekijkt dit en helpt je op schema te blijven.
           </p>
         </div>
@@ -220,7 +220,7 @@ export default function AccountabilityPage() {
           Check
         </h1>
       </div>
-      <p className="text-[14px] text-[rgba(253,253,254,0.55)]">
+      <p className="text-[14px] text-[rgba(28,30,24,0.62)]">
         Even terugblikken op je dag
       </p>
 
@@ -229,8 +229,8 @@ export default function AccountabilityPage() {
         {/* Workout status */}
         <div className={`p-5 border rounded-2xl ${
           log.workout_completed
-            ? 'bg-[#A6ADA7] border-[#2FA65A]/20'
-            : 'bg-[#A6ADA7] border-[#C0FC01]/20'
+            ? 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border-[#2FA65A]/20'
+            : 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border-[#C0FC01]/20'
         }`}>
           <div className="flex items-center gap-3 mb-2">
             <div className={`w-10 h-10 flex items-center justify-center ${
@@ -241,8 +241,8 @@ export default function AccountabilityPage() {
               } />
             </div>
             <div>
-              <p className="font-semibold text-[#FDFDFE]">Training</p>
-              <p className="text-[13px] text-[rgba(253,253,254,0.55)]">
+              <p className="font-semibold text-[#1C1E18]">Training</p>
+              <p className="text-[13px] text-[rgba(28,30,24,0.62)]">
                 {log.workout_completed ? 'Voltooid vandaag' : 'Niet voltooid vandaag'}
               </p>
             </div>
@@ -250,7 +250,7 @@ export default function AccountabilityPage() {
 
           {needsWorkoutReason && (
             <div className="mt-3">
-              <label className="block text-[13px] font-medium text-[#FDFDFE] mb-1.5">
+              <label className="block text-[13px] font-medium text-[#1C1E18] mb-1.5">
                 Waarom heb je niet getraind? <span className="text-[#B55A4A]">*</span>
               </label>
               <textarea
@@ -258,7 +258,7 @@ export default function AccountabilityPage() {
                 onChange={(e) => setWorkoutReason(e.target.value)}
                 placeholder="Bijv. drukke werkdag, niet lekker gevoeld, reisdag..."
                 rows={3}
-                className="w-full px-3 py-2 bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] text-[14px] placeholder-[rgba(253,253,254,0.55)] focus:outline-none focus:border-[#FDFDFE] resize-none rounded-xl"
+                className="w-full px-3 py-2 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] text-[14px] placeholder-[rgba(253,253,254,0.55)] focus:outline-none focus:border-[#FDFDFE] resize-none rounded-xl"
               />
             </div>
           )}
@@ -267,8 +267,8 @@ export default function AccountabilityPage() {
         {/* Nutrition status */}
         <div className={`p-5 border rounded-2xl ${
           log.nutrition_logged
-            ? 'bg-[#A6ADA7] border-[#2FA65A]/20'
-            : 'bg-[#A6ADA7] border-[#C0FC01]/20'
+            ? 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border-[#2FA65A]/20'
+            : 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border-[#C0FC01]/20'
         }`}>
           <div className="flex items-center gap-3 mb-2">
             <div className={`w-10 h-10 flex items-center justify-center ${
@@ -279,8 +279,8 @@ export default function AccountabilityPage() {
               } />
             </div>
             <div className="flex-1">
-              <p className="font-semibold text-[#FDFDFE]">Voeding</p>
-              <p className="text-[13px] text-[rgba(253,253,254,0.55)]">
+              <p className="font-semibold text-[#1C1E18]">Voeding</p>
+              <p className="text-[13px] text-[rgba(28,30,24,0.62)]">
                 {nutritionStatusText}
               </p>
             </div>
@@ -289,7 +289,7 @@ export default function AccountabilityPage() {
           {/* Meal progress bar when partially complete */}
           {hasMealProgress && !log.nutrition_logged && log.meals_completed! > 0 && (
             <div className="mt-2 mb-3">
-              <div className="h-2 bg-[rgba(253,253,254,0.08)] overflow-hidden">
+              <div className="h-2 bg-[rgba(255,255,255,0.50)] overflow-hidden">
                 <div
                   className="h-full bg-[#C0FC01] transition-all"
                   style={{ width: `${(log.meals_completed! / log.meals_total!) * 100}%` }}
@@ -300,7 +300,7 @@ export default function AccountabilityPage() {
 
           {needsNutritionReason && (
             <div className="mt-3">
-              <label className="block text-[13px] font-medium text-[#FDFDFE] mb-1.5">
+              <label className="block text-[13px] font-medium text-[#1C1E18] mb-1.5">
                 {hasMealProgress && log.meals_completed! > 0
                   ? 'Waarom heb je niet alle maaltijden gelogd?'
                   : 'Waarom heb je je voeding niet gelogd?'
@@ -311,7 +311,7 @@ export default function AccountabilityPage() {
                 onChange={(e) => setNutritionReason(e.target.value)}
                 placeholder="Bijv. uit eten geweest, vergeten, weekend..."
                 rows={3}
-                className="w-full px-3 py-2 bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] text-[14px] placeholder-[rgba(253,253,254,0.55)] focus:outline-none focus:border-[#FDFDFE] resize-none rounded-xl"
+                className="w-full px-3 py-2 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] text-[14px] placeholder-[rgba(253,253,254,0.55)] focus:outline-none focus:border-[#FDFDFE] resize-none rounded-xl"
               />
             </div>
           )}

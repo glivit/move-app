@@ -248,10 +248,10 @@ export default function LogsPage() {
           aria-label="Terug"
           style={{
             width: 32, height: 32, borderRadius: 999,
-            background: 'rgba(253,253,254,0.06)',
-            border: '1px solid rgba(253,253,254,0.10)',
+            background: 'var(--card-bg-subtle)',
+            border: '1px solid var(--card-divider)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#FDFDFE', cursor: 'pointer',
+            color: 'var(--card-text)', cursor: 'pointer',
             WebkitTapHighlightColor: 'transparent',
           }}
         >
@@ -259,8 +259,8 @@ export default function LogsPage() {
             <polyline points="15 6 9 12 15 18" />
           </svg>
         </button>
-        <div style={{ textAlign: 'center', fontSize: 15, fontWeight: 400, letterSpacing: '-0.005em', color: '#FDFDFE' }}>
-          <div style={{ fontSize: 9, fontWeight: 500, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(253,253,254,0.44)', marginBottom: 2, lineHeight: 1 }}>
+        <div style={{ textAlign: 'center', fontSize: 15, fontWeight: 400, letterSpacing: '-0.005em', color: 'var(--card-text)' }}>
+          <div style={{ fontSize: 9, fontWeight: 500, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--card-text-muted)', marginBottom: 2, lineHeight: 1 }}>
             Profiel
           </div>
           Mijn logs
@@ -278,13 +278,13 @@ export default function LogsPage() {
           boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 6px rgba(0,0,0,0.18)',
         }}
       >
-        <div style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(253,253,254,0.44)', marginBottom: 8 }}>
+        <div style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--card-text-muted)', marginBottom: 8 }}>
           Geschiedenis
         </div>
-        <div style={{ fontSize: 22, fontWeight: 300, letterSpacing: '-0.018em', color: '#FDFDFE', lineHeight: 1.2, marginBottom: 6 }}>
+        <div style={{ fontSize: 22, fontWeight: 300, letterSpacing: '-0.018em', color: 'var(--card-text)', lineHeight: 1.2, marginBottom: 6 }}>
           Bekijk en verwijder je {tab === 'workout' ? 'workouts' : tab === 'weight' ? 'gewicht-loggings' : 'voedings-loggings'}
         </div>
-        <div style={{ fontSize: 12, color: 'rgba(253,253,254,0.62)', letterSpacing: '-0.002em' }}>
+        <div style={{ fontSize: 12, color: 'var(--card-text-muted)', letterSpacing: '-0.002em' }}>
           {loading
             ? 'Laden…'
             : tab === 'workout'
@@ -374,7 +374,7 @@ export default function LogsPage() {
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
           }}
         >
-          <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 13 }}>Laden…</p>
+          <p style={{ color: 'var(--card-text-muted)', fontSize: 13 }}>Laden…</p>
         </div>
       ) : logs.length === 0 ? (
         <div
@@ -387,10 +387,10 @@ export default function LogsPage() {
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
           }}
         >
-          <p style={{ color: '#FDFDFE', fontSize: 15, fontWeight: 400, marginBottom: 6 }}>
+          <p style={{ color: 'var(--card-text)', fontSize: 15, fontWeight: 400, marginBottom: 6 }}>
             Geen logs in deze range
           </p>
-          <p style={{ color: 'rgba(253,253,254,0.62)', fontSize: 12 }}>
+          <p style={{ color: 'var(--card-text-muted)', fontSize: 12 }}>
             Verander het bereik of ga een dag trainen.
           </p>
         </div>
@@ -462,14 +462,14 @@ function LogRow({
           style={{
             fontSize: 10, fontWeight: 500,
             letterSpacing: '0.1em', textTransform: 'uppercase',
-            color: 'rgba(253,253,254,0.44)', marginBottom: 3,
+            color: 'var(--card-text-muted)', marginBottom: 3,
           }}
         >
           {formatDate(log.date)}
         </div>
         <div
           style={{
-            fontSize: 14, fontWeight: 400, color: '#FDFDFE',
+            fontSize: 14, fontWeight: 400, color: 'var(--card-text)',
             letterSpacing: '-0.005em',
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}
@@ -482,7 +482,7 @@ function LogRow({
       <div
         style={{
           fontSize: 11, fontWeight: 400,
-          color: 'rgba(253,253,254,0.62)',
+          color: 'var(--card-text-muted)',
           fontFeatureSettings: '"tnum"',
           whiteSpace: 'nowrap',
         }}
@@ -496,7 +496,7 @@ function LogRow({
         {log.kind === 'weight' && (
           <span style={{
             fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase',
-            color: 'rgba(253,253,254,0.44)',
+            color: 'var(--card-text-muted)',
           }}>
             {log.source === 'weekly_checkins' ? 'check-in' : 'dagelijks'}
           </span>
@@ -520,7 +520,7 @@ function LogRow({
           border: 'none',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: isDeleting ? 'default' : 'pointer',
-          color: 'rgba(253,253,254,0.78)',
+          color: 'var(--card-text-soft)',
           WebkitTapHighlightColor: 'transparent',
           flexShrink: 0,
         }}
@@ -587,13 +587,13 @@ function ConfirmDelete({
           boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08), 0 -8px 24px rgba(0,0,0,0.28)',
         }}
       >
-        <div style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(253,253,254,0.44)', marginBottom: 8 }}>
+        <div style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--card-text-muted)', marginBottom: 8 }}>
           Verwijderen
         </div>
-        <div style={{ fontSize: 18, fontWeight: 300, letterSpacing: '-0.01em', color: '#FDFDFE', lineHeight: 1.3, marginBottom: 10 }}>
+        <div style={{ fontSize: 18, fontWeight: 300, letterSpacing: '-0.01em', color: 'var(--card-text)', lineHeight: 1.3, marginBottom: 10 }}>
           Deze {label} permanent verwijderen?
         </div>
-        <p style={{ fontSize: 13, color: 'rgba(253,253,254,0.72)', letterSpacing: '-0.003em', marginBottom: 18 }}>
+        <p style={{ fontSize: 13, color: 'var(--card-text-soft)', letterSpacing: '-0.003em', marginBottom: 18 }}>
           {log.kind === 'workout' && 'Alle sets die bij deze sessie horen worden ook verwijderd. Dit kan niet ongedaan gemaakt worden.'}
           {log.kind === 'weight' && 'De entry wordt weggehaald uit je gewichtgeschiedenis.'}
           {log.kind === 'diet' && 'De maaltijd-log wordt weggehaald uit je voedingsgeschiedenis.'}
@@ -608,7 +608,7 @@ function ConfirmDelete({
               borderRadius: 999,
               border: '1px solid rgba(253,253,254,0.14)',
               background: 'transparent',
-              color: '#FDFDFE',
+              color: 'var(--card-text)',
               fontSize: 14,
               fontWeight: 400,
               letterSpacing: '-0.003em',

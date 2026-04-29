@@ -185,14 +185,14 @@ export default function CardioSessionPage() {
     return (
       <div className="min-h-screen">
         {/* Header */}
-        <header className="sticky top-0 z-10 px-5 py-4 flex items-center gap-3 border-b border-[rgba(253,253,254,0.08)]">
+        <header className="sticky top-0 z-10 px-5 py-4 flex items-center gap-3 border-b border-[rgba(28,30,24,0.10)]">
           <button
             onClick={() => router.back()}
-            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[rgba(253,253,254,0.08)] transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[rgba(255,255,255,0.50)] transition-colors"
           >
-            <ChevronLeft size={20} strokeWidth={1.5} className="text-[rgba(253,253,254,0.55)]" />
+            <ChevronLeft size={20} strokeWidth={1.5} className="text-[rgba(28,30,24,0.62)]" />
           </button>
-          <h1 className="text-[18px] font-semibold text-[#FDFDFE] page-title">Cardio sessie</h1>
+          <h1 className="text-[18px] font-semibold text-[#1C1E18] page-title">Cardio sessie</h1>
         </header>
 
         <main className="max-w-lg mx-auto px-5 py-6">
@@ -205,14 +205,14 @@ export default function CardioSessionPage() {
               {exercises.map(ex => {
                 const nameHasInterval = (ex.name_nl || ex.name || '').toLowerCase().includes('interval')
                 return (
-                  <div key={ex.id} className="bg-[rgba(253,253,254,0.08)] rounded-2xl overflow-hidden">
+                  <div key={ex.id} className="bg-[rgba(255,255,255,0.50)] rounded-2xl overflow-hidden">
                     <div className="flex items-center gap-4 p-4">
-                      <div className="w-11 h-11 bg-[rgba(253,253,254,0.12)] rounded-xl flex items-center justify-center flex-shrink-0 border border-[rgba(253,253,254,0.08)]">
+                      <div className="w-11 h-11 bg-[rgba(253,253,254,0.12)] rounded-xl flex items-center justify-center flex-shrink-0 border border-[rgba(28,30,24,0.10)]">
                         <Footprints size={18} strokeWidth={1.5} className="text-[#C0FC01]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[14px] font-semibold text-[#FDFDFE] truncate">{ex.name_nl || ex.name}</p>
-                        <p className="text-[11px] text-[rgba(253,253,254,0.55)] mt-0.5">{ex.equipment}</p>
+                        <p className="text-[14px] font-semibold text-[#1C1E18] truncate">{ex.name_nl || ex.name}</p>
+                        <p className="text-[11px] text-[rgba(28,30,24,0.62)] mt-0.5">{ex.equipment}</p>
                       </div>
                     </div>
                     <div className="flex gap-2 px-4 pb-4">
@@ -247,33 +247,33 @@ export default function CardioSessionPage() {
   if (mode === 'steady') {
     return (
       <div className="min-h-screen">
-        <header className="sticky top-0 z-10 px-5 py-4 flex items-center gap-3 border-b border-[rgba(253,253,254,0.08)]">
+        <header className="sticky top-0 z-10 px-5 py-4 flex items-center gap-3 border-b border-[rgba(28,30,24,0.10)]">
           <button
             onClick={() => { setRunning(false); setMode('select') }}
-            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[rgba(253,253,254,0.08)] transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[rgba(255,255,255,0.50)] transition-colors"
           >
-            <ChevronLeft size={20} strokeWidth={1.5} className="text-[rgba(253,253,254,0.55)]" />
+            <ChevronLeft size={20} strokeWidth={1.5} className="text-[rgba(28,30,24,0.62)]" />
           </button>
-          <h1 className="text-[18px] font-semibold text-[#FDFDFE] page-title truncate">
+          <h1 className="text-[18px] font-semibold text-[#1C1E18] page-title truncate">
             {selectedExercise?.name_nl || selectedExercise?.name}
           </h1>
         </header>
 
         <main className="max-w-lg mx-auto px-5 py-8 flex flex-col items-center">
           {/* Big timer */}
-          <div className="w-full bg-[rgba(253,253,254,0.08)] rounded-3xl p-10 text-center mb-8">
-            <p className="text-[64px] font-bold text-[#FDFDFE] tabular-nums tracking-tight leading-none">
+          <div className="w-full bg-[rgba(255,255,255,0.50)] rounded-3xl p-10 text-center mb-8">
+            <p className="text-[64px] font-bold text-[#1C1E18] tabular-nums tracking-tight leading-none">
               {hours > 0 && `${hours}:`}{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
             </p>
             {elapsed > 0 && (
               <div className="flex items-center justify-center gap-8 mt-6">
                 <div className="flex items-center gap-2">
                   <Flame size={16} strokeWidth={1.5} className="text-[#C0FC01]" />
-                  <span className="text-[15px] font-semibold text-[rgba(253,253,254,0.55)]">~{estimatedCals} kcal</span>
+                  <span className="text-[15px] font-semibold text-[rgba(28,30,24,0.62)]">~{estimatedCals} kcal</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock size={16} strokeWidth={1.5} className="text-[#C0FC01]" />
-                  <span className="text-[15px] font-semibold text-[rgba(253,253,254,0.55)]">{minutes} min</span>
+                  <span className="text-[15px] font-semibold text-[rgba(28,30,24,0.62)]">{minutes} min</span>
                 </div>
               </div>
             )}
@@ -308,9 +308,9 @@ export default function CardioSessionPage() {
                 </button>
                 <button
                   onClick={() => { setElapsed(0); setPausedAt(0); setStartTime(null) }}
-                  className="w-16 h-16 flex items-center justify-center bg-[rgba(253,253,254,0.08)] rounded-2xl hover:bg-[rgba(253,253,254,0.14)] transition-colors"
+                  className="w-16 h-16 flex items-center justify-center bg-[rgba(255,255,255,0.50)] rounded-2xl hover:bg-[rgba(253,253,254,0.14)] transition-colors"
                 >
-                  <RotateCcw size={20} strokeWidth={1.5} className="text-[rgba(253,253,254,0.55)]" />
+                  <RotateCcw size={20} strokeWidth={1.5} className="text-[rgba(28,30,24,0.62)]" />
                 </button>
               </>
             )}
@@ -336,14 +336,14 @@ export default function CardioSessionPage() {
     if (phase === 'idle') {
       return (
         <div className="min-h-screen">
-          <header className="sticky top-0 z-10 px-5 py-4 flex items-center gap-3 border-b border-[rgba(253,253,254,0.08)]">
+          <header className="sticky top-0 z-10 px-5 py-4 flex items-center gap-3 border-b border-[rgba(28,30,24,0.10)]">
             <button
               onClick={() => setMode('select')}
-              className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[rgba(253,253,254,0.08)] transition-colors"
+              className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-[rgba(255,255,255,0.50)] transition-colors"
             >
-              <ChevronLeft size={20} strokeWidth={1.5} className="text-[rgba(253,253,254,0.55)]" />
+              <ChevronLeft size={20} strokeWidth={1.5} className="text-[rgba(28,30,24,0.62)]" />
             </button>
-            <h1 className="text-[18px] font-semibold text-[#FDFDFE] page-title truncate">
+            <h1 className="text-[18px] font-semibold text-[#1C1E18] page-title truncate">
               {selectedExercise?.name_nl || selectedExercise?.name}
             </h1>
           </header>
@@ -351,7 +351,7 @@ export default function CardioSessionPage() {
           <main className="max-w-lg mx-auto px-5 py-6 space-y-6">
             {/* Work time */}
             <div>
-              <label className="text-[11px] font-semibold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.08em] mb-2.5 block">
+              <label className="text-[11px] font-semibold text-[rgba(28,30,24,0.62)] uppercase tracking-[0.08em] mb-2.5 block">
                 <Zap size={12} className="inline mr-1 text-[#2FA65A]" />
                 Werk (seconden)
               </label>
@@ -361,7 +361,7 @@ export default function CardioSessionPage() {
                     key={s}
                     onClick={() => setWorkSeconds(s)}
                     className={`px-5 py-3 rounded-xl text-[14px] font-semibold transition-all ${
-                      workSeconds === s ? 'bg-[#2FA65A] text-white' : 'bg-[rgba(253,253,254,0.08)] text-[rgba(253,253,254,0.55)] border border-[rgba(253,253,254,0.08)]'
+                      workSeconds === s ? 'bg-[#2FA65A] text-white' : 'bg-[rgba(255,255,255,0.50)] text-[rgba(28,30,24,0.62)] border border-[rgba(28,30,24,0.10)]'
                     }`}
                   >
                     {s}s
@@ -372,7 +372,7 @@ export default function CardioSessionPage() {
 
             {/* Rest time */}
             <div>
-              <label className="text-[11px] font-semibold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.08em] mb-2.5 block">
+              <label className="text-[11px] font-semibold text-[rgba(28,30,24,0.62)] uppercase tracking-[0.08em] mb-2.5 block">
                 <Pause size={12} className="inline mr-1 text-[#E8B948]" />
                 Rust (seconden)
               </label>
@@ -382,7 +382,7 @@ export default function CardioSessionPage() {
                     key={s}
                     onClick={() => setRestSeconds(s)}
                     className={`px-5 py-3 rounded-xl text-[14px] font-semibold transition-all ${
-                      restSeconds === s ? 'bg-[#E8B948] text-white' : 'bg-[rgba(253,253,254,0.08)] text-[rgba(253,253,254,0.55)] border border-[rgba(253,253,254,0.08)]'
+                      restSeconds === s ? 'bg-[#E8B948] text-white' : 'bg-[rgba(255,255,255,0.50)] text-[rgba(28,30,24,0.62)] border border-[rgba(28,30,24,0.10)]'
                     }`}
                   >
                     {s}s
@@ -393,7 +393,7 @@ export default function CardioSessionPage() {
 
             {/* Rounds */}
             <div>
-              <label className="text-[11px] font-semibold text-[rgba(253,253,254,0.55)] uppercase tracking-[0.08em] mb-2.5 block">
+              <label className="text-[11px] font-semibold text-[rgba(28,30,24,0.62)] uppercase tracking-[0.08em] mb-2.5 block">
                 <RotateCcw size={12} className="inline mr-1 text-[#C0FC01]" />
                 Rondes
               </label>
@@ -403,7 +403,7 @@ export default function CardioSessionPage() {
                     key={r}
                     onClick={() => setTotalRounds(r)}
                     className={`px-5 py-3 rounded-xl text-[14px] font-semibold transition-all ${
-                      totalRounds === r ? 'bg-[#C0FC01] text-white' : 'bg-[rgba(253,253,254,0.08)] text-[rgba(253,253,254,0.55)] border border-[rgba(253,253,254,0.08)]'
+                      totalRounds === r ? 'bg-[#C0FC01] text-white' : 'bg-[rgba(255,255,255,0.50)] text-[rgba(28,30,24,0.62)] border border-[rgba(28,30,24,0.10)]'
                     }`}
                   >
                     {r}×
@@ -413,9 +413,9 @@ export default function CardioSessionPage() {
             </div>
 
             {/* Summary */}
-            <div className="bg-[rgba(253,253,254,0.08)] rounded-xl px-5 py-4 text-center">
-              <p className="text-[14px] text-[rgba(253,253,254,0.55)]">
-                Totaal: <span className="font-bold text-[#FDFDFE]">{totalRounds} rondes</span> · ±{Math.round((totalRounds * (workSeconds + restSeconds)) / 60)} min
+            <div className="bg-[rgba(255,255,255,0.50)] rounded-xl px-5 py-4 text-center">
+              <p className="text-[14px] text-[rgba(28,30,24,0.62)]">
+                Totaal: <span className="font-bold text-[#1C1E18]">{totalRounds} rondes</span> · ±{Math.round((totalRounds * (workSeconds + restSeconds)) / 60)} min
               </p>
             </div>
 
@@ -443,11 +443,11 @@ export default function CardioSessionPage() {
               <div className="w-16 h-16 bg-[#2FA65A] rounded-full flex items-center justify-center mx-auto mb-4">
                 <Check size={28} strokeWidth={3} className="text-white" />
               </div>
-              <p className="text-[24px] font-bold text-[#FDFDFE]">{totalRounds} rondes klaar!</p>
-              <p className="text-[15px] font-medium text-[#FDFDFE] mt-1">{selectedExercise?.name_nl}</p>
+              <p className="text-[24px] font-bold text-[#1C1E18]">{totalRounds} rondes klaar!</p>
+              <p className="text-[15px] font-medium text-[#1C1E18] mt-1">{selectedExercise?.name_nl}</p>
               <div className="flex items-center justify-center gap-6 mt-4">
-                <span className="text-[14px] font-semibold text-[rgba(253,253,254,0.55)]">{doneMinutes} min</span>
-                <span className="text-[14px] font-semibold text-[rgba(253,253,254,0.55)]">~{doneCals} kcal</span>
+                <span className="text-[14px] font-semibold text-[rgba(28,30,24,0.62)]">{doneMinutes} min</span>
+                <span className="text-[14px] font-semibold text-[rgba(28,30,24,0.62)]">~{doneCals} kcal</span>
               </div>
             </div>
             <button
@@ -481,7 +481,7 @@ export default function CardioSessionPage() {
           </p>
 
           {/* Big timer */}
-          <p className="text-[80px] font-bold text-[#FDFDFE] tabular-nums tracking-tight leading-none mb-4">
+          <p className="text-[80px] font-bold text-[#1C1E18] tabular-nums tracking-tight leading-none mb-4">
             {displayMin > 0 && `${displayMin}:`}{String(displaySec).padStart(2, '0')}
           </p>
 
@@ -496,10 +496,10 @@ export default function CardioSessionPage() {
           </div>
 
           {/* Round counter */}
-          <p className="text-[16px] font-bold text-[rgba(253,253,254,0.55)] mb-2">
+          <p className="text-[16px] font-bold text-[rgba(28,30,24,0.62)] mb-2">
             Ronde {currentRound} / {totalRounds}
           </p>
-          <p className="text-[14px] text-[rgba(253,253,254,0.48)] mb-10">
+          <p className="text-[14px] text-[rgba(28,30,24,0.60)] mb-10">
             {selectedExercise?.name_nl}
           </p>
 
@@ -523,7 +523,7 @@ export default function CardioSessionPage() {
                   setEndTime(Date.now() + workSeconds * 1000)
                 }
               }}
-              className="flex-1 py-4 bg-[rgba(253,253,254,0.08)] text-[rgba(253,253,254,0.55)] rounded-2xl font-semibold text-[14px] hover:bg-[rgba(253,253,254,0.08)] transition-colors"
+              className="flex-1 py-4 bg-[rgba(255,255,255,0.50)] text-[rgba(28,30,24,0.62)] rounded-2xl font-semibold text-[14px] hover:bg-[rgba(255,255,255,0.50)] transition-colors"
             >
               Skip →
             </button>
@@ -551,11 +551,11 @@ export default function CardioSessionPage() {
           <div className="w-16 h-16 bg-[#2FA65A] rounded-full flex items-center justify-center mx-auto mb-4">
             <Check size={28} strokeWidth={3} className="text-white" />
           </div>
-          <p className="text-[24px] font-bold text-[#FDFDFE]">Cardio klaar!</p>
-          <p className="text-[15px] font-medium text-[#FDFDFE] mt-1">{selectedExercise?.name_nl}</p>
+          <p className="text-[24px] font-bold text-[#1C1E18]">Cardio klaar!</p>
+          <p className="text-[15px] font-medium text-[#1C1E18] mt-1">{selectedExercise?.name_nl}</p>
           <div className="flex items-center justify-center gap-6 mt-4">
-            <span className="text-[14px] font-semibold text-[rgba(253,253,254,0.55)]">{doneMinutes} min</span>
-            <span className="text-[14px] font-semibold text-[rgba(253,253,254,0.55)]">~{estimatedCals} kcal</span>
+            <span className="text-[14px] font-semibold text-[rgba(28,30,24,0.62)]">{doneMinutes} min</span>
+            <span className="text-[14px] font-semibold text-[rgba(28,30,24,0.62)]">~{estimatedCals} kcal</span>
           </div>
         </div>
         <button

@@ -60,7 +60,7 @@ function ExerciseInfoPanelComponent({ exerciseData }: { exerciseData: Exercise }
   return (
     <div className="px-5 pb-3 space-y-3">
       {/* Large GIF display */}
-      <div className="overflow-hidden rounded-xl relative" style={{ maxHeight: '50vh', background: 'rgba(253,253,254,0.08)' }}>
+      <div className="overflow-hidden rounded-xl relative" style={{ maxHeight: '50vh', background: 'var(--card-bg-tint)' }}>
         {hasGif ? (
           <>
             {!imgLoaded && (
@@ -87,7 +87,7 @@ function ExerciseInfoPanelComponent({ exerciseData }: { exerciseData: Exercise }
           </>
         ) : (
           <div className="aspect-[4/3] flex items-center justify-center">
-            <p className="text-[12px]" style={{ color: 'rgba(253,253,254,0.62)' }}>{exerciseData.target_muscle}</p>
+            <p className="text-[12px]" style={{ color: 'var(--card-text-muted)' }}>{exerciseData.target_muscle}</p>
           </div>
         )}
       </div>
@@ -95,12 +95,12 @@ function ExerciseInfoPanelComponent({ exerciseData }: { exerciseData: Exercise }
       {/* Equipment + muscle labels */}
       <div className="flex items-center gap-2">
         {exerciseData.equipment && (
-          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg" style={{ color: '#FDFDFE', background: 'rgba(253,253,254,0.10)' }}>
+          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg" style={{ color: 'var(--card-text)', background: 'var(--card-bg-tint)' }}>
             {exerciseData.equipment}
           </span>
         )}
         {exerciseData.target_muscle && (
-          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg" style={{ color: '#FDFDFE', background: 'rgba(253,253,254,0.10)' }}>
+          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-lg" style={{ color: 'var(--card-text)', background: 'var(--card-bg-tint)' }}>
             {exerciseData.target_muscle}
           </span>
         )}
@@ -108,17 +108,17 @@ function ExerciseInfoPanelComponent({ exerciseData }: { exerciseData: Exercise }
 
       {/* Collapsible: Coach tips */}
       {exerciseData.coach_tips && (
-        <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(253,253,254,0.10)', background: 'rgba(253,253,254,0.04)' }}>
+        <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--card-divider)', background: 'var(--card-bg-subtle)' }}>
           <button
             onClick={handleTipsToggle}
             className="w-full flex items-center justify-between p-3"
           >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: '#FDFDFE' }}>Coach tips</p>
-            <ChevronDown size={14} className={`transition-transform ${showTips ? 'rotate-180' : ''}`} style={{ color: 'rgba(253,253,254,0.62)' }} />
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--card-text)' }}>Coach tips</p>
+            <ChevronDown size={14} className={`transition-transform ${showTips ? 'rotate-180' : ''}`} style={{ color: 'var(--card-text-muted)' }} />
           </button>
           {showTips && (
             <div className="px-3 pb-3 -mt-1">
-              <p className="text-[13px] leading-relaxed" style={{ color: 'rgba(253,253,254,0.62)' }}>{exerciseData.coach_tips}</p>
+              <p className="text-[13px] leading-relaxed" style={{ color: 'var(--card-text-muted)' }}>{exerciseData.coach_tips}</p>
             </div>
           )}
         </div>
@@ -126,17 +126,17 @@ function ExerciseInfoPanelComponent({ exerciseData }: { exerciseData: Exercise }
 
       {/* Collapsible: Instructions */}
       {exerciseData.instructions && (
-        <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(253,253,254,0.10)', background: 'rgba(253,253,254,0.04)' }}>
+        <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--card-divider)', background: 'var(--card-bg-subtle)' }}>
           <button
             onClick={handleInstructionsToggle}
             className="w-full flex items-center justify-between p-3"
           >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: '#FDFDFE' }}>Uitvoering</p>
-            <ChevronDown size={14} className={`transition-transform ${showInstructions ? 'rotate-180' : ''}`} style={{ color: 'rgba(253,253,254,0.62)' }} />
+            <p className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--card-text)' }}>Uitvoering</p>
+            <ChevronDown size={14} className={`transition-transform ${showInstructions ? 'rotate-180' : ''}`} style={{ color: 'var(--card-text-muted)' }} />
           </button>
           {showInstructions && (
             <div className="px-3 pb-3 -mt-1">
-              <p className="text-[13px] leading-relaxed whitespace-pre-wrap" style={{ color: 'rgba(253,253,254,0.62)' }}>{exerciseData.instructions}</p>
+              <p className="text-[13px] leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--card-text-muted)' }}>{exerciseData.instructions}</p>
             </div>
           )}
         </div>
@@ -211,8 +211,8 @@ function CardioTimerPanelComponent({
   return (
     <div className="px-5 pb-5">
       {/* Timer display */}
-      <div className="rounded-2xl p-6 text-center mb-4" style={{ background: 'rgba(253,253,254,0.06)' }}>
-        <p className="text-[48px] font-bold tabular-nums tracking-tight leading-none" style={{ color: '#FDFDFE' }}>
+      <div className="rounded-2xl p-6 text-center mb-4" style={{ background: 'var(--card-bg-subtle)' }}>
+        <p className="text-[48px] font-bold tabular-nums tracking-tight leading-none" style={{ color: 'var(--card-text)' }}>
           {hours > 0 && `${hours}:`}{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
         </p>
 
@@ -221,13 +221,13 @@ function CardioTimerPanelComponent({
           <div className="flex items-center justify-center gap-6 mt-4">
             <div className="flex items-center gap-1.5">
               <Flame size={14} strokeWidth={1.5} style={{ color: '#2FA65A' }} />
-              <span className="text-[13px] font-semibold" style={{ color: 'rgba(253,253,254,0.62)' }}>
+              <span className="text-[13px] font-semibold" style={{ color: 'var(--card-text-muted)' }}>
                 ~{estimatedCals} kcal
               </span>
             </div>
             <div className="flex items-center gap-1.5">
               <Clock size={14} strokeWidth={1.5} style={{ color: '#2FA65A' }} />
-              <span className="text-[13px] font-semibold" style={{ color: 'rgba(253,253,254,0.62)' }}>
+              <span className="text-[13px] font-semibold" style={{ color: 'var(--card-text-muted)' }}>
                 {minutes} min
               </span>
             </div>
@@ -268,7 +268,7 @@ function CardioTimerPanelComponent({
             <button
               onClick={handleReset}
               className="w-14 h-14 flex items-center justify-center rounded-2xl transition-colors"
-              style={{ background: 'rgba(253,253,254,0.10)', color: 'rgba(253,253,254,0.78)' }}
+              style={{ background: 'var(--card-bg-tint)', color: 'var(--card-text-soft)' }}
             >
               <RotateCcw size={18} strokeWidth={1.5} />
             </button>
@@ -279,7 +279,7 @@ function CardioTimerPanelComponent({
           <button
             onClick={handleFinish}
             className="w-14 h-14 flex items-center justify-center rounded-2xl transition-colors"
-            style={{ background: '#474B48', color: '#FDFDFE' }}
+            style={{ background: '#474B48', color: 'var(--card-text)' }}
           >
             <Check size={18} strokeWidth={2.5} />
           </button>
@@ -369,7 +369,7 @@ function IntervalTimerPanelComponent({
       <div className="px-5 pb-5 space-y-5">
         {/* Work time */}
         <div>
-          <label className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-2 block" style={{ color: 'rgba(253,253,254,0.62)' }}>
+          <label className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-2 block" style={{ color: 'var(--card-text-muted)' }}>
             <Zap size={12} className="inline mr-1" style={{ color: '#2FA65A' }} />
             Werk (sec)
           </label>
@@ -393,7 +393,7 @@ function IntervalTimerPanelComponent({
 
         {/* Rest time */}
         <div>
-          <label className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-2 block" style={{ color: 'rgba(253,253,254,0.62)' }}>
+          <label className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-2 block" style={{ color: 'var(--card-text-muted)' }}>
             <Pause size={12} className="inline mr-1" style={{ color: '#2FA65A' }} />
             Rust (sec)
           </label>
@@ -417,7 +417,7 @@ function IntervalTimerPanelComponent({
 
         {/* Rounds */}
         <div>
-          <label className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-2 block" style={{ color: 'rgba(253,253,254,0.62)' }}>
+          <label className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-2 block" style={{ color: 'var(--card-text-muted)' }}>
             <RotateCcw size={12} className="inline mr-1" style={{ color: '#2FA65A' }} />
             Rondes
           </label>
@@ -440,9 +440,9 @@ function IntervalTimerPanelComponent({
         </div>
 
         {/* Summary */}
-        <div className="rounded-xl px-4 py-3 text-center" style={{ background: 'rgba(253,253,254,0.06)' }}>
-          <p className="text-[12px]" style={{ color: 'rgba(253,253,254,0.62)' }}>
-            Totaal: <span className="font-semibold" style={{ color: '#FDFDFE' }}>{totalRounds} rondes</span> · {Math.round((totalRounds * (workSeconds + restSeconds)) / 60)} min
+        <div className="rounded-xl px-4 py-3 text-center" style={{ background: 'var(--card-bg-subtle)' }}>
+          <p className="text-[12px]" style={{ color: 'var(--card-text-muted)' }}>
+            Totaal: <span className="font-semibold" style={{ color: 'var(--card-text)' }}>{totalRounds} rondes</span> · {Math.round((totalRounds * (workSeconds + restSeconds)) / 60)} min
           </p>
         </div>
 
@@ -467,10 +467,10 @@ function IntervalTimerPanelComponent({
           <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style={{ background: '#C0FC01', color: '#000' }}>
             <Check size={20} strokeWidth={3} />
           </div>
-          <p className="text-[18px] font-semibold" style={{ color: '#FDFDFE' }}>{totalRounds} rondes klaar!</p>
+          <p className="text-[18px] font-semibold" style={{ color: 'var(--card-text)' }}>{totalRounds} rondes klaar!</p>
           <div className="flex items-center justify-center gap-4 mt-3">
-            <span className="text-[13px]" style={{ color: 'rgba(253,253,254,0.62)' }}>{doneMinutes} min</span>
-            <span className="text-[13px]" style={{ color: 'rgba(253,253,254,0.62)' }}>~{doneCals} kcal</span>
+            <span className="text-[13px]" style={{ color: 'var(--card-text-muted)' }}>{doneMinutes} min</span>
+            <span className="text-[13px]" style={{ color: 'var(--card-text-muted)' }}>~{doneCals} kcal</span>
           </div>
         </div>
       </div>
@@ -491,12 +491,12 @@ function IntervalTimerPanelComponent({
         </p>
 
         {/* Big timer */}
-        <p className="text-[56px] font-bold tabular-nums tracking-tight leading-none" style={{ color: '#FDFDFE' }}>
+        <p className="text-[56px] font-bold tabular-nums tracking-tight leading-none" style={{ color: 'var(--card-text)' }}>
           {displayMinutes > 0 && `${displayMinutes}:`}{String(displaySeconds).padStart(2, '0')}
         </p>
 
         {/* Progress bar */}
-        <div className="h-[4px] rounded-full mt-4 overflow-hidden" style={{ background: 'rgba(253,253,254,0.10)' }}>
+        <div className="h-[4px] rounded-full mt-4 overflow-hidden" style={{ background: 'var(--card-bg-tint)' }}>
           <div
             className="h-full rounded-full transition-all duration-300"
             style={{ width: `${progressPct}%`, background: '#C0FC01' }}
@@ -504,7 +504,7 @@ function IntervalTimerPanelComponent({
         </div>
 
         {/* Round counter */}
-        <p className="text-[13px] font-semibold mt-3" style={{ color: 'rgba(253,253,254,0.62)' }}>
+        <p className="text-[13px] font-semibold mt-3" style={{ color: 'var(--card-text-muted)' }}>
           Ronde {currentRound} / {totalRounds}
         </p>
       </div>
@@ -531,14 +531,14 @@ function IntervalTimerPanelComponent({
             }
           }}
           className="flex-1 py-3.5 rounded-xl font-semibold text-[13px] transition-colors"
-          style={{ background: 'rgba(253,253,254,0.10)', color: 'rgba(253,253,254,0.78)' }}
+          style={{ background: 'var(--card-bg-tint)', color: 'var(--card-text-soft)' }}
         >
           Skip →
         </button>
         <button
           onClick={handleFinish}
           className="px-6 py-3.5 rounded-xl font-semibold text-[13px] transition-colors"
-          style={{ background: '#474B48', color: '#FDFDFE' }}
+          style={{ background: '#474B48', color: 'var(--card-text)' }}
         >
           Stop
         </button>
@@ -581,7 +581,7 @@ interface ProgramTemplateExercise {
 type SetType = 'normal' | 'warmup' | 'failure' | 'dropset'
 
 const SET_TYPE_CONFIG: Record<SetType, { label: string; short: string; color: string; bg: string }> = {
-  normal:  { label: 'Normaal',  short: '',  color: 'rgba(253,253,254,0.55)', bg: 'transparent' },
+  normal:  { label: 'Normaal',  short: '',  color: 'var(--card-text-muted)', bg: 'transparent' },
   warmup:  { label: 'Warm-up',  short: 'W', color: '#E8A838', bg: '#FEF3E0' },
   failure: { label: 'Failure',  short: 'F', color: '#E04040', bg: '#FEECEC' },
   dropset: { label: 'Drop Set', short: 'D', color: '#7B61FF', bg: '#F0ECFF' },
@@ -803,16 +803,16 @@ function ExercisePickerModalComponent({
     <div className="fixed inset-0 z-[80] flex items-end" style={{ background: 'rgba(0,0,0,0.4)' }}>
       <div className="w-full h-[75vh] rounded-t-2xl flex flex-col animate-slide-up" style={{ background: '#474B48' }}>
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid rgba(253,253,254,0.10)' }}>
-          <h3 className="text-[18px] font-semibold" style={{ color: '#FDFDFE' }}>
+        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid var(--card-divider)' }}>
+          <h3 className="text-[18px] font-semibold" style={{ color: 'var(--card-text)' }}>
             {showCreateForm ? 'Nieuwe oefening' : 'Oefening toevoegen'}
           </h3>
           <button
             onClick={showCreateForm ? () => setShowCreateForm(false) : onClose}
             className="w-9 h-9 flex items-center justify-center rounded-xl transition-colors"
-            style={{ background: 'rgba(253,253,254,0.10)' }}
+            style={{ background: 'var(--card-bg-tint)' }}
           >
-            <X size={18} strokeWidth={1.5} style={{ color: 'rgba(253,253,254,0.62)' }} />
+            <X size={18} strokeWidth={1.5} style={{ color: 'var(--card-text-muted)' }} />
           </button>
         </div>
 
@@ -821,7 +821,7 @@ function ExercisePickerModalComponent({
           <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
             {/* Name */}
             <div>
-              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-1.5 block" style={{ color: 'rgba(253,253,254,0.62)' }}>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-1.5 block" style={{ color: 'var(--card-text-muted)' }}>
                 Naam oefening
               </label>
               <input
@@ -832,16 +832,16 @@ function ExercisePickerModalComponent({
                 autoFocus
                 className="w-full rounded-xl px-4 py-3 text-[14px] border focus:outline-none"
                 style={{
-                  background: 'rgba(253,253,254,0.10)',
-                  color: '#FDFDFE',
-                  borderColor: 'rgba(253,253,254,0.10)'
+                  background: 'var(--card-bg-tint)',
+                  color: 'var(--card-text)',
+                  borderColor: 'var(--card-divider)'
                 }}
               />
             </div>
 
             {/* Body part */}
             <div>
-              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-1.5 block" style={{ color: 'rgba(253,253,254,0.62)' }}>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-1.5 block" style={{ color: 'var(--card-text-muted)' }}>
                 Lichaamsgroep
               </label>
               <div className="flex flex-wrap gap-2">
@@ -864,7 +864,7 @@ function ExercisePickerModalComponent({
 
             {/* Target muscle */}
             <div>
-              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-1.5 block" style={{ color: 'rgba(253,253,254,0.62)' }}>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-1.5 block" style={{ color: 'var(--card-text-muted)' }}>
                 Doelspier
               </label>
               <input
@@ -874,16 +874,16 @@ function ExercisePickerModalComponent({
                 placeholder="bv. quadriceps, glutes"
                 className="w-full rounded-xl px-4 py-3 text-[14px] border focus:outline-none focus:ring-2"
                 style={{
-                  background: 'rgba(253,253,254,0.10)',
-                  color: '#FDFDFE',
-                  borderColor: 'rgba(253,253,254,0.10)'
+                  background: 'var(--card-bg-tint)',
+                  color: 'var(--card-text)',
+                  borderColor: 'var(--card-divider)'
                 }}
               />
             </div>
 
             {/* Equipment */}
             <div>
-              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-1.5 block" style={{ color: 'rgba(253,253,254,0.62)' }}>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.08em] mb-1.5 block" style={{ color: 'var(--card-text-muted)' }}>
                 Materiaal
               </label>
               <div className="flex flex-wrap gap-2">
@@ -929,8 +929,8 @@ function ExercisePickerModalComponent({
           <>
             {/* Search */}
             <div className="px-5 py-3">
-              <div className="flex items-center gap-2 rounded-xl px-3.5 py-2.5 focus-within:ring-2" style={{ background: 'rgba(253,253,254,0.10)' }}>
-                <Search size={16} strokeWidth={1.5} style={{ color: 'rgba(253,253,254,0.62)' }} className="flex-shrink-0" />
+              <div className="flex items-center gap-2 rounded-xl px-3.5 py-2.5 focus-within:ring-2" style={{ background: 'var(--card-bg-tint)' }}>
+                <Search size={16} strokeWidth={1.5} style={{ color: 'var(--card-text-muted)' }} className="flex-shrink-0" />
                 <input
                   type="text"
                   value={searchQuery}
@@ -938,7 +938,7 @@ function ExercisePickerModalComponent({
                   placeholder="Zoek oefening..."
                   autoFocus
                   className="flex-1 bg-transparent text-[14px] border-none focus:outline-none"
-                  style={{ color: '#FDFDFE' }}
+                  style={{ color: 'var(--card-text)' }}
                 />
               </div>
             </div>
@@ -951,7 +951,7 @@ function ExercisePickerModalComponent({
                 </div>
               ) : filteredExercises.length === 0 ? (
                 <div className="flex flex-col items-center justify-center flex-1 min-h-[200px] space-y-4">
-                  <p className="text-[14px]" style={{ color: 'rgba(253,253,254,0.62)' }}>Geen oefeningen gevonden voor &ldquo;{searchQuery}&rdquo;</p>
+                  <p className="text-[14px]" style={{ color: 'var(--card-text-muted)' }}>Geen oefeningen gevonden voor &ldquo;{searchQuery}&rdquo;</p>
                   <button
                     onClick={handleShowCreateForm}
                     className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-[13px] font-semibold transition-colors active:scale-[0.98]"
@@ -968,18 +968,18 @@ function ExercisePickerModalComponent({
                       key={ex.id}
                       onClick={() => handleSelectExercise(ex)}
                       className="w-full text-left px-4 py-3.5 rounded-xl transition-colors flex items-center gap-3"
-                      style={{ background: 'rgba(253,253,254,0.06)', color: '#FDFDFE' }}
+                      style={{ background: 'var(--card-bg-subtle)', color: 'var(--card-text)' }}
                     >
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden border" style={{ background: 'rgba(253,253,254,0.06)', borderColor: 'rgba(253,253,254,0.10)' }}>
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden border" style={{ background: 'var(--card-bg-subtle)', borderColor: 'var(--card-divider)' }}>
                         {ex.gif_url ? (
                           <Image src={ex.gif_url} alt="" width={40} height={40} className="w-full h-full object-cover" unoptimized loading="lazy" style={{ filter: 'saturate(0.3)' }} />
                         ) : (
-                          <span className="text-[10px] uppercase" style={{ color: 'rgba(253,253,254,0.44)' }}>{ex.target_muscle?.slice(0, 3)}</span>
+                          <span className="text-[10px] uppercase" style={{ color: 'var(--card-text-muted)' }}>{ex.target_muscle?.slice(0, 3)}</span>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[14px] font-medium truncate" style={{ color: '#FDFDFE' }}>{ex.name_nl || ex.name}</p>
-                        <p className="text-[11px] mt-0.5" style={{ color: 'rgba(253,253,254,0.44)' }}>
+                        <p className="text-[14px] font-medium truncate" style={{ color: 'var(--card-text)' }}>{ex.name_nl || ex.name}</p>
+                        <p className="text-[11px] mt-0.5" style={{ color: 'var(--card-text-muted)' }}>
                           {ex.target_muscle}{ex.equipment ? ` · ${ex.equipment}` : ''}
                         </p>
                       </div>
@@ -991,14 +991,14 @@ function ExercisePickerModalComponent({
                   <button
                     onClick={handleShowCreateForm}
                     className="w-full text-left px-4 py-3.5 rounded-xl transition-colors flex items-center gap-3 border border-dashed mt-3"
-                    style={{ borderColor: 'rgba(253,253,254,0.10)' }}
+                    style={{ borderColor: 'var(--card-divider)' }}
                   >
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(253,253,254,0.06)' }}>
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'var(--card-bg-subtle)' }}>
                       <Plus size={16} strokeWidth={2} style={{ color: '#C0FC01' }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[14px] font-medium" style={{ color: '#C0FC01' }}>Maak nieuwe oefening</p>
-                      <p className="text-[11px] mt-0.5" style={{ color: 'rgba(253,253,254,0.44)' }}>Staat je oefening er niet bij?</p>
+                      <p className="text-[11px] mt-0.5" style={{ color: 'var(--card-text-muted)' }}>Staat je oefening er niet bij?</p>
                     </div>
                   </button>
                 </div>
@@ -1090,17 +1090,17 @@ function FormCheckModalComponent({ exerciseName, onClose }: { exerciseName: stri
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.4)' }}>
       <div className="w-full max-w-lg rounded-t-2xl p-6 animate-slide-up" style={{ background: '#474B48' }}>
-        <h3 className="text-[18px] font-semibold mb-1" style={{ color: '#FDFDFE' }}>
+        <h3 className="text-[18px] font-semibold mb-1" style={{ color: 'var(--card-text)' }}>
           Form Check
         </h3>
-        <p className="text-[13px] mb-5" style={{ color: 'rgba(253,253,254,0.62)' }}>
+        <p className="text-[13px] mb-5" style={{ color: 'var(--card-text-muted)' }}>
           Neem een video op van je {exerciseName} en stuur deze naar je coach voor feedback.
         </p>
 
         {sent ? (
           <div className="text-center py-6">
             <div className="text-[32px] mb-2">✅</div>
-            <p className="text-[15px] font-semibold" style={{ color: '#FDFDFE' }}>Verstuurd naar je coach!</p>
+            <p className="text-[15px] font-semibold" style={{ color: 'var(--card-text)' }}>Verstuurd naar je coach!</p>
           </div>
         ) : (
           <>
@@ -1111,9 +1111,9 @@ function FormCheckModalComponent({ exerciseName, onClose }: { exerciseName: stri
               placeholder="Optioneel: vraag of opmerking..."
               className="w-full px-4 py-3 rounded-xl text-[14px] mb-4 focus:outline-none border"
               style={{
-                background: 'rgba(253,253,254,0.10)',
-                color: '#FDFDFE',
-                borderColor: 'rgba(253,253,254,0.10)'
+                background: 'var(--card-bg-tint)',
+                color: 'var(--card-text)',
+                borderColor: 'var(--card-divider)'
               }}
             />
 
@@ -1150,7 +1150,7 @@ function FormCheckModalComponent({ exerciseName, onClose }: { exerciseName: stri
             <button
               onClick={onClose}
               className="w-full py-3 mt-2 text-[14px] font-medium"
-              style={{ color: 'rgba(253,253,254,0.62)' }}
+              style={{ color: 'var(--card-text-muted)' }}
             >
               Annuleren
             </button>
@@ -2079,28 +2079,28 @@ function ActiveWorkoutPage() {
     return (
       <div className="fixed inset-0 z-50 flex flex-col overflow-hidden pt-safe" style={{ background: '#8E9890' }}>
         {/* Skeleton header */}
-        <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: '1px solid rgba(253,253,254,0.08)' }}>
-          <div className="h-5 w-5 rounded animate-pulse" style={{ background: 'rgba(253,253,254,0.08)' }} />
-          <div className="h-4 w-16 rounded animate-pulse" style={{ background: 'rgba(253,253,254,0.08)' }} />
-          <div className="h-5 w-5 rounded animate-pulse" style={{ background: 'rgba(253,253,254,0.08)' }} />
+        <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: '1px solid var(--card-divider)' }}>
+          <div className="h-5 w-5 rounded animate-pulse" style={{ background: 'var(--card-bg-tint)' }} />
+          <div className="h-4 w-16 rounded animate-pulse" style={{ background: 'var(--card-bg-tint)' }} />
+          <div className="h-5 w-5 rounded animate-pulse" style={{ background: 'var(--card-bg-tint)' }} />
         </div>
         {/* Skeleton exercise blocks */}
         <div className="flex-1 overflow-hidden px-5 pt-4 animate-pulse">
           {[1, 2, 3].map(i => (
             <div key={i} className="mb-6">
               <div className="flex items-center gap-3 mb-3">
-                <div className="h-10 w-10 rounded-xl animate-pulse" style={{ background: 'rgba(253,253,254,0.08)' }} />
+                <div className="h-10 w-10 rounded-xl animate-pulse" style={{ background: 'var(--card-bg-tint)' }} />
                 <div>
-                  <div className="h-4 w-32 rounded mb-1.5 animate-pulse" style={{ background: 'rgba(253,253,254,0.08)' }} />
-                  <div className="h-3 w-20 rounded animate-pulse" style={{ background: 'rgba(253,253,254,0.08)' }} />
+                  <div className="h-4 w-32 rounded mb-1.5 animate-pulse" style={{ background: 'var(--card-bg-tint)' }} />
+                  <div className="h-3 w-20 rounded animate-pulse" style={{ background: 'var(--card-bg-tint)' }} />
                 </div>
               </div>
               {[1, 2, 3].map(j => (
                 <div key={j} className="flex items-center gap-3 py-2.5">
-                  <div className="h-6 w-6 rounded-full animate-pulse" style={{ background: 'rgba(253,253,254,0.08)' }} />
-                  <div className="h-4 w-16 rounded animate-pulse" style={{ background: 'rgba(253,253,254,0.08)' }} />
-                  <div className="h-4 w-16 rounded animate-pulse" style={{ background: 'rgba(253,253,254,0.08)' }} />
-                  <div className="h-4 w-12 rounded animate-pulse" style={{ background: 'rgba(253,253,254,0.08)' }} />
+                  <div className="h-6 w-6 rounded-full animate-pulse" style={{ background: 'var(--card-bg-tint)' }} />
+                  <div className="h-4 w-16 rounded animate-pulse" style={{ background: 'var(--card-bg-tint)' }} />
+                  <div className="h-4 w-16 rounded animate-pulse" style={{ background: 'var(--card-bg-tint)' }} />
+                  <div className="h-4 w-12 rounded animate-pulse" style={{ background: 'var(--card-bg-tint)' }} />
                 </div>
               ))}
             </div>
@@ -2144,22 +2144,22 @@ function ActiveWorkoutPage() {
       {closeConfirm && (
         <div className="fixed inset-0 z-[70] flex items-end" style={{ background: 'rgba(0,0,0,0.3)' }}>
           <div className="w-full p-6 rounded-t-2xl shadow-xl animate-slide-up" style={{ background: '#474B48' }}>
-            <h3 className="text-[20px] font-semibold tracking-[-0.02em] mb-2" style={{ color: '#FDFDFE' }}>
+            <h3 className="text-[20px] font-semibold tracking-[-0.02em] mb-2" style={{ color: 'var(--card-text)' }}>
               Training afsluiten?
             </h3>
-            <p className="text-[14px] mb-6" style={{ color: 'rgba(253,253,254,0.62)' }}>Je voortgang wordt opgeslagen.</p>
+            <p className="text-[14px] mb-6" style={{ color: 'var(--card-text-muted)' }}>Je voortgang wordt opgeslagen.</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setCloseConfirm(false)}
                 className="flex-1 py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors"
-                style={{ background: 'rgba(253,253,254,0.10)', color: '#FDFDFE' }}
+                style={{ background: 'var(--card-bg-tint)', color: 'var(--card-text)' }}
               >
                 Doorgaan
               </button>
               <button
                 onClick={confirmClose}
                 className="flex-1 py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors"
-                style={{ background: '#B55A4A', color: '#FDFDFE' }}
+                style={{ background: '#B55A4A', color: 'var(--card-text)' }}
               >
                 Afsluiten
               </button>
@@ -2192,10 +2192,10 @@ function ActiveWorkoutPage() {
           type="button"
           aria-label="Minimaliseer training en ga naar home"
           onClick={handleMinimize}
-          style={{ fontFamily: 'var(--font-sans, Outfit), Outfit, sans-serif', fontSize: 22, fontWeight: 500, letterSpacing: '-0.02em', color: '#FDFDFE', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
+          style={{ fontFamily: 'var(--font-sans, Outfit), Outfit, sans-serif', fontSize: 22, fontWeight: 500, letterSpacing: '-0.02em', color: 'var(--card-text)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
         >MŌVE</button>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, #646B66, #4a4f4c)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 500, color: '#FDFDFE' }}>G</div>
+          <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, #646B66, #4a4f4c)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 500, color: 'var(--card-text)' }}>G</div>
           <button className="ico-btn" aria-label="Minimize workout" onClick={handleMinimize} style={{ WebkitTapHighlightColor: 'transparent' }}>
             <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18" /><line x1="6" y1="18" x2="18" y2="6" /></svg>
           </button>
@@ -2207,7 +2207,7 @@ function ActiveWorkoutPage() {
         <div>
           <div className="page-title">{session?.started_at ? new Date(session.started_at).toLocaleDateString('nl-NL', { weekday: 'long' }).replace(/^\w/, c => c.toUpperCase()) : 'Training'}</div>
           <div className="page-sub">{session ? formatTimer(workoutSeconds) : 'Preview'}</div>
-          <button onClick={toggleWeightUnit} style={{ marginTop: 6, fontSize: 11, fontWeight: 500, color: 'rgba(253,253,254,0.44)', background: 'transparent', border: 'none', padding: 0, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+          <button onClick={toggleWeightUnit} style={{ marginTop: 6, fontSize: 11, fontWeight: 500, color: 'var(--card-text-muted)', background: 'transparent', border: 'none', padding: 0, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
             {weightUnit}
           </button>
         </div>
@@ -2480,7 +2480,7 @@ function ActiveWorkoutPage() {
               marginBottom: 14,
             }}
           >
-            <p style={{ color: '#FDFDFE', fontSize: 13, fontWeight: 500, margin: 0 }}>{saveError}</p>
+            <p style={{ color: 'var(--card-text)', fontSize: 13, fontWeight: 500, margin: 0 }}>{saveError}</p>
           </div>
         )}
 
@@ -2492,7 +2492,7 @@ function ActiveWorkoutPage() {
               padding: '8px 14px',
               background: 'transparent',
               border: 'none',
-              color: 'rgba(253,253,254,0.44)',
+              color: 'var(--card-text-muted)',
               fontSize: 12,
               fontWeight: 500,
               letterSpacing: '0.02em',
@@ -2527,24 +2527,24 @@ function ActiveWorkoutPage() {
         {confirmRemoveExercise && (
           <div className="fixed inset-0 z-[70] flex items-end" style={{ background: 'rgba(0,0,0,0.3)' }}>
             <div className="w-full p-6 rounded-t-2xl shadow-xl animate-slide-up" style={{ background: '#474B48' }}>
-              <h3 className="text-[20px] font-semibold tracking-[-0.02em] mb-2" style={{ color: '#FDFDFE' }}>
+              <h3 className="text-[20px] font-semibold tracking-[-0.02em] mb-2" style={{ color: 'var(--card-text)' }}>
                 Oefening verwijderen?
               </h3>
-              <p className="text-[14px] mb-6" style={{ color: 'rgba(253,253,254,0.62)' }}>
+              <p className="text-[14px] mb-6" style={{ color: 'var(--card-text-muted)' }}>
                 {exercises.find(e => e.id === confirmRemoveExercise)?.exercises?.name_nl || 'Deze oefening'} wordt uit deze workout verwijderd.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setConfirmRemoveExercise(null)}
                   className="flex-1 py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors"
-                  style={{ background: 'rgba(253,253,254,0.10)', color: '#FDFDFE' }}
+                  style={{ background: 'var(--card-bg-tint)', color: 'var(--card-text)' }}
                 >
                   Annuleer
                 </button>
                 <button
                   onClick={() => removeExercise(confirmRemoveExercise)}
                   className="flex-1 py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors"
-                  style={{ background: '#B55A4A', color: '#FDFDFE' }}
+                  style={{ background: '#B55A4A', color: 'var(--card-text)' }}
                 >
                   Verwijderen
                 </button>
@@ -2558,10 +2558,10 @@ function ActiveWorkoutPage() {
         {showSaveChangesModal && (
           <div className="fixed inset-0 z-[70] flex items-end" style={{ background: 'rgba(0,0,0,0.3)' }}>
             <div className="w-full p-6 rounded-t-2xl shadow-xl animate-slide-up" style={{ background: '#474B48' }}>
-              <h3 className="text-[20px] font-semibold tracking-[-0.02em] mb-2" style={{ color: '#FDFDFE' }}>
+              <h3 className="text-[20px] font-semibold tracking-[-0.02em] mb-2" style={{ color: 'var(--card-text)' }}>
                 Je hebt aanpassingen gemaakt
               </h3>
-              <p className="text-[14px] mb-6" style={{ color: 'rgba(253,253,254,0.62)' }}>
+              <p className="text-[14px] mb-6" style={{ color: 'var(--card-text-muted)' }}>
                 Wil je de wijzigingen opslaan in je programma, of alleen voor deze workout?
               </p>
               <div className="space-y-3">
@@ -2578,14 +2578,14 @@ function ActiveWorkoutPage() {
                 <button
                   onClick={handleFinishOnlyThisTime}
                   className="w-full py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors"
-                  style={{ background: 'rgba(253,253,254,0.10)', color: '#FDFDFE' }}
+                  style={{ background: 'var(--card-bg-tint)', color: 'var(--card-text)' }}
                 >
                   Alleen deze keer
                 </button>
                 <button
                   onClick={() => setShowSaveChangesModal(false)}
                   className="w-full py-2.5 text-[12px] font-medium transition-colors"
-                  style={{ color: 'rgba(253,253,254,0.62)' }}
+                  style={{ color: 'var(--card-text-muted)' }}
                 >
                   Annuleer
                 </button>
@@ -2597,22 +2597,22 @@ function ActiveWorkoutPage() {
         {showDiscardConfirm && (
           <div className="fixed inset-0 z-[70] flex items-end" style={{ background: 'rgba(0,0,0,0.3)' }}>
             <div className="w-full p-6 rounded-t-2xl shadow-xl animate-slide-up" style={{ background: '#474B48' }}>
-              <h3 className="text-[20px] font-semibold tracking-[-0.02em] mb-2" style={{ color: '#FDFDFE' }}>
+              <h3 className="text-[20px] font-semibold tracking-[-0.02em] mb-2" style={{ color: 'var(--card-text)' }}>
                 Workout verwijderen?
               </h3>
-              <p className="text-[14px] mb-6" style={{ color: 'rgba(253,253,254,0.62)' }}>Alle voortgang wordt permanent verwijderd.</p>
+              <p className="text-[14px] mb-6" style={{ color: 'var(--card-text-muted)' }}>Alle voortgang wordt permanent verwijderd.</p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowDiscardConfirm(false)}
                   className="flex-1 py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors"
-                  style={{ background: 'rgba(253,253,254,0.10)', color: '#FDFDFE' }}
+                  style={{ background: 'var(--card-bg-tint)', color: 'var(--card-text)' }}
                 >
                   Annuleer
                 </button>
                 <button
                   onClick={discardWorkout}
                   className="flex-1 py-3.5 rounded-xl font-semibold text-[14px] uppercase tracking-[0.06em] transition-colors"
-                  style={{ background: '#B55A4A', color: '#FDFDFE' }}
+                  style={{ background: '#B55A4A', color: 'var(--card-text)' }}
                 >
                   Verwijderen
                 </button>
@@ -2663,7 +2663,7 @@ function InlineRestBarComponent({ durationSeconds, onDismiss }: { durationSecond
         borderRadius: 2,
         cursor: 'pointer',
         overflow: 'hidden',
-        background: 'rgba(253,253,254,0.06)',
+        background: 'var(--card-bg-subtle)',
         opacity: finished ? 0 : 1,
         transition: 'opacity 500ms ease',
       }}
@@ -2946,7 +2946,7 @@ function SetRowComponent({
       {showTypeMenu && (
         <>
           <div className="fixed inset-0 z-50" onClick={() => setShowTypeMenu(false)} />
-          <div className="absolute left-0 top-full mt-1 z-50 rounded-xl shadow-lg border overflow-hidden min-w-[140px]" style={{ background: '#474B48', borderColor: 'rgba(253,253,254,0.10)' }}>
+          <div className="absolute left-0 top-full mt-1 z-50 rounded-xl shadow-lg border overflow-hidden min-w-[140px]" style={{ background: '#474B48', borderColor: 'var(--card-divider)' }}>
             {(Object.entries(SET_TYPE_CONFIG) as [SetType, typeof typeConfig][]).map(([type, cfg]) => (
               <button
                 key={type}
@@ -2954,7 +2954,7 @@ function SetRowComponent({
                 className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-left text-[13px] font-medium transition-colors touch-manipulation"
                 style={{
                   background: currentType === type ? 'rgba(253,253,254,0.10)' : 'transparent',
-                  color: '#FDFDFE',
+                  color: 'var(--card-text)',
                   WebkitTapHighlightColor: 'transparent'
                 }}
               >

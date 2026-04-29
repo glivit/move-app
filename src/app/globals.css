@@ -130,6 +130,17 @@ html {
 }
 
 body {
+  /* Canvas-level fallbacks — gebruikt als inline styles op canvas
+   * (buiten cards) deze vars referencen via var(--card-text-*, fallback). */
+  --card-text:         #1C1E18;
+  --card-text-soft:    rgba(28,30,24,0.82);
+  --card-text-muted:   rgba(28,30,24,0.65);
+  --card-text-faint:   rgba(28,30,24,0.50);
+  --card-text-ghost:   rgba(28,30,24,0.32);
+  --card-divider:      rgba(28,30,24,0.10);
+  --card-bg-subtle:    rgba(28,30,24,0.05);
+  --card-bg-tint:      rgba(28,30,24,0.08);
+
   font-family: var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
   font-weight: 400;
   font-size: 15px;
@@ -217,13 +228,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .v6-card {
   /* Card-scoped text tokens — utility classes (eyebrow/cap/stat) gebruiken deze. */
-  --card-text:        #1C1E18;
-  --card-text-soft:   rgba(28,30,24,0.82);
-  --card-text-muted:  rgba(28,30,24,0.65);
-  --card-text-faint:  rgba(28,30,24,0.50);
-  --card-divider:     rgba(28,30,24,0.10);
-  --card-arr-bg:      rgba(255,255,255,0.65);
-  --card-arr-stroke:  #1C1E18;
+  --card-text:         #1C1E18;
+  --card-text-soft:    rgba(28,30,24,0.82);
+  --card-text-muted:   rgba(28,30,24,0.65);
+  --card-text-faint:   rgba(28,30,24,0.50);
+  --card-text-ghost:   rgba(28,30,24,0.32);
+  --card-divider:      rgba(28,30,24,0.10);
+  --card-bg-subtle:    rgba(28,30,24,0.05);
+  --card-bg-tint:      rgba(28,30,24,0.08);
+  --card-arr-bg:       rgba(255,255,255,0.65);
+  --card-arr-stroke:   #1C1E18;
 
   background: rgba(255,255,255,0.50);
   backdrop-filter: blur(60px) saturate(170%);
@@ -241,14 +255,18 @@ h1, h2, h3, h4, h5, h6 {
 }
 .v6-card:active { transform: scale(0.99); }
 
-.v6-card-dark {
-  --card-text:        #F2F2EC;
-  --card-text-soft:   rgba(242,242,236,0.78);
-  --card-text-muted:  rgba(242,242,236,0.55);
-  --card-text-faint:  rgba(242,242,236,0.32);
-  --card-divider:     rgba(255,255,255,0.10);
-  --card-arr-bg:      rgba(255,255,255,0.10);
-  --card-arr-stroke:  #F2F2EC;
+.v6-card-dark,
+.card-elevated-v2 {
+  --card-text:         #F2F2EC;
+  --card-text-soft:    rgba(242,242,236,0.78);
+  --card-text-muted:   rgba(242,242,236,0.55);
+  --card-text-faint:   rgba(242,242,236,0.32);
+  --card-text-ghost:   rgba(242,242,236,0.18);
+  --card-divider:      rgba(255,255,255,0.10);
+  --card-bg-subtle:    rgba(255,255,255,0.06);
+  --card-bg-tint:      rgba(255,255,255,0.10);
+  --card-arr-bg:       rgba(255,255,255,0.10);
+  --card-arr-stroke:   #F2F2EC;
 
   background: rgba(28,30,24,0.88);
   backdrop-filter: blur(30px) saturate(180%);

@@ -16,11 +16,11 @@ export default function ClientLoading() {
         <div className="animate-pulse space-y-3">
           <div className="h-3 w-24 rounded-full" style={{ background: 'rgba(253,253,254,0.18)' }} />
           <div className="h-7 w-48 rounded-lg" style={{ background: 'rgba(253,253,254,0.24)' }} />
-          <div className="h-3 w-32 rounded-full mt-1" style={{ background: 'rgba(253,253,254,0.14)' }} />
-          <div style={{ height: 3, width: '100%', background: 'rgba(253,253,254,0.14)', borderRadius: 2, marginTop: 18 }} />
+          <div className="h-3 w-32 rounded-full mt-1" style={{ background: 'var(--card-bg-tint)' }} />
+          <div style={{ height: 3, width: '100%', background: 'var(--card-bg-tint)', borderRadius: 2, marginTop: 18 }} />
           <div className="flex justify-between mt-3">
-            <div className="h-2.5 w-16 rounded-full" style={{ background: 'rgba(253,253,254,0.12)' }} />
-            <div className="h-2.5 w-20 rounded-full" style={{ background: 'rgba(253,253,254,0.12)' }} />
+            <div className="h-2.5 w-16 rounded-full" style={{ background: 'var(--card-bg-tint)' }} />
+            <div className="h-2.5 w-20 rounded-full" style={{ background: 'var(--card-bg-tint)' }} />
           </div>
         </div>
       </div>
@@ -39,8 +39,8 @@ export default function ClientLoading() {
           <div className="flex gap-3">
             {[0, 1, 2, 3, 4, 5, 6].map(i => (
               <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ background: 'rgba(253,253,254,0.14)' }} />
-                <div className="h-2 w-6 rounded-full" style={{ background: 'rgba(253,253,254,0.10)' }} />
+                <div className="w-3 h-3 rounded-full" style={{ background: 'var(--card-bg-tint)' }} />
+                <div className="h-2 w-6 rounded-full" style={{ background: 'var(--card-bg-tint)' }} />
               </div>
             ))}
           </div>
@@ -57,14 +57,14 @@ export default function ClientLoading() {
         }}
       >
         <div className="animate-pulse space-y-3">
-          <div className="h-3 w-24 rounded-full" style={{ background: 'rgba(253,253,254,0.14)' }} />
+          <div className="h-3 w-24 rounded-full" style={{ background: 'var(--card-bg-tint)' }} />
           <div className="h-10 w-32 rounded-lg" style={{ background: 'rgba(253,253,254,0.18)' }} />
-          <div style={{ height: 3, width: '100%', background: 'rgba(253,253,254,0.10)', borderRadius: 2, marginTop: 14 }} />
+          <div style={{ height: 3, width: '100%', background: 'var(--card-bg-tint)', borderRadius: 2, marginTop: 14 }} />
           <div className="flex gap-6 mt-4">
             {[1, 2, 3].map(i => (
               <div key={i} className="flex-1 space-y-1.5">
                 <div className="h-4 w-10 rounded" style={{ background: 'rgba(253,253,254,0.18)' }} />
-                <div className="h-2.5 w-14 rounded-full" style={{ background: 'rgba(253,253,254,0.10)' }} />
+                <div className="h-2.5 w-14 rounded-full" style={{ background: 'var(--card-bg-tint)' }} />
               </div>
             ))}
           </div>

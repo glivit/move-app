@@ -55,17 +55,17 @@ export function OnboardingChecklist() {
           <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{
             background: 'linear-gradient(135deg, rgba(26,25,23,0.12) 0%, rgba(26,25,23,0.05) 100%)'
           }}>
-            <Sparkles strokeWidth={1.5} className="w-[18px] h-[18px] text-[#FDFDFE]" />
+            <Sparkles strokeWidth={1.5} className="w-[18px] h-[18px] text-[#1C1E18]" />
           </div>
           <div>
             <span className="text-[11px] font-bold uppercase tracking-[0.1em] text-[rgba(253,253,254,0.30)]">Setup</span>
-            <p className="text-[14px] font-semibold text-[#FDFDFE] tracking-[-0.01em]">
+            <p className="text-[14px] font-semibold text-[#1C1E18] tracking-[-0.01em]">
               Voltooi je profiel
             </p>
           </div>
         </div>
         <span className="text-[14px] font-bold tracking-[-0.01em]" style={{
-          color: completedCount === totalCount ? '#2FA65A' : '#FDFDFE'
+          color: completedCount === totalCount ? '#2FA65A' : '#1C1E18'
         }}>
           {completedCount}/{totalCount}
         </span>
@@ -78,14 +78,14 @@ export function OnboardingChecklist() {
             className="h-full rounded-full transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
             style={{
               width: `${progress}%`,
-              backgroundColor: '#FDFDFE',
+              backgroundColor: '#1C1E18',
             }}
           />
         </div>
       </div>
 
       {/* Items */}
-      <div className="divide-y divide-[rgba(253,253,254,0.14)]">
+      <div className="divide-y divide-[rgba(28,30,24,0.18)]">
         {items.filter(i => !i.completed).slice(0, 4).map((item) => (
           <Link
             key={item.id}
@@ -93,7 +93,7 @@ export function OnboardingChecklist() {
             className="flex items-center gap-3.5 px-6 py-3.5 hover:bg-[#E5E1D9] transition-all duration-[280ms]"
           >
             <Circle strokeWidth={1.5} className="w-5 h-5 text-[rgba(253,253,254,0.30)] shrink-0" />
-            <span className="flex-1 text-[14px] font-medium text-[#FDFDFE] tracking-[-0.01em]">
+            <span className="flex-1 text-[14px] font-medium text-[#1C1E18] tracking-[-0.01em]">
               {item.label}
             </span>
             <ChevronRight strokeWidth={1.5} className="w-4 h-4 text-[rgba(253,253,254,0.30)] shrink-0" />

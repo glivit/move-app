@@ -340,13 +340,13 @@ export function PhotoUploadStep({ photos, onChange, showSilhouette = true }: Pro
               fontSize: 10,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
-              color: 'rgba(253,253,254,0.44)',
+              color: 'var(--card-text-muted)',
               fontWeight: 600,
             }}
           >
             4 posities
           </span>
-          <span className="ml-auto text-[11px] font-semibold text-[#FDFDFE] tabular-nums">
+          <span className="ml-auto text-[11px] font-semibold text-[#1C1E18] tabular-nums">
             {completedCount}/4
           </span>
         </div>
@@ -395,7 +395,7 @@ export function PhotoUploadStep({ photos, onChange, showSilhouette = true }: Pro
                 /* ── Empty state — tap opens custom camera ── */
                 <button
                   onClick={() => setCameraActive(key)}
-                  className="aspect-[3/4] w-full rounded-[20px] border border-dashed border-[rgba(253,253,254,0.22)] hover:border-[rgba(253,253,254,0.48)] flex flex-col items-center justify-center transition-all bg-[#A6ADA7] relative overflow-hidden group"
+                  className="aspect-[3/4] w-full rounded-[20px] border border-dashed border-[rgba(253,253,254,0.22)] hover:border-[rgba(253,253,254,0.48)] flex flex-col items-center justify-center transition-all bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl relative overflow-hidden group"
                   style={{
                     boxShadow:
                       'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',
@@ -403,14 +403,14 @@ export function PhotoUploadStep({ photos, onChange, showSilhouette = true }: Pro
                 >
                   {showSilhouette && (
                     <div className="absolute inset-0 flex items-center justify-center opacity-25 group-hover:opacity-40 transition-opacity">
-                      <Silhouette className="h-[85%] text-[#FDFDFE]" />
+                      <Silhouette className="h-[85%] text-[#1C1E18]" />
                     </div>
                   )}
                   <div className="relative z-10 flex flex-col items-center gap-2">
                     <div className="w-12 h-12 rounded-xl bg-[rgba(31,35,32,0.18)] flex items-center justify-center shadow-sm">
-                      <Camera className="h-5 w-5 text-[#FDFDFE]" strokeWidth={1.5} />
+                      <Camera className="h-5 w-5 text-[#1C1E18]" strokeWidth={1.5} />
                     </div>
-                    <span className="text-[11px] font-bold text-[#FDFDFE] uppercase tracking-[0.06em]">{label}</span>
+                    <span className="text-[11px] font-bold text-[#1C1E18] uppercase tracking-[0.06em]">{label}</span>
                   </div>
                   <p className="relative z-10 text-[10px] text-[rgba(253,253,254,0.72)] mt-2 px-4 text-center">
                     Tik om camera te openen
@@ -437,14 +437,14 @@ export function PhotoUploadStep({ photos, onChange, showSilhouette = true }: Pro
               fontSize: 10,
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
-              color: 'rgba(253,253,254,0.44)',
+              color: 'var(--card-text-muted)',
               fontWeight: 600,
             }}
           >
             Tip
           </span>
         </div>
-        <p className="text-[12px] text-[#FDFDFE] leading-relaxed">
+        <p className="text-[12px] text-[#1C1E18] leading-relaxed">
           Zet je telefoon op ooghoogte met de timer (3s). Gebruik dezelfde plek en belichting voor de beste vergelijking.
         </p>
       </div>

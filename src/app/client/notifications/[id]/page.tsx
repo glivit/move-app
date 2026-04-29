@@ -82,10 +82,10 @@ export default function BroadcastDetailPage() {
   if (!broadcast) {
     return (
       <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center gap-4">
-        <p className="text-[15px] text-[rgba(253,253,254,0.55)]">Melding niet gevonden</p>
+        <p className="text-[15px] text-[rgba(28,30,24,0.62)]">Melding niet gevonden</p>
         <button
           onClick={handleClose}
-          className="text-[14px] font-medium text-[#FDFDFE] underline underline-offset-2"
+          className="text-[14px] font-medium text-[#1C1E18] underline underline-offset-2"
         >
           Terug naar meldingen
         </button>
@@ -99,7 +99,7 @@ export default function BroadcastDetailPage() {
       style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       {/* Top bar with close button */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(253,253,254,0.08)]">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(28,30,24,0.10)]">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-[#3068C4]/10 flex items-center justify-center">
             <Megaphone strokeWidth={1.5} className="w-5 h-5 text-[#3068C4]" />
@@ -108,23 +108,23 @@ export default function BroadcastDetailPage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#3068C4]">
               Bericht van je coach
             </p>
-            <p className="text-[12px] text-[rgba(253,253,254,0.55)]">
+            <p className="text-[12px] text-[rgba(28,30,24,0.62)]">
               {format(new Date(broadcast.created_at), 'd MMMM yyyy · HH:mm', { locale: nl })}
             </p>
           </div>
         </div>
         <button
           onClick={handleClose}
-          className="w-10 h-10 rounded-full bg-[rgba(253,253,254,0.08)] flex items-center justify-center hover:bg-[#E8E8E6] transition-colors"
+          className="w-10 h-10 rounded-full bg-[rgba(255,255,255,0.50)] flex items-center justify-center hover:bg-[#E8E8E6] transition-colors"
           aria-label="Sluiten"
         >
-          <X strokeWidth={1.5} className="w-5 h-5 text-[rgba(253,253,254,0.55)]" />
+          <X strokeWidth={1.5} className="w-5 h-5 text-[rgba(28,30,24,0.62)]" />
         </button>
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-6 py-8">
-        <h1 className="text-editorial-h2 text-[#FDFDFE]">
+        <h1 className="text-editorial-h2 text-[#1C1E18]">
           {broadcast.title}
         </h1>
 
@@ -134,7 +134,7 @@ export default function BroadcastDetailPage() {
       </div>
 
       {/* Bottom bar */}
-      <div className="px-6 py-5 border-t border-[rgba(253,253,254,0.08)]">
+      <div className="px-6 py-5 border-t border-[rgba(28,30,24,0.10)]">
         <button
           onClick={handleClose}
           className="w-full py-3.5 rounded-2xl bg-[#474B48] text-white text-[15px] font-semibold tracking-[-0.01em] transition-all active:scale-[0.98]"

@@ -315,7 +315,7 @@ export default function ExerciseProgressionPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[rgba(253,253,254,0.08)] p-6">
+      <div className="min-h-screen bg-[rgba(28,30,24,0.10)] p-6">
         <div className="flex items-center justify-center h-96">
           <Loader className="w-8 h-8 animate-spin text-[#C0FC01]" />
         </div>
@@ -325,7 +325,7 @@ export default function ExerciseProgressionPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[rgba(253,253,254,0.08)] p-6">
+      <div className="min-h-screen bg-[rgba(28,30,24,0.10)] p-6">
         <div className="flex flex-col gap-4">
           <button
             onClick={() => router.back()}
@@ -334,8 +334,8 @@ export default function ExerciseProgressionPage() {
             <ChevronLeft className="w-5 h-5" />
             Terug
           </button>
-          <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-6">
-            <p className="text-[rgba(253,253,254,0.55)]">{error}</p>
+          <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.18)] p-6">
+            <p className="text-[rgba(28,30,24,0.62)]">{error}</p>
           </div>
         </div>
       </div>
@@ -343,7 +343,7 @@ export default function ExerciseProgressionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[rgba(253,253,254,0.08)] p-6">
+    <div className="min-h-screen bg-[rgba(28,30,24,0.10)] p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col gap-4">
@@ -355,12 +355,12 @@ export default function ExerciseProgressionPage() {
             Terug
           </button>
 
-          <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-6">
-            <h1 className="text-4xl font-bold text-[#FDFDFE]">
+          <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.18)] p-6">
+            <h1 className="text-4xl font-bold text-[#1C1E18]">
               {exercise?.name}
             </h1>
             {exercise?.muscle_groups && (
-              <p className="text-[rgba(253,253,254,0.55)] mt-2">
+              <p className="text-[rgba(28,30,24,0.62)] mt-2">
                 {exercise.muscle_groups.join(', ')}
               </p>
             )}
@@ -370,27 +370,27 @@ export default function ExerciseProgressionPage() {
         {/* Personal Records Section */}
         {personalRecords && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-6">
+            <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.18)] p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Trophy className="w-6 h-6 text-[#C0FC01]" />
-                <h2 className="text-xl font-bold text-[#FDFDFE]">
+                <h2 className="text-xl font-bold text-[#1C1E18]">
                   Persoonlijke Records
                 </h2>
               </div>
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm text-[rgba(253,253,254,0.55)]">Zwaarste gewicht</p>
+                  <p className="text-sm text-[rgba(28,30,24,0.62)]">Zwaarste gewicht</p>
                   <p className="text-3xl font-bold text-[#C0FC01]">
                     {personalRecords.weight} kg
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-[rgba(253,253,254,0.55)]">Herhalingen op PR</p>
-                  <p className="text-2xl font-bold text-[#FDFDFE]">
+                  <p className="text-sm text-[rgba(28,30,24,0.62)]">Herhalingen op PR</p>
+                  <p className="text-2xl font-bold text-[#1C1E18]">
                     {personalRecords.reps}x
                   </p>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-[rgba(253,253,254,0.55)] pt-2">
+                <div className="flex items-center gap-2 text-sm text-[rgba(28,30,24,0.62)] pt-2">
                   <Calendar className="w-4 h-4" />
                   {personalRecords.date}
                 </div>
@@ -398,23 +398,23 @@ export default function ExerciseProgressionPage() {
             </div>
 
             {chartData.length > 0 && (
-              <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-6">
+              <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.18)] p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <TrendingUp className="w-6 h-6 text-[#C0FC01]" />
-                  <h2 className="text-xl font-bold text-[#FDFDFE]">
+                  <h2 className="text-xl font-bold text-[#1C1E18]">
                     Nieuwste week
                   </h2>
                 </div>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-[rgba(253,253,254,0.55)]">1RM schatting</p>
+                    <p className="text-sm text-[rgba(28,30,24,0.62)]">1RM schatting</p>
                     <p className="text-3xl font-bold text-[#C0FC01]">
                       {chartData[chartData.length - 1].estimated1rm} kg
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-[rgba(253,253,254,0.55)]">Totaal volume</p>
-                    <p className="text-2xl font-bold text-[#FDFDFE]">
+                    <p className="text-sm text-[rgba(28,30,24,0.62)]">Totaal volume</p>
+                    <p className="text-2xl font-bold text-[#1C1E18]">
                       {chartData[chartData.length - 1].volume} kg
                     </p>
                   </div>
@@ -428,8 +428,8 @@ export default function ExerciseProgressionPage() {
         {chartData.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* 1RM Chart */}
-            <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-6">
-              <h2 className="text-xl font-bold text-[#FDFDFE] mb-4">
+            <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.18)] p-6">
+              <h2 className="text-xl font-bold text-[#1C1E18] mb-4">
                 1RM Progressie
               </h2>
               <ResponsiveContainer width="100%" height={300}>
@@ -442,7 +442,7 @@ export default function ExerciseProgressionPage() {
                   </defs>
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="rgba(253,253,254,0.14)"
+                    stroke="rgba(28,30,24,0.18)"
                     vertical={false}
                   />
                   <XAxis
@@ -453,10 +453,10 @@ export default function ExerciseProgressionPage() {
                   <YAxis stroke="rgba(253,253,254,0.55)" style={{ fontSize: '12px' }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#FDFDFE',
+                      backgroundColor: '#1C1E18',
                       border: 'none',
                       borderRadius: '8px',
-                      color: 'rgba(253,253,254,0.08)',
+                      color: 'rgba(28,30,24,0.10)',
                     }}
                     formatter={(value) => `${value} kg`}
                   />
@@ -473,15 +473,15 @@ export default function ExerciseProgressionPage() {
             </div>
 
             {/* Volume Chart */}
-            <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-6">
-              <h2 className="text-xl font-bold text-[#FDFDFE] mb-4">
+            <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.18)] p-6">
+              <h2 className="text-xl font-bold text-[#1C1E18] mb-4">
                 Volume Progressie
               </h2>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={chartData}>
                   <CartesianGrid
                     strokeDasharray="3 3"
-                    stroke="rgba(253,253,254,0.14)"
+                    stroke="rgba(28,30,24,0.18)"
                     vertical={false}
                   />
                   <XAxis
@@ -492,10 +492,10 @@ export default function ExerciseProgressionPage() {
                   <YAxis stroke="rgba(253,253,254,0.55)" style={{ fontSize: '12px' }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#FDFDFE',
+                      backgroundColor: '#1C1E18',
                       border: 'none',
                       borderRadius: '8px',
-                      color: 'rgba(253,253,254,0.08)',
+                      color: 'rgba(28,30,24,0.10)',
                     }}
                     formatter={(value) => `${value} kg`}
                   />
@@ -515,23 +515,23 @@ export default function ExerciseProgressionPage() {
 
         {/* Progression Suggestions */}
         {suggestions.length > 0 && (
-          <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-6">
+          <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.18)] p-6">
             <div className="flex items-center gap-3 mb-4">
               <Dumbbell className="w-6 h-6 text-[#C0FC01]" />
-              <h2 className="text-xl font-bold text-[#FDFDFE]">
+              <h2 className="text-xl font-bold text-[#1C1E18]">
                 Progressie suggesties
               </h2>
             </div>
             <div className="space-y-3">
               {suggestions.map((suggestion, idx) => (
-                <div key={idx} className="flex gap-3 p-3 bg-[rgba(253,253,254,0.08)] rounded-lg">
+                <div key={idx} className="flex gap-3 p-3 bg-[rgba(28,30,24,0.10)] rounded-lg">
                   <div className="flex-shrink-0">
                     <div className="flex items-center justify-center h-6 w-6 rounded-full bg-[#C0FC01] text-white text-sm font-bold">
                       {idx + 1}
                     </div>
                   </div>
                   <div>
-                    <p className="text-[#FDFDFE] text-sm">
+                    <p className="text-[#1C1E18] text-sm">
                       {suggestion.suggestion}
                     </p>
                     {suggestion.type && (
@@ -548,10 +548,10 @@ export default function ExerciseProgressionPage() {
 
         {/* Recent Sessions */}
         {recentSessions.length > 0 && (
-          <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-6">
+          <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.18)] p-6">
             <div className="flex items-center gap-3 mb-4">
               <Calendar className="w-6 h-6 text-[#C0FC01]" />
-              <h2 className="text-xl font-bold text-[#FDFDFE]">
+              <h2 className="text-xl font-bold text-[#1C1E18]">
                 Recente sessies
               </h2>
             </div>
@@ -559,13 +559,13 @@ export default function ExerciseProgressionPage() {
               {recentSessions.map((session) => (
                 <div
                   key={session.sessionId}
-                  className="border border-[rgba(253,253,254,0.14)] rounded-lg p-4 hover:bg-[rgba(253,253,254,0.08)] transition-colors"
+                  className="border border-[rgba(28,30,24,0.18)] rounded-lg p-4 hover:bg-[rgba(28,30,24,0.10)] transition-colors"
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <p className="font-semibold text-[#FDFDFE]">
+                    <p className="font-semibold text-[#1C1E18]">
                       {session.date}
                     </p>
-                    <span className="text-sm text-[rgba(253,253,254,0.55)] bg-[rgba(253,253,254,0.08)] px-3 py-1 rounded-full">
+                    <span className="text-sm text-[rgba(28,30,24,0.62)] bg-[rgba(28,30,24,0.10)] px-3 py-1 rounded-full">
                       Volume: {session.totalVolume} kg
                     </span>
                   </div>
@@ -587,12 +587,12 @@ export default function ExerciseProgressionPage() {
 
         {/* Empty State */}
         {chartData.length === 0 && (
-          <div className="bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.14)] p-12 text-center">
-            <Dumbbell className="w-12 h-12 text-[rgba(253,253,254,0.55)] mx-auto mb-4 opacity-50" />
-            <p className="text-[rgba(253,253,254,0.55)] text-lg">
+          <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.18)] p-12 text-center">
+            <Dumbbell className="w-12 h-12 text-[rgba(28,30,24,0.62)] mx-auto mb-4 opacity-50" />
+            <p className="text-[rgba(28,30,24,0.62)] text-lg">
               Nog geen gegevens beschikbaar voor deze oefening
             </p>
-            <p className="text-sm text-[rgba(253,253,254,0.55)] mt-2">
+            <p className="text-sm text-[rgba(28,30,24,0.62)] mt-2">
               Voeg deze oefening toe aan je training om progressie bij te houden
             </p>
           </div>

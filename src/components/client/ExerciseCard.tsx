@@ -23,8 +23,8 @@ interface ExerciseCardProps {
 }
 
 // v6 Orion tokens
-const INK = '#FDFDFE'
-const INK_FAINT = 'rgba(253,253,254,0.62)'
+const INK = '#1C1E18'
+const INK_FAINT = 'rgba(28,30,24,0.65)'
 const INK_MUTED = 'rgba(253,253,254,0.74)'
 const CHECK = '#2FA65A'
 const INNER_SURFACE = 'rgba(31,35,32,0.14)'

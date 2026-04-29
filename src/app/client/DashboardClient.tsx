@@ -974,11 +974,11 @@ function NutritionCard({
     return (
       <div className="v6-card-dark">
         <div className="animate-pulse space-y-4">
-          <div className="h-3 w-16 rounded" style={{ background: 'rgba(253,253,254,0.14)' }} />
+          <div className="h-3 w-16 rounded" style={{ background: 'var(--card-bg-tint)' }} />
           <div className="h-10 w-40 rounded" style={{ background: 'rgba(253,253,254,0.18)' }} />
-          <div className="grid grid-cols-3 gap-3 pt-3" style={{ borderTop: '1px solid rgba(253,253,254,0.10)' }}>
+          <div className="grid grid-cols-3 gap-3 pt-3" style={{ borderTop: '1px solid var(--card-divider)' }}>
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-10 rounded" style={{ background: 'rgba(253,253,254,0.12)' }} />
+              <div key={i} className="h-10 rounded" style={{ background: 'var(--card-bg-tint)' }} />
             ))}
           </div>
         </div>
@@ -995,12 +995,12 @@ function NutritionCard({
         <div className="stat-number-lg" style={{ fontFeatureSettings: '"tnum"' }}>
           {formatNumber(consumed)}
           {hasTarget && (
-            <span style={{ display: 'block', fontSize: 12, color: 'rgba(253,253,254,0.44)', fontWeight: 400, marginTop: 6, letterSpacing: 0.01 }}>
+            <span style={{ display: 'block', fontSize: 12, color: 'var(--card-text-muted)', fontWeight: 400, marginTop: 6, letterSpacing: 0.01 }}>
               / {formatNumber(target)} kcal
             </span>
           )}
           {!hasTarget && (
-            <span style={{ display: 'block', fontSize: 12, color: 'rgba(253,253,254,0.44)', fontWeight: 400, marginTop: 6, letterSpacing: 0.01 }}>
+            <span style={{ display: 'block', fontSize: 12, color: 'var(--card-text-muted)', fontWeight: 400, marginTop: 6, letterSpacing: 0.01 }}>
               kcal vandaag
             </span>
           )}
@@ -1012,7 +1012,7 @@ function NutritionCard({
           gridTemplateColumns: 'repeat(3, 1fr)',
           gap: 14,
           padding: '14px 0 0',
-          borderTop: '1px solid rgba(253,253,254,0.10)',
+          borderTop: '1px solid var(--card-divider)',
         }}
       >
         <MacroCell label="Eiwit" value={Math.round(protein)} />
@@ -1026,10 +1026,10 @@ function NutritionCard({
 function MacroCell({ label, value }: { label: string; value: number }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)', letterSpacing: 0 }}>{label}</span>
-      <span style={{ fontSize: 18, color: '#FDFDFE', fontWeight: 300, fontFeatureSettings: '"tnum"', letterSpacing: '-0.01em' }}>
+      <span style={{ fontSize: 11, color: 'var(--card-text-muted)', letterSpacing: 0 }}>{label}</span>
+      <span style={{ fontSize: 18, color: 'var(--card-text)', fontWeight: 300, fontFeatureSettings: '"tnum"', letterSpacing: '-0.01em' }}>
         {value}
-        <i style={{ fontSize: 11, color: 'rgba(253,253,254,0.44)', fontStyle: 'normal', fontWeight: 400, marginLeft: 2 }}>g</i>
+        <i style={{ fontSize: 11, color: 'var(--card-text-muted)', fontStyle: 'normal', fontWeight: 400, marginLeft: 2 }}>g</i>
       </span>
     </div>
   )

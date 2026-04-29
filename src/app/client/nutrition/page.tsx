@@ -218,10 +218,10 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <ShoppingCart strokeWidth={1.5} size={16} style={{ color: '#C0FC01' }} />
-          <span style={{ fontSize: 14, fontWeight: 600, color: '#FDFDFE', letterSpacing: '-0.01em' }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--card-text)', letterSpacing: '-0.01em' }}>
             Boodschappenlijst
           </span>
-          <span style={{ fontSize: 11, color: 'rgba(253,253,254,0.52)', fontWeight: 500 }}>
+          <span style={{ fontSize: 11, color: 'var(--card-text-muted)', fontWeight: 500 }}>
             {checkedCount > 0 ? `${checkedCount}/${totalItems}` : `${totalItems} items`}
           </span>
         </div>
@@ -229,7 +229,7 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
           strokeWidth={1.5}
           size={16}
           style={{
-            color: 'rgba(253,253,254,0.52)',
+            color: 'var(--card-text-muted)',
             transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
             transition: 'transform 200ms',
           }}
@@ -239,7 +239,7 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
       {open && (
         <div style={{ marginTop: 16 }}>
           <p style={{
-            fontSize: 10, color: 'rgba(253,253,254,0.52)',
+            fontSize: 10, color: 'var(--card-text-muted)',
             textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 14px',
           }}>
             Weekoverzicht — 7 dagen
@@ -248,7 +248,7 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
           {categories.map((cat, ci) => (
             <div key={cat.key} style={{ marginBottom: ci < categories.length - 1 ? 18 : 0 }}>
               <div style={{
-                fontSize: 11, fontWeight: 600, color: 'rgba(253,253,254,0.62)',
+                fontSize: 11, fontWeight: 600, color: 'var(--card-text-muted)',
                 textTransform: 'uppercase', letterSpacing: '0.06em',
                 marginBottom: 8,
               }}>
@@ -284,7 +284,7 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
                         border: isChecked ? 'none' : '1.5px solid rgba(253,253,254,0.28)',
                         transition: 'all 160ms',
                       }}>
-                        {isChecked && <Check strokeWidth={3} size={11} style={{ color: '#FDFDFE' }} />}
+                        {isChecked && <Check strokeWidth={3} size={11} style={{ color: 'var(--card-text)' }} />}
                       </div>
 
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -299,7 +299,7 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
                         {item.brand && (
                           <p style={{
                             fontSize: 11, margin: '2px 0 0',
-                            color: 'rgba(253,253,254,0.44)',
+                            color: 'var(--card-text-muted)',
                             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                           }}>
                             {item.brand}
@@ -329,7 +329,7 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
             <div style={{ marginTop: 14 }}>
               <div style={{
                 height: 4, borderRadius: 999, overflow: 'hidden',
-                background: 'rgba(253,253,254,0.10)',
+                background: 'var(--card-bg-tint)',
               }}>
                 <div
                   style={{
@@ -341,7 +341,7 @@ function WeeklyShoppingList({ meals }: { meals: MealMoment[] }) {
                 />
               </div>
               <p style={{
-                fontSize: 11, color: 'rgba(253,253,254,0.52)',
+                fontSize: 11, color: 'var(--card-text-muted)',
                 margin: '8px 0 0', textAlign: 'center',
               }}>
                 {checkedCount === totalItems ? 'Alles ingekocht' : `${checkedCount} van ${totalItems} ingekocht`}
@@ -604,10 +604,10 @@ function AddFoodBottomSheet({
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 20px 14px',
-          borderBottom: '1px solid rgba(253,253,254,0.08)',
+          borderBottom: '1px solid var(--card-divider)',
         }}>
           <h2 style={{
-            fontSize: 15, fontWeight: 600, color: '#FDFDFE',
+            fontSize: 15, fontWeight: 600, color: 'var(--card-text)',
             margin: 0, letterSpacing: '-0.01em',
           }}>
             {meal.name} toevoegen
@@ -618,7 +618,7 @@ function AddFoodBottomSheet({
               padding: 6,
               background: 'transparent',
               border: 'none',
-              color: 'rgba(253,253,254,0.52)',
+              color: 'var(--card-text-muted)',
               cursor: 'pointer',
               WebkitTapHighlightColor: 'transparent',
             }}
@@ -631,7 +631,7 @@ function AddFoodBottomSheet({
         <div style={{
           display: 'flex', gap: 8,
           padding: '14px 20px',
-          borderBottom: '1px solid rgba(253,253,254,0.08)',
+          borderBottom: '1px solid var(--card-divider)',
         }}>
           {(['recent', 'search'] as const).map(t => {
             const active = tab === t
@@ -663,7 +663,7 @@ function AddFoodBottomSheet({
             <div>
               {recentFoods.length === 0 ? (
                 <div style={{ padding: '48px 20px', textAlign: 'center' }}>
-                  <p style={{ fontSize: 13, color: 'rgba(253,253,254,0.52)', margin: 0 }}>
+                  <p style={{ fontSize: 13, color: 'var(--card-text-muted)', margin: 0 }}>
                     Geen recente items
                   </p>
                 </div>
@@ -680,7 +680,7 @@ function AddFoodBottomSheet({
                     <div
                       key={idx}
                       style={{
-                        borderBottom: '1px solid rgba(253,253,254,0.06)',
+                        borderBottom: '1px solid var(--card-divider)',
                         background: isExpanded ? 'rgba(253,253,254,0.04)' : 'transparent',
                         transition: 'background 160ms',
                       }}
@@ -696,14 +696,14 @@ function AddFoodBottomSheet({
                       >
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <p style={{
-                            fontSize: 14, fontWeight: 500, color: '#FDFDFE',
+                            fontSize: 14, fontWeight: 500, color: 'var(--card-text)',
                             margin: 0, lineHeight: 1.25,
                             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                           }}>
                             {food.name}
                           </p>
                           <p style={{
-                            fontSize: 12, color: 'rgba(253,253,254,0.52)',
+                            fontSize: 12, color: 'var(--card-text-muted)',
                             margin: '3px 0 0',
                           }}>
                             {displayCal} kcal · {currentGrams}g{food.brand && <span> · {food.brand}</span>}
@@ -793,7 +793,7 @@ function AddFoodBottomSheet({
                           {/* Stepper */}
                           <div style={{
                             display: 'flex', alignItems: 'center', gap: 10,
-                            background: 'rgba(253,253,254,0.06)',
+                            background: 'var(--card-bg-subtle)',
                             borderRadius: 12,
                             padding: '6px 8px',
                           }}>
@@ -802,8 +802,8 @@ function AddFoodBottomSheet({
                               style={{
                                 width: 32, height: 32, borderRadius: 10,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                background: 'rgba(253,253,254,0.10)',
-                                color: '#FDFDFE',
+                                background: 'var(--card-bg-tint)',
+                                color: 'var(--card-text)',
                                 border: 'none', cursor: 'pointer',
                                 WebkitTapHighlightColor: 'transparent',
                               }}
@@ -821,20 +821,20 @@ function AddFoodBottomSheet({
                               }}
                               style={{
                                 flex: 1, textAlign: 'center',
-                                fontSize: 16, fontWeight: 600, color: '#FDFDFE',
+                                fontSize: 16, fontWeight: 600, color: 'var(--card-text)',
                                 background: 'transparent', border: 'none', outline: 'none',
                                 fontVariantNumeric: 'tabular-nums',
                                 padding: '6px 0',
                               }}
                             />
-                            <span style={{ fontSize: 13, color: 'rgba(253,253,254,0.52)', marginRight: 4 }}>g</span>
+                            <span style={{ fontSize: 13, color: 'var(--card-text-muted)', marginRight: 4 }}>g</span>
                             <button
                               onClick={(e) => { e.stopPropagation(); setEditGrams(editGrams + 5) }}
                               style={{
                                 width: 32, height: 32, borderRadius: 10,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                background: 'rgba(253,253,254,0.10)',
-                                color: '#FDFDFE',
+                                background: 'var(--card-bg-tint)',
+                                color: 'var(--card-text)',
                                 border: 'none', cursor: 'pointer',
                                 WebkitTapHighlightColor: 'transparent',
                               }}
@@ -856,7 +856,7 @@ function AddFoodBottomSheet({
               <div style={{ position: 'relative', marginBottom: 12 }}>
                 <Search strokeWidth={1.5} size={16} style={{
                   position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)',
-                  color: 'rgba(253,253,254,0.44)',
+                  color: 'var(--card-text-muted)',
                 }} />
                 <input
                   ref={inputRef}
@@ -879,7 +879,7 @@ function AddFoodBottomSheet({
                     background: '#343836',
                     borderRadius: 12,
                     fontSize: 16, // 16px voorkomt iOS zoom-in op focus
-                    color: '#FDFDFE',
+                    color: 'var(--card-text)',
                     border: 'none',
                     outline: 'none',
                     WebkitAppearance: 'none',
@@ -893,7 +893,7 @@ function AddFoodBottomSheet({
                       position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
                       padding: 4,
                       background: 'transparent', border: 'none',
-                      cursor: 'pointer', color: 'rgba(253,253,254,0.44)',
+                      cursor: 'pointer', color: 'var(--card-text-muted)',
                       WebkitTapHighlightColor: 'transparent',
                     }}
                   >
@@ -910,10 +910,10 @@ function AddFoodBottomSheet({
                       padding: '12px 0', opacity: 0.5,
                     }}>
                       <div style={{ flex: 1 }}>
-                        <div style={{ height: 14, width: 128, background: 'rgba(253,253,254,0.10)', borderRadius: 4, marginBottom: 6 }} />
-                        <div style={{ height: 10, width: 192, background: 'rgba(253,253,254,0.08)', borderRadius: 4 }} />
+                        <div style={{ height: 14, width: 128, background: 'var(--card-bg-tint)', borderRadius: 4, marginBottom: 6 }} />
+                        <div style={{ height: 10, width: 192, background: 'var(--card-bg-tint)', borderRadius: 4 }} />
                       </div>
-                      <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(253,253,254,0.10)' }} />
+                      <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--card-bg-tint)' }} />
                     </div>
                   ))}
                 </div>
@@ -921,7 +921,7 @@ function AddFoodBottomSheet({
 
               {!loading && results.length === 0 && query && (
                 <div style={{ padding: '48px 0', textAlign: 'center' }}>
-                  <p style={{ fontSize: 13, color: 'rgba(253,253,254,0.52)', margin: 0 }}>
+                  <p style={{ fontSize: 13, color: 'var(--card-text-muted)', margin: 0 }}>
                     Geen resultaten
                   </p>
                 </div>
@@ -944,7 +944,7 @@ function AddFoodBottomSheet({
                   <div
                     key={idx}
                     style={{
-                      borderBottom: '1px solid rgba(253,253,254,0.06)',
+                      borderBottom: '1px solid var(--card-divider)',
                       background: isExpanded ? 'rgba(253,253,254,0.04)' : 'transparent',
                       transition: 'background 160ms',
                       margin: '0 -20px',
@@ -962,16 +962,16 @@ function AddFoodBottomSheet({
                     >
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <p style={{
-                          fontSize: 14, color: '#FDFDFE', margin: 0, lineHeight: 1.25,
+                          fontSize: 14, color: 'var(--card-text)', margin: 0, lineHeight: 1.25,
                           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                         }}>
                           {product.name}
                         </p>
                         <p style={{
-                          fontSize: 12, color: 'rgba(253,253,254,0.52)', margin: '3px 0 0',
+                          fontSize: 12, color: 'var(--card-text-muted)', margin: '3px 0 0',
                         }}>
                           {displayCal} kcal{product.brand && <span> · {product.brand}</span>}
-                          <span style={{ color: 'rgba(253,253,254,0.32)' }}> · {currentGrams}g</span>
+                          <span style={{ color: 'var(--card-text-faint)' }}> · {currentGrams}g</span>
                         </p>
                       </div>
 
@@ -1053,7 +1053,7 @@ function AddFoodBottomSheet({
 
                         <div style={{
                           display: 'flex', alignItems: 'center', gap: 10,
-                          background: 'rgba(253,253,254,0.06)',
+                          background: 'var(--card-bg-subtle)',
                           borderRadius: 12,
                           padding: '6px 8px',
                         }}>
@@ -1062,8 +1062,8 @@ function AddFoodBottomSheet({
                             style={{
                               width: 32, height: 32, borderRadius: 10,
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              background: 'rgba(253,253,254,0.10)',
-                              color: '#FDFDFE',
+                              background: 'var(--card-bg-tint)',
+                              color: 'var(--card-text)',
                               border: 'none', cursor: 'pointer',
                               WebkitTapHighlightColor: 'transparent',
                             }}
@@ -1081,20 +1081,20 @@ function AddFoodBottomSheet({
                             }}
                             style={{
                               flex: 1, textAlign: 'center',
-                              fontSize: 16, fontWeight: 600, color: '#FDFDFE',
+                              fontSize: 16, fontWeight: 600, color: 'var(--card-text)',
                               background: 'transparent', border: 'none', outline: 'none',
                               fontVariantNumeric: 'tabular-nums',
                               padding: '6px 0',
                             }}
                           />
-                          <span style={{ fontSize: 13, color: 'rgba(253,253,254,0.52)', marginRight: 4 }}>g</span>
+                          <span style={{ fontSize: 13, color: 'var(--card-text-muted)', marginRight: 4 }}>g</span>
                           <button
                             onClick={(e) => { e.stopPropagation(); setEditGrams(editGrams + 5) }}
                             style={{
                               width: 32, height: 32, borderRadius: 10,
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              background: 'rgba(253,253,254,0.10)',
-                              color: '#FDFDFE',
+                              background: 'var(--card-bg-tint)',
+                              color: 'var(--card-text)',
                               border: 'none', cursor: 'pointer',
                               WebkitTapHighlightColor: 'transparent',
                             }}
@@ -1428,7 +1428,7 @@ export default function ClientNutritionPage() {
             display: 'flex', alignItems: 'center', gap: 4,
             marginTop: 8, marginBottom: 18,
             background: 'transparent', border: 'none', cursor: 'pointer',
-            color: 'rgba(253,253,254,0.62)',
+            color: 'var(--card-text-muted)',
             WebkitTapHighlightColor: 'transparent',
           }}
         >
@@ -1436,10 +1436,10 @@ export default function ClientNutritionPage() {
           <span style={{ fontSize: 14 }}>Home</span>
         </button>
         <div className="v6-card" style={{ textAlign: 'center', padding: '48px 22px' }}>
-          <p style={{ fontSize: 16, fontWeight: 600, color: '#FDFDFE', margin: '0 0 6px' }}>
+          <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--card-text)', margin: '0 0 6px' }}>
             Nog geen plan
           </p>
-          <p style={{ fontSize: 13, color: 'rgba(253,253,254,0.62)', margin: 0 }}>
+          <p style={{ fontSize: 13, color: 'var(--card-text-muted)', margin: 0 }}>
             Je coach bereidt je voedingsplan voor.
           </p>
         </div>
@@ -1459,7 +1459,7 @@ export default function ClientNutritionPage() {
           display: 'flex', alignItems: 'center', gap: 4,
           marginTop: 8, marginBottom: 14,
           background: 'transparent', border: 'none', cursor: 'pointer',
-          color: 'rgba(253,253,254,0.62)',
+          color: 'var(--card-text-muted)',
           WebkitTapHighlightColor: 'transparent',
           padding: 0,
         }}
@@ -1480,16 +1480,16 @@ export default function ClientNutritionPage() {
             style={{
               width: 32, height: 32, borderRadius: '50%',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'rgba(253,253,254,0.08)',
+              background: 'var(--card-bg-tint)',
               border: 'none', cursor: 'pointer',
-              color: 'rgba(253,253,254,0.62)',
+              color: 'var(--card-text-muted)',
               WebkitTapHighlightColor: 'transparent',
             }}
           >
             <ChevronLeft strokeWidth={1.5} size={16} />
           </button>
           <span style={{
-            fontSize: 15, fontWeight: 600, color: '#FDFDFE',
+            fontSize: 15, fontWeight: 600, color: 'var(--card-text)',
             letterSpacing: '-0.01em', minWidth: 88, textAlign: 'center',
           }}>
             {formatDate(selectedDate)}
@@ -1499,9 +1499,9 @@ export default function ClientNutritionPage() {
             style={{
               width: 32, height: 32, borderRadius: '50%',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'rgba(253,253,254,0.08)',
+              background: 'var(--card-bg-tint)',
               border: 'none', cursor: 'pointer',
-              color: 'rgba(253,253,254,0.62)',
+              color: 'var(--card-text-muted)',
               WebkitTapHighlightColor: 'transparent',
             }}
           >
@@ -1537,7 +1537,7 @@ export default function ClientNutritionPage() {
                 {actualCal}
               </span>
               <span style={{
-                fontSize: 11, color: 'rgba(253,253,254,0.52)',
+                fontSize: 11, color: 'var(--card-text-muted)',
                 marginTop: 4, letterSpacing: '0.02em',
               }}>
                 / {targetCal} kcal
@@ -1562,21 +1562,21 @@ export default function ClientNutritionPage() {
               <div
                 key={macro.label}
                 style={{
-                  background: 'rgba(253,253,254,0.06)',
+                  background: 'var(--card-bg-subtle)',
                   borderRadius: 14,
                   padding: '12px 10px 10px',
                   textAlign: 'center',
                 }}
               >
                 <div style={{
-                  fontSize: 15, fontWeight: 600, color: '#FDFDFE',
+                  fontSize: 15, fontWeight: 600, color: 'var(--card-text)',
                   fontVariantNumeric: 'tabular-nums',
                 }}>
                   {macro.actual}
-                  <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(253,253,254,0.52)' }}>g</span>
+                  <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--card-text-muted)' }}>g</span>
                 </div>
                 <div style={{
-                  fontSize: 10, color: 'rgba(253,253,254,0.44)',
+                  fontSize: 10, color: 'var(--card-text-muted)',
                   marginTop: 2, fontVariantNumeric: 'tabular-nums',
                 }}>
                   / {macro.target}g
@@ -1584,7 +1584,7 @@ export default function ClientNutritionPage() {
                 <div style={{
                   marginTop: 8,
                   height: 3, borderRadius: 999,
-                  background: 'rgba(253,253,254,0.10)',
+                  background: 'var(--card-bg-tint)',
                   overflow: 'hidden',
                 }}>
                   <div style={{
@@ -1596,7 +1596,7 @@ export default function ClientNutritionPage() {
                 </div>
                 <div style={{
                   fontSize: 10, fontWeight: 500,
-                  color: 'rgba(253,253,254,0.62)',
+                  color: 'var(--card-text-muted)',
                   textTransform: 'uppercase', letterSpacing: '0.08em',
                   marginTop: 8,
                 }}>
@@ -1649,7 +1649,7 @@ export default function ClientNutritionPage() {
                 )}
               </div>
               <span style={{
-                fontSize: 12, color: 'rgba(253,253,254,0.52)',
+                fontSize: 12, color: 'var(--card-text-muted)',
                 fontVariantNumeric: 'tabular-nums',
                 flexShrink: 0,
               }}>
@@ -1687,7 +1687,7 @@ export default function ClientNutritionPage() {
                               transition: 'all 160ms',
                             }}
                           >
-                            {isChecked && <Check strokeWidth={2.5} size={11} style={{ color: '#FDFDFE' }} />}
+                            {isChecked && <Check strokeWidth={2.5} size={11} style={{ color: 'var(--card-text)' }} />}
                           </button>
 
                           <div
@@ -1722,7 +1722,7 @@ export default function ClientNutritionPage() {
                             style={{
                               padding: 6,
                               background: 'transparent', border: 'none', cursor: 'pointer',
-                              color: 'rgba(253,253,254,0.28)',
+                              color: 'var(--card-text-faint)',
                               WebkitTapHighlightColor: 'transparent',
                               flexShrink: 0,
                             }}
@@ -1740,7 +1740,7 @@ export default function ClientNutritionPage() {
                             {/* Stepper */}
                             <div style={{
                               display: 'flex', alignItems: 'center', gap: 10,
-                              background: 'rgba(253,253,254,0.06)',
+                              background: 'var(--card-bg-subtle)',
                               borderRadius: 12,
                               padding: '6px 8px',
                             }}>
@@ -1749,8 +1749,8 @@ export default function ClientNutritionPage() {
                                 style={{
                                   width: 32, height: 32, borderRadius: 10,
                                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                  background: 'rgba(253,253,254,0.10)',
-                                  color: '#FDFDFE',
+                                  background: 'var(--card-bg-tint)',
+                                  color: 'var(--card-text)',
                                   border: 'none', cursor: 'pointer',
                                   WebkitTapHighlightColor: 'transparent',
                                 }}
@@ -1767,20 +1767,20 @@ export default function ClientNutritionPage() {
                                 }}
                                 style={{
                                   flex: 1, textAlign: 'center',
-                                  fontSize: 16, fontWeight: 600, color: '#FDFDFE',
+                                  fontSize: 16, fontWeight: 600, color: 'var(--card-text)',
                                   background: 'transparent', border: 'none', outline: 'none',
                                   fontVariantNumeric: 'tabular-nums',
                                   padding: '6px 0',
                                 }}
                               />
-                              <span style={{ fontSize: 13, color: 'rgba(253,253,254,0.52)', marginRight: 4 }}>g</span>
+                              <span style={{ fontSize: 13, color: 'var(--card-text-muted)', marginRight: 4 }}>g</span>
                               <button
                                 onClick={() => setEditingFood({ ...editingFood!, grams: editingFood!.grams + 5 })}
                                 style={{
                                   width: 32, height: 32, borderRadius: 10,
                                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                  background: 'rgba(253,253,254,0.10)',
-                                  color: '#FDFDFE',
+                                  background: 'var(--card-bg-tint)',
+                                  color: 'var(--card-text)',
                                   border: 'none', cursor: 'pointer',
                                   WebkitTapHighlightColor: 'transparent',
                                 }}
@@ -1797,8 +1797,8 @@ export default function ClientNutritionPage() {
                                   flex: 1, padding: '10px 12px',
                                   borderRadius: 12,
                                   fontSize: 13, fontWeight: 500,
-                                  background: 'rgba(253,253,254,0.08)',
-                                  color: 'rgba(253,253,254,0.62)',
+                                  background: 'var(--card-bg-tint)',
+                                  color: 'var(--card-text-muted)',
                                   border: 'none', cursor: 'pointer',
                                   WebkitTapHighlightColor: 'transparent',
                                 }}
@@ -1815,7 +1815,7 @@ export default function ClientNutritionPage() {
                                   borderRadius: 12,
                                   fontSize: 13, fontWeight: 600,
                                   background: '#C0FC01',
-                                  color: '#FDFDFE',
+                                  color: 'var(--card-text)',
                                   border: 'none', cursor: 'pointer',
                                   WebkitTapHighlightColor: 'transparent',
                                 }}
@@ -1831,7 +1831,7 @@ export default function ClientNutritionPage() {
                 </div>
             ) : (
               <p style={{
-                fontSize: 12, color: 'rgba(253,253,254,0.32)',
+                fontSize: 12, color: 'var(--card-text-faint)',
                 margin: '6px 0 14px', fontStyle: 'italic',
               }}>
                 Geen items
@@ -1861,7 +1861,7 @@ export default function ClientNutritionPage() {
                 fontFamily: 'inherit',
                 fontSize: 13,
                 fontWeight: 400,
-                color: 'rgba(253,253,254,0.62)',
+                color: 'var(--card-text-muted)',
                 letterSpacing: '-0.003em',
                 transition: 'background 140ms',
               }}
@@ -1917,7 +1917,7 @@ export default function ClientNutritionPage() {
       {plan.guidelines && (
         <div className="v6-card-dark animate-slide-up">
           <p style={{
-            fontSize: 10, color: 'rgba(253,253,254,0.52)',
+            fontSize: 10, color: 'var(--card-text-muted)',
             textTransform: 'uppercase', letterSpacing: '0.1em',
             margin: '0 0 8px',
           }}>
@@ -1925,7 +1925,7 @@ export default function ClientNutritionPage() {
           </p>
           <p style={{
             fontSize: 13, lineHeight: 1.55,
-            color: 'rgba(253,253,254,0.78)',
+            color: 'var(--card-text-soft)',
             margin: 0, whiteSpace: 'pre-wrap',
           }}>
             {plan.guidelines}

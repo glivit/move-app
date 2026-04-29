@@ -15,11 +15,11 @@ export default function WorkoutLoading() {
       <div className="flex justify-between items-center mb-2 px-1">
         <div
           className="h-3 w-20 rounded-md"
-          style={{ background: 'rgba(253,253,254,0.18)' }}
+          style={{ background: 'rgba(28,30,24,0.32)' }}
         />
         <div
           className="h-3 w-24 rounded-md"
-          style={{ background: 'rgba(253,253,254,0.10)' }}
+          style={{ background: 'rgba(28,30,24,0.12)' }}
         />
       </div>
 
@@ -27,7 +27,7 @@ export default function WorkoutLoading() {
       <div
         className="rounded-[24px]"
         style={{
-          background: 'rgba(253,253,254,0.08)',
+          background: 'rgba(28,30,24,0.10)',
           padding: '6px 4px',
           minHeight: 340,
         }}
@@ -37,26 +37,26 @@ export default function WorkoutLoading() {
             key={i}
             className="flex items-center gap-4 px-4 py-4"
             style={{
-              borderTop: i === 0 ? 'none' : '1px solid rgba(253,253,254,0.06)',
+              borderTop: i === 0 ? 'none' : '1px solid rgba(28,30,24,0.08)',
             }}
           >
             <div
               className="h-4 w-10 rounded"
-              style={{ background: 'rgba(253,253,254,0.14)' }}
+              style={{ background: 'rgba(28,30,24,0.18)' }}
             />
             <div className="flex-1 space-y-1.5">
               <div
                 className="h-3 w-32 rounded"
-                style={{ background: 'rgba(253,253,254,0.12)' }}
+                style={{ background: 'rgba(28,30,24,0.14)' }}
               />
               <div
                 className="h-2.5 w-24 rounded"
-                style={{ background: 'rgba(253,253,254,0.06)' }}
+                style={{ background: 'rgba(28,30,24,0.08)' }}
               />
             </div>
             <div
               className="h-5 w-14 rounded-full"
-              style={{ background: 'rgba(253,253,254,0.08)' }}
+              style={{ background: 'rgba(28,30,24,0.10)' }}
             />
           </div>
         ))}

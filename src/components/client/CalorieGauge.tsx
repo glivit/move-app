@@ -9,8 +9,8 @@ interface CalorieGaugeProps {
 }
 
 // v6 Orion tokens
-const INK = '#FDFDFE';
-const INK_FAINT = 'rgba(253,253,254,0.62)';
+const INK = '#1C1E18';
+const INK_FAINT = 'rgba(28,30,24,0.65)';
 const TRACK = 'rgba(255,255,255,0.12)';
 
 export function CalorieGauge({ consumed, target, meals }: CalorieGaugeProps) {

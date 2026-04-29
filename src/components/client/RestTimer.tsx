@@ -32,7 +32,7 @@ function triggerVibration(pattern: number | number[]) {
 }
 
 // v6 Orion
-const INK = '#FDFDFE'
+const INK = '#1C1E18'
 const INK_FAINT = 'rgba(253,253,254,0.55)'
 const CHECK = '#2FA65A'
 const AMBER = '#E8B948'

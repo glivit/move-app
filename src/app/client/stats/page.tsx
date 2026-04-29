@@ -373,10 +373,10 @@ export default function StatsPage() {
       {/* Hero Section */}
       <div className="mb-14 animate-slide-up">
         <p className="text-label mb-3">Training</p>
-        <p className="stat-number-hero text-[#FDFDFE]">
+        <p className="stat-number-hero text-[#1C1E18]">
           <AnimatedNumber value={Math.round(totalVolume / 1000)} suffix=" ton" />
         </p>
-        <p className="text-[16px] text-[rgba(253,253,254,0.55)] mt-2">totaal volume</p>
+        <p className="text-[16px] text-[rgba(28,30,24,0.62)] mt-2">totaal volume</p>
       </div>
 
       {/* Tab bar */}
@@ -387,8 +387,8 @@ export default function StatsPage() {
             onClick={() => setActiveTab(tab.id)}
             className={`flex-1 py-3 text-[13px] font-semibold uppercase tracking-[0.06em] transition-all border-b-2 text-center ${
               activeTab === tab.id
-                ? 'border-[#FDFDFE] text-[#FDFDFE]'
-                : 'border-transparent text-[rgba(253,253,254,0.48)] hover:opacity-60'
+                ? 'border-[#FDFDFE] text-[#1C1E18]'
+                : 'border-transparent text-[rgba(28,30,24,0.60)] hover:opacity-60'
             }`}
           >
             {tab.label}
@@ -404,7 +404,7 @@ export default function StatsPage() {
               key={r}
               onClick={() => setTimeRange(r)}
               className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] transition-all ${
-                timeRange === r ? 'bg-[#474B48] text-white' : 'text-[rgba(253,253,254,0.55)] hover:text-[#FDFDFE]'
+                timeRange === r ? 'bg-[#474B48] text-white' : 'text-[rgba(28,30,24,0.62)] hover:text-[#1C1E18]'
               }`}
             >
               {r === 'all' ? 'Alles' : r}
@@ -416,7 +416,7 @@ export default function StatsPage() {
           <button
             onClick={() => { setGroupBy('spiergroep'); setSelectedExercise(null) }}
             className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] transition-all ${
-              groupBy === 'spiergroep' ? 'bg-[#474B48] text-white' : 'text-[rgba(253,253,254,0.55)] hover:text-[#FDFDFE]'
+              groupBy === 'spiergroep' ? 'bg-[#474B48] text-white' : 'text-[rgba(28,30,24,0.62)] hover:text-[#1C1E18]'
             }`}
           >
             Spiergroep
@@ -424,7 +424,7 @@ export default function StatsPage() {
           <button
             onClick={() => setGroupBy('oefening')}
             className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] transition-all ${
-              groupBy === 'oefening' ? 'bg-[#474B48] text-white' : 'text-[rgba(253,253,254,0.55)] hover:text-[#FDFDFE]'
+              groupBy === 'oefening' ? 'bg-[#474B48] text-white' : 'text-[rgba(28,30,24,0.62)] hover:text-[#1C1E18]'
             }`}
           >
             Oefening
@@ -438,7 +438,7 @@ export default function StatsPage() {
           <select
             value={selectedExercise || ''}
             onChange={(e) => setSelectedExercise(e.target.value || null)}
-            className="w-full py-2.5 px-4 bg-[#A6ADA7] border border-[rgba(253,253,254,0.08)] text-[14px] text-[#FDFDFE] appearance-none pr-10 focus:border-[#FDFDFE] outline-none rounded-xl"
+            className="w-full py-2.5 px-4 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] text-[14px] text-[#1C1E18] appearance-none pr-10 focus:border-[#FDFDFE] outline-none rounded-xl"
           >
             <option value="">Selecteer een oefening...</option>
             {availableExercises.map(ex => (
@@ -447,7 +447,7 @@ export default function StatsPage() {
               </option>
             ))}
           </select>
-          <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgba(253,253,254,0.55)] pointer-events-none" />
+          <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgba(28,30,24,0.62)] pointer-events-none" />
         </div>
       )}
 
@@ -457,7 +457,7 @@ export default function StatsPage() {
           <button
             onClick={() => setSelectedGroup(null)}
             className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 ${
-              !selectedGroup ? 'bg-[#474B48] text-white' : 'text-[rgba(253,253,254,0.55)]'
+              !selectedGroup ? 'bg-[#474B48] text-white' : 'text-[rgba(28,30,24,0.62)]'
             }`}
           >
             Alles
@@ -467,7 +467,7 @@ export default function StatsPage() {
               key={g}
               onClick={() => setSelectedGroup(selectedGroup === g ? null : g)}
               className={`px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] whitespace-nowrap shrink-0 ${
-                selectedGroup === g ? 'bg-[#474B48] text-white' : 'text-[rgba(253,253,254,0.55)]'
+                selectedGroup === g ? 'bg-[#474B48] text-white' : 'text-[rgba(28,30,24,0.62)]'
               }`}
             >
               <span className="inline-block w-2 h-2 mr-1.5" style={{ backgroundColor: GROUP_COLORS[g] || 'rgba(253,253,254,0.55)' }} />
@@ -481,7 +481,7 @@ export default function StatsPage() {
       {activeTab === 'kracht' && (
         <div className="animate-slide-up stagger-4">
           {krachtData.length > 0 ? (
-            <div className="border-t border-[rgba(253,253,254,0.08)] pt-8 mt-12">
+            <div className="border-t border-[rgba(28,30,24,0.10)] pt-8 mt-12">
               <p className="text-label mb-3">Max gewicht per week (kg)</p>
               <ResponsiveContainer width="100%" height={220}>
                 {groupBy === 'spiergroep' ? (
@@ -504,7 +504,7 @@ export default function StatsPage() {
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="text-center py-12 text-[14px] text-[rgba(253,253,254,0.48)]">
+            <div className="text-center py-12 text-[14px] text-[rgba(28,30,24,0.60)]">
               {groupBy === 'oefening' && !selectedExercise
                 ? 'Selecteer een oefening om data te zien'
                 : 'Geen data in deze periode'}
@@ -517,7 +517,7 @@ export default function StatsPage() {
       {activeTab === 'volume' && (
         <div className="animate-slide-up stagger-4">
           {volumeData.length > 0 ? (
-            <div className="border-t border-[rgba(253,253,254,0.08)] pt-8 mt-12">
+            <div className="border-t border-[rgba(28,30,24,0.10)] pt-8 mt-12">
               <p className="text-label mb-3">
                 Volume per week {groupBy === 'spiergroep' ? '(ton)' : '(kg)'}
               </p>
@@ -542,7 +542,7 @@ export default function StatsPage() {
               </ResponsiveContainer>
             </div>
           ) : (
-            <div className="text-center py-12 text-[14px] text-[rgba(253,253,254,0.48)]">
+            <div className="text-center py-12 text-[14px] text-[rgba(28,30,24,0.60)]">
               {groupBy === 'oefening' && !selectedExercise
                 ? 'Selecteer een oefening om data te zien'
                 : 'Geen data in deze periode'}
@@ -557,10 +557,10 @@ export default function StatsPage() {
           {filteredPrs.length === 0 ? (
             <div className="text-center py-12">
               <Trophy size={32} strokeWidth={1} className="text-[rgba(253,253,254,0.35)] mx-auto mb-4" />
-              <p className="text-[14px] text-[rgba(253,253,254,0.48)]">Geen records in deze periode</p>
+              <p className="text-[14px] text-[rgba(28,30,24,0.60)]">Geen records in deze periode</p>
             </div>
           ) : (
-            <div className="border-t border-[rgba(253,253,254,0.08)] mt-12">
+            <div className="border-t border-[rgba(28,30,24,0.10)] mt-12">
               {filteredPrs.map((pr, idx) => {
                 const ex = pr.exercise as any
                 const exName = ex?.name_nl || ex?.name || 'Onbekend'
@@ -568,21 +568,21 @@ export default function StatsPage() {
                 const isLast = idx === filteredPrs.length - 1
 
                 return (
-                  <div key={pr.id} className={`flex items-center gap-3 py-4 ${!isLast ? 'border-b border-[rgba(253,253,254,0.08)]' : ''}`}>
+                  <div key={pr.id} className={`flex items-center gap-3 py-4 ${!isLast ? 'border-b border-[rgba(28,30,24,0.10)]' : ''}`}>
                     <div className="w-9 h-9 flex items-center justify-center shrink-0" style={{ backgroundColor: `${GROUP_COLORS[group] || 'rgba(253,253,254,0.55)'}15` }}>
                       <Trophy size={16} strokeWidth={1.5} style={{ color: GROUP_COLORS[group] || 'rgba(253,253,254,0.55)' }} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[14px] font-semibold text-[#FDFDFE] truncate">{exName}</p>
-                      <p className="text-[11px] text-[rgba(253,253,254,0.55)]">
+                      <p className="text-[14px] font-semibold text-[#1C1E18] truncate">{exName}</p>
+                      <p className="text-[11px] text-[rgba(28,30,24,0.62)]">
                         {group} · {new Date(pr.achieved_at).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-[18px] font-bold text-[#FDFDFE] tabular-nums">
+                      <p className="text-[18px] font-bold text-[#1C1E18] tabular-nums">
                         {pr.value}
                       </p>
-                      <p className="text-[10px] text-[rgba(253,253,254,0.55)]">
+                      <p className="text-[10px] text-[rgba(28,30,24,0.62)]">
                         {pr.record_type === 'weight' ? 'kg' : pr.record_type === 'reps' ? 'reps' : pr.record_type}
                       </p>
                     </div>

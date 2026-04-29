@@ -10,7 +10,7 @@ import {
 
 const HealthChart = dynamic(() => import('@/components/client/HealthChart').then(mod => ({ default: mod.HealthChart })), {
   ssr: false,
-  loading: () => <div className="h-32 bg-[rgba(253,253,254,0.08)] rounded animate-pulse" />
+  loading: () => <div className="h-32 bg-[rgba(28,30,24,0.10)] rounded animate-pulse" />
 })
 
 interface HealthMetric {
@@ -142,7 +142,7 @@ export default function HealthPage() {
       <div className="space-y-6">
         <div><h1 className="page-title-sm">Gezondheid</h1></div>
         <div className="space-y-3">
-          {[1, 2, 3].map((i) => <div key={i} className="h-24 bg-[rgba(253,253,254,0.08)] rounded-2xl animate-shimmer" />)}
+          {[1, 2, 3].map((i) => <div key={i} className="h-24 bg-[rgba(28,30,24,0.10)] rounded-2xl animate-shimmer" />)}
         </div>
       </div>
     )
@@ -154,20 +154,20 @@ export default function HealthPage() {
       <h1 className="page-title mb-6">Gezondheid</h1>
       <div className="animate-slide-up text-center">
         {heroMetric.type === 'emoji' && (
-          <div className="p-8 bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)]">
+          <div className="p-8 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)]">
             <div className="text-8xl mb-3">{heroMetric.value}</div>
-            <p className="text-[18px] font-semibold text-[#FDFDFE]">
+            <p className="text-[18px] font-semibold text-[#1C1E18]">
               {heroMetric.label}
             </p>
-            <p className="text-[13px] mt-1 text-[rgba(253,253,254,0.55)]">
+            <p className="text-[13px] mt-1 text-[rgba(28,30,24,0.62)]">
               Slaapkwaliteit vandaag
             </p>
           </div>
         )}
         {heroMetric.type === 'steps' && (
-          <div className="p-8 bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)]">
-            <p className="text-[14px] text-[rgba(253,253,254,0.55)]">Vandaag</p>
-            <div className="text-7xl font-bold my-3 text-[#FDFDFE]">
+          <div className="p-8 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)]">
+            <p className="text-[14px] text-[rgba(28,30,24,0.62)]">Vandaag</p>
+            <div className="text-7xl font-bold my-3 text-[#1C1E18]">
               {(heroMetric.value as number / 1000).toFixed(1)}k
             </div>
             <p className="text-[16px] font-semibold text-[#C0FC01]">
@@ -176,11 +176,11 @@ export default function HealthPage() {
           </div>
         )}
         {heroMetric.type === 'default' && (
-          <div className="p-8 bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)]">
-            <h1 className="text-6xl font-bold text-[#FDFDFE]">
+          <div className="p-8 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)]">
+            <h1 className="text-6xl font-bold text-[#1C1E18]">
               {heroMetric.value}
             </h1>
-            <p className="text-[13px] mt-2 text-[rgba(253,253,254,0.55)]">
+            <p className="text-[13px] mt-2 text-[rgba(28,30,24,0.62)]">
               Track je dagelijkse gezondheidsdata
             </p>
           </div>
@@ -191,31 +191,31 @@ export default function HealthPage() {
       {weekAvg && (
         <div className="grid grid-cols-3 gap-3">
           <div
-            className="p-4 text-center bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] animate-slide-up hover:bg-[rgba(253,253,254,0.10)] transition-colors stagger-2"
+            className="p-4 text-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] animate-slide-up hover:bg-[rgba(28,30,24,0.12)] transition-colors stagger-2"
           >
             <Footprints size={18} strokeWidth={1.5} className="mx-auto mb-1 text-[#C0FC01]" />
-            <p className="text-[18px] font-bold text-[#FDFDFE]">
+            <p className="text-[18px] font-bold text-[#1C1E18]">
               {(weekAvg.steps / 1000).toFixed(1)}k
             </p>
-            <p className="text-[11px] text-[rgba(253,253,254,0.55)]">Gem. stappen</p>
+            <p className="text-[11px] text-[rgba(28,30,24,0.62)]">Gem. stappen</p>
           </div>
           <div
-            className="p-4 text-center bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] animate-slide-up hover:bg-[rgba(253,253,254,0.10)] transition-colors stagger-3"
+            className="p-4 text-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] animate-slide-up hover:bg-[rgba(28,30,24,0.12)] transition-colors stagger-3"
           >
             <Moon size={18} strokeWidth={1.5} className="mx-auto mb-1 text-[#7B5EA7]" />
-            <p className="text-[18px] font-bold text-[#FDFDFE]">
+            <p className="text-[18px] font-bold text-[#1C1E18]">
               {weekAvg.sleep}u
             </p>
-            <p className="text-[11px] text-[rgba(253,253,254,0.55)]">Gem. slaap</p>
+            <p className="text-[11px] text-[rgba(28,30,24,0.62)]">Gem. slaap</p>
           </div>
           <div
-            className="p-4 text-center bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] animate-slide-up hover:bg-[rgba(253,253,254,0.10)] transition-colors stagger-4"
+            className="p-4 text-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] animate-slide-up hover:bg-[rgba(28,30,24,0.12)] transition-colors stagger-4"
           >
             <Droplets size={18} strokeWidth={1.5} className="mx-auto mb-1 text-[#3068C4]" />
-            <p className="text-[18px] font-bold text-[#FDFDFE]">
+            <p className="text-[18px] font-bold text-[#1C1E18]">
               {(weekAvg.water / 1000).toFixed(1)}L
             </p>
-            <p className="text-[11px] text-[rgba(253,253,254,0.55)]">Gem. water</p>
+            <p className="text-[11px] text-[rgba(28,30,24,0.62)]">Gem. water</p>
           </div>
         </div>
       )}
@@ -223,9 +223,9 @@ export default function HealthPage() {
       {/* Mini Chart */}
       {chartData.length > 2 && (
         <div
-          className="p-4 bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] animate-slide-up stagger-5"
+          className="p-4 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] animate-slide-up stagger-5"
         >
-          <p className="text-[13px] font-semibold mb-3 text-[#FDFDFE]">
+          <p className="text-[13px] font-semibold mb-3 text-[#1C1E18]">
             Laatste 7 dagen
           </p>
           <HealthChart data={chartData} />
@@ -234,13 +234,13 @@ export default function HealthPage() {
 
       {/* Today's Input */}
       <div
-        className="p-5 bg-[#A6ADA7] rounded-2xl border border-[rgba(253,253,254,0.08)] animate-slide-up stagger-6"
+        className="p-5 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] animate-slide-up stagger-6"
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[15px] font-semibold text-[#FDFDFE]">
+          <h2 className="text-[15px] font-semibold text-[#1C1E18]">
             Vandaag
           </h2>
-          <span className="text-[12px] text-[rgba(253,253,254,0.55)]">
+          <span className="text-[12px] text-[rgba(28,30,24,0.62)]">
             {new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' })}
           </span>
         </div>
@@ -248,50 +248,50 @@ export default function HealthPage() {
         <div className="space-y-4">
           {/* Steps */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center bg-[#A6ADA7] border border-[#C0FC01]/20 rounded-xl">
+            <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[#C0FC01]/20 rounded-xl">
               <Footprints size={16} strokeWidth={1.5} className="text-[#C0FC01]" />
             </div>
             <div className="flex-1">
-              <label className="text-[12px] font-medium text-[rgba(253,253,254,0.55)]">Stappen</label>
+              <label className="text-[12px] font-medium text-[rgba(28,30,24,0.62)]">Stappen</label>
               <input
                 type="number"
                 value={todayData.steps || ''}
                 onChange={(e) => updateField('steps', parseInt(e.target.value) || undefined)}
                 placeholder="0"
-                className="w-full text-[15px] font-semibold bg-transparent outline-none text-[#FDFDFE]"
+                className="w-full text-[15px] font-semibold bg-transparent outline-none text-[#1C1E18]"
               />
             </div>
           </div>
 
           {/* Sleep */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center bg-[#A6ADA7] border border-[#7B5EA7]/20 rounded-xl">
+            <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[#7B5EA7]/20 rounded-xl">
               <Moon size={16} strokeWidth={1.5} className="text-[#7B5EA7]" />
             </div>
             <div className="flex-1">
-              <label className="text-[12px] font-medium text-[rgba(253,253,254,0.55)]">Slaap (uren)</label>
+              <label className="text-[12px] font-medium text-[rgba(28,30,24,0.62)]">Slaap (uren)</label>
               <input
                 type="number"
                 step="0.5"
                 value={todayData.sleep_hours || ''}
                 onChange={(e) => updateField('sleep_hours', parseFloat(e.target.value) || undefined)}
                 placeholder="0"
-                className="w-full text-[15px] font-semibold bg-transparent outline-none text-[#FDFDFE]"
+                className="w-full text-[15px] font-semibold bg-transparent outline-none text-[#1C1E18]"
               />
             </div>
           </div>
 
           {/* Sleep quality */}
           <div>
-            <label className="text-[12px] font-medium text-[rgba(253,253,254,0.55)]">Slaapkwaliteit</label>
+            <label className="text-[12px] font-medium text-[rgba(28,30,24,0.62)]">Slaapkwaliteit</label>
             <div className="flex gap-2 mt-1.5">
               {SLEEP_QUALITY_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
                   onClick={() => updateField('sleep_quality', todayData.sleep_quality === opt.value ? undefined : opt.value)}
-                  className="flex-1 py-2 text-center text-[11px] font-semibold uppercase tracking-[0.12em] border rounded-xl transition-all hover:bg-[rgba(253,253,254,0.10)]"
+                  className="flex-1 py-2 text-center text-[11px] font-semibold uppercase tracking-[0.12em] border rounded-xl transition-all hover:bg-[rgba(28,30,24,0.12)]"
                   style={{
-                    borderColor: todayData.sleep_quality === opt.value ? opt.color : 'rgba(253,253,254,0.08)',
+                    borderColor: todayData.sleep_quality === opt.value ? opt.color : 'rgba(28,30,24,0.10)',
                     backgroundColor: todayData.sleep_quality === opt.value ? `${opt.color}15` : 'white',
                     color: todayData.sleep_quality === opt.value ? opt.color : 'rgba(253,253,254,0.55)',
                   }}
@@ -305,18 +305,18 @@ export default function HealthPage() {
 
           {/* Water */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center bg-[#A6ADA7] border border-[#3068C4]/20 rounded-xl">
+            <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[#3068C4]/20 rounded-xl">
               <Droplets size={16} strokeWidth={1.5} className="text-[#3068C4]" />
             </div>
             <div className="flex-1">
-              <label className="text-[12px] font-medium text-[rgba(253,253,254,0.55)]">Water (ml)</label>
+              <label className="text-[12px] font-medium text-[rgba(28,30,24,0.62)]">Water (ml)</label>
               <input
                 type="number"
                 step="250"
                 value={todayData.water_ml || ''}
                 onChange={(e) => updateField('water_ml', parseInt(e.target.value) || undefined)}
                 placeholder="0"
-                className="w-full text-[15px] font-semibold bg-transparent outline-none text-[#FDFDFE]"
+                className="w-full text-[15px] font-semibold bg-transparent outline-none text-[#1C1E18]"
               />
             </div>
             {/* Quick add buttons */}
@@ -325,7 +325,7 @@ export default function HealthPage() {
                 <button
                   key={ml}
                   onClick={() => updateField('water_ml', (todayData.water_ml || 0) + ml)}
-                  className="px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] bg-[#A6ADA7] border border-[#3068C4]/20 text-[#3068C4] rounded-xl hover:bg-[rgba(253,253,254,0.10)] transition-colors"
+                  className="px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[#3068C4]/20 text-[#3068C4] rounded-xl hover:bg-[rgba(28,30,24,0.12)] transition-colors"
                 >
                   +{ml}
                 </button>
@@ -335,17 +335,17 @@ export default function HealthPage() {
 
           {/* Heart Rate */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center bg-[#A6ADA7] border border-[#B55A4A]/20 rounded-xl">
+            <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[#B55A4A]/20 rounded-xl">
               <Heart size={16} strokeWidth={1.5} className="text-[#B55A4A]" />
             </div>
             <div className="flex-1">
-              <label className="text-[12px] font-medium text-[rgba(253,253,254,0.55)]">Rusthartslag (bpm)</label>
+              <label className="text-[12px] font-medium text-[rgba(28,30,24,0.62)]">Rusthartslag (bpm)</label>
               <input
                 type="number"
                 value={todayData.resting_heart_rate || ''}
                 onChange={(e) => updateField('resting_heart_rate', parseInt(e.target.value) || undefined)}
                 placeholder="0"
-                className="w-full text-[15px] font-semibold bg-transparent outline-none text-[#FDFDFE]"
+                className="w-full text-[15px] font-semibold bg-transparent outline-none text-[#1C1E18]"
               />
             </div>
           </div>
@@ -353,10 +353,10 @@ export default function HealthPage() {
           {/* Stress */}
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-9 h-9 flex items-center justify-center bg-[#A6ADA7] border border-[#C0FC01]/20 rounded-xl">
+              <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[#C0FC01]/20 rounded-xl">
                 <Brain size={16} strokeWidth={1.5} className="text-[#C0FC01]" />
               </div>
-              <label className="text-[12px] font-medium text-[rgba(253,253,254,0.55)]">
+              <label className="text-[12px] font-medium text-[rgba(28,30,24,0.62)]">
                 Stressniveau: {todayData.stress_level || '–'}/10
               </label>
             </div>
@@ -368,7 +368,7 @@ export default function HealthPage() {
               onChange={(e) => updateField('stress_level', parseInt(e.target.value))}
               className="w-full accent-[#C0FC01]"
             />
-            <div className="flex justify-between text-[10px] text-[rgba(253,253,254,0.55)]">
+            <div className="flex justify-between text-[10px] text-[rgba(28,30,24,0.62)]">
               <span>Ontspannen</span>
               <span>Gestrest</span>
             </div>
@@ -376,31 +376,31 @@ export default function HealthPage() {
 
           {/* Weight */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center bg-[#A6ADA7] border border-[#2FA65A]/20 rounded-xl">
+            <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[#2FA65A]/20 rounded-xl">
               <Activity size={16} strokeWidth={1.5} className="text-[#2FA65A]" />
             </div>
             <div className="flex-1">
-              <label className="text-[12px] font-medium text-[rgba(253,253,254,0.55)]">Gewicht (kg)</label>
+              <label className="text-[12px] font-medium text-[rgba(28,30,24,0.62)]">Gewicht (kg)</label>
               <input
                 type="number"
                 step="0.1"
                 value={todayData.weight_kg || ''}
                 onChange={(e) => updateField('weight_kg', parseFloat(e.target.value) || undefined)}
                 placeholder="0.0"
-                className="w-full text-[15px] font-semibold bg-transparent outline-none text-[#FDFDFE]"
+                className="w-full text-[15px] font-semibold bg-transparent outline-none text-[#1C1E18]"
               />
             </div>
           </div>
 
           {/* Notes */}
           <div>
-            <label className="text-[12px] font-medium text-[rgba(253,253,254,0.55)]">Notities</label>
+            <label className="text-[12px] font-medium text-[rgba(28,30,24,0.62)]">Notities</label>
             <textarea
               value={todayData.notes || ''}
               onChange={(e) => updateField('notes', e.target.value)}
               rows={2}
               placeholder="Hoe voel je je vandaag?"
-              className="w-full mt-1 p-3 border border-[rgba(253,253,254,0.08)] rounded-xl text-[13px] resize-none focus:outline-none focus:border-[#FDFDFE] text-[#FDFDFE]"
+              className="w-full mt-1 p-3 border border-[rgba(28,30,24,0.10)] rounded-xl text-[13px] resize-none focus:outline-none focus:border-[#1C1E18] text-[#1C1E18]"
             />
           </div>
         </div>
@@ -409,7 +409,7 @@ export default function HealthPage() {
         <button
           onClick={saveMetrics}
           disabled={saving}
-          className={`w-full mt-4 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-white transition-all disabled:opacity-50 border rounded-xl hover:bg-opacity-90 ${saved ? 'bg-[#2FA65A] border-[#2FA65A]' : 'bg-[#FDFDFE] border-[#FDFDFE]'}`}
+          className={`w-full mt-4 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-white transition-all disabled:opacity-50 border rounded-xl hover:bg-opacity-90 ${saved ? 'bg-[#2FA65A] border-[#2FA65A]' : 'bg-[#1C1E18] border-[#1C1E18]'}`}
         >
           <span className="flex items-center justify-center gap-2">
             <Save size={16} strokeWidth={2} />
