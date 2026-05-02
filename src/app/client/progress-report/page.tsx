@@ -344,7 +344,7 @@ Bekijk mijn voortgang in Move!`
         </div>
 
         {/* Period Selector */}
-        <div className="mb-6 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] p-5">
+        <div className="mb-6 bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] p-5">
           <div className="flex items-center gap-2 mb-3">
             <Calendar className="w-5 h-5 text-[#C0FC01]" />
             <span className="font-semibold text-[#1C1E18]">Periode</span>
@@ -367,7 +367,7 @@ Bekijk mijn voortgang in Move!`
         </div>
 
         {/* Report Card Container */}
-        <div ref={reportRef} className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] p-8 mb-6">
+        <div ref={reportRef} className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] p-8 mb-6">
           {/* Report Header */}
           <div className="text-center mb-8 pb-6 border-b border-[rgba(28,30,24,0.10)]">
             <h2 className="text-3xl font-bold text-[#1C1E18] mb-1">{clientName}</h2>

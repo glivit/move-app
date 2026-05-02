@@ -316,7 +316,7 @@ export default function CalendarPage() {
       {/* ═══ DETAIL SLIDE-UP PANEL ═════════════════════════ */}
       {selectedDate && selectedDayData && (
         <div className="animate-slide-up">
-          <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] overflow-hidden">
+          <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] overflow-hidden">
             {/* Panel header */}
             <div className="flex items-center justify-between px-6 pt-5 pb-3">
               <p className="text-[15px] font-semibold text-[#1C1E18]">

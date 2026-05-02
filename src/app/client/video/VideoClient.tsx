@@ -132,7 +132,7 @@ export default function ClientVideoPage() {
                 return (
                   <div
                     key={session.id}
-                    className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl p-5 border border-[rgba(28,30,24,0.10)]"
+                    className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl p-5 border border-[rgba(28,30,24,0.10)]"
                   >
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-center gap-3">
@@ -210,7 +210,7 @@ export default function ClientVideoPage() {
               {past.map((session) => (
                 <div
                   key={session.id}
-                  className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl p-4 border border-[rgba(28,30,24,0.10)] flex items-center gap-3"
+                  className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl p-4 border border-[rgba(28,30,24,0.10)] flex items-center gap-3"
                 >
                   <div className="w-9 h-9 rounded-lg bg-[rgba(28,30,24,0.10)] flex items-center justify-center">
                     <Video strokeWidth={1.5} className="w-4 h-4 text-[rgba(28,30,24,0.62)]" />
@@ -234,7 +234,7 @@ export default function ClientVideoPage() {
 
         {/* Empty State */}
         {sessions.length === 0 && (
-          <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl p-12 border border-[rgba(28,30,24,0.10)] text-center">
+          <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl p-12 border border-[rgba(28,30,24,0.10)] text-center">
             <div className="w-16 h-16 rounded-full bg-[#3068C4]/10 flex items-center justify-center mx-auto mb-4">
               <Video strokeWidth={1.5} className="w-8 h-8 text-[#3068C4]" />
             </div>

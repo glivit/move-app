@@ -243,8 +243,8 @@ h1, h2, h3, h4, h5, h6 {
 
   /* Iets warmer dan zuiver wit (ivoor/cream) — voorkomt "bland uniform". */
   background: linear-gradient(180deg, rgba(255,253,247,0.62), rgba(252,249,238,0.50));
-  backdrop-filter: blur(60px) saturate(160%);
-  -webkit-backdrop-filter: blur(60px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
   border-radius: 28px;
   padding: 22px 22px 24px;
   color: var(--card-text);
@@ -273,8 +273,8 @@ h1, h2, h3, h4, h5, h6 {
   --card-arr-stroke:   #F2F2EC;
 
   background: rgba(28,30,24,0.88);
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(130%);
+  -webkit-backdrop-filter: blur(18px) saturate(130%);
   border-radius: 28px;
   padding: 22px 22px 24px;
   color: var(--card-text);
@@ -323,8 +323,8 @@ h1, h2, h3, h4, h5, h6 {
   --card-divider:     rgba(28,30,24,0.10);
 
   background: linear-gradient(180deg, rgba(255,253,247,0.62), rgba(252,249,238,0.50));
-  backdrop-filter: blur(60px) saturate(160%);
-  -webkit-backdrop-filter: blur(60px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
   border-radius: 28px;
   box-shadow:
     0 1px 2px rgba(28,30,24,0.03),
@@ -338,16 +338,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .card-v2-flat {
   background: rgba(255,255,255,0.32);
-  backdrop-filter: blur(40px) saturate(160%);
-  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(130%);
+  -webkit-backdrop-filter: blur(20px) saturate(130%);
   border-radius: 20px;
   color: #1C1E18;
 }
 
 .card-elevated-v2 {
   background: rgba(28,30,24,0.88);
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(130%);
+  -webkit-backdrop-filter: blur(18px) saturate(130%);
   border-radius: 28px;
   box-shadow: 0 8px 22px rgba(0,0,0,0.28), 0 2px 6px rgba(0,0,0,0.18);
   color: #FDFDFE;
@@ -1051,8 +1051,8 @@ a, button {
   padding: 6px 4px;
   border-radius: 28px;
   background: linear-gradient(180deg, rgba(255,253,247,0.62), rgba(252,249,238,0.50));
-  backdrop-filter: blur(60px) saturate(160%);
-  -webkit-backdrop-filter: blur(60px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
   box-shadow:
     0 1px 1px rgba(28,30,24,0.05),
     0 10px 28px -10px rgba(28,30,24,0.14),
@@ -1231,8 +1231,8 @@ a, button {
   --card-divider:     rgba(28,30,24,0.10);
 
   background: linear-gradient(180deg, rgba(255,253,247,0.62), rgba(252,249,238,0.50));
-  backdrop-filter: blur(60px) saturate(160%);
-  -webkit-backdrop-filter: blur(60px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
   border-radius: 28px;
   padding: 20px 20px 18px;
   margin-bottom: 10px;

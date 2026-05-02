@@ -169,7 +169,7 @@ export default function HealthPage() {
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
                     ? 'bg-[#C0FC01] text-white'
-                    : 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] text-[#1C1E18] hover:border-[#C0FC01]'
+                    : 'bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[rgba(28,30,24,0.10)] text-[#1C1E18] hover:border-[#C0FC01]'
                 }`}
               >
                 {part.label}
@@ -192,7 +192,7 @@ export default function HealthPage() {
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
                     ? 'bg-[#B55A4A] text-white'
-                    : 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] text-[#1C1E18] hover:border-[#B55A4A]'
+                    : 'bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[rgba(28,30,24,0.10)] text-[#1C1E18] hover:border-[#B55A4A]'
                 }`}
               >
                 {limit}
@@ -205,7 +205,7 @@ export default function HealthPage() {
       {/* Activity Level */}
       <div>
         <p className="text-[13px] font-medium text-[rgba(28,30,24,0.62)] uppercase tracking-wide px-1 mb-2">Huidig activiteitsniveau</p>
-        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
+        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
           {[
             { id: 'sedentair', label: 'Sedentair', desc: 'Weinig tot geen beweging' },
             { id: 'licht', label: 'Licht actief', desc: '1-2 keer per week' },
@@ -235,7 +235,7 @@ export default function HealthPage() {
       {/* Details */}
       <div>
         <p className="text-[13px] font-medium text-[rgba(28,30,24,0.62)] uppercase tracking-wide px-1 mb-2">Extra details</p>
-        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] p-5">
+        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] p-5">
           <textarea
             value={details}
             onChange={(e) => setDetails(e.target.value)}

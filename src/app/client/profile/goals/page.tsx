@@ -107,7 +107,7 @@ export default function GoalsPage() {
       {/* Primary Goal */}
       <div>
         <p className="text-[13px] font-medium text-[rgba(28,30,24,0.62)] uppercase tracking-wide px-1 mb-2">Hoofddoel</p>
-        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
+        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
           {GOAL_OPTIONS.map((goal) => (
             <button
               key={goal.id}
@@ -141,7 +141,7 @@ export default function GoalsPage() {
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
                     ? 'bg-[#474B48] text-white'
-                    : 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] text-[#1C1E18] hover:border-[#FDFDFE]'
+                    : 'bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[rgba(28,30,24,0.10)] text-[#1C1E18] hover:border-[#FDFDFE]'
                 }`}
               >
                 {goal.emoji} {goal.label}
@@ -154,7 +154,7 @@ export default function GoalsPage() {
       {/* Motivation */}
       <div>
         <p className="text-[13px] font-medium text-[rgba(28,30,24,0.62)] uppercase tracking-wide px-1 mb-2">Motivatie</p>
-        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] p-5">
+        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] p-5">
           <textarea
             value={motivation}
             onChange={(e) => setMotivation(e.target.value)}

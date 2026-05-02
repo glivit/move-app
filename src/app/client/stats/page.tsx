@@ -438,7 +438,7 @@ export default function StatsPage() {
           <select
             value={selectedExercise || ''}
             onChange={(e) => setSelectedExercise(e.target.value || null)}
-            className="w-full py-2.5 px-4 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] text-[14px] text-[#1C1E18] appearance-none pr-10 focus:border-[#FDFDFE] outline-none rounded-xl"
+            className="w-full py-2.5 px-4 bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[rgba(28,30,24,0.10)] text-[14px] text-[#1C1E18] appearance-none pr-10 focus:border-[#FDFDFE] outline-none rounded-xl"
           >
             <option value="">Selecteer een oefening...</option>
             {availableExercises.map(ex => (

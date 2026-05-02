@@ -395,7 +395,7 @@ export function PhotoUploadStep({ photos, onChange, showSilhouette = true }: Pro
                 /* ── Empty state — tap opens custom camera ── */
                 <button
                   onClick={() => setCameraActive(key)}
-                  className="aspect-[3/4] w-full rounded-[20px] border border-dashed border-[rgba(253,253,254,0.22)] hover:border-[rgba(253,253,254,0.48)] flex flex-col items-center justify-center transition-all bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl relative overflow-hidden group"
+                  className="aspect-[3/4] w-full rounded-[20px] border border-dashed border-[rgba(253,253,254,0.22)] hover:border-[rgba(253,253,254,0.48)] flex flex-col items-center justify-center transition-all bg-[rgba(255,255,255,0.50)] backdrop-blur-md relative overflow-hidden group"
                   style={{
                     boxShadow:
                       'inset 0 1px 0 rgba(255,255,255,0.14), 0 1px 2px rgba(0,0,0,0.10)',

@@ -221,7 +221,7 @@ export default function ExercisesPage() {
           placeholder="Zoek oefening..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-9 pr-4 py-2.5 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] text-[14px] text-[#1C1E18] placeholder-[rgba(253,253,254,0.48)] focus:border-[#FDFDFE] outline-none rounded-xl"
+          className="w-full pl-9 pr-4 py-2.5 bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[rgba(28,30,24,0.10)] text-[14px] text-[#1C1E18] placeholder-[rgba(253,253,254,0.48)] focus:border-[#FDFDFE] outline-none rounded-xl"
         />
       </div>
 

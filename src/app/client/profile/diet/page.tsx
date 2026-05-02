@@ -112,7 +112,7 @@ export default function DietPage() {
       {/* Diet Type */}
       <div>
         <p className="text-[13px] font-medium text-[rgba(28,30,24,0.62)] uppercase tracking-wide px-1 mb-2">Dieettype</p>
-        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
+        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
           {DIET_TYPES.map((diet) => (
             <button
               key={diet.id}
@@ -146,7 +146,7 @@ export default function DietPage() {
                 className={`px-4 py-2 rounded-full text-[13px] font-medium transition-colors ${
                   selected
                     ? 'bg-[#B55A4A] text-white'
-                    : 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] text-[#1C1E18] hover:border-[#B55A4A]'
+                    : 'bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[rgba(28,30,24,0.10)] text-[#1C1E18] hover:border-[#B55A4A]'
                 }`}
               >
                 {allergy}
@@ -159,7 +159,7 @@ export default function DietPage() {
       {/* Other */}
       <div>
         <p className="text-[13px] font-medium text-[rgba(28,30,24,0.62)] uppercase tracking-wide px-1 mb-2">Overige opmerkingen</p>
-        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] p-5">
+        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] p-5">
           <textarea
             value={otherRestrictions}
             onChange={(e) => setOtherRestrictions(e.target.value)}

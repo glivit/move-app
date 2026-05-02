@@ -367,7 +367,7 @@ export default function ClientPromptsPage() {
             ))}
           </div>
         ) : unansweredPrompts.length === 0 ? (
-          <div className="p-12 text-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl">
+          <div className="p-12 text-center bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl">
             <MessageSquare
               size={48}
               style={{ color: '#1C1E18' }}
@@ -409,7 +409,7 @@ export default function ClientPromptsPage() {
               <div>
                 <button
                   onClick={() => setShowAnswered(!showAnswered)}
-                  className="w-full flex items-center justify-between px-6 py-4 transition-all bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl"
+                  className="w-full flex items-center justify-between px-6 py-4 transition-all bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl"
                   style={{
                     color: '#1C1E18',
                   }}
@@ -433,7 +433,7 @@ export default function ClientPromptsPage() {
                     {answeredPrompts.map((prompt) => (
                       <div
                         key={prompt.id}
-                        className="p-6 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl"
+                        className="p-6 bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl"
                       >
                         <p
                           className="text-sm font-medium mb-3"

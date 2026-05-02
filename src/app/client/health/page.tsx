@@ -154,7 +154,7 @@ export default function HealthPage() {
       <h1 className="page-title mb-6">Gezondheid</h1>
       <div className="animate-slide-up text-center">
         {heroMetric.type === 'emoji' && (
-          <div className="p-8 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)]">
+          <div className="p-8 bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)]">
             <div className="text-8xl mb-3">{heroMetric.value}</div>
             <p className="text-[18px] font-semibold text-[#1C1E18]">
               {heroMetric.label}
@@ -165,7 +165,7 @@ export default function HealthPage() {
           </div>
         )}
         {heroMetric.type === 'steps' && (
-          <div className="p-8 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)]">
+          <div className="p-8 bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)]">
             <p className="text-[14px] text-[rgba(28,30,24,0.62)]">Vandaag</p>
             <div className="text-7xl font-bold my-3 text-[#1C1E18]">
               {(heroMetric.value as number / 1000).toFixed(1)}k
@@ -176,7 +176,7 @@ export default function HealthPage() {
           </div>
         )}
         {heroMetric.type === 'default' && (
-          <div className="p-8 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)]">
+          <div className="p-8 bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)]">
             <h1 className="text-6xl font-bold text-[#1C1E18]">
               {heroMetric.value}
             </h1>
@@ -191,7 +191,7 @@ export default function HealthPage() {
       {weekAvg && (
         <div className="grid grid-cols-3 gap-3">
           <div
-            className="p-4 text-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] animate-slide-up hover:bg-[rgba(28,30,24,0.12)] transition-colors stagger-2"
+            className="p-4 text-center bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] animate-slide-up hover:bg-[rgba(28,30,24,0.12)] transition-colors stagger-2"
           >
             <Footprints size={18} strokeWidth={1.5} className="mx-auto mb-1 text-[#C0FC01]" />
             <p className="text-[18px] font-bold text-[#1C1E18]">
@@ -200,7 +200,7 @@ export default function HealthPage() {
             <p className="text-[11px] text-[rgba(28,30,24,0.62)]">Gem. stappen</p>
           </div>
           <div
-            className="p-4 text-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] animate-slide-up hover:bg-[rgba(28,30,24,0.12)] transition-colors stagger-3"
+            className="p-4 text-center bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] animate-slide-up hover:bg-[rgba(28,30,24,0.12)] transition-colors stagger-3"
           >
             <Moon size={18} strokeWidth={1.5} className="mx-auto mb-1 text-[#7B5EA7]" />
             <p className="text-[18px] font-bold text-[#1C1E18]">
@@ -209,7 +209,7 @@ export default function HealthPage() {
             <p className="text-[11px] text-[rgba(28,30,24,0.62)]">Gem. slaap</p>
           </div>
           <div
-            className="p-4 text-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] animate-slide-up hover:bg-[rgba(28,30,24,0.12)] transition-colors stagger-4"
+            className="p-4 text-center bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] animate-slide-up hover:bg-[rgba(28,30,24,0.12)] transition-colors stagger-4"
           >
             <Droplets size={18} strokeWidth={1.5} className="mx-auto mb-1 text-[#3068C4]" />
             <p className="text-[18px] font-bold text-[#1C1E18]">
@@ -223,7 +223,7 @@ export default function HealthPage() {
       {/* Mini Chart */}
       {chartData.length > 2 && (
         <div
-          className="p-4 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] animate-slide-up stagger-5"
+          className="p-4 bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] animate-slide-up stagger-5"
         >
           <p className="text-[13px] font-semibold mb-3 text-[#1C1E18]">
             Laatste 7 dagen
@@ -234,7 +234,7 @@ export default function HealthPage() {
 
       {/* Today's Input */}
       <div
-        className="p-5 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] animate-slide-up stagger-6"
+        className="p-5 bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] animate-slide-up stagger-6"
       >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-[15px] font-semibold text-[#1C1E18]">
@@ -248,7 +248,7 @@ export default function HealthPage() {
         <div className="space-y-4">
           {/* Steps */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[#C0FC01]/20 rounded-xl">
+            <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[#C0FC01]/20 rounded-xl">
               <Footprints size={16} strokeWidth={1.5} className="text-[#C0FC01]" />
             </div>
             <div className="flex-1">
@@ -265,7 +265,7 @@ export default function HealthPage() {
 
           {/* Sleep */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[#7B5EA7]/20 rounded-xl">
+            <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[#7B5EA7]/20 rounded-xl">
               <Moon size={16} strokeWidth={1.5} className="text-[#7B5EA7]" />
             </div>
             <div className="flex-1">
@@ -305,7 +305,7 @@ export default function HealthPage() {
 
           {/* Water */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[#3068C4]/20 rounded-xl">
+            <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[#3068C4]/20 rounded-xl">
               <Droplets size={16} strokeWidth={1.5} className="text-[#3068C4]" />
             </div>
             <div className="flex-1">
@@ -325,7 +325,7 @@ export default function HealthPage() {
                 <button
                   key={ml}
                   onClick={() => updateField('water_ml', (todayData.water_ml || 0) + ml)}
-                  className="px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[#3068C4]/20 text-[#3068C4] rounded-xl hover:bg-[rgba(28,30,24,0.12)] transition-colors"
+                  className="px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[#3068C4]/20 text-[#3068C4] rounded-xl hover:bg-[rgba(28,30,24,0.12)] transition-colors"
                 >
                   +{ml}
                 </button>
@@ -335,7 +335,7 @@ export default function HealthPage() {
 
           {/* Heart Rate */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[#B55A4A]/20 rounded-xl">
+            <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[#B55A4A]/20 rounded-xl">
               <Heart size={16} strokeWidth={1.5} className="text-[#B55A4A]" />
             </div>
             <div className="flex-1">
@@ -353,7 +353,7 @@ export default function HealthPage() {
           {/* Stress */}
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[#C0FC01]/20 rounded-xl">
+              <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[#C0FC01]/20 rounded-xl">
                 <Brain size={16} strokeWidth={1.5} className="text-[#C0FC01]" />
               </div>
               <label className="text-[12px] font-medium text-[rgba(28,30,24,0.62)]">
@@ -376,7 +376,7 @@ export default function HealthPage() {
 
           {/* Weight */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[#2FA65A]/20 rounded-xl">
+            <div className="w-9 h-9 flex items-center justify-center bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[#2FA65A]/20 rounded-xl">
               <Activity size={16} strokeWidth={1.5} className="text-[#2FA65A]" />
             </div>
             <div className="flex-1">

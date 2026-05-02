@@ -373,7 +373,7 @@ export default function WorkoutHistoryPage() {
         <button
           onClick={() => setActiveTab('history')}
           className={`flex-1 py-2.5 text-[12px] font-semibold uppercase tracking-[0.06em] rounded-lg transition-all touch-manipulation ${
-            activeTab === 'history' ? 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl text-[#1C1E18] shadow-sm' : 'text-[rgba(28,30,24,0.62)]'
+            activeTab === 'history' ? 'bg-[rgba(255,255,255,0.50)] backdrop-blur-md text-[#1C1E18] shadow-sm' : 'text-[rgba(28,30,24,0.62)]'
           }`}
           style={{ WebkitTapHighlightColor: 'transparent' }}
         >
@@ -382,7 +382,7 @@ export default function WorkoutHistoryPage() {
         <button
           onClick={() => setActiveTab('progress')}
           className={`flex-1 py-2.5 text-[12px] font-semibold uppercase tracking-[0.06em] rounded-lg transition-all touch-manipulation ${
-            activeTab === 'progress' ? 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl text-[#1C1E18] shadow-sm' : 'text-[rgba(28,30,24,0.62)]'
+            activeTab === 'progress' ? 'bg-[rgba(255,255,255,0.50)] backdrop-blur-md text-[#1C1E18] shadow-sm' : 'text-[rgba(28,30,24,0.62)]'
           }`}
           style={{ WebkitTapHighlightColor: 'transparent' }}
         >
@@ -628,7 +628,7 @@ export default function WorkoutHistoryPage() {
               {/* Selected exercise detail */}
               {selectedExHistory && (
                 <div className="mb-8">
-                  <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] rounded-2xl p-5">
+                  <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[rgba(28,30,24,0.10)] rounded-2xl p-5">
                     <h3 className="text-[16px] font-semibold text-[#1C1E18] mb-1">{selectedExHistory.name}</h3>
                     <p className="text-[11px] text-[rgba(28,30,24,0.62)] mb-4">{selectedExHistory.sessions.length} trainingen</p>
 
@@ -701,7 +701,7 @@ export default function WorkoutHistoryPage() {
                       <button
                         key={ex.exerciseId}
                         onClick={() => setSelectedExercise(ex.exerciseId)}
-                        className="w-full bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] rounded-xl p-4 text-left flex items-center gap-4 hover:border-[rgba(253,253,254,0.35)] transition-all touch-manipulation"
+                        className="w-full bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[rgba(28,30,24,0.10)] rounded-xl p-4 text-left flex items-center gap-4 hover:border-[rgba(253,253,254,0.35)] transition-all touch-manipulation"
                         style={{ WebkitTapHighlightColor: 'transparent' }}
                       >
                         <div className="flex-1 min-w-0">

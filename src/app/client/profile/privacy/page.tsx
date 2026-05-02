@@ -19,7 +19,7 @@ export default function PrivacyPage() {
       </div>
 
       {/* Privacy Shield */}
-      <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] p-6 flex flex-col items-center text-center">
+      <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] p-6 flex flex-col items-center text-center">
         <div className="w-16 h-16 rounded-full bg-[#2FA65A]/10 flex items-center justify-center mb-4">
           <Shield strokeWidth={1.5} className="w-8 h-8 text-[#2FA65A]" />
         </div>
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
       </div>
 
       {/* Sections */}
-      <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
+      <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
         <div className="px-5 py-5">
           <h3 className="text-[15px] font-semibold text-[#1C1E18] mb-2">Welke gegevens verzamelen we?</h3>
           <p className="text-[14px] text-[rgba(28,30,24,0.62)] leading-relaxed">
@@ -75,7 +75,7 @@ export default function PrivacyPage() {
       </div>
 
       {/* Contact */}
-      <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] p-5">
+      <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] p-5">
         <p className="text-[13px] text-[rgba(28,30,24,0.62)] text-center">
           Vragen over je privacy? Neem contact op via{' '}
           <a href="/client/messages" className="text-[#1C1E18] font-medium">Berichten</a>

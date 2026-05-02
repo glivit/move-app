@@ -67,7 +67,7 @@ export default function InvoicesPage() {
       </div>
 
       {/* Current Package */}
-      <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] p-6">
+      <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-[13px] text-[rgba(28,30,24,0.62)] uppercase tracking-wide font-medium">Huidig pakket</p>
@@ -92,7 +92,7 @@ export default function InvoicesPage() {
       {profile?.stripe_customer_id && (
         <a
           href="/api/billing/portal"
-          className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] p-5 flex items-center justify-between hover:bg-[#FAFAFA] transition-colors"
+          className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] p-5 flex items-center justify-between hover:bg-[#FAFAFA] transition-colors"
         >
           <div className="flex items-center gap-3">
             <ExternalLink strokeWidth={1.5} className="w-5 h-5 text-[#1C1E18]" />
@@ -106,7 +106,7 @@ export default function InvoicesPage() {
       )}
 
       {/* Empty State */}
-      <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] p-8 text-center">
+      <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] p-8 text-center">
         <Receipt strokeWidth={1.5} className="w-10 h-10 text-[rgba(28,30,24,0.60)] mx-auto mb-3" />
         <p className="text-[15px] text-[rgba(28,30,24,0.62)] mb-1">Factuuroverzicht</p>
         <p className="text-[13px] text-[rgba(28,30,24,0.60)]">

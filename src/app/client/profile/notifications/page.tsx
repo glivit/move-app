@@ -93,7 +93,7 @@ export default function NotificationsPage() {
       </div>
 
       {/* Push Notification Toggle */}
-      <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
+      <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
         <div className="px-5 py-4 flex items-center justify-between">
           <div>
             <p className="text-[15px] text-[#1C1E18] font-medium">Push meldingen</p>
@@ -117,7 +117,7 @@ export default function NotificationsPage() {
       {/* Notification Categories */}
       <div>
         <p className="text-[13px] font-medium text-[rgba(28,30,24,0.62)] uppercase tracking-wide px-1 mb-2">Training</p>
-        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
+        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
           <div className="px-5 py-4 flex items-center justify-between">
             <div>
               <p className="text-[15px] text-[#1C1E18]">Workout herinneringen</p>
@@ -137,7 +137,7 @@ export default function NotificationsPage() {
 
       <div>
         <p className="text-[13px] font-medium text-[rgba(28,30,24,0.62)] uppercase tracking-wide px-1 mb-2">Coach</p>
-        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
+        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
           <div className="px-5 py-4 flex items-center justify-between">
             <div>
               <p className="text-[15px] text-[#1C1E18]">Berichten van coach</p>
@@ -157,7 +157,7 @@ export default function NotificationsPage() {
 
       <div>
         <p className="text-[13px] font-medium text-[rgba(28,30,24,0.62)] uppercase tracking-wide px-1 mb-2">Voortgang</p>
-        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
+        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] divide-y divide-[rgba(28,30,24,0.10)]">
           <div className="px-5 py-4 flex items-center justify-between">
             <div>
               <p className="text-[15px] text-[#1C1E18]">Wekelijks overzicht</p>

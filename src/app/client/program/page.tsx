@@ -268,7 +268,7 @@ export default function ClientProgramPage() {
           <p className="text-label mb-3 text-[rgba(28,30,24,0.62)]">Schema</p>
           <h1 className="page-title">Training</h1>
         </div>
-        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl p-8 border border-[rgba(28,30,24,0.10)] text-center animate-slide-up stagger-2">
+        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl p-8 border border-[rgba(28,30,24,0.10)] text-center animate-slide-up stagger-2">
           <Dumbbell
             size={48}
             strokeWidth={1.5}
@@ -302,7 +302,7 @@ export default function ClientProgramPage() {
       </div>
 
       {/* Day Picker */}
-      <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl border border-[rgba(28,30,24,0.10)] overflow-hidden animate-slide-up stagger-3">
+      <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] overflow-hidden animate-slide-up stagger-3">
         <DayPicker
           days={dayNames}
           activeDay={activeDay}
@@ -340,7 +340,7 @@ export default function ClientProgramPage() {
 
       {/* Rest Day Message */}
       {isRestDay ? (
-        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl p-8 border border-[rgba(28,30,24,0.10)] text-center animate-slide-up stagger-5">
+        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl p-8 border border-[rgba(28,30,24,0.10)] text-center animate-slide-up stagger-5">
           <Moon
             size={48}
             strokeWidth={1.5}

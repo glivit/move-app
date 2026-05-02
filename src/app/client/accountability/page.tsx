@@ -229,8 +229,8 @@ export default function AccountabilityPage() {
         {/* Workout status */}
         <div className={`p-5 border rounded-2xl ${
           log.workout_completed
-            ? 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border-[#2FA65A]/20'
-            : 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border-[#C0FC01]/20'
+            ? 'bg-[rgba(255,255,255,0.50)] backdrop-blur-md border-[#2FA65A]/20'
+            : 'bg-[rgba(255,255,255,0.50)] backdrop-blur-md border-[#C0FC01]/20'
         }`}>
           <div className="flex items-center gap-3 mb-2">
             <div className={`w-10 h-10 flex items-center justify-center ${
@@ -258,7 +258,7 @@ export default function AccountabilityPage() {
                 onChange={(e) => setWorkoutReason(e.target.value)}
                 placeholder="Bijv. drukke werkdag, niet lekker gevoeld, reisdag..."
                 rows={3}
-                className="w-full px-3 py-2 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] text-[14px] placeholder-[rgba(253,253,254,0.55)] focus:outline-none focus:border-[#FDFDFE] resize-none rounded-xl"
+                className="w-full px-3 py-2 bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[rgba(28,30,24,0.10)] text-[14px] placeholder-[rgba(253,253,254,0.55)] focus:outline-none focus:border-[#FDFDFE] resize-none rounded-xl"
               />
             </div>
           )}
@@ -267,8 +267,8 @@ export default function AccountabilityPage() {
         {/* Nutrition status */}
         <div className={`p-5 border rounded-2xl ${
           log.nutrition_logged
-            ? 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border-[#2FA65A]/20'
-            : 'bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border-[#C0FC01]/20'
+            ? 'bg-[rgba(255,255,255,0.50)] backdrop-blur-md border-[#2FA65A]/20'
+            : 'bg-[rgba(255,255,255,0.50)] backdrop-blur-md border-[#C0FC01]/20'
         }`}>
           <div className="flex items-center gap-3 mb-2">
             <div className={`w-10 h-10 flex items-center justify-center ${
@@ -311,7 +311,7 @@ export default function AccountabilityPage() {
                 onChange={(e) => setNutritionReason(e.target.value)}
                 placeholder="Bijv. uit eten geweest, vergeten, weekend..."
                 rows={3}
-                className="w-full px-3 py-2 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)] text-[14px] placeholder-[rgba(253,253,254,0.55)] focus:outline-none focus:border-[#FDFDFE] resize-none rounded-xl"
+                className="w-full px-3 py-2 bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[rgba(28,30,24,0.10)] text-[14px] placeholder-[rgba(253,253,254,0.55)] focus:outline-none focus:border-[#FDFDFE] resize-none rounded-xl"
               />
             </div>
           )}

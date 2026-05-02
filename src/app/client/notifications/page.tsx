@@ -200,7 +200,7 @@ function BroadcastCard({ broadcast, onTap }: {
       onClick={onTap}
       className={`w-full text-left rounded-2xl p-5 transition-all active:scale-[0.98] ${
         isUnread
-          ? 'border-2 border-[#3068C4]/25 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl border border-[rgba(28,30,24,0.10)]'
+          ? 'border-2 border-[#3068C4]/25 bg-[rgba(255,255,255,0.50)] backdrop-blur-md border border-[rgba(28,30,24,0.10)]'
           : 'border border-[rgba(28,30,24,0.10)] bg-white'
       }`}
     >

@@ -149,9 +149,9 @@ export default function HealthConnectPage() {
     return (
       <div className="min-h-[80vh] bg-[#FFFFFF] px-4 py-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-xl w-48" />
-          <div className="h-24 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl" />
-          <div className="h-24 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl" />
+          <div className="h-8 bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-xl w-48" />
+          <div className="h-24 bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl" />
+          <div className="h-24 bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl" />
         </div>
       </div>
     )
@@ -175,7 +175,7 @@ export default function HealthConnectPage() {
           const Icon = provider.icon
 
           return (
-            <div key={provider.id} className="bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl p-5 border border-[rgba(28,30,24,0.10)]">
+            <div key={provider.id} className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl p-5 border border-[rgba(28,30,24,0.10)]">
               <div className="flex items-center gap-4">
                 <div
                   className="w-12 h-12 rounded-xl flex items-center justify-center"

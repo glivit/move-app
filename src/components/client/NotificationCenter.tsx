@@ -158,7 +158,7 @@ export function NotificationCenter() {
       {/* Dropdown */}
       {isOpen && (
         <div
-          className="absolute right-0 top-full mt-2 w-80 bg-[rgba(255,255,255,0.50)] backdrop-blur-2xl rounded-2xl overflow-hidden z-50"
+          className="absolute right-0 top-full mt-2 w-80 bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl overflow-hidden z-50"
           style={{
             boxShadow: '0 4px 24px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.06)',
             border: '1px solid rgba(28,30,24,0.18)',
