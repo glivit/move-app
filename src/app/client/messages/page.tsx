@@ -51,10 +51,17 @@ function getInitials(name: string): string {
   return name.substring(0, 2).toUpperCase()
 }
 
-// v6 tokens
-const CANVAS = '#EDECE3'
-const WHITE = '#1C1E18'
-const INK_FAINT = 'rgba(28,30,24,0.58)'
+// v7 tokens — naming legacy (WHITE actually = ink-dark)
+const CANVAS_BG =
+  'radial-gradient(900px 700px at 0% 0%,    #EFE8D4 0%, transparent 55%),' +
+  'radial-gradient(800px 700px at 100% 25%, #DCDBCF 0%, transparent 60%),' +
+  'radial-gradient(700px 700px at 0% 100%,  #EBE3CB 0%, transparent 55%),' +
+  '#EAE8DD'
+const INK = '#1C1E18'
+const INK_SOFT = 'rgba(28,30,24,0.78)'
+const INK_FAINT = 'rgba(28,30,24,0.55)'
+const SKELETON_BG = 'rgba(28,30,24,0.08)'
+const SKELETON_BG_2 = 'rgba(28,30,24,0.12)'
 
 export default function ClientMessagesPage() {
   const router = useRouter()
@@ -175,18 +182,18 @@ export default function ClientMessagesPage() {
   // ─── Loading ──────────────────────────────────────
   if (loading) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: CANVAS, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'fixed', inset: 0, background: CANVAS_BG, display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: 'calc(env(safe-area-inset-top, 0px) + 16px) 20px 12px', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 32, height: 32, borderRadius: 999, background: 'rgba(255,255,255,0.06)' }} />
-          <div style={{ width: 36, height: 36, borderRadius: 999, background: 'rgba(255,255,255,0.08)' }} />
+          <div style={{ width: 32, height: 32, borderRadius: 999, background: SKELETON_BG }} />
+          <div style={{ width: 36, height: 36, borderRadius: 999, background: SKELETON_BG }} />
           <div className="animate-pulse" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <div style={{ width: 80, height: 12, borderRadius: 4, background: 'rgba(28,30,24,0.18)' }} />
-            <div style={{ width: 40, height: 8, borderRadius: 4, background: 'rgba(28,30,24,0.10)' }} />
+            <div style={{ width: 80, height: 12, borderRadius: 4, background: SKELETON_BG_2 }} />
+            <div style={{ width: 40, height: 8, borderRadius: 4, background: SKELETON_BG }} />
           </div>
         </div>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="animate-pulse" style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
-            <div style={{ width: 180, height: 12, borderRadius: 4, background: 'rgba(28,30,24,0.12)' }} />
+            <div style={{ width: 180, height: 12, borderRadius: 4, background: SKELETON_BG_2 }} />
           </div>
         </div>
       </div>
@@ -195,7 +202,7 @@ export default function ClientMessagesPage() {
 
   if (!currentUserId || !coachId) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: CANVAS, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ position: 'fixed', inset: 0, background: CANVAS_BG, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <MessageCircle size={28} style={{ color: INK_FAINT, margin: '0 auto 12px' }} strokeWidth={1.5} />
           <p style={{ color: INK_FAINT, fontSize: 14 }}>{!currentUserId ? 'Niet aangemeld' : 'Coach niet beschikbaar'}</p>
@@ -211,7 +218,7 @@ export default function ClientMessagesPage() {
     <>
       {/* Full-screen fixed container — immune to iOS keyboard layout shifts */}
       <div style={{
-        position: 'fixed', inset: 0, background: CANVAS,
+        position: 'fixed', inset: 0, background: CANVAS_BG,
         display: 'flex', flexDirection: 'column',
       }}>
 
@@ -226,7 +233,7 @@ export default function ClientMessagesPage() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             textDecoration: 'none', WebkitTapHighlightColor: 'transparent',
           }}>
-            <ChevronLeft size={22} strokeWidth={1.8} style={{ color: WHITE }} />
+            <ChevronLeft size={22} strokeWidth={1.8} style={{ color: INK }} />
           </Link>
 
           <div style={{
@@ -240,7 +247,7 @@ export default function ClientMessagesPage() {
 
           <div style={{ minWidth: 0 }}>
             <div style={{
-              fontSize: 15, fontWeight: 500, letterSpacing: '-0.01em', color: WHITE,
+              fontSize: 15, fontWeight: 500, letterSpacing: '-0.01em', color: INK,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
               {coachName}
@@ -269,13 +276,13 @@ export default function ClientMessagesPage() {
               <div style={{ textAlign: 'center' }}>
                 <div style={{
                   width: 56, height: 56, borderRadius: '50%', margin: '0 auto 16px',
-                  background: 'rgba(28,30,24,0.10)',
+                  background: 'rgba(28,30,24,0.08)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <MessageCircle size={24} style={{ color: WHITE }} strokeWidth={1.5} />
+                  <MessageCircle size={24} style={{ color: INK_SOFT }} strokeWidth={1.5} />
                 </div>
-                <p style={{ fontSize: 15, fontWeight: 500, color: WHITE, marginBottom: 4 }}>Stuur je coach een bericht</p>
-                <p style={{ fontSize: 13, color: 'rgba(253,253,254,0.55)' }}>Reactie binnen 24 uur</p>
+                <p style={{ fontSize: 15, fontWeight: 500, color: INK, marginBottom: 4 }}>Stuur je coach een bericht</p>
+                <p style={{ fontSize: 13, color: INK_FAINT }}>Reactie binnen 24 uur</p>
               </div>
             </div>
           ) : (

@@ -31,13 +31,14 @@ interface ChatInputProps {
  *     eigen schaduw.
  */
 
-const DARK = '#474B48'
-const WHITE = '#FDFDFE'
+// v7 — dark glass pill op licht canvas
+const DARK = 'rgba(28,30,24,0.92)'
+const WHITE = '#F2F2EC'
 const LIME = '#C0FC01'
-const PLACEHOLDER = 'rgba(253,253,254,0.44)'
-const INK_MUTED = 'rgba(253,253,254,0.62)'
-const INPUT_BG = 'rgba(253,253,254,0.06)'
-const INPUT_HOVER = 'rgba(253,253,254,0.12)'
+const PLACEHOLDER = 'rgba(242,242,236,0.50)'
+const INK_MUTED = 'rgba(242,242,236,0.65)'
+const INPUT_BG = 'rgba(255,255,255,0.08)'
+const INPUT_HOVER = 'rgba(255,255,255,0.14)'
 
 export function ChatInput({ onSend, loading = false }: ChatInputProps) {
   const [content, setContent] = useState('')
@@ -436,7 +437,7 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
         accept=".pdf,.doc,.docx,.xls,.xlsx"
       />
 
-      {/* ═══ The pill ═══ */}
+      {/* ═══ The pill — dark glass v7 ═══ */}
       <div
         style={{
           display: 'grid',
@@ -445,9 +446,11 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
           gap: 8,
           padding: '8px 8px 8px 8px',
           background: DARK,
+          backdropFilter: 'blur(18px) saturate(140%)',
+          WebkitBackdropFilter: 'blur(18px) saturate(140%)',
           borderRadius: 999,
           boxShadow:
-            'inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 24px rgba(0,0,0,0.28)',
+            'inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 24px rgba(28,30,24,0.20)',
         }}
       >
         {/* Attach */}

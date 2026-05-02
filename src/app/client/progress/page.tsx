@@ -679,9 +679,9 @@ export default function ProgressPage() {
             <div className="h-3 w-48 rounded-full" style={{ background: 'var(--card-bg-tint)' }} />
           </div>
         </div>
-        <div className="rounded-[24px] mb-2 animate-pulse" style={{ height: 64, background: '#474B48' }} />
+        <div className="rounded-[24px] mb-2 animate-pulse dark-surface" style={{ height: 64, background: '#474B48' }} />
         <div className="rounded-[24px] mb-2 animate-pulse" style={{ height: 84, background: 'rgba(255,255,255,0.50)' }} />
-        <div className="rounded-[24px] mb-2 animate-pulse" style={{ height: 200, background: '#474B48' }} />
+        <div className="rounded-[24px] mb-2 animate-pulse dark-surface" style={{ height: 200, background: '#474B48' }} />
       </div>
     )
   }
@@ -908,9 +908,9 @@ export default function ProgressPage() {
 
           {/* ─── Coach check-in banner ─── */}
           {weeklyCheckIn.pending && (
-            <Link
+            <Link className="dark-surface flex items-center mb-3 animate-slide-up stagger-3"
               href="/client/weekly-check-in"
-              className="flex items-center mb-3 animate-slide-up stagger-3"
+              
               style={{
                 background: '#474B48',
                 padding: '16px 18px',
@@ -1022,8 +1022,7 @@ export default function ProgressPage() {
           {momentum.length > 0 && (
             <>
               <div style={capStyle}>Kracht momentum · 8 weken</div>
-              <div
-                className="mb-2 animate-slide-up stagger-4"
+              <div className="mb-2 animate-slide-up stagger-4 dark-surface"
                 style={{
                   background: '#474B48',
                   padding: '18px 20px 20px',
@@ -1620,8 +1619,7 @@ export default function ProgressPage() {
           {body.weightData.length >= 1 ? (
             <>
               <div style={capStyle}>Gewicht</div>
-              <div
-                className="animate-slide-up stagger-2 mb-2"
+              <div className="animate-slide-up stagger-2 mb-2 dark-surface"
                 style={{
                   background: '#474B48',
                   padding: '22px 22px 18px',
@@ -1965,8 +1963,7 @@ export default function ProgressPage() {
 
           {/* Empty state */}
           {body.weightData.length < 1 && !body.measurements.some((m) => m.current !== null) && body.photos.length === 0 && (
-            <div
-              className="animate-fade-in"
+            <div className="animate-fade-in dark-surface"
               style={{
                 background: '#474B48',
                 padding: '48px 22px',
@@ -2010,9 +2007,9 @@ export default function ProgressPage() {
         <>
           {/* Due banner — only when weekly check-in still pending */}
           {weeklyCheckIn.pending && (
-            <Link
+            <Link className="dark-surface animate-slide-up stagger-2"
               href="/client/weekly-check-in"
-              className="animate-slide-up stagger-2"
+              
               style={{
                 display: 'block',
                 textDecoration: 'none',
@@ -2145,9 +2142,9 @@ export default function ProgressPage() {
                 const photoUrl = ci.photoFrontUrl || ci.photoBackUrl || null
                 const num = checkIns.monthly.length - i
                 return (
-                  <div
+                  <div className="dark-surface animate-slide-up"
                     key={ci.id}
-                    className="animate-slide-up"
+                    
                     style={{
                       background: '#474B48',
                       padding: '20px 22px 22px',
@@ -2399,8 +2396,7 @@ export default function ProgressPage() {
 
           {/* Empty state */}
           {!weeklyCheckIn.pending && checkIns.monthly.length === 0 && checkIns.weekly.length === 0 && (
-            <div
-              className="animate-fade-in"
+            <div className="animate-fade-in dark-surface"
               style={{
                 background: '#474B48',
                 padding: '48px 22px',

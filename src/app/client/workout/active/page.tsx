@@ -276,9 +276,9 @@ function CardioTimerPanelComponent({
         )}
 
         {elapsed > 30 && (
-          <button
+          <button className="dark-surface w-14 h-14 flex items-center justify-center rounded-2xl transition-colors"
             onClick={handleFinish}
-            className="w-14 h-14 flex items-center justify-center rounded-2xl transition-colors"
+            
             style={{ background: '#474B48', color: 'var(--card-text)' }}
           >
             <Check size={18} strokeWidth={2.5} />
@@ -535,9 +535,9 @@ function IntervalTimerPanelComponent({
         >
           Skip →
         </button>
-        <button
+        <button className="dark-surface px-6 py-3.5 rounded-xl font-semibold text-[13px] transition-colors"
           onClick={handleFinish}
-          className="px-6 py-3.5 rounded-xl font-semibold text-[13px] transition-colors"
+          
           style={{ background: '#474B48', color: 'var(--card-text)' }}
         >
           Stop
@@ -800,10 +800,27 @@ function ExercisePickerModalComponent({
   }
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-end" style={{ background: 'rgba(0,0,0,0.4)' }}>
-      <div className="w-full h-[75vh] rounded-t-2xl flex flex-col animate-slide-up" style={{ background: '#474B48' }}>
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid var(--card-divider)' }}>
+    <div
+      className="fixed inset-0 z-[80] flex items-end"
+      style={{ background: 'rgba(28,30,24,0.40)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div
+        className="w-full max-h-[88vh] rounded-t-3xl flex flex-col animate-slide-up dark-surface"
+        style={{
+          background: 'rgba(28,30,24,0.94)',
+          minHeight: '60vh',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          boxShadow: '0 -12px 40px rgba(0,0,0,0.30)',
+        }}
+      >
+        {/* Drag handle */}
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 10, flexShrink: 0 }}>
+          <div style={{ width: 38, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.20)' }} />
+        </div>
+
+        {/* Header — bovenaan, blijft zichtbaar */}
+        <div className="flex items-center justify-between px-5 pt-3 pb-3" style={{ borderBottom: '1px solid var(--card-divider)', flexShrink: 0 }}>
           <h3 className="text-[18px] font-semibold" style={{ color: 'var(--card-text)' }}>
             {showCreateForm ? 'Nieuwe oefening' : 'Oefening toevoegen'}
           </h3>
@@ -811,6 +828,7 @@ function ExercisePickerModalComponent({
             onClick={showCreateForm ? () => setShowCreateForm(false) : onClose}
             className="w-9 h-9 flex items-center justify-center rounded-xl transition-colors"
             style={{ background: 'var(--card-bg-tint)' }}
+            aria-label="Sluiten"
           >
             <X size={18} strokeWidth={1.5} style={{ color: 'var(--card-text-muted)' }} />
           </button>
@@ -927,73 +945,104 @@ function ExercisePickerModalComponent({
           </div>
         ) : (
           <>
-            {/* Search */}
-            <div className="px-5 py-3">
-              <div className="flex items-center gap-2 rounded-xl px-3.5 py-2.5 focus-within:ring-2" style={{ background: 'var(--card-bg-tint)' }}>
-                <Search size={16} strokeWidth={1.5} style={{ color: 'var(--card-text-muted)' }} className="flex-shrink-0" />
+            {/* Search — fixed bovenaan, ondersteund door subtiele border-bottom */}
+            <div className="px-5 py-3" style={{ flexShrink: 0, borderBottom: '1px solid var(--card-divider)' }}>
+              <div
+                className="flex items-center gap-2.5 rounded-xl px-3.5 py-3 transition-colors"
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.10)',
+                }}
+              >
+                <Search size={16} strokeWidth={1.8} style={{ color: 'var(--card-text-muted)' }} className="flex-shrink-0" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Zoek oefening..."
+                  placeholder="Zoek oefening…"
                   autoFocus
-                  className="flex-1 bg-transparent text-[14px] border-none focus:outline-none"
+                  className="flex-1 bg-transparent text-[15px] border-none focus:outline-none"
                   style={{ color: 'var(--card-text)' }}
                 />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-colors"
+                    style={{ background: 'rgba(255,255,255,0.10)' }}
+                    aria-label="Wis zoekopdracht"
+                  >
+                    <X size={12} strokeWidth={2} style={{ color: 'var(--card-text-muted)' }} />
+                  </button>
+                )}
               </div>
+              {searchQuery && filteredExercises.length > 0 && (
+                <p className="text-[11px] mt-2 px-1" style={{ color: 'var(--card-text-faint)' }}>
+                  {filteredExercises.length} {filteredExercises.length === 1 ? 'resultaat' : 'resultaten'}
+                </p>
+              )}
             </div>
 
-            {/* Exercise list */}
-            <div className="flex-1 overflow-y-auto px-5 pb-8">
+            {/* Exercise list — scrollable area, search bar blijft fixed bovenaan */}
+            <div className="flex-1 overflow-y-auto px-5 pt-3 pb-8" style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
               {loading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="w-6 h-6 border-[1.5px] rounded-full animate-spin" style={{ borderColor: 'rgba(253,253,254,0.20)', borderTopColor: '#FDFDFE' }} />
+                  <div className="w-6 h-6 border-[1.5px] rounded-full animate-spin" style={{ borderColor: 'rgba(255,255,255,0.20)', borderTopColor: 'var(--card-text)' }} />
                 </div>
               ) : filteredExercises.length === 0 ? (
-                <div className="flex flex-col items-center justify-center flex-1 min-h-[200px] space-y-4">
-                  <p className="text-[14px]" style={{ color: 'var(--card-text-muted)' }}>Geen oefeningen gevonden voor &ldquo;{searchQuery}&rdquo;</p>
+                <div className="flex flex-col items-center justify-center min-h-[280px] space-y-4 text-center px-4">
+                  <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                    <Search size={22} strokeWidth={1.5} style={{ color: 'var(--card-text-muted)' }} />
+                  </div>
+                  <p className="text-[14px]" style={{ color: 'var(--card-text-soft)' }}>Geen oefeningen gevonden voor<br /><span style={{ color: 'var(--card-text)', fontWeight: 500 }}>&ldquo;{searchQuery}&rdquo;</span></p>
                   <button
                     onClick={handleShowCreateForm}
-                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-[13px] font-semibold transition-colors active:scale-[0.98]"
-                    style={{ background: '#C0FC01', color: '#000' }}
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-[13px] font-semibold transition-transform active:scale-[0.98]"
+                    style={{ background: '#C0FC01', color: '#000', boxShadow: '0 4px 14px rgba(192,252,1,0.30)' }}
                   >
-                    <Plus size={16} strokeWidth={2} />
+                    <Plus size={16} strokeWidth={2.2} />
                     Maak &ldquo;{searchQuery.trim()}&rdquo; aan
                   </button>
                 </div>
               ) : (
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   {filteredExercises.map((ex) => (
                     <button
                       key={ex.id}
                       onClick={() => handleSelectExercise(ex)}
-                      className="w-full text-left px-4 py-3.5 rounded-xl transition-colors flex items-center gap-3"
-                      style={{ background: 'var(--card-bg-subtle)', color: 'var(--card-text)' }}
+                      className="w-full text-left px-4 py-3 rounded-xl transition-all flex items-center gap-3 active:scale-[0.99]"
+                      style={{
+                        background: 'rgba(255,255,255,0.04)',
+                        border: '1px solid rgba(255,255,255,0.06)',
+                        color: 'var(--card-text)',
+                        WebkitTapHighlightColor: 'transparent',
+                      }}
                     >
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden border" style={{ background: 'var(--card-bg-subtle)', borderColor: 'var(--card-divider)' }}>
+                      <div className="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
                         {ex.gif_url ? (
-                          <Image src={ex.gif_url} alt="" width={40} height={40} className="w-full h-full object-cover" unoptimized loading="lazy" style={{ filter: 'saturate(0.3)' }} />
+                          <Image src={ex.gif_url} alt="" width={44} height={44} className="w-full h-full object-cover" unoptimized loading="lazy" style={{ filter: 'saturate(0.4)' }} />
                         ) : (
-                          <span className="text-[10px] uppercase" style={{ color: 'var(--card-text-muted)' }}>{ex.target_muscle?.slice(0, 3)}</span>
+                          <span className="text-[10px] uppercase tracking-wide" style={{ color: 'var(--card-text-muted)' }}>{ex.target_muscle?.slice(0, 3)}</span>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[14px] font-medium truncate" style={{ color: 'var(--card-text)' }}>{ex.name_nl || ex.name}</p>
-                        <p className="text-[11px] mt-0.5" style={{ color: 'var(--card-text-muted)' }}>
+                        <p className="text-[14px] font-medium truncate leading-tight" style={{ color: 'var(--card-text)' }}>{ex.name_nl || ex.name}</p>
+                        <p className="text-[11px] mt-1 truncate" style={{ color: 'var(--card-text-muted)' }}>
                           {ex.target_muscle}{ex.equipment ? ` · ${ex.equipment}` : ''}
                         </p>
                       </div>
-                      <Plus size={16} strokeWidth={2} style={{ color: '#C0FC01' }} className="flex-shrink-0" />
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(192,252,1,0.14)' }}>
+                        <Plus size={15} strokeWidth={2.2} style={{ color: '#C0FC01' }} />
+                      </div>
                     </button>
                   ))}
 
                   {/* Always-visible create button at bottom of list */}
                   <button
                     onClick={handleShowCreateForm}
-                    className="w-full text-left px-4 py-3.5 rounded-xl transition-colors flex items-center gap-3 border border-dashed mt-3"
-                    style={{ borderColor: 'var(--card-divider)' }}
+                    className="w-full text-left px-4 py-3 rounded-xl transition-all flex items-center gap-3 border border-dashed mt-3 active:scale-[0.99]"
+                    style={{ borderColor: 'rgba(192,252,1,0.30)', background: 'rgba(192,252,1,0.04)', WebkitTapHighlightColor: 'transparent' }}
                   >
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'var(--card-bg-subtle)' }}>
+                    <div className="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(192,252,1,0.10)' }}>
                       <Plus size={16} strokeWidth={2} style={{ color: '#C0FC01' }} />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -1089,7 +1138,7 @@ function FormCheckModalComponent({ exerciseName, onClose }: { exerciseName: stri
 
   return (
     <div className="fixed inset-0 z-[70] flex items-end justify-center" style={{ background: 'rgba(0,0,0,0.4)' }}>
-      <div className="w-full max-w-lg rounded-t-2xl p-6 animate-slide-up" style={{ background: '#474B48' }}>
+      <div className="w-full max-w-lg rounded-t-2xl p-6 animate-slide-up dark-surface" style={{ background: '#474B48' }}>
         <h3 className="text-[18px] font-semibold mb-1" style={{ color: 'var(--card-text)' }}>
           Form Check
         </h3>
@@ -1666,6 +1715,9 @@ function ActiveWorkoutPage() {
     if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10)
   }, [exercises.length])
 
+  // --- Exercise options menu (kebab) ---
+  const [exerciseMenu, setExerciseMenu] = useState<string | null>(null)
+
   // --- Remove exercise from workout ---
   const [confirmRemoveExercise, setConfirmRemoveExercise] = useState<string | null>(null)
   const removeExercise = useCallback((exerciseId: string) => {
@@ -2143,7 +2195,7 @@ function ActiveWorkoutPage() {
       {/* Close confirmation — bottom sheet */}
       {closeConfirm && (
         <div className="fixed inset-0 z-[70] flex items-end" style={{ background: 'rgba(0,0,0,0.3)' }}>
-          <div className="w-full p-6 rounded-t-2xl shadow-xl animate-slide-up" style={{ background: '#474B48' }}>
+          <div className="w-full p-6 rounded-t-2xl shadow-xl animate-slide-up dark-surface" style={{ background: '#474B48' }}>
             <h3 className="text-[20px] font-semibold tracking-[-0.02em] mb-2" style={{ color: 'var(--card-text)' }}>
               Training afsluiten?
             </h3>
@@ -2321,9 +2373,84 @@ function ActiveWorkoutPage() {
                   <div className="ex-title">{exerciseData.name_nl || exerciseData.name}</div>
                 </div>
                 {!reorderMode && (
-                  <button className="ex-kebab" onClick={() => setExpandedExercise(isExpanded ? null : ex.id)} aria-label="Opties" style={{ WebkitTapHighlightColor: 'transparent' }}>
-                    <span/>
-                  </button>
+                  <div style={{ position: 'relative' }}>
+                    <button className="ex-kebab" onClick={() => setExerciseMenu(exerciseMenu === ex.id ? null : ex.id)} aria-label="Opties" aria-expanded={exerciseMenu === ex.id} style={{ WebkitTapHighlightColor: 'transparent' }}>
+                      <span/>
+                    </button>
+                    {exerciseMenu === ex.id && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setExerciseMenu(null)} />
+                        <div
+                          className="dark-surface"
+                          style={{
+                            position: 'absolute',
+                            top: 'calc(100% + 6px)',
+                            right: 0,
+                            zIndex: 50,
+                            minWidth: 180,
+                            borderRadius: 14,
+                            boxShadow: '0 12px 28px rgba(28,30,24,0.30)',
+                            overflow: 'hidden',
+                            padding: 4,
+                          }}
+                          role="menu"
+                        >
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => {
+                              setExpandedExercise(isExpanded ? null : ex.id)
+                              setExerciseMenu(null)
+                            }}
+                            style={{
+                              width: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 10,
+                              padding: '11px 14px',
+                              background: 'transparent',
+                              border: 'none',
+                              color: 'var(--card-text)',
+                              fontSize: 14,
+                              fontWeight: 500,
+                              cursor: 'pointer',
+                              textAlign: 'left',
+                              borderRadius: 10,
+                              WebkitTapHighlightColor: 'transparent',
+                            }}
+                          >
+                            {isExpanded ? 'Verberg info' : 'Toon info'}
+                          </button>
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => {
+                              setConfirmRemoveExercise(ex.id)
+                              setExerciseMenu(null)
+                            }}
+                            style={{
+                              width: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 10,
+                              padding: '11px 14px',
+                              background: 'transparent',
+                              border: 'none',
+                              color: '#FF8B7A',
+                              fontSize: 14,
+                              fontWeight: 500,
+                              cursor: 'pointer',
+                              textAlign: 'left',
+                              borderRadius: 10,
+                              WebkitTapHighlightColor: 'transparent',
+                            }}
+                          >
+                            Verwijder oefening
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 )}
               </div>
 
@@ -2526,7 +2653,7 @@ function ActiveWorkoutPage() {
         {/* Remove exercise confirmation */}
         {confirmRemoveExercise && (
           <div className="fixed inset-0 z-[70] flex items-end" style={{ background: 'rgba(0,0,0,0.3)' }}>
-            <div className="w-full p-6 rounded-t-2xl shadow-xl animate-slide-up" style={{ background: '#474B48' }}>
+            <div className="w-full p-6 rounded-t-2xl shadow-xl animate-slide-up dark-surface" style={{ background: '#474B48' }}>
               <h3 className="text-[20px] font-semibold tracking-[-0.02em] mb-2" style={{ color: 'var(--card-text)' }}>
                 Oefening verwijderen?
               </h3>
@@ -2557,7 +2684,7 @@ function ActiveWorkoutPage() {
         {/* Save changes modal */}
         {showSaveChangesModal && (
           <div className="fixed inset-0 z-[70] flex items-end" style={{ background: 'rgba(0,0,0,0.3)' }}>
-            <div className="w-full p-6 rounded-t-2xl shadow-xl animate-slide-up" style={{ background: '#474B48' }}>
+            <div className="w-full p-6 rounded-t-2xl shadow-xl animate-slide-up dark-surface" style={{ background: '#474B48' }}>
               <h3 className="text-[20px] font-semibold tracking-[-0.02em] mb-2" style={{ color: 'var(--card-text)' }}>
                 Je hebt aanpassingen gemaakt
               </h3>
@@ -2596,7 +2723,7 @@ function ActiveWorkoutPage() {
 
         {showDiscardConfirm && (
           <div className="fixed inset-0 z-[70] flex items-end" style={{ background: 'rgba(0,0,0,0.3)' }}>
-            <div className="w-full p-6 rounded-t-2xl shadow-xl animate-slide-up" style={{ background: '#474B48' }}>
+            <div className="w-full p-6 rounded-t-2xl shadow-xl animate-slide-up dark-surface" style={{ background: '#474B48' }}>
               <h3 className="text-[20px] font-semibold tracking-[-0.02em] mb-2" style={{ color: 'var(--card-text)' }}>
                 Workout verwijderen?
               </h3>
@@ -2946,7 +3073,7 @@ function SetRowComponent({
       {showTypeMenu && (
         <>
           <div className="fixed inset-0 z-50" onClick={() => setShowTypeMenu(false)} />
-          <div className="absolute left-0 top-full mt-1 z-50 rounded-xl shadow-lg border overflow-hidden min-w-[140px]" style={{ background: '#474B48', borderColor: 'var(--card-divider)' }}>
+          <div className="absolute left-0 top-full mt-1 z-50 rounded-xl shadow-lg border overflow-hidden min-w-[140px] dark-surface" style={{ background: '#474B48', borderColor: 'var(--card-divider)' }}>
             {(Object.entries(SET_TYPE_CONFIG) as [SetType, typeof typeConfig][]).map(([type, cfg]) => (
               <button
                 key={type}

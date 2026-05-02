@@ -569,7 +569,7 @@ function AddFoodBottomSheet({
       />
 
       {/* Sheet — v6 dark card style */}
-      <div
+      <div className="dark-surface"
         ref={sheetRef}
         style={{
           position: 'absolute', bottom: 0, left: 0, right: 0,

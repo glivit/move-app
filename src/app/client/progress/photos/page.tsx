@@ -315,7 +315,7 @@ export default function PhotoComparisonPage() {
 
         {/* Comparison area */}
         {hasBoth ? (
-          <div
+          <div className="dark-surface"
             ref={containerRef}
             style={{
               position: 'relative',
@@ -432,7 +432,7 @@ export default function PhotoComparisonPage() {
               overflow: 'hidden',
             }}
           >
-            <div style={{ position: 'relative', aspectRatio: '3 / 4', background: '#474B48' }}>
+            <div className="dark-surface" style={{ position: 'relative', aspectRatio: '3 / 4', background: '#474B48' }}>
               {beforeUrl ? (
                 <NextImage src={beforeUrl} alt="Before" width={400} height={500} style={{ width: '100%', height: '100%', objectFit: 'cover' }} unoptimized loading="lazy" />
               ) : (
@@ -451,7 +451,7 @@ export default function PhotoComparisonPage() {
                 <p style={{ fontSize: 12, color: 'var(--card-text)', fontWeight: 500, margin: 0 }}>{formatDate(before.date)}</p>
               </div>
             </div>
-            <div style={{ position: 'relative', aspectRatio: '3 / 4', background: '#474B48' }}>
+            <div className="dark-surface" style={{ position: 'relative', aspectRatio: '3 / 4', background: '#474B48' }}>
               {afterUrl ? (
                 <NextImage src={afterUrl} alt="After" width={400} height={500} style={{ width: '100%', height: '100%', objectFit: 'cover' }} unoptimized loading="lazy" />
               ) : (

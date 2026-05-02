@@ -140,7 +140,7 @@ export function PhotoComparison() {
         }}
       >
         {/* Before */}
-        <div style={{ background: '#474B48', position: 'relative' }}>
+        <div className="dark-surface" style={{ background: '#474B48', position: 'relative' }}>
           {beforeUrl ? (
             <Image
               src={beforeUrl}
@@ -205,7 +205,7 @@ export function PhotoComparison() {
         </div>
 
         {/* After */}
-        <div style={{ background: '#474B48', position: 'relative' }}>
+        <div className="dark-surface" style={{ background: '#474B48', position: 'relative' }}>
           {afterUrl ? (
             <Image
               src={afterUrl}

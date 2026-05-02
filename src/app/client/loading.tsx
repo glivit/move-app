@@ -48,8 +48,7 @@ export default function ClientLoading() {
       </div>
 
       {/* Dieet v6-card-dark skeleton */}
-      <div
-        className="rounded-[24px] mb-4"
+      <div className="rounded-[24px] mb-4 dark-surface"
         style={{
           padding: '22px 22px 24px',
           background: '#474B48',

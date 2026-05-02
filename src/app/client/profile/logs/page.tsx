@@ -269,8 +269,7 @@ export default function LogsPage() {
       </div>
 
       {/* ═══ HERO DARK CARD ═══════════════════════════════════ */}
-      <div
-        className="animate-slide-up stagger-2 mb-4"
+      <div className="animate-slide-up stagger-2 mb-4 dark-surface"
         style={{
           background: '#474B48',
           padding: '20px 22px 18px',

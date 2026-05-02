@@ -404,7 +404,7 @@ export default function LiftDetailPage() {
     return (
       <div className="pb-28 animate-fade-in">
         <div style={{ height: 32, marginBottom: 18 }} />
-        <div className="rounded-[24px] mb-4 animate-pulse" style={{ height: 200, background: '#474B48' }} />
+        <div className="rounded-[24px] mb-4 animate-pulse dark-surface" style={{ height: 200, background: '#474B48' }} />
         <div className="rounded-[24px] mb-2 animate-pulse" style={{ height: 180, background: 'rgba(255,255,255,0.50)' }} />
       </div>
     )
@@ -447,8 +447,7 @@ export default function LiftDetailPage() {
       <TopBar title={info?.name || 'Oefening'} subtitle={info?.bodyPart} onBack={() => router.back()} />
 
       {/* ═══ HERO CARD ═══════════════════════════════════════════ */}
-      <div
-        className="animate-slide-up stagger-2 mb-4"
+      <div className="animate-slide-up stagger-2 mb-4 dark-surface"
         style={{
           background: '#474B48',
           padding: '22px 22px 18px',
