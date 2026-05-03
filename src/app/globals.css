@@ -152,31 +152,18 @@ body {
   min-height: 100vh;
 }
 
-/* Subtiele tonale variatie in dezelfde beige-familie — frosted glass bron zonder lightshow */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(900px 700px at 0% 0%,    #F4F1E6 0%, transparent 60%),
-    radial-gradient(800px 600px at 100% 30%, #E5E3D8 0%, transparent 60%),
-    radial-gradient(700px 600px at 0% 100%,  #F2EEDF 0%, transparent 60%);
-}
-
-/* Alle directe app-content moet boven de orbs staan */
-body > * {
-  position: relative;
-  z-index: 1;
-}
+/* body::before gradient verwijderd — .client-app heeft al gradients en
+ * dubbele lagen veroorzaken extra paint cost op iOS Safari (3-5s lag bij
+ * scherm-transities). Eén bron van waarheid voor canvas-orbs. */
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
   font-weight: 300;
   letter-spacing: -0.02em;
   line-height: 1.12;
-  color: #FDFDFE;
+  /* Was #FDFDFE (wit) — invisible op v7 light canvas. Heading color
+   * inherits van parent (body = #1C1E18 of card-scoped via --card-text). */
+  color: var(--card-text, #1C1E18);
 }
 
 .client-app {
