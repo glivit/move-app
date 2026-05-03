@@ -69,11 +69,29 @@ async function ensureAuth(page: import('@playwright/test').Page) {
     await page.fill('input[type="email"]', email, { timeout: 5000 })
     await page.fill('input[type="password"]', password, { timeout: 5000 })
     await page.click('button[type="submit"]', { timeout: 5000 })
-    await page.waitForURL(/\/client/, { timeout: 15000 })
+    await page.waitForURL(/(\/client|\/onboarding)/, { timeout: 15000 })
   } catch (err) {
-    if (!page.url().includes('/client')) {
+    if (!page.url().match(/(\/client|\/onboarding)/)) {
       console.warn('[auth] login fallback:', err)
     }
+  }
+  // Skip onboarding: inject move_intake cookie so middleware lets us through
+  // (audit user may not have completed intake — this lets us still see /client routes)
+  try {
+    const url = new URL(BASE)
+    await page.context().addCookies([
+      {
+        name: 'move_intake',
+        value: '1',
+        domain: url.hostname,
+        path: '/',
+        httpOnly: false,
+        secure: false,
+        sameSite: 'Lax',
+      },
+    ])
+  } catch (err) {
+    console.warn('[cookie inject] move_intake:', err)
   }
 }
 
@@ -93,27 +111,27 @@ test.describe('walk-through', () => {
       await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {})
       await page.waitForTimeout(600) // animations settle
 
-      // Full-page screenshot — tolerate crashed page
+      // Viewport screenshot (full-page sometimes crashes on heavy pages)
       try {
         await page.screenshot({
           path: path.join(OUT_DIR, `${route.slug}.png`),
-          fullPage: true,
+          fullPage: false,
           animations: 'disabled',
-          timeout: 15000,
+          timeout: 10000,
         })
       } catch (err) {
-        console.warn(`[screenshot fullpage] ${route.slug}:`, err)
-        // try a viewport-only screenshot as fallback
-        try {
-          await page.screenshot({
-            path: path.join(OUT_DIR, `${route.slug}.png`),
-            fullPage: false,
-            animations: 'disabled',
-            timeout: 8000,
-          })
-        } catch (err2) {
-          console.warn(`[screenshot viewport] ${route.slug}:`, err2)
-        }
+        console.warn(`[screenshot viewport] ${route.slug}:`, err)
+      }
+      // Try full-page as a "long" capture too — nice to have
+      try {
+        await page.screenshot({
+          path: path.join(OUT_DIR, `${route.slug}.full.png`),
+          fullPage: true,
+          animations: 'disabled',
+          timeout: 12000,
+        })
+      } catch {
+        // ignore — many pages crash on full-page capture
       }
 
       // DOM snapshot — interactives
