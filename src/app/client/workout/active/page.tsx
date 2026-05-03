@@ -2253,7 +2253,22 @@ function ActiveWorkoutPage() {
         >MŌVE</button>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, #646B66, #4a4f4c)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 500, color: 'var(--card-text)' }}>G</div>
-          <button className="ico-btn" aria-label="Minimize workout" onClick={handleMinimize} style={{ WebkitTapHighlightColor: 'transparent' }}>
+          {/* MŌVE-mark above = pause/minimize. X = sluit met bevestiging
+           *  (active-workout-report BLOCKER #1: closeConfirm modal hing als
+           *  dead JSX zonder trigger). In preview-mode (geen session) is
+           *  niets te bevestigen, daar is X = direct terug. */}
+          <button
+            className="ico-btn"
+            aria-label={session ? 'Sluit training' : 'Sluiten'}
+            onClick={() => {
+              if (!session) {
+                handleMinimize()
+              } else {
+                setCloseConfirm(true)
+              }
+            }}
+            style={{ WebkitTapHighlightColor: 'transparent' }}
+          >
             <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18" /><line x1="6" y1="18" x2="18" y2="6" /></svg>
           </button>
         </div>
@@ -2851,6 +2866,11 @@ function SetRowComponent({
     return toDisplay(prefilledWeight) || ''
   }
   const [weight, setWeight] = useState(getDefaultWeight)
+  // Track when value is system-generated (smart-prefill capped from previous
+  // set) vs user-typed. Visual cue (lighter opacity) zodat klanten begrijpen
+  // dat het cijfer een suggestie is — voorkomt stille verlaging-confusie
+  // (active-workout-report BLOCKER #4).
+  const [weightUserTouched, setWeightUserTouched] = useState<boolean>(set.weight_kg != null)
 
   // Smart prefill: cap reps at what previous set achieved
   const getDefaultReps = () => {
@@ -2861,6 +2881,7 @@ function SetRowComponent({
     return set.prescribed_reps?.toString() || ''
   }
   const [reps, setReps] = useState(getDefaultReps)
+  const [repsUserTouched, setRepsUserTouched] = useState<boolean>(set.actual_reps != null)
 
   // Sync display when unit changes
   useEffect(() => {
@@ -2901,16 +2922,18 @@ function SetRowComponent({
 
   const handleWeightChange = useCallback((value: string) => {
     setWeight(value)
+    setWeightUserTouched(true)
     const kgValue = fromDisplay(value)
     setSets((prev: Record<string, SetData[]>) => {
       const updated = [...(prev[exerciseId] || [])]
       updated[index] = { ...updated[index], weight_kg: kgValue }
       return { ...prev, [exerciseId]: updated }
     })
-  }, [exerciseId, index, setSets])
+  }, [exerciseId, index, setSets, fromDisplay])
 
   const handleRepsChange = useCallback((value: string) => {
     setReps(value)
+    setRepsUserTouched(true)
     setSets((prev: Record<string, SetData[]>) => {
       const updated = [...(prev[exerciseId] || [])]
       updated[index] = { ...updated[index], actual_reps: value ? parseInt(value) : set.prescribed_reps }
@@ -3115,11 +3138,16 @@ function SetRowComponent({
         id={`weight-${exerciseId}-${index}`}
         type="text"
         inputMode="decimal"
+        enterKeyHint="next"
+        aria-label={`Gewicht set ${index + 1}`}
+        title={!weightUserTouched && !set.completed && weight ? 'Suggestie op basis van vorige set — tik om aan te passen' : undefined}
         value={weight}
         onChange={(e) => handleWeightChange(e.target.value)}
         onFocus={(e) => e.target.select()}
         placeholder={prefilledWeight ? toDisplay(prefilledWeight) : '—'}
         disabled={set.completed}
+        data-prefilled={!weightUserTouched && !set.completed && !!weight ? 'true' : undefined}
+        style={!weightUserTouched && !set.completed && weight ? { opacity: 0.55 } : undefined}
         className="c-kg"
       />
 
@@ -3128,11 +3156,16 @@ function SetRowComponent({
         id={`reps-${exerciseId}-${index}`}
         type="text"
         inputMode="numeric"
+        enterKeyHint="done"
+        aria-label={`Reps set ${index + 1}`}
+        title={!repsUserTouched && !set.completed && reps ? 'Suggestie op basis van vorige set — tik om aan te passen' : undefined}
         value={reps}
         onChange={(e) => handleRepsChange(e.target.value)}
         onFocus={(e) => e.target.select()}
         placeholder={set.prescribed_reps?.toString() || '—'}
         disabled={set.completed}
+        data-prefilled={!repsUserTouched && !set.completed && !!reps ? 'true' : undefined}
+        style={!repsUserTouched && !set.completed && reps ? { opacity: 0.55 } : undefined}
         className="c-reps"
       />
 
