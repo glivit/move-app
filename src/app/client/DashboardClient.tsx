@@ -509,6 +509,9 @@ export default function ClientDashboard({
 
   return (
     <div className="pb-28">
+      {/* Page heading — visueel overgeslagen (zichtbare hiërarchie zit in
+       *  per-card h2's), maar verplicht voor screen-readers (WCAG 1.3.1). */}
+      <h1 className="sr-only">Home</h1>
 
       {/* Freshness-pill — subtiele aanduiding dat data uit cache komt. */}
       {showFreshnessPill && (
@@ -1126,7 +1129,9 @@ function CheckInWeightCard({
             <input
               type="text"
               inputMode="decimal"
-              placeholder={weightLog?.lastValue ? `Vorige: ${weightLog.lastValue} kg` : 'Gewicht vandaag (bv. 78,5)'}
+              enterKeyHint="send"
+              aria-label="Gewicht vandaag in kilogram"
+              placeholder={weightLog?.lastValue ? `Vorige: ${weightLog.lastValue} kg (bv. 78,5)` : 'Gewicht vandaag (bv. 78,5)'}
               value={weightInput}
               onChange={(e) => setWeightInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') onSubmit() }}
@@ -1145,7 +1150,7 @@ function CheckInWeightCard({
                 padding: '10px 18px',
                 borderRadius: 14,
                 background: '#1C1E18',
-                color: '#1F231F',
+                color: '#FDFDFE',
                 fontSize: 13,
                 fontWeight: 500,
                 border: 'none',

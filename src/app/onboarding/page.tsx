@@ -521,6 +521,9 @@ export default function OnboardingPage() {
   const [error, setError] = useState<string | null>(null)
   const [animatingOut, setAnimatingOut] = useState(false)
   const [showPhotoStep, setShowPhotoStep] = useState(false)
+  // True wanneer user op disabled "Volgende" probeert te tappen — zet
+  // een hint + aria-live boodschap zonder de stap te verlaten.
+  const [attemptedAdvance, setAttemptedAdvance] = useState(false)
   const [draftNotice, setDraftNotice] = useState<DraftShape | null>(() => {
     if (typeof window === 'undefined') return null
     try {
@@ -668,6 +671,7 @@ export default function OnboardingPage() {
     setTimeout(() => {
       setStep(s)
       setError(null)
+      setAttemptedAdvance(false)
       setAnimatingOut(false)
       if (typeof window !== 'undefined') window.scrollTo({ top: 0 })
     }, 220)
@@ -1106,6 +1110,10 @@ export default function OnboardingPage() {
                     type="date"
                     value={data.date_of_birth}
                     onChange={(e) => update('date_of_birth', e.target.value)}
+                    /* color-scheme: dark zorgt dat iOS Safari de native date-
+                     *  picker als dark theme rendert (witte tekst leesbaar). */
+                    style={{ colorScheme: 'dark' }}
+                    aria-label="Geboortedatum"
                   />
                 </div>
 
@@ -1862,10 +1870,21 @@ export default function OnboardingPage() {
             ) : (
               <button
                 type="button"
-                onClick={() => goTo(step + 1)}
-                disabled={!proceedOk}
-                className="flex-1 inline-flex items-center justify-center rounded-full px-5 py-3 text-[13px] font-semibold uppercase tracking-[0.12em] transition-opacity active:opacity-70 disabled:opacity-40 disabled:cursor-not-allowed"
-                style={{ background: ORION.ink, color: '#1A1A18' }}
+                onClick={() => {
+                  if (!proceedOk) {
+                    setAttemptedAdvance(true)
+                    return
+                  }
+                  setAttemptedAdvance(false)
+                  goTo(step + 1)
+                }}
+                aria-disabled={!proceedOk}
+                className="flex-1 inline-flex items-center justify-center rounded-full px-5 py-3 text-[13px] font-semibold uppercase tracking-[0.12em] transition-opacity active:opacity-70"
+                style={{
+                  background: ORION.ink,
+                  color: '#1A1A18',
+                  opacity: proceedOk ? 1 : 0.5,
+                }}
               >
                 Volgende
               </button>
@@ -1875,10 +1894,17 @@ export default function OnboardingPage() {
           {/* Helper hint when blocked */}
           {!proceedOk && !onOverview && (
             <div
-              className="max-w-md mx-auto text-center mt-2 text-[11px]"
-              style={{ color: ORION.inkFaded }}
+              role={attemptedAdvance ? 'alert' : undefined}
+              aria-live="polite"
+              className="max-w-md mx-auto text-center mt-2 text-[12px]"
+              style={{
+                color: attemptedAdvance ? ORION.error : ORION.inkFaded,
+                fontWeight: attemptedAdvance ? 500 : 400,
+              }}
             >
-              Vul deze stap aan om verder te gaan
+              {attemptedAdvance
+                ? 'Vul de gemarkeerde velden in om verder te gaan'
+                : 'Vul deze stap aan om verder te gaan'}
             </div>
           )}
         </div>

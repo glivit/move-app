@@ -229,12 +229,15 @@ export default function WeeklyCheckInPage() {
           <input
             type="text"
             inputMode="decimal"
+            enterKeyHint="done"
+            aria-label="Gewicht in kilogram"
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
             placeholder="0.0"
+            maxLength={6}
             className="flex-1 min-w-0 text-[44px] leading-none font-semibold text-[#1C1E18] bg-transparent outline-none tracking-tight placeholder-[rgba(253,253,254,0.28)]"
           />
-          <span className="text-[16px] text-[rgba(28,30,24,0.62)] font-medium">kg</span>
+          <span className="shrink-0 text-[16px] text-[rgba(28,30,24,0.62)] font-medium">kg</span>
         </div>
 
         <div className="mt-4 pt-3 border-t border-[rgba(253,253,254,0.12)]">

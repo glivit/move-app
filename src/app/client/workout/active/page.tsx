@@ -619,6 +619,9 @@ interface AddedExerciseData {
   exercise_id: string
   name: string
   body_part?: string
+  /** Bewaard zodat de info-panel niet leeg blijft na navigate-weg-en-terug
+   *  (active-workout-report BLOCKER #6 — `target_muscle: ''` regression). */
+  target_muscle?: string
   equipment?: string
   gif_url?: string | null
   sets: number
@@ -1343,6 +1346,7 @@ function ActiveWorkoutPage() {
         exercise_id: e.exercise_id,
         name: e.exercises?.name || '',
         body_part: e.exercises?.body_part,
+        target_muscle: e.exercises?.target_muscle,
         equipment: e.exercises?.equipment,
         gif_url: e.exercises?.gif_url,
         sets: e.sets,
@@ -1537,7 +1541,7 @@ function ActiveWorkoutPage() {
                       name: ae.name,
                       name_nl: ae.name,
                       body_part: ae.body_part || '',
-                      target_muscle: '',
+                      target_muscle: ae.target_muscle || '',
                       equipment: ae.equipment || '',
                       gif_url: ae.gif_url || '',
                       video_url: null,
@@ -2076,6 +2080,7 @@ function ActiveWorkoutPage() {
         exercise_id: e.exercise_id,
         name: e.exercises?.name || '',
         body_part: e.exercises?.body_part,
+        target_muscle: e.exercises?.target_muscle,
         equipment: e.exercises?.equipment,
         gif_url: e.exercises?.gif_url,
         sets: e.sets,
