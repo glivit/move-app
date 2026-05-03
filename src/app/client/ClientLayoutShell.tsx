@@ -4,12 +4,26 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { ClientBottomNav } from '@/components/layout/ClientBottomNav'
-import { ClientSidebar } from '@/components/layout/ClientSidebar'
 import { TopBarAvatar } from '@/components/layout/TopBarAvatar'
-import { ActiveWorkoutBar } from '@/components/workout/ActiveWorkoutBar'
 
-// Lazy load non-critical UI components
+// Lazy load non-critical UI components — komen in een aparte chunk
+// die pas downloadt wanneer de browser idle is na first paint.
+const ClientBottomNav = dynamic(
+  () => import('@/components/layout/ClientBottomNav').then(m => ({ default: m.ClientBottomNav })),
+  { ssr: false },
+)
+// ClientSidebar — alleen zichtbaar op desktop (lg:). Mobile users
+// betalen geen byte.
+const ClientSidebar = dynamic(
+  () => import('@/components/layout/ClientSidebar').then(m => ({ default: m.ClientSidebar })),
+  { ssr: false },
+)
+// ActiveWorkoutBar — alleen zichtbaar als een workout actief is.
+// Default state = niet actief, dus geen reden voor sync-load.
+const ActiveWorkoutBar = dynamic(
+  () => import('@/components/workout/ActiveWorkoutBar').then(m => ({ default: m.ActiveWorkoutBar })),
+  { ssr: false },
+)
 const NotificationPermission = dynamic(
   () => import('@/components/notifications/NotificationPermission').then(m => m.NotificationPermission),
   { ssr: false },
@@ -18,8 +32,6 @@ const SyncStatusIndicator = dynamic(
   () => import('@/components/ui/SyncStatusIndicator').then(m => m.SyncStatusIndicator),
   { ssr: false },
 )
-// DevFeedbackWidget — element-picker tool voor dev/coach feedback.
-// Alleen zichtbaar voor coach/admin role of als NEXT_PUBLIC_DEV_FEEDBACK=true.
 const DevFeedbackWidget = dynamic(
   () => import('@/components/DevFeedbackWidget').then(m => m.DevFeedbackWidget),
   { ssr: false },
