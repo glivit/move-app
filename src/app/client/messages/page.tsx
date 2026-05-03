@@ -7,7 +7,6 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { ChatBubble } from '@/components/client/ChatBubble'
 import { ChatInput } from '@/components/client/ChatInput'
-import { useVisualViewportHeight } from '@/hooks/useVisualViewportHeight'
 import { invalidateCache } from '@/lib/fetcher'
 import { optimisticMutate } from '@/lib/optimistic'
 import { readDashboardCache, writeDashboardCache } from '@/lib/dashboard-cache'
@@ -74,15 +73,21 @@ export default function ClientMessagesPage() {
   const [coachName, setCoachName] = useState('')
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // Visual Viewport tracking — keyboard-aware container height
-  const viewportHeight = useVisualViewportHeight()
-  // Zorgt dat laatste bubble zichtbaar blijft wanneer viewport krimpt door keyboard
+  // Body-scroll lock terwijl chat open is — voorkomt dat iOS PWA de body
+  // begint te scrollen wanneer keyboard opent (wat ons fixed-positioning
+  // breekt en messages onzichtbaar maakt).
   useEffect(() => {
-    if (viewportHeight == null) return
-    requestAnimationFrame(() => {
-      if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-    })
-  }, [viewportHeight])
+    const prevOverflow = document.body.style.overflow
+    const prevPosition = document.body.style.position
+    document.body.style.overflow = 'hidden'
+    document.body.style.position = 'fixed'
+    document.body.style.width = '100%'
+    return () => {
+      document.body.style.overflow = prevOverflow
+      document.body.style.position = prevPosition
+      document.body.style.width = ''
+    }
+  }, [])
 
   // Scroll to bottom helper
   const scrollToBottom = useCallback(() => {
@@ -194,13 +199,16 @@ export default function ClientMessagesPage() {
     finally { setSending(false) }
   }
 
-  // Viewport-aware container style — passt aan op iOS keyboard.
+  // Container style — pure flexbox + 100dvh (dynamic viewport height op
+  // iOS 15.4+ schrinkt mee met keyboard zonder JS workaround). Body-scroll
+  // is hierboven al gelocked zodat iOS PWA niks weg-scrollt.
   const containerStyle: React.CSSProperties = {
     position: 'fixed',
     top: 0,
     left: 0,
-    width: '100%',
-    height: viewportHeight ? `${viewportHeight}px` : '100dvh',
+    right: 0,
+    bottom: 0,
+    height: '100dvh',
     background: CANVAS_BG,
     display: 'flex',
     flexDirection: 'column',
