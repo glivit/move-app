@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { Bug, X, Crosshair, Send, Check } from 'lucide-react'
+import { Code, X, Crosshair, Send, Check } from 'lucide-react'
 import { createClient } from '@/lib/supabase'
 
 /**
@@ -97,20 +97,13 @@ export function DevFeedbackWidget() {
   const [submitted, setSubmitted] = useState(false)
   const overlayRef = useRef<HTMLDivElement>(null)
 
-  // Visibility check — alleen tonen voor coaches/admins of als feature flag aan
+  // Visibility — open voor elke geauthenticeerde user (clients incl.).
+  // RLS op dev_feedback dwingt af dat enkel auth-users kunnen inserteren.
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const flag = process.env.NEXT_PUBLIC_DEV_FEEDBACK === 'true'
-    if (flag) { setEnabled(true); return }
     const supabase = createClient()
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (!user) return
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .maybeSingle()
-      if (profile?.role === 'coach' || profile?.role === 'admin') setEnabled(true)
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) setEnabled(true)
     })
   }, [])
 
@@ -192,7 +185,7 @@ export function DevFeedbackWidget() {
 
   return (
     <div data-feedback-widget>
-      {/* Floating button */}
+      {/* Floating button — wit cirkeltje met </> */}
       {!pickMode && !modalOpen && (
         <button
           onClick={() => setPickMode(true)}
@@ -206,19 +199,22 @@ export function DevFeedbackWidget() {
             width: 44,
             height: 44,
             borderRadius: '50%',
-            background: 'rgba(28,30,24,0.92)',
-            backdropFilter: 'blur(12px)',
-            color: '#C0FC01',
-            border: '1px solid rgba(255,255,255,0.10)',
+            background: '#FFFFFF',
+            color: '#1C1E18',
+            border: '1px solid rgba(28,30,24,0.10)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            boxShadow: '0 8px 22px rgba(0,0,0,0.20)',
+            boxShadow: '0 6px 18px rgba(28,30,24,0.18), 0 1px 2px rgba(28,30,24,0.06)',
             WebkitTapHighlightColor: 'transparent',
+            transition: 'transform 180ms cubic-bezier(0.16,1,0.3,1)',
           }}
+          onMouseDown={(e) => { e.currentTarget.style.transform = 'scale(0.95)' }}
+          onMouseUp={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
         >
-          <Bug size={18} strokeWidth={2} />
+          <Code size={18} strokeWidth={2} />
         </button>
       )}
 
