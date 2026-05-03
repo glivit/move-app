@@ -28,10 +28,12 @@ const EXTRA = [
 
 test.use({
   viewport: { width: 393, height: 852 },
-  deviceScaleFactor: 3,
+  deviceScaleFactor: 1,
   isMobile: true,
   hasTouch: true,
 })
+
+const MAX_CAPTURE_HEIGHT = 1800
 
 async function ensureAuth(page: import('@playwright/test').Page) {
   const email = process.env.TEST_USER_EMAIL!
@@ -76,12 +78,42 @@ test.describe('extra-walkthrough', () => {
         console.warn(`[screenshot] ${route.slug}:`, (err as Error).message)
       }
       try {
+        const docHeight = await page.evaluate(() => document.documentElement.scrollHeight)
+        const captureHeight = Math.min(docHeight, MAX_CAPTURE_HEIGHT)
         await page.screenshot({
           path: path.join(OUT_DIR, `${route.slug}.full.png`),
-          fullPage: true,
+          clip: { x: 0, y: 0, width: 393, height: captureHeight },
           animations: 'disabled',
           timeout: 12000,
         })
+      } catch {}
+      // DOM snapshot
+      try {
+        const interactives = await page.evaluate(() => {
+          const sel = 'button, a[href], input, textarea, select, [role="button"], [role="link"], [role="tab"]'
+          return Array.from(document.querySelectorAll(sel)).map((el) => {
+            const r = el.getBoundingClientRect()
+            const styles = window.getComputedStyle(el as HTMLElement)
+            return {
+              tag: el.tagName.toLowerCase(),
+              text: (el.textContent || '').trim().slice(0, 80),
+              aria: el.getAttribute('aria-label'),
+              role: el.getAttribute('role'),
+              href: el.getAttribute('href'),
+              disabled: (el as HTMLButtonElement).disabled || el.getAttribute('aria-disabled') === 'true',
+              visible: r.width > 0 && r.height > 0 && styles.display !== 'none' && styles.visibility !== 'hidden',
+              tooSmall: r.width < 44 || r.height < 44,
+              x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height),
+              color: styles.color, background: styles.backgroundColor, zIndex: styles.zIndex,
+            }
+          })
+        })
+        const DOM_DIR = path.join('audits', '2026-05-03', 'dom')
+        fs.mkdirSync(DOM_DIR, { recursive: true })
+        fs.writeFileSync(
+          path.join(DOM_DIR, `${route.slug}.json`),
+          JSON.stringify({ route: route.path, interactives, timestamp: new Date().toISOString() }, null, 2)
+        )
       } catch {}
     })
   }

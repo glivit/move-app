@@ -1,0 +1,219 @@
+
+> move-app@0.1.0 build
+> next build
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+- Experiments (use with caution):
+  · optimizePackageImports
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 12.8s
+  Running TypeScript ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/132) ...
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+  Generating static pages using 7 workers (33/132) 
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+  Generating static pages using 7 workers (66/132) 
+  Generating static pages using 7 workers (99/132) 
+✓ Generating static pages using 7 workers (132/132) in 743.0ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/accountability
+├ ƒ /api/accountability/coach
+├ ƒ /api/ai-drafts
+├ ƒ /api/ai-feedback
+├ ƒ /api/ai-test
+├ ƒ /api/ai/chat-suggest
+├ ƒ /api/ai/nutrition-plan
+├ ƒ /api/ai/weekly-summary
+├ ƒ /api/auth/reset-password
+├ ƒ /api/automations
+├ ƒ /api/automations/logs
+├ ƒ /api/checkins
+├ ƒ /api/client-program
+├ ƒ /api/client-workout
+├ ƒ /api/clients
+├ ƒ /api/clients/request-reintake
+├ ƒ /api/clients/resend-invite
+├ ƒ /api/coach-badges
+├ ƒ /api/coach-debug-sessions
+├ ƒ /api/coach-duplicate-day
+├ ƒ /api/coach-seen
+├ ƒ /api/coach-update-nutrition-plan
+├ ƒ /api/coach-update-template-day
+├ ƒ /api/coach/week-overview
+├ ƒ /api/community
+├ ƒ /api/community/comments
+├ ƒ /api/community/like
+├ ƒ /api/conversations/[clientId]/priority
+├ ƒ /api/cron/accountability
+├ ƒ /api/cron/ai-nudges
+├ ƒ /api/cron/automations
+├ ƒ /api/cron/check-in-reminders
+├ ƒ /api/cron/meeting-reminders
+├ ƒ /api/cron/send-prompts
+├ ƒ /api/cron/smart-suggestions
+├ ƒ /api/cron/test
+├ ƒ /api/cron/video-reminders
+├ ƒ /api/cron/weekly-report
+├ ƒ /api/dashboard
+├ ƒ /api/exercises
+├ ƒ /api/exercises/[id]
+├ ƒ /api/exercises/create
+├ ƒ /api/food-search
+├ ƒ /api/habits
+├ ƒ /api/health-metrics
+├ ƒ /api/is-test-user
+├ ƒ /api/meal-plans
+├ ƒ /api/messages/[id]/read
+├ ƒ /api/nutrition-log
+├ ƒ /api/onboarding-status
+├ ƒ /api/progress
+├ ƒ /api/progress-photos
+├ ƒ /api/progression-rules
+├ ƒ /api/push
+├ ƒ /api/push/send
+├ ƒ /api/push/test
+├ ƒ /api/reports
+├ ƒ /api/reports/client/[clientId]
+├ ƒ /api/reports/generate
+├ ƒ /api/scheduling/availability
+├ ƒ /api/stripe/customer-portal
+├ ƒ /api/subscriptions/cancel
+├ ƒ /api/subscriptions/create
+├ ƒ /api/supplement-logs
+├ ƒ /api/supplement-plans
+├ ƒ /api/supplements
+├ ƒ /api/template-diets
+├ ƒ /api/training-phases
+├ ƒ /api/update-1rm
+├ ƒ /api/update-template-day
+├ ƒ /api/upload
+├ ƒ /api/video-sessions
+├ ƒ /api/video-sessions/[id]
+├ ƒ /api/webhooks/health-data
+├ ƒ /api/webhooks/stripe
+├ ƒ /api/weekly-check-in
+├ ƒ /api/workout-auto-finish
+├ ƒ /api/workout-complete
+├ ƒ /api/workout-feedback
+├ ƒ /api/workout-finish
+├ ƒ /api/workout-save
+├ ƒ /auth/callback
+├ ○ /auth/callback/invite
+├ ○ /auth/callback/recovery
+├ ○ /auth/reset-password
+├ ○ /auth/set-password
+├ ○ /auth/verify
+├ ƒ /client
+├ ○ /client/accountability
+├ ○ /client/booking
+├ ○ /client/calendar
+├ ○ /client/check-in
+├ ○ /client/community
+├ ○ /client/exercises
+├ ƒ /client/exercises/[id]
+├ ○ /client/health
+├ ○ /client/journey
+├ ○ /client/meal-plan
+├ ○ /client/measurements
+├ ○ /client/messages
+├ ○ /client/notifications
+├ ƒ /client/notifications/[id]
+├ ○ /client/nutrition
+├ ○ /client/profile
+├ ○ /client/profile/diet
+├ ○ /client/profile/edit
+├ ○ /client/profile/goals
+├ ○ /client/profile/health
+├ ○ /client/profile/help
+├ ○ /client/profile/invoices
+├ ○ /client/profile/logs
+├ ○ /client/profile/notifications
+├ ○ /client/profile/privacy
+├ ○ /client/program
+├ ○ /client/progress
+├ ○ /client/progress-report
+├ ƒ /client/progress/exercise/[exerciseId]
+├ ○ /client/progress/photos
+├ ○ /client/prompts
+├ ○ /client/push-test
+├ ○ /client/resources
+├ ○ /client/settings/health-connect
+├ ○ /client/stats
+├ ○ /client/supplements
+├ ○ /client/video
+├ ƒ /client/video/[sessionId]
+├ ○ /client/weekly-check-in
+├ ○ /client/workout
+├ ○ /client/workout/active
+├ ○ /client/workout/cardio
+├ ○ /client/workout/complete
+├ ○ /client/workout/history
+├ ƒ /coach
+├ ○ /coach/accountability
+├ ƒ /coach/activity
+├ ○ /coach/ai-settings
+├ ○ /coach/automations
+├ ƒ /coach/billing
+├ ƒ /coach/broadcasts
+├ ƒ /coach/check-ins
+├ ƒ /coach/check-ins/[id]
+├ ƒ /coach/clients
+├ ƒ /coach/clients/[id]
+├ ƒ /coach/clients/[id]/exercises/[exId]
+├ ƒ /coach/clients/[id]/intake
+├ ƒ /coach/clients/[id]/meal-plan
+├ ƒ /coach/clients/[id]/nutrition
+├ ƒ /coach/clients/[id]/program
+├ ƒ /coach/clients/[id]/progress
+├ ƒ /coach/clients/[id]/report
+├ ƒ /coach/clients/[id]/sessions/[sessionId]
+├ ƒ /coach/clients/[id]/week
+├ ƒ /coach/clients/[id]/workout/[sessionId]
+├ ○ /coach/clients/new
+├ ○ /coach/community
+├ ƒ /coach/debug-sessions
+├ ƒ /coach/exercises
+├ ƒ /coach/exercises/[id]
+├ ○ /coach/exercises/new
+├ ƒ /coach/inbox
+├ ○ /coach/messages
+├ ƒ /coach/messages/[clientId]
+├ ○ /coach/nutrition
+├ ƒ /coach/nutrition/[id]/edit
+├ ○ /coach/nutrition/new
+├ ○ /coach/profile
+├ ƒ /coach/programs
+├ ƒ /coach/programs/[id]
+├ ƒ /coach/programs/[id]/days/[dayId]/edit
+├ ○ /coach/programs/new
+├ ƒ /coach/prompts
+├ ƒ /coach/prompts/responses
+├ ƒ /coach/resources
+├ ○ /coach/schedule
+├ ○ /coach/schedule/availability
+├ ƒ /coach/studio
+├ ƒ /coach/video/[sessionId]
+├ ○ /offline
+├ ○ /onboarding
+└ ● /serwist/[path]
+  ├ /serwist/sw.js.map
+  └ /serwist/sw.js
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

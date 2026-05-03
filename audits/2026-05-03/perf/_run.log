@@ -1,0 +1,154 @@
+Running /client
+{
+  route: '/client',
+  perf: 76,
+  LCP: 6962.114999999997,
+  INP: undefined,
+  CLS: 0,
+  FCP: 1057.269,
+  TBT: 104.5,
+  TTI: 6993.2323499999975,
+  SI: 2349.316661134454,
+  transferKB: 972,
+  mainThreadMs: 915,
+  bootupMs: 536,
+  unusedJsKB: 358,
+  unusedCssKB: 0
+}
+Running /client/workout
+{
+  route: '/client/workout',
+  perf: 76,
+  LCP: 6245.2705000000005,
+  INP: undefined,
+  CLS: 0,
+  FCP: 1099.3623,
+  TBT: 154.5,
+  TTI: 7148.831819999999,
+  SI: 1396.5765300209953,
+  transferKB: 972,
+  mainThreadMs: 1253,
+  bootupMs: 834,
+  unusedJsKB: 355,
+  unusedCssKB: 0
+}
+Running /client/workout/active
+{
+  route: '/client/workout/active',
+  perf: 75,
+  LCP: 6810.372,
+  INP: undefined,
+  CLS: 0,
+  FCP: 1078.4232,
+  TBT: 147,
+  TTI: 7023.93496,
+  SI: 1149.9518960192395,
+  transferKB: 972,
+  mainThreadMs: 1051,
+  bootupMs: 610,
+  unusedJsKB: 358,
+  unusedCssKB: 0
+}
+Running /client/nutrition
+{
+  route: '/client/nutrition',
+  perf: 77,
+  LCP: 6281,
+  INP: undefined,
+  CLS: 0,
+  FCP: 1140,
+  TBT: 105,
+  TTI: 7078.550000000001,
+  SI: 1140,
+  transferKB: 972,
+  mainThreadMs: 916,
+  bootupMs: 482,
+  unusedJsKB: 358,
+  unusedCssKB: 0
+}
+Running /client/messages
+{
+  route: '/client/messages',
+  perf: 76,
+  LCP: 6950,
+  INP: undefined,
+  CLS: 0,
+  FCP: 1140,
+  TBT: 80.5,
+  TTI: 7086.55,
+  SI: 1140,
+  transferKB: 972,
+  mainThreadMs: 899,
+  bootupMs: 464,
+  unusedJsKB: 358,
+  unusedCssKB: 0
+}
+Running /client/progress
+{
+  route: '/client/progress',
+  perf: 76,
+  LCP: 6758.9045000000015,
+  INP: undefined,
+  CLS: 0,
+  FCP: 1069.1426999999999,
+  TBT: 94.5,
+  TTI: 6974.5995600000015,
+  SI: 1069.1426999999999,
+  transferKB: 972,
+  mainThreadMs: 864,
+  bootupMs: 453,
+  unusedJsKB: 358,
+  unusedCssKB: 0
+}
+Running /client/calendar
+{
+  route: '/client/calendar',
+  perf: 77,
+  LCP: 6171.610000000001,
+  INP: undefined,
+  CLS: 0,
+  FCP: 1068.366,
+  TBT: 114.49999999999909,
+  TTI: 6980.9248000000025,
+  SI: 1082.9585099440576,
+  transferKB: 972,
+  mainThreadMs: 939,
+  bootupMs: 535,
+  unusedJsKB: 358,
+  unusedCssKB: 0
+}
+Running /client/profile
+{
+  route: '/client/profile',
+  perf: 76,
+  LCP: 6885,
+  INP: undefined,
+  CLS: 0,
+  FCP: 1140,
+  TBT: 107,
+  TTI: 7080.35,
+  SI: 1140,
+  transferKB: 972,
+  mainThreadMs: 896,
+  bootupMs: 483,
+  unusedJsKB: 358,
+  unusedCssKB: 0
+}
+Running /client/check-in
+{
+  route: '/client/check-in',
+  perf: 76,
+  LCP: 6756.790000000001,
+  INP: undefined,
+  CLS: 0,
+  FCP: 1065.4740000000002,
+  TBT: 104.5,
+  TTI: 6969.427200000001,
+  SI: 1065.4740000000002,
+  transferKB: 972,
+  mainThreadMs: 916,
+  bootupMs: 482,
+  unusedJsKB: 358,
+  unusedCssKB: 0
+}
+done
