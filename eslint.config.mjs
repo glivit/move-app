@@ -9,9 +9,14 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
+    // Catches ".next 2/", ".next 3/" build-artefact dupes that some tooling creates.
+    ".next*/**",
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Local-only directories that contain code-as-data, not source under lint:
+    ".claude/worktrees/**",
+    "scripts/tmp/**",
   ]),
 ]);
 

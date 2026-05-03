@@ -253,11 +253,17 @@ export default function CoachClientProgressPage() {
       ] = await Promise.all([
         supabase.from('profiles').select('id, full_name').eq('id', clientId).single(),
         supabase.from('intake_forms').select('*').eq('client_id', clientId).single(),
-        supabase.from('checkins').select('*').eq('client_id', clientId).order('date', { ascending: true }),
-        supabase.from('workout_sessions').select('*').eq('client_id', clientId).order('started_at', { ascending: true }),
-        supabase.from('exercises').select('*'),
-        supabase.from('personal_records').select('*, exercises(id, name, name_nl)').eq('client_id', clientId).order('achieved_at', { ascending: false }),
+        // Cap to last ~6mo of activity for power-clients (>2 yrs) — was unbounded select('*).
+        // Order desc on the wire to leverage the index, then reverse client-side for chrono render.
+        supabase.from('checkins').select('*').eq('client_id', clientId).order('date', { ascending: false }).limit(180),
+        supabase.from('workout_sessions').select('*').eq('client_id', clientId).order('started_at', { ascending: false }).limit(180),
+        supabase.from('exercises').select('id, name, name_nl, body_part, target_muscle'),
+        supabase.from('personal_records').select('*, exercises(id, name, name_nl)').eq('client_id', clientId).order('achieved_at', { ascending: false }).limit(200),
       ])
+
+      // Re-orient checkins/sessions to ascending — fetched desc to use index, but UI expects chrono.
+      const checkinsAsc = checkinsData ? [...checkinsData].reverse() : null
+      const sessionsAsc = sessionsData ? [...sessionsData].reverse() : null
 
       if (profileData) setProfile(profileData)
       if (intakeFormData) setIntakeData(intakeFormData as any)
@@ -266,11 +272,11 @@ export default function CoachClientProgressPage() {
 
       // ── Phase 2: Dependent queries in parallel ──
       // Sets depend on sessions; signed URLs depend on checkins + intake
-      const setsPromise = (sessionsData && sessionsData.length > 0)
+      const setsPromise = (sessionsAsc && sessionsAsc.length > 0)
         ? supabase
             .from('workout_sets')
             .select('*')
-            .in('workout_session_id', sessionsData.map((s: any) => s.id))
+            .in('workout_session_id', sessionsAsc.map((s: any) => s.id))
         : Promise.resolve({ data: null })
 
       // Collect all photo URLs that need signing
@@ -285,8 +291,8 @@ export default function CoachClientProgressPage() {
         collectUrl(ifd.photo_left_url)
         collectUrl(ifd.photo_right_url)
       }
-      if (checkinsData) {
-        checkinsData.forEach((c: any) => {
+      if (checkinsAsc) {
+        checkinsAsc.forEach((c: any) => {
           collectUrl(c.photo_front_url)
           collectUrl(c.photo_back_url)
           collectUrl(c.photo_left_url)
@@ -308,10 +314,10 @@ export default function CoachClientProgressPage() {
 
       const [setsResult, ...signResults] = await Promise.all([setsPromise, ...signPromises])
 
-      // Apply results
-      if (sessionsData) setWorkoutSessions(sessionsData)
+      // Apply results (chrono-ascending)
+      if (sessionsAsc) setWorkoutSessions(sessionsAsc)
       if (setsResult.data) setWorkoutSets(setsResult.data)
-      if (checkinsData) setCheckins(checkinsData)
+      if (checkinsAsc) setCheckins(checkinsAsc)
 
       const urlMap: Record<string, string> = {}
       for (const result of signResults) {

@@ -265,7 +265,10 @@ export function useConversationList(coachId: string) {
 
   useEffect(() => {
     refresh()
-  }, [refresh])
+    // refresh is memoized on [coachId]; depend on coachId directly to avoid the
+    // set-state-in-effect cascade-rerender that the linter flagged.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coachId])
 
   // Subscribe to new messages for real-time updates
   useEffect(() => {

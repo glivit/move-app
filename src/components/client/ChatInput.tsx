@@ -71,7 +71,13 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
       if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
         mediaRecorderRef.current.stop()
       }
+      // Release any in-flight blob preview URL — prevents leak if user navigates
+      // away mid-recording or with an attached preview.
+      if (filePreview?.localPreview) {
+        URL.revokeObjectURL(filePreview.localPreview)
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleSend = () => {
@@ -86,6 +92,8 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
             ? 'voice'
             : 'file'
       onSend(content || filePreview.name, messageType, filePreview.url)
+      // Free the local blob URL — uploaded URL is what we render going forward.
+      if (filePreview.localPreview) URL.revokeObjectURL(filePreview.localPreview)
       setFilePreview(null)
       setContent('')
     } else if (content.trim()) {
@@ -161,6 +169,9 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
     setIsUploading(true)
     setUploadProgress(10)
     setShowMediaMenu(false)
+
+    // If an old preview was attached, release its blob URL before overwriting.
+    if (filePreview?.localPreview) URL.revokeObjectURL(filePreview.localPreview)
 
     try {
       let localPreview: string | undefined

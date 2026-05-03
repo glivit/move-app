@@ -10,7 +10,12 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url)
   const clientId = url.searchParams.get('client_id')
 
-  let query = supabase.from('checkins').select('*').order('date', { ascending: false })
+  // Cap at 100 most-recent rows; coach inbox previously kept years of history.
+  let query = supabase
+    .from('checkins')
+    .select('*')
+    .order('date', { ascending: false })
+    .limit(100)
 
   if (clientId) {
     query = query.eq('client_id', clientId)

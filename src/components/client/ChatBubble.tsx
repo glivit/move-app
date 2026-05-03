@@ -28,8 +28,11 @@ interface ChatBubbleProps {
  * Voice note krijgt eigen waveform-pill (geen native <audio controls>).
  */
 
-const CARD_LIGHT = 'rgba(255,255,255,0.55)' // coach bubble — frosted light
-const CARD_DARK = 'rgba(28,30,24,0.88)' // me bubble — dark glass
+// Bubbles render solid (not glass) — backdrop-filter on every bubble in a scrolling list
+// blew the iOS Safari paint budget once >25 bubbles were on-screen. Blur is reserved for
+// the input pill + header per the audit.
+const CARD_LIGHT = 'rgba(255,255,255,0.92)' // coach bubble — solid light
+const CARD_DARK = 'rgba(28,30,24,0.96)' // me bubble — solid dark
 // Bubble-scoped tokens via CSS vars op de container:
 //   - coach bubble setup: --card-text: #1C1E18 (dark on light)
 //   - me bubble setup:    --card-text: #F2F2EC (light on dark)
@@ -390,8 +393,6 @@ export function ChatBubble({ message, isCoach }: ChatBubbleProps) {
             borderRadius: 18,
             borderTopLeftRadius: 8,
             background: CARD_LIGHT,
-            backdropFilter: 'blur(20px) saturate(140%)',
-            WebkitBackdropFilter: 'blur(20px) saturate(140%)',
             color: INK,
             boxShadow: '0 1px 1px rgba(28,30,24,0.04), 0 8px 24px -8px rgba(28,30,24,0.10), inset 0 1px 0 rgba(255,255,255,0.55)',
             wordWrap: 'break-word',
@@ -427,8 +428,6 @@ export function ChatBubble({ message, isCoach }: ChatBubbleProps) {
           borderRadius: 18,
           borderTopRightRadius: 8,
           background: CARD_DARK,
-          backdropFilter: 'blur(18px) saturate(130%)',
-          WebkitBackdropFilter: 'blur(18px) saturate(130%)',
           color: INK,
           boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 12px 28px rgba(28,30,24,0.20)',
           wordWrap: 'break-word',
