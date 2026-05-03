@@ -3,6 +3,8 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { cachedFetch } from '@/lib/fetcher'
+import { Dumbbell } from 'lucide-react'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 // ─── Types ─────────────────────────────────────────────────────────────
 interface ClientProgram {
@@ -187,14 +189,12 @@ export default function WorkoutOverviewPage() {
     return (
       <div className="pb-28">
         <h1 className="page-title mb-6">Training</h1>
-        <div className="py-16 text-center">
-          <p style={{ fontSize: 20, fontWeight: 300, color: '#1C1E18', marginBottom: 8 }}>
-            Geen programma
-          </p>
-          <p style={{ fontSize: 14, color: 'rgba(28,30,24,0.65)' }}>
-            Je coach zal binnenkort een trainingsplan opstellen.
-          </p>
-        </div>
+        <EmptyState
+          icon={Dumbbell}
+          title="Geen programma actief"
+          description="Je coach zal binnenkort een trainingsplan voor je opstellen."
+          cta={{ label: 'Bekijk berichten', href: '/client/messages' }}
+        />
       </div>
     )
   }

@@ -4,10 +4,11 @@ import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { createClient } from '@/lib/supabase'
 import {
   ChevronLeft, ChevronRight, Plus, X, Search,
-  Check, Trash2, ShoppingCart, ChevronDown
+  Check, Trash2, ShoppingCart, ChevronDown, UtensilsCrossed
 } from 'lucide-react'
 import { invalidateCache } from '@/lib/fetcher'
 import { optimisticMutate } from '@/lib/optimistic'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 // ─── Types ──────────────────────────────────────────
 
@@ -1435,13 +1436,14 @@ export default function ClientNutritionPage() {
           <ChevronLeft strokeWidth={1.5} size={18} />
           <span style={{ fontSize: 14 }}>Home</span>
         </button>
-        <div className="v6-card" style={{ textAlign: 'center', padding: '48px 22px' }}>
-          <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--card-text)', margin: '0 0 6px' }}>
-            Nog geen plan
-          </p>
-          <p style={{ fontSize: 13, color: 'var(--card-text-muted)', margin: 0 }}>
-            Je coach bereidt je voedingsplan voor.
-          </p>
+        <div className="v6-card" style={{ padding: '8px 0' }}>
+          <EmptyState
+            icon={UtensilsCrossed}
+            title="Nog geen plan"
+            description="Je coach bereidt je voedingsplan voor. Loggen kan altijd ook zonder plan."
+            cta={{ label: 'Eerste maaltijd loggen', href: '/client/nutrition?ad=hoc' }}
+            secondaryCta={{ label: 'Bekijk berichten', href: '/client/messages' }}
+          />
         </div>
       </div>
     )
