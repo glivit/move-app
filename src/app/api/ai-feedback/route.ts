@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase-admin'
 import { generateWorkoutFeedback, saveAIDraft, type WorkoutContext } from '@/lib/ai-coach'
+import { getAuthFast } from '@/lib/auth-fast'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -21,10 +22,25 @@ export const maxDuration = 30
  */
 export async function POST(request: NextRequest) {
   try {
+    // Auth-gate: accept either an internal call (Bearer CRON_SECRET, used by workout-complete)
+    // or a logged-in caller who is the session's client or a coach.
+    const authHeader = request.headers.get('authorization')
+    const isInternal =
+      !!process.env.CRON_SECRET && authHeader === `Bearer ${process.env.CRON_SECRET}`
+
+    let userId: string | null = null
+    let userSupabase: Awaited<ReturnType<typeof getAuthFast>>['supabase'] | null = null
+    if (!isInternal) {
+      const auth = await getAuthFast()
+      if (!auth.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      userId = auth.user.id
+      userSupabase = auth.supabase
+    }
+
     const body = await request.json()
     const { sessionId } = body
 
-    if (!sessionId) {
+    if (!sessionId || typeof sessionId !== 'string') {
       return NextResponse.json({ error: 'sessionId is required' }, { status: 400 })
     }
 
@@ -43,6 +59,18 @@ export async function POST(request: NextRequest) {
 
     if (sessionError || !session) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
+    }
+
+    // Authorization: caller must be the session's client OR a coach (skipped for internal calls)
+    if (!isInternal && userId && userSupabase && session.client_id !== userId) {
+      const { data: profile } = await userSupabase
+        .from('profiles')
+        .select('role')
+        .eq('id', userId)
+        .single()
+      if (profile?.role !== 'coach') {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
     }
 
     // Check if coach already manually reviewed (skip AI if so)

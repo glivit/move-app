@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { NextRequest, NextResponse } from 'next/server'
+import { getAuthFast } from '@/lib/auth-fast'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,13 +12,27 @@ Je bent NIET een AI — je bent Glenn.`
 
 export async function POST(request: NextRequest) {
   try {
+    // Auth-gate: coach-only AI test endpoint
+    const { user, supabase } = await getAuthFast()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.role !== 'coach') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     if (!process.env.ANTHROPIC_API_KEY) {
       return NextResponse.json({ error: 'ANTHROPIC_API_KEY not configured' }, { status: 503 })
     }
 
     const { prompt } = await request.json()
-    if (!prompt) {
-      return NextResponse.json({ error: 'prompt is required' }, { status: 400 })
+    if (!prompt || typeof prompt !== 'string' || prompt.length > 2000) {
+      return NextResponse.json({ error: 'prompt is required (string, max 2000 chars)' }, { status: 400 })
     }
 
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })

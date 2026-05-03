@@ -100,6 +100,35 @@ Patterns die op meerdere screens terugkomen.
 - Max 40 findings per report (filter je eigen output: top-20 BLOCKERS+MAJORS, top-10 MINORS, top-10 NITS)
 - Stop bij 6000 woorden
 
+## Image-budget (CRITISCH)
+
+De Anthropic API blokkeert >2000px afbeeldingen. Volg deze regels strikt:
+
+1. **PRIMAIR werk je vanuit DOM-data, niet vanuit screenshots.** De Playwright spec dumpt per route:
+   - `audits/<date>/dom/<slug>.json` — alle clickable elements + computed styles + bounds
+   - `audits/<date>/dom/<slug>.contrast-issues.json` — pre-flagged white-on-white problems
+   Lees deze JSON-files met de Read tool. Dit is rijke, structurele data — geen images nodig.
+
+2. **Screenshots laad je alleen wanneer nodig.** Beperk tot:
+   - **Maximum 1 screenshot per route in je context-window tegelijk.** Lees, evalueer, sluit af, ga verder.
+   - **Maximum 8 screenshots totaal** voor het hele audit (alleen de meest kritieke schermen).
+   - Voor de andere routes: vertrouw op DOM-data + contrast-issues.json + jouw architectuur-kennis.
+
+3. **Als je een screenshot Read-t en het is >2000px**, skip 'm — geen workaround. Vermeld in het rapport dat visuele bevestiging miste voor die route.
+
+4. **Test toestand controleren via DOM**, niet screenshot:
+   - "Is deze knop te klein?" → check `dom/<slug>.json` voor `tooSmall: true`
+   - "Is er wit-op-wit?" → check `dom/<slug>.contrast-issues.json`
+   - "Is hiërarchie OK?" → analyse computed font-size/weight uit DOM
+   - "Is iets onvindbaar?" → check welke interactives bestaan en waar ze staan
+   
+5. **Volgorde van werken per route:**
+   1. Read `dom/<slug>.json`
+   2. Read `dom/<slug>.contrast-issues.json` (als bestaat)
+   3. Vorm een eerste hypothese over UX issues
+   4. Pas screenshot inladen ALS je visuele bevestiging nodig hebt voor één specifieke claim
+   5. Schrijf findings, ga verder
+
 ## Playwright setup
 
 Als `audits/playwright/walk-through.spec.ts` niet bestaat, genereer hem met deze structuur:

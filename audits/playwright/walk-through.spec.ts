@@ -39,15 +39,21 @@ const ROUTES = [
 ]
 
 // iPhone 14 Pro device emulation
+// NOTE: deviceScaleFactor 1 i.p.v. 3 — anders worden full-page screenshots
+// >2000px en kan een Claude API agent ze niet inlezen voor evaluatie.
+// 1x@393w geeft nog steeds duidelijke pixels voor UX review.
 test.use({
   viewport: { width: 393, height: 852 },
-  deviceScaleFactor: 3,
+  deviceScaleFactor: 1,
   isMobile: true,
   hasTouch: true,
   userAgent:
     'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 ' +
     '(KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
 })
+
+// Max screenshot height for image-API compatibility (under 2000px)
+const MAX_CAPTURE_HEIGHT = 1800
 
 test.beforeAll(async () => {
   fs.mkdirSync(OUT_DIR, { recursive: true })
@@ -126,11 +132,17 @@ test.describe('walk-through', () => {
       await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {})
       await page.waitForTimeout(500)
 
-      // Try full-page as a "long" capture too — nice to have
+      // "Long" capture — clipped to MAX_CAPTURE_HEIGHT zodat resultaat
+      // onder de 2000px API image-limit blijft. Bij langere pagina's
+      // mis je content onder 1800px maar de above-the-fold vibe + eerste
+      // scroll is meestal genoeg voor UX-evaluatie.
       try {
+        // Get document height to know how much to clip
+        const docHeight = await page.evaluate(() => document.documentElement.scrollHeight)
+        const captureHeight = Math.min(docHeight, MAX_CAPTURE_HEIGHT)
         await page.screenshot({
           path: path.join(OUT_DIR, `${route.slug}.full.png`),
-          fullPage: true,
+          clip: { x: 0, y: 0, width: 393, height: captureHeight },
           animations: 'disabled',
           timeout: 12000,
         })
@@ -200,17 +212,19 @@ test.describe('walk-through', () => {
           await btn.click({ trial: false, timeout: 1500 })
           await page.waitForTimeout(400)
           if (page.url() !== before) {
-            // navigated away — take screenshot of new state and return
+            // navigated away — take viewport screenshot van nieuwe state en terug
             await page.screenshot({
               path: path.join(OUT_DIR, `${route.slug}.tap-${tapCount}.png`),
-              fullPage: true,
+              fullPage: false,
+              animations: 'disabled',
             })
             await page.goto(`${BASE}${route.path}`)
             await page.waitForLoadState('networkidle').catch(() => {})
           } else {
             await page.screenshot({
               path: path.join(OUT_DIR, `${route.slug}.tap-${tapCount}.png`),
-              fullPage: true,
+              fullPage: false,
+              animations: 'disabled',
             })
           }
           tapCount++

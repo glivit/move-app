@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase-admin'
 import { sendPushToUser } from '@/lib/push-server'
 import { checkAndAwardMilestones } from '@/lib/milestones'
+import { getAuthFast } from '@/lib/auth-fast'
 import { NextRequest, NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -21,10 +22,14 @@ export const dynamic = 'force-dynamic'
  */
 export async function POST(request: NextRequest) {
   try {
+    // Auth-gate: only the session's client (or a coach) can complete a workout.
+    const { user, supabase: userSupabase } = await getAuthFast()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
     const body = await request.json()
     const { sessionId } = body
 
-    if (!sessionId) {
+    if (!sessionId || typeof sessionId !== 'string') {
       return NextResponse.json({ error: 'sessionId is required' }, { status: 400 })
     }
 
@@ -60,6 +65,18 @@ export async function POST(request: NextRequest) {
         { error: 'Workout session not found' },
         { status: 404 }
       )
+    }
+
+    // Authorization: caller must own this workout session, OR be a coach.
+    if (session.client_id !== user.id) {
+      const { data: profile } = await userSupabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+      if (profile?.role !== 'coach') {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
     }
 
     // Calculate stats
@@ -124,7 +141,7 @@ export async function POST(request: NextRequest) {
 
     // Trigger AI feedback (delayed, non-blocking)
     // Wait 3 minutes before sending AI feedback to give coach a chance to respond manually
-    if (process.env.ANTHROPIC_API_KEY) {
+    if (process.env.ANTHROPIC_API_KEY && process.env.CRON_SECRET) {
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL
         ? `https://${process.env.VERCEL_URL}`
         : 'http://localhost:3000'
@@ -133,7 +150,10 @@ export async function POST(request: NextRequest) {
         try {
           await fetch(`${baseUrl}/api/ai-feedback`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              authorization: `Bearer ${process.env.CRON_SECRET}`,
+            },
             body: JSON.stringify({ sessionId: session.id }),
           })
         } catch (e) {

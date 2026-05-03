@@ -99,12 +99,16 @@ export default function ClientMessagesPage() {
         setCoachId(coach.id)
         setCoachName(coach.full_name || 'Coach')
 
+        // Fetch the 100 most-recent messages (ordered desc on the wire to leverage index),
+        // then reverse client-side so the UI keeps chronological-ascending render order.
         const { data: messageData } = await supabase
           .from('messages').select('*')
           .or(`and(sender_id.eq.${user.id},receiver_id.eq.${coach.id}),and(sender_id.eq.${coach.id},receiver_id.eq.${user.id})`)
-          .order('created_at', { ascending: true })
+          .order('created_at', { ascending: false })
+          .limit(100)
 
-        if (messageData) setMessages(messageData as Message[])
+        const orderedMessages = messageData ? [...messageData].reverse() : []
+        if (messageData) setMessages(orderedMessages as Message[])
 
         // Mark unread as read (optimistic)
         if (messageData?.length) {

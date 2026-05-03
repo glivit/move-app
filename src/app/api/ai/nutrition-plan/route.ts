@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase-admin'
+import { getAuthFast } from '@/lib/auth-fast'
 import Anthropic from '@anthropic-ai/sdk'
 
 export const runtime = 'nodejs'
@@ -12,9 +13,25 @@ export const maxDuration = 60
  */
 export async function POST(request: NextRequest) {
   try {
+    // Auth-gate: caller must be authenticated, AND must be either the userId
+    // they're requesting a plan for, or a coach.
+    const { user, supabase: userSupabase } = await getAuthFast()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
     const { userId } = await request.json()
-    if (!userId) {
+    if (!userId || typeof userId !== 'string') {
       return NextResponse.json({ error: 'userId is verplicht' }, { status: 400 })
+    }
+
+    if (userId !== user.id) {
+      const { data: profile } = await userSupabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+      if (profile?.role !== 'coach') {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
     }
 
     const db = createAdminClient()
