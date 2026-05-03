@@ -169,7 +169,7 @@ export default function ResourcesPage() {
                 >
                   {resource.thumbnail_url ? (
                     <div className="relative aspect-[21/9] overflow-hidden">
-                      <Image src={resource.thumbnail_url} alt="" width={400} height={171} className="w-full h-full object-cover" unoptimized loading="lazy" />
+                      <Image src={resource.thumbnail_url} alt="" width={400} height={171} sizes="(max-width: 600px) 100vw, 400px" className="w-full h-full object-cover" loading="lazy" />
                       {resource.content_type === 'video' && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                           <div className="w-12 h-12 rounded-full bg-white dark:bg-[#1C1E18]/90 flex items-center justify-center">
@@ -225,7 +225,7 @@ export default function ResourcesPage() {
               >
                 {resource.thumbnail_url ? (
                   <div className="relative aspect-video overflow-hidden">
-                    <Image src={resource.thumbnail_url} alt="" width={400} height={225} className="w-full h-full object-cover" unoptimized loading="lazy" />
+                    <Image src={resource.thumbnail_url} alt="" width={400} height={225} sizes="(max-width: 600px) 100vw, 400px" className="w-full h-full object-cover" loading="lazy" />
                     {resource.content_type === 'video' && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                         <div className="w-10 h-10 rounded-full bg-white dark:bg-[#1C1E18]/90 flex items-center justify-center">
@@ -287,7 +287,7 @@ export default function ResourcesPage() {
 
             {selectedResource.content_type !== 'video' && selectedResource.thumbnail_url && (
               <div className="aspect-[21/9] overflow-hidden">
-                <Image src={selectedResource.thumbnail_url} alt="" width={400} height={171} className="w-full h-full object-cover" unoptimized loading="lazy" />
+                <Image src={selectedResource.thumbnail_url} alt="" width={400} height={171} sizes="(max-width: 600px) 100vw, 400px" className="w-full h-full object-cover" loading="lazy" />
               </div>
             )}
 

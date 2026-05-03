@@ -437,7 +437,7 @@ export default function ResourcesView({ initialResources }: ResourcesViewProps) 
                   {/* Thumbnail / Type indicator */}
                   {resource.thumbnail_url ? (
                     <div className="relative aspect-video bg-[#A6ADA7] overflow-hidden">
-                      <Image src={resource.thumbnail_url} alt="" width={400} height={225} className="w-full h-full object-cover" unoptimized loading="lazy" />
+                      <Image src={resource.thumbnail_url} alt="" width={400} height={225} sizes="(max-width: 600px) 100vw, 400px" className="w-full h-full object-cover" loading="lazy" />
                       {resource.content_type === 'video' && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                           <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">

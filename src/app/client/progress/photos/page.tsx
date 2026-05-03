@@ -339,7 +339,7 @@ export default function PhotoComparisonPage() {
               height={500}
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
               draggable={false}
-              unoptimized
+              sizes="(max-width: 600px) 100vw, 400px"
               loading="lazy"
             />
 
@@ -352,7 +352,7 @@ export default function PhotoComparisonPage() {
                 width={400}
                 height={500}
                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-                unoptimized
+                sizes="(max-width: 600px) 100vw, 400px"
                 loading="lazy"
                 draggable={false}
               />
@@ -434,7 +434,7 @@ export default function PhotoComparisonPage() {
           >
             <div className="dark-surface" style={{ position: 'relative', aspectRatio: '3 / 4', background: '#474B48' }}>
               {beforeUrl ? (
-                <NextImage src={beforeUrl} alt="Before" width={400} height={500} style={{ width: '100%', height: '100%', objectFit: 'cover' }} unoptimized loading="lazy" />
+                <NextImage src={beforeUrl} alt="Before" width={400} height={500} sizes="(max-width: 600px) 50vw, 200px" style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                   <Camera size={24} style={{ color: 'var(--card-text-muted)' }} />
@@ -453,7 +453,7 @@ export default function PhotoComparisonPage() {
             </div>
             <div className="dark-surface" style={{ position: 'relative', aspectRatio: '3 / 4', background: '#474B48' }}>
               {afterUrl ? (
-                <NextImage src={afterUrl} alt="After" width={400} height={500} style={{ width: '100%', height: '100%', objectFit: 'cover' }} unoptimized loading="lazy" />
+                <NextImage src={afterUrl} alt="After" width={400} height={500} sizes="(max-width: 600px) 50vw, 200px" style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                   <Camera size={24} style={{ color: 'var(--card-text-muted)' }} />
@@ -655,8 +655,8 @@ export default function PhotoComparisonPage() {
             <X size={18} style={{ color: 'var(--card-text)' }} />
           </button>
           <div style={{ width: '100%', height: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-            <NextImage src={beforeUrl!} alt="Before" width={800} height={1000} style={{ width: '100%', height: '100%', objectFit: 'contain' }} unoptimized loading="lazy" />
-            <NextImage src={afterUrl!} alt="After" width={800} height={1000} style={{ width: '100%', height: '100%', objectFit: 'contain' }} unoptimized loading="lazy" />
+            <NextImage src={beforeUrl!} alt="Before" width={800} height={1000} sizes="(max-width: 600px) 100vw, 800px" style={{ width: '100%', height: '100%', objectFit: 'contain' }} loading="lazy" />
+            <NextImage src={afterUrl!} alt="After" width={800} height={1000} sizes="(max-width: 600px) 100vw, 800px" style={{ width: '100%', height: '100%', objectFit: 'contain' }} loading="lazy" />
           </div>
           <div
             style={{

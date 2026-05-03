@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase'
 import {
   ChevronLeft, FileText, UtensilsCrossed, ChevronDown, Check, Moon,
 } from 'lucide-react'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 interface Meal {
   name: string
@@ -290,10 +291,13 @@ export default function ClientMealPlanPage() {
     return (
       <div className="pb-28">
         {BackBtn}
-        <div className="v6-card-dark" style={{ textAlign: 'center', padding: '32px 22px' }}>
-          <p style={{ fontSize: 13, color: 'var(--card-text-muted)', margin: 0 }}>
-            Geen maaltijden ingepland
-          </p>
+        <div className="v6-card-dark">
+          <EmptyState
+            icon={UtensilsCrossed}
+            title="Geen maaltijden ingepland"
+            description="Je voedingsplan is nog leeg. Je coach werkt aan een schema dat past bij je doelen."
+            cta={{ label: 'Bekijk berichten', href: '/client/messages' }}
+          />
         </div>
       </div>
     )

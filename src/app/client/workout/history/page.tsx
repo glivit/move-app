@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { ChevronLeft, ChevronRight, TrendingUp, Dumbbell, Flame, Trophy, BarChart3, Target, RotateCcw } from 'lucide-react'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -584,12 +585,12 @@ export default function WorkoutHistoryPage() {
               })}
             </div>
           ) : (
-            <div className="py-16 text-center">
-              <p className="text-editorial-h1 mb-3">Nog geen data</p>
-              <p className="text-[14px] text-[rgba(28,30,24,0.62)]" style={{ fontFamily: 'var(--font-body)' }}>
-                Voltooi je eerste training om te beginnen
-              </p>
-            </div>
+            <EmptyState
+              icon={Dumbbell}
+              title="Nog geen training voltooid"
+              description="Voltooi je eerste training om je geschiedenis hier te zien."
+              cta={{ label: 'Start training', href: '/client/workout' }}
+            />
           )}
         </>
       )}
@@ -600,11 +601,12 @@ export default function WorkoutHistoryPage() {
       {activeTab === 'progress' && (
         <>
           {exerciseHistories.length === 0 ? (
-            <div className="py-16 text-center">
-              <Target size={32} strokeWidth={1} className="mx-auto text-[rgba(253,253,254,0.35)] mb-4" />
-              <p className="text-[16px] font-semibold text-[#1C1E18] mb-2">Nog geen progressiedata</p>
-              <p className="text-[13px] text-[rgba(28,30,24,0.62)]">Na 2+ trainingen verschijnen hier je grafieken</p>
-            </div>
+            <EmptyState
+              icon={Target}
+              title="Nog geen progressiedata"
+              description="Na 2+ trainingen verschijnen hier je grafieken per oefening."
+              cta={{ label: 'Start training', href: '/client/workout' }}
+            />
           ) : (
             <>
               {/* Exercise selector pills */}

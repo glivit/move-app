@@ -13,7 +13,7 @@ import {
   BarChart,
   Bar,
   Legend,
-} from 'recharts'
+} from '@/components/charts/LazyRecharts'
 import {
   TrendingUp,
   Trophy,
@@ -26,7 +26,9 @@ import {
   Share2,
   Copy,
   Check,
+  BarChart3,
 } from 'lucide-react'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 interface PeriodOption {
   label: string
@@ -529,10 +531,13 @@ Bekijk mijn voortgang in Move!`
           )}
 
           {prs.length === 0 && weightChartData.length === 0 && weeklyData.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-[rgba(28,30,24,0.62)] mb-2">Nog geen gegevens beschikbaar voor deze periode</p>
-              <p className="text-sm text-[#B5B1AA]">Start met trainingen en loggen van je voortgang</p>
-            </div>
+            <EmptyState
+              icon={BarChart3}
+              title="Nog geen gegevens"
+              description="Voor deze periode is er nog geen voortgang gelogd. Start met trainingen of voeg een check-in toe."
+              cta={{ label: 'Nieuwe check-in', href: '/client/check-in' }}
+              secondaryCta={{ label: 'Start training', href: '/client/workout' }}
+            />
           )}
         </div>
 

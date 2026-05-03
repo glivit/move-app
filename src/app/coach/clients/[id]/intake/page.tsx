@@ -330,7 +330,7 @@ export default async function IntakeFormPage({ params }: Props) {
           <div className="grid grid-cols-2 gap-3">
             {signedPhotos.map(({ url, label }) => (
               <div key={label} className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#A6ADA7]">
-                <Image src={url} alt={label} width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
+                <Image src={url} alt={label} width={400} height={500} sizes="(max-width: 600px) 50vw, 200px" className="w-full h-full object-cover" loading="lazy" />
                 <span className="absolute bottom-2 left-2 text-xs font-medium text-white bg-black/50 px-2 py-0.5 rounded">
                   {label}
                 </span>

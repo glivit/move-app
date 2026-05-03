@@ -81,7 +81,7 @@ export default function EditProfilePage() {
         <div className="relative mb-4">
           <div className="w-24 h-24 rounded-full bg-[#474B48] text-white flex items-center justify-center text-3xl font-semibold overflow-hidden">
             {avatarUrl ? (
-              <Image src={avatarUrl} alt={fullName} width={96} height={96} className="w-full h-full object-cover" unoptimized loading="lazy" />
+              <Image src={avatarUrl} alt={fullName} width={96} height={96} sizes="96px" className="w-full h-full object-cover" loading="lazy" />
             ) : (
               fullName ? fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '?'
             )}

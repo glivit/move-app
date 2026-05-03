@@ -610,7 +610,7 @@ export default function CoachClientProgressPage() {
                     <div key={idx} className="space-y-2">
                       <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#A6ADA7] border border-[#A6ADA7]">
                         {photoUrl ? (
-                          <Image src={photoUrl} alt={`${entry.label} ${positionLabels[photoPosition]}`} width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
+                          <Image src={photoUrl} alt={`${entry.label} ${positionLabels[photoPosition]}`} width={400} height={500} sizes="(max-width: 600px) 50vw, 25vw" className="w-full h-full object-cover" loading="lazy" />
                         ) : (
                           <div className="flex flex-col items-center justify-center h-full gap-2">
                             <ImageOff className="w-6 h-6 text-[#CDD1CE]" strokeWidth={1.5} />
@@ -648,7 +648,7 @@ export default function CoachClientProgressPage() {
                         <div key={idx}>
                           <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#A6ADA7]">
                             {photoUrl ? (
-                              <Image src={photoUrl} alt={entry.label} width={400} height={500} className="w-full h-full object-cover" unoptimized loading="lazy" />
+                              <Image src={photoUrl} alt={entry.label} width={400} height={500} sizes="(max-width: 600px) 50vw, 25vw" className="w-full h-full object-cover" loading="lazy" />
                             ) : (
                               <div className="flex items-center justify-center h-full">
                                 <ImageOff className="w-8 h-8 text-[#CDD1CE]" strokeWidth={1.5} />

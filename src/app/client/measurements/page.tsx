@@ -268,8 +268,8 @@ export default function MeasurementsPage() {
                           alt={photo.label}
                           width={400}
                           height={500}
+                          sizes="(max-width: 600px) 50vw, 200px"
                           className="w-full h-full object-cover"
-                          unoptimized
                           loading="lazy"
                         />
                       ) : (

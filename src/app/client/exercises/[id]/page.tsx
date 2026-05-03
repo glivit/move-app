@@ -13,7 +13,7 @@ import {
   ResponsiveContainer,
   LineChart,
   Line,
-} from 'recharts'
+} from '@/components/charts/LazyRecharts'
 import {
   ChevronLeft,
   TrendingUp,

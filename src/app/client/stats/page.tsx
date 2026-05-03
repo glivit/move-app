@@ -4,8 +4,8 @@ import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  AreaChart, Area
-} from 'recharts'
+  AreaChart, Area,
+} from '@/components/charts/LazyRecharts'
 import { Trophy, TrendingUp, Dumbbell, Flame, ChevronDown } from 'lucide-react'
 
 // ─── Types ──────────────────────────────────────────────────
