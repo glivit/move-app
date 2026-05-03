@@ -36,3 +36,11 @@ next-env.d.ts
 
 # serwist — service worker is geserveerd door route handler (src/app/serwist/[path]/route.ts)
 # (geen file output in /public meer met @serwist/turbopack)
+
+# Audit pipeline
+.env.test
+audits/*/screens/
+audits/*/dom/
+audits/*/raw/
+audits/playwright/_html-report/
+test-results/
