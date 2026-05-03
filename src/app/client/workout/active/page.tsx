@@ -25,6 +25,7 @@ import {
 // StepperInput removed — plain inputs like Hevy
 import { ExerciseMedia } from '@/components/ExerciseMedia'
 import { notifyWorkoutBarChanged } from '@/components/workout/ActiveWorkoutBar'
+import { useVisualViewportHeight } from '@/hooks/useVisualViewportHeight'
 import {
   DndContext,
   closestCenter,
@@ -701,6 +702,10 @@ function ExercisePickerModalComponent({
     equipment: 'body weight',
   })
 
+  // iOS keyboard awareness — modal moet meekrimpen wanneer keyboard
+  // opent, anders schiet zoekvak omhoog en lijst is half onbereikbaar.
+  const viewportHeight = useVisualViewportHeight()
+
   useEffect(() => {
     const loadExercises = async () => {
       try {
@@ -802,17 +807,29 @@ function ExercisePickerModalComponent({
     setShowCreateForm(true)
   }
 
+  // Bereken modal-hoogte: 85% van zichtbare viewport. Bij open keyboard
+  // is viewportHeight kleiner dus de modal krimpt mee — zoekvak en lijst
+  // blijven beide bereikbaar zonder dat de pagina onverwacht scrollt.
+  const modalHeight = viewportHeight ? Math.round(viewportHeight * 0.85) : null
   return (
     <div
       className="fixed inset-0 z-[80] flex items-end"
-      style={{ background: 'rgba(28,30,24,0.40)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}
+      style={{
+        background: 'rgba(28,30,24,0.40)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)',
+        // Outer container ook viewport-aware zodat keyboard niet het overlay
+        // breekt. Fallback naar 100dvh voor non-Safari.
+        height: viewportHeight ? `${viewportHeight}px` : '100dvh',
+      }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
       <div
-        className="w-full max-h-[88vh] rounded-t-3xl flex flex-col animate-slide-up dark-surface"
+        className="w-full rounded-t-3xl flex flex-col animate-slide-up dark-surface"
         style={{
           background: 'rgba(28,30,24,0.94)',
-          minHeight: '60vh',
+          height: modalHeight ? `${modalHeight}px` : '85dvh',
+          maxHeight: modalHeight ? `${modalHeight}px` : '85dvh',
           paddingBottom: 'env(safe-area-inset-bottom, 0px)',
           boxShadow: '0 -12px 40px rgba(0,0,0,0.30)',
         }}
@@ -963,8 +980,11 @@ function ExercisePickerModalComponent({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Zoek oefening…"
-                  autoFocus
-                  className="flex-1 bg-transparent text-[15px] border-none focus:outline-none"
+                  // iOS auto-zoomt op input <16px → blijven op 16
+                  enterKeyHint="search"
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  className="flex-1 bg-transparent text-[16px] border-none focus:outline-none"
                   style={{ color: 'var(--card-text)' }}
                 />
                 {searchQuery && (

@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { ChatBubble } from '@/components/client/ChatBubble'
 import { ChatInput } from '@/components/client/ChatInput'
+import { useVisualViewportHeight } from '@/hooks/useVisualViewportHeight'
 import { invalidateCache } from '@/lib/fetcher'
 import { optimisticMutate } from '@/lib/optimistic'
 import { readDashboardCache, writeDashboardCache } from '@/lib/dashboard-cache'
@@ -73,34 +74,15 @@ export default function ClientMessagesPage() {
   const [coachName, setCoachName] = useState('')
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // ── Visual Viewport tracking ──────────────────────────────────────
-  // iOS Safari geeft `position: fixed; inset: 0` containers NIET door dat
-  // de keyboard ruimte inneemt. Resultaat: input verdwijnt onder keyboard,
-  // of er ontstaat een "faded bar" tussen content en keyboard.
-  // Visual Viewport API geeft de échte zichtbare hoogte terug en updatet
-  // bij keyboard show/hide. We schalen de container naar die hoogte.
-  const [viewportHeight, setViewportHeight] = useState<number | null>(null)
+  // Visual Viewport tracking — keyboard-aware container height
+  const viewportHeight = useVisualViewportHeight()
+  // Zorgt dat laatste bubble zichtbaar blijft wanneer viewport krimpt door keyboard
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    const vv = window.visualViewport
-    if (!vv) return
-    const update = () => {
-      setViewportHeight(vv.height)
-      // Wanneer de keyboard opent zou de bottom van scrollRef onder de
-      // fold kunnen verdwijnen — forceer scroll-to-bottom zodat de laatste
-      // bubble zichtbaar blijft direct boven de keyboard.
-      requestAnimationFrame(() => {
-        if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-      })
-    }
-    update()
-    vv.addEventListener('resize', update)
-    vv.addEventListener('scroll', update)
-    return () => {
-      vv.removeEventListener('resize', update)
-      vv.removeEventListener('scroll', update)
-    }
-  }, [])
+    if (viewportHeight == null) return
+    requestAnimationFrame(() => {
+      if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    })
+  }, [viewportHeight])
 
   // Scroll to bottom helper
   const scrollToBottom = useCallback(() => {
