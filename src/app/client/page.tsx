@@ -1,5 +1,4 @@
 import { getAuthFast } from '@/lib/auth-fast'
-import { fetchDashboardData } from '@/lib/dashboard-data'
 import { redirect } from 'next/navigation'
 import DashboardClient from './DashboardClient'
 
@@ -7,22 +6,22 @@ import DashboardClient from './DashboardClient'
 export const dynamic = 'force-dynamic'
 
 /**
- * Server Component — auth + initial data fetch.
+ * Server Component — thin auth-gate.
  *
- * Fase 3 perf-optimization: data fetch GEBEURT NU op de server zodat de
- * eerste paint al alle data heeft. Voorheen schipten we `initialData={null}`
- * en moest de client een extra round-trip naar /api/dashboard doen voor
- * cold starts (skeleton flash + 2-5s wait).
+ * Architecturele keuze: data-fetch GEBEURT OP DE CLIENT, niet op de server.
+ * Reden:
+ *   - PWA is offline-first; IDB-cache geeft instant warm-start
+ *   - Server-side fetch blokkeerde HTML-stream tot DB queries klaar waren
+ *     → 8-12s witte pagina op trage netwerk (we hebben dat live gezien)
+ *   - Skeleton-flash via client = veel betere UX dan blanco wachten
  *
- * Trade-off:
- *   - Voor cold start: TTFB iets hoger (we wachten op DB), maar TTI veel
- *     lager. Geen skeleton flash, content meteen zichtbaar.
- *   - Voor warm start: DashboardClient gebruikt nog steeds IDB-cache als
- *     primary, valt terug op deze SSR-data.
- *   - Bij DB-fout: we passen null door, client doet retry-fetch via API.
+ * Server doet hier alleen 0ms-werk:
+ *   1. JWT-parse via getAuthFast (lokaal, geen netwerk)
+ *   2. Redirect naar / als geen user
  *
- * NB: `fetchDashboardData` is dezelfde call die /api/dashboard intern doet,
- * dus geen duplicate query-pad — alleen anders aangeroepen.
+ * HTML shell stuurt binnen ~50ms. DashboardClient hydrateert + leest IDB
+ * + fetcht /api/dashboard parallel — total time-to-content ~200-500ms warm,
+ * ~1-2s cold (IDB miss + API).
  */
 export default async function DashboardPage() {
   const { user } = await getAuthFast()
@@ -31,14 +30,5 @@ export default async function DashboardPage() {
     redirect('/')
   }
 
-  // Server-side data fetch. Bij fout: log en fallback naar null
-  // zodat client zelf opnieuw probeert. Geen blocking error.
-  let initialData = null
-  try {
-    initialData = await fetchDashboardData(user.id)
-  } catch (err) {
-    console.error('[dashboard SSR fetch]', err)
-  }
-
-  return <DashboardClient initialData={initialData} userId={user.id} />
+  return <DashboardClient initialData={null} userId={user.id} />
 }
