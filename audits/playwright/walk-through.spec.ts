@@ -97,21 +97,22 @@ async function ensureAuth(page: import('@playwright/test').Page) {
 
 test.describe('walk-through', () => {
   for (const route of ROUTES) {
-    test(`${route.slug}`, async ({ page }) => {
+    test(`${route.slug}`, async ({ page, context }) => {
+      // Block service worker entirely to prevent tab crashes during render
+      await context.route('**/serwist/**', (r) => r.abort())
+      await context.route('**/sw.js', (r) => r.abort())
       try {
         await ensureAuth(page)
       } catch (err) {
         console.warn(`[auth] ${route.slug} could not auth:`, err)
       }
       try {
-        await page.goto(`${BASE}${route.path}`, { timeout: 30000 })
+        await page.goto(`${BASE}${route.path}`, { timeout: 30000, waitUntil: 'domcontentloaded' })
       } catch (err) {
         console.warn(`[goto] ${route.slug}:`, err)
       }
-      await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {})
-      await page.waitForTimeout(600) // animations settle
-
-      // Viewport screenshot (full-page sometimes crashes on heavy pages)
+      // Take screenshot ASAP — before any reflow / heavy js
+      await page.waitForTimeout(1500)
       try {
         await page.screenshot({
           path: path.join(OUT_DIR, `${route.slug}.png`),
@@ -120,8 +121,11 @@ test.describe('walk-through', () => {
           timeout: 10000,
         })
       } catch (err) {
-        console.warn(`[screenshot viewport] ${route.slug}:`, err)
+        console.warn(`[screenshot early] ${route.slug}:`, (err as Error).message)
       }
+      await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {})
+      await page.waitForTimeout(500)
+
       // Try full-page as a "long" capture too — nice to have
       try {
         await page.screenshot({

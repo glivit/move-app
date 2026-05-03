@@ -30,6 +30,14 @@ export default defineConfig({
       use: {
         ...devices['iPhone 14 Pro'],
         defaultBrowserType: 'chromium',
+        launchOptions: {
+          args: [
+            '--disable-gpu',
+            '--disable-software-rasterizer',
+            '--disable-dev-shm-usage',
+            '--no-sandbox',
+          ],
+        },
       },
     },
   ],
