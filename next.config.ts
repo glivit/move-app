@@ -1,5 +1,10 @@
 import type { NextConfig } from "next"
 import { withSerwist } from "@serwist/turbopack"
+import bundleAnalyzer from "@next/bundle-analyzer"
+
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})
 
 const nextConfig: NextConfig = {
   images: {
@@ -38,4 +43,4 @@ const nextConfig: NextConfig = {
 // Custom handlers (push, notification, badge) staan in src/app/sw.ts.
 // Client-side registratie gebeurt in useServiceWorker met scope '/'.
 // ────────────────────────────────────────────────────────────────
-export default withSerwist(nextConfig)
+export default withBundleAnalyzer(withSerwist(nextConfig))

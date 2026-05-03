@@ -1,97 +1,33 @@
 'use client'
 
 /**
- * Lazy-loaded recharts wrappers.
+ * Recharts re-exports — single source zodat pagina's de library niet
+ * dupliceren.
  *
- * Recharts is ~336 kB minified. Voorheen werd hij statisch geïmporteerd op
- * `progress-report`, `stats` en `exercises/[id]` — dat resulteerde in 3×
- * gedupliceerde chunks (~1 MB) in de bundle (perf-report B1).
+ * Eerdere versie had 13 separate `next/dynamic()` calls per component.
+ * Bundler split die in afzonderlijke chunks die elk recharts internals
+ * dupliceerden → 4× recharts in chunks ≈ 1.26 MB duplicate code.
  *
- * Nu importeren die pagina's via deze module. `next/dynamic` met `ssr: false`
- * splitst recharts naar één gedeelde async-chunk die pas laadt wanneer een
- * chart-pagina open gaat.
+ * Nieuwe pattern: directe re-exports. `optimizePackageImports: ['recharts']`
+ * in next.config.ts regelt tree-shaking; bundler dedupliceert recharts naar
+ * één vendor-chunk die door alle chart-pagina's gedeeld wordt.
+ *
+ * Voor route-level lazy-loading: gebruik `next/dynamic` op de hele PAGE
+ * component, niet per chart-component.
  */
 
-import dynamic from 'next/dynamic'
-
-const loadingFallback = () => (
-  <div
-    aria-busy="true"
-    aria-label="Grafiek laden"
-    style={{
-      width: '100%',
-      height: 240,
-      borderRadius: 14,
-      background: 'rgba(28,30,24,0.04)',
-    }}
-  />
-)
-
-// Container — nodig om kinderen op viewport-grootte te schalen.
-export const ResponsiveContainer = dynamic(
-  () => import('recharts').then((m) => ({ default: m.ResponsiveContainer })),
-  { ssr: false, loading: loadingFallback },
-) as unknown as typeof import('recharts').ResponsiveContainer
-
-// Charts
-export const AreaChart = dynamic(
-  () => import('recharts').then((m) => ({ default: m.AreaChart })),
-  { ssr: false },
-) as unknown as typeof import('recharts').AreaChart
-
-export const LineChart = dynamic(
-  () => import('recharts').then((m) => ({ default: m.LineChart })),
-  { ssr: false },
-) as unknown as typeof import('recharts').LineChart
-
-export const BarChart = dynamic(
-  () => import('recharts').then((m) => ({ default: m.BarChart })),
-  { ssr: false },
-) as unknown as typeof import('recharts').BarChart
-
-// Series
-export const Area = dynamic(
-  () => import('recharts').then((m) => ({ default: m.Area })),
-  { ssr: false },
-) as unknown as typeof import('recharts').Area
-
-export const Line = dynamic(
-  () => import('recharts').then((m) => ({ default: m.Line })),
-  { ssr: false },
-) as unknown as typeof import('recharts').Line
-
-export const Bar = dynamic(
-  () => import('recharts').then((m) => ({ default: m.Bar })),
-  { ssr: false },
-) as unknown as typeof import('recharts').Bar
-
-// Axes / grid / labels
-export const XAxis = dynamic(
-  () => import('recharts').then((m) => ({ default: m.XAxis })),
-  { ssr: false },
-) as unknown as typeof import('recharts').XAxis
-
-export const YAxis = dynamic(
-  () => import('recharts').then((m) => ({ default: m.YAxis })),
-  { ssr: false },
-) as unknown as typeof import('recharts').YAxis
-
-export const CartesianGrid = dynamic(
-  () => import('recharts').then((m) => ({ default: m.CartesianGrid })),
-  { ssr: false },
-) as unknown as typeof import('recharts').CartesianGrid
-
-export const Tooltip = dynamic(
-  () => import('recharts').then((m) => ({ default: m.Tooltip })),
-  { ssr: false },
-) as unknown as typeof import('recharts').Tooltip
-
-export const Legend = dynamic(
-  () => import('recharts').then((m) => ({ default: m.Legend })),
-  { ssr: false },
-) as unknown as typeof import('recharts').Legend
-
-export const ReferenceLine = dynamic(
-  () => import('recharts').then((m) => ({ default: m.ReferenceLine })),
-  { ssr: false },
-) as unknown as typeof import('recharts').ReferenceLine
+export {
+  ResponsiveContainer,
+  AreaChart,
+  LineChart,
+  BarChart,
+  Area,
+  Line,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ReferenceLine,
+} from 'recharts'

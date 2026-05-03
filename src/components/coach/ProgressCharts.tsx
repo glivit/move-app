@@ -1,6 +1,6 @@
 'use client'
 
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from '@/components/charts/LazyRecharts'
 import { ReactNode } from 'react'
 
 interface ChartData {
