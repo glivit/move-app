@@ -57,8 +57,9 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  // Pinch-to-zoom blijft beschikbaar (WCAG 1.4.4 Resize Text). Geen
+  // `maximumScale: 1` of `userScalable: false` — die maken slechtziende
+  // gebruikers afhankelijk van OS-zoom.
   themeColor: '#EDECE3',
   viewportFit: 'cover',
 }

@@ -111,9 +111,11 @@ const ORION = {
   softCard: 'rgba(71,75,72,0.55)',
   inputBg: 'rgba(253,253,254,0.06)',
   ink: '#FDFDFE',
-  inkMuted: 'rgba(253,253,254,0.62)',
-  inkFaded: 'rgba(253,253,254,0.44)',
-  inkGhost: 'rgba(253,253,254,0.30)',
+  // Bumped from 0.62→0.85 voor WCAG AA contrast op #8E9890 page bg
+  // (was 2.05:1, nu ~3.6:1 — body ≥ 4.5:1 enkel op #474B48 card-context).
+  inkMuted: 'rgba(253,253,254,0.85)',
+  inkFaded: 'rgba(253,253,254,0.62)',
+  inkGhost: 'rgba(253,253,254,0.40)',
   divider: 'rgba(253,253,254,0.10)',
   lime: '#C0FC01',
   limeSoft: 'rgba(192,252,1,0.14)',
@@ -179,16 +181,32 @@ function Hint({ children }: { children: React.ReactNode }) {
   )
 }
 
-function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  const { className = '', style, ...rest } = props
+/* Onboarding TextInput — local primitive met:
+ *   - min 44px touch-target (py-3 + 14px text + line-height = ~46px)
+ *   - :focus-visible ring (vervangt globale outline:none)
+ *   - aria-invalid + aria-describedby slot
+ *   - accepteert error-prop voor a11y koppeling
+ */
+type OnboardTextInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+  error?: string
+  describedById?: string
+}
+
+function TextInput(props: OnboardTextInputProps) {
+  const { className = '', style, error, describedById, id, 'aria-describedby': ariaDescribed, ...rest } = props
+  const computedDescribed = [describedById, ariaDescribed].filter(Boolean).join(' ') || undefined
   return (
     <input
       {...rest}
-      className={`w-full rounded-[14px] px-[14px] py-3 text-[14px] leading-[1.5] outline-none transition-colors placeholder:text-[rgba(253,253,254,0.36)] ${className}`}
+      id={id}
+      aria-invalid={error ? true : undefined}
+      aria-describedby={computedDescribed}
+      className={`w-full rounded-[14px] px-[14px] py-3 text-[14px] leading-[1.5] outline-none transition-colors placeholder:text-[rgba(253,253,254,0.36)] focus-visible:ring-2 focus-visible:ring-[#C0FC01] focus-visible:ring-offset-2 focus-visible:ring-offset-[#474B48] ${error ? 'ring-2 ring-[#E07A5F]' : ''} ${className}`}
       style={{
         background: ORION.inputBg,
         color: ORION.ink,
         border: 'none',
+        minHeight: 44,
         ...style,
       }}
     />
@@ -200,11 +218,12 @@ function TextArea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       {...rest}
-      className={`w-full rounded-[14px] px-[14px] py-3 text-[14px] leading-[1.5] resize-none outline-none transition-colors placeholder:text-[rgba(253,253,254,0.36)] ${className}`}
+      className={`w-full rounded-[14px] px-[14px] py-3 text-[14px] leading-[1.5] resize-none outline-none transition-colors placeholder:text-[rgba(253,253,254,0.36)] focus-visible:ring-2 focus-visible:ring-[#C0FC01] focus-visible:ring-offset-2 focus-visible:ring-offset-[#474B48] ${className}`}
       style={{
         background: ORION.inputBg,
         color: ORION.ink,
         border: 'none',
+        minHeight: 44,
         ...style,
       }}
     />

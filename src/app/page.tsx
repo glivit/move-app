@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { Eye, EyeOff } from 'lucide-react'
+import { Input } from '@/components/ui/Input'
 
 /* ─── v6 Orion tokens (inline omdat login pre-auth draait zonder globals
  *     garantie) ─────────────────────────────────────────────────────────
@@ -322,8 +323,10 @@ function LoginPageInner() {
         className="flex min-h-screen items-center justify-center"
         style={{ background: '#8E9890' }}
       >
+        {/* LCP-element — geen fade-in zodat Lighthouse niet de animation
+         *  als delay meet (perf-report L1). */}
         <h1
-          className="text-7xl animate-fade-in"
+          className="text-7xl"
           style={{
             fontFamily: 'var(--font-sans, Outfit), Outfit, sans-serif',
             color: '#FDFDFE',
@@ -521,14 +524,17 @@ function LoginPageInner() {
             ) : resetMode ? (
               /* Reset form */
               <form onSubmit={handlePasswordReset} style={{ display: 'flex', flexDirection: 'column' }}>
-                <FloatingInput
+                <Input
+                  mode="floating"
                   id="reset-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   label="E-mailadres"
                   autoComplete="email"
-                  delay={0}
+                  inputMode="email"
+                  enterKeyHint="send"
+                  animationDelay={0}
                 />
                 <button
                   type="submit"
@@ -592,24 +598,29 @@ function LoginPageInner() {
             ) : (
               /* Login form */
               <form onSubmit={handlePasswordLogin} style={{ display: 'flex', flexDirection: 'column' }}>
-                <FloatingInput
+                <Input
+                  mode="floating"
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   label="E-mailadres"
                   autoComplete="email"
-                  delay={200}
+                  inputMode="email"
+                  enterKeyHint="next"
+                  animationDelay={200}
                 />
 
-                <FloatingInput
+                <Input
+                  mode="floating"
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   label="Wachtwoord"
                   autoComplete="current-password"
-                  delay={320}
+                  enterKeyHint="go"
+                  animationDelay={320}
                   endAdornment={
                     <button
                       type="button"

@@ -661,9 +661,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 .input-v3::placeholder { color: var(--card-text-faint, rgba(28,30,24,0.50)); }
 .input-v3:focus {
-  outline: none;
   border-color: rgba(28,30,24,0.40);
   background: rgba(28,30,24,0.06);
+}
+.input-v3:focus-visible {
+  outline: 2px solid var(--card-text, #1C1E18);
+  outline-offset: 2px;
 }
 
 /* Donkere card variant — input wit-op-donker */
@@ -700,12 +703,18 @@ select {
   transition: border-color 250ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Geen `outline:none` zonder vervanger — gebruik :focus-visible voor
+ * keyboard focus-rings. Pointer/touch krijgen alleen border-color shift. */
 input:focus,
 textarea:focus,
 select:focus {
-  outline: none;
   border-color: rgba(253,253,254,0.46);
-  box-shadow: none;
+}
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--card-text, #FDFDFE);
+  outline-offset: 2px;
 }
 
 /* Autofill override — iOS/Chrome forceren anders een wit/geel bg op
@@ -1474,11 +1483,16 @@ a, button {
   width: 100%;
   padding: 0;
   font-family: var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
-  outline: none;
 }
 .set-row .c-kg:focus,
 .set-row .c-reps:focus {
   color: #1C1E18;
+}
+.set-row .c-kg:focus-visible,
+.set-row .c-reps:focus-visible {
+  outline: 2px solid var(--card-text, #1C1E18);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 .set-row .c-check {
   display: flex; justify-content: center; align-items: center;
@@ -1870,7 +1884,11 @@ body:has(.workout-active-modal) [data-client-bottom-nav] { display: none !import
   resize: none;
   width: 100%;
   font-family: var(--font-sans, 'Outfit'), 'Outfit', sans-serif;
-  outline: none;
+}
+.note-box:focus-visible {
+  outline: 2px solid var(--card-text, #FDFDFE);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 .note-box::placeholder { color: rgba(253,253,254,0.44); }
 

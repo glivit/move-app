@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { Eye, EyeOff } from 'lucide-react'
+import { Input } from '@/components/ui/Input'
 
 export default function SetPasswordPage() {
   return (
@@ -80,7 +81,7 @@ function AnimatedInput({
             absolute left-5 transition-all duration-200 ease-out pointer-events-none
             ${isActive
               ? 'top-2 text-[11px] font-medium tracking-wide uppercase text-[#A09D96]'
-              : 'top-1/2 -translate-y-1/2 text-[15px] text-[#A09D96]'
+              : 'top-1/2 -translate-y-1/2 text-[15px] text-[#75726B]'
             }
           `}
         >
@@ -234,7 +235,7 @@ function SetPasswordContent() {
             MOVE
           </h1>
           <div className="w-8 h-8 border-2 border-[#1A1917]/20 border-t-[#1A1917] rounded-full animate-spin mx-auto" />
-          <p className="text-[15px] text-[#A09D96] animate-fade-in" style={{ animationDelay: '300ms' }}>
+          <p className="text-[15px] text-[#75726B] animate-fade-in" style={{ animationDelay: '300ms' }}>
             Account verifiëren...
           </p>
         </div>
@@ -284,7 +285,7 @@ function SetPasswordContent() {
               <h1 className="text-3xl font-[family-name:var(--font-display)] font-semibold text-[#1A1917] tracking-tight mb-2">
                 Welkom bij MOVE{userName ? `, ${userName}` : ''}!
               </h1>
-              <p className="text-[#A09D96] text-[15px]">
+              <p className="text-[#75726B] text-[15px]">
                 Je account is klaar. Laten we beginnen.
               </p>
             </div>
@@ -386,46 +387,55 @@ function SetPasswordContent() {
                 <h2 className="text-3xl font-[family-name:var(--font-display)] font-semibold text-[#1A1917] tracking-tight">
                   Kies een wachtwoord
                 </h2>
-                <p className="text-[#A09D96] text-[15px]">
+                <p className="text-[#75726B] text-[15px]">
                   Dit heb je nodig om later in te loggen.
                 </p>
               </div>
 
               {/* Error */}
               {error && (
-                <div className="bg-[#C4372A]/[0.06] border border-[#C4372A]/10 rounded-xl px-4 py-3 animate-scale-in">
+                <div role="alert" aria-live="polite" className="bg-[#C4372A]/[0.06] border border-[#C4372A]/10 rounded-xl px-4 py-3 animate-scale-in">
                   <p className="text-sm text-[#C4372A]">{error}</p>
                 </div>
               )}
 
               <form onSubmit={handleSetPassword} className="space-y-5">
-                <AnimatedInput
+                <Input
+                  mode="floating"
+                  theme="light"
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   label="Wachtwoord"
                   autoComplete="new-password"
-                  delay={400}
+                  enterKeyHint="next"
+                  required
+                  animationDelay={400}
                   endAdornment={
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="text-[#A09D96] hover:text-[#1A1917] transition-colors duration-200"
+                      aria-label={showPassword ? 'Verberg wachtwoord' : 'Toon wachtwoord'}
+                      className="text-[#75726B] hover:text-[#1A1917] transition-colors duration-200"
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   }
                 />
 
-                <AnimatedInput
+                <Input
+                  mode="floating"
+                  theme="light"
                   id="confirm"
                   type={showPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   label="Bevestig wachtwoord"
                   autoComplete="new-password"
-                  delay={500}
+                  enterKeyHint="done"
+                  required
+                  animationDelay={500}
                 />
 
                 {/* Password strength bar */}
@@ -484,7 +494,7 @@ function SetPasswordContent() {
 
             {/* Footer text */}
             <p
-              className="text-center text-[12px] text-[#A09D96] animate-slide-up opacity-0"
+              className="text-center text-[12px] text-[#75726B] animate-slide-up opacity-0"
               style={{ animationDelay: '800ms', animationFillMode: 'forwards' }}
             >
               Door je account te activeren ga je akkoord met de voorwaarden van MOVE.
