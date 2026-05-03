@@ -73,8 +73,37 @@ export default function ClientMessagesPage() {
   const [coachName, setCoachName] = useState('')
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  // ── Visual Viewport tracking ──────────────────────────────────────
+  // iOS Safari geeft `position: fixed; inset: 0` containers NIET door dat
+  // de keyboard ruimte inneemt. Resultaat: input verdwijnt onder keyboard,
+  // of er ontstaat een "faded bar" tussen content en keyboard.
+  // Visual Viewport API geeft de échte zichtbare hoogte terug en updatet
+  // bij keyboard show/hide. We schalen de container naar die hoogte.
+  const [viewportHeight, setViewportHeight] = useState<number | null>(null)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const vv = window.visualViewport
+    if (!vv) return
+    const update = () => {
+      setViewportHeight(vv.height)
+      // Wanneer de keyboard opent zou de bottom van scrollRef onder de
+      // fold kunnen verdwijnen — forceer scroll-to-bottom zodat de laatste
+      // bubble zichtbaar blijft direct boven de keyboard.
+      requestAnimationFrame(() => {
+        if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+      })
+    }
+    update()
+    vv.addEventListener('resize', update)
+    vv.addEventListener('scroll', update)
+    return () => {
+      vv.removeEventListener('resize', update)
+      vv.removeEventListener('scroll', update)
+    }
+  }, [])
+
   // Scroll to bottom helper
-  const scrollToBottom = useCallback((smooth = true) => {
+  const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
       if (scrollRef.current) {
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight
@@ -183,10 +212,22 @@ export default function ClientMessagesPage() {
     finally { setSending(false) }
   }
 
+  // Viewport-aware container style — passt aan op iOS keyboard.
+  const containerStyle: React.CSSProperties = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: viewportHeight ? `${viewportHeight}px` : '100dvh',
+    background: CANVAS_BG,
+    display: 'flex',
+    flexDirection: 'column',
+  }
+
   // ─── Loading ──────────────────────────────────────
   if (loading) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: CANVAS_BG, display: 'flex', flexDirection: 'column' }}>
+      <div style={containerStyle}>
         <div style={{ padding: 'calc(env(safe-area-inset-top, 0px) + 16px) 20px 12px', display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ width: 32, height: 32, borderRadius: 999, background: SKELETON_BG }} />
           <div style={{ width: 36, height: 36, borderRadius: 999, background: SKELETON_BG }} />
@@ -206,7 +247,7 @@ export default function ClientMessagesPage() {
 
   if (!currentUserId || !coachId) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: CANVAS_BG, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ ...containerStyle, alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <MessageCircle size={28} style={{ color: INK_FAINT, margin: '0 auto 12px' }} strokeWidth={1.5} />
           <p style={{ color: INK_FAINT, fontSize: 14 }}>{!currentUserId ? 'Niet aangemeld' : 'Coach niet beschikbaar'}</p>
@@ -220,11 +261,10 @@ export default function ClientMessagesPage() {
 
   return (
     <>
-      {/* Full-screen fixed container — immune to iOS keyboard layout shifts */}
-      <div style={{
-        position: 'fixed', inset: 0, background: CANVAS_BG,
-        display: 'flex', flexDirection: 'column',
-      }}>
+      {/* Viewport-aware container — Visual Viewport API laat ons de echte
+       * zichtbare hoogte gebruiken, dus content kruipt netjes onder het
+       * keyboard ipv te verdwijnen of een faded balk te laten. */}
+      <div style={containerStyle}>
 
         {/* ─── Header ─── */}
         <div style={{

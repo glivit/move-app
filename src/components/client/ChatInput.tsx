@@ -271,8 +271,11 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
     <div
       style={{
         padding: '10px 5% calc(14px + env(safe-area-inset-bottom, 0px))',
+        // Fade naar de v7 off-white canvas (was: oude v6 sage = de faded
+        // groen-grijze strook). Gradient houdt scrollende content visueel
+        // los van de input-pill.
         background:
-          'linear-gradient(180deg, rgba(142,152,144,0) 0%, rgba(142,152,144,0.95) 30%, rgba(142,152,144,1) 100%)',
+          'linear-gradient(180deg, rgba(234,232,221,0) 0%, rgba(234,232,221,0.92) 30%, rgba(234,232,221,1) 100%)',
       }}
     >
       {/* ═══ File preview strip ═══ */}
@@ -486,7 +489,7 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
           <Plus size={16} style={{ color: WHITE }} strokeWidth={1.8} />
         </button>
 
-        {/* Text field */}
+        {/* Text field — fontSize 16 om iOS auto-zoom op focus te voorkomen */}
         <textarea
           ref={textareaRef}
           value={content}
@@ -495,17 +498,20 @@ export function ChatInput({ onSend, loading = false }: ChatInputProps) {
           placeholder={isRecording ? 'Opname bezig…' : 'Bericht…'}
           disabled={loading || isUploading || isRecording}
           rows={1}
+          enterKeyHint="send"
+          autoCapitalize="sentences"
+          autoCorrect="on"
           className="chat-pill-textarea"
           style={{
             background: 'transparent',
             color: WHITE,
             border: 'none',
             outline: 'none',
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: 400,
             letterSpacing: '-0.003em',
-            lineHeight: 1.4,
-            padding: '8px 4px',
+            lineHeight: 1.35,
+            padding: '6px 4px',
             resize: 'none',
             width: '100%',
             minHeight: 20,
