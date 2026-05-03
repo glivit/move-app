@@ -274,13 +274,13 @@ function MomentumSpark({ data, opacity = 0.92 }: { data: number[]; opacity?: num
       <polyline
         points={pts}
         fill="none"
-        stroke="#FDFDFE"
+        stroke="currentColor"
         strokeWidth="1.4"
         strokeLinecap="round"
         strokeLinejoin="round"
         opacity={opacity}
       />
-      <circle cx={lastX} cy={lastY} r="2.2" fill="#FDFDFE" opacity={opacity} />
+      <circle cx={lastX} cy={lastY} r="2.2" fill="currentColor" opacity={opacity} />
     </svg>
   )
 }
@@ -396,8 +396,8 @@ function WeightAreaChart({ data }: { data: Array<{ date: string; weight: number 
       <line x1="0" y1="50" x2={w} y2="50" stroke="rgba(253,253,254,0.06)" strokeDasharray="2 4" />
       <line x1="0" y1="75" x2={w} y2="75" stroke="rgba(253,253,254,0.06)" strokeDasharray="2 4" />
       <path d={areaPath} fill="url(#wc-grad)" />
-      <path d={linePath} fill="none" stroke="#FDFDFE" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" opacity="0.92" />
-      <circle cx={last.x} cy={last.y} r="2.8" fill="#FDFDFE" />
+      <path d={linePath} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" opacity="0.92" />
+      <circle cx={last.x} cy={last.y} r="2.8" fill="currentColor" />
     </svg>
   )
 }
@@ -437,13 +437,13 @@ function LiftSpark({ data, positive = true }: { data: number[]; positive?: boole
       <polyline
         points={pts}
         fill="none"
-        stroke="#FDFDFE"
+        stroke="currentColor"
         strokeWidth="1.4"
         strokeLinecap="round"
         strokeLinejoin="round"
         opacity={positive ? 0.92 : 0.72}
       />
-      <circle cx={lastX} cy={lastY} r="2.2" fill="#FDFDFE" opacity={positive ? 1 : 0.85} />
+      <circle cx={lastX} cy={lastY} r="2.2" fill="currentColor" opacity={positive ? 1 : 0.85} />
     </svg>
   )
 }
@@ -467,12 +467,12 @@ function ExSpark({ data, positive = true }: { data: number[]; positive?: boolean
       <polyline
         points={pts}
         fill="none"
-        stroke="#FDFDFE"
+        stroke="currentColor"
         strokeWidth="1.3"
         strokeLinecap="round"
         opacity={positive ? 0.82 : 0.62}
       />
-      <circle cx={lastX} cy={lastY} r="1.8" fill="#FDFDFE" opacity={positive ? 1 : 0.85} />
+      <circle cx={lastX} cy={lastY} r="1.8" fill="currentColor" opacity={positive ? 1 : 0.85} />
     </svg>
   )
 }
@@ -761,7 +761,7 @@ export default function ProgressPage() {
   const thisWeekVal = chartData.length > 0 ? chartData[chartData.length - 1] : 0
 
   const weightPositive = body.weightChange !== null && body.weightChange <= 0
-  const weightColor = weightPositive ? '#2FA65A' : 'rgba(253,253,254,0.78)'
+  const weightColor = weightPositive ? '#2FA65A' : 'var(--card-text-soft)'
 
   // Caption label style (reused a lot)
   const capStyle: React.CSSProperties = {
@@ -797,9 +797,9 @@ export default function ProgressPage() {
                 fontSize: 13,
                 fontWeight: active ? 500 : 400,
                 letterSpacing: '-0.005em',
-                background: active ? '#FDFDFE' : 'transparent',
-                color: active ? '#474B48' : 'rgba(253,253,254,0.78)',
-                border: active ? '1px solid #FDFDFE' : '1px solid rgba(253,253,254,0.10)',
+                background: active ? '#1C1E18' : 'transparent',
+                color: active ? '#F2F2EC' : 'var(--card-text-soft)',
+                border: active ? '1px solid #1C1E18' : '1px solid var(--card-divider)',
                 WebkitTapHighlightColor: 'transparent',
                 cursor: 'pointer',
               }}
@@ -882,7 +882,7 @@ export default function ProgressPage() {
                         fontWeight: 500,
                         letterSpacing: '0.14em',
                         textTransform: 'uppercase',
-                        color: isToday ? '#FDFDFE' : 'rgba(253,253,254,0.44)',
+                        color: isToday ? 'var(--card-text)' : 'var(--card-text-faint)',
                       }}
                     >
                       {d.dayLabel}
@@ -893,10 +893,10 @@ export default function ProgressPage() {
                         height: 4,
                         borderRadius: 2,
                         background: isDone
-                          ? 'rgba(253,253,254,0.85)'
+                          ? 'var(--card-text)'
                           : isToday
-                            ? 'rgba(253,253,254,0.24)'
-                            : 'rgba(253,253,254,0.10)',
+                            ? 'rgba(28,30,24,0.32)'
+                            : 'rgba(28,30,24,0.10)',
                         transition: 'background 260ms cubic-bezier(0.16, 1, 0.3, 1)',
                       }}
                     />
@@ -947,7 +947,7 @@ export default function ProgressPage() {
                   flexShrink: 0,
                 }}
               >
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#FDFDFE" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="9 6 15 12 9 18" />
                 </svg>
               </div>
@@ -977,7 +977,7 @@ export default function ProgressPage() {
                     flexShrink: 0,
                   }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FDFDFE" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M7 4h10v4a5 5 0 0 1-10 0z" />
                     <line x1="12" y1="12" x2="12" y2="17" />
                     <line x1="9" y1="20" x2="15" y2="20" />
@@ -1088,7 +1088,7 @@ export default function ProgressPage() {
                           fontWeight: 500,
                           letterSpacing: '0.04em',
                           marginTop: 1,
-                          color: m.delta > 0 ? '#FDFDFE' : 'rgba(253,253,254,0.44)',
+                          color: m.delta > 0 ? 'var(--card-text)' : 'var(--card-text-muted)',
                         }}
                       >
                         {m.delta > 0 ? '+' : ''}{m.delta} kg
@@ -1145,7 +1145,7 @@ export default function ProgressPage() {
                         <span
                           style={{
                             width: '100%',
-                            background: skip ? 'rgba(253,253,254,0.14)' : '#FDFDFE',
+                            background: skip ? 'rgba(253,253,254,0.14)' : 'var(--card-text)',
                             opacity: skip ? 1 : d.withinBudget ? 0.9 : 0.5,
                             borderRadius: 2,
                             minHeight: 3,
@@ -1159,7 +1159,7 @@ export default function ProgressPage() {
                             fontWeight: 500,
                             letterSpacing: '0.14em',
                             textTransform: 'uppercase',
-                            color: d.isToday ? '#FDFDFE' : 'rgba(253,253,254,0.44)',
+                            color: d.isToday ? 'var(--card-text)' : 'var(--card-text-muted)',
                             textAlign: 'center',
                             marginTop: 6,
                           }}
@@ -1378,7 +1378,7 @@ export default function ProgressPage() {
                       <span>vs. 12w</span>
                       <span
                         style={{
-                          color: positive ? '#FDFDFE' : 'rgba(253,253,254,0.44)',
+                          color: positive ? 'var(--card-text)' : 'var(--card-text-muted)',
                           fontWeight: positive ? 500 : 400,
                           letterSpacing: '-0.005em',
                         }}
@@ -1494,9 +1494,9 @@ export default function ProgressPage() {
                     borderRadius: 999,
                     fontSize: 11,
                     fontWeight: 400,
-                    color: active ? '#FDFDFE' : 'rgba(253,253,254,0.78)',
+                    color: active ? 'var(--card-text)' : 'var(--card-text-soft)',
                     background: active ? 'rgba(253,253,254,0.12)' : 'transparent',
-                    border: `1px solid ${active ? 'rgba(253,253,254,0.18)' : 'rgba(253,253,254,0.10)'}`,
+                    border: `1px solid ${active ? 'var(--card-text-ghost)' : 'var(--card-divider)'}`,
                     cursor: 'pointer',
                     letterSpacing: '0.005em',
                     WebkitTapHighlightColor: 'transparent',
@@ -1651,7 +1651,7 @@ export default function ProgressPage() {
                             fontWeight: 500,
                             padding: '3px 8px',
                             borderRadius: 999,
-                            color: active ? '#FDFDFE' : 'rgba(253,253,254,0.62)',
+                            color: active ? 'var(--card-text)' : 'var(--card-text-muted)',
                             background: active ? 'rgba(253,253,254,0.12)' : 'transparent',
                             border: 'none',
                             cursor: 'pointer',
@@ -1839,7 +1839,7 @@ export default function ProgressPage() {
                             style={{
                               fontSize: 11,
                               fontWeight: 400,
-                              color: flat ? 'rgba(253,253,254,0.44)' : 'rgba(253,253,254,0.78)',
+                              color: flat ? 'var(--card-text-muted)' : 'var(--card-text-soft)',
                               letterSpacing: '-0.005em',
                             }}
                           >
@@ -2100,7 +2100,7 @@ export default function ProgressPage() {
                     gap: 8,
                     padding: '11px 18px 12px 20px',
                     borderRadius: 999,
-                    background: '#FDFDFE',
+                    background: 'var(--card-text)',
                     color: '#474B48',
                     fontSize: 13,
                     fontWeight: 500,

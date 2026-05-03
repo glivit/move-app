@@ -181,7 +181,7 @@ export default function WeeklyCheckInPage() {
       <div className="space-y-6">
         <SubPageHeader overline="Wekelijks" title="Check-in" backHref="/client" />
         <div className="flex justify-center py-20">
-          <div className="w-6 h-6 border-[1.5px] border-[rgba(253,253,254,0.48)] border-t-[#FDFDFE] rounded-full animate-spin" />
+          <div className="w-6 h-6 border-[1.5px] border-[rgba(28,30,24,0.40)] border-t-[#FDFDFE] rounded-full animate-spin" />
         </div>
       </div>
     )
@@ -249,7 +249,7 @@ export default function WeeklyCheckInPage() {
               {weightDiff !== null && weightDiff !== 0 && (
                 <span
                   className={`text-[12px] font-semibold tabular-nums ${
-                    weightDiff < 0 ? 'text-[#2FA65A]' : 'text-[rgba(253,253,254,0.72)]'
+                    weightDiff < 0 ? 'text-[#2FA65A]' : 'text-[rgba(28,30,24,0.72)]'
                   }`}
                 >
                   {weightDiff > 0 ? '+' : ''}{weightDiff} kg
@@ -297,7 +297,7 @@ export default function WeeklyCheckInPage() {
                 setPhoto(null)
                 setPhotoPreview(null)
               }}
-              className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-[#474B48]/80 text-[#1C1E18] flex items-center justify-center hover:bg-[#474B48] transition-colors"
+              className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-[#1C1E18]/85 text-[#F2F2EC] flex items-center justify-center hover:bg-[#1C1E18] transition-colors"
               aria-label="Verwijder foto"
             >
               <X size={16} strokeWidth={2} />
@@ -306,12 +306,12 @@ export default function WeeklyCheckInPage() {
         ) : (
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="w-full py-10 rounded-[18px] border border-dashed border-[rgba(253,253,254,0.22)] hover:border-[rgba(253,253,254,0.48)] hover:bg-[rgba(255,255,255,0.50)] transition-all flex flex-col items-center gap-2.5"
+            className="w-full py-10 rounded-[18px] border border-dashed border-[rgba(28,30,24,0.18)] hover:border-[rgba(28,30,24,0.40)] hover:bg-[rgba(255,255,255,0.50)] transition-all flex flex-col items-center gap-2.5"
           >
-            <div className="w-11 h-11 rounded-full bg-[rgba(255,255,255,0.55)] flex items-center justify-center">
-              <Camera size={18} strokeWidth={1.75} className="text-[rgba(253,253,254,0.72)]" />
+            <div className="w-11 h-11 rounded-full bg-[rgba(28,30,24,0.06)] flex items-center justify-center">
+              <Camera size={18} strokeWidth={1.75} className="text-[rgba(28,30,24,0.65)]" />
             </div>
-            <span className="text-[13px] text-[rgba(253,253,254,0.72)] font-medium">Tik om foto te nemen</span>
+            <span className="text-[13px] text-[rgba(28,30,24,0.72)] font-medium">Tik om foto te nemen</span>
           </button>
         )}
       </div>
@@ -422,7 +422,7 @@ function RatingRow({
               }`}
               style={
                 active && !current
-                  ? { background: 'rgba(253,253,254,0.18)' }
+                  ? { background: 'var(--card-text-ghost)' }
                   : undefined
               }
             >
