@@ -6,6 +6,7 @@ import { DayPicker } from '@/components/client/DayPicker'
 import { ExerciseCard } from '@/components/client/ExerciseCard'
 import { PeriodizationBar } from '@/components/client/PeriodizationBar'
 import { Dumbbell, Moon } from 'lucide-react'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 // ─── Types ──────────────────────────────────────────────────
 // Deze pagina leest *niet* meer uit de legacy `programs`-tabel, maar
@@ -268,18 +269,13 @@ export default function ClientProgramPage() {
           <p className="text-label mb-3 text-[rgba(28,30,24,0.62)]">Schema</p>
           <h1 className="page-title">Training</h1>
         </div>
-        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl p-8 border border-[rgba(28,30,24,0.10)] text-center animate-slide-up stagger-2">
-          <Dumbbell
-            size={48}
-            strokeWidth={1.5}
-            className="text-[rgba(253,253,254,0.35)] mx-auto mb-3"
+        <div className="bg-[rgba(255,255,255,0.50)] backdrop-blur-md rounded-2xl border border-[rgba(28,30,24,0.10)] animate-slide-up stagger-2">
+          <EmptyState
+            icon={Dumbbell}
+            title="Schema wordt opgesteld"
+            description="Je coach werkt aan een trainingsplan dat past bij je doelen. Je krijgt een bericht zodra het klaar is."
+            cta={{ label: 'Bekijk berichten', href: '/client/messages' }}
           />
-          <p className="font-medium text-[#1C1E18]">
-            Je trainingsschema wordt opgesteld
-          </p>
-          <p className="text-[14px] text-[rgba(28,30,24,0.62)] mt-2">
-            Je coach zal binnenkort een trainingsplan voor je opstellen.
-          </p>
         </div>
       </div>
     )
