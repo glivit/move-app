@@ -18,7 +18,12 @@ const SyncStatusIndicator = dynamic(
   () => import('@/components/ui/SyncStatusIndicator').then(m => m.SyncStatusIndicator),
   { ssr: false },
 )
-// BugReporter tijdelijk uit — Glenn wil geen drijvende bug-knop op de app.
+// DevFeedbackWidget — element-picker tool voor dev/coach feedback.
+// Alleen zichtbaar voor coach/admin role of als NEXT_PUBLIC_DEV_FEEDBACK=true.
+const DevFeedbackWidget = dynamic(
+  () => import('@/components/DevFeedbackWidget').then(m => m.DevFeedbackWidget),
+  { ssr: false },
+)
 
 export default function ClientLayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -169,6 +174,10 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
 
       {/* Offline sync status indicator */}
       <SyncStatusIndicator />
+
+      {/* In-app feedback widget — alleen voor coach/admin of dev flag.
+       * Render buiten focus-mode zodat actieve workout cleaner blijft. */}
+      {!isFocusMode && <DevFeedbackWidget />}
 
       {/* Spacer for bottom nav on mobile */}
       {!isFocusMode && <div className="lg:hidden h-24" />}
