@@ -175,9 +175,10 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
       {/* Offline sync status indicator */}
       <SyncStatusIndicator />
 
-      {/* In-app feedback widget — alleen voor coach/admin of dev flag.
-       * Render buiten focus-mode zodat actieve workout cleaner blijft. */}
-      {!isFocusMode && <DevFeedbackWidget />}
+      {/* In-app feedback widget — altijd zichtbaar, ook tijdens active
+       * workout / chat / complete (focus-mode). Anders kunnen users juist
+       * dáár geen feedback geven waar ze meeste tijd doorbrengen. */}
+      <DevFeedbackWidget />
 
       {/* Spacer for bottom nav on mobile */}
       {!isFocusMode && <div className="lg:hidden h-24" />}
