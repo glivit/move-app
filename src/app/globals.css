@@ -167,16 +167,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .client-app {
-  /* Tonale variatie binnen de beige-familie — geeft het frosted glass iets
-   * om te diffuseren én voorkomt "bland" wit-op-wit. Iets meer presence dan
-   * voorheen, nog steeds binnen één kleurfamilie. */
+  /* Single radial → 2 linear-gradients ipv 4 radials. iOS Safari paint
+   * cost was 60-80ms per frame met 4 radials. Visuele variatie nog steeds
+   * voldoende voor frosted-glass effect. */
   background:
-    radial-gradient(900px 700px at 0% 0%,    #EFE8D4 0%, transparent 55%),
-    radial-gradient(800px 700px at 100% 25%, #DCDBCF 0%, transparent 60%),
-    radial-gradient(700px 700px at 0% 100%,  #EBE3CB 0%, transparent 55%),
-    radial-gradient(500px 500px at 100% 100%, #D8D6CB 0%, transparent 60%),
+    linear-gradient(140deg, #EFE8D4 0%, transparent 50%),
+    linear-gradient(220deg, #EBE3CB 0%, transparent 60%),
     #EAE8DD;
-  background-attachment: scroll;
   color: #1C1E18;
 }
 
@@ -236,11 +233,8 @@ h1, h2, h3, h4, h5, h6 {
   padding: 22px 22px 24px;
   color: var(--card-text);
   box-shadow:
-    0 1px 1px rgba(28,30,24,0.05),
-    0 10px 28px -10px rgba(28,30,24,0.14),
-    0 32px 70px -24px rgba(28,30,24,0.20),
-    inset 0 1px 0 rgba(255,253,247,0.85),
-    inset 0 -1px 0 rgba(28,30,24,0.04);
+    0 12px 28px -10px rgba(28,30,24,0.14),
+    inset 0 1px 0 rgba(255,253,247,0.7);
   position: relative;
   transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -1069,11 +1063,8 @@ a, button {
   backdrop-filter: blur(24px) saturate(140%);
   -webkit-backdrop-filter: blur(24px) saturate(140%);
   box-shadow:
-    0 1px 1px rgba(28,30,24,0.05),
-    0 10px 28px -10px rgba(28,30,24,0.14),
-    0 32px 70px -24px rgba(28,30,24,0.20),
-    inset 0 1px 0 rgba(255,253,247,0.85),
-    inset 0 -1px 0 rgba(28,30,24,0.04);
+    0 12px 28px -10px rgba(28,30,24,0.14),
+    inset 0 1px 0 rgba(255,253,247,0.7);
   overflow: hidden;
 }
 .week-row {
@@ -1254,11 +1245,8 @@ a, button {
   width: 100%;
   color: #1C1E18;
   box-shadow:
-    0 1px 1px rgba(28,30,24,0.05),
-    0 10px 28px -10px rgba(28,30,24,0.14),
-    0 32px 70px -24px rgba(28,30,24,0.20),
-    inset 0 1px 0 rgba(255,253,247,0.85),
-    inset 0 -1px 0 rgba(28,30,24,0.04);
+    0 12px 28px -10px rgba(28,30,24,0.14),
+    inset 0 1px 0 rgba(255,253,247,0.7);
   position: relative;
   overflow: hidden;
 }

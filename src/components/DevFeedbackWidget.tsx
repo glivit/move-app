@@ -99,12 +99,14 @@ export function DevFeedbackWidget() {
 
   // Visibility — open voor elke geauthenticeerde user (clients incl.).
   // RLS op dev_feedback dwingt af dat enkel auth-users kunnen inserteren.
+  // Auth-check via cookie-presence i.p.v. Supabase RPC: voorkomt een
+  // network round-trip op elke route-change.
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) setEnabled(true)
-    })
+    // Sneller dan supabase.auth.getUser() — leest enkel document.cookie.
+    // Als we een sb-* cookie hebben, is er een session.
+    const hasSession = document.cookie.split(';').some(c => /\s*sb-[^=]+-auth-token/.test(c))
+    if (hasSession) setEnabled(true)
   }, [])
 
   // Pick-mode: capture click + ignore widget itself
