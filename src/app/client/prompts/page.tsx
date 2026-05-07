@@ -217,14 +217,12 @@ export default function ClientPromptsPage() {
     try {
       setLoading(true);
 
-      // Get current user
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+      // Get current user — getSession() is local JWT parse (~0ms), no network
+      const { data: { session: __authSession } } = await supabase.auth.getSession()
+      const user = __authSession?.user ?? null
 
-      if (userError || !user) {
-        console.error('Error getting user:', userError);
+      if (!user) {
+        console.error('No authenticated session')
         return;
       }
 

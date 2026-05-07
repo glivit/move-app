@@ -499,7 +499,8 @@ export default function ProgressPage() {
         if (res.ok) setData(await res.json())
 
         const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
+        const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
         if (!user) return
 
         // Sessions of last 12 weeks (for chart/top-lifts) + 8 weeks (for momentum)

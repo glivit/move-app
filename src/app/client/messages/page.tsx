@@ -103,8 +103,9 @@ export default function ClientMessagesPage() {
     async function initPage() {
       try {
         const supabase = createClient()
-        const { data: { user }, error: authError } = await supabase.auth.getUser()
-        if (authError || !user) { router.push('/auth/login'); return }
+        const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
+        if (!user) { router.push('/auth/login'); return }
         setCurrentUserId(user.id)
 
         const { data: coaches } = await supabase

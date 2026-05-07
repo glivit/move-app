@@ -84,7 +84,8 @@ export default function CheckInPage() {
   useEffect(() => {
     async function checkWindow() {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
       if (!user) return
 
       const { data: profile } = await supabase
@@ -158,7 +159,8 @@ export default function CheckInPage() {
 
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
       if (!user) throw new Error('Niet ingelogd')
 
       // Upload photos

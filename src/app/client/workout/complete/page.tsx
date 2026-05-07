@@ -314,7 +314,8 @@ function WorkoutCompletePage() {
 
         // ── Per-exercise history (last 6 sessions incl current) for sparklines & prevVolume ──
         try {
-          const { data: { user } } = await supabase.auth.getUser()
+          const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
           if (user) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const sbAny: any = supabase
@@ -404,7 +405,8 @@ function WorkoutCompletePage() {
 
         // ── Global volume trend: last 6 user sessions ──
         try {
-          const { data: { user } } = await supabase.auth.getUser()
+          const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
           if (user) {
             const { data: recent } = await supabase
               .from('workout_sessions')

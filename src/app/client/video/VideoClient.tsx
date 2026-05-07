@@ -26,7 +26,8 @@ export default function ClientVideoPage() {
   async function loadSessions() {
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
       if (!user) return
 
       const { data } = await supabase

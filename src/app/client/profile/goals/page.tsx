@@ -31,7 +31,8 @@ export default function GoalsPage() {
 
   useEffect(() => {
     const load = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
       if (!user) { router.replace('/'); return }
 
       const { data } = await supabase
@@ -59,7 +60,8 @@ export default function GoalsPage() {
 
   const handleSave = async () => {
     setSaving(true)
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
     if (!user) return
 
     await supabase

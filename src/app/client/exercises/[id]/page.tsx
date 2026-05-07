@@ -96,9 +96,8 @@ export default function ExerciseProgressionPage() {
         const supabase = createClient()
 
         // Get current user
-        const {
-          data: { user },
-        } = await supabase.auth.getUser()
+        const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
         if (!user) {
           router.push('/login')
           return

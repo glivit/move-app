@@ -85,7 +85,8 @@ export default function ResourcesPage() {
   }
 
   const trackView = async (resourceId: string) => {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
     if (!user) return
     await supabase.from('resource_views').upsert({
       user_id: user.id,

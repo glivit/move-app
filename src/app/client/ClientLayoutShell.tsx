@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useEffect } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { TopBarAvatar } from '@/components/layout/TopBarAvatar'
 
 // Lazy load non-critical UI components — komen in een aparte chunk
@@ -39,6 +39,24 @@ const DevFeedbackWidget = dynamic(
 
 export default function ClientLayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
+
+  // ─── Prefetch key routes ──────────────────────────────────────────
+  // Prefetch the 4 main tab routes on mount so client-side navigation
+  // is instant (JS chunks + RSC payloads are already cached).
+  useEffect(() => {
+    const routes = ['/client', '/client/workout', '/client/nutrition', '/client/progress']
+    // Use requestIdleCallback so prefetching doesn't compete with initial render
+    const id = (window as any).requestIdleCallback?.(() => {
+      routes.forEach(r => router.prefetch(r))
+    }) ?? setTimeout(() => {
+      routes.forEach(r => router.prefetch(r))
+    }, 2000)
+    return () => {
+      if ((window as any).cancelIdleCallback) (window as any).cancelIdleCallback(id)
+      else clearTimeout(id)
+    }
+  }, [router])
 
   // ─── Sync-queue bootstrap ─────────────────────────────────────────
   // initSyncQueue() hoort 1× te draaien per page-load: het hangt

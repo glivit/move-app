@@ -61,7 +61,8 @@ export default function HealthConnectPage() {
   async function loadIntegrations() {
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
       if (!user) return
 
       const { data } = await supabase
@@ -83,7 +84,8 @@ export default function HealthConnectPage() {
       // In production, this would open Terra/Vital widget
       // For now, create a placeholder integration
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
       if (!user) return
 
       // Check if Terra API key is configured
@@ -115,7 +117,8 @@ export default function HealthConnectPage() {
   async function disconnectProvider(providerId: string) {
     try {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
       if (!user) return
 
       await supabase

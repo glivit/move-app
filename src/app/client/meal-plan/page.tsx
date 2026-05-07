@@ -152,7 +152,8 @@ export default function ClientMealPlanPage() {
   async function loadMealPlan() {
     try {
       setLoading(true)
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
 
       if (!user) {
         setError('Je bent niet ingelogd')

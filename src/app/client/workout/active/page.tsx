@@ -965,7 +965,8 @@ function ActiveWorkoutPage() {
       try {
         if (!dayId || !programId) { router.push('/client/workout'); return }
         const supabase = createClient()
-        const { data: { user: authUser } } = await supabase.auth.getUser()
+        const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const authUser = __authSession?.user ?? null
         if (!authUser) { router.push('/auth/login'); return }
 
         const res = await fetch(`/api/client-workout?dayId=${dayId}&programId=${programId}`)
@@ -1116,7 +1117,8 @@ function ActiveWorkoutPage() {
     if (!dayId || !programId) return null
     try {
       const supabase = createClient()
-      const { data: { user: authUser } } = await supabase.auth.getUser()
+      const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const authUser = __authSession?.user ?? null
       if (!authUser) return null
 
       const { data: newSession, error: insertErr } = await supabase

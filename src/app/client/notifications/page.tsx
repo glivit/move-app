@@ -34,7 +34,8 @@ export default function NotificationsPage() {
   }, [])
 
   async function load() {
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
     if (!user) return
 
     // Load broadcasts targeted at this client

@@ -143,7 +143,8 @@ export default function StatsPage() {
   useEffect(() => {
     async function load() {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
       if (!user) return
 
       // Sessions — limit to last 6 months for performance

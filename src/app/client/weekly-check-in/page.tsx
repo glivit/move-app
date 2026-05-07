@@ -79,7 +79,8 @@ export default function WeeklyCheckInPage() {
 
     // Snapshot dashboard-cache + userId vóór optimistic patch — nodig voor rollback.
     const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
     const userId = user?.id ?? null
     let cacheSnapshot: DashboardData | null = null
     if (userId) {

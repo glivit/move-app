@@ -123,7 +123,8 @@ export default function WorkoutHistoryPage() {
     const loadData = async () => {
       try {
         const supabase = createClient()
-        const { data: { user: authUser } } = await supabase.auth.getUser()
+        const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const authUser = __authSession?.user ?? null
         if (!authUser) return
 
         const { data: sessionsData } = await supabase

@@ -251,7 +251,8 @@ export default function ProfilePage() {
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser()
+        const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
         if (!user) { router.replace('/'); return }
 
         const { data: profileData } = await supabase

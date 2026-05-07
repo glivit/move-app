@@ -38,6 +38,12 @@ function ClientBottomNavComponent() {
     }
   }, [open])
 
+  // Prefetch all tab routes when nav opens so navigation feels instant
+  useEffect(() => {
+    if (!open) return
+    tabs.forEach(tab => router.prefetch(tab.href))
+  }, [open, router])
+
   const handlePillClick = useCallback((e: React.MouseEvent) => {
     // Click on the outer pill (the + icon area) — toggle.
     if ((e.target as HTMLElement).closest('.bnav-lbl')) return

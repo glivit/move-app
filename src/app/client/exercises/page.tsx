@@ -66,7 +66,8 @@ export default function ExercisesPage() {
     async function load() {
       try {
         const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
+        const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
         if (!user) return
 
         // Get all workout sets with session info

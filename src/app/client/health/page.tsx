@@ -53,7 +53,8 @@ export default function HealthPage() {
 
   async function loadData() {
     setLoading(true)
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { session: __authSession } } = await supabase.auth.getSession()
+        const user = __authSession?.user ?? null
     if (!user) return
 
     const cutoff = new Date()
