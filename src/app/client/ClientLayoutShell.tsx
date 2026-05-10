@@ -42,20 +42,18 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
   const router = useRouter()
 
   // ─── Prefetch key routes ──────────────────────────────────────────
-  // Prefetch the 4 main tab routes on mount so client-side navigation
-  // is instant (JS chunks + RSC payloads are already cached).
+  // Defer 3s zodat dashboard-fetch + hydration eerst klaar zijn — anders
+  // concurreren 4 RSC-fetches met de critical path en voelt eerste paint
+  // traag aan. requestIdleCallback alleen valt in iOS Safari soms te
+  // vroeg (idle = direct na render-frame, niet na network-quiet).
   useEffect(() => {
     const routes = ['/client', '/client/workout', '/client/nutrition', '/client/progress']
-    // Use requestIdleCallback so prefetching doesn't compete with initial render
-    const id = (window as any).requestIdleCallback?.(() => {
-      routes.forEach(r => router.prefetch(r))
-    }) ?? setTimeout(() => {
-      routes.forEach(r => router.prefetch(r))
-    }, 2000)
-    return () => {
-      if ((window as any).cancelIdleCallback) (window as any).cancelIdleCallback(id)
-      else clearTimeout(id)
-    }
+    const id = setTimeout(() => {
+      const ric = (window as any).requestIdleCallback
+      if (ric) ric(() => routes.forEach(r => router.prefetch(r)))
+      else routes.forEach(r => router.prefetch(r))
+    }, 3000)
+    return () => clearTimeout(id)
   }, [router])
 
   // ─── Sync-queue bootstrap ─────────────────────────────────────────
@@ -89,48 +87,55 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
   // Beide stappen zijn best-effort — niks fataals als ze falen.
   useEffect(() => {
     let cancelled = false
-    ;(async () => {
-      try {
-        const [{ createClient }, { processPendingWorkoutFinish }] = await Promise.all([
-          import('@/lib/supabase'),
-          import('@/lib/workout-finish-retry'),
-        ])
-        if (cancelled) return
-        const supabase = createClient()
-        const { data: { session: authSession } } = await supabase.auth.getSession()
-        const headers: Record<string, string> = {}
-        if (authSession?.access_token) {
-          headers['Authorization'] = `Bearer ${authSession.access_token}`
-        }
-        if (cancelled) return
-
-        // 1. retry-queue
-        await processPendingWorkoutFinish(headers)
-        if (cancelled) return
-
-        // 2. auto-finish abandoned sessions
-        let excludeSessionId: string | null = null
+    // 5s defer — dashboard-fetch + hydration moeten eerst klaar zijn.
+    // Workout-auto-finish is een safety-net (geen latency-critical pad)
+    // en mocht best wachten tot na de eerste interaction-window.
+    const deferId = setTimeout(() => {
+      if (cancelled) return
+      ;(async () => {
         try {
-          const raw = window.localStorage.getItem('move_minimized_workout')
-          if (raw) {
-            const parsed = JSON.parse(raw) as { sessionId?: string }
-            if (parsed?.sessionId) excludeSessionId = parsed.sessionId
+          const [{ createClient }, { processPendingWorkoutFinish }] = await Promise.all([
+            import('@/lib/supabase'),
+            import('@/lib/workout-finish-retry'),
+          ])
+          if (cancelled) return
+          const supabase = createClient()
+          const { data: { session: authSession } } = await supabase.auth.getSession()
+          const headers: Record<string, string> = {}
+          if (authSession?.access_token) {
+            headers['Authorization'] = `Bearer ${authSession.access_token}`
           }
-        } catch {
-          /* ignore */
-        }
+          if (cancelled) return
 
-        await fetch('/api/workout-auto-finish', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...headers },
-          body: JSON.stringify({ excludeSessionId }),
-        })
-      } catch {
-        /* best-effort */
-      }
-    })()
+          // 1. retry-queue
+          await processPendingWorkoutFinish(headers)
+          if (cancelled) return
+
+          // 2. auto-finish abandoned sessions
+          let excludeSessionId: string | null = null
+          try {
+            const raw = window.localStorage.getItem('move_minimized_workout')
+            if (raw) {
+              const parsed = JSON.parse(raw) as { sessionId?: string }
+              if (parsed?.sessionId) excludeSessionId = parsed.sessionId
+            }
+          } catch {
+            /* ignore */
+          }
+
+          await fetch('/api/workout-auto-finish', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...headers },
+            body: JSON.stringify({ excludeSessionId }),
+          })
+        } catch {
+          /* best-effort */
+        }
+      })()
+    }, 5000)
     return () => {
       cancelled = true
+      clearTimeout(deferId)
     }
   }, [])
   // Workout active page = focus-modus: top-bar + bnav + active-bar weggelaten,
