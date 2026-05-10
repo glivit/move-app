@@ -41,34 +41,20 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
   const pathname = usePathname()
   const router = useRouter()
 
-  // ─── Prefetch routes + warm API caches ─────────────────────────────
-  // Tab-navigatie was 3-6s op iPhone 14 Pro omdat elke tab zijn eigen
-  // fetch-on-mount doet (network roundtrip op cold cache). Prefetch alleen
-  // van routes (JS chunks) lost dat niet op — de data moet ook in-memory
-  // klaar staan. cachedFetch() vult zijn module-level Map zodat de tab-
-  // page het cache-hit pad raakt en instant rendert.
+  // ─── Route prefetch only — API warmup REMOVED ─────────────────────
+  // Eerdere experiment met parallel API-warmup maakte het traag i.p.v.
+  // sneller: 3 parallelle fetches × middleware getUser() × dev compile
+  // = network congestie die concurreerde met de user's eigen tab-click.
+  // Nu enkel route-bundle prefetch (gratis, geen DB-load).
   useEffect(() => {
     const id = setTimeout(() => {
       const ric = (window as { requestIdleCallback?: (cb: () => void) => void }).requestIdleCallback
-      const warm = () => {
-        // Route bundles
-        ;['/client', '/client/workout', '/client/nutrition', '/client/progress']
+      const prefetch = () => {
+        ;['/client/workout', '/client/nutrition', '/client/progress']
           .forEach(r => router.prefetch(r))
-
-        // API responses — populate cachedFetch's Map zodat tab-pages
-        // bij mount instant cache-hits krijgen i.p.v. network roundtrip.
-        // 60s maxAge = lang genoeg voor casual tab-hopping.
-        const today = new Date().toISOString().slice(0, 10)
-        Promise.allSettled([
-          import('@/lib/fetcher').then(({ cachedFetch }) => Promise.all([
-            cachedFetch('/api/client-program', { maxAge: 60_000 }),
-            cachedFetch('/api/progress', { maxAge: 60_000 }),
-            cachedFetch(`/api/nutrition-log?date=${today}`, { maxAge: 60_000 }),
-          ])),
-        ]).catch(() => {})
       }
-      if (ric) ric(warm)
-      else warm()
+      if (ric) ric(prefetch)
+      else prefetch()
     }, 3000)
     return () => clearTimeout(id)
   }, [router])
