@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { getAuthFast } from '@/lib/auth-fast'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -6,11 +6,13 @@ import { NextRequest, NextResponse } from 'next/server'
  * GET /api/progress
  * Returns all stats for the animated Voortgang overview page.
  * Uses admin client to bypass RLS (matches /api/client-program pattern).
+ *
+ * Auth: getAuthFast() = local JWT parse (~0ms) i.p.v. supabase.auth.getUser()
+ * (network ~300-500ms). Middleware doet wél getUser bij cookie-miss.
  */
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { user, supabase } = await getAuthFast()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     // Use admin client to bypass RLS — queries still filter by user.id
