@@ -191,6 +191,12 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|manifest\\.json|service-worker\\.js|sw\\.js|icon-.*\\.png|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    // KRITIEK: /serwist/ MOET uitgesloten blijven. De service worker wordt
+    // geserveerd op /serwist/sw.js — toen de middleware die request nog
+    // intercepteerde (geen/verlopen cookies → redirect naar /) weigerde de
+    // browser het SW-script ("redirect disallowed") en bleven geïnstalleerde
+    // PWA's permanent op een oude SW met stale precache hangen.
+    // Symptoom: 5-10s navigatie, dode chunks, app "blokkeert" bij terugkeren.
+    '/((?!_next/static|_next/image|favicon.ico|manifest\\.json|serwist/|service-worker\\.js|sw\\.js|icon-.*\\.png|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
