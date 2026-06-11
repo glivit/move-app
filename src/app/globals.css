@@ -855,24 +855,38 @@ select:-webkit-autofill {
 
 .animate-slide-in-right { animation: slide-in-right 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .animate-slide-in-left  { animation: slide-in-left 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.animate-slide-up       { animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.animate-fade-in        { animation: fade-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.animate-slide-up       { animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-fade-in        { animation: fade-in 0.25s cubic-bezier(0.4, 0, 0.2, 1) both; }
 .animate-scale-in       { animation: scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .animate-bounce-in      { animation: bounce-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 .animate-gentle-rise    { animation: gentle-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .animate-pulse-subtle   { animation: pulse-subtle 2s ease-in-out infinite; }
-.animate-up-v6          { animation: up-v6 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-up-v6          { animation: up-v6 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 .stagger-1  { animation-delay: 0ms; }
-.stagger-2  { animation-delay: 60ms; }
-.stagger-3  { animation-delay: 120ms; }
-.stagger-4  { animation-delay: 180ms; }
-.stagger-5  { animation-delay: 240ms; }
-.stagger-6  { animation-delay: 300ms; }
-.stagger-7  { animation-delay: 360ms; }
-.stagger-8  { animation-delay: 420ms; }
-.stagger-9  { animation-delay: 480ms; }
-.stagger-10 { animation-delay: 540ms; }
+.stagger-2  { animation-delay: 35ms; }
+.stagger-3  { animation-delay: 70ms; }
+.stagger-4  { animation-delay: 105ms; }
+.stagger-5  { animation-delay: 140ms; }
+.stagger-6  { animation-delay: 175ms; }
+.stagger-7  { animation-delay: 210ms; }
+.stagger-8  { animation-delay: 245ms; }
+.stagger-9  { animation-delay: 280ms; }
+.stagger-10 { animation-delay: 315ms; }
+
+/* ── Warm revisit: entrance-animaties overslaan ─────────────────────
+ * Bij een herbezoek binnen de sessie staat de content er al (IDB
+ * cache-paint ~10ms). De staggered entrance replayen voelt dan als
+ * traag her-renderen i.p.v. polish — useWarmVisit() zet .no-entrance
+ * op de page-root en deze regel neutraliseert alléén entrance-classes
+ * (pulse-dots, spinners en micro-interacties blijven werken). */
+.no-entrance .animate-slide-up,
+.no-entrance .animate-fade-in,
+.no-entrance .animate-up-v6 {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
 
 .confetti-particle {
   position: fixed;

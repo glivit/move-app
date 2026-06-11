@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/providers/AuthProvider'
 import { readPageCache, writePageCache } from '@/lib/page-cache'
+import { useWarmVisit } from '@/lib/warm-visit'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -482,6 +483,7 @@ function ExSpark({ data, positive = true }: { data: number[]; positive?: boolean
 
 export default function ProgressPage() {
   const { user } = useAuth()
+  const warmVisit = useWarmVisit('progress')
   const [data, setData] = useState<ProgressData | null>(null)
   const [weeklyStats, setWeeklyStats] = useState<WeeklyStats[]>([])
   const [topLifts, setTopLifts] = useState<TopLift[]>([])
@@ -788,7 +790,7 @@ export default function ProgressPage() {
   }
 
   return (
-    <div className="pb-28">
+    <div className={`pb-28${warmVisit ? ' no-entrance' : ''}`}>
 
       {/* ═══ SUBTABS — pill chips, horizontal scroll ═══════════════ */}
       <div

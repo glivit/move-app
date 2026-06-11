@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { cachedFetch } from '@/lib/fetcher'
 import { useAuth } from '@/providers/AuthProvider'
 import { readPageCache, writePageCache } from '@/lib/page-cache'
+import { useWarmVisit } from '@/lib/warm-visit'
 import { Dumbbell } from 'lucide-react'
 import { EmptyState } from '@/components/ui/EmptyState'
 
@@ -128,6 +129,7 @@ export default function WorkoutOverviewPage() {
   const [showCatchupPicker, setShowCatchupPicker] = useState(false)
 
   const { user } = useAuth()
+  const warmVisit = useWarmVisit('workout')
   const gotFreshRef = useRef(false)
 
   // Instant paint: laatst bekende programma uit IDB zodra auth resolved
@@ -248,7 +250,7 @@ export default function WorkoutOverviewPage() {
   }
 
   return (
-    <div className="pb-28">
+    <div className={`pb-28${warmVisit ? ' no-entrance' : ''}`}>
       {/* ─── Hero · Vandaag (DARK) ─── */}
       <div className="v6-card-dark" style={{ padding: '22px 22px 24px', marginBottom: 6, width: '100%' }}>
         <div className="eyebrow">

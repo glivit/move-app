@@ -10,6 +10,8 @@ import {
   STALE_AFTER_MS,
 } from '@/lib/dashboard-cache'
 import { optimisticMutate } from '@/lib/optimistic'
+import { useWarmVisit } from '@/lib/warm-visit'
+import { useAuth } from '@/providers/AuthProvider'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -160,11 +162,17 @@ function formatNumber(n: number): string {
 
 export default function ClientDashboard({
   initialData,
-  userId,
+  userId: serverUserId,
 }: {
   initialData: DashboardData | null
   userId: string | null
 }) {
+  const warmVisit = useWarmVisit('home')
+  // Statische shell levert geen userId meer — haal hem client-side uit
+  // AuthProvider (lokale JWT-parse). serverUserId blijft werken als de
+  // page ooit weer server-rendered wordt.
+  const { user: authUser } = useAuth()
+  const userId = serverUserId ?? authUser?.id ?? null
   const [data, setData] = useState<DashboardData | null>(initialData)
   const [loading, setLoading] = useState(!initialData)
   const [cacheAgeMs, setCacheAgeMs] = useState<number | null>(null)
@@ -508,7 +516,7 @@ export default function ClientDashboard({
   }
 
   return (
-    <div className="pb-28">
+    <div className={`pb-28${warmVisit ? ' no-entrance' : ''}`}>
       {/* Page heading — visueel overgeslagen (zichtbare hiërarchie zit in
        *  per-card h2's), maar verplicht voor screen-readers (WCAG 1.3.1). */}
       <h1 className="sr-only">Home</h1>

@@ -1,12 +1,11 @@
 import { AuthProvider } from '@/providers/AuthProvider'
 import ClientLayoutShell from './ClientLayoutShell'
 
-// Alle /client/* routes hebben runtime auth nodig (cookies-based session).
-// Force dynamic op layout-niveau voorkomt build-time prerender-fouten zoals
-// "Supabase URL/key required" die optreden wanneer Next probeert deze
-// pagina's statisch te genereren tijdens een build zonder env-vars.
-export const dynamic = 'force-dynamic'
-
+// GEEN force-dynamic hier: statische prerender van de client-shells maakt
+// tab-navigatie instant (RSC payload komt uit de prefetch-cache i.p.v. een
+// server-roundtrip per tap — dat kostte 0.5-1.5s per navigatie). Vereiste:
+// componenten in deze tree mogen GEEN Supabase-client in render-scope
+// aanmaken (zie ClientSidebar.handleLogout) — prerender draait de render.
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>

@@ -1,34 +1,14 @@
-import { getAuthFast } from '@/lib/auth-fast'
-import { redirect } from 'next/navigation'
 import DashboardClient from './DashboardClient'
 
-// Force dynamic rendering (uses cookies for auth)
-export const dynamic = 'force-dynamic'
-
 /**
- * Server Component — thin auth-gate.
+ * Statische shell — auth wordt afgedwongen door de middleware (elke HTML-
+ * navigatie naar /client passeert die) én door elke API-call zelf
+ * (getAuthFast met JWT-verificatie). Een server-side gate hier zou de
+ * pagina dynamic maken → RSC-roundtrip per tab-tap (0.5-1.5s) i.p.v.
+ * instant prefetched navigatie.
  *
- * Architecturele keuze: data-fetch GEBEURT OP DE CLIENT, niet op de server.
- * Reden:
- *   - PWA is offline-first; IDB-cache geeft instant warm-start
- *   - Server-side fetch blokkeerde HTML-stream tot DB queries klaar waren
- *     → 8-12s witte pagina op trage netwerk (we hebben dat live gezien)
- *   - Skeleton-flash via client = veel betere UX dan blanco wachten
- *
- * Server doet hier alleen 0ms-werk:
- *   1. JWT-parse via getAuthFast (lokaal, geen netwerk)
- *   2. Redirect naar / als geen user
- *
- * HTML shell stuurt binnen ~50ms. DashboardClient hydrateert + leest IDB
- * + fetcht /api/dashboard parallel — total time-to-content ~200-500ms warm,
- * ~1-2s cold (IDB miss + API).
+ * userId komt client-side uit AuthProvider (lokale JWT-parse, ~ms).
  */
-export default async function DashboardPage() {
-  const { user } = await getAuthFast()
-
-  if (!user) {
-    redirect('/')
-  }
-
-  return <DashboardClient initialData={null} userId={user.id} />
+export default function DashboardPage() {
+  return <DashboardClient initialData={null} userId={null} />
 }

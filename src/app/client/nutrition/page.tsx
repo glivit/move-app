@@ -9,6 +9,7 @@ import {
 import { invalidateCache } from '@/lib/fetcher'
 import { readPageCache, writePageCache } from '@/lib/page-cache'
 import { optimisticMutate } from '@/lib/optimistic'
+import { useWarmVisit } from '@/lib/warm-visit'
 import { EmptyState } from '@/components/ui/EmptyState'
 
 // ─── Types ──────────────────────────────────────────
@@ -1126,6 +1127,7 @@ function AddFoodBottomSheet({
 // ─── Main Page ──────────────────────────────────────
 
 export default function ClientNutritionPage() {
+  const warmVisit = useWarmVisit('nutrition')
   const [plan, setPlan] = useState<NutritionPlan | null>(null)
   const [logs, setLogs] = useState<Map<string, MealLog>>(new Map())
   const [summary, setSummary] = useState<DailySummary | null>(null)
@@ -1473,7 +1475,7 @@ export default function ClientNutritionPage() {
   const ringColor = allMealsComplete ? '#2FA65A' : '#C0FC01'
 
   return (
-    <div className="pb-28">
+    <div className={`pb-28${warmVisit ? ' no-entrance' : ''}`}>
       {/* Back button */}
       <button
         onClick={() => window.history.back()}

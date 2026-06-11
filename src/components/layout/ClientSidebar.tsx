@@ -48,7 +48,6 @@ const secondaryNavItems = [
 function ClientSidebarComponent() {
   const pathname = usePathname()
   const router = useRouter()
-  const supabase = createClient()
 
   // Memoize isActive function
   const isActive = useCallback((href: string) => {
@@ -58,9 +57,12 @@ function ClientSidebarComponent() {
 
   // Memoize handleLogout
   const handleLogout = useCallback(async () => {
-    await supabase.auth.signOut()
+    // createClient hier en niet in render-scope: render-time constructie
+    // draait ook tijdens build-prerender (zonder env vars → crash) en
+    // dwong voorheen force-dynamic af op de hele /client layout.
+    await createClient().auth.signOut()
     router.replace('/')
-  }, [supabase.auth, router])
+  }, [router])
 
   return (
     <aside
