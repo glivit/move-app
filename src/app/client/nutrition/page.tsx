@@ -7,6 +7,7 @@ import {
   Check, Trash2, ShoppingCart, ChevronDown, UtensilsCrossed
 } from 'lucide-react'
 import { invalidateCache } from '@/lib/fetcher'
+import { readPageCache, writePageCache } from '@/lib/page-cache'
 import { optimisticMutate } from '@/lib/optimistic'
 import { EmptyState } from '@/components/ui/EmptyState'
 
@@ -1146,6 +1147,20 @@ export default function ClientNutritionPage() {
         const user = __authSession?.user ?? null
       if (!user) return
 
+      // Instant paint: laatst bekende plan + logs uit IDB (~5-15ms),
+      // verse fetch hieronder swapt stil in en ververst de cache.
+      const CACHE_KEY = `nutrition:${user.id}:${dateStr}`
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const hit = await readPageCache<any>(CACHE_KEY)
+        if (hit?.data?.plan) {
+          setPlan(hit.data.plan)
+          setLogs(new Map(hit.data.logsEntries))
+          setSummary(hit.data.summary)
+          setLoading(false)
+        }
+      } catch {}
+
       function ensureFoodIds(foods: any[], prefix: string): FoodEntry[] {
         return (foods || []).map((f: any, fi: number) => ({
           ...f,
@@ -1185,6 +1200,14 @@ export default function ClientNutritionPage() {
       setLogs(logMap)
       setSummary(logsRes.summary || null)
       setLoading(false)
+
+      if (fixedPlan) {
+        writePageCache(CACHE_KEY, {
+          plan: fixedPlan,
+          logsEntries: Array.from(logMap.entries()),
+          summary: logsRes.summary || null,
+        }).catch(() => {})
+      }
 
       if (logMap.size === 0 && planData && fixedPlan) {
         const yesterday = new Date(dateStr)

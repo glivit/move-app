@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase'
+import { useAuth } from '@/providers/AuthProvider'
+import { readPageCache, writePageCache } from '@/lib/page-cache'
 
 // ─── Types ──────────────────────────────────────────────────
 
@@ -480,6 +481,7 @@ function ExSpark({ data, positive = true }: { data: number[]; positive?: boolean
 // ─── Main Component ─────────────────────────────────────────
 
 export default function ProgressPage() {
+  const { user } = useAuth()
   const [data, setData] = useState<ProgressData | null>(null)
   const [weeklyStats, setWeeklyStats] = useState<WeeklyStats[]>([])
   const [topLifts, setTopLifts] = useState<TopLift[]>([])
@@ -493,28 +495,19 @@ export default function ProgressPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch('/api/progress')
-        if (res.ok) setData(await res.json())
+    if (!user?.id) return
+    let cancelled = false
+    let gotFresh = false
+    const CACHE_KEY = `progress:${user.id}`
 
-        const supabase = createClient()
-        const { data: { session: __authSession } } = await supabase.auth.getSession()
-        const user = __authSession?.user ?? null
-        if (!user) return
-
-        // Sessions of last 12 weeks (for chart/top-lifts) + 8 weeks (for momentum)
-        const twelveWeeksAgo = new Date()
-        twelveWeeksAgo.setDate(twelveWeeksAgo.getDate() - 12 * 7)
-
-        const { data: sessions } = await supabase
-          .from('workout_sessions')
-          .select('id, started_at, completed_at, duration_seconds, workout_sets(exercise_id, weight_kg, actual_reps, is_warmup, exercises(name, name_nl, body_part))')
-          .eq('client_id', user.id)
-          .not('completed_at', 'is', null)
-          .gte('started_at', twelveWeeksAgo.toISOString())
-          .order('started_at', { ascending: false })
-
+    // Eén apply-pad voor cache én verse data. De zware 12-weken sessies-
+    // query (met sets + oefeningen) zit nu server-side in /api/progress
+    // (json.detailedSessions) — voorheen was dat een TWEEDE, sequentiële
+    // browser→Supabase roundtrip die seconden kostte.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function applyAll(json: any) {
+      setData(json)
+      const sessions = json?.detailedSessions
         if (sessions) {
           const weeks: Record<string, WeeklyStats> = {}
           const now = new Date()
@@ -650,14 +643,34 @@ export default function ProgressPage() {
             }))
           setMomentum(topMomentum)
         }
+      setLoading(false)
+    }
+
+    // 1) Instant paint vanuit IDB — laatst bekende data (~5-15ms)
+    readPageCache<Record<string, unknown>>(CACHE_KEY).then((hit) => {
+      if (cancelled || gotFresh || !hit) return
+      applyAll(hit.data)
+    })
+
+    // 2) Verse fetch in achtergrond — swapt stil in en ververst cache
+    async function load() {
+      try {
+        const res = await fetch('/api/progress')
+        if (!res.ok || cancelled) return
+        const json = await res.json()
+        if (cancelled) return
+        gotFresh = true
+        applyAll(json)
+        writePageCache(CACHE_KEY, json).catch(() => {})
       } catch (err) {
         console.error('Progress load error:', err)
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
     }
     load()
-  }, [])
+    return () => { cancelled = true }
+  }, [user?.id])
 
   if (loading) {
     return (

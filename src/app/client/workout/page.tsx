@@ -1,8 +1,10 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { cachedFetch } from '@/lib/fetcher'
+import { useAuth } from '@/providers/AuthProvider'
+import { readPageCache, writePageCache } from '@/lib/page-cache'
 import { Dumbbell } from 'lucide-react'
 import { EmptyState } from '@/components/ui/EmptyState'
 
@@ -125,10 +127,27 @@ export default function WorkoutOverviewPage() {
   // scrolt/kiest.
   const [showCatchupPicker, setShowCatchupPicker] = useState(false)
 
+  const { user } = useAuth()
+  const gotFreshRef = useRef(false)
+
+  // Instant paint: laatst bekende programma uit IDB zodra auth resolved
+  // (lokale JWT-parse, ~ms). Verse fetch hieronder swapt stil in.
+  useEffect(() => {
+    if (!user?.id) return
+    let cancelled = false
+    readPageCache<ProgramResponse>(`program:${user.id}`).then((hit) => {
+      if (cancelled || gotFreshRef.current || !hit?.data?.program) return
+      setData(hit.data)
+      setLoading(false)
+    })
+    return () => { cancelled = true }
+  }, [user?.id])
+
   useEffect(() => {
     const loadData = async () => {
       try {
         const res = await cachedFetch('/api/client-program', { maxAge: 30_000 }) as ProgramResponse
+        gotFreshRef.current = true
         if (res?.program) setData(res)
       } catch (error) {
         console.error('Error loading program:', error)
@@ -138,6 +157,13 @@ export default function WorkoutOverviewPage() {
     }
     loadData()
   }, [])
+
+  // Ververs de IDB-cache zodra verse data én user bekend zijn
+  useEffect(() => {
+    if (user?.id && data?.program && gotFreshRef.current) {
+      writePageCache(`program:${user.id}`, data).catch(() => {})
+    }
+  }, [user?.id, data])
 
   const {
     program,

@@ -39,7 +39,11 @@ export async function GET(request: NextRequest) {
     const mondayStr = monday.toISOString().split('T')[0]
     const sundayStr = sunday.toISOString().split('T')[0]
 
+    const twelveWeeksAgo = new Date(now)
+    twelveWeeksAgo.setDate(twelveWeeksAgo.getDate() - 12 * 7)
+
     const [
+      detailedSessionsRes,
       profileRes,
       workoutsAllRes,
       workouts30Res,
@@ -56,6 +60,18 @@ export async function GET(request: NextRequest) {
       weeklyWeightsRes,
       intakeWeightRes,
     ] = await Promise.all([
+      // 12 weken sessies mét sets + oefening-namen — voor de Kracht-tab
+      // aggregatie (weekly volume, top lifts, e1RM per oefening). Stond
+      // eerst als TWEEDE roundtrip client-side (browser → Supabase, na de
+      // API-call) = sequentiële waterfall van seconden. Server ↔ DB zit in
+      // dezelfde regio (~1-5ms), dus hier is hij vrijwel gratis.
+      db.from('workout_sessions')
+        .select('id, started_at, completed_at, duration_seconds, workout_sets(exercise_id, weight_kg, actual_reps, is_warmup, exercises(name, name_nl, body_part))')
+        .eq('client_id', user.id)
+        .not('completed_at', 'is', null)
+        .gte('started_at', twelveWeeksAgo.toISOString())
+        .order('started_at', { ascending: false }),
+
       db.from('profiles').select('created_at, start_date, coach_id, height_cm').eq('id', user.id).single(),
 
       // All completed workouts
@@ -502,6 +518,10 @@ export async function GET(request: NextRequest) {
         totalPrs,
         adherence: weekAdherence,
       },
+      // Ruwe 12-weken sessies voor client-side aggregatie (Kracht-tab).
+      // Zelfde shape als de oude directe browser-query, zodat de
+      // aggregatie-code in progress/page.tsx ongewijzigd blijft.
+      detailedSessions: detailedSessionsRes.data || [],
     })
     response.headers.set('Cache-Control', 'private, max-age=120, stale-while-revalidate=600')
     return response
