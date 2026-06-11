@@ -7,8 +7,8 @@ import { NextRequest, NextResponse } from 'next/server'
  * Returns all stats for the animated Voortgang overview page.
  * Uses admin client to bypass RLS (matches /api/client-program pattern).
  *
- * Auth: getAuthFast() = local JWT parse (~0ms) i.p.v. supabase.auth.getUser()
- * (network ~300-500ms). Middleware doet wél getUser bij cookie-miss.
+ * Auth: getAuthFast() — lokale JWT-verificatie (ES256/JWKS, ~0ms)
+ * i.p.v. een netwerk-call per request.
  */
 export async function GET(request: NextRequest) {
   try {

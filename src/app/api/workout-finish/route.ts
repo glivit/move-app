@@ -1,3 +1,4 @@
+import { getUserVerified } from '@/lib/auth-fast'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { sendPushToUser } from '@/lib/push-server'
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
     if (!userId) {
       try {
         const supabase = await createServerSupabaseClient()
-        const { data: { user } } = await supabase.auth.getUser()
+        const { data: { user } } = await getUserVerified(supabase)
         if (user) userId = user.id
       } catch (e: any) {
         console.error('[workout-finish] Cookie auth error:', e?.message)

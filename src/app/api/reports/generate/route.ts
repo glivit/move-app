@@ -1,3 +1,4 @@
+import { getUserVerified } from '@/lib/auth-fast'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { generateCheckInPDF } from '@/lib/pdf-generator'
 import { NextRequest, NextResponse } from 'next/server'
@@ -15,7 +16,7 @@ export async function POST(
     const supabase = await createServerSupabaseClient()
 
     // Verify user is authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const { data: { user }, error: authError } = await getUserVerified(supabase)
     if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },

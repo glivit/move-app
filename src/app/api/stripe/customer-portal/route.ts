@@ -1,3 +1,4 @@
+import { getUserVerified } from '@/lib/auth-fast'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { stripe } from '@/lib/stripe'
 import { NextRequest, NextResponse } from 'next/server'
@@ -9,7 +10,7 @@ interface CustomerPortalRequest {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user } } = await getUserVerified(supabase)
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

@@ -1,3 +1,4 @@
+import { getUserVerified } from '@/lib/auth-fast'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
         const supabase = await createServerSupabaseClient()
         const {
           data: { user },
-        } = await supabase.auth.getUser()
+        } = await getUserVerified(supabase)
         if (user) userId = user.id
       } catch {
         /* ignore */

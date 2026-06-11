@@ -1248,14 +1248,10 @@ export default function ClientNutritionPage() {
       }
 
       try {
-        const today = new Date(dateStr)
-        const datePromises = Array.from({ length: 7 }, (_, i) => {
-          const d = new Date(today)
-          d.setDate(d.getDate() - i)
-          return fetch(`/api/nutrition-log?date=${d.toISOString().split('T')[0]}`)
-            .then(r => r.json()).catch(() => ({ logs: [] }))
-        })
-        const recentResults = await Promise.all(datePromises)
+        // Eén range-call i.p.v. 7 aparte day-fetches (zelfde aggregatie hieronder)
+        const rangeData = await fetch(`/api/nutrition-log?date=${dateStr}&days=7`)
+          .then(r => r.json()).catch(() => ({ logs: [] }))
+        const recentResults = [rangeData]
         const recentMap = new Map<string, { frequency: number; per100g: any; brand?: string }>()
         for (const rData of recentResults) {
           for (const log of rData.logs || []) {

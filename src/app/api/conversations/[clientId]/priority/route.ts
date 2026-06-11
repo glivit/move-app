@@ -1,3 +1,4 @@
+import { getUserVerified } from '@/lib/auth-fast'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -14,7 +15,7 @@ export async function PATCH(
   try {
     const { clientId } = await params
     const supabase = await createServerSupabaseClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user } } = await getUserVerified(supabase)
 
     if (!user) {
       return NextResponse.json({ error: 'Niet geauthenticeerd' }, { status: 401 })
@@ -40,7 +41,7 @@ export async function GET(
   try {
     const { clientId } = await params
     const supabase = await createServerSupabaseClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user } } = await getUserVerified(supabase)
 
     if (!user) {
       return NextResponse.json({ error: 'Niet geauthenticeerd' }, { status: 401 })

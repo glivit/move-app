@@ -1,3 +1,4 @@
+import { getUserVerified } from '@/lib/auth-fast'
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 import { createAdminClient } from '@/lib/supabase-admin';
 import { createRoom } from '@/lib/daily';
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser();
+    } = await getUserVerified(supabase);
 
     if (authError || !user) {
       return NextResponse.json(
@@ -159,7 +160,7 @@ export async function GET(request: NextRequest) {
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser();
+    } = await getUserVerified(supabase);
 
     if (authError || !user) {
       return NextResponse.json(

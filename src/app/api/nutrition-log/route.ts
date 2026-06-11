@@ -25,21 +25,39 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Get meal logs
-  const { data: logs } = await db
-    .from('nutrition_logs')
-    .select('*')
-    .eq('client_id', clientId)
-    .eq('date', date)
-    .order('created_at')
+  // Range-mode: ?days=N → alle logs van de laatste N dagen in ÉÉN query.
+  // Vervangt de 7 aparte requests die de recent-foods lijst deed
+  // (7× function-invocatie + auth + query → 1×).
+  const daysParam = searchParams.get('days')
+  if (daysParam) {
+    const days = Math.min(Math.max(parseInt(daysParam, 10) || 7, 1), 31)
+    const from = new Date(date)
+    from.setDate(from.getDate() - (days - 1))
+    const fromStr = from.toISOString().split('T')[0]
+    const { data: rangeLogs } = await db
+      .from('nutrition_logs')
+      .select('meal_id, foods_eaten, date')
+      .eq('client_id', clientId)
+      .gte('date', fromStr)
+      .lte('date', date)
+    const response = NextResponse.json({ logs: rangeLogs || [] })
+    response.headers.set('Cache-Control', 'private, max-age=300, stale-while-revalidate=900')
+    return response
+  }
 
-  // Get daily summary
-  const { data: summary } = await db
-    .from('nutrition_daily_summary')
-    .select('*')
-    .eq('client_id', clientId)
-    .eq('date', date)
-    .single()
+  // Meal logs + daily summary parallel (was sequentieel: 2 roundtrips na elkaar)
+  const [{ data: logs }, { data: summary }] = await Promise.all([
+    db.from('nutrition_logs')
+      .select('*')
+      .eq('client_id', clientId)
+      .eq('date', date)
+      .order('created_at'),
+    db.from('nutrition_daily_summary')
+      .select('*')
+      .eq('client_id', clientId)
+      .eq('date', date)
+      .single(),
+  ])
 
   const response = NextResponse.json({ logs: logs || [], summary: summary || null })
   response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=120')

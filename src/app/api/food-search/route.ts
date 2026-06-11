@@ -1,3 +1,4 @@
+import { getUserVerified } from '@/lib/auth-fast'
 import { NextRequest, NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase-admin"
 import { createServerSupabaseClient } from '@/lib/supabase-server'
@@ -259,7 +260,7 @@ async function searchLocalProducts(
 export async function POST(request: NextRequest) {
   try {
     let supabase: any; try { supabase = createAdminClient() } catch { supabase = await createServerSupabaseClient() }
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user } } = await getUserVerified(supabase)
 
     if (!user) {
       return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 })

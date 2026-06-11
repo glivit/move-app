@@ -1,3 +1,4 @@
+import { getUserVerified } from '@/lib/auth-fast'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { stripe, getPriceId } from '@/lib/stripe'
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest) {
   try {
     // Verify the requesting user is a coach
     const supabase = await createServerSupabaseClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user } } = await getUserVerified(supabase)
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

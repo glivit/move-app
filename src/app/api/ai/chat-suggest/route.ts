@@ -1,3 +1,4 @@
+import { getUserVerified } from '@/lib/auth-fast'
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
@@ -14,7 +15,7 @@ export const maxDuration = 15
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const { data: { user }, error: authError } = await getUserVerified(supabase)
     if (authError || !user) {
       return NextResponse.json({ error: 'Niet geauthenticeerd' }, { status: 401 })
     }

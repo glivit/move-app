@@ -1,3 +1,4 @@
+import { getUserVerified } from '@/lib/auth-fast'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { sendPushToUser, sendPushToUsers } from '@/lib/push-server'
@@ -7,7 +8,7 @@ import { NextRequest, NextResponse } from 'next/server'
 // Both coach→client and client→coach push notifications
 export async function POST(req: NextRequest) {
   const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user } } = await getUserVerified(supabase)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()

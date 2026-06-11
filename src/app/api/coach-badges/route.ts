@@ -1,3 +1,4 @@
+import { getUserVerified } from '@/lib/auth-fast'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { NextResponse } from 'next/server'
 
@@ -8,7 +9,7 @@ import { NextResponse } from 'next/server'
 export async function GET() {
   try {
     const supabase = await createServerSupabaseClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user } } = await getUserVerified(supabase)
     if (!user) return NextResponse.json({})
 
     const [unseenWorkouts, unreadMessages, pendingCheckins] = await Promise.all([

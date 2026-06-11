@@ -1,3 +1,4 @@
+import { getUserVerified } from '@/lib/auth-fast'
 import { createAdminClient } from '@/lib/supabase-admin'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { NextRequest, NextResponse } from 'next/server'
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
   try {
     // Verify the caller is a coach
     const userSupabase = await createServerSupabaseClient()
-    const { data: { user } } = await userSupabase.auth.getUser()
+    const { data: { user } } = await getUserVerified(userSupabase)
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

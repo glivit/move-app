@@ -1,3 +1,4 @@
+import { getUserVerified } from '@/lib/auth-fast'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { NextRequest, NextResponse } from 'next/server'
 import webpush from 'web-push'
@@ -20,7 +21,7 @@ export async function GET(req: NextRequest) {
 
   // 2. Check auth
   const supabase = await createServerSupabaseClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await getUserVerified(supabase)
   diagnostics.auth = {
     authenticated: !!user,
     userId: user?.id || null,

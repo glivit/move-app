@@ -1,3 +1,4 @@
+import { getUserVerified } from '@/lib/auth-fast'
 import { createServerSupabaseClient } from '@/lib/supabase-server';
 import { createAdminClient } from '@/lib/supabase-admin';
 import { NextRequest, NextResponse } from 'next/server';
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest, { params }: GetSessionParams) {
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser();
+    } = await getUserVerified(supabase);
 
     if (authError || !user) {
       return NextResponse.json(
@@ -126,7 +127,7 @@ export async function PATCH(
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser();
+    } = await getUserVerified(supabase);
 
     if (authError || !user) {
       return NextResponse.json(

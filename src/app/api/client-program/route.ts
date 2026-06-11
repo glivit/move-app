@@ -2,9 +2,8 @@ import { getAuthFast } from '@/lib/auth-fast'
 import { NextRequest, NextResponse } from 'next/server'
 
 // GET: Fetch the active program for the authenticated client
-// getAuthFast() = local JWT parse (~0ms) i.p.v. supabase.auth.getUser()
-// (network call ~300-500ms). Middleware verifieert al via getUser bij
-// cookie-miss; deze helper trust-een de gevalideerde JWT.
+// getAuthFast() — lokale JWT-verificatie (ES256/JWKS, ~0ms) i.p.v. een
+// netwerk-call per request.
 export async function GET(request: NextRequest) {
   try {
     const { user, supabase } = await getAuthFast()

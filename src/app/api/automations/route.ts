@@ -1,3 +1,4 @@
+import { getUserVerified } from '@/lib/auth-fast'
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-admin'
@@ -6,7 +7,7 @@ import { createAdminClient } from '@/lib/supabase-admin'
 export async function GET() {
   try {
     const supabase = await createServerSupabaseClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const { data: { user }, error: authError } = await getUserVerified(supabase)
     if (authError || !user) {
       return NextResponse.json({ error: 'Niet geauthenticeerd' }, { status: 401 })
     }
@@ -59,7 +60,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const { data: { user }, error: authError } = await getUserVerified(supabase)
     if (authError || !user) {
       return NextResponse.json({ error: 'Niet geauthenticeerd' }, { status: 401 })
     }
@@ -115,7 +116,7 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const { data: { user }, error: authError } = await getUserVerified(supabase)
     if (authError || !user) {
       return NextResponse.json({ error: 'Niet geauthenticeerd' }, { status: 401 })
     }
@@ -172,7 +173,7 @@ export async function PATCH(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const { data: { user }, error: authError } = await getUserVerified(supabase)
     if (authError || !user) {
       return NextResponse.json({ error: 'Niet geauthenticeerd' }, { status: 401 })
     }
