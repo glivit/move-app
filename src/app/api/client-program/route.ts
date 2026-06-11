@@ -46,9 +46,11 @@ export async function GET(request: NextRequest) {
     weekStart.setHours(0, 0, 0, 0)
 
     const [templateDaysRes, completedSessionsRes] = await Promise.all([
+      // Nested select: exercise-ids meteen mee → spaart de aparte
+      // (sequentiële) count-query uit die hierna nog een 3e DB-roundtrip was.
       adminClient
         .from('program_template_days')
-        .select('*')
+        .select('*, program_template_exercises(id)')
         .eq('template_id', activeProgram.template_id)
         .order('sort_order', { ascending: true }),
       adminClient
@@ -67,25 +69,17 @@ export async function GET(request: NextRequest) {
     const templateDays = templateDaysRes.data
     const completedSessions = completedSessionsRes.data
 
-    // Get exercise counts for ALL days in a single query (fixes N+1)
-    const dayIds = (templateDays || []).map((d: { id: string }) => d.id)
-    const { data: allExercises } = dayIds.length > 0
-      ? await adminClient
-          .from('program_template_exercises')
-          .select('template_day_id')
-          .in('template_day_id', dayIds)
-      : { data: [] }
-
-    // Count exercises per day in memory
-    const exerciseCountMap: Record<string, number> = {}
-    for (const ex of allExercises || []) {
-      exerciseCountMap[ex.template_day_id] = (exerciseCountMap[ex.template_day_id] || 0) + 1
-    }
-
-    const days = (templateDays || []).map((day: { id: string } & Record<string, unknown>) => ({
-      ...day,
-      exercise_count: exerciseCountMap[day.id] || 0,
-    }))
+    // exercise_count uit de nested select — geen aparte roundtrip meer.
+    // De nested id-array strippen we uit de payload (alleen de count telt).
+    const days = (templateDays || []).map(
+      (day: { id: string; program_template_exercises?: { id: string }[] } & Record<string, unknown>) => {
+        const { program_template_exercises, ...rest } = day
+        return {
+          ...rest,
+          exercise_count: program_template_exercises?.length || 0,
+        }
+      },
+    )
 
     const uniqueCompletedDays = new Set(
       (completedSessions || []).map(s => s.template_day_id)

@@ -41,22 +41,44 @@ export default function ClientLayoutShell({ children }: { children: React.ReactN
   const pathname = usePathname()
   const router = useRouter()
 
-  // ─── Route prefetch only — API warmup REMOVED ─────────────────────
-  // Eerdere experiment met parallel API-warmup maakte het traag i.p.v.
-  // sneller: 3 parallelle fetches × middleware getUser() × dev compile
-  // = network congestie die concurreerde met de user's eigen tab-click.
-  // Nu enkel route-bundle prefetch (gratis, geen DB-load).
+  // ─── Route prefetch + STAGED data-warmup ───────────────────────────
+  // Routes (RSC/JS) na 1.5s; daarna de tab-API's SEQUENTIEEL voorladen
+  // zodat ook het éérste tab-bezoek instant data heeft.
+  //
+  // Een eerdere parallelle warmup maakte het juist trager — maar dat was
+  // mét netwerk-auth per API-call (~400ms) in dev-mode. Nu: lokale
+  // JWT-verificatie, productie-shells, en strikt één request tegelijk
+  // ná de eerste paint → geen concurrentie met de critical path.
+  //   - client-program via cachedFetch → vult de in-memory Map die de
+  //     workout-page zelf gebruikt (instant resolve bij tap)
+  //   - progress + nutrition via plain fetch → primet de browser-cache
+  //     (beide API's sturen Cache-Control private + SWR headers)
   useEffect(() => {
-    const id = setTimeout(() => {
+    let cancelled = false
+    const routeId = setTimeout(() => {
+      ;['/client/workout', '/client/nutrition', '/client/progress']
+        .forEach(r => router.prefetch(r))
+    }, 1500)
+
+    const dataId = setTimeout(() => {
       const ric = (window as { requestIdleCallback?: (cb: () => void) => void }).requestIdleCallback
-      const prefetch = () => {
-        ;['/client/workout', '/client/nutrition', '/client/progress']
-          .forEach(r => router.prefetch(r))
+      const warm = async () => {
+        if (cancelled) return
+        try {
+          const { cachedFetch } = await import('@/lib/fetcher')
+          await cachedFetch('/api/client-program', { maxAge: 60_000 }).catch(() => {})
+          if (cancelled) return
+          await fetch('/api/progress').catch(() => {})
+          if (cancelled) return
+          const today = new Date().toISOString().split('T')[0]
+          await fetch(`/api/nutrition-log?date=${today}`).catch(() => {})
+        } catch { /* warmup is best-effort */ }
       }
-      if (ric) ric(prefetch)
-      else prefetch()
-    }, 3000)
-    return () => clearTimeout(id)
+      if (ric) ric(() => { warm() })
+      else warm()
+    }, 2500)
+
+    return () => { cancelled = true; clearTimeout(routeId); clearTimeout(dataId) }
   }, [router])
 
   // ─── Sync-queue bootstrap ─────────────────────────────────────────
